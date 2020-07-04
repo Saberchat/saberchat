@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html>
+<link rel="stylesheet" href="styles.css">
+<script src="js.js"></script>
+<head>
+	<title>Saberchat</title>
+  <h1>Welcome to Saberchat!</h1>
+</head>
+<body>
+	<h2>Modal Signup Form</h2>
+
+<button onclick="document.getElementById('id01').style.display='block'" style="width:auto;">Sign In/Sign Up</button>
+
+<div id="id01" class="modal">
+  <span onclick="document.getElementById('id01').style.display='none'" class="close" title="Close Modal">&times;</span>
+  <form class="modal-content" action="/action_page.php">
+    <div class="container">
+      <h1>Sign In/Sign Up</h1>
+      <p>Please fill in this form to login or sign up.</p>
+      <hr>
+      <label for="email"><b>Email</b></label>
+      <input type="text" placeholder="Enter Email" name="email" required>
+
+      <label for="psw"><b>Password</b></label>
+      <input type="password" placeholder="Enter Password" name="psw" required>
+
+
+
+      <div class="clearfix">
+        <button type="button" onclick="document.getElementById('id01').style.display='none'" class="cancelbtn">Cancel</button>
+        <button type="submit" class="signupbtn">Sign In/Sign Up</button>
+      </div>
+    </div>
+  </form>
+</div>
+
+
+		<script>
+		var input = document.getElementById("myInput");
+		input.addEventListener("keyup", function(event) {
+		  if (event.keyCode === 13) {
+		   event.preventDefault();
+		   document.getElementById("myBtn").click();
+		  }
+		});
+		</script>
+
+<div class="container">
+  <img src="/w3images/bandmember.jpg" alt="Avatar">
+  <p>Hello. How are you today?</p>
+  <span class="time-right">11:00</span>
+</div>
+<div class="darker container">
+  <img src="/w3images/bandmember.jpg" alt="Avatar">
+  <p>Hello. How are you today?</p>
+  <span class="time-right">11:00</span>
+</div>
+<div class="container">
+  <img src="/w3images/bandmember.jpg" alt="Avatar">
+  <p>Hello. How are you today?</p>
+  <span class="time-right">11:00</span>
+</div>
+<div class="darker container">
+  <img src="/w3images/bandmember.jpg" alt="Avatar">
+  <p>Hello. How are you today?</p>
+  <span class="time-right">11:00</span>
+</div>
+<p>
+	Message
+	<p>
+		<input id="myInput" value=" ">
+			<button id="myBtn" onclick="javascript:alert('Hello World!')">Enter</button>
+
+</body>
+</html>
