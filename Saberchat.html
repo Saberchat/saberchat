@@ -32,11 +32,11 @@
     <!-- Navbar links -->
     <div class="collapse navbar-collapse" id="collapsibleNavbar">
       <ul class="navbar-nav ml-auto">
-        <li class="nav-item ">
+        <li class="nav-item">
           <a class="nav-link" href="#">Register</a>
         </li>
         <li class="nav-item">
-          <a class="nav-link" href="#">Login</a>
+          <a class="nav-link" href="#" id="login">Login</a>
         </li>
         <li class="nav-item">
           <a class="nav-link" href="#">Logout</a>
@@ -44,10 +44,24 @@
       </ul>
     </div>
   </nav>
-  <div class="container-fluid text-center" style="margin-bottom:0">
-    <h1>Saberchat</h1>
-    <p>Welcome to Saberchat, Alsion's very own texting service!</p>
-  </div>
+  <section id="background">
+    <div class="container-fluid text-center" style="margin-bottom:0">
+      <div class="row">
+        <div class="col-12 background-title">
+          <h1>Saberchat</h1>
+          <p>Welcome to Saberchat, Alsion's very own texting service!</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <script>
+    $('#login').on('click', function() {
+      $("#id01").css({"display":"block", "width":"auto"});
+    });
+  </script>
+
+  
 
 
 
@@ -62,14 +76,15 @@
 	<div class="jumbotron text-center" style="margin-bottom:0">
   <h1>Saberchat</h1>
   <p>Welcome to Saberchat, Alsion's very own texting service!</p>
-</div>
+</div> -->
 
 
 
-<div id="id01" class="modal">
-  <span onclick="document.getElementById('id01').style.display='none'" class="close" title="Close Modal">&times;</span>
-  <form class="modal-content" action="/action_page.php">
+<div id="id01" class="model">
+  
+  <form class="model-content">
     <div class="container">
+      <span onclick="document.getElementById('id01').style.display='none'" class="close" title="Close Modal">&times;</span>
       <h1>Sign In/Sign Up</h1>
       <p>Please fill in this form to login or sign up.</p>
       <hr>
@@ -78,13 +93,10 @@
 
       <label for="psw"><b>Password</b></label>
       <input type="password" placeholder="Enter Password" name="psw" required>
-
-
-
-      <div class="clearfix">
-        <button type="button" onclick="document.getElementById('id01').style.display='none'" class="cancelbtn">Cancel</button>
-        <button type="submit" class="signupbtn">Sign In/Sign Up</button>
-      </div>
+    </div>
+    <div class="clearfix">
+      <button type="button" onclick="document.getElementById('id01').style.display='none'" class="cancelbtn">Cancel</button>
+      <button type="submit" class="signupbtn">Sign In/Sign Up</button>
     </div>
   </form>
 </div>
@@ -101,7 +113,7 @@
 		</script>
 
 
-<p>
+<!-- <p>
 	Message
 	<p>
 		<input id="myInput" value=" ">

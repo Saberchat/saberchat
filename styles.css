@@ -51,24 +51,25 @@ button:hover {
 }
 
 /* The Modal (background) */
-.modal {
+.model {
   display: none; /* Hidden by default */
   position: fixed; /* Stay in place */
   z-index: 1; /* Sit on top */
-  left: 0;
+  left: 20%;
+  right:20%;
   top: 0;
-  width: 100%; /* Full width */
   height: 100%; /* Full height */
   overflow: auto; /* Enable scroll if needed */
-  background-color: #474e5d;
-  padding-top: 50px;
+  /* background-color: #474e5d;
+  padding-top: 50px; */
 }
 
 /* Modal Content/Box */
-.modal-content {
+.model-content {
+  position: relative;
   background-color: #fefefe;
   margin: 5% auto 15% auto; /* 5% from the top, 15% from the bottom and centered */
-  border: 1px solid #888;
+  /* border: 1px solid #888; */
   width: 80%; /* Could be more or less, depending on screen size */
 }
 
@@ -81,8 +82,8 @@ hr {
 /* The Close Button (x) */
 .close {
   position: absolute;
-  right: 35px;
-  top: 15px;
+  right: 15px;
+  /* top: 15px; */
   font-size: 40px;
   font-weight: bold;
   color: #f1f1f1;
@@ -108,9 +109,9 @@ hr {
   }
 } 
 .container {
-  border: 2px solid #dedede;
-  background-color: #f1f1f1;
-  border-radius: 5px;
+  /* border: 2px solid #dedede; */
+  /* background-color: #f1f1f1; */
+  /* border-radius: 5px; */
   padding: 10px;
   margin: 10px 0;
 }
@@ -154,4 +155,38 @@ hr {
 .time-left {
   float: left;
   color: #999;
+}
+
+#background{
+  background-image: url(https://images.unsplash.com/photo-1594793861747-136c34047e9d?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=1952&q=80);
+  background-position: center;
+  background-size: cover;
+  min-height: 40rem;
+  position: relative;
+}
+
+.col-12.background-title {
+  position: absolute;
+  top: 30%;
+}
+
+.col-12.background-title > h1, .col-12.background-title > p {
+  color: white;
+  text-shadow: 0px 4px 3px rgba(0, 0, 0, 0.4),
+                 0px 8px 13px rgba(0, 0, 0, 0.1),
+                 0px 18px 23px rgba(0, 0, 0, 0.1);
+}
+
+.col-12.background-title > h1 {
+  font-size: 6rem;
+  font-weight: 500;
+}
+
+.col-12.background-title > p {
+  font-size: 1.5rem;
+  font-weight: 300;
+}
+
+html, body {
+  min-height: 100vh;
 }
