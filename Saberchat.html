@@ -17,32 +17,33 @@
   }
   </style>
 
-
-
 <body>
   <nav class="navbar navbar-expand-md bg-dark navbar-dark">
-    <!-- Brand  (change link to home page)-->
-    <a class="navbar-brand" href="#">Saberchat</a>
+    <div class="container" id="nav-container">
+      <!-- Brand  (change link to home page)-->
+      <a class="navbar-brand" href="#">Saberchat</a>
 
-    <!-- Toggler/collapsibe Button -->
-    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#collapsibleNavbar">
-      <span class="navbar-toggler-icon"></span>
-    </button>
+      <!-- Toggler/collapsibe Button -->
+      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#collapsibleNavbar">
+        <span class="navbar-toggler-icon"></span>
+      </button>
 
-    <!-- Navbar links -->
-    <div class="collapse navbar-collapse" id="collapsibleNavbar">
-      <ul class="navbar-nav ml-auto">
-        <li class="nav-item">
-          <a class="nav-link" href="#">Register</a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" href="#" id="login">Login</a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" href="#">Logout</a>
-        </li>
-      </ul>
+      <!-- Navbar links -->
+      <div class="collapse navbar-collapse" id="collapsibleNavbar">
+        <ul class="navbar-nav ml-auto">
+          <li class="nav-item">
+            <a class="nav-link" href="#">Register</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="#" id="login">Login</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="#">Logout</a>
+          </li>
+        </ul>
+      </div>
     </div>
+    
   </nav>
   <section id="background">
     <div class="container-fluid text-center" style="margin-bottom:0">
@@ -55,69 +56,37 @@
     </div>
   </section>
 
+  <div id="id01" class="model">
+    <form class="model-content">
+      <div class="container">
+        <span onclick="document.getElementById('id01').style.display='none'" class="close" title="Close Modal">&times;</span>
+        <h1>Sign In/Sign Up</h1>
+        <p>Please fill in this form to login or sign up.</p>
+        <hr>
+        <label for="email"><b>Email</b></label>
+        <input type="text" placeholder="Enter Email" name="email" required>
+
+        <label for="psw"><b>Password</b></label>
+        <input type="password" placeholder="Enter Password" name="psw" required>
+      </div>
+      <div class="clearfix">
+        <button type="button" onclick="document.getElementById('id01').style.display='none'" class="cancelbtn">Cancel</button>
+        <button type="submit" class="signupbtn">Sign In/Sign Up</button>
+      </div>
+    </form>
+  </div>
+
   <script>
     $('#login').on('click', function() {
       $("#id01").css({"display":"block", "width":"auto"});
     });
+    var input = document.getElementById("myInput");
+    input.addEventListener("keyup", function(event) {
+      if (event.keyCode === 13) {
+      event.preventDefault();
+      document.getElementById("myBtn").click();
+      }
+    });
   </script>
-
-  
-
-
-
-	<!-- <nav class="navbar navbar-expand-sm bg-dark navbar-dark">
-	  <a class="navbar-brand" href="#">Navbar</a>
-	  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#collapsibleNavbar">
-	    <span class="navbar-toggler-icon"></span>
-	  </button>
-
-
-	<button onclick="document.getElementById('id01').style.display='block'" style="width:auto;">Sign In/Sign Up</button>
-	<div class="jumbotron text-center" style="margin-bottom:0">
-  <h1>Saberchat</h1>
-  <p>Welcome to Saberchat, Alsion's very own texting service!</p>
-</div> -->
-
-
-
-<div id="id01" class="model">
-  
-  <form class="model-content">
-    <div class="container">
-      <span onclick="document.getElementById('id01').style.display='none'" class="close" title="Close Modal">&times;</span>
-      <h1>Sign In/Sign Up</h1>
-      <p>Please fill in this form to login or sign up.</p>
-      <hr>
-      <label for="email"><b>Email</b></label>
-      <input type="text" placeholder="Enter Email" name="email" required>
-
-      <label for="psw"><b>Password</b></label>
-      <input type="password" placeholder="Enter Password" name="psw" required>
-    </div>
-    <div class="clearfix">
-      <button type="button" onclick="document.getElementById('id01').style.display='none'" class="cancelbtn">Cancel</button>
-      <button type="submit" class="signupbtn">Sign In/Sign Up</button>
-    </div>
-  </form>
-</div>
-
-
-		<script>
-		var input = document.getElementById("myInput");
-		input.addEventListener("keyup", function(event) {
-		  if (event.keyCode === 13) {
-		   event.preventDefault();
-		   document.getElementById("myBtn").click();
-		  }
-		});
-		</script>
-
-
-<!-- <p>
-	Message
-	<p>
-		<input id="myInput" value=" ">
-			<button id="myBtn" onclick="javascript:alert('Hello World!')">Enter</button> -->
-
 </body>
 </html>
