@@ -1,0 +1,61 @@
+
+/* Makesure body and html elements go all the way down */
+html, body {
+    min-height: 100vh;
+}
+
+/* 
+================================
+background
+================================
+ */
+#background{
+    background-image: url(https://images.unsplash.com/photo-1594793861747-136c34047e9d?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=1952&q=80);
+    background-position: center;
+    background-size: cover;
+    min-height: 40rem;
+    position: relative;
+}
+
+.col-12.background-title {
+    position: absolute;
+    top: 30%;
+}
+
+.col-12.background-title > h1, .col-12.background-title > p {
+    color: white;
+    text-shadow: 0px 4px 3px rgba(0, 0, 0, 0.4),
+                    0px 8px 13px rgba(0, 0, 0, 0.1),
+                    0px 18px 23px rgba(0, 0, 0, 0.1);
+}
+
+.col-12.background-title > h1 {
+    font-size: 6rem;
+    font-weight: 500;
+}
+
+.col-12.background-title > p {
+    font-size: 1.5rem;
+    font-weight: 300;
+}
+
+/* 
+================================
+User login form
+================================
+ */
+.user-login-form {
+    position: fixed;
+    right: 10%;
+    z-index: 1;
+    background-color: white;
+    padding: 15px;
+    display: none;
+}
+
+.form-close {
+    position: absolute;
+    right: 1rem;
+    top: 0.3rem;
+    font-size: 1.5rem;
+}
