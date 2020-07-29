@@ -44,13 +44,31 @@ background
 User login form
 ================================
  */
-.user-login-form {
+/* .user-form {
     position: fixed;
     right: 10%;
     z-index: 1;
     background-color: white;
     padding: 15px;
     display: none;
+} */
+
+.user-form {
+    position: fixed;
+    right: 10%;
+    z-index: 1;
+    background-color: white;
+    padding: 0 15px;
+    height: 0;
+    overflow: hidden;
+    transition: height ease-out 500ms;
+    -webkit-transition: height ease-out 500ms;
+}
+
+.display {
+    height: 275px;
+    transition: height ease-out 500ms;
+    -webkit-transition: height ease-out 500ms;
 }
 
 .form-close {
