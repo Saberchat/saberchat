@@ -37,18 +37,7 @@ app.use(function(req, res, next) {
 });
 
 app.get('/', (req, res) => {
-	Comment.find({}, function(err, foundComments){
-		if(err){
-			console.log(err)
-		} else {
-			// console.log(foundComments)
-			if(!foundComments){
-				console.log('no found comments!')
-			}
-			comments = foundComments
-			res.render('index', {comments: comments});
-		}
-	});
+	res.render('index');
 });
 
 app.get('/chat', (req, res) => {
@@ -61,7 +50,7 @@ app.get('/chat', (req, res) => {
 				console.log('no found comments!')
 			}
 			comments = foundComments
-			res.render('chat', {comments: comments});
+			res.render('chat', {comments: comments, user: JSON.stringify(req.user.username)});
 		}
 	});
 });
@@ -88,8 +77,7 @@ app.post("/register",  function(req, res) {
 
 app.post("/login", passport.authenticate("local", {
 	successRedirect: "/chat",
-	failureRedirect: "/",
-	failureFlash: true
+	failureRedirect: "/"
 }), function(req, res) {
 });
 
@@ -106,17 +94,17 @@ io.on('connection', (socket) => {
 	});
 	socket.on('chat message', (msg) => {
 		io.emit('chat message', msg);
-		// console.log(msg)
+		console.log(msg);
 
 		// Leave commented until you need to actually create comments. prevent useless comments from flooding DB
 		
-		Comment.create({text: msg}, function(err, comment) {
-			if(err) {
-				console.log(err);
-			} else {
-				console.log('comment created: '+ comment)
-			}
-		});
+		// Comment.create({text: msg}, function(err, comment) {
+		// 	if(err) {
+		// 		console.log(err);
+		// 	} else {
+		// 		console.log('comment created: '+ comment)
+		// 	}
+		// });
 	});
 });
 

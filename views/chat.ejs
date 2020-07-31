@@ -7,6 +7,8 @@
         <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css" integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk" crossorigin="anonymous">
 
         <script src="https://kit.fontawesome.com/dccc745c41.js" crossorigin="anonymous"></script>
+        <script src="/socket.io/socket.io.js"></script>
+        <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
     </head>
     <body>
         <style>
@@ -98,17 +100,41 @@
                         <% }); %>
                     </ul>  
                     <% if(currentUser) { %>
-                        <form action="" id="message-form">
-                            <input id="m" autocomplete="off" type="text"/><button>Send</button>
+                        <form id="message-form">
+                            <input id="m" autocomplete="off" type="text"/>
+                            <button>Send</button>
                         </form>
+                        <!-- <script>var user = <%= currentUser %></script> -->
                     <% } else { %>
                         <div id="message-form"><h1>Login To Post!</h1></div>
                     <% } %>
                 </div>
             </div>
         </div>
-        <script src="/socket.io/socket.io.js"></script>
-        <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
-        <script src="/javascript/socket.js"></script>
+        <script>
+            var user = JSON.parse('<%- user %>');
+            $(function() {
+                var socket = io();
+                var nick = null;
+                $('#message-form').submit(function(e) {
+                    e.preventDefault(); // prevents page reloading
+                    
+                    socket.emit('chat message', {'text': $('#m').val(), 'author': user});
+                    $('#m').val('');
+                    return false;
+                });
+
+                socket.on('chat message', function(msg) {
+                    // $('#messages').append($('<li>').text(msg));
+                    $('#messages').append(
+                        "<li>\
+                        <i class='fas fa-user-circle avatar'></i>\
+                            <p>" + msg['author'] + ": " + msg['text'] +  "</p>\
+                        </li>"
+                    );
+                });
+                socket.on('')
+            });
+        </script>
     </body>
 </html>
