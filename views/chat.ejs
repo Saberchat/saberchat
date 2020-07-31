@@ -5,88 +5,14 @@
         <meta name="viewport">
         <title>SaberChat</title>
         <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css" integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk" crossorigin="anonymous">
+        <link rel="stylesheet" href="/stylesheets/chat.css">
 
         <script src="https://kit.fontawesome.com/dccc745c41.js" crossorigin="anonymous"></script>
         <script src="/socket.io/socket.io.js"></script>
         <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+        <script src="/javascript/socket.js"></script>
     </head>
     <body>
-        <style>
-
-            @media (min-width: 768px) {
-                html {
-                    height: 100vh;
-                }
-                body {
-                    height: 100vh;
-                }
-                #message-form {
-                    position: absolute;
-                    bottom: 0;
-                    left: 0;
-                    right: 0;
-                    height: 50px;
-                }
-
-                #message-form > button {
-                    width: 15%;
-                    height: 100%;
-                    border: none;
-                    background-color: #aaa7a4;
-                    font-weight: 600;
-                    color: white;
-                }
-
-                #m {
-                    border: 3px solid #aaa7a4;
-                    width: 85%;
-                    height: 100%;
-                    padding: 20px;
-                }
-
-                div.chat {
-                    position: relative;
-                    padding: 0;
-                }
-
-                #messages {
-                    list-style: none;
-                    padding: 0;
-                    width: 100%;
-                }
-
-                li {
-                    padding-top: 10px;
-                    padding-left: 20px;
-                    position: relative;
-                }
-
-                li > p {
-                    display: inline-block;
-                    margin-left: 40px;
-                    width: 90%;
-                }
-
-                li:nth-child(even) {
-                    background-color: #d4d3d1;
-                }
-
-                .avatar {
-                    border-radius: 50%;
-                    position: absolute;
-                    top: 10px;
-                }
-            }
-
-            div.user {
-                background-color: #e49f5a;
-                color: white;
-                padding: 3rem;
-            }
-            div.row {
-                min-height: 100vh;
-            }
-        </style>
         <div class="container"></div>
         <div class="container-fluid">
             <div class="row">
@@ -95,7 +21,11 @@
                         <% comments.forEach(function(comment){ %>
                             <li>
                                 <i class="fas fa-user-circle avatar"></i>
-                                <p><%= comment['text'] %></p>
+                                <% if (comment.author.username) { %>
+                                    <p><%= comment.author.username %>: <%= comment['text'] %></p>
+                                <% } else { %>
+                                    <p><%= comment['text'] %></p>
+                                <% } %>
                             </li>
                         <% }); %>
                     </ul>  
@@ -104,37 +34,20 @@
                             <input id="m" autocomplete="off" type="text"/>
                             <button>Send</button>
                         </form>
-                        <!-- <script>var user = <%= currentUser %></script> -->
+                        <script>
+                            const username = '<%= currentUser.username %>';
+                            const userId = '<%= currentUser._id %>';
+                            const messageForm = '#message-form';
+                            const input = '#m';
+                            const chatDisplay = '#messages';
+                
+                            chatInit(username, userId, messageForm, input, chatDisplay);
+                        </script>
                     <% } else { %>
                         <div id="message-form"><h1>Login To Post!</h1></div>
                     <% } %>
                 </div>
             </div>
         </div>
-        <script>
-            var user = JSON.parse('<%- user %>');
-            $(function() {
-                var socket = io();
-                var nick = null;
-                $('#message-form').submit(function(e) {
-                    e.preventDefault(); // prevents page reloading
-                    
-                    socket.emit('chat message', {'text': $('#m').val(), 'author': user});
-                    $('#m').val('');
-                    return false;
-                });
-
-                socket.on('chat message', function(msg) {
-                    // $('#messages').append($('<li>').text(msg));
-                    $('#messages').append(
-                        "<li>\
-                        <i class='fas fa-user-circle avatar'></i>\
-                            <p>" + msg['author'] + ": " + msg['text'] +  "</p>\
-                        </li>"
-                    );
-                });
-                socket.on('')
-            });
-        </script>
     </body>
 </html>

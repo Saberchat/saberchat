@@ -6,6 +6,20 @@ html, body {
 
 /* 
 ================================
+flash messages
+================================
+ */
+
+#flash {
+    position: absolute;
+    z-index: 1;
+    min-width: 400px;
+    left: 50%;
+    margin-left: -200px;
+}
+
+/* 
+================================
 background
 ================================
  */
