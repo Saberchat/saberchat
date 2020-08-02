@@ -1,9 +1,10 @@
 const   express = require('express'),
-        router = express.Router();
+		router = express.Router(),
+		middleware = require('../middleware');
 
 const   Comment = require('../models/comment');
 
-router.get('/chat', (req, res) => {
+router.get('/chat', middleware.isLoggedIn, (req, res) => {
 	Comment.find({}, function(err, foundComments){
 		if(err){
             console.log(err);
