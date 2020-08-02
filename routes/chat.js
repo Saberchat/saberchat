@@ -14,7 +14,7 @@ router.get('/chat', middleware.isLoggedIn, (req, res) => {
 				console.log('no found comments!');
 			}
 			comments = foundComments
-			res.render('chat', {comments: foundComments});
+			res.render('chat/index', {comments: foundComments});
 		}
 	});
 });

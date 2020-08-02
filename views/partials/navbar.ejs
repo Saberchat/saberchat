@@ -25,9 +25,19 @@
             </ul>
             <ul class="navbar-nav ml-auto">
                 <% if(currentUser) { %>
-                    <li class="nav-item">
+                    <!-- <li class="nav-item">
                         <a class="nav-link" href="/logout">Logout</a>
-                    </li>
+                    </li> -->
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        Welcome <%= currentUser.username %>
+                        </a>
+                        <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
+                          <a class="dropdown-item" href="/profile">View Profile</a>
+                          <a class="dropdown-item" href="/logout">Logout</a>
+                          <a class="dropdown-item" href="#">Something else here</a>
+                        </div>
+                      </li>
                 <% } else { %>
                     <li class="nav-item">
                         <a class="nav-link user-form-btn signup">Register</a>
@@ -45,12 +55,12 @@
 <form class="user-form login" action="/login" method="post">
     <span class="form-close text-danger login"><i class="far fa-window-close"></i></span>
     <div class="form-group mt-3">
-        <label for="email">Email address</label>
-        <input name="email" type="email" class="form-control" id="email" placeholder="enter email">
+        <label for="email-login">Email address</label>
+        <input name="email" type="email" class="form-control" id="email-login" placeholder="enter email">
     </div>
     <div class="form-group">
-        <label for="password">Password</label>
-        <input name="password" type="password" class="form-control" id="password" placeholder="enter password">
+        <label for="password-login">Password</label>
+        <input name="password" type="password" class="form-control" id="password-login" placeholder="enter password">
     </div>
     <button type="submit" class="btn btn-success float-right">Login</button>
 </form>
@@ -59,17 +69,17 @@
 <form class="user-form signup" action="/register" method="post">
     <span class="form-close text-danger signup"><i class="far fa-window-close"></i></span>
     <div class="form-group mt-3">
-        <label for="username">Username</label>
-        <input name="username" type="text" class="form-control" id="username" placeholder="enter username">
+        <label for="username-signup">Username</label>
+        <input name="username" type="text" class="form-control" id="username-signup" placeholder="enter username">
     </div>
     <div class="form-group">
-        <label for="email">Email address</label>
-        <input name="email" type="email" class="form-control" id="email" aria-describedby="emailHelp" placeholder="enter email">
+        <label for="email-signup">Email address</label>
+        <input name="email" type="email" class="form-control" id="email-signup" aria-describedby="emailHelp" placeholder="enter email">
         <small id="emailHelp" class="form-text text-muted">We'll never share your email with anyone else.</small>
     </div>
     <div class="form-group">
-        <label for="password">Password</label>
-        <input name="password" type="password" class="form-control" id="password" placeholder="enter password">
+        <label for="password-signup">Password</label>
+        <input name="password" type="password" class="form-control" id="password-signup" placeholder="enter password">
     </div>
     <button type="submit" class="btn btn-warning float-right">Sign Up</button>
 </form>

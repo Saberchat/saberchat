@@ -12,7 +12,8 @@ const Comment = require('./models/comment'),
 
 //require the routes
 const indexRoutes = require('./routes/index'),
-	  chatRoutes = require('./routes/chat');
+	  chatRoutes = require('./routes/chat'),
+	  profileRoutes = require('./routes/profile');
 
 const http = require('http').createServer(app);
 const io = require('socket.io')(http);
@@ -54,6 +55,7 @@ app.use(function(req, res, next) {
 // =======================
 app.use(indexRoutes);
 app.use(chatRoutes);
+app.use(profileRoutes);
 
 // =======================
 // Socket Chat stuff
