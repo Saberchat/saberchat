@@ -20,7 +20,7 @@
                     <ul id="messages">
                         <% comments.forEach(function(comment){ %>
                             <li>
-                                <i class="fas fa-user-circle avatar"></i>
+                                <!--<i class="fas fa-user-circle avatar"></i> Replace with image -->
                                 <% if (comment.author.username) { %>
                                     <p><%= comment.author.username %>: <%= comment['text'] %></p>
                                 <% } else { %>
@@ -28,7 +28,7 @@
                                 <% } %>
                             </li>
                         <% }); %>
-                    </ul>  
+                    </ul>
                     <% if(currentUser) { %>
                         <form id="message-form">
                             <input id="m" autocomplete="off" type="text"/>
@@ -40,7 +40,7 @@
                             const messageForm = '#message-form';
                             const input = '#m';
                             const chatDisplay = '#messages';
-                
+
                             chatInit(username, userId, messageForm, input, chatDisplay);
                         </script>
                     <% } else { %>
