@@ -1,28 +1,22 @@
-$(function() {
-    var socket = io();
-    var nick = null;
-    $('#message-form').submit(function(e) {
+function chatInit(username, userId, messageForm, input, chatDisplay) {
+  var socket = io();
+
+  $(messageForm).submit(function(e) {
       e.preventDefault(); // prevents page reloading
-      if ($('#m').val().substring(0, 5) == '/nick') {
-        nick = $('#m').val().substring(6);
-        $('#m').val('');
-      } else if (nick != null) {
-        socket.emit('chat message', nick + ": " + $('#m').val());
-        $('#m').val('');
-      } else {
-        socket.emit('chat message', $('#m').val());
-        $('#m').val('');
-      }
+      
+      socket.emit('chat message', {'text': $('#m').val(), 'author': username, 'authorId': userId});
+      $(input).val('');
       return false;
-    });
-    socket.on('chat message', function(msg) {
+  });
+
+  socket.on('chat message', function(msg) {
       // $('#messages').append($('<li>').text(msg));
-      $('#messages').append(
-        "<li>\
+      $(chatDisplay).append(
+          "<li>\
           <i class='fas fa-user-circle avatar'></i>\
-            <p>" + msg + "</p>\
-        </li>"
+              <p>" + msg['author'] + ": " + msg['text'] +  "</p>\
+          </li>"
       );
-    });
-    socket.on('')
-});
+  });
+  socket.on('')
+}

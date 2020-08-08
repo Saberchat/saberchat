@@ -1,0 +1,99 @@
+<nav class="navbar navbar-expand-md bg-dark navbar-dark">
+    <div class="container" id="nav-container">
+        <!-- Brand  (change link to home page)-->
+        <a class="navbar-brand" href="#">
+            <i class="far fa-comments"></i>
+            SaberChat
+        </a>
+        <!-- Toggler/collapsibe Button -->
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#collapsibleNavbar">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+    
+        <!-- Navbar links -->
+        <div class="collapse navbar-collapse" id="collapsibleNavbar">
+            <ul class="navbar-nav">
+                <li class="nav-item">
+                    <a class="nav-link" href="#">About</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/chat">Chat</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#">Witherly Heights</a>
+                </li>
+            </ul>
+            <ul class="navbar-nav ml-auto">
+                <% if(currentUser) { %>
+                    <!-- <li class="nav-item">
+                        <a class="nav-link" href="/logout">Logout</a>
+                    </li> -->
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        Welcome <%= currentUser.username %>
+                        </a>
+                        <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
+                          <a class="dropdown-item" href="/profile">View Profile</a>
+                          <a class="dropdown-item" href="/logout">Logout</a>
+                          <a class="dropdown-item" href="#">Something else here</a>
+                        </div>
+                      </li>
+                <% } else { %>
+                    <li class="nav-item">
+                        <a class="nav-link user-form-btn signup">Register</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link user-form-btn login">Login</a>
+                    </li>
+                <% } %>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<!-- Login Form -->
+<form class="user-form login" action="/login" method="post">
+    <span class="form-close text-danger login"><i class="far fa-window-close"></i></span>
+    <div class="form-group mt-3">
+        <label for="email-login">Email address</label>
+        <input name="email" type="email" class="form-control" id="email-login" placeholder="enter email">
+    </div>
+    <div class="form-group">
+        <label for="password-login">Password</label>
+        <input name="password" type="password" class="form-control" id="password-login" placeholder="enter password">
+    </div>
+    <button type="submit" class="btn btn-success float-right">Login</button>
+</form>
+
+<!-- Sign Up Form -->
+<form class="user-form signup" action="/register" method="post">
+    <span class="form-close text-danger signup"><i class="far fa-window-close"></i></span>
+    <div class="form-group mt-3">
+        <label for="username-signup">Username</label>
+        <input name="username" type="text" class="form-control" id="username-signup" placeholder="enter username">
+    </div>
+    <div class="form-group">
+        <label for="email-signup">Email address</label>
+        <input name="email" type="email" class="form-control" id="email-signup" aria-describedby="emailHelp" placeholder="enter email">
+        <small id="emailHelp" class="form-text text-muted">We'll never share your email with anyone else.</small>
+    </div>
+    <div class="form-group">
+        <label for="password-signup">Password</label>
+        <input name="password" type="password" class="form-control" id="password-signup" placeholder="enter password">
+    </div>
+    <button type="submit" class="btn btn-warning float-right">Sign Up</button>
+</form>
+
+<div class="mb-3" id="flash">
+    <% if(error && error.length > 0) { %>
+        <div class="alert alert-danger">
+            <%= error %>
+        </div>
+    <% } %>
+    
+    <% if(success && success.length > 0) { %>
+        <div class="alert alert-success">
+            <%= success %>
+        </div>
+    <% } %>
+</div>
