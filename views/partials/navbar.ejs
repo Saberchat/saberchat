@@ -1,7 +1,7 @@
-<nav class="navbar navbar-expand-md bg-dark navbar-dark">
+<nav class="navbar navbar-expand-md navbar-dark navbar-custom bg-custom">
     <div class="container" id="nav-container">
         <!-- Brand  (change link to home page)-->
-        <a class="navbar-brand" href="#">
+        <a class="navbar-brand" href="/">
             <i class="far fa-comments"></i>
             SaberChat
         </a>
@@ -53,7 +53,7 @@
 
 <!-- Login Form -->
 <form class="user-form login" action="/login" method="post">
-    <span class="form-close text-danger login"><i class="far fa-window-close"></i></span>
+    <span class="form-close login"><i class="far fa-window-close"></i></span>
     <div class="form-group mt-3">
         <label for="email-login">Email address</label>
         <input name="email" type="email" class="form-control" id="email-login" placeholder="enter email">
@@ -67,7 +67,7 @@
 
 <!-- Sign Up Form -->
 <form class="user-form signup" action="/register" method="post">
-    <span class="form-close text-danger signup"><i class="far fa-window-close"></i></span>
+    <span class="form-close signup"><i class="far fa-window-close"></i></span>
     <div class="form-group mt-3">
         <label for="username-signup">Username</label>
         <input name="username" type="text" class="form-control" id="username-signup" placeholder="enter username">

@@ -1,0 +1,77 @@
+/* 
+================================
+flash messages
+================================
+ */
+
+ #flash {
+    position: absolute;
+    z-index: 1;
+    min-width: 400px;
+    left: 50%;
+    margin-left: -200px;
+}
+
+
+
+/* 
+================================
+User login form
+================================
+ */
+
+.user-form {
+    position: fixed;
+    right: 10%;
+    z-index: 2;
+    background-color: white;
+    padding: 0 15px;
+    height: 0;
+    min-width: 304px;
+    overflow: hidden;
+    transition: height ease-out 500ms;
+    -webkit-transition: height ease-out 500ms;
+}
+
+.signup.display {
+    height: 350px;
+    transition: height ease-out 500ms;
+    -webkit-transition: height ease-out 500ms;
+}
+
+.login.display {
+    height: 250px;
+    transition: height ease-out 500ms;
+    -webkit-transition: height ease-out 500ms;
+}
+
+.form-close {
+    position: absolute;
+    right: 1rem;
+    top: 0.3rem;
+    font-size: 1.5rem;
+    color: #dc3545;
+}
+
+.form-close:focus, .form-close:hover {
+    color: #9e2531;
+}
+
+/* 
+================================
+Navbar
+================================
+ */
+.bg-custom {
+    background-color: #c3423f;
+}
+
+.navbar-custom .navbar-nav .nav-link {
+    color: rgba(255,255,255, 0.8);
+}
+
+.navbar-custom .nav-item.active .nav-link,
+.navbar-custom .nav-item:focus .nav-link,
+.navbar-custom .nav-item:hover .nav-link {
+    color: #9f9aa4;
+}

@@ -1,1 +1,45 @@
-<h1>Profile Page</h1>
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Saberchat Profile</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/stylesheets/main.css">
+    <link rel="stylesheet" href="/stylesheets/components/navbar.css">
+    <link rel="stylesheet" href="/stylesheets/profile.css">
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js"></script>
+
+    <script src="https://kit.fontawesome.com/dccc745c41.js" crossorigin="anonymous"></script>
+</head>
+<body>
+    <%- include('../partials/navbar') %>
+    <div id="background">
+    </div>
+    <div class="container">
+        <div class="row">
+            <div class="col-12">
+                <div class="profile-head">
+                    <div class="profile-image"></div>
+
+                    <h1>Alsion Student1</h1>
+                    <p>Guardian of Bread<p>
+                    <h4>email@email.com</h4>
+                </div>
+
+                <h4>Description</h4>
+                <p>
+                    Lorem ipsum dolor sit amet, consectetur adipiscing elit. Quisque auctor nisi semper tortor iaculis pharetra. Mauris aliquet nisl hendrerit ante varius, sit amet convallis lacus porta. Quisque a dui leo. Pellentesque pellentesque vehicula lacus eu viverra. Nam vulputate urna at felis dignissim, eget pellentesque nulla vehicula. Vestibulum vestibulum nunc sed nisi mollis, nec placerat ipsum laoreet. Aliquam sollicitudin pharetra ex quis consequat. Sed quis pharetra mi, nec ultricies sem. Ut ut venenatis lorem, auctor auctor magna. Mauris id odio eget orci ultrices lobortis. Duis non massa vitae ante venenatis porttitor vitae sed ante. Sed scelerisque, odio sit amet consectetur dignissim, ante purus lacinia lectus, et euismod eros elit ac nibh. Suspendisse semper lobortis quam, id rhoncus enim posuere placerat.
+                </p>
+                <a class="btn btn-info" href= "/profile/edit">
+                    Edit Profile
+                </a>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
