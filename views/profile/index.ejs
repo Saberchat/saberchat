@@ -31,16 +31,20 @@
                     <!-- profile image set as background img of this div -->
                     <div class="profile-image"></div>
 
-                    <h1>Alsion Student1</h1>
+                    <h1><%= currentUser.username %></h1>
                     <p>Guardian of Bread<p>
-                    <h4>email@email.com</h4>
+                    <h4><%= currentUser.email %></h4>
                 </div>
 
+                <!-- shows 'no desc.' if user doesn't have desc. yet. -->
                 <h4>Description</h4>
-                <p>
-                    Lorem ipsum dolor sit amet, consectetur adipiscing elit. Quisque auctor nisi semper tortor iaculis pharetra. Mauris aliquet nisl hendrerit ante varius, sit amet convallis lacus porta. Quisque a dui leo. Pellentesque pellentesque vehicula lacus eu viverra. Nam vulputate urna at felis dignissim, eget pellentesque nulla vehicula. Vestibulum vestibulum nunc sed nisi mollis, nec placerat ipsum laoreet. Aliquam sollicitudin pharetra ex quis consequat. Sed quis pharetra mi, nec ultricies sem. Ut ut venenatis lorem, auctor auctor magna. Mauris id odio eget orci ultrices lobortis. Duis non massa vitae ante venenatis porttitor vitae sed ante. Sed scelerisque, odio sit amet consectetur dignissim, ante purus lacinia lectus, et euismod eros elit ac nibh. Suspendisse semper lobortis quam, id rhoncus enim posuere placerat.
-                </p>
-                <!-- link to edit profile. Doesn't work yet of course.  -->
+                <% if(!currentUser.description) { %>
+                    <p>No description.</p>
+                <% } else { %>
+                    <p><%= currentUser.description %></p>
+                <% } %>
+
+                 <!-- link to edit profile. Doesn't work yet of course.  -->
                 <a class="btn btn-info" href= "/profile/userDatabaseId/edit">
                     Edit Profile
                 </a>
