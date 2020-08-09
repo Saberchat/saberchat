@@ -15,5 +15,23 @@ middlewareObj.isLoggedIn = function(req, res, next) {
 	res.redirect('/');
 }
 
+middlewareObj.checkUserMatch = function(req, res, next) {
+	//check if user is logged in
+	if(req.isAuthenticated()) {
+		//check if the profile that is being edited matches the current user
+		if(req.user._id == req.params.id) {
+			next();
+		} else {
+			// else give error message
+			req.flash('error', "You don't have permission to do that!");
+			res.redirect('/');
+		}
+	} else {
+		// else give error message
+		req.flash('error', 'Please Login');
+		res.redirect('/')
+	}
+}
+
 //export the object with all the functions
 module.exports = middlewareObj;

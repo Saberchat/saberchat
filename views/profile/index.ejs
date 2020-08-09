@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Saberchat Profile</title>
+    <title>Saberchat</title>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
@@ -29,13 +29,22 @@
             <div class="col-12">
                 <div class="profile-head">
                     <!-- profile image set as background img of this div -->
-                    <div class="profile-image"></div>
-
+                    <% if(currentUser.imageUrl) { %>
+                        <div class="profile-image" style="background-image: url('<%= currentUser.imageUrl %>');"></div>
+                    <% } else { %>
+                        <div class="profile-image" style="background-image: url('https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_640.png');"></div>
+                    <% } %>
+                    
                     <h1><%= currentUser.username %></h1>
-                    <p>Guardian of Bread<p>
+
+                    <% if(currentUser.title) { %>
+                        <p><%= currentUser.title %></p>
+                    <% } %>
+                    
                     <h4><%= currentUser.email %></h4>
                 </div>
-
+            </div>
+            <div class="col-md-8 offset-md-2">
                 <!-- shows 'no desc.' if user doesn't have desc. yet. -->
                 <h4>Description</h4>
                 <% if(!currentUser.description) { %>
@@ -45,7 +54,7 @@
                 <% } %>
 
                  <!-- link to edit profile. Doesn't work yet of course.  -->
-                <a class="btn btn-info" href= "/profile/userDatabaseId/edit">
+                <a class="btn btn-info" href= "/profile/edit">
                     Edit Profile
                 </a>
             </div>

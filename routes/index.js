@@ -33,6 +33,7 @@ router.post("/register",  function(req, res) {
 			//redirect to root
 			return res.redirect("/");
 		}
+		
 		//if registration is successful, login user. 
 		passport.authenticate("local")(req, res, function() {
 			//flash message for succesful login

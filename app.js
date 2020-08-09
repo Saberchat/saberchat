@@ -4,7 +4,8 @@ const express = require('express'),
 	  passport = require('passport'),
 	  bodyParser = require('body-parser'),
 	  LocalStrategy = require('passport-local'),
-	  flash = require('connect-flash');
+	  flash = require('connect-flash'),
+	  methodOverride = require('method-override');
 
 // require the models for database actions
 const Comment = require('./models/comment'),
@@ -33,6 +34,8 @@ app.use(express.static(__dirname + "/public"));
 app.use(bodyParser.urlencoded({extended: true}));
 //set view engine to ejs
 app.set("view engine", "ejs");
+// I think yall already know what method override is
+app.use(methodOverride('_method'));
 // use connect-flash for flash messages
 app.use(flash());
 

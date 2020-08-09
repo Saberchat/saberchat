@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Saberchat</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/stylesheets/main.css">
+    <!-- link css for navbar. Don't need to include public/javascript/userForm.js since user is already logged in and does not need to access login and register forms.  -->
+    <link rel="stylesheet" href="/stylesheets/components/navbar.css">
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js"></script>
+
+    <!-- I'm using my fontawesome kit -->
+    <script src="https://kit.fontawesome.com/dccc745c41.js" crossorigin="anonymous"></script>
+</head>
+<body>
+    <!-- include the navbar via ejs -->
+    <%- include('../partials/navbar') %>
+    <div class="container mt-5">
+        <div class="row">
+            <h1 style="text-align: center; width: 100%">Edit Profile</h1>
+        </div>
+        <div class="row">
+            <div style="width: 30%; margin: 25px auto;">
+                <form action="/profile/<%= currentUser._id %>?_method=put" method="post">
+                    <div class="form-group">
+                        <label for="usernameInput">Username</label>
+                        <input id="usernameInput" class="form-control" type="text" name="user[username]" value="<%= currentUser.username %>">
+                    </div>
+                    <div class="form-group">
+                        <label for="descInput">Description</label>
+                        <% if(currentUser.description){ %>
+                            <input id="descInput" class="form-control" type="text" name="user[description]" value="<%= currentUser.description %>">
+                        <% } else { %>
+                            <input id="descInput" class="form-control" type="text" aria-describedby="descHelp" name="user[description]" value="">
+                            <small id="descHelp" class="form-text text-muted">Ex. Hobbies: swimming, tennis, searching for bigfoot.</small>
+                        <% } %>
+                    </div>
+                    <div class="form-group">
+                        <label for="titleInput">User Title</label>
+                        <% if(currentUser.title){ %>
+                            <input id="titleInput" class="form-control" type="text" name="user[title]" value="<%= currentUser.title %>">
+                        <% } else { %>
+                            <input id="titleInput" class="form-control" type="text" name="user[title]" aria-describedby="titleHelp" value="">
+                            <small id="titleHelp" class="form-text text-muted">Ex. Ninja Warrior, Guardian of Bread, Champion of the art room</small>
+                        <% } %>
+                    </div>
+                    <div class="form-group">
+                        <label for="imageInput">Profile Image Url</label>
+                        <% if(currentUser.imageUrl){ %>
+                            <input id="imageInput" class="form-control" type="text" name="user[imageUrl]" value="<%= currentUser.imageUrl %>">
+                        <% } else { %>
+                            <input id="imageInput" class="form-control" type="text" name="user[imageUrl]"  value="">
+                        <% } %>
+                    </div>
+                    <button class="btn btn-lg btn-primary btn-block">Submit!</button>
+                </form>
+            </div>
+        </div>
+        <div class="row">
+            <div style="width: 30%; margin: 0 auto;">
+                <a href="/profile">Go Back</a>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
