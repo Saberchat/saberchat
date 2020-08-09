@@ -20,50 +20,49 @@
 <body>
     <!-- include the navbar via ejs -->
     <%- include('../partials/navbar') %>
+
     <div class="container mt-5">
         <div class="row">
-            <h1 style="text-align: center; width: 100%">Edit Profile</h1>
+            <div class="col-12">
+                <h1 style="text-align: center; width: 100%">Edit Profile</h1>
+            </div>
         </div>
         <div class="row">
-            <div style="width: 30%; margin: 25px auto;">
+            <div class="col-md-8 offset-md-2 col-12">
                 <form action="/profile/<%= currentUser._id %>?_method=put" method="post">
                     <div class="form-group">
                         <label for="usernameInput">Username</label>
-                        <input id="usernameInput" class="form-control" type="text" name="user[username]" value="<%= currentUser.username %>">
+                        <input id="usernameInput" class="form-control" type="text" name="user[username]" value="<%= currentUser.username %>" placeholder="Enter Username" required>
                     </div>
                     <div class="form-group">
                         <label for="descInput">Description</label>
                         <% if(currentUser.description){ %>
-                            <input id="descInput" class="form-control" type="text" name="user[description]" value="<%= currentUser.description %>">
+                            <input id="descInput" class="form-control" type="text" name="user[description]" value="<%= currentUser.description %>" placeholder="Enter Description">
                         <% } else { %>
-                            <input id="descInput" class="form-control" type="text" aria-describedby="descHelp" name="user[description]" value="">
+                            <input id="descInput" class="form-control" type="text" name="user[description]" value="" placeholder="Enter Description" aria-describedby="descHelp">
                             <small id="descHelp" class="form-text text-muted">Ex. Hobbies: swimming, tennis, searching for bigfoot.</small>
                         <% } %>
                     </div>
                     <div class="form-group">
                         <label for="titleInput">User Title</label>
                         <% if(currentUser.title){ %>
-                            <input id="titleInput" class="form-control" type="text" name="user[title]" value="<%= currentUser.title %>">
+                            <input id="titleInput" class="form-control" type="text" name="user[title]" value="<%= currentUser.title %>" placeholder="Enter Title">
                         <% } else { %>
-                            <input id="titleInput" class="form-control" type="text" name="user[title]" aria-describedby="titleHelp" value="">
+                            <input id="titleInput" class="form-control" type="text" name="user[title]" aria-describedby="titleHelp" value="" placeholder="Enter Title">
                             <small id="titleHelp" class="form-text text-muted">Ex. Ninja Warrior, Guardian of Bread, Champion of the art room</small>
                         <% } %>
                     </div>
                     <div class="form-group">
                         <label for="imageInput">Profile Image Url</label>
                         <% if(currentUser.imageUrl){ %>
-                            <input id="imageInput" class="form-control" type="text" name="user[imageUrl]" value="<%= currentUser.imageUrl %>">
+                            <input id="imageInput" class="form-control" type="text" name="user[imageUrl]" value="<%= currentUser.imageUrl %>" placeholder="Enter Image Url">
                         <% } else { %>
-                            <input id="imageInput" class="form-control" type="text" name="user[imageUrl]"  value="">
+                            <input id="imageInput" class="form-control" type="text" name="user[imageUrl]"  value="" placeholder="Enter Image Url">
                         <% } %>
                     </div>
                     <button class="btn btn-lg btn-primary btn-block">Submit!</button>
                 </form>
-            </div>
-        </div>
-        <div class="row">
-            <div style="width: 30%; margin: 0 auto;">
-                <a href="/profile">Go Back</a>
+                <a style="display: block; margin-top: 1rem;" href="/profile">Go Back</a>
             </div>
         </div>
     </div>

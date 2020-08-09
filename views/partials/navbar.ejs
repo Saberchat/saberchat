@@ -15,13 +15,13 @@
         <div class="collapse navbar-collapse" id="collapsibleNavbar">
             <ul class="navbar-nav">
                 <li class="nav-item">
-                    <a class="nav-link" href="#">About</a>
+                    <a class="nav-link" href="/">Dashboard</a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link" href="/chat">Chat</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="#">Witherly Heights</a>
+                    <a class="nav-link" href="/">News</a>
                 </li>
             </ul>
             <ul class="navbar-nav ml-auto">
@@ -56,11 +56,11 @@
     <span class="form-close login"><i class="far fa-window-close"></i></span>
     <div class="form-group mt-3">
         <label for="email-login">Email address</label>
-        <input name="email" type="email" class="form-control" id="email-login" placeholder="enter email">
+        <input name="email" type="email" class="form-control" id="email-login" placeholder="enter email" required>
     </div>
     <div class="form-group">
         <label for="password-login">Password</label>
-        <input name="password" type="password" class="form-control" id="password-login" placeholder="enter password">
+        <input name="password" type="password" class="form-control" id="password-login" placeholder="enter password" required>
     </div>
     <button type="submit" class="btn btn-success float-right">Login</button>
 </form>
@@ -70,16 +70,16 @@
     <span class="form-close signup"><i class="far fa-window-close"></i></span>
     <div class="form-group mt-3">
         <label for="username-signup">Username</label>
-        <input name="username" type="text" class="form-control" id="username-signup" placeholder="enter username">
+        <input name="username" type="text" class="form-control" id="username-signup" placeholder="enter username" required>
     </div>
     <div class="form-group">
         <label for="email-signup">Email address</label>
-        <input name="email" type="email" class="form-control" id="email-signup" aria-describedby="emailHelp" placeholder="enter email">
+        <input name="email" type="email" class="form-control" id="email-signup" aria-describedby="emailHelp" placeholder="enter email" required>
         <small id="emailHelp" class="form-text text-muted">We'll never share your email with anyone else.</small>
     </div>
     <div class="form-group">
         <label for="password-signup">Password</label>
-        <input name="password" type="password" class="form-control" id="password-signup" placeholder="enter password">
+        <input name="password" type="password" class="form-control" id="password-signup" placeholder="enter password" required>
     </div>
     <button type="submit" class="btn btn-warning float-right">Sign Up</button>
 </form>
