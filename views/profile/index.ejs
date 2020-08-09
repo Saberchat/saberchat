@@ -7,6 +7,7 @@
 
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css">
     <link rel="stylesheet" href="/stylesheets/main.css">
+    <!-- link css for navbar. Don't need to include public/javascript/userForm.js since user is already logged in and does not need to access login and register forms.  -->
     <link rel="stylesheet" href="/stylesheets/components/navbar.css">
     <link rel="stylesheet" href="/stylesheets/profile.css">
 
@@ -14,16 +15,20 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js"></script>
 
+    <!-- I'm using my fontawesome kit -->
     <script src="https://kit.fontawesome.com/dccc745c41.js" crossorigin="anonymous"></script>
 </head>
 <body>
+    <!-- include the navbar via ejs -->
     <%- include('../partials/navbar') %>
+    <!-- big background image -->
     <div id="background">
     </div>
     <div class="container">
         <div class="row">
             <div class="col-12">
                 <div class="profile-head">
+                    <!-- profile image set as background img of this div -->
                     <div class="profile-image"></div>
 
                     <h1>Alsion Student1</h1>
@@ -35,7 +40,8 @@
                 <p>
                     Lorem ipsum dolor sit amet, consectetur adipiscing elit. Quisque auctor nisi semper tortor iaculis pharetra. Mauris aliquet nisl hendrerit ante varius, sit amet convallis lacus porta. Quisque a dui leo. Pellentesque pellentesque vehicula lacus eu viverra. Nam vulputate urna at felis dignissim, eget pellentesque nulla vehicula. Vestibulum vestibulum nunc sed nisi mollis, nec placerat ipsum laoreet. Aliquam sollicitudin pharetra ex quis consequat. Sed quis pharetra mi, nec ultricies sem. Ut ut venenatis lorem, auctor auctor magna. Mauris id odio eget orci ultrices lobortis. Duis non massa vitae ante venenatis porttitor vitae sed ante. Sed scelerisque, odio sit amet consectetur dignissim, ante purus lacinia lectus, et euismod eros elit ac nibh. Suspendisse semper lobortis quam, id rhoncus enim posuere placerat.
                 </p>
-                <a class="btn btn-info" href= "/profile/edit">
+                <!-- link to edit profile. Doesn't work yet of course.  -->
+                <a class="btn btn-info" href= "/profile/userDatabaseId/edit">
                     Edit Profile
                 </a>
             </div>

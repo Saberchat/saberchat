@@ -33,6 +33,7 @@ User login form
     -webkit-transition: height ease-out 500ms;
 }
 
+/* classes for animation */
 .signup.display {
     height: 350px;
     transition: height ease-out 500ms;
@@ -45,6 +46,7 @@ User login form
     -webkit-transition: height ease-out 500ms;
 }
 
+/* the 'x' button styling */
 .form-close {
     position: absolute;
     right: 1rem;
@@ -59,7 +61,7 @@ User login form
 
 /* 
 ================================
-Navbar
+Custom styling for the bootstrap nav
 ================================
  */
 .bg-custom {
