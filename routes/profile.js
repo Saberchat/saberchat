@@ -5,40 +5,59 @@ const User = require('../models/user');
 
 const middleware = require('../middleware');
 
-//renders views/profile/index.ejs at /profile route.
-router.get('/profile', middleware.isLoggedIn, function(req, res) {
-    res.render('profile/index');
+// renders the list of users page
+router.get('/profiles', middleware.isLoggedIn, function(req, res) {
+    User.find({}, function(err, foundUsers) {
+        if(err || !foundUsers) {
+            req.flash('error', 'Unable to access Database');
+            res.redirect('back');
+        } else {
+            res.render('profile/index', {users: foundUsers});
+        }
+    });
 });
 
-//renders profile edit page
-router.get('/profile/edit', middleware.isLoggedIn, function(req, res) {
+//renders profiles edit page
+router.get('/profiles/edit', middleware.isLoggedIn, function(req, res) {
     res.render('profile/edit');
 });
 
 //renders the email/password edit page
-router.get('/profile/change-login-info', middleware.isLoggedIn, function(req, res) {
-    res.render('profile/pwd_email_edit');
+router.get('/profiles/change-login-info', middleware.isLoggedIn, function(req, res) {
+    res.render('profile/edit_pwd_email');
 });
 
-// update user route. Check if current user matches profile they're trying to edit with middleware.
-router.put('/profile/:id/edit', middleware.checkUserMatch, function(req, res) {
+//renders views/profiles/show.ejs at /profiles route.
+router.get('/profiles/:id', middleware.isLoggedIn, function(req, res) {
+    User.findById(req.params.id, function(err, foundUser) {
+        if(err || !foundUser) {
+            req.flash('error', 'Error. Cannot find user.');
+            res.redirect('back');
+        } else {
+            res.render('profile/show', {user: foundUser});
+        }
+    });
+});
+
+// update user route. Check if current user matches profiles they're trying to edit with middleware.
+router.put('/profiles/edit', middleware.isLoggedIn, function(req, res) {
     //find and update the user with new info
-    User.findByIdAndUpdate(req.params.id, req.body.user, function(err, updatedUser) {
-        if(err) {
+    User.findByIdAndUpdate(req.user._id, req.body.user, function(err, updatedUser) {
+        if(err || !updatedUser) {
             req.flash('error', 'There was an error updating your profile');
-            res.redirect('/profile');
+            res.redirect('back');
         } else {
             req.flash('success', 'Updated your profile');
-            res.redirect('/profile');
+            res.redirect('/profiles/' + req.user._id);
             console.log(updatedUser);
         }
     });
 });
 
-//route for changing email. Similar to edit profile route. But changing email logs out user for some reason.
-router.put('/profile/:id/change-email', middleware.checkUserMatch, function(req, res) {
-    User.findByIdAndUpdate(req.params.id, {email: req.body.email}, function(err, updatedUser) {
-        if(err) {
+//route for changing email. Similar to edit profiles route. But changing email logs out user for some reason.
+router.put('/profiles/change-email', middleware.isLoggedIn, function(req, res) {
+    User.findByIdAndUpdate(req.user._id, {email: req.body.email}, function(err, updatedUser) {
+        if(err || !updatedUser) {
             req.flash('error', 'There was an error changing your email');
             res.redirect('/');
         } else {
@@ -48,9 +67,9 @@ router.put('/profile/:id/change-email', middleware.checkUserMatch, function(req,
     });
 });
 //route for changing password. Not too much different from previous routes.
-router.put('/profile/:id/change-password', middleware.checkUserMatch, function(req, res) {
-    User.findById(req.params.id, function(err, foundUser) {
-        if(err) {
+router.put('/profiles/change-password', middleware.isLoggedIn, function(req, res) {
+    User.findById(req.user._id, function(err, foundUser) {
+        if(err || !foundUser) {
             req.flash('error', 'Error, cannot find user');
             res.redirect('/');
         } else {
@@ -60,7 +79,7 @@ router.put('/profile/:id/change-password', middleware.checkUserMatch, function(r
                     res.redirect('/');
                 } else {
                     req.flash('success', 'Successfully changed your password');
-                    res.redirect('/profile');
+                    res.redirect('/profiles/' + req.user._id);
                 }
             });
         }

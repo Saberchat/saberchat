@@ -9,7 +9,6 @@
     <link rel="stylesheet" href="/stylesheets/main.css">
     <!-- link css for navbar. Don't need to include public/javascript/userForm.js since user is already logged in and does not need to access login and register forms.  -->
     <link rel="stylesheet" href="/stylesheets/components/navbar.css">
-    <link rel="stylesheet" href="/stylesheets/profile.css">
 
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
@@ -21,45 +20,22 @@
 <body>
     <!-- include the navbar via ejs -->
     <%- include('../partials/navbar') %>
-    <!-- big background image -->
-    <div id="background">
-    </div>
     <div class="container">
-        <div class="row">
-            <div class="col-12">
-                <div class="profile-head">
-                    <!-- profile image set as background img of this div -->
-                    <% if(currentUser.imageUrl) { %>
-                        <div class="profile-image" style="background-image: url('<%= currentUser.imageUrl %>');"></div>
-                    <% } else { %>
-                        <div class="profile-image" style="background-image: url('https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_640.png');"></div>
-                    <% } %>
-                    
-                    <h1><%= currentUser.username %></h1>
-
-                    <% if(currentUser.title) { %>
-                        <p><%= currentUser.title %></p>
-                    <% } %>
-                    
-                    <h4><%= currentUser.email %></h4>
-                </div>
+        <div class="row mt-5 mb-2">
+            <div class="col-12 text-center">
+                <h1>Users</h1>
             </div>
-            <div class="col-md-8 offset-md-2">
-                <!-- shows 'no desc.' if user doesn't have desc. yet. -->
-                <h4>Description</h4>
-                <% if(!currentUser.description) { %>
-                    <p>No description.</p>
-                <% } else { %>
-                    <p><%= currentUser.description %></p>
-                <% } %>
-
-                 <!-- link to edit profile. Doesn't work yet of course.  -->
-                <a class="btn btn-info" href= "/profile/edit">
-                    Edit Profile
-                </a>
-                <a class="btn btn-info" href= "/profile/change-login-info">
-                    Change Email or Password
-                </a>
+        </div>
+        <div class="row">
+            <div class="col-md-10 offset-md-1 col-12">
+                <div class="list-group">
+                    <% users.forEach(user => { %>
+                        <a href="/profiles/<%= user._id %>" class="list-group-item list-group-item-action">
+                            <div class="profile-image"></div>
+                            <%= user.username %>
+                        </a>
+                    <% }); %>
+                </div>
             </div>
         </div>
     </div>

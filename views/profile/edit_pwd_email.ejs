@@ -30,7 +30,7 @@
         <div class="row mt-3">
             <div class="col-md-8 offset-md-2 col-12">
                 <h4 class="mb-3">Change Email</h1>
-                <form action="/profile/<%= currentUser._id %>/change-email?_method=put" method="post">
+                <form action="/profiles/change-email?_method=put" method="post">
                     <div class="form-group">
                         <label for="usernameInput">Email</label>
                         <input id="usernameInput" class="form-control" type="text" name="email" value="<%= currentUser.email %>" placeholder="Enter New Email" required>
@@ -39,7 +39,7 @@
                     <button class="btn btn-lg btn-primary btn-block">Submit</button>
                 </form>
                 <h4 class="mt-5 mb-3">Change Password</h4>
-                <form action="/profile/<%= currentUser._id %>/change-password?_method=put" method="post">
+                <form action="/profiles/change-password?_method=put" method="post">
                     <div class="form-group">
                         <label for="usernameInput">Old Password</label>
                         <input id="usernameInput" class="form-control" type="password" name="oldPassword" placeholder="Enter Old Password" required>
@@ -51,7 +51,7 @@
                     
                     <button class="btn btn-lg btn-primary btn-block">Submit</button>
                 </form>
-                <a style="display: block; margin-top: 1rem;" href="/profile">Go Back</a>
+                <a style="display: block; margin-top: 1rem;" href="/profiles/<%= currentUser._id %>">Go Back</a>
             </div>
         </div>
     </div>

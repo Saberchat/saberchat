@@ -19,8 +19,6 @@ router.get('/', (req, res) => {
 
 //new registered user
 router.post("/register",  function(req, res) {
-	console.log(req.body)
-
 	//creates new user from form info
 	var newUser = new User({email: req.body.email, username: req.body.username});
 

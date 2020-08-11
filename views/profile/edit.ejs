@@ -29,7 +29,7 @@
         </div>
         <div class="row">
             <div class="col-md-8 offset-md-2 col-12">
-                <form action="/profile/<%= currentUser._id %>/edit?_method=put" method="post">
+                <form action="/profiles/edit?_method=put" method="post">
                     <div class="form-group">
                         <label for="usernameInput">Username</label>
                         <input id="usernameInput" class="form-control" type="text" name="user[username]" value="<%= currentUser.username %>" placeholder="Enter Username" required>
@@ -62,7 +62,7 @@
                     </div>
                     <button class="btn btn-lg btn-primary btn-block">Submit</button>
                 </form>
-                <a style="display: block; margin-top: 1rem;" href="/profile">Go Back</a>
+                <a style="display: block; margin-top: 1rem;" href="/profiles/<%= currentUser._id %>">Go Back</a>
             </div>
         </div>
     </div>
