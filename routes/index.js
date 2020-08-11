@@ -59,7 +59,7 @@ router.post('/login', function(req, res, next) {
         if (err) { return next(err); }
         if (!user) { 
 			//flash message error
-            req.flash('error', 'Error Signing In');
+            req.flash('error', 'Invalid Email or Password');
             return res.redirect('/'); 
 		}
 		//login user again? I'm not sure why this is here. 
