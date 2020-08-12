@@ -28,7 +28,11 @@
         </div>
         <div class="row">
             <div class="col-md-10 offset-md-1 col-12">
-                <div class="list-group">
+                <div class="search-filter">
+                    <i class="fas fa-search"></i>
+                    <input id="search-input" onkeyup="searchFunction()" class="form-control" type="text" placeholder="Search..." title="Type in Username">
+                </div>
+                <div class="list-group" id="user-list">
                     <% users.forEach(user => { %>
                         <a href="/profiles/<%= user._id %>" class="list-group-item list-group-item-action">
                             <div class="profile-image"></div>
@@ -39,5 +43,36 @@
             </div>
         </div>
     </div>
+    <style>
+        .search-filter {
+            margin-bottom: 2rem;
+            border-bottom: 1px solid grey;
+        }
+
+        input#search-input {
+            display: inline-block;
+            width: 80%;
+            border: none;
+            outline: 0;
+            box-shadow: none;
+        }
+    </style>
+    <script>
+        function searchFunction() {
+            let input = document.getElementById("search-input");
+            let filter = input.value.toUpperCase();
+            let list = document.getElementById("user-list");
+            let a = list.getElementsByTagName("a");
+            for (i = 0; i < a.length; i++) {
+                user = a[i];
+                txtValue = user.textContent || user.innerText;
+                if (txtValue.toUpperCase().indexOf(filter) > -1) {
+                    a[i].style.display = "";
+                } else {
+                    a[i].style.display = "none";
+                }
+            }
+        }
+    </script>
 </body>
 </html>
