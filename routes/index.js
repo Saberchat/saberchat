@@ -36,7 +36,7 @@ router.post("/register",  function(req, res) {
 		passport.authenticate("local")(req, res, function() {
 			//flash message for succesful login
 			req.flash("success", "Welcome to Saber Chat " + user.username);
-			res.redirect("/chat");
+			res.redirect("/");
 			console.log('succesfully registered and logged in user')
 		});
 	});
