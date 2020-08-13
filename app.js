@@ -66,7 +66,6 @@ app.use(function(req, res, next) {
 	next()
 });
 
-
 // =======================
 // Routes
 // =======================
@@ -75,39 +74,7 @@ app.use(indexRoutes);
 app.use(chatRoutes);
 app.use(profileRoutes);
 
-// =======================
-// Socket Chat stuff
-// =======================
-// io.on('connection', (socket) => {
-// 	console.log("A user connected");
-// 	socket.on('disconnect', () => {
-// 		console.log("A user disconnected");
-// 	});
-// 	// listens for chat message event. Should receive a msg object with all needed info.
-// 	socket.on('chat message', (msg) => {
-// 		// broadcast message to all connected users
-// 		io.emit('chat message', msg);
-// 		console.log(msg);
-// 		// create/save comment to db
-// 		Comment.create({text: msg.text}, function(err, comment) {
-// 			if(err) {
-// 				// sends error msg if comment could not be created
-// 				console.log(err);
-// 				req.flash('error', 'message could not be created');
-// 			} else {
-// 				// sets comment's author info from the received message object
-// 				comment.author.username = msg.author;
-// 				comment.author.id = msg.authorId;
-// 				// saves changes
-// 				comment.save();
-// 				console.log('comment created: '+ comment)
-// 			}
-// 		});
-// 	});
-// });
-var users = {};
-var rooms = ['room 1', 'room 2', 'room 3'];
-
+// Socket.io server-side code
 io.on('connect', (socket) => {
 
   console.log("A user connected");
