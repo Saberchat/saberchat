@@ -97,19 +97,29 @@ router.get('/chat/edit-form/:id', middleware.isLoggedIn, (req, res) => {
 });
 
 router.put('/chat/edit/:id', middleware.isLoggedIn, (req, res) => {
-	// Room.findByIdAndUpdate(req.params.id, function(err, room) {
-	// 	if (err || !room) {
-	// 		req.flash('error', 'Unable to access Database');
-	// 		res.redirect('back');
-	// 	} else {
-	// 		room.name = req.body.newname;
-	// 		// for(const user in req.body.check) {
-	// 		// 	room.members.push(user);
-	// 		// }
-	// 		res.render('chat');
-	// 	}
-	// });
-	res.send(req.params.id + " " + req.body.newname);
+	var query = { name: req.body.newname }
+	var rooms;
+	Room.find({}, function(err, foundRooms) {
+		if(err || !foundRooms) {
+        req.flash('error', 'Unable to access Database');
+        res.redirect('back');
+      } else {
+				rooms = foundRooms;
+      }
+	});
+	Room.findByIdAndUpdate(req.params.id, query, function(err, room) {
+		if (err || !room) {
+			req.flash('error', 'Unable to access Database');
+			res.redirect('back');
+		} else {
+			// for(const user in req.body.check) {
+			// 	room.members.push(user);
+			// }
+			req.flash('success', 'Updated your group');
+			res.redirect('/chat');
+		}
+	});
+	// res.send(req.params.id + " " + req.body.newname);
 });
 
 //export the router with all the routes connected
