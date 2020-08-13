@@ -117,7 +117,7 @@ io.on('connect', (socket) => {
 				// saves changes
 				comment.save();
         // confirmation log
-				console.log('Database Comment created: '.magenta);
+				console.log('Database Comment created: '.cyan);
         console.log(comment);
 			}
 		});
