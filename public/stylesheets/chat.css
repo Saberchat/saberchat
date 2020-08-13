@@ -12,6 +12,7 @@
         left: 0;
         right: 0;
         height: 50px;
+        width: 100%;
     }
 
     #message-form > button {
@@ -38,6 +39,7 @@
     #messages {
         list-style: none;
         padding: 0;
+        padding-bottom: 50px;
         width: 100%;
     }
 
