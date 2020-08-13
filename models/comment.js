@@ -4,12 +4,9 @@ var commentSchema = new mongoose.Schema({
 	text: String,
 	room: String,
 	author: {
-		id: {
-			type: mongoose.Schema.Types.ObjectId,
-			ref: "User"
-		},
-		username: String
-  }
+		type: mongoose.Schema.Types.ObjectId,
+		ref: "User"
+	}
 }, {timestamps: {createdAt: 'created_at'}});
 
 module.exports = mongoose.model("Comment", commentSchema);

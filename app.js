@@ -112,8 +112,7 @@ io.on('connect', (socket) => {
 				req.flash('error', 'message could not be created');
 			} else {
 				// sets comment's author info from the received message object
-				comment.author.username = msg.author;
-				comment.author.id = msg.authorId;
+				comment.author = msg.authorId;
 				// saves changes
 				comment.save();
         // confirmation log

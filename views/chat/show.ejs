@@ -1,59 +1,79 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8">
-    <meta name="viewport">
-    <title>Saberchat</title>
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css" integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk" crossorigin="anonymous">
-    <!-- link chat stylesheet -->
-    <link rel="stylesheet" href="/stylesheets/chat/show.css">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport">
+  <title>Saberchat</title>
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css" integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk" crossorigin="anonymous">
+  <!-- link chat stylesheet -->
+  <link rel="stylesheet" href="/stylesheets/chat/show.css">
 
-    <!-- using my fontawesome kit -->
-    <script src="https://kit.fontawesome.com/dccc745c41.js" crossorigin="anonymous"></script>
+  <!-- using my fontawesome kit -->
+  <script src="https://kit.fontawesome.com/dccc745c41.js" crossorigin="anonymous"></script>
 
-    <script src="/socket.io/socket.io.js"></script>
-    <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+  <script src="/socket.io/socket.io.js"></script>
+  <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
 
-    <!-- script for socket io chat -->
-    <script src="/javascript/socket.js"></script>
-  </head>
-  <body>
-    <div class="container"></div>
-    <div class="container-fluid">
-      <div class="row">
-        <div class="col-12 chat">
-          <!-- ul containing all the messages -->
-          <ul id="messages">
-            <!-- creates a li element for each comment-->
-            <% comments.forEach(function(comment){ %>
-              <li>
-                <!--<i class="fas fa-user-circle avatar"></i> Replace with image -->
-                <i class="fas fa-user-circle avatar"></i>
-                <!-- Checks if the comment has author. This is to prevent errors since some old anonymous comments in the db were created before users and comments were linked and are missing authors. -->
-               
-                <p><%= comment.author.username %>: <%= comment['text'] %></p>
-              </li>
-            <% }); %>
-          </ul>
-          <!-- ejs logic. If there is signed in user, reveal the chat input -->
-          <form id="message-form">
-            <input id="m" autocomplete="off" type="text"/>
-            <button>Send</button>
-          </form>
-          <script>
-            //set all the variables for the chatInit function
-            const username = '<%= currentUser.username %>';
-            const userId = '<%= currentUser._id %>';
-            const messageForm = '#message-form';
-            const input = '#m';
-            const chatDisplay = '#messages';
-            const room = '<%= room %>';
-
-            // call the chatInit function from public/javascript/socket.js
-            chatInit(username, userId, messageForm, input, chatDisplay, room);
-          </script>
-        </div>
+  <!-- script for socket io chat -->
+  <script src="/javascript/socket.js"></script>
+</head>
+<body>
+  <div class="container py-5 px-4">
+    <header class="text-center">
+        <h1 class="display-4 text-white">Chat Group Name</h1>
+        <p class="text-white lead mb-0">Chat Group Desc.</p>
+    </header>
+    <div class="row rounded-lg overflow-hidden shadow mt-2">
+      <!-- Chat Box-->
+      <div class="col-12 px-0">
+        <div class="px-4 py-5 chat-box bg-white" id="message-display">
+          <% comments.forEach(comment => { %>
+            <div class="media w-50 mb-3">
+              <img src="<%= comment.author.imageUrl %>" alt="user" width="50" class="rounded-circle">
+              <div class="media-body ml-3">
+                <div class="bg-light rounded py-2 px-3 mb-2">
+                  <p class="text-small mb-0 text-muted"><%= comment.text %></p>
+                </div>
+                <p class="small text-muted"><%= comment.created_at %> </p>
+              </div>
+            </div>
+          <% }) %>
+          <!-- Sender Message-->
+          
+  
+          <!-- Reciever Message-->
+          <div class="media w-50 ml-auto mb-3">
+            <div class="media-body">
+              <div class="bg-primary rounded py-2 px-3 mb-2">
+                <p class="text-small mb-0 text-white">Test which is a new approach to have all solutions</p>
+              </div>
+              <p class="small text-muted">12:00 PM | Aug 13</p>
+            </div>
+          </div>
+        <!-- Typing area -->
+        <form class="bg-light" id="message-form">
+          <div class="input-group">
+            <input id="m" type="text" placeholder="Type a message" aria-describedby="button-addon2" class="form-control rounded-0 border-0 py-4 bg-light" autocomplete="off">
+            <div class="input-group-append">
+              <button id="button-addon2" class="btn btn-link"> <i class="fa fa-paper-plane"></i></button>
+            </div>
+          </div>
+        </form>
+        
       </div>
     </div>
-  </body>
+</div>
+<script>
+  //set all the variables for the chatInit function
+  const userId = '<%= currentUser._id %>';
+  const username = '<%= currentUser.username %>';
+  const userImage = '<%= currentUser.imageUrl %>';
+  const messageForm = '#message-form';
+  const input = '#m';
+  const chatDisplay = '#message-display';
+  const room = '<%= room %>';
+  // call the chatInit function from public/javascript/socket.js
+  chatInit(username, userId, messageForm, input, chatDisplay, room, userImage);
+</script>
+</body>
 </html>
