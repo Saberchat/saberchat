@@ -1,5 +1,8 @@
 // Executes before the code in HTTP route request
 
+const Room = require("../models/room");
+const user = require("../models/user");
+
 //create a 'middleware' object to store middleware functions
 middlewareObj = {};
 
@@ -15,22 +18,23 @@ middlewareObj.isLoggedIn = function(req, res, next) {
 	res.redirect('/');
 }
 
-middlewareObj.checkUserMatch = function(req, res, next) {
-	//check if user is logged in
-	if(req.isAuthenticated()) {
-		//check if the profile that is being edited matches the current user
-		if(req.user._id == req.params.id) {
-			next();
+//checks if user is allowed into room
+middlewareObj.checkIfMember = function(req, res, next) {
+	Room.findById(req.params.id, function(err, foundRoom) {
+		if(err || !foundRoom) {
+			console.log(err);
+			req.flash('error', 'Room cannot be found or does not exist');
+			res.redirect('/chat')
 		} else {
-			// else give error message
-			req.flash('error', "You don't have permission to do that!");
-			res.redirect('/');
+			let userId = req.user._id;
+			if(foundRoom.members.includes(userId)) {
+				return next();
+			}
+			// stuff for when user is not member of room
+			req.flash('error', 'You are not a member of this room');
+			res.redirect('/chat');
 		}
-	} else {
-		// else give error message
-		req.flash('error', 'Please Login');
-		res.redirect('/')
-	}
+	})
 }
 
 //export the object with all the functions

@@ -1,0 +1,20 @@
+#user-list {
+    max-height: 10rem;
+    overflow-y: scroll;
+    border: 1px solid #ced4da;
+    padding: 10px;
+    margin-bottom: 1rem;
+}
+
+.search-filter {
+    margin-bottom: 2rem;
+    border-bottom: 1px solid #424651;
+}
+
+input#search-input {
+    display: inline-block;
+    width: 80%;
+    border: none;
+    outline: 0;
+    box-shadow: none;
+}

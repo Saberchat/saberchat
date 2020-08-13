@@ -26,7 +26,11 @@ router.post("/register",  function(req, res) {
 	User.register(newUser, req.body.password, function(err, user) {
 		if(err) {
 			//flash message the error if there is an error registering user
-			req.flash("error", err.message);
+			if(err.name == 'UserExistsError') {
+				req.flash('error', 'Email is already taken');
+			} else {
+				req.flash("error", err.message);
+			}
 			console.log(err);
 			//redirect to root
 			return res.redirect("/");
