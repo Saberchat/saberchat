@@ -75,13 +75,6 @@ app.use(indexRoutes);
 app.use(chatRoutes);
 app.use(profileRoutes);
 
-app.get('/test', (req, res) => {
-  console.log("test".cyan);
-  process.stdout.write("test 2".magenta);
-  var stringTest = "test 3";
-  console.log(stringTest.blue);
-})
-
 // Socket.io server-side code
 io.on('connect', (socket) => {
   console.log("A user connected");
