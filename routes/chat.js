@@ -9,14 +9,14 @@ const middleware = require('../middleware');
 //import comment schema for db stuff
 const Comment = require('../models/comment');
 
-router.get('/rooms', middleware.isLoggedIn, (req, res) => {
-	res.render('chat/selectRoom');
+router.get('/chat', middleware.isLoggedIn, (req, res) => {
+	res.render('chat/index');
 });
 
 // stuff for /chat route. Middleware makes sure user is logged in.
 router.get('/chat/:id', middleware.isLoggedIn, (req, res) => {
 	//finds all comments in the db
-	Comment.find({}, function(err, foundComments){
+	Comment.find({room: req.params.id}, function(err, foundComments){
 		if(err){
 			//log error and flash message if it can't access the comments in db
       console.log(err);
@@ -27,7 +27,7 @@ router.get('/chat/:id', middleware.isLoggedIn, (req, res) => {
 				console.log('no found comments!');
 			}
 			//renders views/chat/index.ejs and passes in data
-			res.render('chat/index', {comments: foundComments, room: req.params.id});
+			res.render('chat/show', {comments: foundComments, room: req.params.id});
 		}
 	});
 });

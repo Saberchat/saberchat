@@ -75,6 +75,12 @@ app.use(indexRoutes);
 app.use(chatRoutes);
 app.use(profileRoutes);
 
+//route to catch non-existent routes
+app.get('*', function(req, res) {
+	req.flash('error', 'Url does not exist');
+	res.redirect('/');
+});
+
 // Socket.io server-side code
 io.on('connect', (socket) => {
   console.log("A user connected");
@@ -99,7 +105,7 @@ io.on('connect', (socket) => {
     console.log(msg);
 
 		// create/save comment to db
-		Comment.create({text: msg.text}, function(err, comment) {
+		Comment.create({text: msg.text, room: socket.room}, function(err, comment) {
 			if(err) {
 				// sends error msg if comment could not be created
 				console.log(err);

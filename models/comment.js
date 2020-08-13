@@ -1,7 +1,8 @@
 const mongoose = require("mongoose");
 //comment will have text, author id, author username, and a timestamp for when it was created.
 var commentSchema = new mongoose.Schema({
-  text: String,
+	text: String,
+	room: String,
 	author: {
 		id: {
 			type: mongoose.Schema.Types.ObjectId,
