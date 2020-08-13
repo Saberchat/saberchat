@@ -13,6 +13,14 @@ const Room = require('../models/room');
 
 //route for displaying chats
 router.get('/chat', middleware.isLoggedIn, (req, res) => {
+	// var user;
+	// User.findById(req.params.id, function(err, foundUser) {
+	// 	if (err || !foundUser) {
+	// 		res.redirect('back');
+	// 	} else {
+	// 		user = foundUser;
+	// 	}
+	// });
 	Room.find({}, function(err, foundRooms) {
 		if(err || !foundRooms) {
             req.flash('error', 'Unable to access Database');

@@ -30,6 +30,19 @@
       <% }) %>
       <a href="chat/new" class="btn btn-info mt-2">Create Chat Group</a>
     </div>
-    
+    <div class="container pt-4">
+      <li href="" class="list-group-item list-group-item-info">
+        <div class="d-flex w-100 justify-content-between">
+          <h2 class="mb-1">Edit my rooms.</h2>
+          <small></small>
+        </div>
+        <p class="mb-1">Make changes to the rooms you created.</p>
+      </li>
+      <% rooms.forEach(room => { %>
+        <% if (room.creator.id.equals(currentUser._id)) { %>
+          <a href="chat/edit/<%= room._id %>" class="list-group-item list-group-item-action list-group-item-light"><%= room.name %></a>
+        <% } %>
+      <% }) %>
+    </div>
   </body>
 </html>
