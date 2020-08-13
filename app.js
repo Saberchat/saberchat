@@ -1,20 +1,22 @@
-const express = require('express'),
- 	  app = express(),
-	  mongoose = require('mongoose'),
-	  passport = require('passport'),
-	  bodyParser = require('body-parser'),
-	  LocalStrategy = require('passport-local'),
-	  flash = require('connect-flash'),
-	  methodOverride = require('method-override');
+// Require NodeJS modules
+const express = require('express');
+const app = express();
+const mongoose = require('mongoose');
+const passport = require('passport');
+const bodyParser = require('body-parser');
+const LocalStrategy = require('passport-local');
+const flash = require('connect-flash');
+const methodOverride = require('method-override');
+const colors = require('colors');
 
 // require the models for database actions
-const Comment = require('./models/comment'),
-	  User = require("./models/user");
+const Comment = require('./models/comment');
+const User = require("./models/user");
 
 //require the routes
-const indexRoutes = require('./routes/index'),
-	  chatRoutes = require('./routes/chat'),
-	  profileRoutes = require('./routes/profile');
+const indexRoutes = require('./routes/index');
+const chatRoutes = require('./routes/chat');
+const profileRoutes = require('./routes/profile');
 
 const http = require('http').createServer(app);
 const io = require('socket.io')(http);
@@ -23,7 +25,6 @@ const port = process.env.PORT || 3000;
 //connect to db. We should set the link as environment variable for security purposes in the future.
 //mongodb+srv://<username>:<password>@cluster0-cpycz.mongodb.net/saberChat?retryWrites=true&w=majority
 mongoose.connect("mongodb+srv://admin_1:alsion2020@cluster0-cpycz.mongodb.net/saberChat?retryWrites=true&w=majority", {useNewUrlParser: true, useUnifiedTopology: true, useFindAndModify: false});
-
 
 // ============================
 // app configuration
@@ -74,11 +75,16 @@ app.use(indexRoutes);
 app.use(chatRoutes);
 app.use(profileRoutes);
 
+app.get('/test', (req, res) => {
+  console.log("test".cyan);
+  process.stdout.write("test 2".magenta);
+  var stringTest = "test 3";
+  console.log(stringTest.blue);
+})
+
 // Socket.io server-side code
 io.on('connect', (socket) => {
-
   console.log("A user connected");
-
   socket.on('disconnect', () => {
 		console.log("A user disconnected");
 	});
@@ -90,12 +96,15 @@ io.on('connect', (socket) => {
   });
 
 	socket.on('chat message', (msg) => {
-		// broadcast message to all connected users
+		// broadcast message to all connected users in the room
 		io.sockets.in(socket.room).emit('chat message', msg);
-		console.log(msg);
-    // Log room name
-    process.stdout.write("Room: ");
+
+    // Log information
+    console.log("Room: ".cyan);
     console.log(socket.room);
+		console.log("Message: ".cyan);
+    console.log(msg);
+
 		// create/save comment to db
 		Comment.create({text: msg.text}, function(err, comment) {
 			if(err) {
@@ -108,12 +117,12 @@ io.on('connect', (socket) => {
 				comment.author.id = msg.authorId;
 				// saves changes
 				comment.save();
-				console.log('comment created: '+ comment)
+        // confirmation log
+				console.log('Database Comment created: '.magenta);
+        console.log(comment);
 			}
 		});
-
 	});
-
 });
 
 // -----------------------
