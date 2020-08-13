@@ -40,7 +40,7 @@
       </li>
       <% rooms.forEach(room => { %>
         <% if (room.creator.id.equals(currentUser._id)) { %>
-          <a href="chat/edit/<%= room._id %>" class="list-group-item list-group-item-action list-group-item-light"><%= room.name %></a>
+          <a href="chat/edit-form/<%= room._id %>" class="list-group-item list-group-item-action list-group-item-light"><%= room.name %></a>
         <% } %>
       <% }) %>
     </div>

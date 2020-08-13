@@ -14,7 +14,7 @@ middlewareObj.isLoggedIn = function(req, res, next) {
 		return next();
 	}
 	//user is not logged in. Give flash message and redirect to root
-	req.flash('error', 'Please Log In');
+	req.flash('error', 'Please Login');
 	res.redirect('/');
 }
 

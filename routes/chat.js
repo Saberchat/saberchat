@@ -13,14 +13,6 @@ const Room = require('../models/room');
 
 //route for displaying chats
 router.get('/chat', middleware.isLoggedIn, (req, res) => {
-	// var user;
-	// User.findById(req.params.id, function(err, foundUser) {
-	// 	if (err || !foundUser) {
-	// 		res.redirect('back');
-	// 	} else {
-	// 		user = foundUser;
-	// 	}
-	// });
 	Room.find({}, function(err, foundRooms) {
 		if(err || !foundRooms) {
             req.flash('error', 'Unable to access Database');
@@ -34,13 +26,13 @@ router.get('/chat', middleware.isLoggedIn, (req, res) => {
 //route for desplaying new room form
 router.get('/chat/new', middleware.isLoggedIn, (req, res) => {
 	User.find({}, function(err, foundUsers) {
-        if(err || !foundUsers) {
-            req.flash('error', 'Unable to access Database');
-            res.redirect('back');
-        } else {
-            res.render('chat/new', {users: foundUsers});
-        }
-    });
+    if(err || !foundUsers) {
+      req.flash('error', 'Unable to access Database');
+      res.redirect('back');
+    } else {
+      res.render('chat/new', {users: foundUsers});
+    }
+  });
 });
 
 // stuff for /chat route. Middleware makes sure user is logged in and allowed in chat group.
@@ -77,11 +69,47 @@ router.post('/chat/new', middleware.isLoggedIn, function(req, res) {
 			room.creator.id = req.user._id;
 			room.creator.username = req.user.username;
 			room.save()
-			console.log('Database Room created: '.magenta);
+			console.log('Database Room created: '.cyan);
 			console.log(room);
 			res.redirect('/chat');
 		}
 	});
+});
+
+router.get('/chat/edit-form/:id', middleware.isLoggedIn, (req, res) => {
+	var users;
+	User.find({}, function(err, foundUsers) {
+    if(err || !foundUsers) {
+      req.flash('error', 'Unable to access Database');
+      res.redirect('back');
+    } else {
+      users = foundUsers;
+    }
+  });
+	Room.findById(req.params.id, function(err, foundRoom) {
+		if(err || !foundRoom) {
+      req.flash('error', 'Unable to access Database');
+      res.redirect('back');
+    } else {
+      res.render('chat/edit', {users: users, room: foundRoom});
+    }
+	});
+});
+
+router.put('/chat/edit/:id', middleware.isLoggedIn, (req, res) => {
+	// Room.findByIdAndUpdate(req.params.id, function(err, room) {
+	// 	if (err || !room) {
+	// 		req.flash('error', 'Unable to access Database');
+	// 		res.redirect('back');
+	// 	} else {
+	// 		room.name = req.body.newname;
+	// 		// for(const user in req.body.check) {
+	// 		// 	room.members.push(user);
+	// 		// }
+	// 		res.render('chat');
+	// 	}
+	// });
+	res.send(req.params.id + " " + req.body.newname);
 });
 
 //export the router with all the routes connected
