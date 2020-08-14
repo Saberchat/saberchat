@@ -96,7 +96,7 @@ router.get('/chat/edit-form/:id', middleware.isLoggedIn, (req, res) => {
 	});
 });
 
-router.put('/chat/edit/:id', middleware.isLoggedIn, (req, res) => {
+router.put('/chat/:id/edit', middleware.isLoggedIn, (req, res) => {
 	var query = { name: req.body.newname }
 	var rooms;
 	Room.find({}, function(err, foundRooms) {
