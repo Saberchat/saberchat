@@ -26,7 +26,12 @@
         <p class="mb-1">Connect with other members of the Alsion community.</p>
       </li>
       <% rooms.forEach(room => { %>
-        <a href="chat/<%= room._id %>" class="list-group-item list-group-item-action list-group-item-light"><%= room.name %></a>
+        <% if (room.members.includes(currentUser._id)) { %>
+          <a href="chat/<%= room._id %>" class="list-group-item list-group-item-action list-group-item-light"><%= room.name %> :you are a member:</a>
+        <% } else { %>
+          <a href="chat/<%= room._id %>" class="list-group-item list-group-item-action list-group-item-light"><%= room.name %> :you are not a member:</a>
+        <% } %>
+        
       <% }) %>
       <a href="chat/new" class="btn btn-info mt-2">Create chat room</a>
     </div>
