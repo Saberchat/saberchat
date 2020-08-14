@@ -7,6 +7,7 @@
   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css" integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk" crossorigin="anonymous">
   <!-- link chat stylesheet -->
   <link rel="stylesheet" href="/stylesheets/chat/show.css">
+  <link rel="stylesheet" href="/stylesheets/components/navbar.css">
 
   <!-- using my fontawesome kit -->
   <script src="https://kit.fontawesome.com/dccc745c41.js" crossorigin="anonymous"></script>
@@ -19,6 +20,7 @@
   <script src="/javascript/socket.js"></script>
 </head>
 <body>
+  <%- include("../partials/navbar") %>
   <div class="container py-5 px-4">
     <header class="text-center">
         <h1 class="display-4 text-white">Chat Group Name</h1>
@@ -44,8 +46,8 @@
               <div class="media w-50 mb-3">
                 <img src="<%= comment.author.imageUrl %>" alt="user" width="50" class="rounded-circle">
                 <div class="media-body ml-3">
-                  <div class="bg-light rounded py-2 px-3 mb-2">
-                    <p class="text-small mb-0 text-muted"><%= comment.text %></p>
+                  <div class="bg-grey rounded py-2 px-3 mb-2">
+                    <p class="text-small mb-0 text-dark"><%= comment.text %></p>
                   </div>
                   <p class="small text-muted"><%= comment.date %></p>
                 </div>
@@ -56,7 +58,7 @@
       <!-- Typing area -->
       <form class="bg-light" id="message-form">
         <div class="input-group">
-          <input id="m" type="text" placeholder="Type a message" aria-describedby="button-addon2" class="form-control rounded-0 border-0 py-4 bg-light" autocomplete="off">
+          <input id="m" type="text" placeholder="Type a message..." aria-describedby="button-addon2" class="form-control rounded-0 border-0 py-4 bg-light" autocomplete="off">
           <div class="input-group-append">
             <button id="button-addon2" class="btn btn-link"> <i class="fa fa-paper-plane"></i></button>
           </div>

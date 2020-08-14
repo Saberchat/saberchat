@@ -39,3 +39,12 @@ input::placeholder {
     font-size: 0.9rem;
     color: #999;
 }
+
+#m {
+    outline: none;
+    box-shadow: none;
+}
+
+.bg-grey {
+    background-color: #dfe0e1;
+}
