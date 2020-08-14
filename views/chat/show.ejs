@@ -13,7 +13,9 @@
   <script src="https://kit.fontawesome.com/dccc745c41.js" crossorigin="anonymous"></script>
 
   <script src="/socket.io/socket.io.js"></script>
-  <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+  <script src="https://code.jquery.com/jquery-3.5.1.min.js" integrity="sha256-9/aliU8dGd2tb6OSsuzixeV4y/faTqgFtohetphbbj0=" crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/@popperjs/core@2" crossorigin="anonymous"></script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js" integrity="sha384-OgVRvuATP1z7JjHLkuOU7Xw704+h835Lr+6QL9UvYjZE3Ipu6Tp75j7Bh/kR0JKI" crossorigin="anonymous"></script>
 
   <!-- Cdn for formating the dates -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-dateFormat/1.0/jquery.dateFormat.min.js"></script>
@@ -23,19 +25,20 @@
 </head>
 <body>
   <%- include("../partials/navbar") %>
+  <header class="text-center">
+    <h1 class="display-4 text-dark"><%= room.name %> </h1>
+    <p class="text-dark lead mb-0">Chat Group Desc.</p>
+</header>
   <div class="container py-5 px-4">
-    <header class="text-center">
-        <h1 class="display-4 text-white">Chat Group Name</h1>
-        <p class="text-white lead mb-0">Chat Group Desc.</p>
-    </header>
     <div class="row rounded-lg overflow-hidden shadow mt-2">
       <!-- Chat Box-->
       <div class="col-12 px-0">
-        <div class="px-4 py-5 chat-box bg-white" id="message-display">
+        <div class="px-4 py-3 chat-box bg-white" id="message-display">
+          <a href="/chat" class="mb-3" style="display: block;"><i class="fas fa-long-arrow-alt-left"></i> Exit</a>
           <% comments.forEach(comment => { %>
             <% if (comment.author._id.equals(currentUser._id)) { %>
               <!-- Reciever Message-->
-              <div class="media w-50 ml-auto mb-3">
+              <div class="media w-65 ml-auto mb-2">
                 <div class="media-body">
                   <div class="bg-primary rounded py-2 px-3 mb-2">
                     <p class="text-small mb-0 text-white"><%= comment.text %></p>
@@ -45,13 +48,13 @@
               </div>
             <% } else { %>
               <!-- Sender message -->
-              <div class="media w-50 mb-3">
-                <img src="<%= comment.author.imageUrl %>" alt="user" width="50" class="rounded-circle">
+              <div class="media w-65 mb-2">
+                <img src="<%= comment.author.imageUrl %>" alt="user" class="user-image">
                 <div class="media-body ml-3">
                   <div class="bg-grey rounded py-2 px-3 mb-2">
                     <p class="text-small mb-0 text-dark"><%= comment.text %></p>
                   </div>
-                  <p class="small text-muted"><%= comment.date %></p>
+                  <p class="small text-muted"><span class="username"><%= comment.author.username %></span>, <%= comment.date %></p>
                 </div>
               </div>
             <% } %>
@@ -60,9 +63,9 @@
       <!-- Typing area -->
       <form class="bg-light" id="message-form">
         <div class="input-group">
-          <input id="m" type="text" placeholder="Type a message..." aria-describedby="button-addon2" class="form-control rounded-0 border-0 py-4 bg-light" autocomplete="off">
+          <input id="m" type="text" placeholder="Type a message..." aria-describedby="send-button" class="form-control rounded-0 border-0 py-4 bg-light" autocomplete="off">
           <div class="input-group-append">
-            <button id="button-addon2" class="btn btn-link"> <i class="fa fa-paper-plane"></i></button>
+            <button id="send-button" class="btn btn-link"> <i class="fa fa-paper-plane send-icon"></i></button>
           </div>
         </div>
       </form>
@@ -76,7 +79,7 @@
   const messageForm = '#message-form';
   const input = '#m';
   const chatDisplay = '#message-display';
-  const room = '<%= room %>';
+  const room = '<%= room._id %>';
   // call the chatInit function from public/javascript/socket.js
   chatInit(username, userId, messageForm, input, chatDisplay, room, userImage);
 </script>
