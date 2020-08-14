@@ -13,6 +13,7 @@
 
   <script src="/socket.io/socket.io.js"></script>
   <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-dateFormat/1.0/jquery.dateFormat.min.js"></script>
 
   <!-- script for socket io chat -->
   <script src="/javascript/socket.js"></script>
@@ -28,39 +29,39 @@
       <div class="col-12 px-0">
         <div class="px-4 py-5 chat-box bg-white" id="message-display">
           <% comments.forEach(comment => { %>
-            <div class="media w-50 mb-3">
-              <img src="<%= comment.author.imageUrl %>" alt="user" width="50" class="rounded-circle">
-              <div class="media-body ml-3">
-                <div class="bg-light rounded py-2 px-3 mb-2">
-                  <p class="text-small mb-0 text-muted"><%= comment.text %></p>
+            <% if (comment.author._id.equals(currentUser._id)) { %>
+              <!-- Reciever Message-->
+              <div class="media w-50 ml-auto mb-3">
+                <div class="media-body">
+                  <div class="bg-primary rounded py-2 px-3 mb-2">
+                    <p class="text-small mb-0 text-white"><%= comment.text %></p>
+                  </div>
+                  <p class="small text-muted"><%= comment.date %></p>
                 </div>
-                <p class="small text-muted"><%= comment.created_at %> </p>
               </div>
-            </div>
+            <% } else { %>
+              <!-- Sender message -->
+              <div class="media w-50 mb-3">
+                <img src="<%= comment.author.imageUrl %>" alt="user" width="50" class="rounded-circle">
+                <div class="media-body ml-3">
+                  <div class="bg-light rounded py-2 px-3 mb-2">
+                    <p class="text-small mb-0 text-muted"><%= comment.text %></p>
+                  </div>
+                  <p class="small text-muted"><%= comment.date %></p>
+                </div>
+              </div>
+            <% } %>
           <% }) %>
-          <!-- Sender Message-->
-          
-  
-          <!-- Reciever Message-->
-          <div class="media w-50 ml-auto mb-3">
-            <div class="media-body">
-              <div class="bg-primary rounded py-2 px-3 mb-2">
-                <p class="text-small mb-0 text-white">Test which is a new approach to have all solutions</p>
-              </div>
-              <p class="small text-muted">12:00 PM | Aug 13</p>
-            </div>
-          </div>
-        <!-- Typing area -->
-        <form class="bg-light" id="message-form">
-          <div class="input-group">
-            <input id="m" type="text" placeholder="Type a message" aria-describedby="button-addon2" class="form-control rounded-0 border-0 py-4 bg-light" autocomplete="off">
-            <div class="input-group-append">
-              <button id="button-addon2" class="btn btn-link"> <i class="fa fa-paper-plane"></i></button>
-            </div>
-          </div>
-        </form>
-        
       </div>
+      <!-- Typing area -->
+      <form class="bg-light" id="message-form">
+        <div class="input-group">
+          <input id="m" type="text" placeholder="Type a message" aria-describedby="button-addon2" class="form-control rounded-0 border-0 py-4 bg-light" autocomplete="off">
+          <div class="input-group-append">
+            <button id="button-addon2" class="btn btn-link"> <i class="fa fa-paper-plane"></i></button>
+          </div>
+        </div>
+      </form>
     </div>
 </div>
 <script>
