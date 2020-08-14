@@ -107,14 +107,13 @@ io.on('connect', (socket) => {
 		console.log(msg);
 
 		// create/save comment to db
-		Comment.create({text: msg.text, room: socket.room}, function(err, comment) {
+		Comment.create({text: msg.text, room: socket.room, author: msg.authorId}, function(err, comment) {
 			if(err) {
 				// sends error msg if comment could not be created
 				console.log(err);
 				req.flash('error', 'message could not be created');
 			} else {
-				// sets comment's author info from the received message object
-				comment.author = msg.authorId;
+				// format created date
 				comment.date = dateFormat(comment.created_at, "h:MM TT | mmm d");
 				// saves changes
 				comment.save();
