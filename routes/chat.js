@@ -43,8 +43,8 @@ router.get('/chat/:id', middleware.isLoggedIn, middleware.checkIfMember, (req, r
 			req.flash('error', 'Could not find group');
 			res.redirect('/chat');
 		} else {
-			//finds all comments in the db
-			Comment.find({room: foundRoom._id}).populate('author').exec(function(err, foundComments){
+			//finds latest 30 comments in the db with matchin room#. This one's a bit monstrous
+			Comment.find({room: foundRoom._id}).sort({_id: -1}).limit(30).populate('author').exec(function(err, foundComments){
 				if(err){
 					//log error and flash message if it can't access the comments in db
 					console.log(err);

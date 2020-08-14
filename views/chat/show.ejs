@@ -33,9 +33,10 @@
     <div class="row rounded-lg overflow-hidden shadow mt-2">
       <!-- Chat Box-->
       <div class="col-12 px-0">
-        <div class="px-4 py-3 chat-box bg-white" id="message-display">
-          <a href="/chat" class="mb-3" style="display: block;"><i class="fas fa-long-arrow-alt-left"></i> Exit</a>
-          <% comments.forEach(comment => { %>
+        <a href="/chat" class="exit-button"><i class="fas fa-long-arrow-alt-left"></i> Exit</a>
+        <div class="px-4 chat-box bg-white" id="message-display">
+          <!-- reverse it to get correct order -->
+          <% comments.reverse().forEach(comment => { %>
             <% if (comment.author._id.equals(currentUser._id)) { %>
               <!-- Reciever Message-->
               <div class="media w-65 ml-auto mb-2">
@@ -72,6 +73,11 @@
     </div>
 </div>
 <script>
+  //scroll to the last chat message
+  let messages = document.getElementsByClassName('media');
+  let message = messages[messages.length - 1];
+  message.scrollIntoView();
+
   //set all the variables for the chatInit function
   const userId = '<%= currentUser._id %>';
   const username = '<%= currentUser.username %>';

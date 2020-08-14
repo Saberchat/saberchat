@@ -21,6 +21,9 @@ function chatInit(username, userId, messageForm, input, chatDisplay, room, userI
       </div>`
       );
     }
+    let messages = document.getElementsByClassName('media');
+    let message = messages[messages.length - 1];
+    message.scrollIntoView();
     return false;
   });
 
@@ -31,14 +34,17 @@ function chatInit(username, userId, messageForm, input, chatDisplay, room, userI
   socket.on('chat message', function(msg) {
     // appends the message to the ul element displaying the messages
     $(chatDisplay).append(`<div class="media w-50 mb-2">
-    <img src="${msg.userImage}" alt="user" width="50" class="rounded-circle">\
+    <img src="${msg.userImage}" alt="user" class="user-image">\
     <div class="media-body ml-3">
-      <div class="bg-light rounded py-2 px-3 mb-2">
-        <p class="text-small mb-0 text-muted">${msg.text}</p>
+      <div class="bg-grey rounded py-2 px-3 mb-2">
+        <p class="text-small mb-0 text-dark">${msg.text}</p>
       </div>
-      <p class="small text-muted">${$.format.date(Date.now(), "h:mm a | MMM d")}</p>
+      <p class="small text-muted"><span class="username">${msg.username}</span>, ${$.format.date(Date.now(), "h:mm a | MMM d")}</p>
     </div>
-  </div>`);
+    </div>`);
+    let messages = document.getElementsByClassName('media');
+    let message = messages[messages.length - 1];
+    message.scrollIntoView();
+    socket.on('');
   });
-  socket.on('')
 }
