@@ -76,7 +76,7 @@ app.use(indexRoutes);
 app.use(chatRoutes);
 app.use(profileRoutes);
 
-//route to catch non-existent routes
+// Catch-all route
 app.get('*', function(req, res) {
 	req.flash('error', 'Url does not exist');
 	res.redirect('/');

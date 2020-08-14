@@ -26,13 +26,13 @@ router.get('/chat', middleware.isLoggedIn, (req, res) => {
 //route for desplaying new room form
 router.get('/chat/new', middleware.isLoggedIn, (req, res) => {
 	User.find({}, function(err, foundUsers) {
-        if(err || !foundUsers) {
-            req.flash('error', 'Unable to access Database');
-            res.redirect('back');
-        } else {
-            res.render('chat/new', {users: foundUsers});
-        }
-    });
+    if(err || !foundUsers) {
+      req.flash('error', 'Unable to access Database');
+      res.redirect('back');
+    } else {
+      res.render('chat/new', {users: foundUsers});
+    }
+  });
 });
 
 // stuff for /chat route. Middleware makes sure user is logged in and allowed in chat group.
@@ -70,11 +70,57 @@ router.post('/chat/new', middleware.isLoggedIn, function(req, res) {
 			room.creator.id = req.user._id;
 			room.creator.username = req.user.username;
 			room.save()
-			console.log('Database Room created: '.magenta);
+			console.log('Database Room created: '.cyan);
 			console.log(room);
 			res.redirect('/chat');
 		}
 	});
+});
+
+router.get('/chat/edit-form/:id', middleware.isLoggedIn, (req, res) => {
+	var users;
+	User.find({}, function(err, foundUsers) {
+    if(err || !foundUsers) {
+      req.flash('error', 'Unable to access Database');
+      res.redirect('back');
+    } else {
+      users = foundUsers;
+    }
+  });
+	Room.findById(req.params.id, function(err, foundRoom) {
+		if(err || !foundRoom) {
+      req.flash('error', 'Unable to access Database');
+      res.redirect('back');
+    } else {
+      res.render('chat/edit', {users: users, room: foundRoom});
+    }
+	});
+});
+
+router.put('/chat/:id/edit', middleware.isLoggedIn, (req, res) => {
+	var query = { name: req.body.newname }
+	var rooms;
+	Room.find({}, function(err, foundRooms) {
+		if(err || !foundRooms) {
+        req.flash('error', 'Unable to access Database');
+        res.redirect('back');
+      } else {
+				rooms = foundRooms;
+      }
+	});
+	Room.findByIdAndUpdate(req.params.id, query, function(err, room) {
+		if (err || !room) {
+			req.flash('error', 'Unable to access Database');
+			res.redirect('back');
+		} else {
+			// for(const user in req.body.check) {
+			// 	room.members.push(user);
+			// }
+			req.flash('success', 'Updated your group');
+			res.redirect('/chat');
+		}
+	});
+	// res.send(req.params.id + " " + req.body.newname);
 });
 
 //export the router with all the routes connected
