@@ -4,10 +4,11 @@ const app = express();
 const mongoose = require('mongoose');
 const passport = require('passport');
 const bodyParser = require('body-parser');
-const LocalStrategy = require('passport-local');
+// const LocalStrategy = require('passport-local');
 const flash = require('connect-flash');
 const methodOverride = require('method-override');
 const colors = require('colors');
+const dateFormat = require('dateformat');
 
 // require the models for database actions
 const Comment = require('./models/comment');
@@ -96,13 +97,14 @@ io.on('connect', (socket) => {
 
 	socket.on('chat message', (msg) => {
 		// broadcast message to all connected users in the room
-		io.sockets.in(socket.room).emit('chat message', msg);
+		// io.sockets.in(socket.room).emit('chat message', msg);
+		socket.to(socket.room).emit('chat message', msg);
 
-    // Log information
-    console.log("Room: ".cyan);
-    console.log(socket.room);
+		// Log information
+		console.log("Room: ".cyan);
+		console.log(socket.room);
 		console.log("Message: ".cyan);
-    console.log(msg);
+		console.log(msg);
 
 		// create/save comment to db
 		Comment.create({text: msg.text, room: socket.room}, function(err, comment) {
@@ -112,13 +114,13 @@ io.on('connect', (socket) => {
 				req.flash('error', 'message could not be created');
 			} else {
 				// sets comment's author info from the received message object
-				comment.author.username = msg.author;
-				comment.author.id = msg.authorId;
+				comment.author = msg.authorId;
+				comment.date = dateFormat(comment.created_at, "h:MM TT | mmm d");
 				// saves changes
 				comment.save();
-        // confirmation log
+        		// confirmation log
 				console.log('Database Comment created: '.cyan);
-        console.log(comment);
+        		console.log(comment);
 			}
 		});
 	});

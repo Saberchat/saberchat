@@ -38,16 +38,17 @@ router.get('/chat/new', middleware.isLoggedIn, (req, res) => {
 // stuff for /chat route. Middleware makes sure user is logged in and allowed in chat group.
 router.get('/chat/:id', middleware.isLoggedIn, middleware.checkIfMember, (req, res) => {
 	//finds all comments in the db
-	Comment.find({room: req.params.id}, function(err, foundComments){
+	Comment.find({room: req.params.id}).populate('author').exec(function(err, foundComments){
 		if(err){
 			//log error and flash message if it can't access the comments in db
-      console.log(err);
-      req.flash('error', 'Comments could not be loaded');
+			console.log(err);
+			req.flash('error', 'Comments could not be loaded');
 		} else {
 			if(!foundComments){
 				//if there are no comments in db
 				console.log('no found comments!');
 			}
+			console.log(foundComments);
 			//renders views/chat/index.ejs and passes in data
 			res.render('chat/show', {comments: foundComments, room: req.params.id});
 		}
