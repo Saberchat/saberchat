@@ -4,11 +4,10 @@ const app = express();
 const mongoose = require('mongoose');
 const passport = require('passport');
 const bodyParser = require('body-parser');
-// const LocalStrategy = require('passport-local');
+const LocalStrategy = require('passport-local');
 const flash = require('connect-flash');
 const methodOverride = require('method-override');
 const colors = require('colors');
-const dateFormat = require('dateformat');
 
 // require the models for database actions
 const Comment = require('./models/comment');
@@ -84,9 +83,9 @@ app.get('*', function(req, res) {
 
 // Socket.io server-side code
 io.on('connect', (socket) => {
-  console.log("A user connected");
+  console.log("A user connected".cyan);
   socket.on('disconnect', () => {
-		console.log("A user disconnected");
+		console.log("A user disconnected".cyan);
 	});
 
   socket.on('switch room', (newroom) => {
@@ -97,29 +96,29 @@ io.on('connect', (socket) => {
 
 	socket.on('chat message', (msg) => {
 		// broadcast message to all connected users in the room
-		// io.sockets.in(socket.room).emit('chat message', msg);
-		socket.to(socket.room).emit('chat message', msg);
+		io.sockets.in(socket.room).emit('chat message', msg);
 
-		// Log information
-		console.log("Room: ".cyan);
-		console.log(socket.room);
-		console.log("Message: ".cyan);
-		console.log(msg);
+    // Log information
+    // console.log("Room: ".cyan);
+    // console.log(socket.room);
+		// console.log("Message: ".cyan);
+    // console.log(msg);
 
 		// create/save comment to db
-		Comment.create({text: msg.text, room: socket.room, author: msg.authorId}, function(err, comment) {
+		Comment.create({text: msg.text, room: socket.room}, function(err, comment) {
 			if(err) {
 				// sends error msg if comment could not be created
 				console.log(err);
 				req.flash('error', 'message could not be created');
 			} else {
-				// format created date
-				comment.date = dateFormat(comment.created_at, "h:MM TT | mmm d");
+				// sets comment's author info from the received message object
+				comment.author.username = msg.author;
+				comment.author.id = msg.authorId;
 				// saves changes
 				comment.save();
-        		// confirmation log
-				console.log('Database Comment created: '.cyan);
-        		console.log(comment);
+        // confirmation log
+				// console.log('Database Comment created: '.cyan);
+        // console.log(comment);
 			}
 		});
 	});

@@ -54,14 +54,14 @@ router.get('/chat/:id', middleware.isLoggedIn, middleware.checkIfMember, (req, r
 						//if there are no comments in db
 						console.log('no found comments!');
 					}
-					console.log(foundComments);
+					// console.log(foundComments);
 					//renders views/chat/index.ejs and passes in data
 					res.render('chat/show', {comments: foundComments, room: foundRoom});
 				}
 			});
 		}
 	});
-	
+
 });
 
 // route for creating new rooms
