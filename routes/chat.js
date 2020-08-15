@@ -13,126 +13,144 @@ const Room = require('../models/room');
 
 //route for displaying chats
 router.get('/chat', middleware.isLoggedIn, (req, res) => {
-	Room.find({}, function(err, foundRooms) {
-		if(err || !foundRooms) {
-            req.flash('error', 'Unable to access Database');
-            res.redirect('back');
-        } else {
-            res.render('chat/index', {rooms: foundRooms});
-        }
-	});
+  Room.find({}, function(err, foundRooms) {
+    if (err || !foundRooms) {
+      req.flash('error', 'Unable to access Database');
+      res.redirect('back');
+    } else {
+      res.render('chat/index', {
+        rooms: foundRooms
+      });
+    }
+  });
 });
 
 //route for desplaying new room form
 router.get('/chat/new', middleware.isLoggedIn, (req, res) => {
-	User.find({}, function(err, foundUsers) {
-    if(err || !foundUsers) {
+  User.find({}, function(err, foundUsers) {
+    if (err || !foundUsers) {
       req.flash('error', 'Unable to access Database');
       res.redirect('back');
     } else {
-      res.render('chat/new', {users: foundUsers});
+      res.render('chat/new', {
+        users: foundUsers
+      });
     }
   });
 });
 
 // stuff for /chat route. Middleware makes sure user is logged in and allowed in chat group.
 router.get('/chat/:id', middleware.isLoggedIn, middleware.checkIfMember, (req, res) => {
-	Room.findById(req.params.id, function(err, foundRoom) {
-		if(err) {
-			console.log(err);
-			req.flash('error', 'Could not find group');
-			res.redirect('/chat');
-		} else {
-			//finds latest 30 comments in the db with matchin room#. This one's a bit monstrous
-			Comment.find({room: foundRoom._id}).sort({_id: -1}).limit(30).populate('author').exec(function(err, foundComments){
-				if(err){
-					//log error and flash message if it can't access the comments in db
-					console.log(err);
-					req.flash('error', 'Comments could not be loaded');
-				} else {
-					if(!foundComments){
-						//if there are no comments in db
-						console.log('no found comments!');
-					}
-					// console.log(foundComments);
-					//renders views/chat/index.ejs and passes in data
-					res.render('chat/show', {comments: foundComments, room: foundRoom});
-				}
-			});
-		}
-	});
+  Room.findById(req.params.id, function(err, foundRoom) {
+    if (err) {
+      console.log(err);
+      req.flash('error', 'Could not find group');
+      res.redirect('/chat');
+    } else {
+      //finds latest 30 comments in the db with matchin room#. This one's a bit monstrous
+      Comment.find({
+        room: foundRoom._id
+      }).sort({
+        _id: -1
+      }).limit(30).populate('author').exec(function(err, foundComments) {
+        if (err) {
+          //log error and flash message if it can't access the comments in db
+          console.log(err);
+          req.flash('error', 'Comments could not be loaded');
+        } else {
+          if (!foundComments) {
+            //if there are no comments in db
+            console.log('no found comments!');
+          }
+          // console.log(foundComments);
+          //renders views/chat/index.ejs and passes in data
+          res.render('chat/show', {
+            comments: foundComments,
+            room: foundRoom
+          });
+        }
+      });
+    }
+  });
 
 });
 
 // route for creating new rooms
 router.post('/chat/new', middleware.isLoggedIn, function(req, res) {
-	Room.create({name: req.body.name}, function(err, room) {
-		if(err) {
-			console.log(err);
-			req.flash('error', 'group could not be created');
-			res.redirect('/chat/new');
-		} else {
-			for(const user in req.body.check) {
-				room.members.push(user);
-			}
-			room.members.push(req.user._id);
-			room.creator.id = req.user._id;
-			room.creator.username = req.user.username;
-			room.save()
-			console.log('Database Room created: '.cyan);
-			console.log(room);
-			res.redirect('/chat');
-		}
-	});
+  Room.create({
+    name: req.body.name
+  }, function(err, room) {
+    if (err) {
+      console.log(err);
+      req.flash('error', 'group could not be created');
+      res.redirect('/chat/new');
+    } else {
+      for (const user in req.body.check) {
+        room.members.push(user);
+      }
+      room.members.push(req.user._id);
+      room.creator.id = req.user._id;
+      room.creator.username = req.user.username;
+      room.save()
+      console.log('Database Room created: '.cyan);
+      console.log(room);
+      res.redirect('/chat');
+    }
+  });
 });
 
 router.get('/chat/edit-form/:id', middleware.isLoggedIn, (req, res) => {
-	var users;
-	User.find({}, function(err, foundUsers) {
-    if(err || !foundUsers) {
+  var users;
+  User.find({}, function(err, foundUsers) {
+    if (err || !foundUsers) {
       req.flash('error', 'Unable to access Database');
       res.redirect('back');
     } else {
       users = foundUsers;
     }
   });
-	Room.findById(req.params.id, function(err, foundRoom) {
-		if(err || !foundRoom) {
+  Room.findById(req.params.id, function(err, foundRoom) {
+    if (err || !foundRoom) {
       req.flash('error', 'Unable to access Database');
       res.redirect('back');
     } else {
-      res.render('chat/edit', {users: users, room: foundRoom});
+      res.render('chat/edit', {
+        users: users,
+        room: foundRoom
+      });
     }
-	});
+  });
 });
 
 router.put('/chat/:id/edit', middleware.isLoggedIn, (req, res) => {
-	var query = { name: req.body.newname }
-	Room.findByIdAndUpdate(req.params.id, query, function(err, room) {
-		if (err || !room) {
-			req.flash('error', 'Unable to access Database');
-			res.redirect('back');
-		} else {
-			// for(const user in req.body.check) {
-			// 	room.members.push(user);
-			// }
-			req.flash('success', 'Updated your group');
-			res.redirect('/chat/' + req.params.id);
-		}
-	});
-	// res.send(req.params.id + " " + req.body.newname);
+  var query = {
+    name: req.body.newname
+  }
+  Room.findByIdAndUpdate(req.params.id, query, function(err, room) {
+    if (err || !room) {
+      req.flash('error', 'Unable to access Database');
+      res.redirect('back');
+    } else {
+      // for(const user in req.body.check) {
+      // 	room.members.push(user);
+      // }
+      req.flash('success', 'Updated your group');
+      res.redirect('/chat/' + req.params.id);
+    }
+  });
+  // res.send(req.params.id + " " + req.body.newname);
 });
 
 router.delete('/chat/:id/delete', middleware.isLoggedIn, (req, res) => {
-	Room.findByIdAndDelete(req.params.id, function(err, room) {
-		if (err || !room) {
-			req.flash('error', 'Unable to access Database');
-			res.redirect('back');
-		} else {
-			req.flash('success', 'Deleted the group');
-			res.redirect('/chat');
-		}
-	});
+  Room.findByIdAndDelete(req.params.id, function(err, room) {
+    if (err || !room) {
+      req.flash('error', 'Unable to access Database');
+      res.redirect('back');
+    } else {
+      req.flash('success', 'Deleted the group');
+      res.redirect('/chat');
+    }
+  });
 });
 
 //export the router with all the routes connected
