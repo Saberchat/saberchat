@@ -108,15 +108,6 @@ router.get('/chat/edit-form/:id', middleware.isLoggedIn, (req, res) => {
 
 router.put('/chat/:id/edit', middleware.isLoggedIn, (req, res) => {
 	var query = { name: req.body.newname }
-	var rooms;
-	Room.find({}, function(err, foundRooms) {
-		if(err || !foundRooms) {
-        req.flash('error', 'Unable to access Database');
-        res.redirect('back');
-      } else {
-				rooms = foundRooms;
-      }
-	});
 	Room.findByIdAndUpdate(req.params.id, query, function(err, room) {
 		if (err || !room) {
 			req.flash('error', 'Unable to access Database');
@@ -126,7 +117,7 @@ router.put('/chat/:id/edit', middleware.isLoggedIn, (req, res) => {
 			// 	room.members.push(user);
 			// }
 			req.flash('success', 'Updated your group');
-			res.redirect('/chat');
+			res.redirect('/chat/' + req.params.id);
 		}
 	});
 	// res.send(req.params.id + " " + req.body.newname);

@@ -17,6 +17,7 @@
   },
   "homepage": "https://github.com/schavan04/alsion-fb#readme",
   "dependencies": {
+    "bad-words": "^3.0.3",
     "body-parser": "^1.19.0",
     "colors": "^1.4.0",
     "connect-flash": "^0.1.1",

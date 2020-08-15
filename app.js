@@ -1,23 +1,31 @@
 // Require NodeJS modules
+//set up and start the express server
 const express = require('express');
 const app = express();
+//mongoose allows us to communicate with mongodb seamlessly through js
 const mongoose = require('mongoose');
+//passport.js is an authentication middleware module
 const passport = require('passport');
-const bodyParser = require('body-parser');
 const LocalStrategy = require('passport-local');
+//flash messages on screen i.e "logged in successfully!"
 const flash = require('connect-flash');
+//middleware; parses incoming data from client under req.body
+const bodyParser = require('body-parser');
+//allow us to use PUT and DELETE methods
 const methodOverride = require('method-override');
+//pretty up the console
 const colors = require('colors');
-
+//profanity filter
+// const Filter = require('bad-words');
+// const filter = new Filter();
 // require the models for database actions
 const Comment = require('./models/comment');
 const User = require("./models/user");
-
 //require the routes
 const indexRoutes = require('./routes/index');
 const chatRoutes = require('./routes/chat');
 const profileRoutes = require('./routes/profile');
-
+//set up ports and socket.io
 const http = require('http').createServer(app);
 const io = require('socket.io')(http);
 const port = process.env.PORT || 3000;
@@ -64,6 +72,8 @@ app.use(function(req, res, next) {
 	// flash message stuff
 	res.locals.error = req.flash('error');
 	res.locals.success = req.flash('success');
+	// profanity filter
+	// res.locals.filter = req.filter;
 	next()
 });
 
@@ -76,10 +86,10 @@ app.use(chatRoutes);
 app.use(profileRoutes);
 
 // Catch-all route
-// app.get('*', function(req, res) {
-// 	req.flash('error', 'Url does not exist');
-// 	res.redirect('/');
-// });
+app.get('*', function(req, res) {
+	req.flash('error', 'Url does not exist');
+	res.redirect('/');
+});
 
 // Socket.io server-side code
 io.on('connect', (socket) => {
@@ -87,13 +97,14 @@ io.on('connect', (socket) => {
   socket.on('disconnect', () => {
 		console.log("A user disconnected".cyan);
 	});
-
+	// When 'switch room' event is detected, leave old room and join 'newroom';
   socket.on('switch room', (newroom) => {
     socket.leave(socket.room);
     socket.join(newroom);
     socket.room = newroom;
   });
 
+	// When 'chat message' event is detected, emit msg to all clients in room
 	socket.on('chat message', (msg) => {
 		// broadcast message to all connected users in the room
 		io.sockets.in(socket.room).emit('chat message', msg);
