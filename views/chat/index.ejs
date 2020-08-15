@@ -31,11 +31,11 @@
         <% } else { %>
           <a href="chat/<%= room._id %>" class="list-group-item list-group-item-action list-group-item-light"><%= room.name %> :you are not a member:</a>
         <% } %>
-        
+
       <% }) %>
       <a href="chat/new" class="btn btn-info mt-2">Create chat room</a>
     </div>
-    <div class="container pt-4">
+    <!-- <div class="container pt-4">
       <li href="" class="list-group-item list-group-item-info">
         <div class="d-flex w-100 justify-content-between">
           <h2 class="mb-1">Edit my rooms.</h2>
@@ -48,6 +48,6 @@
           <a href="chat/edit-form/<%= room._id %>" class="list-group-item list-group-item-action list-group-item-light"><%= room.name %></a>
         <% } %>
       <% }) %>
-    </div>
+    </div> -->
   </body>
 </html>

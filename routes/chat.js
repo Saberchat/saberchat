@@ -132,5 +132,17 @@ router.put('/chat/:id/edit', middleware.isLoggedIn, (req, res) => {
 	// res.send(req.params.id + " " + req.body.newname);
 });
 
+router.delete('/chat/:id/delete', middleware.isLoggedIn, (req, res) => {
+	Room.findByIdAndDelete(req.params.id, function(err, room) {
+		if (err || !room) {
+			req.flash('error', 'Unable to access Database');
+			res.redirect('back');
+		} else {
+			req.flash('success', 'Deleted the group');
+			res.redirect('/chat');
+		}
+	});
+});
+
 //export the router with all the routes connected
 module.exports = router;

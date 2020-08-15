@@ -39,25 +39,46 @@
             </div>
 
             <h4>Select Members</h4>
-
-            <!-- <div class="search-filter mb-3">
-              <i class="fas fa-search"></i>
-              <input id="search-input" onkeyup="searchFunction()" class="form-control" type="text" placeholder="Search..." title="Type in Username">
-            </div> -->
-
-            <!-- <div id="user-list">
-              <% users.forEach(function(user) { %>
-                <% if (!(user._id.equals(currentUser._id))) { %>
-                  <div class="form-check">
-                    <input name="check[<%= user._id %>]" id="<%= user._id %>" class="form-check-input" type="checkbox" value="">
-                    <label class="form-check-label" for="<%= user._id %>"><%= user.username %></label>
-                  </div>
-                <% } %>
-              <% }); %>
-            </div> -->
+            <div class="search-filter mb-3">
+                <i class="fas fa-search"></i>
+                <input id="search-input" onkeyup="searchFunction()" class="form-control" type="text" placeholder="Search..." title="Type in Username">
+            </div>
+            <div id="user-list">
+                <% users.forEach(function(user) { %>
+                    <% if (!(user._id.equals(currentUser._id))) { %>
+                        <div class="form-check">
+                            <input name="check[<%= user._id %>]" id="<%= user._id %>" class="form-check-input" type="checkbox" value="">
+                            <label class="form-check-label" for="<%= user._id %>"><%= user.username %></label>
+                        </div>
+                    <% } %>
+                <% }); %>
+            </div>
 
             <button class="btn btn-lg btn-primary btn-block">Submit</button>
 
+          </form>
+          <div class="container mt-2"></div>
+          <form action="/chat/<%= room._id %>/delete?_method=delete" method="post">
+            <button type="button" class="btn btn-lg btn-danger btn-block" data-toggle="modal" data-target="#deleteModal">Delete this room</button>
+            <div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+              <div class="modal-dialog">
+                <div class="modal-content">
+                  <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Delete <%= room.name %>?</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                      <span aria-hidden="true">&times;</span>
+                    </button>
+                  </div>
+                  <div class="modal-body">
+                    You will not be able to change your mind.
+                  </div>
+                  <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">No thanks</button>
+                    <button type="submit" class="btn btn-danger">Delete it!</button>
+                  </div>
+                </div>
+              </div>
+            </div>
           </form>
 
           <a style="display: block; margin-top: 1rem;" href="/chat">Go Back</a>

@@ -76,10 +76,10 @@ app.use(chatRoutes);
 app.use(profileRoutes);
 
 // Catch-all route
-app.get('*', function(req, res) {
-	req.flash('error', 'Url does not exist');
-	res.redirect('/');
-});
+// app.get('*', function(req, res) {
+// 	req.flash('error', 'Url does not exist');
+// 	res.redirect('/');
+// });
 
 // Socket.io server-side code
 io.on('connect', (socket) => {
