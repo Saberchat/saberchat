@@ -32,12 +32,7 @@
                 <div class="list-group" id="user-list">
                     <% users.forEach(user => { %>
                         <a href="/profiles/<%= user._id %>" class="list-group-item list-group-item-action">
-                            <% if(user.imageUrl) { %>
-                                <div class="profile-image" style="background-image: url('<%= user.imageUrl %>');">
-                            <% } else { %>
-                                <div class="profile-image" style="background-image: url('https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_640.png');">
-                            <% } %>
-                            </div>
+                            <img class="profile-image" src="<%= user.imageUrl %>" alt="profile picture">
                             <span><%= user.username %></span>
                         </a>
                     <% }); %>
