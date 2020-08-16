@@ -18,8 +18,8 @@ const dateFormat = require('dateformat');
 //pretty up the console
 const colors = require('colors');
 //profanity filter
-// const Filter = require('bad-words');
-// const filter = new Filter();
+const Filter = require('bad-words');
+const filter = new Filter();
 // require the models for database actions
 const Comment = require('./models/comment');
 const User = require("./models/user");
@@ -75,7 +75,8 @@ app.use(function(req, res, next) {
 	res.locals.error = req.flash('error');
 	res.locals.success = req.flash('success');
 	// profanity filter
-	// res.locals.filter = req.filter;
+	// this won't work - alex
+	// res.locals.filter = filter;
 	next()
 });
 
@@ -108,6 +109,7 @@ io.on('connect', (socket) => {
 
 	// When 'chat message' event is detected, emit msg to all clients in room
 	socket.on('chat message', (msg) => {
+		msg.text = filter.clean(msg.text)
 		// broadcast message to all connected users in the room
 		socket.to(socket.room).emit('chat message', msg);
 
