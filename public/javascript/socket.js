@@ -23,7 +23,9 @@ function chatInit(username, userId, messageForm, input, chatDisplay, room, userI
     }
     let messages = document.getElementsByClassName('media');
     let message = messages[messages.length - 1];
-    message.scrollIntoView();
+    if(message) {
+      message.scrollIntoView();
+    }
     return false;
   });
 
@@ -44,7 +46,9 @@ function chatInit(username, userId, messageForm, input, chatDisplay, room, userI
     </div>`);
     let messages = document.getElementsByClassName('media');
     let message = messages[messages.length - 1];
-    message.scrollIntoView();
+    if(message) {
+      message.scrollIntoView();
+    }
     socket.on('');
   });
 }

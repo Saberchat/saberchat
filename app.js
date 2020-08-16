@@ -13,6 +13,8 @@ const flash = require('connect-flash');
 const bodyParser = require('body-parser');
 //allow us to use PUT and DELETE methods
 const methodOverride = require('method-override');
+// package for formating dates on the serverside
+const dateFormat = require('dateformat');
 //pretty up the console
 const colors = require('colors');
 //profanity filter
@@ -107,7 +109,7 @@ io.on('connect', (socket) => {
 	// When 'chat message' event is detected, emit msg to all clients in room
 	socket.on('chat message', (msg) => {
 		// broadcast message to all connected users in the room
-		io.sockets.in(socket.room).emit('chat message', msg);
+		socket.to(socket.room).emit('chat message', msg);
 
     // Log information
     // console.log("Room: ".cyan);
@@ -116,20 +118,19 @@ io.on('connect', (socket) => {
     // console.log(msg);
 
 		// create/save comment to db
-		Comment.create({text: msg.text, room: socket.room}, function(err, comment) {
+		Comment.create({text: msg.text, room: socket.room, author: msg.authorId}, function(err, comment) {
 			if(err) {
 				// sends error msg if comment could not be created
 				console.log(err);
 				req.flash('error', 'message could not be created');
 			} else {
-				// sets comment's author info from the received message object
-				comment.author.username = msg.author;
-				comment.author.id = msg.authorId;
+				// format the date in the form we want.
+				comment.date = dateFormat(comment.created_at, "h:MM TT | mmm d");
 				// saves changes
 				comment.save();
         // confirmation log
 				// console.log('Database Comment created: '.cyan);
-        // console.log(comment);
+				// console.log(comment);
 			}
 		});
 	});

@@ -9,7 +9,7 @@
     <link rel="stylesheet" href="/stylesheets/main.css">
     <!-- link css for navbar. Don't need to include public/javascript/userForm.js since user is already logged in and does not need to access login and register forms.  -->
     <link rel="stylesheet" href="/stylesheets/components/navbar.css">
-    <link rel="stylesheet" href="/stylesheets/chat/new.css">
+    <link rel="stylesheet" href="/stylesheets/chat/edit.css">
 
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
@@ -25,7 +25,7 @@
     <div class="container mt-5">
       <div class="row">
           <div class="col-12">
-              <h1 style="text-align: center; width: 100%">Edit <%= room.name %></h1>
+              <h1 style="text-align: center; width: 100%" class="title">Edit <span><%= room.name %></span></h1>
           </div>
       </div>
       <div class="row">
@@ -35,25 +35,44 @@
 
             <div class="form-group">
               <label for="usernameInput">Name</label>
-              <input id="usernameInput" class="form-control" type="text" name="newname" placeholder="<%= room.name %>" required>
+              <input id="usernameInput" class="form-control" type="text" name="name" value="<%= room.name %>" placeholder="Enter Room Name" required>
             </div>
 
-            <h4>Select Members</h4>
-            <div class="search-filter mb-3">
-                <i class="fas fa-search"></i>
-                <input id="search-input" onkeyup="searchFunction()" class="form-control" type="text" placeholder="Search..." title="Type in Username">
-            </div>
-            <div id="user-list">
-                <% users.forEach(function(user) { %>
-                    <% if (!(user._id.equals(currentUser._id))) { %>
-                        <div class="form-check">
-                            <input name="check[<%= user._id %>]" id="<%= user._id %>" class="form-check-input" type="checkbox" value="">
-                            <label class="form-check-label" for="<%= user._id %>"><%= user.username %></label>
-                        </div>
-                    <% } %>
-                <% }); %>
+            <div id="remove-block">
+              <h4>Remove Members</h4>
+              <div class="search-filter mb-3">
+                  <i class="fas fa-search"></i>
+                  <input id="remove-search-input" onkeyup="searchFunction('remove')" class="form-control  search-input" type="text" placeholder="Search..." title="Type in Username">
+              </div>
+              <div id="remove-user-list" class="user-list">
+                  <% users.forEach(function(user) { %>
+                      <% if (!(user._id.equals(currentUser._id)) && room.members.includes(user._id)) { %>
+                          <div class="form-check">
+                              <input name="checkRemove[<%= user._id %>]" id="<%= user._id %>" class="form-check-input" type="checkbox" value="">
+                              <label class="form-check-label" for="<%= user._id %>"><%= user.username %></label>
+                          </div>
+                      <% } %>
+                  <% }); %>
+              </div>
             </div>
 
+            <div id="add-block">
+              <h4>Add Members</h4>
+              <div class="search-filter mb-3">
+                  <i class="fas fa-search"></i>
+                  <input id="add-search-input" onkeyup="searchFunction('add')" class="form-control  search-input" type="text" placeholder="Search..." title="Type in Username">
+              </div>
+              <div id="add-user-list" class="user-list">
+                  <% users.forEach(function(user) { %>
+                      <% if (!(user._id.equals(currentUser._id)) && !(room.members.includes(user._id))) { %>
+                          <div class="form-check">
+                              <input name="checkAdd[<%= user._id %>]" id="<%= user._id %>" class="form-check-input" type="checkbox" value="">
+                              <label class="form-check-label" for="<%= user._id %>"><%= user.username %></label>
+                          </div>
+                      <% } %>
+                  <% }); %>
+              </div>
+            </div>
             <button class="btn btn-lg btn-primary btn-block">Submit</button>
 
           </form>
@@ -85,11 +104,22 @@
         </div>
       </div>
     </div>
-    <!-- <script>
-      function searchFunction() {
-        let input = document.getElementById("search-input");
+    <script>
+      const removeCount = document.getElementById('remove-user-list').childElementCount;
+      const addCount = document.getElementById('add-user-list').childElementCount;
+      if(removeCount == 0) {
+        const removeBlock = document.getElementById('remove-block');
+        removeBlock.style.display = "none";
+      }
+      if(addCount == 0) {
+        const addBlock = document.getElementById('add-block');
+        addBlock.style.display = "none";
+      }
+
+      function searchFunction(mode) {
+        let input = document.getElementById(mode + "-search-input");
         let filter = input.value.toUpperCase();
-        let list = document.getElementById("user-list");
+        let list = document.getElementById(mode + "-user-list");
         let users = list.getElementsByClassName('form-check');
         for (i = 0; i < users.length; i++) {
           let user = users[i].getElementsByTagName('label')[0];
@@ -101,6 +131,6 @@
           }
         }
       }
-    </script> -->
+    </script>
   </body>
 </html>

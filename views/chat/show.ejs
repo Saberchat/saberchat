@@ -29,7 +29,7 @@
   <h1 class="display-4 text-dark"><%= room.name %> </h1>
   <p class="text-dark lead mb-3">Chat Group Desc.</p>
   <% if (room.creator.id.equals(currentUser._id)) { %>
-    <a href="edit-form/<%= room._id %>" class="">Edit this room</a>
+    <a href="/chat/<%= room._id %>/edit" class="">Edit this room</a>
   <% } %>
 </header>
   <div class="container py-5 px-4">
@@ -79,7 +79,9 @@
     //scroll to the last chat message
     let messages = document.getElementsByClassName('media');
     let message = messages[messages.length - 1];
-    message.scrollIntoView();
+    if(message) {
+      message.scrollIntoView();
+    }
 
     //set all the variables for the chatInit function
     const userId = '<%= currentUser._id %>';

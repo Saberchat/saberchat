@@ -99,43 +99,45 @@ router.post('/chat/new', middleware.isLoggedIn, function(req, res) {
   });
 });
 
-router.get('/chat/edit-form/:id', middleware.isLoggedIn, (req, res) => {
-  var users;
-  User.find({}, function(err, foundUsers) {
-    if (err || !foundUsers) {
-      req.flash('error', 'Unable to access Database');
-      res.redirect('back');
-    } else {
-      users = foundUsers;
-    }
-  });
+router.get('/chat/:id/edit', middleware.isLoggedIn, (req, res) => {
   Room.findById(req.params.id, function(err, foundRoom) {
     if (err || !foundRoom) {
-      req.flash('error', 'Unable to access Database');
+      req.flash('error', 'Cannot find room or unable to access Database');
       res.redirect('back');
     } else {
-      res.render('chat/edit', {
-        users: users,
-        room: foundRoom
-      });
+      User.find({}, function(err, foundUsers) {
+        if (err || !foundUsers) {
+          req.flash('error', 'Unable to access Database');
+          res.redirect('back');
+        } else {
+          res.render('chat/edit', {
+            users: foundUsers,
+            room: foundRoom
+          });
+        }
+      }); 
     }
   });
 });
 
+
+
 router.put('/chat/:id/edit', middleware.isLoggedIn, (req, res) => {
-  var query = {
-    name: req.body.newname
-  }
-  Room.findByIdAndUpdate(req.params.id, query, function(err, room) {
+  Room.findByIdAndUpdate(req.params.id, {name: req.body.name}, function(err, room) {
     if (err || !room) {
       req.flash('error', 'Unable to access Database');
       res.redirect('back');
     } else {
-      // for(const user in req.body.check) {
-      // 	room.members.push(user);
-      // }
+      for(const rUser in req.body.checkRemove) {
+        let index = room.members.indexOf(rUser);
+        room.members.splice(index, 1);
+      }
+      for(const aUser in req.body.checkAdd) {
+        room.members.push(aUser);
+      }
+      room.save()
       req.flash('success', 'Updated your group');
-      res.redirect('/chat/' + req.params.id);
+      res.redirect('/chat/' + room._id);
     }
   });
   // res.send(req.params.id + " " + req.body.newname);

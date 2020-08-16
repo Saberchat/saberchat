@@ -1,4 +1,4 @@
-#user-list {
+.user-list {
     max-height: 10rem;
     overflow-y: scroll;
     border: 1px solid #ced4da;
@@ -11,12 +11,20 @@
     border-bottom: 1px solid #424651;
 }
 
-input#search-input {
+input.search-input {
     display: inline-block;
     width: 80%;
-    border: none;
-    outline: 0;
-    box-shadow: none;
+    border: none !important;
+    outline: 0 !important;
+    box-shadow: none !important;
+}
+
+.title {
+    color: #9f9aa4;
+}
+
+.title span {
+    color: #424651;
 }
 
 label, h4 {
