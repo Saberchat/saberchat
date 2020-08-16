@@ -27,9 +27,9 @@
   <%- include("../partials/navbar") %>
 <header class="text-center">
   <h1 class="display-4 text-dark"><%= room.name %> </h1>
-  <p class="text-dark lead mb-3">Chat Group Desc.</p>
+  <p class="text-dark lead mb-3"><%= room.description %></p>
   <% if (room.creator.id.equals(currentUser._id)) { %>
-    <a href="/chat/<%= room._id %>/edit" class="">Edit this room</a>
+    <a href="/chat/<%= room._id %>/edit" class="btn btn-secondary"><i class="fas fa-cog"></i> Room Settings</a>
   <% } %>
 </header>
   <div class="container py-5 px-4">

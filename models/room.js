@@ -2,7 +2,8 @@ const mongoose = require("mongoose");
 
 // room will have name, list of members, and info on the creator
 var roomSchema = new mongoose.Schema({
-	name: String,
+  name: String,
+  description: { type:String, default: "No description."},
 	members: [
     {
 			type: mongoose.Schema.Types.ObjectId,

@@ -35,7 +35,11 @@
 
             <div class="form-group">
               <label for="usernameInput">Name</label>
-              <input id="usernameInput" class="form-control" type="text" name="name" value="<%= room.name %>" placeholder="Enter Room Name" required>
+              <input id="usernameInput" class="form-control" type="text" name="room[name]" value="<%= room.name %>" placeholder="Enter Room Name" required>
+            </div>
+            <div class="form-group">
+              <label for="descInput">Description</label>
+              <input id="descInput" class="form-control" type="text" name="room[description]" value="<%= room.description %>" placeholder="Enter room description">
             </div>
 
             <div id="remove-block">
@@ -73,12 +77,12 @@
                   <% }); %>
               </div>
             </div>
-            <button class="btn btn-lg btn-primary btn-block">Submit</button>
+            <button id="submit-button" class="btn btn-lg btn-success btn-block">Submit</button>
 
           </form>
           <div class="container mt-2"></div>
-          <form action="/chat/<%= room._id %>/delete?_method=delete" method="post">
-            <button type="button" class="btn btn-lg btn-danger btn-block" data-toggle="modal" data-target="#deleteModal">Delete this room</button>
+          <form action="/chat/<%= room._id %>/delete?_method=delete" method="post" id="delete-form">
+            <button type="button" class="btn btn-lg btn-danger btn-block" data-toggle="modal" data-target="#deleteModal" id="delete-button">Delete this room</button>
             <div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
               <div class="modal-dialog">
                 <div class="modal-content">
@@ -100,7 +104,7 @@
             </div>
           </form>
 
-          <a style="display: block; margin-top: 1rem;" href="/chat">Go Back</a>
+          <a style="display: block; margin-top: 1rem;" href="/chat/<%= room._id %>">Go Back</a>
         </div>
       </div>
     </div>

@@ -2,6 +2,7 @@
     max-height: 10rem;
     overflow-y: scroll;
     border: 1px solid #ced4da;
+    border-radius: 0.25rem;
     padding: 10px;
     margin-bottom: 1rem;
 }

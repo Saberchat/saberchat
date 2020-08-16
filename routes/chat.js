@@ -77,9 +77,7 @@ router.get('/chat/:id', middleware.isLoggedIn, middleware.checkIfMember, (req, r
 
 // route for creating new rooms
 router.post('/chat/new', middleware.isLoggedIn, function(req, res) {
-  Room.create({
-    name: req.body.name
-  }, function(err, room) {
+  Room.create(req.body.room, function(err, room) {
     if (err) {
       console.log(err);
       req.flash('error', 'group could not be created');
@@ -123,7 +121,7 @@ router.get('/chat/:id/edit', middleware.isLoggedIn, (req, res) => {
 
 
 router.put('/chat/:id/edit', middleware.isLoggedIn, (req, res) => {
-  Room.findByIdAndUpdate(req.params.id, {name: req.body.name}, function(err, room) {
+  Room.findByIdAndUpdate(req.params.id, req.body.room, function(err, room) {
     if (err || !room) {
       req.flash('error', 'Unable to access Database');
       res.redirect('back');
