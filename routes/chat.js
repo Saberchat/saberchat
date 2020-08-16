@@ -77,7 +77,7 @@ router.get('/chat/:id', middleware.isLoggedIn, middleware.checkIfMember, (req, r
 
 // route for creating new rooms
 router.post('/chat/new', middleware.isLoggedIn, function(req, res) {
-  Room.create(req.body.room, function(err, room) {
+  Room.create({name: req.body.name, 'creator.id': req.user._id, 'creator.username': req.user.username, members: [req.user._id]}, function(err, room) {
     if (err) {
       console.log(err);
       req.flash('error', 'group could not be created');
@@ -86,9 +86,9 @@ router.post('/chat/new', middleware.isLoggedIn, function(req, res) {
       for (const user in req.body.check) {
         room.members.push(user);
       }
-      room.members.push(req.user._id);
-      room.creator.id = req.user._id;
-      room.creator.username = req.user.username;
+      if(req.body.description) {
+        room.description = req.body.description;
+      }
       room.save()
       console.log('Database Room created: '.cyan);
       console.log(room);
@@ -142,13 +142,22 @@ router.put('/chat/:id/edit', middleware.isLoggedIn, (req, res) => {
 });
 
 router.delete('/chat/:id/delete', middleware.isLoggedIn, (req, res) => {
-  Room.findByIdAndDelete(req.params.id, function(err, room) {
-    if (err || !room) {
-      req.flash('error', 'Unable to access Database');
+  Room.findByIdAndDelete(req.params.id, function(err, deletedRoom) {
+    if(err || !deletedRoom) {
+      console.log(err);
+      req.flash('error', 'A Problem Occured');
       res.redirect('back');
     } else {
-      req.flash('success', 'Deleted the group');
-      res.redirect('/chat');
+      Comment.deleteMany({room: deletedRoom._id}, function(err, result) {
+        if(err) {
+          console.log(err);
+          req.flash('error', 'Group comments could not be deleted')
+          res.redirect('/chat');
+        } else {
+          req.flash('success', 'Successfully deleted group');
+          res.redirect('/chat');
+        }
+      });
     }
   });
 });
