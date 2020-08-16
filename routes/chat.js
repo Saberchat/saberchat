@@ -97,7 +97,7 @@ router.post('/chat/new', middleware.isLoggedIn, function(req, res) {
   });
 });
 
-router.get('/chat/:id/edit', middleware.isLoggedIn, (req, res) => {
+router.get('/chat/:id/edit', middleware.isLoggedIn, middleware.checkRoomOwnership, (req, res) => {
   Room.findById(req.params.id, function(err, foundRoom) {
     if (err || !foundRoom) {
       req.flash('error', 'Cannot find room or unable to access Database');
@@ -120,7 +120,7 @@ router.get('/chat/:id/edit', middleware.isLoggedIn, (req, res) => {
 
 
 
-router.put('/chat/:id/edit', middleware.isLoggedIn, (req, res) => {
+router.put('/chat/:id/edit', middleware.isLoggedIn, middleware.checkRoomOwnership, (req, res) => {
   Room.findByIdAndUpdate(req.params.id, req.body.room, function(err, room) {
     if (err || !room) {
       req.flash('error', 'Unable to access Database');
@@ -141,7 +141,7 @@ router.put('/chat/:id/edit', middleware.isLoggedIn, (req, res) => {
   // res.send(req.params.id + " " + req.body.newname);
 });
 
-router.delete('/chat/:id/delete', middleware.isLoggedIn, (req, res) => {
+router.delete('/chat/:id/delete', middleware.isLoggedIn, middleware.checkRoomOwnership, (req, res) => {
   Room.findByIdAndDelete(req.params.id, function(err, deletedRoom) {
     if(err || !deletedRoom) {
       console.log(err);

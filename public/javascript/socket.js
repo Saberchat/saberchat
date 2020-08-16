@@ -1,3 +1,9 @@
+function scrollToElement(innerElement, containerId) {
+  var topPos = innerElement.offsetTop;
+  document.getElementById(containerId).scrollTop = topPos-10;
+  
+}
+
 //create function that sets up the socket chat
 function chatInit(username, userId, messageForm, input, chatDisplay, room, userImage) {
 
@@ -24,7 +30,7 @@ function chatInit(username, userId, messageForm, input, chatDisplay, room, userI
     let messages = document.getElementsByClassName('media');
     let message = messages[messages.length - 1];
     if(message) {
-      message.scrollIntoView();
+      scrollToElement(message, 'message-display');
     }
     return false;
   });
@@ -47,7 +53,7 @@ function chatInit(username, userId, messageForm, input, chatDisplay, room, userI
     let messages = document.getElementsByClassName('media');
     let message = messages[messages.length - 1];
     if(message) {
-      message.scrollIntoView();
+      scrollToElement(message, 'message-display');
     }
     socket.on('');
   });

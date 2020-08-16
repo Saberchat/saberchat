@@ -80,7 +80,7 @@
     let messages = document.getElementsByClassName('media');
     let message = messages[messages.length - 1];
     if(message) {
-      message.scrollIntoView();
+      scrollToElement(message, 'message-display');
     }
 
     //set all the variables for the chatInit function

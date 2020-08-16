@@ -34,7 +34,23 @@ middleware.checkIfMember = function(req, res, next) {
 			req.flash('error', 'You are not a member of this room');
 			res.redirect('/chat');
 		}
-	})
+	});
+}
+
+middleware.checkRoomOwnership = function(req, res, next) {
+	Room.findById(req.params.id, function(err, foundRoom) {
+		if(err || !foundRoom) {
+			console.log(err);
+			req.flash('error', 'Room cannot be found or does not exist');
+			res.redirect('/chat')
+		} else {
+			if(foundRoom.creator.id.equals(req.user._id)) {
+				return next();
+			}
+			req.flash('error', 'You do not have permission to do that');
+			res.redirect('/chat/' + foundRoom._id);
+		}
+	});
 }
 
 //export the object with all the functions
