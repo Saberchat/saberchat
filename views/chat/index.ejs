@@ -34,7 +34,7 @@
               <h2 class="mb-1"><i class="fas fa-user-friends"></i> Your Groups</h2>
               <a href="chat/new" class="btn btn-info"><i class="fas fa-plus-circle"></i> Create a chat room</a>
             </div>
-            <p class="mb-1">Rooms you are apart of.</p>
+            <p class="mb-1">Rooms you are a member of.</p>
           </li>
           <% rooms.forEach(room => { %>
             <% if (room.members.includes(currentUser._id)) { %>
@@ -53,7 +53,8 @@
           </li>
           <% rooms.forEach(room => { %>
             <% if (!(room.members.includes(currentUser._id))) { %>
-              <a class="list-group-item list-group-item-action list-group-item-light"><%= room.name %></a>
+              <a class="list-group-item list-group-item-action list-group-item-light"><%= room.name %><button class="btn btn-success btn-sm float-right">Request Membership</button></a>
+              
             <% } %>
           <% }) %>
         </div>
