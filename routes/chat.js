@@ -92,7 +92,7 @@ router.post('/chat/new', middleware.isLoggedIn, function(req, res) {
       room.save()
       console.log('Database Room created: '.cyan);
       console.log(room);
-      res.redirect('/chat');
+      res.redirect('/chat/' + room._id);
     }
   });
 });

@@ -32,14 +32,14 @@
                 <% if(currentUser) { %>
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                        Welcome <%= currentUser.username %>
+                        Welcome <%= currentUser.username %> <span class="badge badge-pill badge-light text-danger">!</span><span class="sr-only">unread messages</span>
                         </a>
                         <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
                           <a class="dropdown-item" href="/profiles/<%= currentUser._id %>">View Profile</a>
+                          <a class="dropdown-item" href="/">Inbox <span class="badge badge-pill badge-danger">12</span><span class="sr-only">unread messages</span></a>
                           <a class="dropdown-item" href="/logout">Logout</a>
-                          <a class="dropdown-item" href="#">Something else here</a>
                         </div>
-                      </li>
+                    </li>
                 <!-- if there is no user, show the register and login links -->
                 <% } else { %>
                     <li class="nav-item">

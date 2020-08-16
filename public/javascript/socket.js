@@ -42,7 +42,7 @@ function chatInit(username, userId, messageForm, input, chatDisplay, room, userI
   socket.on('chat message', function(msg) {
     // appends the message to the ul element displaying the messages
     $(chatDisplay).append(`<div class="media w-50 mb-2">
-    <img src="${msg.userImage}" alt="user" class="user-image">\
+    <img src="${msg.userImage}" alt="user" class="user-image">
     <div class="media-body ml-3">
       <div class="bg-grey rounded py-2 px-3 mb-2">
         <p class="text-small mb-0 text-dark">${msg.text}</p>
@@ -55,6 +55,5 @@ function chatInit(username, userId, messageForm, input, chatDisplay, room, userI
     if(message) {
       scrollToElement(message, 'message-display');
     }
-    socket.on('');
   });
 }

@@ -30,11 +30,11 @@
     object-fit: cover;
     border-radius: 50%;
     margin-top: -100px;
+    background-color: #ffffff;
 }
 
 /* custom background without title */
 #background{
-    background-image: url('https://images.unsplash.com/photo-1594793861747-136c34047e9d?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=1952&q=80');
     background-position: center;
     background-size: cover;
     height: 35vh;
