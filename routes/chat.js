@@ -83,9 +83,12 @@ router.post('/chat/new', middleware.isLoggedIn, function(req, res) {
       req.flash('error', 'group could not be created');
       res.redirect('/chat/new');
     } else {
-      for (const user in req.body.check) {
-        room.members.push(user);
-      }
+      if(req.body.type == 'true') {
+        for (const user in req.body.check) {
+          room.members.push(user);
+        }
+        room.type = 'private';
+      } 
       if(req.body.description) {
         room.description = req.body.description;
       }
@@ -126,13 +129,19 @@ router.put('/chat/:id/edit', middleware.isLoggedIn, middleware.checkRoomOwnershi
       req.flash('error', 'Unable to access Database');
       res.redirect('back');
     } else {
-      for(const rUser in req.body.checkRemove) {
-        let index = room.members.indexOf(rUser);
-        room.members.splice(index, 1);
+      if(req.body.type == 'true') {
+        for(const rUser in req.body.checkRemove) {
+          let index = room.members.indexOf(rUser);
+          room.members.splice(index, 1);
+        }
+        for(const aUser in req.body.checkAdd) {
+          room.members.push(aUser);
+        }
+        room.type = 'private';
+      } else {
+        room.type = 'public';
       }
-      for(const aUser in req.body.checkAdd) {
-        room.members.push(aUser);
-      }
+      
       room.save()
       req.flash('success', 'Updated your group');
       res.redirect('/chat/' + room._id);

@@ -27,7 +27,7 @@ middleware.checkIfMember = function(req, res, next) {
 			res.redirect('/chat')
 		} else {
 			let userId = req.user._id;
-			if(foundRoom.members.includes(userId)) {
+			if(foundRoom.type == 'public' || foundRoom.members.includes(userId)) {
 				return next();
 			}
 			// stuff for when user is not member of room

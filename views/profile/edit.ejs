@@ -32,23 +32,23 @@
                 <form action="/profiles/edit?_method=put" method="post">
                     <div class="form-group">
                         <label for="usernameInput">Username</label>
-                        <input id="usernameInput" class="form-control" type="text" name="user[username]" value="<%= currentUser.username %>" placeholder="Enter Username" required>
+                        <input id="usernameInput" class="form-control" type="text" name="user[username]" value="<%= currentUser.username %>" placeholder="(max 15) Enter Username" maxlength="15" required>
                     </div>
                     <div class="form-group">
                         <label for="descInput">Description</label>
                         <% if(currentUser.description){ %>
-                            <input id="descInput" class="form-control" type="text" name="user[description]" value="<%= currentUser.description %>" placeholder="Enter Description">
+                            <input id="descInput" class="form-control" type="text" name="user[description]" value="<%= currentUser.description %>" maxlength="350" placeholder="Enter Description">
                         <% } else { %>
-                            <input id="descInput" class="form-control" type="text" name="user[description]" value="" placeholder="Enter Description" aria-describedby="descHelp">
+                            <input id="descInput" class="form-control" type="text" name="user[description]" value="" placeholder="Enter Description" maxlength="350" aria-describedby="descHelp">
                             <small id="descHelp" class="form-text text-muted">Ex. Hobbies: swimming, tennis, searching for bigfoot.</small>
                         <% } %>
                     </div>
                     <div class="form-group">
                         <label for="titleInput">User Title</label>
                         <% if(currentUser.title){ %>
-                            <input id="titleInput" class="form-control" type="text" name="user[title]" value="<%= currentUser.title %>" placeholder="Enter Title">
+                            <input id="titleInput" class="form-control" type="text" name="user[title]" value="<%= currentUser.title %>" placeholder="Enter Title" maxlength="50">
                         <% } else { %>
-                            <input id="titleInput" class="form-control" type="text" name="user[title]" aria-describedby="titleHelp" value="" placeholder="Enter Title">
+                            <input id="titleInput" class="form-control" type="text" name="user[title]" aria-describedby="titleHelp" value="" placeholder="Enter Title" maxlength="50">
                             <small id="titleHelp" class="form-text text-muted">Ex. Ninja Warrior, Guardian of Bread, Champion of the art room</small>
                         <% } %>
                     </div>

@@ -35,11 +35,19 @@
 
             <div class="form-group">
               <label for="usernameInput">Name</label>
-              <input id="usernameInput" class="form-control" type="text" name="room[name]" value="<%= room.name %>" placeholder="Enter Room Name" required>
+              <input id="usernameInput" class="form-control" type="text" name="room[name]" value="<%= room.name %>" placeholder="(max 45) Enter Room Name" maxlength="45" required>
             </div>
             <div class="form-group">
               <label for="descInput">Description</label>
-              <input id="descInput" class="form-control" type="text" name="room[description]" value="<%= room.description %>" placeholder="Enter room description">
+              <input id="descInput" class="form-control" type="text" name="room[description]" value="<%= room.description %>" placeholder="(max 100) Enter room description" maxlength="100">
+            </div>
+            <div class="form-check mb-3">
+              <input name="type" id="roomType" type="checkbox" onclick="updateDisplay()" class="form-check-input" value="true"
+              <% if (room.type == 'private') { %>
+                checked
+              <% } %>
+              >
+              <label for="roomType" class="form-check-label">Private (public if left blank)</label>
             </div>
 
             <div id="remove-block">
@@ -120,6 +128,19 @@
         addBlock.style.display = "none";
       }
 
+      function updateDisplay() {
+        let userSelect = document.getElementById('roomType');
+        let display1 = document.getElementById('add-block');
+        let display2 = document.getElementById('remove-block');
+        if(userSelect.checked == true) {
+            display1.style.display = "";
+            display2.style.display = "";
+        } else {
+            display1.style.display = "none";
+            display2.style.display = "none";
+        }
+      }
+
       function searchFunction(mode) {
         let input = document.getElementById(mode + "-search-input");
         let filter = input.value.toUpperCase();
@@ -135,6 +156,8 @@
           }
         }
       }
+
+      updateDisplay();
     </script>
   </body>
 </html>

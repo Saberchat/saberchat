@@ -32,7 +32,7 @@
                 <% if(currentUser) { %>
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                        Welcome <%= currentUser.username %> <span class="badge badge-pill badge-light text-danger">!</span><span class="sr-only">unread messages</span>
+                        <%= currentUser.username %> <span class="badge badge-pill badge-light text-danger">!</span><span class="sr-only">unread messages</span>
                         </a>
                         <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
                           <a class="dropdown-item" href="/profiles/<%= currentUser._id %>">View Profile</a>
@@ -73,7 +73,7 @@
     <span class="form-close signup"><i class="far fa-window-close"></i></span>
     <div class="form-group mt-3">
         <label for="username-signup">Username</label>
-        <input name="username" type="text" class="form-control" id="username-signup" placeholder="enter username" required>
+        <input name="username" type="text" class="form-control" id="username-signup" placeholder="(max 15) enter username" maxlength="15" required>
     </div>
     <div class="form-group">
         <label for="email-signup">Email address</label>

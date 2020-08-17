@@ -109,6 +109,7 @@ io.on('connect', (socket) => {
 
 	// When 'chat message' event is detected, emit msg to all clients in room
 	socket.on('chat message', (msg) => {
+		// clean the message
 		msg.text = filter.clean(msg.text)
 		// broadcast message to all connected users in the room
 		socket.to(socket.room).emit('chat message', msg);
