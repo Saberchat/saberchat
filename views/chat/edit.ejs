@@ -118,17 +118,6 @@
       </div>
     </div>
     <script>
-      const removeCount = document.getElementById('remove-user-list').childElementCount;
-      const addCount = document.getElementById('add-user-list').childElementCount;
-      if(removeCount == 0) {
-        const removeBlock = document.getElementById('remove-block');
-        removeBlock.style.display = "none";
-      }
-      if(addCount == 0) {
-        const addBlock = document.getElementById('add-block');
-        addBlock.style.display = "none";
-      }
-
       function updateDisplay() {
         let userSelect = document.getElementById('roomType');
         let display1 = document.getElementById('add-block');
@@ -159,6 +148,17 @@
       }
 
       updateDisplay();
+
+      const removeCount = document.getElementById('remove-user-list').childElementCount;
+      const addCount = document.getElementById('add-user-list').childElementCount;
+      if(removeCount == 0) {
+        const removeBlock = document.getElementById('remove-block');
+        removeBlock.style.display = "none";
+      }
+      if(addCount == 0) {
+        const addBlock = document.getElementById('add-block');
+        addBlock.style.display = "none";
+      }
     </script>
   </body>
 </html>
