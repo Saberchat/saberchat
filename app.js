@@ -111,7 +111,7 @@ function getRandMessage(list) {
 	return list[Math.floor(Math.random() * list.length)]
 }
 
-var manageComments = schedule.scheduleJob('0 0 * * *', function() {
+var manageComments = schedule.scheduleJob('0 17 * * *', function() {
 	Comment.find({}, function(err, foundComments) {
 		if(err) {
 			console.log(err);
