@@ -197,6 +197,6 @@ io.on('connect', (socket) => {
 
 // -----------------------
 // Start server
-http.listen(port, () => {
+http.listen(process.env.PORT,process.env.IP, () => {
 	console.log(":: App listening on port " + port + " ::");
 });
