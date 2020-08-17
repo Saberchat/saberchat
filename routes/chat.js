@@ -1,5 +1,6 @@
 const express = require('express');
-
+const Filter = require('bad-words');
+const filter = new Filter();
 //create express router
 const router = express.Router();
 
@@ -47,6 +48,11 @@ router.get('/chat/:id', middleware.isLoggedIn, middleware.checkIfMember, (req, r
       req.flash('error', 'Could not find group');
       res.redirect('/chat');
     } else {
+      // if the user has not entered the room before, remember that they now have
+      if(!(foundRoom.confirmed.includes(req.user._id))) {
+        foundRoom.confirmed.push(req.user._id);
+        foundRoom.save();
+      }
       //finds latest 30 comments in the db with matchin room#. This one's a bit monstrous
       Comment.find({
         room: foundRoom._id
@@ -99,7 +105,7 @@ router.get('/chat/:id/edit', middleware.isLoggedIn, middleware.checkRoomOwnershi
 
 // create new rooms
 router.post('/chat/new', middleware.isLoggedIn, function(req, res) {
-  Room.create({name: req.body.name, 'creator.id': req.user._id, 'creator.username': req.user.username, members: [req.user._id]}, function(err, room) {
+  Room.create({name: filter.clean(req.body.name), 'creator.id': req.user._id, 'creator.username': req.user.username, members: [req.user._id]}, function(err, room) {
     if (err) {
       console.log(err);
       req.flash('error', 'group could not be created');
@@ -112,7 +118,7 @@ router.post('/chat/new', middleware.isLoggedIn, function(req, res) {
         room.type = 'private';
       } 
       if(req.body.description) {
-        room.description = req.body.description;
+        room.description = filter.clean(req.body.description);
       }
       room.save()
       console.log('Database Room created: '.cyan);
@@ -123,7 +129,7 @@ router.post('/chat/new', middleware.isLoggedIn, function(req, res) {
 });
 
 // leave a room
-router.post('/chat/:id/leave', middleware.isLoggedIn, middleware.checkIfMember, function(req, res) {
+router.post('/chat/:id/leave', middleware.isLoggedIn, middleware.checkForLeave, function(req, res) {
   Room.findById(req.params.id, function(err, foundRoom) {
     if(err) {
       console.log(err);
@@ -134,8 +140,12 @@ router.post('/chat/:id/leave', middleware.isLoggedIn, middleware.checkIfMember, 
         req.flash('error', 'You cannot leave a room you created');
         res.redirect('back');
       } else {
+        //remove user from room's member list and confirmed list
         let index = foundRoom.members.indexOf(req.user._id);
         foundRoom.members.splice(index, 1);
+        index = foundRoom.confirmed.indexOf(req.user._id);
+        foundRoom.confirmed.splice(index, 1);
+
         foundRoom.save();
 
         req.flash('success', 'You have left ' + foundRoom.name);
@@ -146,9 +156,9 @@ router.post('/chat/:id/leave', middleware.isLoggedIn, middleware.checkIfMember, 
 });
 
 
-// update room
+// edit room
 router.put('/chat/:id/edit', middleware.isLoggedIn, middleware.checkRoomOwnership, (req, res) => {
-  Room.findByIdAndUpdate(req.params.id, req.body.room, function(err, room) {
+  Room.findByIdAndUpdate(req.params.id, {name: filter.clean(req.body.name), description: filter.clean(req.body.description)}, function(err, room) {
     if (err || !room) {
       req.flash('error', 'Unable to access Database');
       res.redirect('back');
@@ -157,6 +167,8 @@ router.put('/chat/:id/edit', middleware.isLoggedIn, middleware.checkRoomOwnershi
         for(const rUser in req.body.checkRemove) {
           let index = room.members.indexOf(rUser);
           room.members.splice(index, 1);
+          index = room.confirmed.indexOf(rUser);
+          room.confirmed.splice(index, 1);
         }
         for(const aUser in req.body.checkAdd) {
           room.members.push(aUser);

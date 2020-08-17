@@ -38,7 +38,11 @@
           </li>
           <% rooms.forEach(room => { %>
             <% if (room.type == 'public' || room.members.includes(currentUser._id)) { %>
-              <a href="chat/<%= room._id %>" class="list-group-item list-group-item-action"><%= room.name %></a>
+              <a href="chat/<%= room._id %>" class="list-group-item list-group-item-action"><%= room.name %>
+              <% if (!(room.confirmed.includes(currentUser._id))) { %>
+                <span class="badge badge-danger float-right">New!</span>
+              <% } %>
+              </a>
             <% } %>
           <% }) %>
         </div>

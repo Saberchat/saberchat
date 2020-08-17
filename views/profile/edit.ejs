@@ -32,34 +32,33 @@
                 <form action="/profiles/edit?_method=put" method="post">
                     <div class="form-group">
                         <label for="usernameInput">Username</label>
-                        <input id="usernameInput" class="form-control" type="text" name="user[username]" value="<%= currentUser.username %>" placeholder="(max 15) Enter Username" maxlength="15" required>
+                        <input id="usernameInput" class="form-control" type="text" name="username" value="<%= currentUser.username %>" placeholder="(max 15) Enter Username" maxlength="15" required>
                     </div>
                     <div class="form-group">
                         <label for="descInput">Description</label>
                         <% if(currentUser.description){ %>
-                            <!-- <input id="descInput" class="form-control" type="text" name="user[description]" value="<%= currentUser.description %>" maxlength="350" placeholder="Enter Description"> -->
-                            <textarea id="descInput" class="form-control" name="user[description]" maxlength="550" placeholder="Enter Description" rows="5"><%= currentUser.description %></textarea>
+                            <textarea id="descInput" class="form-control" name="description" maxlength="550" placeholder="Enter Description" rows="5"><%= currentUser.description %></textarea>
                         <% } else { %>
-                            <textarea id="descInput" class="form-control" name="user[description]" placeholder="Enter Description" maxlength="550" rows="5" aria-describedby="descHelp"></textarea>
+                            <textarea id="descInput" class="form-control" name="description" placeholder="Enter Description" maxlength="550" rows="5" aria-describedby="descHelp"></textarea>
                             <small id="descHelp" class="form-text text-muted">Ex. Hobbies: swimming, tennis, searching for bigfoot.</small>
                         <% } %>
                     </div>
                     <div class="form-group">
                         <label for="titleInput">User Title</label>
                         <% if(currentUser.title){ %>
-                            <input id="titleInput" class="form-control" type="text" name="user[title]" value="<%= currentUser.title %>" placeholder="Enter Title" maxlength="50">
+                            <input id="titleInput" class="form-control" type="text" name="title" value="<%= currentUser.title %>" placeholder="Enter Title" maxlength="50">
                         <% } else { %>
-                            <input id="titleInput" class="form-control" type="text" name="user[title]" aria-describedby="titleHelp" value="" placeholder="Enter Title" maxlength="50">
+                            <input id="titleInput" class="form-control" type="text" name="title" aria-describedby="titleHelp" value="" placeholder="Enter Title" maxlength="50">
                             <small id="titleHelp" class="form-text text-muted">Ex. Ninja Warrior, Guardian of Bread, Champion of the art room</small>
                         <% } %>
                     </div>
                     <div class="form-group">
                         <label for="imageInput">Profile Image Url</label>
-                        <input id="imageInput" class="form-control" type="text" name="user[imageUrl]" value="<%= currentUser.imageUrl %>" placeholder="Enter Image Url">
+                        <input id="imageInput" class="form-control" type="text" name="imageUrl" value="<%= currentUser.imageUrl %>" placeholder="Enter Image Url">
                     </div>
                     <div class="form-group">
                         <label for="bannerInput">Banner Image Url</label>
-                        <input id="bannerInput" class="form-control" type="text" name="user[bannerUrl]" value="<%= currentUser.bannerUrl %>" placeholder="Enter Banner Url">
+                        <input id="bannerInput" class="form-control" type="text" name="bannerUrl" value="<%= currentUser.bannerUrl %>" placeholder="Enter Banner Url">
                     </div>
                     <button class="btn btn-lg btn-primary btn-block">Submit</button>
                 </form>

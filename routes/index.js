@@ -1,4 +1,6 @@
 const express = require('express');
+const Filter = require('bad-words');
+const filter = new Filter();
 //start express router
 const router = express.Router();
 //import passport for authentication
@@ -20,7 +22,7 @@ router.get('/', (req, res) => {
 //new registered user
 router.post("/register",  function(req, res) {
 	//creates new user from form info
-	var newUser = new User({email: req.body.email, username: req.body.username});
+	var newUser = new User({email: req.body.email, username: filter.clean(req.body.username)});
 
 	//registers the user
 	User.register(newUser, req.body.password, function(err, user) {

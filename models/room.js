@@ -11,6 +11,12 @@ var roomSchema = new mongoose.Schema({
 			ref: "User"
 		}
   ],
+  confirmed: [
+    {
+			type: mongoose.Schema.Types.ObjectId,
+			ref: "User"
+		}
+  ],
   creator: {
     id: {
       type: mongoose.Schema.Types.ObjectId,

@@ -1,5 +1,7 @@
 const express = require('express')
 const router = express.Router();
+const Filter = require('bad-words');
+const filter = new Filter();
 
 const User = require('../models/user');
 
@@ -41,8 +43,15 @@ router.get('/profiles/:id', middleware.isLoggedIn, function(req, res) {
 
 // update user route. Check if current user matches profiles they're trying to edit with middleware.
 router.put('/profiles/edit', middleware.isLoggedIn, function(req, res) {
+    let user = {
+        username: filter.clean(req.body.username),
+        description: filter.clean(req.body.description),
+        title: filter.clean(req.body.title),
+        imageUrl: req.body.imageUrl,
+        bannerUrl: req.body.bannerUrl
+    }
     //find and update the user with new info
-    User.findByIdAndUpdate(req.user._id, req.body.user, function(err, updatedUser) {
+    User.findByIdAndUpdate(req.user._id, user, function(err, updatedUser) {
         if(err || !updatedUser) {
             req.flash('error', 'There was an error updating your profile');
             res.redirect('back');
