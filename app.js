@@ -20,6 +20,8 @@ const colors = require('colors');
 //profanity filter
 const Filter = require('bad-words');
 const filter = new Filter();
+// scheduler test
+const schedule = require('node-schedule');
 // require the models for database actions
 const Comment = require('./models/comment');
 const User = require("./models/user");
@@ -34,7 +36,7 @@ const port = process.env.PORT || 3000;
 
 //connect to db. We should set the link as environment variable for security purposes in the future.
 //mongodb+srv://<username>:<password>@cluster0-cpycz.mongodb.net/saberChat?retryWrites=true&w=majority
-mongoose.connect("mongodb+srv://admin_1:alsion2020@cluster0-cpycz.mongodb.net/saberChat?retryWrites=true&w=majority", {useNewUrlParser: true, useUnifiedTopology: true, useFindAndModify: false});
+mongoose.connect("mongodb+srv://admin_1:alsion2020@cluster0-cpycz.mongodb.net/saberDemo?retryWrites=true&w=majority", {useNewUrlParser: true, useUnifiedTopology: true, useFindAndModify: false});
 
 // ============================
 // app configuration
@@ -108,6 +110,20 @@ const curseResponse = [
 function getRandMessage(list) {
 	return list[Math.floor(Math.random() * list.length)]
 }
+
+var manageComments = schedule.scheduleJob('0 0 * * *', function() {
+	Comment.find({}, function(err, foundComments) {
+		if(err) {
+			console.log(err);
+		} else {
+			foundComments.map((comment) => {
+				if(true) {
+					comment.remove();
+				}
+			});
+		}
+	});
+});
 
 // Socket.io server-side code
 io.on('connect', (socket) => {
