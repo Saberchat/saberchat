@@ -6,12 +6,12 @@ const router = express.Router();
 //import middleware
 const middleware = require('../middleware');
 
-//import comment schema for db stuff
+//import schemas for db stuff
 const Comment = require('../models/comment');
 const User = require('../models/user');
 const Room = require('../models/room');
 
-//route for displaying chats
+//route for displaying room list
 router.get('/chat', middleware.isLoggedIn, (req, res) => {
   Room.find({}, function(err, foundRooms) {
     if (err || !foundRooms) {
@@ -39,7 +39,7 @@ router.get('/chat/new', middleware.isLoggedIn, (req, res) => {
   });
 });
 
-// stuff for /chat route. Middleware makes sure user is logged in and allowed in chat group.
+// display chat of certain room
 router.get('/chat/:id', middleware.isLoggedIn, middleware.checkIfMember, (req, res) => {
   Room.findById(req.params.id, function(err, foundRoom) {
     if (err) {

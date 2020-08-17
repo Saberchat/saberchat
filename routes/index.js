@@ -46,14 +46,6 @@ router.post("/register",  function(req, res) {
 	});
 });
 
-// Simple login handling
-
-// router.post("/login", passport.authenticate("local", {
-// 	successRedirect: "/",
-// 	failureRedirect: "/"
-// }), function(req, res) {
-// });
-
 // Custom login handling so that flash messages can be sent. I'm not entirely sure how it works. Copy pasted from official doc
 router.post('/login', function(req, res, next) {
 	//authenticate user

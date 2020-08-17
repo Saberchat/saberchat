@@ -30,34 +30,35 @@
   <p class="text-dark lead mb-3"><%= room.description %></p>
   <% if (room.creator.id.equals(currentUser._id)) { %>
     <a href="/chat/<%= room._id %>/edit" class="btn btn-secondary"><i class="fas fa-cog"></i> Room Settings</a>
-  <% } %>
-  <!-- leave button/form with bootstrap modal -->
-  <form action="/chat/<%= room._id %>/leave" method="post" style="display: inline-block;">
-    <!-- Button trigger modal -->
-    <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#leaveModalCenter">
-      <i class="fas fa-sign-out-alt"></i> Leave Room
-    </button>
-    <!-- Modal -->
-    <div class="modal fade" id="leaveModalCenter" tabindex="-1" role="dialog" aria-labelledby="leaveModalCenterTitle" aria-hidden="true">
-      <div class="modal-dialog modal-dialog-centered" role="document">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h5 class="modal-title" id="leaveModalCenterTitle"><i class="fas fa-sign-out-alt"></i> Leave <%= room.name %>?</h5>
-            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-              <span aria-hidden="true">&times;</span>
-            </button>
-          </div>
-          <div class="modal-body">
-            You will need to be invited again to rejoin.
-          </div>
-          <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-            <button type="submit" class="btn btn-danger">Confirm</button>
+  <% } else { %>
+    <!-- leave button/form with bootstrap modal -->
+    <form action="/chat/<%= room._id %>/leave" method="post" style="display: inline-block;">
+      <!-- Button trigger modal -->
+      <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#leaveModalCenter">
+        <i class="fas fa-sign-out-alt"></i> Leave Room
+      </button>
+      <!-- Modal -->
+      <div class="modal fade" id="leaveModalCenter" tabindex="-1" role="dialog" aria-labelledby="leaveModalCenterTitle" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="leaveModalCenterTitle"><i class="fas fa-sign-out-alt"></i> Leave <%= room.name %>?</h5>
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </div>
+            <div class="modal-body">
+              You will need to be invited again to rejoin.
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+              <button type="submit" class="btn btn-danger">Confirm</button>
+            </div>
           </div>
         </div>
       </div>
-    </div>
-  </form>
+    </form>
+  <% } %>
 </header>
   <div class="container py-5 px-4">
     <div class="row rounded-lg overflow-hidden shadow mt-2">
@@ -67,7 +68,7 @@
         <div class="px-4 chat-box bg-white" id="message-display">
           <!-- reverse it to get correct order -->
           <% comments.reverse().forEach(comment => { %>
-            <% if (comment.author._id.equals(currentUser._id)) { %>
+            <% if (comment.author && comment.author._id.equals(currentUser._id)) { %>
               <!-- Reciever Message-->
               <div class="media w-65 ml-auto mb-2">
                 <div class="media-body">
@@ -77,7 +78,7 @@
                   <p class="small text-muted"><%= comment.date %></p>
                 </div>
               </div>
-            <% } else { %>
+            <% } else if(comment.author) { %>
               <!-- Sender message -->
               <div class="media w-65 mb-2">
                 <img src="<%= comment.author.imageUrl %>" alt="user" class="user-image">
@@ -87,6 +88,10 @@
                   </div>
                   <p class="small text-muted"><span class="username"><%= comment.author.username %></span>, <%= comment.date %></p>
                 </div>
+              </div>
+            <% } else { %>
+              <div class="announcement mb-5">
+                <h4><%= comment.text %></h4>
               </div>
             <% } %>
           <% }) %>

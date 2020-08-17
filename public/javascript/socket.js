@@ -40,9 +40,21 @@ function chatInit(username, userId, messageForm, input, chatDisplay, room, userI
     socket.emit('switch room', room);
   });
 
+  socket.on('announcement', function(notif) {
+    $(chatDisplay).append(`
+    <div class="announcement mb-2">
+    <h4>${notif.text}</h4>
+    </div>`);
+    let messages = document.getElementsByClassName('media');
+    let message = messages[messages.length - 1];
+    if(message) {
+      scrollToElement(message, 'message-display');
+    }
+  });
+
   socket.on('chat message', function(msg) {
     // appends the message to the ul element displaying the messages
-    $(chatDisplay).append(`<div class="media w-50 mb-2">
+    $(chatDisplay).append(`<div class="media w-50 mb-5">
     <img src="${msg.userImage}" alt="user" class="user-image">
     <div class="media-body ml-3">
       <div class="bg-grey rounded py-2 px-3 mb-2">

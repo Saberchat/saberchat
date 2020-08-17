@@ -51,6 +51,7 @@ app.use(methodOverride('_method'));
 app.use(flash());
 
 // express session stuff for authorization that I know nothing about
+
 app.use(require("express-session")({
 	// I think secret is what's used to encrypt the information
 	secret: "Programming For Alsion Is Cool",
@@ -94,6 +95,20 @@ app.get('*', function(req, res) {
 	res.redirect('/');
 });
 
+// list of responses to bad words
+const curseResponse = [
+	'Cursing is a poor excuse for intelligence.',
+	"Please Don't curse. Let's keep things family-friendly.",
+	"Give the word filter a break! Don't curse.",
+	"Not cool. Very not cool.",
+	"Come on. Be friendly."
+]
+
+// gets random item in array
+function getRandMessage(list) {
+	return list[Math.floor(Math.random() * list.length)]
+}
+
 // Socket.io server-side code
 io.on('connect', (socket) => {
   console.log("A user connected".cyan);
@@ -109,11 +124,14 @@ io.on('connect', (socket) => {
 
 	// When 'chat message' event is detected, emit msg to all clients in room
 	socket.on('chat message', (msg) => {
+		let profanity;
 		// clean the message
-		msg.text = filter.clean(msg.text)
+		if(msg.text != filter.clean(msg.text)){
+			msg.text = filter.clean(msg.text);
+			profanity = true;
+		}
 		// broadcast message to all connected users in the room
 		socket.to(socket.room).emit('chat message', msg);
-
     // Log information
     // console.log("Room: ".cyan);
     // console.log(socket.room);
@@ -136,6 +154,28 @@ io.on('connect', (socket) => {
 				// console.log(comment);
 			}
 		});
+		// send warning message
+		if(profanity) {
+			// console.log('detected bad words'.green);
+			let notif = {text: getRandMessage(curseResponse), type:'notif'};
+			// send announcement to all
+			io.in(socket.room).emit('announcement', notif);
+			// create announcement in db
+			Comment.create({text: notif.text, room: socket.room, type:'notif'}, function(err, comment) {
+				if(err) {
+					// sends error msg if comment could not be created
+					console.log(err);
+				} else {
+					// format the date in the form we want.
+					comment.date = dateFormat(comment.created_at, "h:MM TT | mmm d");
+					// saves changes
+					comment.save();
+			// confirmation log
+					// console.log('Database Comment created: '.cyan);
+					// console.log(comment);
+				}
+			});
+		}
 	});
 });
 

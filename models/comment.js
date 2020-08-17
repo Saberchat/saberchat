@@ -4,6 +4,7 @@ const mongoose = require("mongoose");
 
 var commentSchema = new mongoose.Schema({
 	text: String,
+	type: String,
 	room: {
 		type: mongoose.Schema.Types.ObjectId,
 		ref: "Room"

@@ -108,6 +108,17 @@ span.username {
 .exit-button:hover {
     background-color: rgba(255, 255, 255, 0.7);
 }
+.announcement {
+    width: 100%;
+    text-align: center;
+}
+
+.announcement h4{
+    display: inline-block;
+    color: #9f9aa4;
+    font-size: 1.5rem;
+    font-weight: 300;
+}
 
 @media (max-width: 550px) {
     .w-65 {
