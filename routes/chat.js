@@ -75,7 +75,29 @@ router.get('/chat/:id', middleware.isLoggedIn, middleware.checkIfMember, (req, r
 
 });
 
-// route for creating new rooms
+// display edit form
+router.get('/chat/:id/edit', middleware.isLoggedIn, middleware.checkRoomOwnership, (req, res) => {
+  Room.findById(req.params.id, function(err, foundRoom) {
+    if (err || !foundRoom) {
+      req.flash('error', 'Cannot find room or unable to access Database');
+      res.redirect('back');
+    } else {
+      User.find({}, function(err, foundUsers) {
+        if (err || !foundUsers) {
+          req.flash('error', 'Unable to access Database');
+          res.redirect('back');
+        } else {
+          res.render('chat/edit', {
+            users: foundUsers,
+            room: foundRoom
+          });
+        }
+      }); 
+    }
+  });
+});
+
+// create new rooms
 router.post('/chat/new', middleware.isLoggedIn, function(req, res) {
   Room.create({name: req.body.name, 'creator.id': req.user._id, 'creator.username': req.user.username, members: [req.user._id]}, function(err, room) {
     if (err) {
@@ -100,29 +122,31 @@ router.post('/chat/new', middleware.isLoggedIn, function(req, res) {
   });
 });
 
-router.get('/chat/:id/edit', middleware.isLoggedIn, middleware.checkRoomOwnership, (req, res) => {
+// leave a room
+router.post('/chat/:id/leave', middleware.isLoggedIn, middleware.checkIfMember, function(req, res) {
   Room.findById(req.params.id, function(err, foundRoom) {
-    if (err || !foundRoom) {
-      req.flash('error', 'Cannot find room or unable to access Database');
+    if(err) {
+      console.log(err);
+      req.flash('error', 'Error accessing Database');
       res.redirect('back');
     } else {
-      User.find({}, function(err, foundUsers) {
-        if (err || !foundUsers) {
-          req.flash('error', 'Unable to access Database');
-          res.redirect('back');
-        } else {
-          res.render('chat/edit', {
-            users: foundUsers,
-            room: foundRoom
-          });
-        }
-      }); 
+      if(foundRoom.creator.id.equals(req.user._id)) {
+        req.flash('error', 'You cannot leave a room you created');
+        res.redirect('back');
+      } else {
+        let index = foundRoom.members.indexOf(req.user._id);
+        foundRoom.members.splice(index, 1);
+        foundRoom.save();
+
+        req.flash('success', 'You have left ' + foundRoom.name);
+        res.redirect('/chat');
+      }
     }
   });
 });
 
 
-
+// update room
 router.put('/chat/:id/edit', middleware.isLoggedIn, middleware.checkRoomOwnership, (req, res) => {
   Room.findByIdAndUpdate(req.params.id, req.body.room, function(err, room) {
     if (err || !room) {
@@ -150,6 +174,7 @@ router.put('/chat/:id/edit', middleware.isLoggedIn, middleware.checkRoomOwnershi
   // res.send(req.params.id + " " + req.body.newname);
 });
 
+// delete room
 router.delete('/chat/:id/delete', middleware.isLoggedIn, middleware.checkRoomOwnership, (req, res) => {
   Room.findByIdAndDelete(req.params.id, function(err, deletedRoom) {
     if(err || !deletedRoom) {

@@ -31,6 +31,33 @@
   <% if (room.creator.id.equals(currentUser._id)) { %>
     <a href="/chat/<%= room._id %>/edit" class="btn btn-secondary"><i class="fas fa-cog"></i> Room Settings</a>
   <% } %>
+  <!-- leave button/form with bootstrap modal -->
+  <form action="/chat/<%= room._id %>/leave" method="post" style="display: inline-block;">
+    <!-- Button trigger modal -->
+    <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#leaveModalCenter">
+      <i class="fas fa-sign-out-alt"></i> Leave Room
+    </button>
+    <!-- Modal -->
+    <div class="modal fade" id="leaveModalCenter" tabindex="-1" role="dialog" aria-labelledby="leaveModalCenterTitle" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="leaveModalCenterTitle"><i class="fas fa-sign-out-alt"></i> Leave <%= room.name %>?</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">
+            You will need to be invited again to rejoin.
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            <button type="submit" class="btn btn-danger">Confirm</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </form>
 </header>
   <div class="container py-5 px-4">
     <div class="row rounded-lg overflow-hidden shadow mt-2">

@@ -12,7 +12,7 @@ function chatInit(username, userId, messageForm, input, chatDisplay, room, userI
   $(messageForm).submit(function(e) {
     e.preventDefault(); // prevents page reloading
     let text = $('#m').val()
-    //emits message object containing text, usrname, and user Id
+    //emits message object containing the info
     if(text != "") {
       socket.emit('chat message', {'text': text, 'authorId': userId, 'userImage': userImage, 'username': username});
       $(input).val('');
@@ -27,6 +27,7 @@ function chatInit(username, userId, messageForm, input, chatDisplay, room, userI
       </div>`
       );
     }
+    // scroll to latest message
     let messages = document.getElementsByClassName('media');
     let message = messages[messages.length - 1];
     if(message) {
@@ -50,6 +51,7 @@ function chatInit(username, userId, messageForm, input, chatDisplay, room, userI
       <p class="small text-muted"><span class="username">${msg.username}</span>, ${$.format.date(Date.now(), "h:mm a | MMM d")}</p>
     </div>
     </div>`);
+    // scroll to latest message
     let messages = document.getElementsByClassName('media');
     let message = messages[messages.length - 1];
     if(message) {

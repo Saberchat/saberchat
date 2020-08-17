@@ -37,9 +37,10 @@
                     <div class="form-group">
                         <label for="descInput">Description</label>
                         <% if(currentUser.description){ %>
-                            <input id="descInput" class="form-control" type="text" name="user[description]" value="<%= currentUser.description %>" maxlength="350" placeholder="Enter Description">
+                            <!-- <input id="descInput" class="form-control" type="text" name="user[description]" value="<%= currentUser.description %>" maxlength="350" placeholder="Enter Description"> -->
+                            <textarea id="descInput" class="form-control" name="user[description]" maxlength="550" placeholder="Enter Description" rows="5"><%= currentUser.description %></textarea>
                         <% } else { %>
-                            <input id="descInput" class="form-control" type="text" name="user[description]" value="" placeholder="Enter Description" maxlength="350" aria-describedby="descHelp">
+                            <textarea id="descInput" class="form-control" name="user[description]" placeholder="Enter Description" maxlength="550" rows="5" aria-describedby="descHelp"></textarea>
                             <small id="descHelp" class="form-text text-muted">Ex. Hobbies: swimming, tennis, searching for bigfoot.</small>
                         <% } %>
                     </div>
@@ -62,7 +63,7 @@
                     </div>
                     <button class="btn btn-lg btn-primary btn-block">Submit</button>
                 </form>
-                <a style="display: block; margin-top: 1rem;" href="/profiles/<%= currentUser._id %>">Go Back</a>
+                <a style="display: block; margin-top: 1rem; margin-bottom: 5rem;" href="/profiles/<%= currentUser._id %>">Go Back</a>
             </div>
         </div>
     </div>

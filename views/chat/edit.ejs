@@ -39,7 +39,7 @@
             </div>
             <div class="form-group">
               <label for="descInput">Description</label>
-              <input id="descInput" class="form-control" type="text" name="room[description]" value="<%= room.description %>" placeholder="(max 100) Enter room description" maxlength="100">
+              <textarea id="descInput" class="form-control" name="room[description]" placeholder="(max 300) Enter room description" maxlength="300" rows="5"><%= room.description %></textarea>
             </div>
             <div class="form-check mb-3">
               <input name="type" id="roomType" type="checkbox" onclick="updateDisplay()" class="form-check-input" value="true"
@@ -89,6 +89,7 @@
 
           </form>
           <div class="container mt-2"></div>
+          <!-- delete button and form with bootstrap modal -->
           <form action="/chat/<%= room._id %>/delete?_method=delete" method="post" id="delete-form">
             <button type="button" class="btn btn-lg btn-danger btn-block" data-toggle="modal" data-target="#deleteModal" id="delete-button">Delete this room</button>
             <div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">

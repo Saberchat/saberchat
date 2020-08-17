@@ -68,7 +68,7 @@ router.post('/login', function(req, res, next) {
         req.logIn(user, function(err) {
 			if (err) { return next(err); }
 			//flash message success
-            req.flash('success', 'Successfully Signed In');
+            req.flash('success', 'Welcome ' + user.username);
             return res.redirect('/');
         });
     })(req, res, next);
