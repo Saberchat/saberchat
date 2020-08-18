@@ -139,10 +139,10 @@ console.log('set scheduler');
 
 // Socket.io server-side code
 io.on('connect', (socket) => {
-  console.log("A user connected".cyan);
-  socket.on('disconnect', () => {
-		console.log("A user disconnected".cyan);
-	});
+//   console.log("A user connected".cyan);
+//   socket.on('disconnect', () => {
+// 		console.log("A user disconnected".cyan);
+// 	});
 	// When 'switch room' event is detected, leave old room and join 'newroom';
   socket.on('switch room', (newroom) => {
     socket.leave(socket.room);
@@ -173,8 +173,9 @@ io.on('connect', (socket) => {
 				console.log(err);
 				req.flash('error', 'message could not be created');
 			} else {
+				let now = new Date();
 				// format the date in the form we want.
-				comment.date = dateFormat(comment.created_at, "h:MM TT | mmm d");
+				comment.date = dateFormat(now, "h:MM TT | mmm d");
 				// saves changes
 				comment.save();
         // confirmation log
@@ -194,7 +195,7 @@ io.on('connect', (socket) => {
 					// sends error msg if comment could not be created
 					console.log(err);
 				} else {
-					// format the date in the form we want.
+					// format the date in the form we want
 					comment.date = dateFormat(comment.created_at, "h:MM TT | mmm d");
 					// saves changes
 					comment.save();
