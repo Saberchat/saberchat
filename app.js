@@ -53,12 +53,21 @@ app.use(methodOverride('_method'));
 app.use(flash());
 
 // express session stuff for authorization that I know nothing about
-
-app.use(require("express-session")({
-	// I think secret is what's used to encrypt the information
-	secret: "Programming For Alsion Is Cool",
-	resave: false,
-	saveUninitialized: false
+var session = require('express-session');
+// using memorystore package because express-session leads to memory leaks and isnt optimized for production.
+var MemoryStore = require('memorystore')(session);
+// app.use(require("express-session")({
+// 	// I think secret is what's used to encrypt the information
+// 	secret: "Programming For Alsion Is Cool",
+// 	resave: false,
+// 	saveUninitialized: false
+// }));
+app.use(session({
+	cookie: {maxAge: 86400000},
+	store: new MemoryStore({
+		checkPeriod: 86400000 //prune expired entries every 24hrs
+	}),
+	secret: "Programming For Alsion is Cool"
 }));
 
 // passport required authorization setup that I also know nothing about.
