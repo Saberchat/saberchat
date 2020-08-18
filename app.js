@@ -120,7 +120,7 @@ function getRandMessage(list) {
 	return list[Math.floor(Math.random() * list.length)]
 }
 
-var manageComments = schedule.scheduleJob('30 17 * * *', function() {
+var manageComments = schedule.scheduleJob('0 18 * * *', function() {
 	console.log('schedule fired');
 	Comment.find({}, function(err, foundComments) {
 		if(err) {
