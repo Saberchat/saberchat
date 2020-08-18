@@ -173,9 +173,8 @@ io.on('connect', (socket) => {
 				console.log(err);
 				req.flash('error', 'message could not be created');
 			} else {
-				let now = new Date();
 				// format the date in the form we want.
-				comment.date = dateFormat(now, "h:MM TT | mmm d");
+				comment.date = dateFormat(comment.created_at, "h:MM TT | mmm d");
 				// saves changes
 				comment.save();
         // confirmation log
