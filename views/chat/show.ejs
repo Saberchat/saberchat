@@ -25,7 +25,7 @@
 </head>
 <body>
   <%- include("../partials/navbar") %>
-<header class="text-center">
+<header class="text-center container">
   <h1 class="display-4 text-dark"><%= room.name %> </h1>
   <p class="text-dark lead mb-3"><%= room.description %></p>
   <% if (room.creator.id.equals(currentUser._id)) { %>
