@@ -67,7 +67,9 @@ app.use(session({
 	store: new MemoryStore({
 		checkPeriod: 86400000 //prune expired entries every 24hrs
 	}),
-	secret: "Programming For Alsion is Cool"
+	secret: "Programming For Alsion is Cool",
+	resave: false,
+	saveUninitialized: false
 }));
 
 // passport required authorization setup that I also know nothing about.
@@ -86,10 +88,7 @@ app.use(function(req, res, next) {
 	// flash message stuff
 	res.locals.error = req.flash('error');
 	res.locals.success = req.flash('success');
-	// profanity filter
-	// this won't work - alex
-	// res.locals.filter = filter;
-	next()
+	next();
 });
 
 // =======================
@@ -108,7 +107,6 @@ app.get('*', function(req, res) {
 
 // list of responses to bad words
 const curseResponse = [
-	'Cursing is a poor excuse for intelligence.',
 	"Please Don't curse. Let's keep things family-friendly.",
 	"Give the word filter a break! Don't curse.",
 	"Not cool. Very not cool.",
