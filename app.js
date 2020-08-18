@@ -120,8 +120,7 @@ function getRandMessage(list) {
 	return list[Math.floor(Math.random() * list.length)]
 }
 
-var manageComments = schedule.scheduleJob('0 18 * * *', function() {
-	console.log('schedule fired');
+var manageComments = schedule.scheduleJob('0 0 * * *', function() {
 	Comment.find({}, function(err, foundComments) {
 		if(err) {
 			console.log(err);
@@ -129,13 +128,12 @@ var manageComments = schedule.scheduleJob('0 18 * * *', function() {
 			foundComments.map((comment) => {
 				if(true) {
 					comment.remove();
+					console.log('removed comments');
 				}
 			});
-			console.log('removed comments');
 		}
 	});
 });
-console.log('set scheduler');
 
 // Socket.io server-side code
 io.on('connect', (socket) => {
