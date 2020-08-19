@@ -32,8 +32,8 @@
                     </li>
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle" href="" id="navbarDropdownMenuLink" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                            <%= currentUser.firstName.charAt(0) %>.<%= currentUser.lastName.charAt(0) %>.
                             <img src="<%= currentUser.imageUrl %>" alt="profile pic" style="width: 20px; height: 20px; object-fit: cover; border-radius: 50%; display: inline-block; margin-top: -3px;">
+                            <%= currentUser.firstName.charAt(0) %>.<%= currentUser.lastName.charAt(0) %>.
                         </a>
                         <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
                           <a class="dropdown-item" href="/profiles/<%= currentUser._id %>">View Profile</a>

@@ -17,7 +17,8 @@ var userSchema = new mongoose.Schema({
 			type: mongoose.Schema.Types.ObjectId,
 			ref: "Notification"
 		}
-	]
+	],
+	permission: {type: String, default: "student"}
 }, {timestamps: {createdAt: 'created_at'}});
 
 //adds authentication functionality

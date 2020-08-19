@@ -47,9 +47,13 @@ router.put('/profiles/edit', middleware.isLoggedIn, function(req, res) {
         firstName: req.body.firstName,
         lastName: req.body.lastName,
         description: filter.clean(req.body.description),
-        title: filter.clean(req.body.title),
-        imageUrl: req.body.imageUrl,
-        bannerUrl: req.body.bannerUrl
+        title: filter.clean(req.body.title)
+    }
+    if(req.body.imageUrl) {
+        user.imageUrl = req.body.imageUrl;
+    }
+    if(req.body.bannerUrl) {
+        user.bannerUrl = req.body.bannerUrl;
     }
     //find and update the user with new info
     User.findByIdAndUpdate(req.user._id, user, function(err, updatedUser) {
