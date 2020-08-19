@@ -29,6 +29,7 @@ const User = require("./models/user");
 const indexRoutes = require('./routes/index');
 const chatRoutes = require('./routes/chat');
 const profileRoutes = require('./routes/profile');
+const wHeightsRoutes = require('./routes/wHeights');
 //set up ports and socket.io
 const http = require('http').createServer(app);
 const io = require('socket.io')(http);
@@ -96,12 +97,13 @@ app.use(function(req, res, next) {
 // =======================
 //tell the app to use the required/imported routes.
 app.use(indexRoutes);
-app.use(chatRoutes);
-app.use(profileRoutes);
+app.use('/chat', chatRoutes);
+app.use('/profiles', profileRoutes);
+app.use('/witherlyheights', wHeightsRoutes);
+
 
 // Catch-all route
 app.get('*', function(req, res) {
-	req.flash('error', 'Url does not exist');
 	res.redirect('/');
 });
 

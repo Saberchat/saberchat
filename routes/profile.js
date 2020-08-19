@@ -8,7 +8,7 @@ const User = require('../models/user');
 const middleware = require('../middleware');
 
 // renders the list of users page
-router.get('/profiles', middleware.isLoggedIn, function(req, res) {
+router.get('/', middleware.isLoggedIn, function(req, res) {
     User.find({}, function(err, foundUsers) {
         if(err || !foundUsers) {
             req.flash('error', 'Unable to access Database');
@@ -20,17 +20,17 @@ router.get('/profiles', middleware.isLoggedIn, function(req, res) {
 });
 
 //renders profiles edit page
-router.get('/profiles/edit', middleware.isLoggedIn, function(req, res) {
+router.get('/edit', middleware.isLoggedIn, function(req, res) {
     res.render('profile/edit');
 });
 
 //renders the email/password edit page
-router.get('/profiles/change-login-info', middleware.isLoggedIn, function(req, res) {
+router.get('/change-login-info', middleware.isLoggedIn, function(req, res) {
     res.render('profile/edit_pwd_email');
 });
 
 //renders views/profiles/show.ejs at /profiles route.
-router.get('/profiles/:id', middleware.isLoggedIn, function(req, res) {
+router.get('/:id', middleware.isLoggedIn, function(req, res) {
     User.findById(req.params.id, function(err, foundUser) {
         if(err || !foundUser) {
             req.flash('error', 'Error. Cannot find user.');
@@ -42,7 +42,7 @@ router.get('/profiles/:id', middleware.isLoggedIn, function(req, res) {
 });
 
 // update user route. Check if current user matches profiles they're trying to edit with middleware.
-router.put('/profiles/edit', middleware.isLoggedIn, function(req, res) {
+router.put('/edit', middleware.isLoggedIn, function(req, res) {
     let user = {
         firstName: req.body.firstName,
         lastName: req.body.lastName,
@@ -69,7 +69,7 @@ router.put('/profiles/edit', middleware.isLoggedIn, function(req, res) {
 });
 
 //route for changing email. Similar to edit profiles route. But changing email logs out user for some reason.
-router.put('/profiles/change-email', middleware.isLoggedIn, function(req, res) {
+router.put('/change-email', middleware.isLoggedIn, function(req, res) {
     User.findByIdAndUpdate(req.user._id, {email: req.body.email}, function(err, updatedUser) {
         if(err || !updatedUser) {
             req.flash('error', 'There was an error changing your email');
@@ -81,7 +81,7 @@ router.put('/profiles/change-email', middleware.isLoggedIn, function(req, res) {
     });
 });
 //route for changing password. Not too much different from previous routes.
-router.put('/profiles/change-password', middleware.isLoggedIn, function(req, res) {
+router.put('/change-password', middleware.isLoggedIn, function(req, res) {
     User.findById(req.user._id, function(err, foundUser) {
         if(err || !foundUser) {
             req.flash('error', 'Error, cannot find user');
