@@ -41,31 +41,39 @@
         </div>
       </div>
     </nav>
-
-    <!-- background image -->
-    <section id="background">
-      <div class="background-content">
-        <h1>Witherly Heights</h1>
-        <p>Alsion Student Newspaper</p>
-      </div>
-    </section>
-    <section class="container mt-5">
-      <h1 class="text-center mb-3">Articles</h1>
-      <a href="/witherlyheights/articles/new" class="btn btn-info">New Article</a>
-      <div class="row">
-        <% for( let index = 0; index < articles.length; index++ ) { %>
-          <div class="col-md-6 col-lg-4 col-12 px-2">
-            <div class="card article" style="width: 18rem;">
-              <img class="card-img-top" src="https://images.unsplash.com/photo-1505235687559-28b5f54645b7?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=2090&q=80" alt="Card image cap">
-              <div class="card-body">
-                <h5 class="card-title">Article <%= index %></h5>
-                <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
-                <a href="#">Read More...</a>
-              </div>
+    <div class="container">
+        <div class="row">
+            <div class="col-12">
+                <h1>New Post</h1>
+                <form action="">
+                    <div class="form-group">
+                        <label for="title">Title</label>
+                        <input name="title" id="title" class="form-control" type="text">
+                    </div>
+                    <div class="form-group">
+                        <label for="author">Author</label>
+                        <input id="author" class="form-control" type="text" name="author">
+                    </div>
+                    <div id="editor">
+                        <div class="form-group">
+                            <label for="content">Content</label>
+                            <textarea id="content" class="form-control" name="content" rows="10"></textarea>
+                        </div>
+                    </div>
+                    <button type="button" class="btn btn-primary" onclick="addText()" >Add Textblock</button>
+                </form>   
             </div>
-          </div>
-        <% } %>
-      </div>
-    </section>
+        </div>
+    </div>
+    <script>
+        let count = 1;
+        function addText() {
+            $('#editor').append(
+                `<div class="form-group">
+                    <textarea id="${count}" class="form-control" name="${count}" rows="10"></textarea>
+                </div>`
+            );
+        }
+    </script>
 </body>
 </html>
