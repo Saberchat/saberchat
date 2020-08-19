@@ -15,7 +15,9 @@ public: contains front end css and js\
 .\
 models: DB models for collections\
 .\
-middleware: express middleware
+middleware: express middleware\
+.\
+Procfile: Tells Heroku what command to call on app start
 
 
 Npm Libraries
