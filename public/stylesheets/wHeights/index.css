@@ -38,4 +38,9 @@ background
 }
 
 /* Articles */
+.article {
+    display: block;
+    margin: 0 auto;
+    margin-bottom: 3rem;
+}
 
