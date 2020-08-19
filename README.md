@@ -15,7 +15,7 @@ public: contains front end css and js\
 .\
 models: DB models for collections\
 .\
-middleware: express middleware\
+middleware: express middleware
 
 
 Npm Libraries
