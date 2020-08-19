@@ -1,11 +1,12 @@
 const mongoose = require("mongoose");
 const passportLocalMongoose = require("passport-local-mongoose");
 
-// user will have email, pswrd, usrname, desc., title, url to profile pic, and timestamp
+// user will have email, pswrd, name, desc., title, url to profile pic, and timestamp
 var userSchema = new mongoose.Schema({
 	email: String,
 	password: String,
-	username: String,
+	firstName: String,
+	lastName:String,
 	description: String,
 	title: String,
 	bannerUrl: {type: String, default: 'https://images.unsplash.com/photo-1594793861747-136c34047e9d?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=1952&q=80'},

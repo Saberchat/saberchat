@@ -31,7 +31,10 @@
                         <a class="nav-link" href="/"><i class="fas fa-inbox"></i> Inbox</a>
                     </li>
                     <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><%= currentUser.username %></a>
+                        <a class="nav-link dropdown-toggle" href="" id="navbarDropdownMenuLink" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            <%= currentUser.firstName.charAt(0) %>.<%= currentUser.lastName.charAt(0) %>.
+                            <img src="<%= currentUser.imageUrl %>" alt="profile pic" style="width: 20px; height: 20px; object-fit: cover; border-radius: 50%; display: inline-block; margin-top: -3px;">
+                        </a>
                         <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
                           <a class="dropdown-item" href="/profiles/<%= currentUser._id %>">View Profile</a>
                           <a class="dropdown-item" href="/logout">Logout</a>
@@ -69,8 +72,12 @@
 <form class="user-form signup" action="/register" method="post">
     <span class="form-close signup"><i class="far fa-window-close"></i></span>
     <div class="form-group mt-3">
-        <label for="username-signup">Username</label>
-        <input name="username" type="text" class="form-control" id="username-signup" placeholder="(max 15) enter username" maxlength="15" required>
+        <label for="firstName-signup">First</label>
+        <input name="firstName" type="text" class="form-control" id="firstName-signup" placeholder="enter first name" required>
+    </div>
+    <div class="form-group mt-3">
+        <label for="lastName-signup">Last</label>
+        <input name="lastName" type="text" class="form-control" id="lastName-signup" placeholder="enter last" required>
     </div>
     <div class="form-group">
         <label for="email-signup">Email address</label>

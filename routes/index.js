@@ -22,7 +22,13 @@ router.get('/', (req, res) => {
 //new registered user
 router.post("/register",  function(req, res) {
 	//creates new user from form info
-	var newUser = new User({email: req.body.email, username: filter.clean(req.body.username)});
+	var newUser = new User(
+		{
+			email: req.body.email, 
+			firstName: req.body.firstName,
+			lastName: req.body.lastName
+		}
+	);
 
 	//registers the user
 	User.register(newUser, req.body.password, function(err, user) {
@@ -41,7 +47,7 @@ router.post("/register",  function(req, res) {
 		//if registration is successful, login user. 
 		passport.authenticate("local")(req, res, function() {
 			//flash message for succesful login
-			req.flash("success", "Welcome to Saber Chat " + user.username);
+			req.flash("success", "Welcome to Saberchat " + user.firstName);
 			res.redirect("/");
 			console.log('succesfully registered and logged in user')
 		});
@@ -62,7 +68,7 @@ router.post('/login', function(req, res, next) {
         req.logIn(user, function(err) {
 			if (err) { return next(err); }
 			//flash message success
-            req.flash('success', 'Welcome ' + user.username);
+            req.flash('success', 'Welcome ' + user.firstName);
             return res.redirect('/');
         });
     })(req, res, next);

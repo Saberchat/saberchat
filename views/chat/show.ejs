@@ -88,7 +88,7 @@
                   <div class="bg-grey rounded py-2 px-3 mb-2">
                     <p class="text-small mb-0 text-dark"><%= comment.text %></p>
                   </div>
-                  <p class="small text-muted"><span class="username"><%= comment.author.username %></span>, <%= comment.date %></p>
+                  <p class="small text-muted"><span class="username"><%= comment.author.firstName %></span>, <%= comment.date %></p>
                 </div>
               </div>
             <% } else { %>
@@ -119,7 +119,7 @@
 
     //set all the variables for the chatInit function
     const userId = '<%= currentUser._id %>';
-    const username = '<%= currentUser.username %>';
+    const username = '<%= currentUser.firstName %>';
     const userImage = '<%= currentUser.imageUrl %>';
     const messageForm = '#message-form';
     const input = '#m';
