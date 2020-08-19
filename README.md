@@ -5,17 +5,17 @@ Link: https://thawing-savannah-89746.herokuapp.com/
 
 ToC
 -----------------------------------------
-app.js: main file of the app
-.
-Views: ejs files of front end code for all pages
-.
-routes: routes of the server
-.
-public: contains front end css and js
-.
-models: DB models for collections
-.
-middleware: express middleware
+app.js: main file of the app\
+.\
+Views: ejs files of front end code for all pages\
+.\
+routes: routes of the server\
+.\
+public: contains front end css and js\
+.\
+models: DB models for collections\
+.\
+middleware: express middleware\
 
 
 Npm Libraries
