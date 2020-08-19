@@ -30,7 +30,7 @@ Npm Libraries
 - mongoose-local-passport (library for easy interaction between passport and mongoose)
 - memorystore (library for fixing memory leak with express-session and optimizing for production env)
 - method-override (enable access to put and delete routes)
-- node-schedule (library for scheduling recuring functions/jobs )
+- node-schedule (library for scheduling recurring functions/jobs )
 - passport (authorization with node)
 - socket.io (sockets for real-time communication)
 
