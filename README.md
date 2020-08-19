@@ -1,16 +1,5 @@
-# alsion-fb
+# Deployed-demo
 
-Table of Contents
-=====================================
- - models: models for the db collections
+This is a branch that is used to host a demo on heroku
 
- - routes: routes.
-
- - views/partials: some templates that might reduce code
-
- - public/stylesheets: the css
- - public/javascript: pardon the folder name but I can't come up with something better. Stores js files for front end
-
- - app.js: the express app
-
- - yeah this readme really needs to be updated at some point
+Link: https://thawing-savannah-89746.herokuapp.com/

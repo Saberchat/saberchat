@@ -20,6 +20,8 @@ const colors = require('colors');
 //profanity filter
 const Filter = require('bad-words');
 const filter = new Filter();
+// scheduler test
+const schedule = require('node-schedule');
 // require the models for database actions
 const Comment = require('./models/comment');
 const User = require("./models/user");
@@ -34,7 +36,7 @@ const port = process.env.PORT || 3000;
 
 //connect to db. We should set the link as environment variable for security purposes in the future.
 //mongodb+srv://<username>:<password>@cluster0-cpycz.mongodb.net/saberChat?retryWrites=true&w=majority
-mongoose.connect("mongodb+srv://admin_1:alsion2020@cluster0-cpycz.mongodb.net/saberChat?retryWrites=true&w=majority", {useNewUrlParser: true, useUnifiedTopology: true, useFindAndModify: false});
+mongoose.connect("mongodb+srv://admin_1:alsion2020@cluster0-cpycz.mongodb.net/saberDemo?retryWrites=true&w=majority", {useNewUrlParser: true, useUnifiedTopology: true, useFindAndModify: false});
 
 // ============================
 // app configuration
@@ -51,10 +53,21 @@ app.use(methodOverride('_method'));
 app.use(flash());
 
 // express session stuff for authorization that I know nothing about
-
-app.use(require("express-session")({
-	// I think secret is what's used to encrypt the information
-	secret: "Programming For Alsion Is Cool",
+var session = require('express-session');
+// using memorystore package because express-session leads to memory leaks and isnt optimized for production.
+var MemoryStore = require('memorystore')(session);
+// app.use(require("express-session")({
+// 	// I think secret is what's used to encrypt the information
+// 	secret: "Programming For Alsion Is Cool",
+// 	resave: false,
+// 	saveUninitialized: false
+// }));
+app.use(session({
+	cookie: {maxAge: 86400000},
+	store: new MemoryStore({
+		checkPeriod: 86400000 //prune expired entries every 24hrs
+	}),
+	secret: "Programming For Alsion is Cool",
 	resave: false,
 	saveUninitialized: false
 }));
@@ -75,10 +88,7 @@ app.use(function(req, res, next) {
 	// flash message stuff
 	res.locals.error = req.flash('error');
 	res.locals.success = req.flash('success');
-	// profanity filter
-	// this won't work - alex
-	// res.locals.filter = filter;
-	next()
+	next();
 });
 
 // =======================
@@ -97,7 +107,6 @@ app.get('*', function(req, res) {
 
 // list of responses to bad words
 const curseResponse = [
-	'Cursing is a poor excuse for intelligence.',
 	"Please Don't curse. Let's keep things family-friendly.",
 	"Give the word filter a break! Don't curse.",
 	"Not cool. Very not cool.",
@@ -109,12 +118,27 @@ function getRandMessage(list) {
 	return list[Math.floor(Math.random() * list.length)]
 }
 
+var manageComments = schedule.scheduleJob('0 0 * * *', function() {
+	Comment.find({}, function(err, foundComments) {
+		if(err) {
+			console.log(err);
+		} else {
+			foundComments.map((comment) => {
+				if(true) {
+					comment.remove();
+					console.log('removed comments');
+				}
+			});
+		}
+	});
+});
+
 // Socket.io server-side code
 io.on('connect', (socket) => {
-  console.log("A user connected".cyan);
-  socket.on('disconnect', () => {
-		console.log("A user disconnected".cyan);
-	});
+//   console.log("A user connected".cyan);
+//   socket.on('disconnect', () => {
+// 		console.log("A user disconnected".cyan);
+// 	});
 	// When 'switch room' event is detected, leave old room and join 'newroom';
   socket.on('switch room', (newroom) => {
     socket.leave(socket.room);
@@ -166,7 +190,7 @@ io.on('connect', (socket) => {
 					// sends error msg if comment could not be created
 					console.log(err);
 				} else {
-					// format the date in the form we want.
+					// format the date in the form we want
 					comment.date = dateFormat(comment.created_at, "h:MM TT | mmm d");
 					// saves changes
 					comment.save();
@@ -181,6 +205,6 @@ io.on('connect', (socket) => {
 
 // -----------------------
 // Start server
-http.listen(port, () => {
+http.listen(process.env.PORT,process.env.IP, () => {
 	console.log(":: App listening on port " + port + " ::");
 });
