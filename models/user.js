@@ -3,6 +3,7 @@ const passportLocalMongoose = require("passport-local-mongoose");
 
 // user will have email, pswrd, name, desc., title, url to profile pic, and timestamp
 var userSchema = new mongoose.Schema({
+	username: String,
 	email: String,
 	password: String,
 	firstName: String,

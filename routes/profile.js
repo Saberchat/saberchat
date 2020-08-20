@@ -46,6 +46,7 @@ router.put('/edit', middleware.isLoggedIn, function(req, res) {
     let user = {
         firstName: req.body.firstName,
         lastName: req.body.lastName,
+        username: filter.clean(req.body.username),
         description: filter.clean(req.body.description),
         title: filter.clean(req.body.title)
     }
