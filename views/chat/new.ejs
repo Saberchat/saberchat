@@ -56,7 +56,7 @@
                                 <% if (!(user._id.equals(currentUser._id))) { %>
                                     <div class="form-check">
                                         <input name="check[<%= user._id %>]" id="<%= user._id %>" class="form-check-input" type="checkbox" value="">
-                                        <label class="form-check-label" for="<%= user._id %>"><%= user.firstName %> <%= user.lastName.charAt(0) %>.</label>
+                                        <label class="form-check-label" for="<%= user._id %>"><%= user.username %> (<%= user.firstName.charAt(0) %>.<%= user.lastName.charAt(0) %>.)</label>
                                     </div>
                                 <% } %>
                             <% }); %>
