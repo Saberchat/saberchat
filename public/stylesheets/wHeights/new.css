@@ -1,7 +1,29 @@
-textarea {
+.text-input {
+    display: block;
     resize: none;
-    width: 100%;
+    width: 85%;
     overflow: hidden;
     box-shadow: none;
     outline: none;
+}
+
+.text-block, .img-block {
+    margin-bottom: 1.5rem;
+    position: relative;
+    padding: 0;
+}
+
+.article-img {
+    display: block;
+    width: 85%;
+}
+
+.delete-btn {
+    position: absolute;
+    display: inline-block;
+    right: 0;
+    top: 0;
+    width: 50px;
+    height: 38px;
+    padding: 0;
 }

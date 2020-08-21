@@ -27,7 +27,10 @@ function next() {
 function addText() {
   textCount += 1;
   $('#article-content').append(
-    `<textarea class="my-3" id="t-${textCount}" name="content[t-${textCount}]" rows="1" oninput="autoGrow(this)"></textarea>`
+    `<div class="text-block">
+    <textarea class="text-input form-control" id="t-${textCount}" name="content[t-${textCount}]" rows="1" oninput="autoGrow(this)"></textarea>
+    <button class="delete-btn btn btn-danger" onclick="remove(this)"><i class="far fa-trash-alt"></i></button>
+  </div>`
   );
   document.getElementById('t-' + textCount).onkeydown = function(e){
         if(e.keyCode==9 || e.which==9){
@@ -42,7 +45,10 @@ function addText() {
 // adds image
 function addImage() {
   $('#article-content').append(
-    `<img src="${imageInput.value}" alt="article image" class="my-3 rounded img-fluid">`
+    `<div class="img-block">
+    <img src="${imageInput.value}" alt="article image" class="rounded article-img">
+    <button class="delete-btn btn btn-danger" onclick="remove(this)"><i class="far fa-trash-alt"></i></button>
+    </div>`
   );
   imageInput.value = "";
 }
@@ -79,6 +85,12 @@ function postIt(url, data){
   $('#jQueryPostItForm').submit();
 }
 
+// removes text/image block
+function remove(element) {
+  let parent = element.parentElement;
+  parent.remove();
+}
+
 // auto grows textareas
 function autoGrow(element) {
   element.style.height = "5px";
@@ -86,33 +98,7 @@ function autoGrow(element) {
 }
 
 // submit article
-$('#create-btn').on('click', function() {
-  let preContent = $('#article-content').children();
-  for(let i=0;i < preContent.length; i++) {
-    if(preContent[i].tagName == 'TEXTAREA') {
-      articleContent.push({
-        type: 'text',
-        content: preContent[i].value
-      });
-    } else if(preContent[i].tagName == 'IMG') {
-      articleContent.push({
-        type: 'image',
-        content: preContent[i].src
-      });
-    }
-  }
-  const article = {
-    title: articleTitle,
-    author: articleAuthor,
-    content: JSON.stringify(articleContent)
-  }
-
-  postIt('/witherlyheights/articles/new', article);
-});
-
-// submits article to be created
-// $('#article-form').submit(function(e) {
-//   const url = '/witherlyheights/articles/new'
+// $('#create-btn').on('click', function() {
 //   let preContent = $('#article-content').children();
 //   for(let i=0;i < preContent.length; i++) {
 //     if(preContent[i].tagName == 'TEXTAREA') {
@@ -127,12 +113,39 @@ $('#create-btn').on('click', function() {
 //       });
 //     }
 //   }
-  
 //   const article = {
 //     title: articleTitle,
 //     author: articleAuthor,
-//     content: articleContent
+//     content: JSON.stringify(articleContent)
 //   }
-  
-//   $.post(url, article, function(data) {});
+
+//   postIt('/witherlyheights/articles/new', article);
 // });
+
+$('#create-btn').on('click', function() {
+  let preContent = $('#article-content').children();
+  console.log(preContent);
+  for(let i=0;i < preContent.length; i++) {
+    let element = preContent[i].children[0];
+    if(element.tagName == 'TEXTAREA') {
+      articleContent.push({
+        type: 'text',
+        content: element.value
+      });
+    } else if(element.tagName == 'IMG') {
+      articleContent.push({
+        type: 'image',
+        content: element.src
+      });
+    }
+  }
+  const article = {
+    title: articleTitle,
+    author: articleAuthor,
+    content: JSON.stringify(articleContent)
+  }
+
+  console.log(article);
+
+  postIt('/articles/new', article);
+});

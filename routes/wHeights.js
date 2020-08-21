@@ -16,6 +16,11 @@ router.get('/', function(req, res) {
     });
 });
 
+// display form for creating articles
+router.get('/new', function(req, res) {
+    res.render('wHeights/new');
+});
+
 // display specific article
 router.get('/:id', function(req, res) {
     Article.findById(req.params.id, function(err, foundArticle) {
@@ -28,11 +33,6 @@ router.get('/:id', function(req, res) {
     });
 });
 
-// display form for creating articles
-router.get('/new', function(req, res) {
-    res.render('wHeights/new');
-});
-
 // create articles
 router.post('/new', function(req, res) {
     const content = JSON.parse(req.body.content);
@@ -41,13 +41,15 @@ router.post('/new', function(req, res) {
         author: req.body.author,
         content: content
     };
-    Article.create(articleObj, function(err, article) {
-        if(err) {
-            console.log(err);
-        } else {
-            res.redirect('/articles');
-        }
-    });
+    console.log(articleObj);
+    res.redirect('/articles');
+    // Article.create(articleObj, function(err, article) {
+    //     if(err) {
+    //         console.log(err);
+    //     } else {
+    //         res.redirect('/articles');
+    //     }
+    // });
 });
 
 module.exports = router;

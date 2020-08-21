@@ -74,14 +74,18 @@
                       <button onclick="addImage()" class="btn btn-outline-secondary" type="button">Add Image</button>
                     </div>
                   </div>
-                  <!-- <form id="article-form" action="/witherlyheights/articles/new" method="post">
-                    <button type="submit" class="btn btn-success">Create</button>
-                  </form> -->
                   <button id="create-btn" class="btn btn-success">Create</button>
                   <hr>
                   <!-- display content -->
-                  <div id="article-content">
-                    <textarea class="my-3" id="t-1" name="content[t-1]" rows="1" oninput="autoGrow(this)"></textarea>
+                  <div class="row">
+                    <div class="col-12 col-lg-9 col-md-10 mx-auto">
+                      <div id="article-content">
+                        <div class="text-block">
+                          <textarea class="text-input form-control" id="t-1" name="content[t-1]" rows="1" oninput="autoGrow(this)"></textarea>
+                          <button class="delete-btn btn btn-danger" onclick="remove(this)"><i class="far fa-trash-alt"></i></button>
+                        </div>
+                      </div>
+                    </div>
                   </div>
                 </div>
             </div>
