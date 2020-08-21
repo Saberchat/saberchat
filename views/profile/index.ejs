@@ -33,7 +33,12 @@
                     <% users.forEach(user => { %>
                         <a href="/profiles/<%= user._id %>" class="list-group-item list-group-item-action">
                             <img class="profile-image" src="<%= user.imageUrl %>" alt="profile picture">
-                            <span><%= user.username %></span>
+                            <span class="username"><%= user.username %></span>
+                            <% if (user.permission == 'student') { %>
+                                <span class="badge badge-secondary">student</span>
+                            <% } else if(user.permission == 'admin') { %>
+                                <span class="badge badge-info">admin</span>
+                            <% } %>
                         </a>
                     <% }); %>
                 </div>
@@ -47,7 +52,7 @@
             let list = document.getElementById("user-list");
             let a = list.getElementsByTagName("a");
             for (i = 0; i < a.length; i++) {
-                user = a[i].getElementsByTagName('span')[0];
+                user = a[i].getElementsByClassName('username')[0];
                 txtValue = user.textContent || user.innerText;
                 if (txtValue.toUpperCase().indexOf(filter) > -1) {
                     a[i].style.display = "";

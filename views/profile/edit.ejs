@@ -31,38 +31,46 @@
             <div class="col-md-8 offset-md-2 col-12">
                 <form action="/profiles/edit?_method=put" method="post">
                     <div class="form-group">
+                        <label for="firstNameInput">First</label>
+                        <input id="firstNameInput" class="form-control" type="text" name="firstName" value="<%= currentUser.firstName %>" placeholder="Enter First Name" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="lastNameInput">Last</label>
+                        <input id="lastNameInput" class="form-control" type="text" name="lastName" value="<%= currentUser.lastName %>" placeholder="Enter Last" required>
+                    </div>
+                    <div class="form-group">
                         <label for="usernameInput">Username</label>
-                        <input id="usernameInput" class="form-control" type="text" name="user[username]" value="<%= currentUser.username %>" placeholder="Enter Username" required>
+                        <input id="usernameInput" class="form-control" type="text" name="username" value="<%= currentUser.username %>" placeholder="(max 23) Enter Username" maxlength="23" required>
                     </div>
                     <div class="form-group">
                         <label for="descInput">Description</label>
                         <% if(currentUser.description){ %>
-                            <input id="descInput" class="form-control" type="text" name="user[description]" value="<%= currentUser.description %>" placeholder="Enter Description">
+                            <textarea id="descInput" class="form-control" name="description" maxlength="550" placeholder="Enter Description" rows="5"><%= currentUser.description %></textarea>
                         <% } else { %>
-                            <input id="descInput" class="form-control" type="text" name="user[description]" value="" placeholder="Enter Description" aria-describedby="descHelp">
+                            <textarea id="descInput" class="form-control" name="description" placeholder="Enter Description" maxlength="550" rows="5" aria-describedby="descHelp"></textarea>
                             <small id="descHelp" class="form-text text-muted">Ex. Hobbies: swimming, tennis, searching for bigfoot.</small>
                         <% } %>
                     </div>
                     <div class="form-group">
                         <label for="titleInput">User Title</label>
                         <% if(currentUser.title){ %>
-                            <input id="titleInput" class="form-control" type="text" name="user[title]" value="<%= currentUser.title %>" placeholder="Enter Title">
+                            <input id="titleInput" class="form-control" type="text" name="title" value="<%= currentUser.title %>" placeholder="Enter Title" maxlength="50">
                         <% } else { %>
-                            <input id="titleInput" class="form-control" type="text" name="user[title]" aria-describedby="titleHelp" value="" placeholder="Enter Title">
+                            <input id="titleInput" class="form-control" type="text" name="title" aria-describedby="titleHelp" value="" placeholder="Enter Title" maxlength="50">
                             <small id="titleHelp" class="form-text text-muted">Ex. Ninja Warrior, Guardian of Bread, Champion of the art room</small>
                         <% } %>
                     </div>
                     <div class="form-group">
                         <label for="imageInput">Profile Image Url</label>
-                        <input id="imageInput" class="form-control" type="text" name="user[imageUrl]" value="<%= currentUser.imageUrl %>" placeholder="Enter Image Url">
+                        <input id="imageInput" class="form-control" type="text" name="imageUrl" value="<%= currentUser.imageUrl %>" placeholder="Enter Image Url">
                     </div>
                     <div class="form-group">
                         <label for="bannerInput">Banner Image Url</label>
-                        <input id="bannerInput" class="form-control" type="text" name="user[bannerUrl]" value="<%= currentUser.bannerUrl %>" placeholder="Enter Banner Url">
+                        <input id="bannerInput" class="form-control" type="text" name="bannerUrl" value="<%= currentUser.bannerUrl %>" placeholder="Enter Banner Url">
                     </div>
-                    <button class="btn btn-lg btn-primary btn-block">Submit</button>
+                    <button class="btn btn-lg btn-primary btn-block">Submit Changes</button>
                 </form>
-                <a style="display: block; margin-top: 1rem;" href="/profiles/<%= currentUser._id %>">Go Back</a>
+                <a style="display: block; margin-top: 1rem; margin-bottom: 5rem;" href="/profiles/<%= currentUser._id %>">Go Back</a>
             </div>
         </div>
     </div>

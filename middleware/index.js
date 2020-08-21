@@ -27,12 +27,34 @@ middleware.checkIfMember = function(req, res, next) {
 			res.redirect('/chat')
 		} else {
 			let userId = req.user._id;
-			if(foundRoom.members.includes(userId)) {
+			if(foundRoom.type == 'public' || foundRoom.members.includes(userId)) {
 				return next();
 			}
 			// stuff for when user is not member of room
 			req.flash('error', 'You are not a member of this room');
 			res.redirect('/chat');
+		}
+	});
+}
+
+// checks for if the user can leave from a room
+middleware.checkForLeave = function(req, res, next) {
+	Room.findById(req.params.id, function(err, foundRoom) {
+		if(err || !foundRoom) {
+			console.log(err);
+			req.flash('error', 'Room cannot be found or does not exist');
+			res.redirect('/chat')
+		} else {
+			if(foundRoom.type != 'private') {
+				req.flash('error', 'You cannot leave a public room');
+				res.redirect('back')
+			} else if(foundRoom.members.includes(req.user._id)) {
+				next();
+			} else {
+				// stuff for when user is not member of room
+				req.flash('error', 'You are not a member of this room');
+				res.redirect('/chat');
+			}
 		}
 	});
 }

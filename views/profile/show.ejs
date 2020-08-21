@@ -30,14 +30,14 @@
                 <div class="profile-head">
                     <!-- profile image set as background img of this div -->
                     <img class="profile-image" src="<%= user.imageUrl %>" alt="profile picture">
-
-                    <h1><%= user.username %></h1>
+                    <h1><%= user.username %> </h1>
+                    <h4><%= user.firstName %> <%= user.lastName %></h4>
 
                     <% if(user.title) { %>
                         <p><%= user.title %></p>
                     <% } %>
 
-                    <h4><%= user.email %></h4>
+                    <h4><%= user.permission %> | <%= user.email %></h4>
                 </div>
             </div>
             <div class="col-md-8 offset-md-2">
@@ -58,7 +58,7 @@
                         Change Email or Password
                     </a>
                 <% } %>
-                <a style="display: block; margin-top: 1rem;" href="/profiles">Go Back</a>
+                <a style="display: block; margin-top: 1rem; margin-bottom: 5rem;" href="/profiles">Go Back</a>
             </div>
         </div>
     </div>

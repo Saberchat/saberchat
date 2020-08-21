@@ -1,16 +1,38 @@
-# alsion-fb
+# Saberchat
 
-Table of Contents
-=====================================
- - models: models for the db collections
+demo on heroku
+Link: https://thawing-savannah-89746.herokuapp.com/
 
- - routes: routes.
+ToC
+-----------------------------------------
+app.js: main file of the app\
+.\
+Views: ejs files of front end code for all pages\
+.\
+routes: routes of the server\
+.\
+public: contains front end css and js\
+.\
+models: DB models for collections\
+.\
+middleware: express middleware\
+.\
+Procfile: Tells Heroku what command to call on app start
 
- - views/partials: some templates that might reduce code
 
- - public/stylesheets: the css
- - public/javascript: pardon the folder name but I can't come up with something better. Stores js files for front end
+Npm Libraries
+===================================
+- body-parser (parsing form bodies)
+- bad-words (bad words filter)
+- dateformat (date formating library)
+- express (app framework)
+- express-session (authorization stuff)
+- ejs (embeded js templating library)
+- mongoose (library for simple interaction with mongoDB)
+- mongoose-local-passport (library for easy interaction between passport and mongoose)
+- memorystore (library for fixing memory leak with express-session and optimizing for production env)
+- method-override (enable access to put and delete routes)
+- node-schedule (library for scheduling recurring functions/jobs )
+- passport (authorization with node)
+- socket.io (sockets for real-time communication)
 
- - app.js: the express app
-
- - yeah this readme really needs to be updated at some point

@@ -20,6 +20,8 @@ const colors = require('colors');
 //profanity filter
 const Filter = require('bad-words');
 const filter = new Filter();
+// scheduler test
+const schedule = require('node-schedule');
 // require the models for database actions
 const Comment = require('./models/comment');
 const User = require("./models/user");
@@ -27,6 +29,7 @@ const User = require("./models/user");
 const indexRoutes = require('./routes/index');
 const chatRoutes = require('./routes/chat');
 const profileRoutes = require('./routes/profile');
+const wHeightsRoutes = require('./routes/wHeights');
 //set up ports and socket.io
 const http = require('http').createServer(app);
 const io = require('socket.io')(http);
@@ -51,9 +54,21 @@ app.use(methodOverride('_method'));
 app.use(flash());
 
 // express session stuff for authorization that I know nothing about
-app.use(require("express-session")({
-	// I think secret is what's used to encrypt the information
-	secret: "Programming For Alsion Is Cool",
+var session = require('express-session');
+// using memorystore package because express-session leads to memory leaks and isnt optimized for production.
+var MemoryStore = require('memorystore')(session);
+// app.use(require("express-session")({
+// 	// I think secret is what's used to encrypt the information
+// 	secret: "Programming For Alsion Is Cool",
+// 	resave: false,
+// 	saveUninitialized: false
+// }));
+app.use(session({
+	cookie: {maxAge: 86400000},
+	store: new MemoryStore({
+		checkPeriod: 86400000 //prune expired entries every 24hrs
+	}),
+	secret: "Programming For Alsion is Cool",
 	resave: false,
 	saveUninitialized: false
 }));
@@ -74,10 +89,7 @@ app.use(function(req, res, next) {
 	// flash message stuff
 	res.locals.error = req.flash('error');
 	res.locals.success = req.flash('success');
-	// profanity filter
-	// this won't work - alex
-	// res.locals.filter = filter;
-	next()
+	next();
 });
 
 // =======================
@@ -85,21 +97,50 @@ app.use(function(req, res, next) {
 // =======================
 //tell the app to use the required/imported routes.
 app.use(indexRoutes);
-app.use(chatRoutes);
-app.use(profileRoutes);
+app.use('/chat', chatRoutes);
+app.use('/profiles', profileRoutes);
+app.use('/witherlyheights', wHeightsRoutes);
+
 
 // Catch-all route
 app.get('*', function(req, res) {
-	req.flash('error', 'Url does not exist');
 	res.redirect('/');
+});
+
+// list of responses to bad words
+const curseResponse = [
+	"Please Don't curse. Let's keep things family-friendly.",
+	"Give the word filter a break! Don't curse.",
+	"Not cool. Very not cool.",
+	"Come on. Be friendly."
+]
+
+// gets random item in array
+function getRandMessage(list) {
+	return list[Math.floor(Math.random() * list.length)]
+}
+
+var manageComments = schedule.scheduleJob('0 0 * * *', function() {
+	Comment.find({}, function(err, foundComments) {
+		if(err) {
+			console.log(err);
+		} else {
+			foundComments.map((comment) => {
+				if(true) {
+					comment.remove();
+					console.log('removed comments');
+				}
+			});
+		}
+	});
 });
 
 // Socket.io server-side code
 io.on('connect', (socket) => {
-  console.log("A user connected".cyan);
-  socket.on('disconnect', () => {
-		console.log("A user disconnected".cyan);
-	});
+//   console.log("A user connected".cyan);
+//   socket.on('disconnect', () => {
+// 		console.log("A user disconnected".cyan);
+// 	});
 	// When 'switch room' event is detected, leave old room and join 'newroom';
   socket.on('switch room', (newroom) => {
     socket.leave(socket.room);
@@ -109,10 +150,14 @@ io.on('connect', (socket) => {
 
 	// When 'chat message' event is detected, emit msg to all clients in room
 	socket.on('chat message', (msg) => {
-		msg.text = filter.clean(msg.text)
+		let profanity;
+		// clean the message
+		if(msg.text != filter.clean(msg.text)){
+			msg.text = filter.clean(msg.text);
+			profanity = true;
+		}
 		// broadcast message to all connected users in the room
 		socket.to(socket.room).emit('chat message', msg);
-
     // Log information
     // console.log("Room: ".cyan);
     // console.log(socket.room);
@@ -135,11 +180,33 @@ io.on('connect', (socket) => {
 				// console.log(comment);
 			}
 		});
+		// send warning message
+		if(profanity) {
+			// console.log('detected bad words'.green);
+			let notif = {text: getRandMessage(curseResponse), type:'notif'};
+			// send announcement to all
+			io.in(socket.room).emit('announcement', notif);
+			// create announcement in db
+			Comment.create({text: notif.text, room: socket.room, type:'notif'}, function(err, comment) {
+				if(err) {
+					// sends error msg if comment could not be created
+					console.log(err);
+				} else {
+					// format the date in the form we want
+					comment.date = dateFormat(comment.created_at, "h:MM TT | mmm d");
+					// saves changes
+					comment.save();
+			// confirmation log
+					// console.log('Database Comment created: '.cyan);
+					// console.log(comment);
+				}
+			});
+		}
 	});
 });
 
 // -----------------------
 // Start server
-http.listen(port, () => {
+http.listen(port,process.env.IP, () => {
 	console.log(":: App listening on port " + port + " ::");
 });

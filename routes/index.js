@@ -1,4 +1,6 @@
 const express = require('express');
+const Filter = require('bad-words');
+const filter = new Filter();
 //start express router
 const router = express.Router();
 //import passport for authentication
@@ -20,7 +22,14 @@ router.get('/', (req, res) => {
 //new registered user
 router.post("/register",  function(req, res) {
 	//creates new user from form info
-	var newUser = new User({email: req.body.email, username: req.body.username});
+	var newUser = new User(
+		{
+			email: req.body.email, 
+			firstName: req.body.firstName,
+			lastName: req.body.lastName,
+			username: filter.clean(req.body.username)
+		}
+	);
 
 	//registers the user
 	User.register(newUser, req.body.password, function(err, user) {
@@ -39,20 +48,12 @@ router.post("/register",  function(req, res) {
 		//if registration is successful, login user.
 		passport.authenticate("local")(req, res, function() {
 			//flash message for succesful login
-			req.flash("success", "Welcome to Saber Chat " + user.username);
+			req.flash("success", "Welcome to Saberchat " + user.firstName);
 			res.redirect("/");
 			console.log('succesfully registered and logged in user')
 		});
 	});
 });
-
-// Simple login handling
-
-// router.post("/login", passport.authenticate("local", {
-// 	successRedirect: "/",
-// 	failureRedirect: "/"
-// }), function(req, res) {
-// });
 
 // Custom login handling so that flash messages can be sent. I'm not entirely sure how it works. Copy pasted from official doc
 router.post('/login', function(req, res, next) {
@@ -68,7 +69,7 @@ router.post('/login', function(req, res, next) {
         req.logIn(user, function(err) {
 			if (err) { return next(err); }
 			//flash message success
-            req.flash('success', 'Successfully Signed In');
+            req.flash('success', 'Welcome ' + user.firstName);
             return res.redirect('/');
         });
     })(req, res, next);

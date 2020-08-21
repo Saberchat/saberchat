@@ -17,6 +17,7 @@
 
     <!-- I'm using my fontawesome kit -->
     <script src="https://kit.fontawesome.com/dccc745c41.js" crossorigin="anonymous"></script>
+    <script defer src="/javascript/chat/edit.js"></script>
   </head>
   <body>
     <!-- include the navbar via ejs -->
@@ -35,14 +36,22 @@
 
             <div class="form-group">
               <label for="usernameInput">Name</label>
-              <input id="usernameInput" class="form-control" type="text" name="room[name]" value="<%= room.name %>" placeholder="Enter Room Name" required>
+              <input id="usernameInput" class="form-control" type="text" name="name" value="<%= room.name %>" placeholder="(max 45) Enter Room Name" maxlength="45" required>
             </div>
             <div class="form-group">
               <label for="descInput">Description</label>
-              <input id="descInput" class="form-control" type="text" name="room[description]" value="<%= room.description %>" placeholder="Enter room description">
+              <textarea id="descInput" class="form-control" name="description" placeholder="(max 300) Enter room description" maxlength="300" rows="5"><%= room.description %></textarea>
+            </div>
+            <div class="form-check mb-3">
+              <input name="type" id="roomType" type="checkbox" onclick="updateDisplay()" class="form-check-input" value="true"
+              <% if (room.type == 'private') { %>
+                checked
+              <% } %>
+              >
+              <label for="roomType" class="form-check-label">Private (public if left blank)</label>
             </div>
 
-            <div id="remove-block">
+            <div id="remove-block" style="display: none;">
               <h4>Remove Members</h4>
               <div class="search-filter mb-3">
                   <i class="fas fa-search"></i>
@@ -53,14 +62,14 @@
                       <% if (!(user._id.equals(currentUser._id)) && room.members.includes(user._id)) { %>
                           <div class="form-check">
                               <input name="checkRemove[<%= user._id %>]" id="<%= user._id %>" class="form-check-input" type="checkbox" value="">
-                              <label class="form-check-label" for="<%= user._id %>"><%= user.username %></label>
+                              <label class="form-check-label" for="<%= user._id %>"><%= user.username %> (<%= user.firstName.charAt(0) %>.<%= user.lastName.charAt(0) %>.)</label>
                           </div>
                       <% } %>
                   <% }); %>
               </div>
             </div>
 
-            <div id="add-block">
+            <div id="add-block" style="display: none;">
               <h4>Add Members</h4>
               <div class="search-filter mb-3">
                   <i class="fas fa-search"></i>
@@ -71,7 +80,7 @@
                       <% if (!(user._id.equals(currentUser._id)) && !(room.members.includes(user._id))) { %>
                           <div class="form-check">
                               <input name="checkAdd[<%= user._id %>]" id="<%= user._id %>" class="form-check-input" type="checkbox" value="">
-                              <label class="form-check-label" for="<%= user._id %>"><%= user.username %></label>
+                              <label class="form-check-label" for="<%= user._id %>"><%= user.username %> (<%= user.firstName.charAt(0) %>.<%= user.lastName.charAt(0) %>.)</label>
                           </div>
                       <% } %>
                   <% }); %>
@@ -81,6 +90,7 @@
 
           </form>
           <div class="container mt-2"></div>
+          <!-- delete button and form with bootstrap modal -->
           <form action="/chat/<%= room._id %>/delete?_method=delete" method="post" id="delete-form">
             <button type="button" class="btn btn-lg btn-danger btn-block" data-toggle="modal" data-target="#deleteModal" id="delete-button">Delete this room</button>
             <div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
@@ -108,33 +118,5 @@
         </div>
       </div>
     </div>
-    <script>
-      const removeCount = document.getElementById('remove-user-list').childElementCount;
-      const addCount = document.getElementById('add-user-list').childElementCount;
-      if(removeCount == 0) {
-        const removeBlock = document.getElementById('remove-block');
-        removeBlock.style.display = "none";
-      }
-      if(addCount == 0) {
-        const addBlock = document.getElementById('add-block');
-        addBlock.style.display = "none";
-      }
-
-      function searchFunction(mode) {
-        let input = document.getElementById(mode + "-search-input");
-        let filter = input.value.toUpperCase();
-        let list = document.getElementById(mode + "-user-list");
-        let users = list.getElementsByClassName('form-check');
-        for (i = 0; i < users.length; i++) {
-          let user = users[i].getElementsByTagName('label')[0];
-          let txtValue = user.textContent || user.innerText;
-          if (txtValue.toUpperCase().indexOf(filter) > -1) {
-            users[i].style.display = "";
-          } else {
-            users[i].style.display = "none";
-          }
-        }
-      }
-    </script>
   </body>
 </html>
