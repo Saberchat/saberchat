@@ -7,7 +7,7 @@ const passport = require('passport');
 //import user schema for db actions
 const User = require('../models/user');
 
-// Home route. gives the landing or home or index page (whatever you want to call it). 
+// Home route. gives the landing or home or index page (whatever you want to call it).
 router.get('/', (req, res) => {
 	res.render('index');
 });
@@ -35,8 +35,8 @@ router.post("/register",  function(req, res) {
 			//redirect to root
 			return res.redirect("/");
 		}
-		
-		//if registration is successful, login user. 
+
+		//if registration is successful, login user.
 		passport.authenticate("local")(req, res, function() {
 			//flash message for succesful login
 			req.flash("success", "Welcome to Saber Chat " + user.username);
@@ -59,12 +59,12 @@ router.post('/login', function(req, res, next) {
 	//authenticate user
     passport.authenticate('local', function(err, user, info) {
         if (err) { return next(err); }
-        if (!user) { 
+        if (!user) {
 			//flash message error
             req.flash('error', 'Invalid Email or Password');
-            return res.redirect('/'); 
+            return res.redirect('/');
 		}
-		//login user again? I'm not sure why this is here. 
+		//login user again? I'm not sure why this is here.
         req.logIn(user, function(err) {
 			if (err) { return next(err); }
 			//flash message success
@@ -73,6 +73,11 @@ router.post('/login', function(req, res, next) {
         });
     })(req, res, next);
 });
+
+//Function to display user inbox
+router.get('/inbox', (req, res, next) => {
+	res.render('chat/inbox')
+})
 
 //logout route
 router.get("/logout", function(req, res) {
