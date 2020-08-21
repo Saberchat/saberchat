@@ -41,15 +41,13 @@ router.post('/new', function(req, res) {
         author: req.body.author,
         content: content
     };
-    console.log(articleObj);
-    res.redirect('/articles');
-    // Article.create(articleObj, function(err, article) {
-    //     if(err) {
-    //         console.log(err);
-    //     } else {
-    //         res.redirect('/articles');
-    //     }
-    // });
+    Article.create(articleObj, function(err, article) {
+        if(err) {
+            console.log(err);
+        } else {
+            res.redirect('/articles');
+        }
+    });
 });
 
 module.exports = router;
