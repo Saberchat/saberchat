@@ -60,6 +60,25 @@ for(let i=0;i<count;i++){
         }
     }
 }
+// function to post data
+// function postIt(url, data){
+
+//   $('body').append($('<form/>', {
+//     id: 'jQueryPostItForm',
+//     method: 'POST',
+//     action: url
+//   }));
+
+//   for(var i in data){
+//     $('#jQueryPostItForm').append($('<input/>', {
+//       type: 'hidden',
+//       name: i,
+//       value: data[i]
+//     }));
+//   }
+
+//   $('#jQueryPostItForm').submit();
+// }
 
 // auto grows textareas
 function autoGrow(element) {
@@ -69,7 +88,6 @@ function autoGrow(element) {
 
 // submits article to be created
 $('#article-form').submit(function(e) {
-  e.preventDefault();
   const url = '/witherlyheights/articles/new'
   let preContent = $('#article-content').children();
   for(let i=0;i < preContent.length; i++) {
@@ -92,7 +110,5 @@ $('#article-form').submit(function(e) {
     content: articleContent
   }
   
-  $.post(url, article, function() {
-    window.location.replace('/witherlyheights');
-  });
+  $.post(url, article, function(data) {});
 });
