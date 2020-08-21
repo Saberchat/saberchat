@@ -61,24 +61,23 @@ for(let i=0;i<count;i++){
     }
 }
 // function to post data
-// function postIt(url, data){
+function postIt(url, data){
 
-//   $('body').append($('<form/>', {
-//     id: 'jQueryPostItForm',
-//     method: 'POST',
-//     action: url
-//   }));
+  $('body').append($('<form/>', {
+    id: 'jQueryPostItForm',
+    method: 'post',
+    action: url
+  }));
 
-//   for(var i in data){
-//     $('#jQueryPostItForm').append($('<input/>', {
-//       type: 'hidden',
-//       name: i,
-//       value: data[i]
-//     }));
-//   }
-
-//   $('#jQueryPostItForm').submit();
-// }
+  for (let i in data) {
+    $('#jQueryPostItForm').append($('<input/>', {
+      type: 'hidden',
+      name: i,
+      value: data[i]
+    }));
+  }
+  $('#jQueryPostItForm').submit();
+}
 
 // auto grows textareas
 function autoGrow(element) {
@@ -86,9 +85,8 @@ function autoGrow(element) {
   element.style.height = (element.scrollHeight)+"px";
 }
 
-// submits article to be created
-$('#article-form').submit(function(e) {
-  const url = '/witherlyheights/articles/new'
+// submit article
+$('#create-btn').on('click', function() {
   let preContent = $('#article-content').children();
   for(let i=0;i < preContent.length; i++) {
     if(preContent[i].tagName == 'TEXTAREA') {
@@ -103,12 +101,38 @@ $('#article-form').submit(function(e) {
       });
     }
   }
-  
   const article = {
     title: articleTitle,
     author: articleAuthor,
-    content: articleContent
+    content: JSON.stringify(articleContent)
   }
-  
-  $.post(url, article, function(data) {});
+
+  postIt('/witherlyheights/articles/new', article);
 });
+
+// submits article to be created
+// $('#article-form').submit(function(e) {
+//   const url = '/witherlyheights/articles/new'
+//   let preContent = $('#article-content').children();
+//   for(let i=0;i < preContent.length; i++) {
+//     if(preContent[i].tagName == 'TEXTAREA') {
+//       articleContent.push({
+//         type: 'text',
+//         content: preContent[i].value
+//       });
+//     } else if(preContent[i].tagName == 'IMG') {
+//       articleContent.push({
+//         type: 'image',
+//         content: preContent[i].src
+//       });
+//     }
+//   }
+  
+//   const article = {
+//     title: articleTitle,
+//     author: articleAuthor,
+//     content: articleContent
+//   }
+  
+//   $.post(url, article, function(data) {});
+// });
