@@ -67,14 +67,16 @@
                   <p>Author: <span id="author-display"></span></p>
                   <h4>Content</h4>
                   <!-- editor controls -->
-                  <button type="button" onclick="addText()" class="btn btn-primary">Add Text Block</button>
-                  <div class="input-group my-3">
-                    <input id="image-input" type="text" class="form-control" placeholder="image Url" aria-label="image Url" aria-describedby="basic-addon2">
-                    <div class="input-group-append">
-                      <button onclick="addImage()" class="btn btn-outline-secondary" type="button">Add Image</button>
+                  <button type="button" onclick="addText()" class="btn btn-primary" id="add-text-btn">Add Text Block</button>
+                  <div id="add-img-btn" class="d-md-inline-block d-block">
+                    <div class="input-group">
+                      <input id="image-input" type="text" class="form-control" placeholder="image Url" aria-label="image Url" aria-describedby="basic-addon2">
+                      <div class="input-group-append">
+                        <button onclick="addImage()" class="btn btn-outline-secondary" type="button">Add Image</button>
+                      </div>
                     </div>
                   </div>
-                  <button id="create-btn" class="btn btn-success">Create</button>
+                  <button id="create-btn" class="btn btn-success d-block">Create</button>
                   <hr>
                   <!-- display content -->
                   <div class="row">

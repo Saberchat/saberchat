@@ -27,3 +27,13 @@
     height: 38px;
     padding: 0;
 }
+
+#add-img-btn {
+    vertical-align: middle;
+    margin-bottom: 1rem;
+}
+
+#add-text-btn{
+    display: inline-block;
+    margin-bottom: 1rem;
+}
