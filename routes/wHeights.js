@@ -9,7 +9,7 @@ router.get('/', function(req, res) {
     Article.find({}, function(err, foundArticles) {
         if(err) {
             req.flash('error', 'Cannot access Database');
-            res.redirect('/witherlyheights');
+            res.redirect('/articles');
         } else {
             res.render('wHeights/index', {articles: foundArticles});
         }
@@ -17,11 +17,11 @@ router.get('/', function(req, res) {
 });
 
 // display specific article
-router.get('/articles/:id', function(req, res) {
+router.get('/:id', function(req, res) {
     Article.findById(req.params.id, function(err, foundArticle) {
         if(err) {
             req.flash('error', 'Cannot find article');
-            res.redirect('/witherlyheights');
+            res.redirect('/articles');
         } else {
             res.render('wHeights/show', {article: foundArticle});
         }
@@ -29,12 +29,12 @@ router.get('/articles/:id', function(req, res) {
 });
 
 // display form for creating articles
-router.get('/articles/new', function(req, res) {
+router.get('/new', function(req, res) {
     res.render('wHeights/new');
 });
 
 // create articles
-router.post('/articles/new', function(req, res) {
+router.post('/new', function(req, res) {
     const content = JSON.parse(req.body.content);
     const articleObj = {
         title: req.body.title,
@@ -45,7 +45,7 @@ router.post('/articles/new', function(req, res) {
         if(err) {
             console.log(err);
         } else {
-            res.redirect('/witherlyheights');
+            res.redirect('/articles');
         }
     });
 });

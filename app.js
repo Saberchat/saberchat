@@ -99,7 +99,7 @@ app.use(function(req, res, next) {
 app.use(indexRoutes);
 app.use('/chat', chatRoutes);
 app.use('/profiles', profileRoutes);
-app.use('/witherlyheights', wHeightsRoutes);
+app.use('/articles', wHeightsRoutes);
 
 
 // Catch-all route
