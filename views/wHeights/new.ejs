@@ -7,7 +7,7 @@
 
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css">
     <link rel="stylesheet" href="/stylesheets/main.css">
-    <link rel="stylesheet" href="/stylesheets/wHeights/new.css">
+    <!-- <link rel="stylesheet" href="/stylesheets/wHeights/new.css"> -->
 
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
@@ -15,7 +15,8 @@
 
     <!-- I'm using my fontawesome kit -->
     <script src="https://kit.fontawesome.com/dccc745c41.js" crossorigin="anonymous"></script>
-    <script defer src="/javascript/wHeights/new.js"></script>
+    <!-- <script defer src="/javascript/wHeights/new.js"></script>
+    <script src="/javascript/wHeights/new_edit.js"></script> -->
 </head>
 <body>
     <!-- witherly heights navbar -->
@@ -61,37 +62,10 @@
                   <button onclick="next()" class="btn btn-primary">Next -></button>
                 </div>
                 <!-- Editor, build the article -->
-                <div id="article-body">
-                  <h1>Editor</h1>
-                  <p>Title: <span id="title-display"></span></p>
-                  <p>Author: <span id="author-display"></span></p>
-                  <h4>Content</h4>
-                  <!-- editor controls -->
-                  <button type="button" onclick="addText()" class="btn btn-primary" id="add-text-btn">Add Text Block</button>
-                  <div id="add-img-btn" class="d-md-inline-block d-block">
-                    <div class="input-group">
-                      <input id="image-input" type="text" class="form-control" placeholder="image Url" aria-label="image Url" aria-describedby="basic-addon2">
-                      <div class="input-group-append">
-                        <button onclick="addImage()" class="btn btn-outline-secondary" type="button">Add Image</button>
-                      </div>
-                    </div>
-                  </div>
-                  <button id="create-btn" class="btn btn-success d-block">Create</button>
-                  <hr>
-                  <!-- display content -->
-                  <div class="row">
-                    <div class="col-12 col-lg-9 col-md-10 mx-auto">
-                      <div id="article-content">
-                        <div class="text-block">
-                          <textarea class="text-input form-control" id="t-1" name="content[t-1]" rows="1" oninput="autoGrow(this)"></textarea>
-                          <button class="delete-btn btn btn-danger" onclick="remove(this)"><i class="far fa-trash-alt"></i></button>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
+                <div id="editorjs"></div>
             </div>
         </div>
     </div>
+    <script src="/javascript/new_edit.js"></script>
 </body>
 </html>

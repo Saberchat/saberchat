@@ -45,6 +45,9 @@ mongoose.connect("mongodb+srv://admin_1:alsion2020@cluster0-cpycz.mongodb.net/sa
 
 // make public dir accessible in all views
 app.use(express.static(__dirname + "/public"));
+// try serving editorjs package to frontend
+app.use('/scripts', express.static(__dirname + "/node_modules/@editorjs/editorjs/dist"));
+// use body parser
 app.use(bodyParser.urlencoded({extended: true}));
 //set view engine to ejs
 app.set("view engine", "ejs");
@@ -92,6 +95,8 @@ app.use(function(req, res, next) {
 	next();
 });
 
+
+
 // =======================
 // Routes
 // =======================
@@ -101,7 +106,10 @@ app.use('/chat', chatRoutes);
 app.use('/profiles', profileRoutes);
 app.use('/articles', wHeightsRoutes);
 
-
+// file dependencies
+app.get('/scripts/editor.js', function(req, res) {
+    res.sendFile(__dirname + '/node_modules/@editorjs/editorjs/dist/editor.js');
+});
 // Catch-all route
 app.get('*', function(req, res) {
 	res.redirect('/');

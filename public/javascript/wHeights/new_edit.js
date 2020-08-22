@@ -1,0 +1,1 @@
+import EditorJs from '/scripts/editor.js';
