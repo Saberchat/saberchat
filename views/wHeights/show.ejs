@@ -49,10 +49,8 @@
                 <h1><%= article.title %></h1>
                 <h4><%= article.author %></h4>
                 <% article.content.forEach(element => { %>
-                    <% if (element.type == 'text') { %>
-                    <pre><%= element.content %></pre>
-                    <% } else { %>
-                        <img src="<%= element.content %>" width="300px">
+                    <% if (element.type == 'paragraph') { %>
+                    <p><%- element.data.text %></p>
                     <% } %>
                 <% }) %> 
             </div>

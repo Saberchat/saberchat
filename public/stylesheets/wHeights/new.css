@@ -1,39 +1,21 @@
-.text-input {
-    display: block;
-    resize: none;
-    width: 85%;
-    overflow: hidden;
-    box-shadow: none;
-    outline: none;
+#article-content {
+    background-color: #f5f3b4;
 }
 
-.text-block, .img-block {
-    margin-bottom: 1.5rem;
-    position: relative;
-    padding: 0;
+.ce-block__content {
+    padding-left: 1rem;
+    padding-right: 1rem;
+    background-color: #ffffff;
 }
 
-.article-img {
-    display: block;
-    width: 85%;
+.ce-block {
+    margin-bottom: 0.5rem;
 }
 
-.delete-btn {
-    position: absolute;
-    display: inline-block;
-    right: 0;
-    top: 0;
-    width: 50px;
-    height: 38px;
-    padding: 0;
+/* .ce-toolbar__plus {
+    color: #ffffff;
 }
 
-#add-img-btn {
-    vertical-align: middle;
-    margin-bottom: 1rem;
-}
-
-#add-text-btn{
-    display: inline-block;
-    margin-bottom: 1rem;
-}
+.ce-toolbar__settings-btn {
+    background-color: #ffffff;
+} */

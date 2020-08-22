@@ -7,7 +7,8 @@
 
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css">
     <link rel="stylesheet" href="/stylesheets/main.css">
-    <!-- <link rel="stylesheet" href="/stylesheets/wHeights/new.css"> -->
+    <link rel="stylesheet" href="/stylesheets/wHeights/simple-image.css">
+    <link rel="stylesheet" href="/stylesheets/wHeights/new.css">
 
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
@@ -58,18 +59,23 @@
                   <div class="form-group">
                       <label for="author">Author</label>
                       <input id="author" class="form-control" type="text" name="author">
-                  </div>  
-                  <button onclick="next()" class="btn btn-primary">Next -></button>
+                  </div>
+                  <button class="btn btn-success" id="save-button">Save</button>
                 </div>
-                <!-- Editor, build the article -->
-                <hr>
-                <div id="editorjs"></div>
+                
             </div>
         </div>
     </div>
+    <!-- Editor, build the article -->
+    <div id="article-content">
+      <hr>
+      <div id="editorjs"></div>
+    </div>
+    <pre id="output"></pre>
     <script src="/editor/editorjs/dist/editor.js"></script>
     <script src="/editor/header/dist/bundle.js"></script>
     <script src="/editor/list/dist/bundle.js"></script>
+    <script src="/javascript/wHeights/simple-image.js"></script>
     <script src="/javascript/wHeights/new_edit.js"></script>
 </body>
 </html>

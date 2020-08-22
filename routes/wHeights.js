@@ -44,6 +44,7 @@ router.post('/new', function(req, res) {
     Article.create(articleObj, function(err, article) {
         if(err) {
             console.log(err);
+            res.redirect('/articles')
         } else {
             res.redirect('/articles');
         }
