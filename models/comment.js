@@ -4,7 +4,11 @@ const mongoose = require("mongoose");
 
 var commentSchema = new mongoose.Schema({
 	text: String,
-	type: String,
+	status: String,
+	statusBy: {
+		type: mongoose.Schema.Types.ObjectId,
+		ref: "User"
+	},
 	room: {
 		type: mongoose.Schema.Types.ObjectId,
 		ref: "Room"

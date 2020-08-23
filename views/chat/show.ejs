@@ -82,13 +82,14 @@
               </div>
             <% } else if(comment.author) { %>
               <!-- Sender message -->
-              <div class="media w-65 mb-2">
+              <div class="media mb-2">
                 <img src="<%= comment.author.imageUrl %>" alt="user" class="user-image">
                 <div class="media-body ml-3">
-                  <div class="bg-grey rounded py-2 px-3 mb-2">
+                  <div class="bg-grey rounded py-2 px-3 mb-2 w-65">
                     <p class="text-small mb-0 text-dark"><%= comment.text %></p>
                   </div>
-                  <p class="small text-muted"><span class="username"><%= comment.author.username %></span>, <%= comment.date %></p>
+                  <p class="small text-muted msg-info"><span class="username"><%= comment.author.username %></span>, <%= comment.date %></p>
+                  <button class="flag" id="<%= comment._id %>" onclick="report(this)"><i class="far fa-flag"></i> <span class="flag-tooltip">Report comment</span></button>
                 </div>
               </div>
             <% } else { %>

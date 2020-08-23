@@ -116,18 +116,60 @@ span.username {
 .announcement h4{
     display: inline-block;
     color: #9f9aa4;
-    font-size: 1.5rem;
+    font-size: 1.3rem;
     font-weight: 300;
 }
 
+.small.text-muted.msg-info {
+    display: inline-block;
+    margin-right: 1rem;
+}
+
+.flag {
+    display: inline-block;
+    height: 19px;
+    padding: 0;
+    border: none;
+    background: none;
+    color: #6c757d;
+    transition: color 0.3s;
+    -webkit-transition: color 0.3s;
+    -moz-transition: color 0.3s;
+}
+
+.flag .flag-tooltip {
+    display: inline-block;
+    opacity: 0;
+    padding: 0 5px;
+    border-radius: 5px;
+    background: #424651;
+    color: #ffffff;
+    transition: opacity 0.3s;
+    -webkit-transition: opacity 0.3s;
+    -moz-transition: opacity 0.3s;
+}
+
+.flag:hover {
+    color: #000000;
+}
+
+.flag:hover .flag-tooltip {
+    opacity: 100%;
+}
+
+.media-body {
+    position: relative;
+}
+
+
 @media (max-width: 550px) {
     .w-65 {
-        width: 90%;
+        width: 100%;
     }
 }
 @media (min-width: 550px) {
     .w-65 {
-        width: 70%;
+        width: 90%;
     }
 }
 @media (min-width: 760px) {

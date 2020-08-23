@@ -155,13 +155,12 @@ io.on('connect', (socket) => {
 //   console.log("A user connected".cyan);
 //   socket.on('disconnect', () => {
 // 		console.log("A user disconnected".cyan);
-// 	});
 	// When 'switch room' event is detected, leave old room and join 'newroom';
-  socket.on('switch room', (newroom) => {
-    socket.leave(socket.room);
-    socket.join(newroom);
-    socket.room = newroom;
-  });
+  	socket.on('switch room', (newroom) => {
+		socket.leave(socket.room);
+		socket.join(newroom);
+		socket.room = newroom;
+	});
 
 	// When 'chat message' event is detected, emit msg to all clients in room
 	socket.on('chat message', (msg) => {
@@ -171,14 +170,6 @@ io.on('connect', (socket) => {
 			msg.text = filter.clean(msg.text);
 			profanity = true;
 		}
-		// broadcast message to all connected users in the room
-		socket.to(socket.room).emit('chat message', msg);
-    // Log information
-    // console.log("Room: ".cyan);
-    // console.log(socket.room);
-		// console.log("Message: ".cyan);
-    // console.log(msg);
-
 		// create/save comment to db
 		Comment.create({text: msg.text, room: socket.room, author: msg.authorId}, function(err, comment) {
 			if(err) {
@@ -186,37 +177,41 @@ io.on('connect', (socket) => {
 				console.log(err);
 				req.flash('error', 'message could not be created');
 			} else {
+				// set msg id
+				msg.id = comment._id;
+				// broadcast message to all connected users in the room
+				socket.to(socket.room).emit('chat message', msg);
 				// format the date in the form we want.
 				comment.date = dateFormat(comment.created_at, "h:MM TT | mmm d");
 				// saves changes
 				comment.save();
-        // confirmation log
+				// checks if bad language was used
+				if(profanity) {
+					// console.log('detected bad words'.green);
+					let notif = {text: getRandMessage(curseResponse), status: 'notif'};
+					// send announcement to all
+					io.in(socket.room).emit('announcement', notif);
+					// create announcement in db
+					Comment.create({text: notif, room: socket.room, status: notif.status}, function(err, comment) {
+						if(err) {
+							// sends error msg if comment could not be created
+							console.log(err);
+						} else {
+							// format the date in the form we want
+							comment.date = dateFormat(comment.created_at, "h:MM TT | mmm d");
+							// saves changes
+							comment.save();
+					// confirmation log
+							// console.log('Database Comment created: '.cyan);
+							// console.log(comment);
+						}
+					});
+				}
+		// confirmation log
 				// console.log('Database Comment created: '.cyan);
 				// console.log(comment);
 			}
 		});
-		// send warning message
-		if(profanity) {
-			// console.log('detected bad words'.green);
-			let notif = {text: getRandMessage(curseResponse), type:'notif'};
-			// send announcement to all
-			io.in(socket.room).emit('announcement', notif);
-			// create announcement in db
-			Comment.create({text: notif.text, room: socket.room, type:'notif'}, function(err, comment) {
-				if(err) {
-					// sends error msg if comment could not be created
-					console.log(err);
-				} else {
-					// format the date in the form we want
-					comment.date = dateFormat(comment.created_at, "h:MM TT | mmm d");
-					// saves changes
-					comment.save();
-			// confirmation log
-					// console.log('Database Comment created: '.cyan);
-					// console.log(comment);
-				}
-			});
-		}
 	});
 });
 

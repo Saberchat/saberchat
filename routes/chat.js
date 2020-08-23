@@ -129,6 +129,24 @@ router.post('/new', middleware.isLoggedIn, function(req, res) {
   });
 });
 
+// handles reports on comments from users
+router.post('/report', middleware.isLoggedIn, function(req, res) {
+  Comment.findById(req.body.comment, function(err, comment) {
+    if(err) {
+      res.json('Error');
+    } else if(comment.status == 'flagged'){
+      res.json('Already Reported');
+    } else {
+      // set status to flagged
+      comment.status = 'flagged';
+      // remember who flagged it
+      comment.statusBy = req.body.user;
+      comment.save();
+      res.json('Reported');
+    }
+  });
+});
+
 // leave a room
 router.post('/:id/leave', middleware.isLoggedIn, middleware.checkForLeave, function(req, res) {
   Room.findById(req.params.id, function(err, foundRoom) {
