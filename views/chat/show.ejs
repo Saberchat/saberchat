@@ -31,7 +31,7 @@
     <p class="text-dark lead mb-3"><%= room.description %></p>
     <% if (room.creator.id.equals(currentUser._id)) { %>
       <a href="/chat/<%= room._id %>/edit" class="btn btn-secondary"><i class="fas fa-cog"></i> Room Settings</a>
-    <% } else if(room.type == 'private') { %>
+    <% } else if(currentUser.permission != 'admin' && room.type == 'private') { %>
       <!-- leave button/form with bootstrap modal -->
       <form action="/chat/<%= room._id %>/leave" method="post" style="display: inline-block;">
         <!-- Button trigger modal -->

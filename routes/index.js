@@ -75,11 +75,6 @@ router.post('/login', function(req, res, next) {
     })(req, res, next);
 });
 
-//Function to display user inbox
-router.get('/inbox', (req, res, next) => {
-	res.render('chat/inbox')
-})
-
 //logout route
 router.get("/logout", function(req, res) {
 	//logout with passport

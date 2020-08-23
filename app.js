@@ -17,19 +17,25 @@ const methodOverride = require('method-override');
 const dateFormat = require('dateformat');
 //pretty up the console
 const colors = require('colors');
+
 //profanity filter
 const Filter = require('bad-words');
 const filter = new Filter();
-// scheduler test
+
+// require scheduler
 const schedule = require('node-schedule');
+
 // require the models for database actions
 const Comment = require('./models/comment');
 const User = require("./models/user");
+
 //require the routes
 const indexRoutes = require('./routes/index');
 const chatRoutes = require('./routes/chat');
 const profileRoutes = require('./routes/profile');
 const wHeightsRoutes = require('./routes/wHeights');
+const inboxRoutes = require('./routes/inbox');
+
 //set up ports and socket.io
 const http = require('http').createServer(app);
 const io = require('socket.io')(http);
@@ -105,12 +111,7 @@ app.use(indexRoutes);
 app.use('/chat', chatRoutes);
 app.use('/profiles', profileRoutes);
 app.use('/articles', wHeightsRoutes);
-
-// file dependencies - doesnt work
-// app.get('/scripts/editor.js', function(req, res) {
-// 	console.log('sent file!');
-//     res.sendFile(__dirname + '/node_modules/@editorjs/editorjs/dist/editor.js');
-// });
+app.use(inboxRoutes);
 
 // Catch-all route
 app.get('*', function(req, res) {
@@ -130,20 +131,22 @@ function getRandMessage(list) {
 	return list[Math.floor(Math.random() * list.length)]
 }
 
-var manageComments = schedule.scheduleJob('0 0 * * *', function() {
-	Comment.find({}, function(err, foundComments) {
-		if(err) {
-			console.log(err);
-		} else {
-			foundComments.map((comment) => {
-				if(true) {
-					comment.remove();
-					console.log('removed comments');
-				}
-			});
-		}
-	});
-});
+// deletes all comments at midnight
+
+// var manageComments = schedule.scheduleJob('0 0 * * *', function() {
+// 	Comment.find({}, function(err, foundComments) {
+// 		if(err) {
+// 			console.log(err);
+// 		} else {
+// 			foundComments.map((comment) => {
+// 				if(true) {
+// 					comment.remove();
+// 					console.log('removed comments');
+// 				}
+// 			});
+// 		}
+// 	});
+// });
 
 // Socket.io server-side code
 io.on('connect', (socket) => {

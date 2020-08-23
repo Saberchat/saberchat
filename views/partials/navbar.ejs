@@ -38,6 +38,11 @@
                     <li class="nav-item">
                         <a class="nav-link" href="/"><i class="fas fa-inbox"></i> Inbox</a>
                     </li>
+                    <% if (currentUser.permission == 'admin') { %>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/admin"><i class="fas fa-crown"></i> AdminCtrl</a>
+                        </li>
+                    <% } %>
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle" href="" id="navbarDropdownMenuLink" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                             <img src="<%= currentUser.imageUrl %>" alt="profile pic" style="width: 20px; height: 20px; object-fit: cover; border-radius: 50%; display: inline-block; margin-top: -3px;">

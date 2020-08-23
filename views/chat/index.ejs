@@ -37,7 +37,7 @@
             <p class="mb-1">Rooms you are a member of.</p>
           </li>
           <% rooms.forEach(room => { %>
-            <% if (room.type == 'public' || room.members.includes(currentUser._id)) { %>
+            <% if (currentUser.permission == 'admin' || room.type == 'public' || room.members.includes(currentUser._id)) { %>
               <a href="chat/<%= room._id %>" class="list-group-item list-group-item-action"><%= room.name %>
               <% if (!(room.confirmed.includes(currentUser._id))) { %>
                 <span class="badge badge-danger float-right">New!</span>
@@ -47,27 +47,29 @@
           <% }) %>
         </div>
       </div>
-      <div class="row mb-5">
-        <div class="col-12">
-          <ul class="list-group">
-            <li class="list-group-item list-group-item-info" style="margin-top: -1px;">
-              <div class="d-flex w-100 justify-content-between">
-                <h2 class="mb-1"><i class="fas fa-door-open"></i> Other rooms to join</h2>
-              </div>
-              <p class="mb-1">Request access to join new rooms.</p>
-            </li>
-            <% rooms.forEach(room => { %>
-              <% if (room.type == 'private' && !(room.members.includes(currentUser._id))) { %>
-                <li class="list-group-item list-group-item-action list-group-item-light">
-                  <%= room.name %>
-                  <form action="" class="float-right">
-                    <button class="btn btn-success btn-sm">Request Invite</button></li>
-                  </form>
-              <% } %>
-            <% }) %>
-          </ul>
+      <% if (currentUser.permission != 'admin') { %>
+        <div class="row mb-5">
+          <div class="col-12">
+            <ul class="list-group">
+              <li class="list-group-item list-group-item-info" style="margin-top: -1px;">
+                <div class="d-flex w-100 justify-content-between">
+                  <h2 class="mb-1"><i class="fas fa-door-open"></i> Other rooms to join</h2>
+                </div>
+                <p class="mb-1">Request access to join new rooms.</p>
+              </li>
+              <% rooms.forEach(room => { %>
+                <% if (room.type == 'private' && !(room.members.includes(currentUser._id))) { %>
+                  <li class="list-group-item list-group-item-action list-group-item-light">
+                    <%= room.name %>
+                    <form action="" class="float-right">
+                      <button class="btn btn-success btn-sm">Request Invite</button></li>
+                    </form>
+                <% } %>
+              <% }) %>
+            </ul>
+          </div>
         </div>
-      </div>
+      <% } %>
     </div>
   </body>
 </html>
