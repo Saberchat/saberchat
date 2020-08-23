@@ -68,13 +68,22 @@ middleware.checkRoomOwnership = function(req, res, next) {
 			req.flash('error', 'Room cannot be found or does not exist');
 			res.redirect('/chat')
 		} else {
-			if(foundRoom.creator.id.equals(req.user._id)) {
+			if(req.user.permission == 'admin' || foundRoom.creator.id.equals(req.user._id)) {
 				return next();
 			}
 			req.flash('error', 'You do not have permission to do that');
 			res.redirect('/chat/' + foundRoom._id);
 		}
 	});
+}
+
+middleware.isAdmin = function(req, res, next) {
+	if(req.user.permission == 'admin') {
+		next();
+	} else {
+		req.flash('error', 'You do not have permission to do that');
+		res.redirect('/');
+	}
 }
 
 //export the object with all the functions
