@@ -86,5 +86,14 @@ middleware.isAdmin = function(req, res, next) {
 	}
 }
 
+middleware.isMod = function(req, res, next) {
+	if(req.user.permission == 'admin' || req.user.permission == 'mod') {
+		next();
+	} else {
+		req.flash('error', 'You do not have permission to do that');
+		res.redirect('/');
+	}
+}
+
 //export the object with all the functions
 module.exports = middleware;
