@@ -27,7 +27,7 @@ middleware.checkIfMember = function(req, res, next) {
 			res.redirect('/chat')
 		} else {
 			let userId = req.user._id;
-			if(req.user.permission == 'admin' || foundRoom.type == 'public' || foundRoom.members.includes(userId)) {
+			if(foundRoom.type == 'public' || foundRoom.members.includes(userId)) {
 				return next();
 			}
 			// stuff for when user is not member of room
@@ -45,9 +45,7 @@ middleware.checkForLeave = function(req, res, next) {
 			req.flash('error', 'Room cannot be found or does not exist');
 			res.redirect('/chat')
 		} else {
-			if(req.user.permission = 'admin') {
-				req.flash('error', "Admin's cannot leave rooms.")
-			} else if(foundRoom.type != 'private') {
+			if(foundRoom.type != 'private') {
 				req.flash('error', 'You cannot leave a public room.');
 				res.redirect('back')
 			} else if(foundRoom.members.includes(req.user._id)) {
@@ -68,7 +66,7 @@ middleware.checkRoomOwnership = function(req, res, next) {
 			req.flash('error', 'Room cannot be found or does not exist');
 			res.redirect('/chat')
 		} else {
-			if(req.user.permission == 'admin' || foundRoom.creator.id.equals(req.user._id)) {
+			if(foundRoom.creator.id.equals(req.user._id)) {
 				return next();
 			}
 			req.flash('error', 'You do not have permission to do that');

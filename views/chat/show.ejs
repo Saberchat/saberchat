@@ -29,7 +29,7 @@
   <div class="container">
     <h1 class="display-4 text-dark"><%= room.name %></h1>
     <p class="text-dark lead mb-3"><%= room.description %></p>
-    <% if (currentUser.permission == 'admin' || room.creator.id.equals(currentUser._id)) { %>
+    <% if (room.creator.id.equals(currentUser._id)) { %>
       <a href="/chat/<%= room._id %>/edit" class="btn btn-secondary"><i class="fas fa-cog"></i> Room Settings</a>
     <% } else if(room.type == 'private') { %>
       <!-- leave button/form with bootstrap modal -->
