@@ -15,7 +15,6 @@
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js" integrity="sha384-OgVRvuATP1z7JjHLkuOU7Xw704+h835Lr+6QL9UvYjZE3Ipu6Tp75j7Bh/kR0JKI" crossorigin="anonymous"></script> -->
 
     <script src="https://kit.fontawesome.com/dccc745c41.js" crossorigin="anonymous"></script>
-    <script src="/javascript/admin/permission.js"></script>
 </head>
 <body>
     <%- include('../partials/navbar') %> 
@@ -23,13 +22,14 @@
         <div class="row">
             <div class="col-12">
                 <h1>Change Permissions</h1>
+                <span id="loading"></span>
                 <hr>
                 <ul class="list-group">
                     <% users.forEach(function(user) { %>
                         <% if(!user._id.equals(currentUser._id)) { %>
                         <li class="list-group-item">
                             <%= user.username %> (<%= user.firstName.charAt(0) %>.<%= user.lastName.charAt(0) %>) 
-                            <select name="permission" class="role-select" onchange="updateRole(this)">
+                            <select name="permission" class="role-select" onchange="updateRole(this)" id="<%= user._id %>">
                                 <option value="admin" 
                                 <% if(user.permission == 'admin'){ %> selected <% } %>
                                 >Administrator</option>
@@ -47,5 +47,6 @@
             </div>
         </div>
     </div>
+    <script src="/javascript/admin/permission.js"></script>
 </body>
 </html>

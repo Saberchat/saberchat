@@ -6,7 +6,7 @@ function scrollToElement(innerElement, containerId) {
 
 function report(element) {
   let id = element.id;
-  let url = '/chat/report'
+  let url = '/chat/report?_method=put'
   let data = {
     comment: id,
     user: userId

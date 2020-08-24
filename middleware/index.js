@@ -78,7 +78,7 @@ middleware.checkRoomOwnership = function(req, res, next) {
 }
 
 middleware.isAdmin = function(req, res, next) {
-	if(req.user.permission == 'admin') {
+	if(req.user.permission == 'admin' || req.user.permission == 'principal') {
 		next();
 	} else {
 		req.flash('error', 'You do not have permission to do that');
