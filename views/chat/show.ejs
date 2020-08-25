@@ -70,7 +70,31 @@
         <div class="px-4 chat-box bg-white" id="message-display">
           <!-- reverse it to get correct order -->
           <% comments.reverse().forEach(comment => { %>
-            <% if (comment.author && comment.author._id.equals(currentUser._id)) { %>
+            <% if(comment.status == 'deleted' && comment.author._id.equals(currentUser._id)) { %>
+              <!-- Reciever Message-->
+              <div class="media w-65 ml-auto mb-2">
+                <div class="media-body">
+                  <div class="bg-primary rounded py-2 px-3 mb-2">
+                    <p class="text-small mb-0 text-white">[Comment Deleted]</p>
+                  </div>
+                  <p class="small text-muted"><%= comment.date %></p>
+                </div>
+              </div>
+            <% } else if(comment.status == 'deleted') { %>
+              <!-- Sender message -->
+              <div class="media mb-2">
+                <img src="<%= comment.author.imageUrl %>" alt="user" class="user-image">
+                <div class="media-body ml-3">
+                  <div class="bg-grey rounded py-2 px-3 mb-2 w-65">
+                    <p class="text-small mb-0 text-dark">[Comment Deleted]</p>
+                  </div>
+                  <p class="small text-muted msg-info"><span class="username"><%= comment.author.username %></span>, <%= comment.date %></p>
+                  <% if(comment.status != 'reported' && comment.status != 'ignored') { %>
+                  <button class="flag" id="<%= comment._id %>" onclick="report(this)"><i class="far fa-flag"></i> <span class="flag-tooltip">Report comment</span></button>
+                  <% } %>
+                </div>
+              </div>
+            <% } else if (comment.author && comment.author._id.equals(currentUser._id)) { %>
               <!-- Reciever Message-->
               <div class="media w-65 ml-auto mb-2">
                 <div class="media-body">
@@ -89,7 +113,9 @@
                     <p class="text-small mb-0 text-dark"><%= comment.text %></p>
                   </div>
                   <p class="small text-muted msg-info"><span class="username"><%= comment.author.username %></span>, <%= comment.date %></p>
+                  <% if(comment.status != 'reported' && comment.status != 'ignored') { %>
                   <button class="flag" id="<%= comment._id %>" onclick="report(this)"><i class="far fa-flag"></i> <span class="flag-tooltip">Report comment</span></button>
+                  <% } %>
                 </div>
               </div>
             <% } else { %>

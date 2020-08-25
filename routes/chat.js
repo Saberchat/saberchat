@@ -157,7 +157,7 @@ router.post('/:id/leave', middleware.isLoggedIn, middleware.checkForLeave, funct
 });
 
 // handles reports on comments from users
-router.put('/report', middleware.isLoggedIn, function(req, res) {
+router.put('/comments/report', middleware.isLoggedIn, function(req, res) {
   Comment.findById(req.body.comment, function(err, comment) {
     if(err) {
       res.json('Error');
