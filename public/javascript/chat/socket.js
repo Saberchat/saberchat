@@ -4,6 +4,22 @@ function scrollToElement(innerElement, containerId) {
   
 }
 
+function report(element) {
+  let id = element.id;
+  let url = '/chat/comments/report?_method=put'
+  let data = {
+    comment: id,
+    user: userId
+  };
+  let parent = element.parentNode;
+  element.remove();
+  $(parent).append(`<p class="flag">Waiting...</p>`);
+  $.post(url, data, function(data) {
+    parent.getElementsByClassName('flag')[0].remove();
+    $(parent).append(`<p class="flag">[${data}]</p>`);
+  });
+}
+
 //create function that sets up the socket chat
 function chatInit(username, userId, messageForm, input, chatDisplay, room, userImage) {
 
@@ -54,15 +70,18 @@ function chatInit(username, userId, messageForm, input, chatDisplay, room, userI
 
   socket.on('chat message', function(msg) {
     // appends the message to the ul element displaying the messages
-    $(chatDisplay).append(`<div class="media w-50 mb-5">
-    <img src="${msg.userImage}" alt="user" class="user-image">
-    <div class="media-body ml-3">
-      <div class="bg-grey rounded py-2 px-3 mb-2">
-        <p class="text-small mb-0 text-dark">${msg.text}</p>
+    $(chatDisplay).append(
+      `<div class="media mb-2">
+      <img src="${msg.userImage}" alt="user" class="user-image">
+      <div class="media-body ml-3">
+        <div class="bg-grey rounded py-2 px-3 mb-2 w-65">
+          <p class="text-small mb-0 text-dark">${msg.text}</p>
+        </div>
+        <p class="small text-muted msg-info"><span class="username">${msg.username}</span>, ${$.format.date(Date.now(), "h:mm a | MMM d")}</p>
+        <button class="flag" id="${msg.id}" onclick="report(this)"><i class="far fa-flag"></i> <span class="flag-tooltip">Report comment</span></button>
       </div>
-      <p class="small text-muted"><span class="username">${msg.username}</span>, ${$.format.date(Date.now(), "h:mm a | MMM d")}</p>
-    </div>
-    </div>`);
+    </div>`
+    );
     // scroll to latest message
     let messages = document.getElementsByClassName('media');
     let message = messages[messages.length - 1];

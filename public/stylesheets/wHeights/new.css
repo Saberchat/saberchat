@@ -1,7 +1,21 @@
-textarea {
-    resize: none;
-    width: 100%;
-    overflow: hidden;
-    box-shadow: none;
-    outline: none;
+#article-content {
+    background-color: #f5f3b4;
 }
+
+.ce-block__content {
+    padding-left: 1rem;
+    padding-right: 1rem;
+    background-color: #ffffff;
+}
+
+.ce-block {
+    margin-bottom: 0.5rem;
+}
+
+/* .ce-toolbar__plus {
+    color: #ffffff;
+}
+
+.ce-toolbar__settings-btn {
+    background-color: #ffffff;
+} */

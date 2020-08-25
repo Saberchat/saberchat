@@ -17,19 +17,26 @@ const methodOverride = require('method-override');
 const dateFormat = require('dateformat');
 //pretty up the console
 const colors = require('colors');
+
 //profanity filter
 const Filter = require('bad-words');
 const filter = new Filter();
-// scheduler test
+
+// require scheduler
 const schedule = require('node-schedule');
+
 // require the models for database actions
 const Comment = require('./models/comment');
 const User = require("./models/user");
+
 //require the routes
 const indexRoutes = require('./routes/index');
 const chatRoutes = require('./routes/chat');
 const profileRoutes = require('./routes/profile');
 const wHeightsRoutes = require('./routes/wHeights');
+const inboxRoutes = require('./routes/inbox');
+const adminRoutes = require('./routes/admin');
+
 //set up ports and socket.io
 const http = require('http').createServer(app);
 const io = require('socket.io')(http);
@@ -45,6 +52,9 @@ mongoose.connect("mongodb+srv://admin_1:alsion2020@cluster0-cpycz.mongodb.net/sa
 
 // make public dir accessible in all views
 app.use(express.static(__dirname + "/public"));
+// try serving editorjs package to frontend
+app.use('/editor', express.static(__dirname + "/node_modules/@editorjs"));
+// use body parser
 app.use(bodyParser.urlencoded({extended: true}));
 //set view engine to ejs
 app.set("view engine", "ejs");
@@ -92,6 +102,8 @@ app.use(function(req, res, next) {
 	next();
 });
 
+
+
 // =======================
 // Routes
 // =======================
@@ -99,8 +111,9 @@ app.use(function(req, res, next) {
 app.use(indexRoutes);
 app.use('/chat', chatRoutes);
 app.use('/profiles', profileRoutes);
-app.use('/witherlyheights', wHeightsRoutes);
-
+app.use('/articles', wHeightsRoutes);
+app.use(inboxRoutes);
+app.use('/admin', adminRoutes);
 
 // Catch-all route
 app.get('*', function(req, res) {
@@ -120,33 +133,34 @@ function getRandMessage(list) {
 	return list[Math.floor(Math.random() * list.length)]
 }
 
-var manageComments = schedule.scheduleJob('0 0 * * *', function() {
-	Comment.find({}, function(err, foundComments) {
-		if(err) {
-			console.log(err);
-		} else {
-			foundComments.map((comment) => {
-				if(true) {
-					comment.remove();
-					console.log('removed comments');
-				}
-			});
-		}
-	});
-});
+// deletes all comments at midnight
+
+// var manageComments = schedule.scheduleJob('0 0 * * *', function() {
+// 	Comment.find({}, function(err, foundComments) {
+// 		if(err) {
+// 			console.log(err);
+// 		} else {
+// 			foundComments.map((comment) => {
+// 				if(true) {
+// 					comment.remove();
+// 					console.log('removed comments');
+// 				}
+// 			});
+// 		}
+// 	});
+// });
 
 // Socket.io server-side code
 io.on('connect', (socket) => {
 //   console.log("A user connected".cyan);
 //   socket.on('disconnect', () => {
 // 		console.log("A user disconnected".cyan);
-// 	});
 	// When 'switch room' event is detected, leave old room and join 'newroom';
-  socket.on('switch room', (newroom) => {
-    socket.leave(socket.room);
-    socket.join(newroom);
-    socket.room = newroom;
-  });
+  	socket.on('switch room', (newroom) => {
+		socket.leave(socket.room);
+		socket.join(newroom);
+		socket.room = newroom;
+	});
 
 	// When 'chat message' event is detected, emit msg to all clients in room
 	socket.on('chat message', (msg) => {
@@ -156,14 +170,6 @@ io.on('connect', (socket) => {
 			msg.text = filter.clean(msg.text);
 			profanity = true;
 		}
-		// broadcast message to all connected users in the room
-		socket.to(socket.room).emit('chat message', msg);
-    // Log information
-    // console.log("Room: ".cyan);
-    // console.log(socket.room);
-		// console.log("Message: ".cyan);
-    // console.log(msg);
-
 		// create/save comment to db
 		Comment.create({text: msg.text, room: socket.room, author: msg.authorId}, function(err, comment) {
 			if(err) {
@@ -171,37 +177,41 @@ io.on('connect', (socket) => {
 				console.log(err);
 				req.flash('error', 'message could not be created');
 			} else {
+				// set msg id
+				msg.id = comment._id;
+				// broadcast message to all connected users in the room
+				socket.to(socket.room).emit('chat message', msg);
 				// format the date in the form we want.
 				comment.date = dateFormat(comment.created_at, "h:MM TT | mmm d");
 				// saves changes
 				comment.save();
-        // confirmation log
+				// checks if bad language was used
+				if(profanity) {
+					// console.log('detected bad words'.green);
+					let notif = {text: getRandMessage(curseResponse), status: 'notif'};
+					// send announcement to all
+					io.in(socket.room).emit('announcement', notif);
+					// create announcement in db
+					Comment.create({text: notif, room: socket.room, status: notif.status}, function(err, comment) {
+						if(err) {
+							// sends error msg if comment could not be created
+							console.log(err);
+						} else {
+							// format the date in the form we want
+							comment.date = dateFormat(comment.created_at, "h:MM TT | mmm d");
+							// saves changes
+							comment.save();
+					// confirmation log
+							// console.log('Database Comment created: '.cyan);
+							// console.log(comment);
+						}
+					});
+				}
+		// confirmation log
 				// console.log('Database Comment created: '.cyan);
 				// console.log(comment);
 			}
 		});
-		// send warning message
-		if(profanity) {
-			// console.log('detected bad words'.green);
-			let notif = {text: getRandMessage(curseResponse), type:'notif'};
-			// send announcement to all
-			io.in(socket.room).emit('announcement', notif);
-			// create announcement in db
-			Comment.create({text: notif.text, room: socket.room, type:'notif'}, function(err, comment) {
-				if(err) {
-					// sends error msg if comment could not be created
-					console.log(err);
-				} else {
-					// format the date in the form we want
-					comment.date = dateFormat(comment.created_at, "h:MM TT | mmm d");
-					// saves changes
-					comment.save();
-			// confirmation log
-					// console.log('Database Comment created: '.cyan);
-					// console.log(comment);
-				}
-			});
-		}
 	});
 });
 

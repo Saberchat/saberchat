@@ -46,7 +46,7 @@ middleware.checkForLeave = function(req, res, next) {
 			res.redirect('/chat')
 		} else {
 			if(foundRoom.type != 'private') {
-				req.flash('error', 'You cannot leave a public room');
+				req.flash('error', 'You cannot leave a public room.');
 				res.redirect('back')
 			} else if(foundRoom.members.includes(req.user._id)) {
 				next();
@@ -73,6 +73,24 @@ middleware.checkRoomOwnership = function(req, res, next) {
 			res.redirect('/chat/' + foundRoom._id);
 		}
 	});
+}
+
+middleware.isAdmin = function(req, res, next) {
+	if(req.user.permission == 'admin' || req.user.permission == 'principal') {
+		next();
+	} else {
+		req.flash('error', 'You do not have permission to do that');
+		res.redirect('/');
+	}
+}
+
+middleware.isMod = function(req, res, next) {
+	if(req.user.permission == 'mod' || req.user.permission == 'admin' || req.user.permission == 'principal') {
+		next();
+	} else {
+		req.flash('error', 'You do not have permission to do that');
+		res.redirect('/');
+	}
 }
 
 //export the object with all the functions

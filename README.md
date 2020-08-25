@@ -35,4 +35,5 @@ Npm Libraries
 - node-schedule (library for scheduling recurring functions/jobs )
 - passport (authorization with node)
 - socket.io (sockets for real-time communication)
+- @editorjs/* (editorjs library and its plugins for potentially creating Witherly hHeights articles)
 

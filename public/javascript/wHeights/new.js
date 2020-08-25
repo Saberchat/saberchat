@@ -27,7 +27,10 @@ function next() {
 function addText() {
   textCount += 1;
   $('#article-content').append(
-    `<textarea class="my-3" id="t-${textCount}" name="content[t-${textCount}]" rows="1" oninput="autoGrow(this)"></textarea>`
+    `<div class="text-block">
+    <textarea class="text-input form-control" id="t-${textCount}" name="content[t-${textCount}]" rows="1" oninput="autoGrow(this)"></textarea>
+    <button class="delete-btn btn btn-danger" onclick="remove(this)"><i class="far fa-trash-alt"></i></button>
+  </div>`
   );
   document.getElementById('t-' + textCount).onkeydown = function(e){
         if(e.keyCode==9 || e.which==9){
@@ -42,7 +45,10 @@ function addText() {
 // adds image
 function addImage() {
   $('#article-content').append(
-    `<img src="${imageInput.value}" alt="article image" class="my-3 rounded img-fluid">`
+    `<div class="img-block">
+    <img src="${imageInput.value}" alt="article image" class="rounded article-img">
+    <button class="delete-btn btn btn-danger" onclick="remove(this)"><i class="far fa-trash-alt"></i></button>
+    </div>`
   );
   imageInput.value = "";
 }
@@ -60,6 +66,30 @@ for(let i=0;i<count;i++){
         }
     }
 }
+// function to post data
+function postIt(url, data){
+
+  $('body').append($('<form/>', {
+    id: 'jQueryPostItForm',
+    method: 'post',
+    action: url
+  }));
+
+  for (let i in data) {
+    $('#jQueryPostItForm').append($('<input/>', {
+      type: 'hidden',
+      name: i,
+      value: data[i]
+    }));
+  }
+  $('#jQueryPostItForm').submit();
+}
+
+// removes text/image block
+function remove(element) {
+  let parent = element.parentElement;
+  parent.remove();
+}
 
 // auto grows textareas
 function autoGrow(element) {
@@ -67,32 +97,55 @@ function autoGrow(element) {
   element.style.height = (element.scrollHeight)+"px";
 }
 
-// submits article to be created
-$('#article-form').submit(function(e) {
-  e.preventDefault();
-  const url = '/witherlyheights/articles/new'
+// submit article
+// $('#create-btn').on('click', function() {
+//   let preContent = $('#article-content').children();
+//   for(let i=0;i < preContent.length; i++) {
+//     if(preContent[i].tagName == 'TEXTAREA') {
+//       articleContent.push({
+//         type: 'text',
+//         content: preContent[i].value
+//       });
+//     } else if(preContent[i].tagName == 'IMG') {
+//       articleContent.push({
+//         type: 'image',
+//         content: preContent[i].src
+//       });
+//     }
+//   }
+//   const article = {
+//     title: articleTitle,
+//     author: articleAuthor,
+//     content: JSON.stringify(articleContent)
+//   }
+
+//   postIt('/witherlyheights/articles/new', article);
+// });
+
+$('#create-btn').on('click', function() {
   let preContent = $('#article-content').children();
+  console.log(preContent);
   for(let i=0;i < preContent.length; i++) {
-    if(preContent[i].tagName == 'TEXTAREA') {
+    let element = preContent[i].children[0];
+    if(element.tagName == 'TEXTAREA') {
       articleContent.push({
         type: 'text',
-        content: preContent[i].value
+        content: element.value
       });
-    } else if(preContent[i].tagName == 'IMG') {
+    } else if(element.tagName == 'IMG') {
       articleContent.push({
         type: 'image',
-        content: preContent[i].src
+        content: element.src
       });
     }
   }
-  
   const article = {
     title: articleTitle,
     author: articleAuthor,
-    content: articleContent
+    content: JSON.stringify(articleContent)
   }
-  
-  $.post(url, article, function() {
-    window.location.replace('/witherlyheights');
-  });
+
+  console.log(article);
+
+  postIt('/articles/new', article);
 });

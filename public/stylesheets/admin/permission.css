@@ -1,0 +1,9 @@
+.role-select {
+    float:right;
+    height: 2rem;
+    width: 10rem;
+}
+
+.list-group-item {
+    line-height: 32px;
+}

@@ -51,20 +51,20 @@
     </section>
     <section class="container mt-5">
       <h1 class="text-center mb-3">Articles</h1>
-      <a href="/witherlyheights/articles/new" class="btn btn-info">New Article</a>
+      <a href="/articles/new" class="btn btn-info">New Article</a>
       <div class="row">
-        <% for( let index = 0; index < articles.length; index++ ) { %>
+        <% articles.forEach(article => { %>
           <div class="col-md-6 col-lg-4 col-12 px-2">
             <div class="card article" style="width: 18rem;">
               <img class="card-img-top" src="https://images.unsplash.com/photo-1505235687559-28b5f54645b7?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=2090&q=80" alt="Card image cap">
               <div class="card-body">
-                <h5 class="card-title">Article <%= index %></h5>
-                <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
-                <a href="#">Read More...</a>
+                <h5 class="card-title"><%= article.title %></h5>
+                <p class="card-text"><%= article.author %></p>
+                <a href="/articles/<%= article._id %>">Read More...</a>
               </div>
             </div>
           </div>
-        <% } %>
+        <% }) %>
       </div>
     </section>
 </body>

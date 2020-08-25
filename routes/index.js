@@ -81,6 +81,7 @@ router.post('/login', function(req, res, next) {
     })(req, res, next);
 });
 
+<<<<<<< HEAD
 //Access sendNotification file
 router.get('/sendNotification', middleware.isLoggedIn, (req, res, next) => {
 	res.render('chat/sendNotification')
@@ -132,6 +133,8 @@ router.get('/inbox', middleware.isLoggedIn, (req, res, next) => {
 	})
 })
 
+=======
+>>>>>>> c413c2fa840ea70b4f1a6207ded0a60067579863
 //logout route
 router.get("/logout", function(req, res) {
 	//logout with passport

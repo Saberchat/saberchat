@@ -55,10 +55,12 @@ router.get('/:id', middleware.isLoggedIn, middleware.checkIfMember, (req, res) =
       }
       //finds latest 30 comments in the db with matchin room#. This one's a bit monstrous
       Comment.find({
-        room: foundRoom._id
+        room: foundRoom._id // filter by room id
       }).sort({
-        _id: -1
-      }).limit(30).populate('author').exec(function(err, foundComments) {
+        _id: -1 // get by newest
+      }).limit(30) // limit by 30
+      .populate({path: 'author', select: ['username', 'imageUrl']}) // populate author's username and prof pic
+      .exec(function(err, foundComments) {
         if (err) {
           //log error and flash message if it can't access the comments in db
           console.log(err);
@@ -68,7 +70,6 @@ router.get('/:id', middleware.isLoggedIn, middleware.checkIfMember, (req, res) =
             //if there are no comments in db
             console.log('no found comments!');
           }
-          // console.log(foundComments);
           //renders views/chat/index.ejs and passes in data
           res.render('chat/show', {
             comments: foundComments,
@@ -155,6 +156,25 @@ router.post('/:id/leave', middleware.isLoggedIn, middleware.checkForLeave, funct
   });
 });
 
+// handles reports on comments from users
+router.put('/comments/report', middleware.isLoggedIn, function(req, res) {
+  Comment.findById(req.body.comment, function(err, comment) {
+    if(err) {
+      res.json('Error');
+    } else if(comment.status == 'flagged'){
+      res.json('Already Reported');
+    } else if(comment.status == 'ignored') {
+      res.json('Report Ignored by Mod');
+    } else {
+      // set status to flagged
+      comment.status = 'flagged';
+      // remember who flagged it
+      comment.statusBy = req.body.user;
+      comment.save();
+      res.json('Reported');
+    }
+  });
+});
 
 // edit room
 router.put('/:id/edit', middleware.isLoggedIn, middleware.checkRoomOwnership, (req, res) => {

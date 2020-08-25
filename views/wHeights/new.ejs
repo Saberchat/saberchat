@@ -7,6 +7,7 @@
 
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css">
     <link rel="stylesheet" href="/stylesheets/main.css">
+    <link rel="stylesheet" href="/stylesheets/wHeights/simple-image.css">
     <link rel="stylesheet" href="/stylesheets/wHeights/new.css">
 
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
@@ -15,7 +16,8 @@
 
     <!-- I'm using my fontawesome kit -->
     <script src="https://kit.fontawesome.com/dccc745c41.js" crossorigin="anonymous"></script>
-    <script defer src="/javascript/wHeights/new.js"></script>
+    <!-- <script defer src="/javascript/wHeights/new.js"></script>
+    <script src="/javascript/wHeights/new_edit.js"></script> -->
 </head>
 <body>
     <!-- witherly heights navbar -->
@@ -57,34 +59,23 @@
                   <div class="form-group">
                       <label for="author">Author</label>
                       <input id="author" class="form-control" type="text" name="author">
-                  </div>  
-                  <button onclick="next()" class="btn btn-primary">Next -></button>
-                </div>
-                <!-- Editor, build the article -->
-                <div id="article-body">
-                  <h1>Editor</h1>
-                  <p>Title: <span id="title-display"></span></p>
-                  <p>Author: <span id="author-display"></span></p>
-                  <h4>Content</h4>
-                  <!-- editor controls -->
-                  <button type="button" onclick="addText()" class="btn btn-primary">Add Text Block</button>
-                  <div class="input-group my-3">
-                    <input id="image-input" type="text" class="form-control" placeholder="image Url" aria-label="image Url" aria-describedby="basic-addon2">
-                    <div class="input-group-append">
-                      <button onclick="addImage()" class="btn btn-outline-secondary" type="button">Add Image</button>
-                    </div>
                   </div>
-                  <form id="article-form" action="/witherlyheights/articles/new" method="post">
-                    <button type="submit" class="btn btn-success">Create</button>
-                  </form>
-                  <hr>
-                  <!-- display content -->
-                  <div id="article-content">
-                    <textarea class="my-3" id="t-1" name="content[t-1]" rows="1" oninput="autoGrow(this)"></textarea>
-                  </div>
+                  <button class="btn btn-success" id="save-button">Save</button>
                 </div>
+                
             </div>
         </div>
     </div>
+    <!-- Editor, build the article -->
+    <div id="article-content">
+      <hr>
+      <div id="editorjs"></div>
+    </div>
+    <pre id="output"></pre>
+    <script src="/editor/editorjs/dist/editor.js"></script>
+    <script src="/editor/header/dist/bundle.js"></script>
+    <script src="/editor/list/dist/bundle.js"></script>
+    <script src="/javascript/wHeights/simple-image.js"></script>
+    <script src="/javascript/wHeights/new_edit.js"></script>
 </body>
 </html>
