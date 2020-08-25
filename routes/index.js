@@ -83,7 +83,15 @@ router.post('/login', function(req, res, next) {
 
 //Access sendNotification file
 router.get('/sendNotification', middleware.isLoggedIn, (req, res, next) => {
-	res.render('chat/sendNotification')
+	let types = ["Cafe Order Status Update", "Field Trip Notification", "PE Notification", "School Event Notification", "Class Schedule Change"]
+	User.find({}, (err, foundUsers) => {
+		if(err || !foundUsers) {
+			req.flash('error', 'Unable to access Database');
+			res.redirect('back');
+		} else {
+			res.render('chat/sendNotification', {users: foundUsers, types})
+		}
+	})
 })
 
 //Route to send 'notification', different from 'comment'
@@ -101,7 +109,7 @@ router.post('/sendNotif', middleware.isLoggedIn, (req, res) => {
 						i.inbox.push(notification)
 						i.save()
 						req.flash('success', "Notification sent!")
-						res.render('chat/sendNotification')
+						res.redirect('/sendNotification')
 					})
 				}
 			}
@@ -126,7 +134,6 @@ router.get('/inbox', middleware.isLoggedIn, (req, res, next) => {
 					notifList.push(notif)
 				}
 			}
-			console.log(notifList)
 			res.render('chat/inbox', {username: req.user.username, notifs: notifList})
 		}
 	})

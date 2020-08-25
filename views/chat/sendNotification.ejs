@@ -30,9 +30,22 @@
                     <div class="search-filter">
                     </div>
                     <form action="/sendNotif" method="post">
-                      <input type='text' name='recipient' placeholder = "Enter recipient name" />
-                      <input type='text' name='type' placeholder = "Enter message type" />
-                      <input type='text' name='message' placeholder = "Enter message" />
+                      <select id="recipient" name="recipient">
+                        <optgroup label="Recipient"></optgroup>
+                        <%users.forEach(user => { %>
+                          <option><%=user.username%></option>
+                        <% }) %>
+                      </select>
+
+                      <select id="type" name="type" style="margin-bottom: 20px;">
+                        <optgroup label="Message Type"></optgroup>
+                        <%types.forEach(type => { %>
+                          <option><%=type%></option>
+                        <% }) %>
+                      </select>
+
+                      <br />
+                      <textarea name="message" cols="40" rows="5" placeholder="Enter message"></textarea>
                       <button action="submit">Send</button>
                     </form>
                 </div>
