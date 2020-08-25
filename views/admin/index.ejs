@@ -16,8 +16,13 @@
     <script src="https://kit.fontawesome.com/dccc745c41.js" crossorigin="anonymous"></script>
 </head>
 <body>
-    <%- include('../partials/navbar') %> 
-    <h1>Admin Dashboard Page</h1>
-    <a href="/admin/permissions">Change Permissions</a>
+    <%- include('../partials/navbar') %>
+    <div class="container">
+      <ul>
+        <h1 class="list-group-item">Admin Dashboard Page</h1>
+        <a href="/admin/permissions" class="list-group-item">Change Permissions</a>
+        <a href="/admin/manageCafe" class="list-group-item">Manage Cafe</a>
+      </ul>
+    </div>
 </body>
 </html>

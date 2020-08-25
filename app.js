@@ -36,6 +36,7 @@ const profileRoutes = require('./routes/profile');
 const wHeightsRoutes = require('./routes/wHeights');
 const inboxRoutes = require('./routes/inbox');
 const adminRoutes = require('./routes/admin');
+const cafeRoutes = require('./routes/cafe');
 
 //set up ports and socket.io
 const http = require('http').createServer(app);
@@ -114,11 +115,12 @@ app.use('/profiles', profileRoutes);
 app.use('/articles', wHeightsRoutes);
 app.use(inboxRoutes);
 app.use('/admin', adminRoutes);
+app.use('/cafe', cafeRoutes);
 
 // Catch-all route
-app.get('*', function(req, res) {
-	res.redirect('/');
-});
+// app.get('*', function(req, res) {
+// 	res.redirect('/');
+// });
 
 // list of responses to bad words
 const curseResponse = [

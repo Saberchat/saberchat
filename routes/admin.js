@@ -64,7 +64,11 @@ router.put('/permissions', middlware.isLoggedIn, middlware.isAdmin, (req, res) =
 			}
 		});
 	}
-	
+
+});
+
+router.get('/manageCafe', middleware.isLoggedIn, middleware.isMod, (req, res) => {
+	res.redirect('/cafe/manage');
 });
 
 module.exports = router;
