@@ -1,0 +1,23 @@
+.body {
+  align: center;
+}
+
+.notification {
+  margin-top: 10px;
+  margin-bottom: 50px;
+  border-color: black;
+  border-width: 2px;
+  color: green;
+  background-color: turquoise;
+}
+
+.msg-info {
+  margin-left: 5px;
+  color: blue;
+}
+
+.message {
+  color: black;
+  font-style: italic;
+  margin-left: 10px;
+}

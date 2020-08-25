@@ -98,7 +98,7 @@ router.get('/:id/edit', middleware.isLoggedIn, middleware.checkRoomOwnership, (r
             room: foundRoom
           });
         }
-      }); 
+      });
     }
   });
 });
@@ -116,7 +116,7 @@ router.post('/new', middleware.isLoggedIn, function(req, res) {
           room.members.push(user);
         }
         room.type = 'private';
-      } 
+      }
       if(req.body.description) {
         room.description = filter.clean(req.body.description);
       }
@@ -177,7 +177,7 @@ router.put('/:id/edit', middleware.isLoggedIn, middleware.checkRoomOwnership, (r
       } else {
         room.type = 'public';
       }
-      
+
       room.save()
       req.flash('success', 'Updated your group');
       res.redirect('/chat/' + room._id);

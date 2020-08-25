@@ -18,6 +18,9 @@
                     <a class="nav-link" href="/chat"><i class="far fa-comment-dots"></i> Chat</a>
                 </li>
                 <li class="nav-item">
+                    <a class="nav-link" href="/sendNotification"><i class="far fa-comment-dots"></i> Send Notification</a>
+                </li>
+                <li class="nav-item">
                     <a class="nav-link" href="/profiles"><i class="far fa-user"></i> Users</a>
                 </li>
                 <li class="nav-item dropdown">
@@ -36,7 +39,7 @@
                 <!-- ejs logic. If there is a user, show the bootstrap dropdown and links below -->
                 <% if(currentUser) { %>
                     <li class="nav-item">
-                        <a class="nav-link" href="/"><i class="fas fa-inbox"></i> Inbox</a>
+                        <a class="nav-link" href="/inbox"><i class="fas fa-inbox"></i> Inbox</a>
                     </li>
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle" href="" id="navbarDropdownMenuLink" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -45,10 +48,7 @@
                         </a>
                         <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
                           <a class="dropdown-item" href="/profiles/<%= currentUser._id %>">View Profile</a>
-<<<<<<< HEAD
                           <a class="dropdown-item" href="/inbox">Inbox <span class="badge badge-pill badge-danger">12</span><span class="sr-only">unread messages</span></a>
-=======
->>>>>>> 73a40e6df0c86effcd9bd0b47576e734698710c1
                           <a class="dropdown-item" href="/logout">Logout</a>
                         </div>
                     </li>

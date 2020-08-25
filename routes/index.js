@@ -5,9 +5,15 @@ const filter = new Filter();
 const router = express.Router();
 //import passport for authentication
 const passport = require('passport');
+const middleware = require('../middleware');
+const textEncoding = require('text-encoding')
+const TextDecoder = textEncoding.TextDecoder
 
 //import user schema for db actions
 const User = require('../models/user');
+const Room = require('../models/room');
+const Comment = require('../models/comment')
+const Notification = require('../models/notification')
 
 // Home route. gives the landing or home or index page (whatever you want to call it).
 router.get('/', (req, res) => {
@@ -22,9 +28,9 @@ router.get('/', (req, res) => {
 //new registered user
 router.post("/register",  function(req, res) {
 	//creates new user from form info
-	var newUser = new User(
+	newUser = new User(
 		{
-			email: req.body.email, 
+			email: req.body.email,
 			firstName: req.body.firstName,
 			lastName: req.body.lastName,
 			username: filter.clean(req.body.username)
@@ -75,9 +81,55 @@ router.post('/login', function(req, res, next) {
     })(req, res, next);
 });
 
-//Function to display user inbox
-router.get('/inbox', (req, res, next) => {
-	res.render('chat/inbox')
+//Access sendNotification file
+router.get('/sendNotification', middleware.isLoggedIn, (req, res, next) => {
+	res.render('chat/sendNotification')
+})
+
+//Route to send 'notification', different from 'comment'
+router.post('/sendNotif', middleware.isLoggedIn, (req, res) => {
+	let recipient = req.body.recipient
+	User.find({}, (err, foundUsers) => {
+		if(err || !foundUsers) {
+			req.flash('error', 'Unable to access Database');
+			res.redirect('back');
+		} else {
+			for (let i of foundUsers) {
+				if (i.username.toLowerCase() == recipient.toLowerCase()) {
+					Notification.create({type: req.body.type, sender: req.user, text: req.body.message}, (err, notification) => {
+						notification.save()
+						i.inbox.push(notification)
+						i.save()
+						req.flash('success', "Notification sent!")
+						res.render('chat/sendNotification')
+					})
+				}
+			}
+		}
+	})
+})
+
+//Route to display user inbox
+router.get('/inbox', middleware.isLoggedIn, (req, res, next) => {
+	let notifList = []
+	Notification.find({
+
+	}).populate({path: 'sender', select: ['username']})
+	.exec((err, foundNotifs) => {
+		if (err || !foundNotifs) {
+			req.flash('error', 'Unable to access Database');
+				res.redirect('back')
+
+		} else {
+			for (let notif of foundNotifs) {
+				if (req.user.inbox.indexOf(notif['_id']) > -1) {
+					notifList.push(notif)
+				}
+			}
+			console.log(notifList)
+			res.render('chat/inbox', {username: req.user.username, notifs: notifList})
+		}
+	})
 })
 
 //logout route
