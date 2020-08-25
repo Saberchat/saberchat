@@ -75,7 +75,7 @@
               <div class="media w-65 ml-auto mb-2">
                 <div class="media-body">
                   <div class="bg-primary rounded py-2 px-3 mb-2">
-                    <p class="text-small mb-0 text-white">[Comment Deleted]</p>
+                    <p class="text-small mb-0 text-white">[Comment deleted by moderator]</p>
                   </div>
                   <p class="small text-muted"><%= comment.date %></p>
                 </div>
@@ -86,10 +86,10 @@
                 <img src="<%= comment.author.imageUrl %>" alt="user" class="user-image">
                 <div class="media-body ml-3">
                   <div class="bg-grey rounded py-2 px-3 mb-2 w-65">
-                    <p class="text-small mb-0 text-dark">[Comment Deleted]</p>
+                    <p class="text-small mb-0 text-dark">[Comment deleted by moderator]</p>
                   </div>
                   <p class="small text-muted msg-info"><span class="username"><%= comment.author.username %></span>, <%= comment.date %></p>
-                  <% if(comment.status != 'reported' && comment.status != 'ignored') { %>
+                  <% if(comment.status != 'reported' && comment.status != 'ignored' && comment.status != 'deleted') { %>
                   <button class="flag" id="<%= comment._id %>" onclick="report(this)"><i class="far fa-flag"></i> <span class="flag-tooltip">Report comment</span></button>
                   <% } %>
                 </div>
