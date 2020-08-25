@@ -16,14 +16,14 @@ router.get('/', middlware.isLoggedIn, middlware.isAdmin, (req, res) => {
 router.get('/moderate', middlware.isLoggedIn, middleware.isMod, (req, res) => {
 	Comment.find({status: 'flagged'})
 	.populate({path: 'author', select:['username','imageUrl']})
-	.populate({path:'statusBy', select:['username', 'imageUrl']})
+	.populate({path: 'statusBy', select:['username', 'imageUrl']})
+	.populate({path: 'room', select: ['name']})
 	.exec(function(err, foundComments) {
 		if(err) {
 			req.flash('error', 'Cannot access DataBase');
 			res.redirect('/admin');
 		} else {
 			res.render('admin/mod', {comments: foundComments});
-			console.log(foundComments[2]);
 		}
 	});
 });

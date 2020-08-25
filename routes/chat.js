@@ -163,6 +163,8 @@ router.put('/report', middleware.isLoggedIn, function(req, res) {
       res.json('Error');
     } else if(comment.status == 'flagged'){
       res.json('Already Reported');
+    } else if(comment.status == 'ignored') {
+      res.json('Report Ignored by Mod');
     } else {
       // set status to flagged
       comment.status = 'flagged';
