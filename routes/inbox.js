@@ -68,10 +68,33 @@ router.get('/inbox', middleware.isLoggedIn, (req, res, next) => {
 	})
 })
 
-//Delete already viewed notifications (not working yet)
+//Delete already viewed notifications (not working completely yet)
+//Notes: Code working erratically. For the first 4-5 tries, notification is deleted. After that, errors are thrown up.
 router.post('/delete', (req, res) => {
-	console.log(res.message)
-	// req.user.save()
-	// res.render('inbox/inbox', {username: req.user.username, notifs: req.user.inbox, capitalizeFirst})
+
+	//Collect all notifications
+	Notification.find({}, (err, foundNotifs) => {
+		if (err || ! foundNotifs) {
+			req.flash('error', 'Unable to access Database');
+			res.redirect('back');
+		} else {
+			for (let notif of foundNotifs) {
+				if (notif['_id'] in req.body) { //Check if notification was on the form's 'remove' checklist
+					Notification.deleteOne({_id: notif._id}, (err, notification) => {
+						if (err) {
+							res.send(err);
+						} else {
+							console.log(req.user.inbox)
+							req.user.inbox.splice(req.user.inbox.indexOf(notif._id), 1)
+							console.log(req.user.inbox)
+							req.flash('success', "Notification deleted!")
+							res.redirect('/inbox')
+						}
+					})
+				}
+			}
+		}
+	})
 })
+
 module.exports = router;

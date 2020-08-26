@@ -4,6 +4,10 @@ body {
   background-image: url('/images/pattern.jpg')
 }
 
+.heading {
+  text-align: center;
+}
+
 .title {
   border-radius: 25px;
   padding: 20px;
@@ -33,6 +37,7 @@ body {
 
 .msg-info {
   margin-left: 5px;
+  margin-right: 10px;
   color: black;
 }
 
@@ -51,11 +56,13 @@ body {
   border-radius: 50%;
 }
 
-.delete-button {
-  margin-left: 50px;
-  width: 50px;
-  height: 20px;
+#delete-button {
+  border-radius: 25px;
+  width: 200px;
+  height: 30px;
   font-size: 10px;
   color: white;
-  background-color: red;
+  background-color: #db391d;
+  border-color: 'black';
+  border-width: 1px;
 }
