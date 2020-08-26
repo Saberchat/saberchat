@@ -56,7 +56,7 @@ router.get('/inbox', middleware.isLoggedIn, (req, res, next) => {
 
 		} else {
 			for (let notif of foundNotifs) {
-				if (req.user.inbox.indexOf(notif['_id']) > -1) {
+				if (req.user.inbox.includes(notif['_id'])) {
 					notifList.push(notif)
 				}
 			}
