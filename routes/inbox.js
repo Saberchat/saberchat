@@ -68,8 +68,7 @@ router.get('/inbox', middleware.isLoggedIn, (req, res, next) => {
 	})
 })
 
-//Delete already viewed notifications (not working completely yet)
-//Notes: Code working erratically. For the first 4-5 tries, notification is deleted. After that, errors are thrown up.
+//Delete already viewed notifications
 router.post('/delete', (req, res) => {
 	deletes = []
 	for (let item of req.user.inbox) {
