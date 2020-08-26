@@ -28,7 +28,7 @@
           <div class="col-md-10 offset-md-1 col-12">
             <form action="/delete" method="post">
               <div class="heading">
-                <h2 class="title"><%=username.charAt(0).toUpperCase() + username.slice(1)%>'s Inbox (<%=notifs.length%> New Notifications)</h2>
+                <h2 class="title"><%=username.charAt(0).toUpperCase() + username.slice(1)%>'s Inbox - <%=notifs.length%> New Notification(s)</h2>
                 <button id="delete-button">Delete Selected Notifications</button>
               </div>
                 <div class="search-filter">
@@ -38,11 +38,11 @@
                     <div class="notification">
                       <img class="profile-img" src="<%=notif.sender.imageUrl%>"/>
                         <% if (parseInt(notif.created_at.toString().slice(16, 19)) > 12) { %>
-                          <input name=<%=notif['id']%> type="checkbox" label = <span class="msg-info"><strong><%=notif.type%></strong> from <strong><%=notif.sender.username%></strong> <span style="font-size: 10px;"><%=parseInt(notif.created_at.toString().slice(16, 19)) - 12%>:<%=notif.created_at.toString().slice(19,21)%>PM | <%=notif.created_at.toString().slice(4,10)%></span></span>
+                          <input name=<%=notif['_id']%> type="checkbox" label = <span class="msg-info"><strong><%=notif.type%></strong> from <strong><%=notif.sender.username%></strong> <span style="font-size: 10px;"><%=parseInt(notif.created_at.toString().slice(16, 19)) - 12%>:<%=notif.created_at.toString().slice(19,21)%>PM | <%=notif.created_at.toString().slice(4,10)%></span></span>
                         <% } else if (parseInt(notif.created_at.toString().slice(16, 19)) == 0) { %>
-                          <input name='notifs'type="checkbox" label= <span class="msg-info"><strong><%=notif.type%></strong> from <strong><%=notif.sender.username%></strong> <span style="font-size: 10px;">12:<%=notif.created_at.toString().slice(19,21)%>AM | <%=notif.created_at.toString().slice(4,10)%></span></span>
+                          <input name=<%=notif['_id']%> type="checkbox" label= <span class="msg-info"><strong><%=notif.type%></strong> from <strong><%=notif.sender.username%></strong> <span style="font-size: 10px;">12:<%=notif.created_at.toString().slice(19,21)%>AM | <%=notif.created_at.toString().slice(4,10)%></span></span>
                         <% } else {%>
-                          <input name='notifs'type="checkbox" label = <span class="msg-info"><strong><%=notif.type%></strong> from <strong><%=notif.sender.username%></strong> <span style="font-size: 10px;"><%=notif.created_at.toString().slice(16,21)%>AM | <%=notif.created_at.toString().slice(4,10)%></span></span>
+                          <input name=<%=notif['_id']%> type="checkbox" label = <span class="msg-info"><strong><%=notif.type%></strong> from <strong><%=notif.sender.username%></strong> <span style="font-size: 10px;"><%=notif.created_at.toString().slice(16,21)%>AM | <%=notif.created_at.toString().slice(4,10)%></span></span>
                         <% } %>
                         <br />
                         <span class="message"><%=notif.text%></span>

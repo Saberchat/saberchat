@@ -60,7 +60,7 @@ router.get('/inbox', middleware.isLoggedIn, (req, res, next) => {
 		} else { //If user's inbox contains notification's id, add to notifList []
 			for (let notif of foundNotifs) {
 				if (req.user.inbox.includes(notif['_id'])) {
-					notifList.push(notif)
+					notifList.unshift(notif)
 				}
 			}
 			res.render('inbox/inbox', {username: req.user.username, notifs: notifList})
@@ -71,30 +71,24 @@ router.get('/inbox', middleware.isLoggedIn, (req, res, next) => {
 //Delete already viewed notifications (not working completely yet)
 //Notes: Code working erratically. For the first 4-5 tries, notification is deleted. After that, errors are thrown up.
 router.post('/delete', (req, res) => {
-
-	//Collect all notifications
-	Notification.find({}, (err, foundNotifs) => {
-		if (err || ! foundNotifs) {
-			req.flash('error', 'Unable to access Database');
-			res.redirect('back');
-		} else {
-			for (let notif of foundNotifs) {
-				if (notif['_id'] in req.body) { //Check if notification was on the form's 'remove' checklist
-					Notification.deleteOne({_id: notif._id}, (err, notification) => {
-						if (err) {
-							res.send(err);
-						} else {
-							console.log(req.user.inbox)
-							req.user.inbox.splice(req.user.inbox.indexOf(notif._id), 1)
-							console.log(req.user.inbox)
-							req.flash('success', "Notification deleted!")
-							res.redirect('/inbox')
-						}
-					})
-				}
-			}
+	deletes = []
+	for (let item of req.user.inbox) {
+		if (Object.keys(req.body).includes(item._id.toString())) {
+			deletes.push(item)
 		}
-	})
+	}
+
+	for (let msg of deletes) {
+		Notification.findByIdAndDelete(msg, (err, deletedNotif) => {
+			if (err || !deletedNotif) {
+				console.log(err)
+				req.flash('error', 'A Problem Occured, Unable to Delete');
+	      res.redirect('back');
+			}
+		})
+	}
+	req.flash('success', 'Notification(s) deleted!');
+	res.redirect('/inbox');
 })
 
 module.exports = router;
