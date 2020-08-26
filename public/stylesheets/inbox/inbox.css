@@ -1,22 +1,51 @@
-.body {
+body {
   align: center;
+  background-image: url('https://images.unsplash.com/photo-1594793861747-136c34047e9d?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=1952&q=80')
+}
+
+.title {
+  background-color: yellow;
+  text-align: center;
+  width: auto;
+  color: black;
+  height: 50px;
+  margin-left: 40px;
+  margin-top: 20px;
+  margin-bottom: 20px;
 }
 
 .notification {
   margin-top: 10px;
-  margin-bottom: 50px;
+  margin-bottom: 10px;
   border-color: black;
   border-width: 2px;
   background-color: turquoise;
+  height: 70px;
 }
 
 .msg-info {
   margin-left: 5px;
-  color: blue;
+  color: black;
 }
 
 .message {
-  color: black;
-  font-style: italic;
+  color: #595e66;
   margin-left: 10px;
+}
+
+.profile-img {
+  height:30px;
+  width: 30px;
+  margin-left: 5px;
+  margin-top: 5px;
+  border-radius: 50%;
+}
+
+.delete-button {
+  margin-left: 50px;
+  width: 50px;
+  height: 20px;
+  font-size: 10px;
+  color: white;
+  background-color: red;
 }

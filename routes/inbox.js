@@ -45,10 +45,15 @@ router.post('/new', middleware.isLoggedIn, (req, res) => {
 
 //Route to display user inbox
 router.get('/inbox', middleware.isLoggedIn, (req, res, next) => {
+	const capitalizeFirst = string => {
+		finalString = (string.charAt(0).toUpperCase() + string.slice(1))
+		return finalString
+	}
+
 	let notifList = []
 	Notification.find({
 
-	}).populate({path: 'sender', select: ['username']})
+	}).populate({path: 'sender', select: ['username', 'imageUrl']})
 	.exec((err, foundNotifs) => {
 		if (err || !foundNotifs) {
 			req.flash('error', 'Unable to access Database');
@@ -60,9 +65,21 @@ router.get('/inbox', middleware.isLoggedIn, (req, res, next) => {
 					notifList.push(notif)
 				}
 			}
-			res.render('inbox/inbox', {username: req.user.username, notifs: notifList})
+			console.log(notifList)
+			res.render('inbox/inbox', {username: req.user.username, notifs: notifList, capitalizeFirst})
 		}
 	})
 })
 
+//Delete already viewed notifications (not working yet)
+router.post('/delete', (req, res) => {
+	const capitalizeFirst = string => {
+		finalString = (string.charAt(0).toUpperCase() + string.slice(1))
+		return finalString
+	}
+
+	console.log(res.message)
+	// req.user.save()
+	// res.render('inbox/inbox', {username: req.user.username, notifs: req.user.inbox, capitalizeFirst})
+})
 module.exports = router;
