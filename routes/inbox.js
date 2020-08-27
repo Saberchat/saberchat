@@ -15,13 +15,58 @@ router.get('/notif', middleware.isLoggedIn, (req, res, next) => {
 			req.flash('error', 'Unable to access Database');
 			res.redirect('back');
 		} else {
-			res.render('inbox/sendNotification', {users: foundUsers, types})
+			res.render('inbox/sendNotification', {users: foundUsers, types, selected_users: []})
 		}
 	})
 })
 
-//Route to send 'notification', different from 'comment'
-router.post('/new', middleware.isLoggedIn, (req, res) => {
+//Route to send notification to everyone
+router.post('/send_all', middleware.isLoggedIn, (req, res) => {
+	//Access recipient from User schema
+	User.find({}, (err, foundUsers) => {
+		if(err || !foundUsers) {
+			req.flash('error', 'Unable to access Database');
+			res.redirect('back');
+		} else {
+			for (let i of foundUsers) {
+				Notification.create({type: req.body.type, sender: req.user, text: req.body.message}, (err, notification) => {
+					notification.save()
+					i.inbox.push(notification) //Add notif to recipient's inbox
+					i.save()
+				})
+			}
+			req.flash('success', `Notification sent to everyone!`)
+			res.redirect('/notif')
+		}
+	})
+})
+
+//Route to send notification to a group of people
+router.post('/send_group', middleware.isLoggedIn, (req, res) => {
+	let mailing_list = req.body.recipient_list.split(', ')
+	User.find({}, (err, foundUsers) => {
+		if(err || !foundUsers) {
+			req.flash('error', 'Unable to access Database');
+			res.redirect('back');
+		} else {
+			for (let i of foundUsers) {
+				if (mailing_list.includes(i.username)) {
+					Notification.create({type: req.body.type, sender: req.user, text: req.body.message}, (err, notification) => {
+						notification.save()
+						i.inbox.push(notification) //Add notif to recipient's inbox
+						i.save()
+					})
+				}
+			}
+		}
+
+		req.flash('success', `Notification sent to mailing list!!`)
+		res.redirect('/notif')
+	})
+})
+
+//Route to send a notification to 1 person
+router.post('/send_individual', middleware.isLoggedIn, (req, res) => {
 	//Access recipient from User schema
 	User.find({}, (err, foundUsers) => {
 		if(err || !foundUsers) {
@@ -35,7 +80,7 @@ router.post('/new', middleware.isLoggedIn, (req, res) => {
 						notification.save()
 						i.inbox.push(notification) //Add notif to recipient's inbox
 						i.save()
-						req.flash('success', "Notification sent!")
+						req.flash('success', `Notification sent to ${i.username}!`)
 						res.redirect('/notif')
 					})
 				}
@@ -68,8 +113,7 @@ router.get('/inbox', middleware.isLoggedIn, (req, res, next) => {
 	})
 })
 
-//Delete already viewed notifications (not working completely yet)
-//Notes: Code working erratically. For the first 4-5 tries, notification is deleted. After that, errors are thrown up.
+//Delete already viewed notifications
 router.post('/delete', (req, res) => {
 	deletes = []
 	for (let item of req.user.inbox) {

@@ -1,0 +1,14 @@
+.submit-button {
+  background-color: green;
+  color: white;
+}
+
+.send-notif-type {
+  margin-bottom: 10px;
+}
+
+.send-notif-header {
+  color: red;
+  font-family: times;
+  font-size: 25px;
+}

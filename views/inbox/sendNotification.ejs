@@ -10,6 +10,7 @@
     <!-- link css for navbar. Don't need to include public/javascript/userForm.js since user is already logged in and does not need to access login and register forms.  -->
     <link rel="stylesheet" href="/stylesheets/components/navbar.css">
     <link rel="stylesheet" href="/stylesheets/chat/edit.css">
+    <link rel="stylesheet" href="/stylesheets/inbox/sendNotif.css">
 
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
@@ -29,27 +30,80 @@
                     <h1 class="title" style="text-align: center; margin-top: 10px;">Send Notification</h1>
                     <div class="search-filter">
                     </div>
-                    <form action="/new" method="post">
-                      <select id="recipient" name="recipient">
-                        <optgroup label="Recipient"></optgroup>
-                        <%users.forEach(user => { %>
-                          <option><%=user.username%></option>
-                        <% }) %>
-                      </select>
+                    <!-- Send notification to everyone -->
+                    <div class="send-notif-type">
+                      <h3 class="send-notif-header">Send Notification to Everyone</h3>
+                      <form action="/send_all" method="post">
+                        <select id="type" name="type" style="margin-bottom: 20px;">
+                          <optgroup label="Message Type"></optgroup>
+                          <%types.forEach(type => { %>
+                            <option><%=type%></option>
+                          <% }) %>
+                        </select>
+                        <br />
+                        <textarea name="message" cols="40" rows="5" placeholder="Enter message"></textarea>
+                        <br />
+                        <button class='submit-button'action="submit">Send</button>
+                      </form>
+                    </div>
 
-                      <select id="type" name="type" style="margin-bottom: 20px;">
-                        <optgroup label="Message Type"></optgroup>
-                        <%types.forEach(type => { %>
-                          <option><%=type%></option>
-                        <% }) %>
-                      </select>
+                    <!-- Send notification to individual -->
+                    <div class="send-notif-type">
+                      <h3 class="send-notif-header">Send Notification to Individual</h3>
+                      <form action="/send_individual" method="post">
+                        <select id="recipient" name="recipient">
+                          <optgroup label="Recipient"></optgroup>
+                          <%users.forEach(user => { %>
+                            <option><%=user.username%></option>
+                          <% }) %>
+                        </select>
 
-                      <br />
-                      <textarea name="message" cols="40" rows="5" placeholder="Enter message"></textarea>
-                      <button action="submit">Send</button>
-                    </form>
+                        <select id="type" name="type" style="margin-bottom: 20px;">
+                          <optgroup label="Message Type"></optgroup>
+                          <%types.forEach(type => { %>
+                            <option><%=type%></option>
+                          <% }) %>
+                        </select>
+                        <br />
+                        <textarea name="message" cols="40" rows="5" placeholder="Enter message"></textarea>
+                        <br />
+                        <button class='submit-button' action="submit">Send</button>
+                      </form>
+                    </div>
+
+                    <!-- Send notification to group -->
+                    <div class="send-notif-type">
+                      <h3 class="send-notif-header">Send Notification to Group of Users</h3>
+                      <form action="/send_group" method="post">
+                        <select id="recipients" name="recipient">
+                          <optgroup label="Recipient"></optgroup>
+                          <%users.forEach(user => { %>
+                            <option class="add_recipient"><button><%=user.username%></button></option>
+                          <% }) %>
+                        </select>
+                        <input name="recipient_list"id="recipient_list" type="text" placeholder="Recipients " style="width: 400px;"/>
+                        <br /><br />
+                        <textarea name="message" cols="40" rows="5" placeholder="Enter message"></textarea>
+                        <br />
+                        <button class='submit-button' action="submit">Send</button>
+                      </form>
+                    </div>
                 </div>
             </div>
         </div>
   </body>
+  <script>
+  let recipients = document.getElementById('recipients')
+  let recipient_list = document.getElementById('recipient_list')
+
+  recipients.onchange = () => {
+    let x = recipients.value;
+    if (recipient_list.value == '') {
+      recipient_list.value += `${x}`
+    } else {
+      recipient_list.value += `, ${x}`
+    }
+  }
+
+  </script>
 </html>
