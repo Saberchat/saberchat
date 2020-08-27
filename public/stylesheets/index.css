@@ -20,12 +20,24 @@ article.text-block {
     color: #ffffff;
 }
 
+.block-header.green {
+    border-bottom: 10px solid #08c962;
+}
+
+.block-header.red {
+    border-bottom: 10px solid #d33913;
+}
+
+.block-header.yellow {
+    border-bottom: 10px solid #fac748;
+}
+
 .text-block .block-content {
     padding: 15px 30px;
 }
 
 footer {
-    background-color: #333442;
+    background-color: #424651;
     color: #ffffff;
     padding: 50px 30px;
 }
