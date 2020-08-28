@@ -89,7 +89,7 @@ router.post('/send_individual', middleware.isLoggedIn, (req, res) => {
 					})
 				}
 			}
-			req.flash('success', `Notification sent to ${i.username}!`)
+			req.flash('success', `Notification sent!`)
 			res.redirect('/notif')
 		}
 	})
