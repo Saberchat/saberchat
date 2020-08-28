@@ -1,3 +1,4 @@
+/* text and image rows */
 article.text-block {
     padding-bottom: 1px;
     background-color: #ffffff;
@@ -36,6 +37,20 @@ article.text-block {
     padding: 15px 30px;
 }
 
+/* block animations */
+#block-2, #block-3 {
+    opacity: 0;
+    transition: opacity 2s ease-out;
+    -webkit-transition: opacity 2s ease-out;
+    -moz-transition: opacity 2s ease-out;
+}
+
+#block-2.fade-in, #block-3.fade-in {
+    opacity: 100%;
+}
+
+
+/* footer */
 footer {
     background-color: #424651;
     color: #ffffff;
@@ -62,6 +77,7 @@ footer hr {
     color: #808080;
 }
 
+/* changes for different screens */
 @media only screen and (min-width: 992px) {
     article.text-block {
         margin-bottom: 0;

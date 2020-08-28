@@ -69,6 +69,27 @@ Custom styling for the bootstrap nav
     opacity: 80%;
 }
 
+#nav-component {
+    position: absolute;
+    z-index: 3;
+    top: 0;
+    left: 0;
+    right: 0;
+}
+
+#nav-component.nav-fixed {
+    position: fixed;
+}
+
+.dropdown-item {
+    color: #ffffff;
+}
+
+div.dropdown-menu.show {
+    color: white;
+    background-color: #000000;
+}
+
 .navbar-custom .navbar-nav .nav-link {
     color: rgb(255,255,255);
 }

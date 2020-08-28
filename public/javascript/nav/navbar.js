@@ -1,13 +1,13 @@
 function updateNav() {
-    const nav = document.getElementById('main-nav');
+    const nav = document.getElementById('nav-component');
     let scrollTop = window.pageYOffset || (document.documentElement || document.body.parentNode || document.body).scrollTop;
     if(scrollTop >= 300) {
-        if(!nav.classList.contains('fixed-top')) {
-            nav.className += ' fixed-top';
+        if(!nav.classList.contains('nav-fixed')) {
+            nav.className += ' nav-fixed';
         }
     } else {
-        if(nav.classList.contains('fixed-top')) {
-            nav.classList.remove('fixed-top');
+        if(nav.classList.contains('nav-fixed')) {
+            nav.classList.remove('nav-fixed');
         }
     }
 }
