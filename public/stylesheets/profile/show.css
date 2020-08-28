@@ -1,6 +1,6 @@
 /* css for the view profile page */
 
-.profile-head{
+/* .profile-head{
     text-align: center;
   
 }
@@ -31,11 +31,102 @@
     border-radius: 50%;
     margin-top: -100px;
     background-color: #ffffff;
+} */
+
+/* 
+====================
+Body Background
+ */
+body {
+    background-color: #dbdbdb;
 }
 
-/* custom background without title */
-#background{
+/* 
+====================
+User banner 
+*/
+#banner{
     background-position: center;
     background-size: cover;
     height: 35vh;
+}
+
+/* 
+====================
+Profile card info 
+*/
+.profile-card {
+    background-color: #ffffff;
+    border-radius: 15px;
+    overflow: hidden;
+}
+
+/* - card head */
+.profile-head hr {
+    border: 3px solid gray;
+    margin-bottom: 5px;
+    margin-top: 10px;
+}
+
+.profile-head h1 {
+    text-align: center;
+    padding: 20px 15px 0px 15px;
+    font-size: 2rem;
+}
+
+/* - card body */
+.profile-body {
+    padding-left: 20px;
+    padding-right: 20px;
+}
+
+.profile-body span {
+    display: block;
+    text-align: center;
+    color: gray;
+}
+
+.profile-body h4 {
+    font-size: 1.3rem;
+    margin-bottom: 0px;
+}
+
+.profile-body p {
+    font-size: 1rem;
+    font-weight: 300;
+}
+
+/* 
+====================
+Description 
+*/
+.profile-desc {
+    background-color: #ffffff;
+    border-radius: 15px;
+    padding: 15px 20px;
+}
+
+/* 
+====================
+Profile Image
+ */
+.profile-image {
+    display: block;
+    width: 230px;
+    height: 230px;
+    object-fit: cover;
+    margin: 0 auto;
+    margin-top: -115px;
+    border-radius: 50%;
+}
+
+/* 
+====================
+Username
+ */
+.username {
+    margin-top: 1rem;
+    font-size: 2.3rem;
+    text-align: center;
+    margin-bottom: 1.7rem;
 }

@@ -31,10 +31,5 @@ function animateDisplay() {
         } else if(block3.getBoundingClientRect().top >= 610 && block3.classList.contains('fade-in')){
             block3.classList.remove('fade-in');
         }
-        console.log(block3.getBoundingClientRect().top);
     }
-}
-
-window.onload = function() {
-    window.onscroll = animateDisplay;
 }

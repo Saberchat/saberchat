@@ -11,7 +11,3 @@ function updateNav() {
         }
     }
 }
-
-window.onload = function () {
-    window.onscroll = updateNav;
-};

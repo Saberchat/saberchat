@@ -22,13 +22,40 @@
     <!-- include the navbar via ejs -->
     <%- include('../partials/navbar') %>
     <!-- big background image -->
-    <div id="background" style="background-image: url('<%= user.bannerUrl %>');">
+    <div id="banner" style="background-image: url('<%= user.bannerUrl %>');">
     </div>
     <div class="container">
+        <img src="<%= user.imageUrl %>" alt="profile image" class="profile-image">
+        <h1 class="username"><%= user.username %></h1>
+        <div class="row">
+            <div class="col-md-4 col-12">
+                <section class="profile-card">
+                    <div class="profile-head">
+                        <h1><%= user.firstName %> <%= user.lastName %></h1>
+                        <hr>
+                    </div>
+                    <div class="profile-body">
+                        <span><%= user.title %></span>
+                        <h4>Role</h4>
+                        <p><%= user.permission %></p>
+
+                        <h4>Email</h4>
+                        <p><%= user.email %></p>
+                    </div>
+                </section>
+            </div>
+            <div class="col-md-8 col-12">
+                <section class="profile-desc">
+                    <h1>Description</h1>
+                    <p><%= user.description %></p>
+                </section>
+            </div>
+        </div>
+    </div>
+    <!-- <div class="container">
         <div class="row">
             <div class="col-12">
                 <div class="profile-head">
-                    <!-- profile image set as background img of this div -->
                     <img class="profile-image" src="<%= user.imageUrl %>" alt="profile picture">
                     <h1><%= user.username %> </h1>
                     <h4><%= user.firstName %> <%= user.lastName %></h4>
@@ -41,7 +68,6 @@
                 </div>
             </div>
             <div class="col-md-8 offset-md-2">
-                <!-- shows 'no desc.' if user doesn't have desc. yet. -->
                 <h4>Description</h4>
                 <% if(!user.description) { %>
                     <p>No description.</p>
@@ -50,7 +76,6 @@
                 <% } %>
 
                 <% if(user._id.equals(currentUser._id)) { %>
-                    <!-- link to edit profile. Doesn't work yet of course.  -->
                     <a class="btn btn-info" href= "/profiles/edit">
                         Edit Profile
                     </a>
@@ -61,6 +86,6 @@
                 <a style="display: block; margin-top: 1rem; margin-bottom: 5rem;" href="/profiles">Go Back</a>
             </div>
         </div>
-    </div>
+    </div> -->
 </body>
 </html>
