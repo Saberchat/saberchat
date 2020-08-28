@@ -13,6 +13,7 @@ router.get('/', middlware.isLoggedIn, middlware.isAdmin, (req, res) => {
 	res.render('admin/index');
 });
 
+// displays moderator page
 router.get('/moderate', middlware.isLoggedIn, middleware.isMod, (req, res) => {
 	Comment.find({status: 'flagged'})
 	.populate({path: 'author', select:['username','imageUrl']})
@@ -28,6 +29,7 @@ router.get('/moderate', middlware.isLoggedIn, middleware.isMod, (req, res) => {
 	});
 });
 
+// displays permissions page
 router.get('/permissions', middlware.isLoggedIn, middlware.isAdmin, (req, res) => {
 	User.find({permission: { $ne: 'principle'}}, (err, foundUsers) => {
 		if(err || !foundUsers) {
@@ -39,6 +41,7 @@ router.get('/permissions', middlware.isLoggedIn, middlware.isAdmin, (req, res) =
 	});
 });
 
+// changes permissions
 router.put('/permissions', middlware.isLoggedIn, middlware.isAdmin, (req, res) => {
 	// check if trying to change to admin
 	if(req.body.role == 'admin') {
@@ -65,6 +68,26 @@ router.put('/permissions', middlware.isLoggedIn, middlware.isAdmin, (req, res) =
 		});
 	}
 	
+});
+
+router.put('/moderate', middlware.isLoggedIn, middlware.isMod, (req, res) => {
+	Comment.findByIdAndUpdate(req.body.id, {status: 'ignored'}, (err, updatedComment) => {
+		if(err || !updatedComment) {
+			res.json({error: 'Could not update comment'});
+		} else {
+			res.json({success: 'Updated comment'});
+		}
+	});
+});
+
+router.delete('/moderate', middlware.isLoggedIn, middlware.isMod, (req, res) => {
+	Comment.findByIdAndUpdate(req.body.id, {status: 'deleted'}, (err, updatedComment) => {
+		if(err || !updatedComment) {
+			res.json({error: 'Could not update comment'});
+		} else {
+			res.json({success: 'Updated comment'});
+		}
+	});
 });
 
 module.exports = router;

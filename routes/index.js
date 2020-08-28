@@ -5,9 +5,15 @@ const filter = new Filter();
 const router = express.Router();
 //import passport for authentication
 const passport = require('passport');
+const middleware = require('../middleware');
+const textEncoding = require('text-encoding')
+const TextDecoder = textEncoding.TextDecoder
 
 //import user schema for db actions
 const User = require('../models/user');
+const Room = require('../models/room');
+const Comment = require('../models/comment')
+const Notification = require('../models/notification')
 
 // Home route. gives the landing or home or index page (whatever you want to call it).
 router.get('/', (req, res) => {
@@ -22,9 +28,9 @@ router.get('/', (req, res) => {
 //new registered user
 router.post("/register",  function(req, res) {
 	//creates new user from form info
-	var newUser = new User(
+	newUser = new User(
 		{
-			email: req.body.email, 
+			email: req.body.email,
 			firstName: req.body.firstName,
 			lastName: req.body.lastName,
 			username: filter.clean(req.body.username)
@@ -75,6 +81,7 @@ router.post('/login', function(req, res, next) {
     })(req, res, next);
 });
 
+// >>>>>>> c413c2fa840ea70b4f1a6207ded0a60067579863
 //logout route
 router.get("/logout", function(req, res) {
 	//logout with passport

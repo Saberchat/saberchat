@@ -99,7 +99,7 @@ router.get('/:id/edit', middleware.isLoggedIn, middleware.checkRoomOwnership, (r
             room: foundRoom
           });
         }
-      }); 
+      });
     }
   });
 });
@@ -117,7 +117,7 @@ router.post('/new', middleware.isLoggedIn, function(req, res) {
           room.members.push(user);
         }
         room.type = 'private';
-      } 
+      }
       if(req.body.description) {
         room.description = filter.clean(req.body.description);
       }
@@ -157,7 +157,7 @@ router.post('/:id/leave', middleware.isLoggedIn, middleware.checkForLeave, funct
 });
 
 // handles reports on comments from users
-router.put('/report', middleware.isLoggedIn, function(req, res) {
+router.put('/comments/report', middleware.isLoggedIn, function(req, res) {
   Comment.findById(req.body.comment, function(err, comment) {
     if(err) {
       res.json('Error');
@@ -197,7 +197,7 @@ router.put('/:id/edit', middleware.isLoggedIn, middleware.checkRoomOwnership, (r
       } else {
         room.type = 'public';
       }
-      
+
       room.save()
       req.flash('success', 'Updated your group');
       res.redirect('/chat/' + room._id);
