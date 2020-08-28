@@ -39,7 +39,27 @@ article.text-block {
 footer {
     background-color: #424651;
     color: #ffffff;
-    padding: 50px 30px;
+    padding-top: 50px;
+    padding-bottom: 20px;
+}
+
+footer nav {
+    text-align: center;
+}
+
+footer hr {
+    border-radius: 5px;
+    border: 1px solid #868686;
+}
+
+.footer-link {
+    color: #ffffff;
+    margin-left: 15px;
+    margin-right: 15px;
+}
+
+.footer-link:hover {
+    color: #808080;
 }
 
 @media only screen and (min-width: 992px) {

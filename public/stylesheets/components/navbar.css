@@ -65,7 +65,8 @@ Custom styling for the bootstrap nav
 ================================
  */
 .bg-custom {
-    background-color: #c3423f;
+    background-color: #000000;
+    opacity: 80%;
 }
 
 .navbar-custom .navbar-nav .nav-link {
