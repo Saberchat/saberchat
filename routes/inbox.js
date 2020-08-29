@@ -13,7 +13,7 @@ router.get('/notif', middleware.isLoggedIn, (req, res, next) => {
 			res.redirect('back');
 
 		} else {
-			let mailingList = foundUsers;
+			let mailingList = foundUsers; //Temporary list of users - operations will be performed on it, we don't want to modify the actual users
 			for (let user of foundUsers) {
 				if (user.username == req.user.username) {
 					mailingList.splice(foundUsers.indexOf(user), 1) //Removes current user from mailing list
@@ -81,16 +81,16 @@ router.post('/send_individual', middleware.isLoggedIn, (req, res) => {
 
 		} else {
 			for (let i of foundUsers) {
-				if (i.username.toLowerCase() == req.body.recipient.toLowerCase()) {
+				if (i.username == req.body.recipient) {
 					Notification.create({type: req.body.type, sender: req.user, text: req.body.message}, (err, notification) => {
 						notification.save()
 						i.inbox.push(notification) //Add notif to recipient's inbox
 						i.save()
-						req.flash('success', `Notification sent to ${i.username}!`)
-						res.redirect('/notif')
 					})
 				}
 			}
+			req.flash('success', `Notification sent to ${req.body.recipient}!`)
+			res.redirect('/notif')
 		}
 	})
 })

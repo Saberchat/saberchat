@@ -67,7 +67,7 @@ router.put('/permissions', middlware.isLoggedIn, middlware.isAdmin, (req, res) =
 			}
 		});
 	}
-	
+
 });
 
 router.put('/moderate', middlware.isLoggedIn, middlware.isMod, (req, res) => {

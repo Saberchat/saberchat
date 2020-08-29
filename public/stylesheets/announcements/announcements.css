@@ -4,6 +4,10 @@ body {
   background-image: url('/images/pattern.jpg');
 }
 
+#body {
+  text-align: center;
+}
+
 .heading {
   text-align: center;
 }
@@ -26,7 +30,7 @@ body {
   border-width: 2px;
 }
 
-.notification {
+.announcement {
   border-radius: 25px;
   padding: 20px;
   margin-top: 10px;
@@ -55,7 +59,7 @@ body {
   border-radius: 50%;
 }
 
-.delete-button  {
+#delete-button {
   border-radius: 25px;
   width: 200px;
   height: 30px;
@@ -64,9 +68,16 @@ body {
   background-color: #db391d;
   border-color: 'black';
   border-width: 1px;
+}
+
+#new-announcement-text {
+  margin-top: 20px;;
   margin-bottom: 10px;
 }
 
-#notifButton {
+#submit-announcement {
+  background-color: green;
   color: white;
+  border-color: black;
+  border-width: thin;
 }

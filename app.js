@@ -36,6 +36,7 @@ const profileRoutes = require('./routes/profile');
 const wHeightsRoutes = require('./routes/wHeights');
 const inboxRoutes = require('./routes/inbox');
 const adminRoutes = require('./routes/admin');
+const announcementRoutes = require('./routes/announcements');
 
 //set up ports and socket.io
 const http = require('http').createServer(app);
@@ -113,6 +114,7 @@ app.use('/chat', chatRoutes);
 app.use('/profiles', profileRoutes);
 app.use('/articles', wHeightsRoutes);
 app.use(inboxRoutes);
+app.use(announcementRoutes);
 app.use('/admin', adminRoutes);
 
 // Catch-all route

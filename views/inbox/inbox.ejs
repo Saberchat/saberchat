@@ -29,7 +29,9 @@
             <form action="/delete" method="post">
               <div class="heading">
                 <h2 class="title"><%=username.charAt(0).toUpperCase() + username.slice(1)%>'s Inbox - <%=notifs.length%> New Notification(s)</h2>
-                <button id="delete-button">Delete Selected Notifications</button>
+                <button class="delete-button">Delete Selected Notifications</button>
+                <br />
+                <button type="button" class="delete-button"><a id="notifButton" href="/notif"><i></i> Send Notification</a></button>
               </div>
                 <div class="search-filter">
                 </div>
