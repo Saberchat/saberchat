@@ -86,7 +86,7 @@ router.post('/send_individual', middleware.isLoggedIn, (req, res) => {
 						notification.save()
 						i.inbox.push(notification) //Add notif to recipient's inbox
 						i.save()
-						req.flash('success', `Notification sent!`)
+						req.flash('success', `Notification sent to ${i.username}!`)
 						res.redirect('/notif')
 					})
 				}
