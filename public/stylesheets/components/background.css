@@ -45,3 +45,10 @@ css for the background image and title
     font-size: 1.5rem;
     font-weight: 300;
 }
+
+@media only screen and (max-width: 576px) {
+    .col-12.background-title > h1 {
+        font-size: 4rem;
+        font-weight: 400;
+    }
+}

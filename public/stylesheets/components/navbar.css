@@ -7,9 +7,24 @@ flash messages
  #flash {
     position: absolute;
     z-index: 1;
-    min-width: 400px;
+    margin-top: 20px;
     left: 50%;
-    margin-left: -200px;
+    transform: translateX(-50%);
+    -ms-transform: translateX(-50%);
+    -webkit-transform: translateX(-50%);
+    -moz-transform: translateX(-50%);
+}
+
+.alert.alert-success {
+    color: #7ae448;
+    background-color: #000000ad;
+    border-color: #ffffff;
+}
+
+.alert.alert-danger {
+    color: #df514f;
+    background-color: #000000ad;
+    border-color: #ffffff;
 }
 
 
@@ -88,7 +103,7 @@ Custom styling for the bootstrap nav
 
 div.dropdown-menu.show {
     color: white;
-    background-color: #000000;
+    background-color: #0000009c;
 }
 
 .navbar-brand span {
@@ -103,4 +118,12 @@ div.dropdown-menu.show {
 .navbar-custom .nav-item:focus .nav-link,
 .navbar-custom .nav-item:hover .nav-link {
     color: #9f9aa4;
+}
+
+@media only screen and (max-width: 768px) {
+    #collapsibleNavbar {
+        padding: 0px 15px 15px 15px;
+        background-color: #0000009a;
+        border-radius: 15px;
+    }
 }
