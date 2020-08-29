@@ -37,9 +37,9 @@
 ====================
 Body Background
  */
-/* body {
-    background-color: #ffffff;
-} */
+body {
+    background-color: #b2d4ff;
+}
 
 /* 
 ====================
@@ -58,18 +58,23 @@ Profile card info
 */
 .profile-card {
     /* background-color: #0a91ab; */
-    background-color: #d5dde8;
+    background-color: #cee5ff;
     border-radius: 15px;
     overflow: hidden;
     /* color: #def4fc; */
     color: black;
-    border: 10px solid #dee7f2;
+    border: 10px solid #edf2f9;
+    box-shadow: 0 10px 10px #95b4db;
 }
 
 /* - card head */
+.profile-head {
+    background-color: #4d8ed3;
+}
+
 .profile-head hr {
     /* border: 3px solid #38c065; */
-    border: 3px solid gray;
+    border: 3px solid #edf2f9;
     margin-bottom: 5px;
     margin-top: 10px;
 }
@@ -78,7 +83,7 @@ Profile card info
     text-align: center;
     padding: 20px 15px 0px 15px;
     font-size: 2rem;
-    color: #042633;
+    color: #edf2f9;
 }
 
 /* - card body */
@@ -109,22 +114,37 @@ Description
 */
 .profile-desc {
     /* background-color: #0a91ab; */
-    background-color: #d5dde8;
+    background-color: #cee5ff;
     border-radius: 15px;
-    padding: 20px 20px;
+    overflow: hidden;
     /* color: #def4fc; */
     color: black;
-    border: 10px solid #dee7f2;
+    border: 10px solid #edf2f9;
+    box-shadow: 0 10px 10px #95b4db;
 }
 
-.profile-desc h1 {
-    color: #042633;
+.desc-head {
+    background-color: #3aa3c9;
+}
+
+.desc-head hr {
+    /* border: 3px solid #38c065; */
+    border: 3px solid #edf2f9;
+    margin-bottom: 5px;
+    margin-top: 10px;
+}
+
+.desc-head h1 {
+    text-align: center;
+    padding: 20px 15px 0px 15px;
     font-size: 2rem;
-    font-weight: 500;
+    color: #edf2f9;
 }
 
-.profile-desc p {
+.desc-body p {
+    padding: 10px 20px;
     font-weight: 400;
+    margin-bottom: 0;
 }
 
 /* 
@@ -153,10 +173,13 @@ Username
     font-size: 2.3rem;
     text-align: center;
     margin-bottom: 1.7rem;
-    color: #042633;
-    background-color: #d5dde8;
+    /* color: #042633; */
+    color: #102654;
+    background-color: #cee5ff;
     padding: 10px 20px;
     border-radius: 15px;
+    border: 10px solid #edf2f9;
+    box-shadow: 0 10px 10px #95b4db;
 }
 
 @media only screen and (max-width: 768px) {
