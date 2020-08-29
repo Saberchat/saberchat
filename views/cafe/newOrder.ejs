@@ -34,7 +34,7 @@
     </div>
     <div class="row">
       <div class="col-md-8 offset-md-2 col-12">
-        <form id="orderForm">
+        <form id="orderForm" action="/cafe/new" method="post">
           <div id="item-selection">
             <h4>Select Items</h4>
 
@@ -55,7 +55,7 @@
           <div class="form-group mt-3">
             <textarea id="descInput" class="form-control" name="description" placeholder="Add special instructions for your order" maxlength="100" rows="5"></textarea>
           </div>
-          <button class="btn btn-lg btn-primary btn-block">Complete your Order</button>
+          <button type="submit" class="btn btn-lg btn-primary btn-block">Complete your Order</button>
         </form>
         <a style="display: block; margin-top: 1rem;" href="/chat">Go Back</a>
       </div>
@@ -63,7 +63,7 @@
   </div>
   <script>
 
-    order(orderForm, '<%= currentUser %>');
+    order(orderForm, '<%= currentUser._id %>');
 
     function searchFunction() {
       let input = document.getElementById("search-input");

@@ -20,6 +20,22 @@ router.get('/new', (req, res) => {
   });
 });
 
+router.post('/new', (req, res) => {
+  res.redirect('/cafe');
+});
+
+router.get('/orders', (req, res) => {
+  Order.find({}, (err, foundOrders) => {
+    if (err) {
+      req.flash('error', 'Could not find orders');
+      console.log(err)
+      res.redirect('back');
+    } else {
+      res.render('cafe/orderDisplay', {orders: foundOrders});
+    }
+  });
+});
+
 router.get('/manage', middleware.isLoggedIn, middleware.isMod, (req, res) => {
 	Item.find({}, (err, foundItems) => {
 		if (err || !foundItems) {

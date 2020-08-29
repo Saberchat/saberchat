@@ -6,7 +6,6 @@
     <title>Saberchat</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css" integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk" crossorigin="anonymous">
     <!-- link chat stylesheet -->
-    <link rel="stylesheet" href="/stylesheets/chat/show.css">
     <link rel="stylesheet" href="/stylesheets/components/navbar.css">
 
     <!-- using my fontawesome kit -->
@@ -19,11 +18,34 @@
 
     <!-- Cdn for formatting the dates -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-dateFormat/1.0/jquery.dateFormat.min.js"></script>
+
+    <script src="/javascript/cafe/cafe-socket.js" charset="utf-8"></script>
   </head>
   <body>
     <%- include("../partials/navbar") %>
-    <ul id="oStream" class="list-group">
-      
-    </ul>
+
+    <div id="output-stream" class="container mt-3">
+      <% orders.reverse().forEach((order) => { %>
+        <div class="card mt-3">
+          <div class="card-body">
+            <h5 class="card-title">Order for <%= order.name %></h5>
+            <% if (!order.instructions) { %>
+              <p class="card-text">No instructions</p>
+            <% } else { %>
+              <p class="card-text"><%= order.instructions %></p>
+            <% } %>
+            <ul class="list-group">
+              <li class="list-group-item">placeholder</li>
+            </ul>
+            <p class="card-text mt-3"><%= order.charge %></p>
+            <p class="card-text"><%= order.date %></p>
+            <a href="#" class="btn btn-primary">Go somewhere</a>
+          </div>
+        </div>
+      <% }); %>
+    </div>
+    <script>
+      getOrders();
+    </script>
   </body>
 </html>

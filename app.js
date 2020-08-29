@@ -219,29 +219,46 @@ io.on('connect', (socket) => {
 		});
 	});
 
-	socket.on('order', (itemList, customer) => {
-		Order.create({customer: customer, items: []}, (err, order) => {
+	socket.on('order', (itemList, instructions, customerId) => {
+
+		var name;
+		User.findById(customerId, (err, foundUser) => {
+			if (err || !foundUser) {
+				console.log(err.red);
+			} else {
+				name = foundUser.firstName + " " + foundUser.lastName;
+			}
+		});
+
+		var totalCharge = 0;
+		itemList.forEach((id) => {
+			Item.findById(id, (err, foundItem) => {
+				if (err || !foundItem) {
+					console.log("Could not find item price".red);
+				} else {
+					totalCharge += foundItem.price;
+				}
+			});
+		});
+
+		Order.create({customer: customerId}, (err, order) => {
 			if (err) {
 				console.log(err);
 			} else {
+				order.name = name;
 				itemList.forEach((id) => {
-
-					Item.findById(id, (err, item) => {
-
-						if (err || !item) {
-							console.log(err);
-						} else {
-							order.items.push(item);
-							console.log(item);
-						}
-
-					});
-
+					order.items.push(id);
 				});
-				order.date = dateFormat(order.created_at, "h:MM TT | mmm d");
+				order.instructions = instructions;
+				order.charge = totalCharge;
+				order.date = dateFormat(order.created_at, "mmm d, h:MM TT");
+
 				order.save();
 
+				console.log("New Order:".cyan);
+				console.log(order);
 
+				socket.emit('order', order._id);
 			}
 		});
 	});
