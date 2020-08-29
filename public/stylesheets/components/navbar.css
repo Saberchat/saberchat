@@ -65,8 +65,7 @@ Custom styling for the bootstrap nav
 ================================
  */
 .bg-custom {
-    background-color: #000000;
-    opacity: 80%;
+    background: none;
 }
 
 #nav-component {
@@ -79,6 +78,8 @@ Custom styling for the bootstrap nav
 
 #nav-component.nav-fixed {
     position: fixed;
+    background-color: #0000009c;
+    z-index: 1;
 }
 
 .dropdown-item {
@@ -91,7 +92,7 @@ div.dropdown-menu.show {
 }
 
 .navbar-brand span {
-    color: #ff231f;
+    color: #ff5451;
 }
 
 .navbar-custom .navbar-nav .nav-link {
