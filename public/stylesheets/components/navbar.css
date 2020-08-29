@@ -90,6 +90,10 @@ div.dropdown-menu.show {
     background-color: #000000;
 }
 
+.navbar-brand span {
+    color: #ff231f;
+}
+
 .navbar-custom .navbar-nav .nav-link {
     color: rgb(255,255,255);
 }

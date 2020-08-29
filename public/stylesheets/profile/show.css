@@ -38,7 +38,7 @@
 Body Background
  */
 body {
-    background-color: #dbdbdb;
+    background-color: #065471;
 }
 
 /* 
@@ -56,14 +56,15 @@ User banner
 Profile card info 
 */
 .profile-card {
-    background-color: #ffffff;
+    background-color: #0a91ab;
     border-radius: 15px;
     overflow: hidden;
+    color: #def4fc;
 }
 
 /* - card head */
 .profile-head hr {
-    border: 3px solid gray;
+    border: 3px solid #38c065;
     margin-bottom: 5px;
     margin-top: 10px;
 }
@@ -72,6 +73,7 @@ Profile card info
     text-align: center;
     padding: 20px 15px 0px 15px;
     font-size: 2rem;
+    color: #042633;
 }
 
 /* - card body */
@@ -83,12 +85,12 @@ Profile card info
 .profile-body span {
     display: block;
     text-align: center;
-    color: gray;
 }
 
 .profile-body h4 {
     font-size: 1.3rem;
     margin-bottom: 0px;
+    color: #043547;
 }
 
 .profile-body p {
@@ -101,9 +103,20 @@ Profile card info
 Description 
 */
 .profile-desc {
-    background-color: #ffffff;
+    background-color: #0a91ab;
     border-radius: 15px;
-    padding: 15px 20px;
+    padding: 20px 20px;
+    color: #def4fc;
+}
+
+.profile-desc h1 {
+    color: #042633;
+    font-size: 2rem;
+    font-weight: 500;
+}
+
+.profile-desc p {
+    font-weight: 400;
 }
 
 /* 
@@ -118,6 +131,7 @@ Profile Image
     margin: 0 auto;
     margin-top: -115px;
     border-radius: 50%;
+    box-shadow: 0px 10px 10px rgba(0, 0, 0, 0.3);
 }
 
 /* 
@@ -129,4 +143,14 @@ Username
     font-size: 2.3rem;
     text-align: center;
     margin-bottom: 1.7rem;
+    color: #042633;
+    background-color: #0a91ab;
+    padding: 10px 20px;
+    border-radius: 15px;
+}
+
+@media only screen and (max-width: 768px) {
+    .profile-desc {
+        margin: 1.7rem 0;
+    }
 }

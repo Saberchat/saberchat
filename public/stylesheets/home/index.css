@@ -40,9 +40,9 @@ article.text-block {
 /* block animations */
 #block-2, #block-3 {
     opacity: 0;
-    transition: opacity 2s ease-out;
-    -webkit-transition: opacity 2s ease-out;
-    -moz-transition: opacity 2s ease-out;
+    transition: opacity 1s linear;
+    -webkit-transition: opacity 1s linear;
+    -moz-transition: opacity 1s linear;
 }
 
 #block-2.fade-in, #block-3.fade-in {
