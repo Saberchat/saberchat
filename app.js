@@ -28,6 +28,8 @@ const schedule = require('node-schedule');
 // require the models for database actions
 const Comment = require('./models/comment');
 const User = require("./models/user");
+const Order = require('./models/order');
+const Item = require('./models/orderItem');
 
 //require the routes
 const indexRoutes = require('./routes/index');
@@ -154,9 +156,10 @@ function getRandMessage(list) {
 
 // Socket.io server-side code
 io.on('connect', (socket) => {
-//   console.log("A user connected".cyan);
-//   socket.on('disconnect', () => {
-// 		console.log("A user disconnected".cyan);
+	// console.log("A user connected".cyan);
+	// socket.on('disconnect', () => {
+	// console.log("A user disconnected".cyan);
+
 	// When 'switch room' event is detected, leave old room and join 'newroom';
   	socket.on('switch room', (newroom) => {
 		socket.leave(socket.room);
@@ -212,6 +215,33 @@ io.on('connect', (socket) => {
 		// confirmation log
 				// console.log('Database Comment created: '.cyan);
 				// console.log(comment);
+			}
+		});
+	});
+
+	socket.on('order', (itemList, customer) => {
+		Order.create({customer: customer, items: []}, (err, order) => {
+			if (err) {
+				console.log(err);
+			} else {
+				itemList.forEach((id) => {
+
+					Item.findById(id, (err, item) => {
+
+						if (err || !item) {
+							console.log(err);
+						} else {
+							order.items.push(item);
+							console.log(item);
+						}
+
+					});
+
+				});
+				order.date = dateFormat(order.created_at, "h:MM TT | mmm d");
+				order.save();
+
+
 			}
 		});
 	});

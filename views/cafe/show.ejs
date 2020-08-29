@@ -31,9 +31,20 @@
       <div class="row">
         <div class="col-md-8 offset-md-2 col-12">
           <form action="/cafe/item/<%= item._id %>/update?_method=put" method="post">
-            <div class="form-group">
-              <label for="usernameInput">Name</label>
-              <input id="usernameInput" class="form-control" value="<%= item.name %>" type="text" name="name" placeholder="(max 45) Enter Item Name" maxlength="45" required>
+            <div class="row mb-3">
+              <div class="col">
+                <label for="usernameInput">Name</label>
+                <input id="usernameInput" class="form-control" type="text" name="name" placeholder="<%= item.name %>" maxlength="45" required>
+              </div>
+              <div class="col">
+                <label for="priceInput">Price</label>
+                <div class="input-group">
+                  <div class="input-group-prepend">
+                    <div class="input-group-text">$</div>
+                  </div>
+                  <input id="priceInput" class="form-control" type="text" name="price" placeholder="<%= item.price %>" maxlength="10" required>
+                </div>
+              </div>
             </div>
             <div class="form-group">
               <label for="descInput">Description</label>

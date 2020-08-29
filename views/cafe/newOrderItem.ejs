@@ -32,12 +32,25 @@
         <div class="col-md-8 offset-md-2 col-12">
           <form action="/cafe/newOrderItem" method="post">
             <div class="form-group">
-              <label for="usernameInput">Name</label>
-              <input id="usernameInput" class="form-control" type="text" name="name" placeholder="(max 45) Enter Item Name" maxlength="45" required>
+              <div class="row">
+                <div class="col">
+                  <label for="usernameInput">Name</label>
+                  <input id="usernameInput" class="form-control" type="text" name="name" placeholder="Enter Item Name" maxlength="45" required>
+                </div>
+                <div class="col">
+                  <label for="priceInput">Price</label>
+                  <div class="input-group">
+                    <div class="input-group-prepend">
+                      <div class="input-group-text">$</div>
+                    </div>
+                    <input id="priceInput" class="form-control" type="text" name="price" placeholder="Enter Price" maxlength="10" required>
+                  </div>
+                </div>
+              </div>
             </div>
             <div class="form-group">
               <label for="descInput">Description</label>
-              <textarea id="descInput" class="form-control" name="description" placeholder="(max 300) Enter a short description about the item" maxlength="300" rows="5" required></textarea>
+              <textarea id="descInput" class="form-control" name="description" placeholder="Enter a short description about the item" maxlength="300" rows="5" required></textarea>
             </div>
             <button class="btn btn-lg btn-primary btn-block">Submit</button>
           </form>

@@ -9,6 +9,17 @@ router.get('/', (req, res) => {
   res.render('cafe/index');
 });
 
+router.get('/new', (req, res) => {
+  Item.find({}, (err, foundItems) => {
+    if (err || !foundItems) {
+      req.flash('error', 'Could not access database');
+      res.redirect('/');
+    } else {
+      res.render('cafe/newOrder', {items: foundItems});
+    }
+  });
+});
+
 router.get('/manage', middleware.isLoggedIn, middleware.isMod, (req, res) => {
 	Item.find({}, (err, foundItems) => {
 		if (err || !foundItems) {
@@ -33,6 +44,11 @@ router.post('/newOrderItem', middleware.isLoggedIn, middleware.isMod, (req, res)
 		} else {
 			item.name = req.body.name;
 			item.description = req.body.description;
+      if (parseFloat(req.body.price)) {
+        item.price = parseFloat(req.body.price);
+      } else {
+        item.price = 0.00;
+      }
       item.isAvailable = true;
 			item.save();
 
