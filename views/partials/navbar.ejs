@@ -19,7 +19,7 @@
                         <a class="nav-link" href="/chat"><i class="far fa-comment-dots"></i> Chat</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="/notif"><i class="far fa-comment-dots"></i> Send Notification</a>
+                        <a class="nav-link" href="/notif"><i class="far fa-comment-dots"></i> Notif.</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="/profiles"><i class="far fa-user"></i> Users</a>
@@ -102,7 +102,7 @@
                 <label for="username-signup">Username</label>
                 <input name="username" type="text" class="form-control" id="username-signup" placeholder="(max 23) enter username" required maxlength="23">
             </div>
-            <button type="button" class="btn btn-info btn-block">Next</button>
+            <button type="button" class="btn btn-info btn-block" onclick="next()">Next <i class="fas fa-arrow-right"></i></button>
         </div>
         <div class="login-info">
             <div class="form-group mt-3">
@@ -114,8 +114,10 @@
                 <label for="password-signup">Password</label>
                 <input name="password" type="password" class="form-control" id="password-signup" placeholder="enter password" required>
             </div>
-            <button type="button" class="btn btn-secondary w-50">Back</button>
-            <button type="submit" class="btn btn-warning w-50 float-right">Sign Up</button>
+            <div style="position: relative;">
+                <button type="button" class="btn btn-secondary btn-h btn-l" onclick="back()"><i class="fas fa-arrow-left"></i> Back</button>
+                <button type="submit" class="btn btn-success btn-h btn-r"><i class="far fa-plus-square"></i> Sign Up</button>
+            </div>
         </div>
     </form>
 

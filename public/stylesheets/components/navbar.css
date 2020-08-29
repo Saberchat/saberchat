@@ -50,7 +50,7 @@ User login form
 
 /* classes for animation */
 .signup.display {
-    height: 525px;
+    height: 350px;
     transition: height ease-out 500ms;
     -webkit-transition: height ease-out 500ms;
 }
@@ -74,6 +74,20 @@ User login form
     color: #9e2531;
 }
 
+.btn.btn-h {
+    width: 50%;
+    position: absolute;
+    display: inline-block;
+}
+
+.btn-l {
+    left: 0;
+}
+
+.btn-r {
+    right: 0;
+}
+
 /* 
 ================================
 SignUp form animations
@@ -83,6 +97,9 @@ SignUp form animations
     position: absolute;
     margin-left: -110%;
     z-index: -1;
+    transition: margin 0.3s ease-out;
+    -moz-transition: margin 0.3s ease-out;
+    -webkit-transition: margin 0.3s ease-out;
 }
 
 .user-info.display {
@@ -93,7 +110,11 @@ SignUp form animations
 .login-info {
     position: absolute;
     margin-left: 110%;
+    margin-right: -110%;
     z-index: -1;
+    transition: margin 0.3s ease-out;
+    -moz-transition: margin 0.3s ease-out;
+    -webkit-transition: margin 0.3s ease-out;
 }
 
 .login-info.display {
