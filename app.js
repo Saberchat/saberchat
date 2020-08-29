@@ -28,6 +28,8 @@ const schedule = require('node-schedule');
 // require the models for database actions
 const Comment = require('./models/comment');
 const User = require("./models/user");
+const Order = require('./models/order');
+const Item = require('./models/orderItem');
 
 //require the routes
 const indexRoutes = require('./routes/index');
@@ -36,6 +38,7 @@ const profileRoutes = require('./routes/profile');
 const wHeightsRoutes = require('./routes/wHeights');
 const inboxRoutes = require('./routes/inbox');
 const adminRoutes = require('./routes/admin');
+const cafeRoutes = require('./routes/cafe');
 const announcementRoutes = require('./routes/announcements');
 
 //set up ports and socket.io
@@ -116,11 +119,12 @@ app.use('/articles', wHeightsRoutes);
 app.use(inboxRoutes);
 app.use(announcementRoutes);
 app.use('/admin', adminRoutes);
+app.use('/cafe', cafeRoutes);
 
 // Catch-all route
-app.get('*', function(req, res) {
-	res.redirect('/');
-});
+// app.get('*', function(req, res) {
+// 	res.redirect('/');
+// });
 
 // list of responses to bad words
 const curseResponse = [
@@ -154,9 +158,10 @@ function getRandMessage(list) {
 
 // Socket.io server-side code
 io.on('connect', (socket) => {
-//   console.log("A user connected".cyan);
-//   socket.on('disconnect', () => {
-// 		console.log("A user disconnected".cyan);
+	// console.log("A user connected".cyan);
+	// socket.on('disconnect', () => {
+	// console.log("A user disconnected".cyan);
+
 	// When 'switch room' event is detected, leave old room and join 'newroom';
   	socket.on('switch room', (newroom) => {
 		socket.leave(socket.room);
@@ -213,6 +218,51 @@ io.on('connect', (socket) => {
 				// console.log('Database Comment created: '.cyan);
 				// console.log(comment);
 			}
+		});
+	});
+
+	socket.on('order', (itemList, instructions, customerId) => {
+
+		var name;
+		User.findById(customerId, (err, foundUser) => {
+			if (err || !foundUser) {
+				console.log(err.red);
+			} else {
+				name = foundUser.firstName + " " + foundUser.lastName;
+			}
+		});
+
+		var totalCharge = 0;
+		itemList.forEach((id) => {
+			Item.findById(id, (err, foundItem) => {
+				if (err || !foundItem) {
+					console.log("Could not find item price".red);
+				} else {
+					totalCharge += foundItem.price;
+				}
+			});
+		});
+
+		var order;
+		Order.create({customer: customerId}, (err, order) => {
+			if (err) {
+				console.log(err);
+			} else {
+				order.name = name;
+				itemList.forEach((id) => {
+					order.items.push(id);
+				});
+				order.instructions = instructions;
+				order.charge = totalCharge;
+				order.date = dateFormat(order.created_at, "mmm d, h:MM TT");
+
+				order.save();
+
+				console.log("New Order:".cyan);
+				console.log(order);
+			}
+
+			io.emit('order', order);
 		});
 	});
 });

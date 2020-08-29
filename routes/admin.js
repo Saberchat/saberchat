@@ -90,4 +90,7 @@ router.delete('/moderate', middlware.isLoggedIn, middlware.isMod, (req, res) => 
 	});
 });
 
+router.get('/manageCafe', middleware.isLoggedIn, middleware.isMod, (req, res) => {
+	res.redirect('/cafe/manage');
+
 module.exports = router;
