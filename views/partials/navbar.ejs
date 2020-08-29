@@ -89,28 +89,34 @@
     <!-- Sign Up Form -->
     <form class="user-form signup" action="/register" method="post">
         <span class="form-close signup"><i class="far fa-window-close"></i></span>
-        <div class="form-group mt-3">
-            <label for="firstName-signup">First</label>
-            <input name="firstName" type="text" class="form-control" id="firstName-signup" placeholder="enter first name" required>
+        <div class="user-info display">
+            <div class="form-group mt-3">
+                <label for="firstName-signup">First</label>
+                <input name="firstName" type="text" class="form-control" id="firstName-signup" placeholder="enter first name" required>
+            </div>
+            <div class="form-group">
+                <label for="lastName-signup">Last</label>
+                <input name="lastName" type="text" class="form-control" id="lastName-signup" placeholder="enter last" required>
+            </div>
+            <div class="form-group">
+                <label for="username-signup">Username</label>
+                <input name="username" type="text" class="form-control" id="username-signup" placeholder="(max 23) enter username" required maxlength="23">
+            </div>
+            <button type="button" class="btn btn-info btn-block">Next</button>
         </div>
-        <div class="form-group">
-            <label for="lastName-signup">Last</label>
-            <input name="lastName" type="text" class="form-control" id="lastName-signup" placeholder="enter last" required>
+        <div class="login-info">
+            <div class="form-group mt-3">
+                <label for="email-signup">Email address</label>
+                <input name="email" type="email" class="form-control" id="email-signup" aria-describedby="emailHelp" placeholder="enter email" required>
+                <small id="emailHelp" class="form-text text-muted">We'll never share your email with anyone else.</small>
+            </div>
+            <div class="form-group">
+                <label for="password-signup">Password</label>
+                <input name="password" type="password" class="form-control" id="password-signup" placeholder="enter password" required>
+            </div>
+            <button type="button" class="btn btn-secondary w-50">Back</button>
+            <button type="submit" class="btn btn-warning w-50 float-right">Sign Up</button>
         </div>
-        <div class="form-group">
-            <label for="username-signup">Username</label>
-            <input name="username" type="text" class="form-control" id="username-signup" placeholder="(max 23) enter username" required maxlength="23">
-        </div>
-        <div class="form-group">
-            <label for="email-signup">Email address</label>
-            <input name="email" type="email" class="form-control" id="email-signup" aria-describedby="emailHelp" placeholder="enter email" required>
-            <small id="emailHelp" class="form-text text-muted">We'll never share your email with anyone else.</small>
-        </div>
-        <div class="form-group">
-            <label for="password-signup">Password</label>
-            <input name="password" type="password" class="form-control" id="password-signup" placeholder="enter password" required>
-        </div>
-        <button type="submit" class="btn btn-warning float-right">Sign Up</button>
     </form>
 
     <div class="mb-3" id="flash">

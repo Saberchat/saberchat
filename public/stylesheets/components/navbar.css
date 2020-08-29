@@ -76,6 +76,33 @@ User login form
 
 /* 
 ================================
+SignUp form animations
+================================
+ */
+.user-info {
+    position: absolute;
+    margin-left: -110%;
+    z-index: -1;
+}
+
+.user-info.display {
+    margin-left: 0;
+    width: calc(100% - 30px);
+}
+
+.login-info {
+    position: absolute;
+    margin-left: 110%;
+    z-index: -1;
+}
+
+.login-info.display {
+    margin-left: 0;
+    width: calc(100% - 30px);
+}
+
+/* 
+================================
 Custom styling for the bootstrap nav
 ================================
  */
