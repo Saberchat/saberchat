@@ -241,6 +241,7 @@ io.on('connect', (socket) => {
 			});
 		});
 
+		var order;
 		Order.create({customer: customerId}, (err, order) => {
 			if (err) {
 				console.log(err);
@@ -257,9 +258,9 @@ io.on('connect', (socket) => {
 
 				console.log("New Order:".cyan);
 				console.log(order);
-
-				socket.emit('order', order._id);
 			}
+
+			io.emit('order', order);
 		});
 	});
 });

@@ -23,19 +23,42 @@ function order(form, customer) {
 function getOrders(outputStream) {
   var socket = io();
 
-  socket.on('order', (id) => {
-    $(outputStream).append(`
-      <div class="card" style="width: 18rem;">
-        <div class="card-body">
-          <h5 class="card-title">${order.customer}</h5>
-          <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
-          <ul class="list-group list-group-flush">
-            <li>placeholder</li>
-          </ul>
-          <small class="card-text">${order.price}</small>
-          <a href="#" class="btn btn-primary">Go somewhere</a>
+  socket.on('connect', () => {
+    console.log("connection from cafe use");
+  });
+
+  socket.on('order', (order) => {
+    console.log("new order");
+    if (!order.instructions) {
+      $(outputStream).prepend(`
+        <div class="card mt-3">
+          <div class="card-body">
+            <h5 class="card-title">Order for ${order.name}</h5>
+            <p class="card-text">No additional instructions</p>
+            <ul class="list-group">
+              <li class="list-group-item">placeholder</li>
+            </ul>
+            <p class="card-text mt-3">${order.charge}</p>
+            <p class="card-text">${order.date}</p>
+            <a href="#" class="btn btn-primary">Go somewhere</a>
+          </div>
         </div>
-      </div>
-    `);
-  })
+      `);
+    } else {
+      $(outputStream).prepend(`
+        <div class="card mt-3">
+          <div class="card-body">
+            <h5 class="card-title">Order for ${order.name}</h5>
+            <p class="card-text">${order.instructions}</p>
+            <ul class="list-group">
+              <li class="list-group-item">placeholder</li>
+            </ul>
+            <p class="card-text mt-3">${order.charge}</p>
+            <p class="card-text">${order.date}</p>
+            <a href="#" class="btn btn-primary">Go somewhere</a>
+          </div>
+        </div>
+      `);
+    }
+  });
 }
