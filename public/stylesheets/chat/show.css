@@ -1,3 +1,7 @@
+/* 
+===========================
+Chat template styling
+*/
 body {
     background-color: #9f9aa4;
     /* background-image: linear-gradient(90deg, #74EBD5 0%, #9FACE6 100%); */
@@ -97,6 +101,10 @@ span.username {
     width: 50px;
 }
 
+/* 
+===========================
+Exit button
+*/
 .exit-button {
     position: absolute;
     font-size: 1.3rem;
@@ -108,6 +116,11 @@ span.username {
 .exit-button:hover {
     background-color: rgba(255, 255, 255, 0.7);
 }
+
+/* 
+===========================
+General msgs and badword response
+*/
 .announcement {
     width: 100%;
     text-align: center;
@@ -125,6 +138,10 @@ span.username {
     margin-right: 1rem;
 }
 
+/* 
+===========================
+Report comment styling
+*/
 .flag {
     display: inline-block;
     height: 19px;
