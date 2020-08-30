@@ -108,7 +108,6 @@ router.get('/inbox', middleware.isLoggedIn, (req, res) => {
 		for (let user of foundUsers) {
 			if (user.username == req.user.username) {
 				res.render('inbox/inbox', {username: req.user.username, notifs: user.inbox.reverse()})
-				break;
 			}
 		}
 	})
