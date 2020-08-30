@@ -5,7 +5,7 @@ const User = require('../models/user');
 const Notification = require('../models/notification');
 
 //Access sendNotification file
-router.get('/notif', middleware.isLoggedIn, (req, res, next) => {
+router.get('/notif', middleware.isLoggedIn, (req, res) => {
 	let types = ["Cafe Order Status Update", "Field Trip Notification", "PE Notification", "School Event Notification", "Class Schedule Change"] //Types of notifs
 	User.find({}, (err, foundUsers) => {
 		if(err || !foundUsers) {
@@ -96,7 +96,7 @@ router.post('/send_individual', middleware.isLoggedIn, (req, res) => {
 })
 
 //Route to display user inbox
-router.get('/inbox', middleware.isLoggedIn, (req, res, next) => {
+router.get('/inbox', middleware.isLoggedIn, (req, res) => {
 	let notifList = [] //List of notifications that will be displayed
 	Notification.find({
 	}).populate({path: 'sender', select: ['username', 'imageUrl']}) //Collect each notification's sender info
