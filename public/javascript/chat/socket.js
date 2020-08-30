@@ -1,9 +1,16 @@
-function scrollToElement(innerElement, containerId) {
+// init variables
+let autoScroll = true;
+let lastScrollTop;
+const messageDisplay = document.getElementById('message-display');
+const scrollBtn = document.getElementsByClassName('btn-scrolldown')[0];
+
+// function for auto scrolling to new messages
+function scrollToElement(innerElement) {
   var topPos = innerElement.offsetTop;
-  document.getElementById(containerId).scrollTop = topPos-10;
-  
+  messageDisplay.scrollTop = topPos-10;
 }
 
+// function for reporting messages
 function report(element) {
   let id = element.id;
   let url = '/chat/comments/report?_method=put'
@@ -19,6 +26,28 @@ function report(element) {
     $(parent).append(`<p class="flag">[${data}]</p>`);
   });
 }
+
+// function for scrolling to very bottom
+function scrollBottom() {
+  let messages = document.getElementsByClassName('media');
+  let message = messages[messages.length - 1];
+  if(message) {
+    scrollToElement(message);
+  }
+  autoScroll = true;
+  scrollBtn.classList.remove('display');
+}
+
+// turn off auto scroll if user is checking previous messages
+messageDisplay.addEventListener('scroll', function() {
+  if(messageDisplay.scrollTop < lastScrollTop) {
+    autoScroll = false;
+    if(!scrollBtn.classList.contains('display')) {
+      scrollBtn.classList.add('display');
+    }
+  }
+  lastScrollTop = messageDisplay.scrollTop <= 0 ? 0 : messageDisplay.scrollTop; // For Mobile or negative scrolling
+}, false);
 
 //create function that sets up the socket chat
 function chatInit(username, userId, messageForm, input, chatDisplay, room, userImage) {
@@ -43,11 +72,13 @@ function chatInit(username, userId, messageForm, input, chatDisplay, room, userI
       </div>`
       );
     }
-    // scroll to latest message
-    let messages = document.getElementsByClassName('media');
-    let message = messages[messages.length - 1];
-    if(message) {
-      scrollToElement(message, 'message-display');
+    if(autoScroll) {
+      // scroll to latest message
+      let messages = document.getElementsByClassName('media');
+      let message = messages[messages.length - 1];
+      if(message) {
+        scrollToElement(message);
+      }
     }
     return false;
   });
@@ -61,10 +92,12 @@ function chatInit(username, userId, messageForm, input, chatDisplay, room, userI
     <div class="announcement mb-2">
     <h4>${notif.text}</h4>
     </div>`);
-    let messages = document.getElementsByClassName('media');
-    let message = messages[messages.length - 1];
-    if(message) {
-      scrollToElement(message, 'message-display');
+    if(autoScroll) {
+      let messages = document.getElementsByClassName('media');
+      let message = messages[messages.length - 1];
+      if(message) {
+        scrollToElement(message);
+      }
     }
   });
 
@@ -82,11 +115,13 @@ function chatInit(username, userId, messageForm, input, chatDisplay, room, userI
       </div>
     </div>`
     );
-    // scroll to latest message
-    let messages = document.getElementsByClassName('media');
-    let message = messages[messages.length - 1];
-    if(message) {
-      scrollToElement(message, 'message-display');
+    if(autoScroll) {
+      // scroll to latest message
+      let messages = document.getElementsByClassName('media');
+      let message = messages[messages.length - 1];
+      if(message) {
+        scrollToElement(message);
+      }
     }
   });
 }

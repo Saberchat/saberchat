@@ -161,7 +161,47 @@ span.username {
     position: relative;
 }
 
+/* 
+===========================
+Scroll To Bottom Button
+*/
+.btn-scrolldown {
+    position: absolute;
+    z-index: 1;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    -webkit-transform: translateX(-50%);
+    -moz-transform: translateX(-50%);
+    -ms-transform: translateX(-50%);
 
+    height: 0;
+    overflow: hidden;
+
+    border: none;
+    border-radius: 0px 0px 15px 15px;
+    padding: 0;
+    background-color: #e6e4e48a;
+    color: #000000;
+    
+    transition: 0.3s linear;
+    -webkit-transition: 0.3s linear;
+    -moz-transition: 0.3s linear;
+}
+
+.btn-scrolldown.display {
+    padding: 15px;
+    height: 54px;
+}
+
+.btn-scrolldown:hover {
+    background-color: #e6e4e4;
+}
+
+/* 
+===========================
+Screen customizations
+ */
 @media (max-width: 550px) {
     .w-65 {
         width: 100%;
@@ -175,5 +215,11 @@ span.username {
 @media (min-width: 760px) {
     .w-65 {
         width: 50%;
+    }
+}
+
+@media (max-width: 992px) {
+    .btn-scrolldown {
+        background-color: #f7f7f7;
     }
 }

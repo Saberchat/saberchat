@@ -19,9 +19,6 @@
 
   <!-- Cdn for formating the dates -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-dateFormat/1.0/jquery.dateFormat.min.js"></script>
-
-  <!-- script for socket io chat -->
-  <script src="/javascript/chat/socket.js"></script>
 </head>
 <body>
   <%- include("../partials/navbar") %>
@@ -67,6 +64,7 @@
       <!-- Chat Box-->
       <div class="col-12 px-0">
         <a href="/chat" class="exit-button"><i class="fas fa-long-arrow-alt-left"></i> Exit</a>
+        <button class="btn-scrolldown" onclick="scrollBottom()">Scroll To <i class="fas fa-arrow-down"></i></button>
         <div class="px-4 chat-box bg-white" id="message-display">
           <!-- reverse it to get correct order -->
           <% comments.reverse().forEach(comment => { %>
@@ -136,12 +134,14 @@
       </form>
     </div>
   </div>
+  <!-- script for socket io chat -->
+  <script src="/javascript/chat/socket.js"></script>
   <script>
     //scroll to the last chat message
     let messages = document.getElementsByClassName('media');
     let message = messages[messages.length - 1];
     if(message) {
-      scrollToElement(message, 'message-display');
+      scrollToElement(message);
     }
 
     //set all the variables for the chatInit function
