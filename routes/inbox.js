@@ -97,22 +97,19 @@ router.post('/send_individual', middleware.isLoggedIn, (req, res) => {
 
 //Route to display user inbox
 router.get('/inbox', middleware.isLoggedIn, (req, res) => {
-	let notifList = [] //List of notifications that will be displayed
-	Notification.find({
-	}).populate({path: 'sender', select: ['username', 'imageUrl']}) //Collect each notification's sender info
+	User.find({
 
-	.exec((err, foundNotifs) => { //Callback
-		if (err || !foundNotifs) {
-			req.flash('error', 'Unable to access Database');
-				res.redirect('back')
+	}).populate({
+		path: 'inbox',
+		populate: { path: 'sender', select: ['username', 'imageUrl']}
+	})
 
-		} else { //If user's inbox contains notification's id, add to notifList []
-			for (let notif of foundNotifs) {
-				if (req.user.inbox.includes(notif['_id'])) {
-					notifList.unshift(notif)
-				}
+	.exec((err, foundUsers) => {
+		for (let user of foundUsers) {
+			if (user.username == req.user.username) {
+				res.render('inbox/inbox', {username: req.user.username, notifs: user.inbox.reverse()})
+				break;
 			}
-			res.render('inbox/inbox', {username: req.user.username, notifs: notifList})
 		}
 	})
 })
