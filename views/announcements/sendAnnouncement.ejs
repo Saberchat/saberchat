@@ -20,7 +20,7 @@
     <%- include('../partials/navbar') %>
 
     <form action="/sendAnnouncement" method="post">
-      <input type="text" placeholder="Enter announcement subject" id="new-announcement-message" name="subject"/>
+      <input type="text" maxlength="30"placeholder="Enter announcement subject" id="new-announcement-message" name="subject"/>
       <br />
       <textarea placeholder="Enter announcement text here" id="new-announcement-text" name="message" cols=60 rows=10></textarea>
       <br />

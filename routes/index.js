@@ -14,10 +14,24 @@ const User = require('../models/user');
 const Room = require('../models/room');
 const Comment = require('../models/comment')
 const Notification = require('../models/notification')
+const Announcement = require('../models/announcement')
 
 // Home route. gives the landing or home or index page (whatever you want to call it).
 router.get('/', (req, res) => {
-	res.render('index');
+	Announcement.find({
+
+  }).populate({path: 'sender', select: ['username', 'imageUrl']})
+  .populate('message') //Collect data for announcement's sender, subject and message
+
+  .exec((err, foundAnns) => {
+    if (err || !foundAnns) {
+      req.flash('error', 'Unable to access database')
+      res.redirect('back')
+
+    } else {
+      res.render('index', {announcements: foundAnns})
+    }
+  })
 });
 
 // ===========================
