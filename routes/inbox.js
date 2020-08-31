@@ -117,7 +117,7 @@ router.get('/inbox', middleware.isLoggedIn, (req, res) => {
 })
 
 //Delete already viewed notifications
-router.post('/delete', (req, res) => {
+router.delete('/delete', (req, res) => {
 	deletes = [] //List of messages to be deleted
 	for (let item of req.user.inbox) {
 		if (Object.keys(req.body).includes(item._id.toString())) { //If item is selected to be deleted (checkbox)
@@ -126,6 +126,7 @@ router.post('/delete', (req, res) => {
 	}
 
 	for (let notif of deletes) {
+		req.user.inbox.splice(req.user.inbox.indexOf(notif), 1)
 		Notification.findByIdAndDelete(notif, (err, deletedNotif) => { //Delete based on the notification's id
 			if (err || !deletedNotif) {
 				console.log(err)

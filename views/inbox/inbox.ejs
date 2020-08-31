@@ -26,10 +26,10 @@
     <div class="container">
         <div class="row">
           <div class="col-md-10 offset-md-1 col-12">
-            <form action="/delete" method="post">
+            <form action="delete/?_method=delete" method="post">
               <div class="heading">
                 <h2 class="title"><%=username.charAt(0).toUpperCase() + username.slice(1)%>'s Inbox - <%=notifs.length%> New Notification(s)</h2>
-                <button class="delete-button">Delete Selected Notifications</button>
+                <button type="delete" class="delete-button">Delete Selected Notifications</button>
                 <br />
                 <button type="button" class="delete-button"><a id="notifButton" href="/notif"><i></i> Send Notification</a></button>
               </div>
