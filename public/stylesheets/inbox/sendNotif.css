@@ -1,5 +1,5 @@
 body {
-  /* background-image: url('/images/pattern.jpg'); */
+  background-image: url('/images/pattern.jpg');
 }
 
 .submit-button {
@@ -28,4 +28,9 @@ body {
   color: white;
   margin-left: 10px;
   font-size: 15px;
+}
+
+.notif-options {
+  background-color: lightgrey;
+  /* text-align: center; */
 }

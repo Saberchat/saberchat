@@ -26,27 +26,27 @@ router.get('/notif', middleware.isLoggedIn, (req, res) => {
 })
 
 //Route to send notification to everyone
-router.post('/send_all', middleware.isLoggedIn, (req, res) => {
-	User.find({}, (err, foundUsers) => {
-		if(err || !foundUsers) {
-			req.flash('error', 'Unable to access Database');
-			res.redirect('back');
-
-		} else {
-			for (let i of foundUsers) {
-				if (i.username != req.user.username) { //Removes current user from mailing list
-					Notification.create({type: req.body.type, sender: req.user, text: req.body.message}, (err, notification) => {
-						notification.save()
-						i.inbox.push(notification) //Add notif to recipient's inbox
-						i.save()
-					})
-				}
-			}
-			req.flash('success', `Notification sent to everyone!`)
-			res.redirect('/notif')
-		}
-	})
-})
+// router.post('/send_all', middleware.isLoggedIn, (req, res) => {
+// 	User.find({}, (err, foundUsers) => {
+// 		if(err || !foundUsers) {
+// 			req.flash('error', 'Unable to access Database');
+// 			res.redirect('back');
+//
+// 		} else {
+// 			for (let i of foundUsers) {
+// 				if (i.username != req.user.username) { //Removes current user from mailing list
+// 					Notification.create({type: req.body.type, sender: req.user, text: req.body.message}, (err, notification) => {
+// 						notification.save()
+// 						i.inbox.push(notification) //Add notif to recipient's inbox
+// 						i.save()
+// 					})
+// 				}
+// 			}
+// 			req.flash('success', `Notification sent to everyone!`)
+// 			res.redirect('/notif')
+// 		}
+// 	})
+// })
 
 //Route to send notification to a group of people
 router.post('/send_group', middleware.isLoggedIn, (req, res) => {
@@ -74,25 +74,51 @@ router.post('/send_group', middleware.isLoggedIn, (req, res) => {
 
 //Route to send a notification to 1 person
 router.post('/send_individual', middleware.isLoggedIn, (req, res) => {
-	User.find({}, (err, foundUsers) => { //Access users from User schema
-		if(err || !foundUsers) {
-			req.flash('error', 'Unable to access Database');
-			res.redirect('back');
 
-		} else {
-			for (let i of foundUsers) {
-				if (i.username == req.body.recipient) {
-					Notification.create({type: req.body.type, sender: req.user, text: req.body.message}, (err, notification) => {
-						notification.save()
-						i.inbox.push(notification) //Add notif to recipient's inbox
-						i.save()
-					})
+	if (req.body.recipient == 'everyone') {
+
+		User.find({}, (err, foundUsers) => {
+			if(err || !foundUsers) {
+				req.flash('error', 'Unable to access Database');
+				res.redirect('back');
+
+			} else {
+				for (let i of foundUsers) {
+					if (i.username != req.user.username) { //Removes current user from mailing list
+						Notification.create({type: req.body.type, sender: req.user, text: req.body.message}, (err, notification) => {
+							notification.save()
+							i.inbox.push(notification) //Add notif to recipient's inbox
+							i.save()
+						})
+					}
 				}
+				req.flash('success', `Notification sent to everyone!`)
+				res.redirect('/notif')
 			}
-			req.flash('success', `Notification sent to ${req.body.recipient}!`)
-			res.redirect('/notif')
-		}
-	})
+		})
+
+	} else {
+
+		User.find({}, (err, foundUsers) => { //Access users from User schema
+			if(err || !foundUsers) {
+				req.flash('error', 'Unable to access Database');
+				res.redirect('back');
+
+			} else {
+				for (let i of foundUsers) {
+					if (i.username == req.body.recipient) {
+						Notification.create({type: req.body.type, sender: req.user, text: req.body.message}, (err, notification) => {
+							notification.save()
+							i.inbox.push(notification) //Add notif to recipient's inbox
+							i.save()
+						})
+					}
+				}
+				req.flash('success', `Notification sent to ${req.body.recipient}!`)
+				res.redirect('/notif')
+			}
+		})
+	}
 })
 
 //Route to display user inbox

@@ -24,14 +24,14 @@
     <%- include('../partials/navbar') %>
     </head>
     <body>
-        <div class="container">
+        <div class="notif-options">
             <div class="row">
                 <div class="col-md-10 offset-md-1 col-12">
                     <h1 class="title" style="text-align: center; margin-top: 10px; color: black;">Send Notification</h1>
                     <div class="search-filter">
                     </div>
                     <!-- Send notification to everyone -->
-                    <div class="send-notif-type">
+                    <!-- <div class="send-notif-type">
                       <h5 class="send-notif-header">Everyone</h5>
                       <form action="/send_all" method="post">
                         <select id="type" name="type" style="margin-bottom: 20px;">
@@ -45,7 +45,7 @@
                         <br />
                         <button class='submit-button'action="submit">Send</button>
                       </form>
-                    </div>
+                    </div> -->
 
                     <!-- Send notification to individual -->
                     <div class="send-notif-type">
@@ -53,6 +53,7 @@
                       <form action="/send_individual" method="post">
                         <select id="recipient" name="recipient">
                           <optgroup label="Recipient"></optgroup>
+                          <option>everyone</option>
                           <%users.forEach(user => { %>
                             <option><%=user.username%></option>
                           <% }) %>
