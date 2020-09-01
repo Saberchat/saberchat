@@ -133,7 +133,6 @@ router.post('/:id/ready', middleware.isLoggedIn, (req, res) => {
               res.redirect('/cafe/manage');
 
             } else {
-              console.log(notif);
               notif.type = "Cafe Order Status Update";
               notif.sender = req.user._id;
 
