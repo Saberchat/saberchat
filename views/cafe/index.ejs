@@ -37,6 +37,30 @@
           </li>
           <ul class="list-group">
             <% orders.forEach(function(order) { %>
+              <% if (order.present) { %>
+                <li class="list-group-item">
+                  <h4>Order</h4>
+                  <% let itemText = []; %>
+                  <% for (var i = 0; i < order.items.length; i++) { %>
+                    <% itemText.push(order.items[i].name); %>
+                  <% } %>
+                  <%= itemText.join(", ") %>
+                </li>
+              <% } %>
+            <% }); %>
+          </ul>
+        </div>
+      </div>
+      <div class="row mb-5">
+        <div class="col-12">
+          <li class="list-group-item list-group-item-info" style="margin-top: -1px;">
+            <div class="d-flex w-100 justify-content-between">
+              <h2 class="mb-1"><i class="fas fa-utensils"></i> Past Orders</h2>
+            </div>
+            <p class="mb-1">View your past orders.</p>
+          </li>
+          <% orders.forEach(function(order) { %>
+            <% if (!order.present) { %>
               <li class="list-group-item">
                 <h4>Order</h4>
                 <% let itemText = []; %>
@@ -45,20 +69,8 @@
                 <% } %>
                 <%= itemText.join(", ") %>
               </li>
-            <% }); %>
-          </ul>
-        </div>
-      </div>
-      <div class="row mb-5">
-        <div class="col-12">
-          <ul class="list-group">
-            <li class="list-group-item list-group-item-info" style="margin-top: -1px;">
-              <div class="d-flex w-100 justify-content-between">
-                <h2 class="mb-1"><i class="fas fa-utensils"></i> Past Orders</h2>
-              </div>
-              <p class="mb-1">View your past orders.</p>
-            </li>
-          </ul>
+            <% } %>
+          <% }); %>
         </div>
       </div>
     </div>

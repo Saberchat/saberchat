@@ -276,6 +276,7 @@ io.on('connect', (socket) => {
         order.instructions = instructions;
         order.charge = totalCharge;
         order.date = dateFormat(order.created_at, "mmm d, h:MM TT");
+        order.present = true;
 
         order.save();
 

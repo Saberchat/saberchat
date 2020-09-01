@@ -78,7 +78,7 @@ router.post('/new', middleware.isLoggedIn, (req, res) => {
 });
 
 router.get('/orders', middleware.isLoggedIn, (req, res) => {
-  Order.find({})
+  Order.find({present: true})
   .populate('items').exec((err, foundOrders) => {
     if (err) {
       req.flash('error', 'Could not find orders');
@@ -116,6 +116,8 @@ router.post('/:id/ready', middleware.isLoggedIn, (req, res) => {
       res.redirect('/cafe/manage');
 
     } else {
+      foundOrder.present = false;
+      
       User.findById(foundOrder.customer, (err, foundUser) => {
         if (err || !foundUser) {
           req.flash('error', "Could not find user");
