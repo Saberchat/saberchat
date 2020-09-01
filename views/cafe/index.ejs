@@ -35,7 +35,18 @@
             </div>
             <p class="mb-1">View your currently active orders.</p>
           </li>
-
+          <ul class="list-group">
+            <% orders.forEach(function(order) { %>
+              <li class="list-group-item">
+                <h4>Order</h4>
+                <% let itemText = []; %>
+                <% for (var i = 0; i < order.items.length; i++) { %>
+                  <% itemText.push(order.items[i].name); %>
+                <% } %>
+                <%= itemText.join(", ") %>
+              </li>
+            <% }); %>
+          </ul>
         </div>
       </div>
       <div class="row mb-5">
@@ -47,7 +58,6 @@
               </div>
               <p class="mb-1">View your past orders.</p>
             </li>
-
           </ul>
         </div>
       </div>

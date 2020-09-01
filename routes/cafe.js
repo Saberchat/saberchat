@@ -8,24 +8,46 @@ const Item = require('../models/orderItem');
 const Announcement = require('../models/announcement');
 const Notification = require('../models/notification');
 
-router.get('/', (req, res) => {
-  Announcement.find({}).populate({
-    path: 'sender',
-    select: ['username', 'imageUrl']
-  }).populate('message').exec((err, foundAnns) => {
-    if (err || !foundAnns) {
-      req.flash('error', 'Unable to access database');
+router.get('/', middleware.isLoggedIn, (req, res) => {
+  Order.find({customer: req.user._id})
+  .populate('items').exec((err, foundOrders) => {
+
+    if (err || !foundOrders) {
+
+      req.flash('error', "Could not find your orders");
+      console.log(err);
       res.redirect('back');
+
     } else {
-      res.render('cafe/index', {
-        announcements: foundAnns,
-        announced: false
+
+      Announcement.find({}).populate({
+        path: 'sender',
+        select: ['username', 'imageUrl']
+      }).populate('message').exec((err, foundAnns) => {
+        if (err || !foundAnns) {
+
+          req.flash('error', 'Unable to access database');
+          res.redirect('back');
+
+        } else {
+
+          res.render('cafe/index', {
+            orders: foundOrders,
+            announcements: foundAnns,
+            announced: false
+          });
+
+        }
+
       });
+
     }
+
   });
+
 });
 
-router.get('/new', (req, res) => {
+router.get('/new', middleware.isLoggedIn, (req, res) => {
   Item.find({}, (err, foundItems) => {
     if (err || !foundItems) {
       req.flash('error', 'Could not access database');
@@ -51,11 +73,11 @@ router.get('/new', (req, res) => {
   });
 });
 
-router.post('/new', (req, res) => {
+router.post('/new', middleware.isLoggedIn, (req, res) => {
   res.redirect('/cafe');
 });
 
-router.get('/orders', (req, res) => {
+router.get('/orders', middleware.isLoggedIn, (req, res) => {
   Order.find({})
   .populate('items').exec((err, foundOrders) => {
     if (err) {
@@ -84,7 +106,7 @@ router.get('/orders', (req, res) => {
   });
 });
 
-router.post('/:id/ready', (req, res) => {
+router.post('/:id/ready', middleware.isLoggedIn, (req, res) => {
   Order.findById(req.params.id)
   .populate('items').exec((err, foundOrder) => {
 
