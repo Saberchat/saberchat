@@ -40,7 +40,9 @@ function getOrders(outputStream) {
             </ul>
             <p class="card-text mt-3">${order.charge}</p>
             <p class="card-text">${order.date}</p>
-            <a href="#" class="btn btn-primary">Go somewhere</a>
+            <form class="ready-form" action="<%= order._id %>/ready" method="post">
+              <button type="submit" class="btn btn-primary" name="button">Order Ready</button>
+            </form>
           </div>
         </div>
       `);

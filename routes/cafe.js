@@ -4,7 +4,8 @@ const router = express.Router();
 
 const Order = require('../models/order');
 const Item = require('../models/orderItem');
-const Announcement = require('../models/announcement')
+const Announcement = require('../models/announcement');
+const Notification = require('../models/notification');
 
 router.get('/', (req, res) => {
   Announcement.find({}).populate({
@@ -77,6 +78,37 @@ router.get('/orders', (req, res) => {
           })
         }
       })
+    }
+  });
+});
+
+router.post('/:id/ready', (req, res) => {
+  Order.findById(req.params.id, (err, foundOrder) => {
+    if (err || !foundOrder) {
+      req.flash('error', "Could not find order");
+      console.log(err);
+      res.redirect('/cafe/manage');
+    } else {
+      User.findById(foundOrder.customer, (err, foundUser) => {
+        if (err || !foundUser) {
+          req.flash('error', "Could not find user");
+          console.log(err);
+          res.redirect('/cafe/manage');
+        } else {
+          Notification.create({}, (err, notif) => {
+            if (err) {
+              req.flash('error', "Could not create notif");
+              console.log(err);
+              res.redirect('/cafe/manage');
+            } else {
+              notif.type = "Cafe Order Status Update";
+              notif.sender = req.user._id;
+              notif.text = "Your order is ready: " + foundOrder.items;
+              res.redirect('/cafe/manage');
+            }
+          });
+        }
+      });
     }
   });
 });
