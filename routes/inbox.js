@@ -62,7 +62,6 @@ router.post('/send_group', middleware.isLoggedIn, (req, res) => {
 router.post('/send_individual', middleware.isLoggedIn, (req, res) => {
 
 	if (req.body.recipient == 'everyone') {
-
 		User.find({}, (err, foundUsers) => {
 			if(err || !foundUsers) {
 				req.flash('error', 'Unable to access Database');
@@ -84,24 +83,19 @@ router.post('/send_individual', middleware.isLoggedIn, (req, res) => {
 		})
 
 	} else {
-
-		User.find({}, (err, foundUsers) => { //Access users from User schema
-			if(err || !foundUsers) {
+		User.findOne({username: req.body.recipient}, (err, foundUser) => { //Access users from User schema
+			if(err || !foundUser) {
 				req.flash('error', 'Unable to access Database');
 				res.redirect('back');
 
 			} else {
-				for (let i of foundUsers) {
-					if (i.username == req.body.recipient) {
-						Notification.create({type: req.body.type, sender: req.user, text: req.body.message}, (err, notification) => {
-							notification.save()
-							i.inbox.push(notification) //Add notif to recipient's inbox
-							i.save()
-						})
-					}
-				}
-				req.flash('success', `Notification sent to ${req.body.recipient}!`)
-				res.redirect('/notif')
+				Notification.create({type: req.body.type, sender: req.user, text: req.body.message}, (err, notification) => {
+					notification.save()
+					foundUser.inbox.push(notification) //Add notif to recipient's
+					foundUser.save()
+					req.flash('success', `Notification sent to ${req.body.recipient}!`)
+					res.redirect('/notif')
+				})
 			}
 		})
 	}
@@ -128,7 +122,7 @@ router.get('/inbox', middleware.isLoggedIn, (req, res) => {
 })
 
 //Delete already viewed notifications
-router.delete('/delete', (req, res) => {
+router.post('/delete', (req, res) => {
 	deletes = [] //List of messages to be deleted
 	for (let item of req.user.inbox) {
 		if (Object.keys(req.body).includes(item._id.toString())) { //If item is selected to be deleted (checkbox)
