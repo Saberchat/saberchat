@@ -39,7 +39,7 @@
             <% orders.forEach(function(order) { %>
               <% if (order.present == true) { %>
                 <li class="list-group-item">
-                  <h4>Order</h4>
+                  <h4>Order - $<%= order.charge %></h4>
                   <% let itemText = []; %>
                   <% for (var i = 0; i < order.items.length; i++) { %>
                     <% itemText.push(order.items[i].name); %>
@@ -62,7 +62,7 @@
           <% orders.forEach(function(order) { %>
             <% if (order.present == false) { %>
               <li class="list-group-item">
-                <h4>Order</h4>
+                <h4>Order - $<%= order.charge %></h4>
                 <% let itemText = []; %>
                 <% for (var i = 0; i < order.items.length; i++) { %>
                   <% itemText.push(order.items[i].name); %>
