@@ -117,7 +117,8 @@ router.post('/:id/ready', middleware.isLoggedIn, (req, res) => {
 
     } else {
       foundOrder.present = false;
-      
+      foundOrder.save();
+
       User.findById(foundOrder.customer, (err, foundUser) => {
         if (err || !foundUser) {
           req.flash('error', "Could not find user");
