@@ -2,6 +2,7 @@ const express = require('express');
 const middleware = require('../middleware');
 const router = express.Router();
 
+const User = require('../models/user');
 const Order = require('../models/order');
 const Item = require('../models/orderItem');
 const Announcement = require('../models/announcement');
@@ -55,7 +56,8 @@ router.post('/new', (req, res) => {
 });
 
 router.get('/orders', (req, res) => {
-  Order.find({}, (err, foundOrders) => {
+  Order.find({})
+  .populate('items').exec((err, foundOrders) => {
     if (err) {
       req.flash('error', 'Could not find orders');
       console.log(err)
@@ -83,27 +85,43 @@ router.get('/orders', (req, res) => {
 });
 
 router.post('/:id/ready', (req, res) => {
-  Order.findById(req.params.id, (err, foundOrder) => {
+  Order.findById(req.params.id)
+  .populate('items').exec((err, foundOrder) => {
+
     if (err || !foundOrder) {
       req.flash('error', "Could not find order");
       console.log(err);
       res.redirect('/cafe/manage');
+
     } else {
       User.findById(foundOrder.customer, (err, foundUser) => {
         if (err || !foundUser) {
           req.flash('error', "Could not find user");
           console.log(err);
           res.redirect('/cafe/manage');
+
         } else {
           Notification.create({}, (err, notif) => {
             if (err) {
               req.flash('error', "Could not create notif");
               console.log(err);
               res.redirect('/cafe/manage');
+
             } else {
+              console.log(notif);
               notif.type = "Cafe Order Status Update";
               notif.sender = req.user._id;
-              notif.text = "Your order is ready: " + foundOrder.items;
+
+              let itemText = [];
+              for (var i = 0; i < foundOrder.items.length; i++) {
+                itemText.push(foundOrder.items[i].name);
+              }
+
+              notif.text = "Your order is ready: " + itemText.join(", ");
+              notif.save();
+              foundUser.inbox.push(notif);
+              foundUser.save();
+
               res.redirect('/cafe/manage');
             }
           });

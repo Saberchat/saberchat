@@ -36,7 +36,7 @@ function getOrders(outputStream) {
             <h5 class="card-title">Order for ${order.name}</h5>
             <p class="card-text">No additional instructions</p>
             <ul class="list-group">
-              <li class="list-group-item">placeholder</li>
+              <li class="list-group-item">${order.items}</li>
             </ul>
             <p class="card-text mt-3">${order.charge}</p>
             <p class="card-text">${order.date}</p>

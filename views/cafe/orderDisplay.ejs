@@ -35,7 +35,9 @@
               <p class="card-text"><%= order.instructions %></p>
             <% } %>
             <ul class="list-group">
-              <li class="list-group-item">placeholder</li>
+              <% order.items.forEach(function(item) { %>
+                <li class="list-group-item"><%= item.name %></li>
+              <% }); %>
             </ul>
             <p class="card-text mt-3"><%= order.charge %></p>
             <p class="card-text"><%= order.date %></p>
