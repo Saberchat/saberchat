@@ -7,14 +7,10 @@ const Item = require('../models/orderItem');
 const Announcement = require('../models/announcement')
 
 router.get('/', (req, res) => {
-  Announcement.find({})
-  .populate({path: 'sender', select: ['username', 'imageUrl']})
-  .populate('message') //Collect data for announcement's sender, subject and message
-  .exec((err, foundAnns) => {
+  Announcement.find({}).populate({path: 'sender', select: ['username', 'imageUrl']}).populate('message').exec((err, foundAnns) => {
     if (err || !foundAnns) {
       req.flash('error', 'Unable to access database')
       res.redirect('back')
-
     } else {
       res.render('cafe/index', {announcements: foundAnns, announced: false})
     }
@@ -28,14 +24,10 @@ router.get('/new', (req, res) => {
       res.redirect('/');
     } else {
 
-      Announcement.find({})
-      .populate({path: 'sender', select: ['username', 'imageUrl']})
-      .populate('message') //Collect data for announcement's sender, subject and message
-      .exec((err, foundAnns) => {
+      Announcement.find({}).populate({path: 'sender', select: ['username', 'imageUrl']}).populate('message').exec((err, foundAnns) => {
         if (err || !foundAnns) {
           req.flash('error', 'Unable to access database')
           res.redirect('back')
-
         } else {
           res.render('cafe/newOrder', {items: foundItems, announcements: foundAnns, announced: false})
         }
@@ -57,14 +49,10 @@ router.get('/orders', (req, res) => {
 
     } else {
 
-      Announcement.find({})
-      .populate({path: 'sender', select: ['username', 'imageUrl']})
-      .populate('message') //Collect data for announcement's sender, subject and message
-      .exec((err, foundAnns) => {
+      Announcement.find({}).populate({path: 'sender', select: ['username', 'imageUrl']}).populate('message').exec((err, foundAnns) => {
         if (err || !foundAnns) {
           req.flash('error', 'Unable to access database')
           res.redirect('back')
-
         } else {
           res.render('cafe/orderDisplay', {orders: foundOrders, announcements: foundAnns, announced: false})
         }
@@ -80,14 +68,10 @@ router.get('/manage', middleware.isLoggedIn, middleware.isMod, (req, res) => {
 			res.redirect('/cafe');
 		} else {
 
-      Announcement.find({})
-      .populate({path: 'sender', select: ['username', 'imageUrl']})
-      .populate('message') //Collect data for announcement's sender, subject and message
-      .exec((err, foundAnns) => {
+      Announcement.find({}).populate({path: 'sender', select: ['username', 'imageUrl']}).populate('message').exec((err, foundAnns) => {
         if (err || !foundAnns) {
           req.flash('error', 'Unable to access database')
           res.redirect('back')
-
         } else {
           res.render('cafe/manage', {items: foundItems, announcements: foundAnns, announced: false})
         }
@@ -97,14 +81,10 @@ router.get('/manage', middleware.isLoggedIn, middleware.isMod, (req, res) => {
 });
 
 router.get('/newOrderItem', middleware.isLoggedIn, middleware.isMod, (req, res) => {
-  Announcement.find({})
-  .populate({path: 'sender', select: ['username', 'imageUrl']})
-  .populate('message') //Collect data for announcement's sender, subject and message
-  .exec((err, foundAnns) => {
+  Announcement.find({}).populate({path: 'sender', select: ['username', 'imageUrl']}).populate('message').exec((err, foundAnns) => {
     if (err || !foundAnns) {
       req.flash('error', 'Unable to access database')
       res.redirect('back')
-
     } else {
       res.render('cafe/newOrderItem', {announcements: foundAnns, announced: false})
     }
@@ -136,14 +116,10 @@ router.post('/newOrderItem', middleware.isLoggedIn, middleware.isMod, (req, res)
 });
 
 router.get('/deleteItems', middleware.isLoggedIn, middleware.isMod, (req, res) => {
-  Announcement.find({})
-  .populate({path: 'sender', select: ['username', 'imageUrl']})
-  .populate('message') //Collect data for announcement's sender, subject and message
-  .exec((err, foundAnns) => {
+  Announcement.find({}).populate({path: 'sender', select: ['username', 'imageUrl']}).populate('message').exec((err, foundAnns) => {
     if (err || !foundAnns) {
       req.flash('error', 'Unable to access database')
       res.redirect('back')
-
     } else {
       res.render('cafe/deleteitems', {announcements: foundAnns, announced: false})
     }
@@ -161,14 +137,10 @@ router.get('/item/:id', middleware.isLoggedIn, middleware.isMod, (req, res) => {
       res.redirect('/cafe/manage');
     } else {
 
-      Announcement.find({})
-      .populate({path: 'sender', select: ['username', 'imageUrl']})
-      .populate('message') //Collect data for announcement's sender, subject and message
-      .exec((err, foundAnns) => {
+      Announcement.find({}).populate({path: 'sender', select: ['username', 'imageUrl']}).populate('message').exec((err, foundAnns) => {
         if (err || !foundAnns) {
           req.flash('error', 'Unable to access database')
           res.redirect('back')
-
         } else {
           res.render('cafe/show.ejs', {item: foundItem, announcements: foundAnns, announced: false})
         }

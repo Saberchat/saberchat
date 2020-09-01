@@ -11,19 +11,15 @@ const middlware = require('../middleware');
 
 //Function to display user inbox
 router.get('/', middlware.isLoggedIn, middlware.isAdmin, (req, res) => {
-	Announcement.find({})
-  .populate({path: 'sender', select: ['username', 'imageUrl']})
-  .populate('message') //Collect data for announcement's sender, subject and message
-  .exec((err, foundAnns) => {
+	Announcement.find({}).populate({path: 'sender', select: ['username', 'imageUrl']}).populate('message').exec((err, foundAnns) => {
     if (err || !foundAnns) {
       req.flash('error', 'Unable to access database')
       res.redirect('back')
-
     } else {
       res.render('admin/index', {announcements: foundAnns, announced: false})
     }
   })
-});
+})
 
 // displays moderator page
 router.get('/moderate', middlware.isLoggedIn, middleware.isMod, (req, res) => {
@@ -37,14 +33,10 @@ router.get('/moderate', middlware.isLoggedIn, middleware.isMod, (req, res) => {
 			res.redirect('/admin');
 		} else {
 
-			Announcement.find({})
-		  .populate({path: 'sender', select: ['username', 'imageUrl']})
-		  .populate('message') //Collect data for announcement's sender, subject and message
-		  .exec((err, foundAnns) => {
+			Announcement.find({}).populate({path: 'sender', select: ['username', 'imageUrl']}).populate('message').exec((err, foundAnns) => {
 		    if (err || !foundAnns) {
 		      req.flash('error', 'Unable to access database')
 		      res.redirect('back')
-
 		    } else {
 		      res.render('admin/mod', {comments: foundComments, announcements: foundAnns, announced: false})
 		    }
@@ -61,14 +53,10 @@ router.get('/permissions', middlware.isLoggedIn, middlware.isAdmin, (req, res) =
 			res.redirect('/admin');
 		} else {
 
-			Announcement.find({})
-		  .populate({path: 'sender', select: ['username', 'imageUrl']})
-		  .populate('message') //Collect data for announcement's sender, subject and message
-		  .exec((err, foundAnns) => {
+			Announcement.find({}).populate({path: 'sender', select: ['username', 'imageUrl']}).populate('message').exec((err, foundAnns) => {
 		    if (err || !foundAnns) {
 		      req.flash('error', 'Unable to access database')
 		      res.redirect('back')
-
 		    } else {
 		      res.render('admin/permission', {users: foundUsers, announcements: foundAnns, announced: false})
 		    }

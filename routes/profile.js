@@ -15,14 +15,11 @@ router.get('/', middleware.isLoggedIn, function(req, res) {
           req.flash('error', 'Unable to access Database');
           res.redirect('back');
       } else {
-        Announcement.find({})
-        .populate({path: 'sender', select: ['username', 'imageUrl']})
-        .populate('message') //Collect data for announcement's sender, subject and message
-        .exec((err, foundAnns) => {
+
+        Announcement.find({}).populate({path: 'sender', select: ['username', 'imageUrl']}).populate('message').exec((err, foundAnns) => {
           if (err || !foundAnns) {
             req.flash('error', 'Unable to access database')
             res.redirect('back')
-
           } else {
             res.render('profile/index', {users: foundUsers, announcements: foundAnns, announced: false})
           }
@@ -33,14 +30,11 @@ router.get('/', middleware.isLoggedIn, function(req, res) {
 
 //renders profiles edit page
 router.get('/edit', middleware.isLoggedIn, function(req, res) {
-  Announcement.find({})
-  .populate({path: 'sender', select: ['username', 'imageUrl']})
-  .populate('message') //Collect data for announcement's sender, subject and message
-  .exec((err, foundAnns) => {
+
+  Announcement.find({}).populate({path: 'sender', select: ['username', 'imageUrl']}).populate('message').exec((err, foundAnns) => {
     if (err || !foundAnns) {
       req.flash('error', 'Unable to access database')
       res.redirect('back')
-
     } else {
       res.render('profile/edit', {announcements: foundAnns, announced: false})
     }
@@ -49,14 +43,10 @@ router.get('/edit', middleware.isLoggedIn, function(req, res) {
 
 //renders the email/password edit page
 router.get('/change-login-info', middleware.isLoggedIn, function(req, res) {
-  Announcement.find({})
-  .populate({path: 'sender', select: ['username', 'imageUrl']})
-  .populate('message') //Collect data for announcement's sender, subject and message
-  .exec((err, foundAnns) => {
+  Announcement.find({}).populate({path: 'sender', select: ['username', 'imageUrl']}).populate('message').exec((err, foundAnns) => {
     if (err || !foundAnns) {
       req.flash('error', 'Unable to access database')
       res.redirect('back')
-
     } else {
       res.render('profile/edit_pwd_email', {announcements: foundAnns, announced: false})
     }
@@ -70,14 +60,11 @@ router.get('/:id', middleware.isLoggedIn, function(req, res) {
             req.flash('error', 'Error. Cannot find user.');
             res.redirect('back');
         } else {
-          Announcement.find({})
-          .populate({path: 'sender', select: ['username', 'imageUrl']})
-          .populate('message') //Collect data for announcement's sender, subject and message
-          .exec((err, foundAnns) => {
+
+          Announcement.find({}).populate({path: 'sender', select: ['username', 'imageUrl']}).populate('message').exec((err, foundAnns) => {
             if (err || !foundAnns) {
               req.flash('error', 'Unable to access database')
               res.redirect('back')
-
             } else {
               res.render('profile/show', {user: foundUser, announcements: foundAnns, announced: false})
             }

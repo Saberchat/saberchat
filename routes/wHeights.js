@@ -12,15 +12,11 @@ router.get('/', function(req, res) {
             req.flash('error', 'Cannot access Database');
             res.redirect('/articles');
         } else {
-          
-          Announcement.find({})
-          .populate({path: 'sender', select: ['username', 'imageUrl']})
-          .populate('message') //Collect data for announcement's sender, subject and message
-          .exec((err, foundAnns) => {
+
+          Announcement.find({}).populate({path: 'sender', select: ['username', 'imageUrl']}).populate('message').exec((err, foundAnns) => {
             if (err || !foundAnns) {
               req.flash('error', 'Unable to access database')
               res.redirect('back')
-
             } else {
               res.render('wHeights/index', {articles: foundArticles, announcements: foundAnns, announced: false})
             }
@@ -31,14 +27,10 @@ router.get('/', function(req, res) {
 
 // display form for creating articles
 router.get('/new', function(req, res) {
-  Announcement.find({})
-  .populate({path: 'sender', select: ['username', 'imageUrl']})
-  .populate('message') //Collect data for announcement's sender, subject and message
-  .exec((err, foundAnns) => {
+  Announcement.find({}).populate({path: 'sender', select: ['username', 'imageUrl']}).populate('message').exec((err, foundAnns) => {
     if (err || !foundAnns) {
       req.flash('error', 'Unable to access database')
       res.redirect('back')
-
     } else {
       res.render('wHeights/new', {announcements: foundAnns, announced: false})
     }
@@ -52,14 +44,10 @@ router.get('/:id', function(req, res) {
             req.flash('error', 'Cannot find article');
             res.redirect('/articles');
         } else {
-          Announcement.find({})
-          .populate({path: 'sender', select: ['username', 'imageUrl']})
-          .populate('message') //Collect data for announcement's sender, subject and message
-          .exec((err, foundAnns) => {
+          Announcement.find({}).populate({path: 'sender', select: ['username', 'imageUrl']}).populate('message').exec((err, foundAnns) => {
             if (err || !foundAnns) {
               req.flash('error', 'Unable to access database')
               res.redirect('back')
-
             } else {
               res.render('wHeights/show', {article: foundArticle, announcements: foundAnns, announced: false})
             }

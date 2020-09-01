@@ -22,14 +22,10 @@ router.get('/notif', middleware.isLoggedIn, (req, res) => {
 				}
 			}
 
-			Announcement.find({})
-			.populate({path: 'sender', select: ['username', 'imageUrl']})
-			.populate('message') //Collect data for announcement's sender, subject and message
-			.exec((err, foundAnns) => {
+			Announcement.find({}).populate({path: 'sender', select: ['username', 'imageUrl']}).populate('message').exec((err, foundAnns) => {
 				if (err || !foundAnns) {
 					req.flash('error', 'Unable to access database')
 					res.redirect('back')
-
 				} else {
 					res.render('inbox/sendNotification', {announcements: foundAnns, announced: false, users: mailingList, types, selected_users: []})
 				}
@@ -119,14 +115,10 @@ router.get('/inbox', middleware.isLoggedIn, (req, res) => {
       res.redirect('back')
 
     } else {
-			Announcement.find({})
-			.populate({path: 'sender', select: ['username', 'imageUrl']})
-			.populate('message') //Collect data for announcement's sender, subject and message
-			.exec((err, foundAnns) => {
+			Announcement.find({}).populate({path: 'sender', select: ['username', 'imageUrl']}).populate('message').exec((err, foundAnns) => {
 				if (err || !foundAnns) {
 					req.flash('error', 'Unable to access database')
 					res.redirect('back')
-
 				} else {
 					res.render('inbox/inbox', {announcements: foundAnns, announced: false, username: foundUser.username, notifs: foundUser.inbox.reverse()})
 				}

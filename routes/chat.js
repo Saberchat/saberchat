@@ -21,14 +21,10 @@ router.get('/', middleware.isLoggedIn, (req, res) => {
       res.redirect('back');
     } else {
 
-      Announcement.find({})
-      .populate({path: 'sender', select: ['username', 'imageUrl']})
-      .populate('message') //Collect data for announcement's sender, subject and message
-      .exec((err, foundAnns) => {
+      Announcement.find({}).populate({path: 'sender', select: ['username', 'imageUrl']}).populate('message').exec((err, foundAnns) => {
         if (err || !foundAnns) {
           req.flash('error', 'Unable to access database')
           res.redirect('back')
-
         } else {
           res.render('chat/index', {rooms: foundRooms, announcements: foundAnns, announced: false})
         }
@@ -45,14 +41,10 @@ router.get('/new', middleware.isLoggedIn, (req, res) => {
       res.redirect('back');
     } else {
 
-      Announcement.find({})
-      .populate({path: 'sender', select: ['username', 'imageUrl']})
-      .populate('message') //Collect data for announcement's sender, subject and message
-      .exec((err, foundAnns) => {
+      Announcement.find({}).populate({path: 'sender', select: ['username', 'imageUrl']}).populate('message').exec((err, foundAnns) => {
         if (err || !foundAnns) {
           req.flash('error', 'Unable to access database')
           res.redirect('back')
-
         } else {
           res.render('chat/new', {users: foundUsers, announcements: foundAnns, announced: false})
         }
@@ -93,14 +85,10 @@ router.get('/:id', middleware.isLoggedIn, middleware.checkIfMember, (req, res) =
           }
           //renders views/chat/index.ejs and passes in data
 
-          Announcement.find({})
-          .populate({path: 'sender', select: ['username', 'imageUrl']})
-          .populate('message') //Collect data for announcement's sender, subject and message
-          .exec((err, foundAnns) => {
+          Announcement.find({}).populate({path: 'sender', select: ['username', 'imageUrl']}).populate('message').exec((err, foundAnns) => {
             if (err || !foundAnns) {
               req.flash('error', 'Unable to access database')
               res.redirect('back')
-
             } else {
               res.render('chat/show', {announcements: foundAnns, announced: false, comments: foundComments, room: foundRoom})
             }
@@ -123,14 +111,10 @@ router.get('/:id/edit', middleware.isLoggedIn, middleware.checkRoomOwnership, (r
           req.flash('error', 'Unable to access Database');
           res.redirect('back');
         } else {
-          Announcement.find({})
-          .populate({path: 'sender', select: ['username', 'imageUrl']})
-          .populate('message') //Collect data for announcement's sender, subject and message
-          .exec((err, foundAnns) => {
+          Announcement.find({}).populate({path: 'sender', select: ['username', 'imageUrl']}).populate('message').exec((err, foundAnns) => {
             if (err || !foundAnns) {
               req.flash('error', 'Unable to access database')
               res.redirect('back')
-
             } else {
               res.render('chat/edit', {users: foundusers, room: foundRoom, announcements: foundAnns, announced: false})
             }
