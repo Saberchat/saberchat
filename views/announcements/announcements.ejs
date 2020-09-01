@@ -18,44 +18,6 @@
     <%- include('../partials/navbar') %>
   </head>
   <body>
-    <div id="carouselExampleControls" class="carousel slide" data-ride="carousel" style="height: 200px; text-align: center;">
-      <div class="carousel-inner">
-
-        <div class="carousel-item active" style="background-color: #dcdcdc;">
-          <img class="profile-img" src="<%=announcements[0].sender.imageUrl%>"/>
-          <% if (parseInt(announcements[0].created_at.toString().slice(16, 19)) > 12) { %>
-            <span><strong><%=announcements[0].sender.username%></strong>: <i><strong><%=announcements[0].subject%></strong></i> <span style="font-size: 10px;"><%=parseInt(announcements[0].created_at.toString().slice(16, 19)) - 12%>:<%=announcements[0].created_at.toString().slice(19,21)%>PM | <%=announcements[0].created_at.toString().slice(4,10)%></span></span>
-          <% } else if (parseInt(announcements[0].created_at.toString().slice(16, 19)) == 0) { %>
-            <span><strong><%=announcements[0].sender.username%></strong>: <i><strong><%=announcements[0].subject%></strong></i> <span style="font-size: 10px;">12:<%=announcements[0].created_at.toString().slice(19,21)%>AM | <%=announcements[0].created_at.toString().slice(4,10)%></span></span>
-          <% } else {%>
-            <span><strong><%=announcements[0].sender.username%></strong>: <i><strong><%=announcements[0].subject%></strong></i> <span style="font-size: 10px;"><%=announcements[0].created_at.toString().slice(16,21)%>AM | <%=announcements[0].created_at.toString().slice(4,10)%></span></span>
-          <% } %>
-          <br />
-        </div>
-
-        <%announcements.slice(1).forEach(announcement => { %>
-          <div class="carousel-item" style="background-color: #dcdcdc;">
-            <img class="profile-img" src="<%=announcement.sender.imageUrl%>"/>
-            <% if (parseInt(announcement.created_at.toString().slice(16, 19)) > 12) { %>
-              <span><strong><%=announcement.sender.username%></strong>: <i><strong><%=announcement.subject%></strong></i> <span style="font-size: 10px;"><%=parseInt(announcement.created_at.toString().slice(16, 19)) - 12%>:<%=announcement.created_at.toString().slice(19,21)%>PM | <%=announcement.created_at.toString().slice(4,10)%></span></span>
-            <% } else if (parseInt(announcement.created_at.toString().slice(16, 19)) == 0) { %>
-              <span><strong><%=announcement.sender.username%></strong>: <i><strong><%=announcement.subject%></strong></i> <span style="font-size: 10px;">12:<%=announcement.created_at.toString().slice(19,21)%>AM | <%=announcement.created_at.toString().slice(4,10)%></span></span>
-            <% } else {%>
-              <span><strong><%=announcement.sender.username%></strong>: <i><strong><%=announcement.subject%></strong></i> <span style="font-size: 10px;"><%=announcement.created_at.toString().slice(16,21)%>AM | <%=announcement.created_at.toString().slice(4,10)%></span></span>
-            <% } %>
-            <br />
-          </div>
-        <%})%>
-      <a class="carousel-control-prev" href="#carouselExampleControls" role="button" data-slide="prev">
-        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-        <span class="sr-only">Previous</span>
-      </a>
-      <a class="carousel-control-next" href="#carouselExampleControls" role="button" data-slide="next">
-        <span class="carousel-control-next-icon" aria-hidden="true"></span>
-        <span class="sr-only">Next</span>
-      </a>
-    </div>
-
     <div class="container mt-5">
       <div class="row">
         <div class="col-12">
@@ -67,27 +29,21 @@
         </div>
       </div>
     </div>
-    <div class="container">
-      <div class="row">
-        <div class="col-md-10 offset-md-1 col-12">
-          <ul class="announcements">
-            <%announcements.forEach(announcement => { %>
-              <div class="announcement">
-                <img class="profile-img" src="<%=announcement.sender.imageUrl%>"/>
-                <% if (parseInt(announcement.created_at.toString().slice(16, 19)) > 12) { %>
-                  <span class="msg-info"><strong><%=announcement.sender.username%></strong>: <i><strong class="subject"><%=announcement.subject%></strong></i> <span style="font-size: 10px;"><%=parseInt(announcement.created_at.toString().slice(16, 19)) - 12%>:<%=announcement.created_at.toString().slice(19,21)%>PM | <%=announcement.created_at.toString().slice(4,10)%></span></span>
-                <% } else if (parseInt(announcement.created_at.toString().slice(16, 19)) == 0) { %>
-                  <span class="msg-info"><strong><%=announcement.sender.username%></strong>: <i><strong class="subject"><%=announcement.subject%></strong></i> <span style="font-size: 10px;">12:<%=announcement.created_at.toString().slice(19,21)%>AM | <%=announcement.created_at.toString().slice(4,10)%></span></span>
-                <% } else {%>
-                  <span class="msg-info"><strong><%=announcement.sender.username%></strong>: <i><strong class="subject"><%=announcement.subject%></strong></i> <span style="font-size: 10px;"><%=announcement.created_at.toString().slice(16,21)%>AM | <%=announcement.created_at.toString().slice(4,10)%></span></span>
-                <% } %>
-                <br />
-                <span> <%=announcement.text%></span>
-              </div>
-            <%})%>
-          </ul>
+    <% if (announced) { %>
+      <div class="container">
+        <div class="announcement">
+          <img class="profile-img" src="<%=announcement.sender.imageUrl%>"/>
+          <% if (parseInt(announcement.created_at.toString().slice(16, 19)) > 12) { %>
+            <span class="msg-info"><strong><%=announcement.sender.username%></strong>: <i><strong class="subject"><%=announcement.subject%></strong></i> <span style="font-size: 10px;"><%=parseInt(announcement.created_at.toString().slice(16, 19)) - 12%>:<%=announcement.created_at.toString().slice(19,21)%>PM | <%=announcement.created_at.toString().slice(4,10)%></span></span>
+          <% } else if (parseInt(announcement.created_at.toString().slice(16, 19)) == 0) { %>
+            <span class="msg-info"><strong><%=announcement.sender.username%></strong>: <i><strong class="subject"><%=announcement.subject%></strong></i> <span style="font-size: 10px;">12:<%=announcement.created_at.toString().slice(19,21)%>AM | <%=announcement.created_at.toString().slice(4,10)%></span></span>
+          <% } else {%>
+            <span class="msg-info"><strong><%=announcement.sender.username%></strong>: <i><strong class="subject"><%=announcement.subject%></strong></i> <span style="font-size: 10px;"><%=announcement.created_at.toString().slice(16,21)%>AM | <%=announcement.created_at.toString().slice(4,10)%></span></span>
+          <% } %>
+          <br />
+          <span> <%=announcement.text%></span>
         </div>
       </div>
-    </div>
+    <%}%>
 </body>
 </html>

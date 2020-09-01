@@ -4,9 +4,21 @@ const router = express.Router();
 
 const Order = require('../models/order');
 const Item = require('../models/orderItem');
+const Announcement = require('../models/announcement')
 
 router.get('/', (req, res) => {
-  res.render('cafe/index');
+  Announcement.find({})
+  .populate({path: 'sender', select: ['username', 'imageUrl']})
+  .populate('message') //Collect data for announcement's sender, subject and message
+  .exec((err, foundAnns) => {
+    if (err || !foundAnns) {
+      req.flash('error', 'Unable to access database')
+      res.redirect('back')
+
+    } else {
+      res.render('cafe/index', {announcements: foundAnns, announced: false})
+    }
+  })
 });
 
 router.get('/new', (req, res) => {
@@ -15,7 +27,19 @@ router.get('/new', (req, res) => {
       req.flash('error', 'Could not access database');
       res.redirect('/');
     } else {
-      res.render('cafe/newOrder', {items: foundItems});
+
+      Announcement.find({})
+      .populate({path: 'sender', select: ['username', 'imageUrl']})
+      .populate('message') //Collect data for announcement's sender, subject and message
+      .exec((err, foundAnns) => {
+        if (err || !foundAnns) {
+          req.flash('error', 'Unable to access database')
+          res.redirect('back')
+
+        } else {
+          res.render('cafe/newOrder', {items: foundItems, announcements: foundAnns, announced: false})
+        }
+      })
     }
   });
 });
@@ -30,8 +54,21 @@ router.get('/orders', (req, res) => {
       req.flash('error', 'Could not find orders');
       console.log(err)
       res.redirect('back');
+
     } else {
-      res.render('cafe/orderDisplay', {orders: foundOrders});
+
+      Announcement.find({})
+      .populate({path: 'sender', select: ['username', 'imageUrl']})
+      .populate('message') //Collect data for announcement's sender, subject and message
+      .exec((err, foundAnns) => {
+        if (err || !foundAnns) {
+          req.flash('error', 'Unable to access database')
+          res.redirect('back')
+
+        } else {
+          res.render('cafe/orderDisplay', {orders: foundOrders, announcements: foundAnns, announced: false})
+        }
+      })
     }
   });
 });
@@ -42,13 +79,36 @@ router.get('/manage', middleware.isLoggedIn, middleware.isMod, (req, res) => {
 			req.flash('error', 'Cannot access Database');
 			res.redirect('/cafe');
 		} else {
-			res.render('cafe/manage', {items: foundItems});
+
+      Announcement.find({})
+      .populate({path: 'sender', select: ['username', 'imageUrl']})
+      .populate('message') //Collect data for announcement's sender, subject and message
+      .exec((err, foundAnns) => {
+        if (err || !foundAnns) {
+          req.flash('error', 'Unable to access database')
+          res.redirect('back')
+
+        } else {
+          res.render('cafe/manage', {items: foundItems, announcements: foundAnns, announced: false})
+        }
+      })
 		}
 	});
 });
 
 router.get('/newOrderItem', middleware.isLoggedIn, middleware.isMod, (req, res) => {
-	res.render('cafe/newOrderItem');
+  Announcement.find({})
+  .populate({path: 'sender', select: ['username', 'imageUrl']})
+  .populate('message') //Collect data for announcement's sender, subject and message
+  .exec((err, foundAnns) => {
+    if (err || !foundAnns) {
+      req.flash('error', 'Unable to access database')
+      res.redirect('back')
+
+    } else {
+      res.render('cafe/newOrderItem', {announcements: foundAnns, announced: false})
+    }
+  })
 });
 
 router.post('/newOrderItem', middleware.isLoggedIn, middleware.isMod, (req, res) => {
@@ -76,7 +136,18 @@ router.post('/newOrderItem', middleware.isLoggedIn, middleware.isMod, (req, res)
 });
 
 router.get('/deleteItems', middleware.isLoggedIn, middleware.isMod, (req, res) => {
-  res.render('cafe/deleteitems');
+  Announcement.find({})
+  .populate({path: 'sender', select: ['username', 'imageUrl']})
+  .populate('message') //Collect data for announcement's sender, subject and message
+  .exec((err, foundAnns) => {
+    if (err || !foundAnns) {
+      req.flash('error', 'Unable to access database')
+      res.redirect('back')
+
+    } else {
+      res.render('cafe/deleteitems', {announcements: foundAnns, announced: false})
+    }
+  })
 });
 
 router.delete('/deleteItems', middleware.isLoggedIn, middleware.isMod, (req, res) => {
@@ -89,7 +160,19 @@ router.get('/item/:id', middleware.isLoggedIn, middleware.isMod, (req, res) => {
       req.flash('error', 'item not found');
       res.redirect('/cafe/manage');
     } else {
-      res.render('cafe/show.ejs', {item: foundItem});
+
+      Announcement.find({})
+      .populate({path: 'sender', select: ['username', 'imageUrl']})
+      .populate('message') //Collect data for announcement's sender, subject and message
+      .exec((err, foundAnns) => {
+        if (err || !foundAnns) {
+          req.flash('error', 'Unable to access database')
+          res.redirect('back')
+
+        } else {
+          res.render('cafe/show.ejs', {item: foundItem, announcements: foundAnns, announced: false})
+        }
+      })
     }
   });
 });

@@ -3,6 +3,7 @@ const middleware = require('../middleware');
 const router = express.Router(); //start express router
 const User = require('../models/user');
 const Notification = require('../models/notification');
+const Announcement = require('../models/announcement');
 
 //Access sendNotification file
 router.get('/notif', middleware.isLoggedIn, (req, res) => {
@@ -20,7 +21,19 @@ router.get('/notif', middleware.isLoggedIn, (req, res) => {
 					break;
 				}
 			}
-			res.render('inbox/sendNotification', {users: mailingList, types, selected_users: []})
+
+			Announcement.find({})
+			.populate({path: 'sender', select: ['username', 'imageUrl']})
+			.populate('message') //Collect data for announcement's sender, subject and message
+			.exec((err, foundAnns) => {
+				if (err || !foundAnns) {
+					req.flash('error', 'Unable to access database')
+					res.redirect('back')
+
+				} else {
+					res.render('inbox/sendNotification', {announcements: foundAnns, announced: false, users: mailingList, types, selected_users: []})
+				}
+			})
 		}
 	})
 })
@@ -100,18 +113,24 @@ router.post('/send_individual', middleware.isLoggedIn, (req, res) => {
 
 //Route to display user inbox
 router.get('/inbox', middleware.isLoggedIn, (req, res) => {
-	User.find({
+	User.findOne({_id: req.user._id}).populate({path: 'inbox', populate: { path: 'sender', select: ['username', 'imageUrl']}}).exec((err, foundUser) => {
+		if (err || !foundUser) {
+      req.flash('error', 'Unable to access database')
+      res.redirect('back')
 
-	}).populate({
-		path: 'inbox',
-		populate: { path: 'sender', select: ['username', 'imageUrl']}
-	})
+    } else {
+			Announcement.find({})
+			.populate({path: 'sender', select: ['username', 'imageUrl']})
+			.populate('message') //Collect data for announcement's sender, subject and message
+			.exec((err, foundAnns) => {
+				if (err || !foundAnns) {
+					req.flash('error', 'Unable to access database')
+					res.redirect('back')
 
-	.exec((err, foundUsers) => {
-		for (let user of foundUsers) {
-			if (user.username == req.user.username) {
-				res.render('inbox/inbox', {username: req.user.username, notifs: user.inbox.reverse()})
-			}
+				} else {
+					res.render('inbox/inbox', {announcements: foundAnns, announced: false, username: foundUser.username, notifs: foundUser.inbox.reverse()})
+				}
+			})
 		}
 	})
 })

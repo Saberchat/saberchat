@@ -4,13 +4,25 @@ const router = express.Router();
 
 const Comment = require('../models/comment');
 const User = require('../models/user');
+const Announcement = require('../models/announcement')
 
 const middlware = require('../middleware');
 
 
 //Function to display user inbox
 router.get('/', middlware.isLoggedIn, middlware.isAdmin, (req, res) => {
-	res.render('admin/index');
+	Announcement.find({})
+  .populate({path: 'sender', select: ['username', 'imageUrl']})
+  .populate('message') //Collect data for announcement's sender, subject and message
+  .exec((err, foundAnns) => {
+    if (err || !foundAnns) {
+      req.flash('error', 'Unable to access database')
+      res.redirect('back')
+
+    } else {
+      res.render('admin/index', {announcements: foundAnns, announced: false})
+    }
+  })
 });
 
 // displays moderator page
@@ -24,7 +36,19 @@ router.get('/moderate', middlware.isLoggedIn, middleware.isMod, (req, res) => {
 			req.flash('error', 'Cannot access DataBase');
 			res.redirect('/admin');
 		} else {
-			res.render('admin/mod', {comments: foundComments});
+
+			Announcement.find({})
+		  .populate({path: 'sender', select: ['username', 'imageUrl']})
+		  .populate('message') //Collect data for announcement's sender, subject and message
+		  .exec((err, foundAnns) => {
+		    if (err || !foundAnns) {
+		      req.flash('error', 'Unable to access database')
+		      res.redirect('back')
+
+		    } else {
+		      res.render('admin/mod', {comments: foundComments, announcements: foundAnns, announced: false})
+		    }
+		  })
 		}
 	});
 });
@@ -36,7 +60,19 @@ router.get('/permissions', middlware.isLoggedIn, middlware.isAdmin, (req, res) =
 			req.flash('error', 'Cannot access Database');
 			res.redirect('/admin');
 		} else {
-			res.render('admin/permission', {users: foundUsers});
+
+			Announcement.find({})
+		  .populate({path: 'sender', select: ['username', 'imageUrl']})
+		  .populate('message') //Collect data for announcement's sender, subject and message
+		  .exec((err, foundAnns) => {
+		    if (err || !foundAnns) {
+		      req.flash('error', 'Unable to access database')
+		      res.redirect('back')
+
+		    } else {
+		      res.render('admin/permission', {users: foundUsers, announcements: foundAnns, announced: false})
+		    }
+		  })
 		}
 	});
 });

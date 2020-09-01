@@ -51,15 +51,6 @@ body {
   border-color: black;
   border-width: 2px;
 }
-
-.profile-img {
-  height:30px;
-  width: 30px;
-  margin-left: 5px;
-  margin-top: 5px;
-  border-radius: 50%;
-}
-
 #delete-button {
   border-radius: 25px;
   width: 200px;
@@ -108,4 +99,12 @@ body {
 .carousel-item {
   padding-top: 25px;
   padding-bottom: 25px;
+}
+
+.profile-img {
+  height:30px;
+  width: 30px;
+  margin-left: 5px;
+  margin-top: 5px;
+  border-radius: 50%;
 }

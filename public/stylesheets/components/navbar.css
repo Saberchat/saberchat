@@ -1,4 +1,4 @@
-/* 
+/*
 ================================
 flash messages
 ================================
@@ -14,7 +14,7 @@ flash messages
 
 
 
-/* 
+/*
 ================================
 User login form
 ================================
@@ -59,7 +59,7 @@ User login form
     color: #9e2531;
 }
 
-/* 
+/*
 ================================
 Custom styling for the bootstrap nav
 ================================
@@ -76,4 +76,39 @@ Custom styling for the bootstrap nav
 .navbar-custom .nav-item:focus .nav-link,
 .navbar-custom .nav-item:hover .nav-link {
     color: #9f9aa4;
+}
+
+.announcement-bar {
+  /* background-color: white; */
+  width: 400px;
+  height: 650px;
+  padding-bottom: 10px;
+  margin-right: 200px;
+  margin-left: 50px;
+  margin-top: 50px;
+  float: left;
+}
+
+.announcement-notification {
+  margin-bottom: 5px;
+  font-size: 10px;
+}
+
+#announcement-bar-header {
+  text-align: center;
+  padding-top: 10px;
+  font-size: 15px;
+}
+
+.carousel-item {
+  padding-top: 25px;
+  padding-bottom: 25px;
+}
+
+.profile-img {
+  height:30px;
+  width: 30px;
+  margin-left: 5px;
+  margin-top: 5px;
+  border-radius: 50%;
 }
