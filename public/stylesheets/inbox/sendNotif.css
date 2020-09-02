@@ -1,5 +1,6 @@
 body {
-  background-image: url('/images/pattern.jpg');
+  background-image: url('/images/Cloudy sunset.jpg');
+  background-size: cover;
 }
 
 .submit-button {
