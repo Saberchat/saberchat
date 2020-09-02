@@ -51,10 +51,12 @@ router.get('/view_announcement', middleware.isLoggedIn, (req, res) => {
       res.redirect('back')
 
     } else {
+
       Announcement.find({}).populate({path: 'sender', select: ['username', 'imageUrl']}).populate('message').exec((err, foundAnns) => {
         if (err || !foundAnns) {
           req.flash('error', 'Unable to access database')
           res.redirect('back')
+
         } else {
           res.render('announcements/announcements', {announcements: foundAnns, announced: true, announcement: foundAnn})
         }
