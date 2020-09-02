@@ -77,6 +77,23 @@
                         <button class='submit-button' action="submit">Send</button>
                       </form>
                     </div>
+
+                    <!-- Anonymous Hotline -->
+                    <div class="send-notif-type">
+                      <h5 class="send-notif-header">Anonymous Hotline</h5>
+                      <form action="/send_anonymous" method="post">
+                        <select id="recipient" name="recipient">
+                          <optgroup label="Recipient"></optgroup>
+                          <%users.forEach(user => { %>
+                            <option><%=user.username%></option>
+                          <% }) %>
+                        </select>
+                        <br /><br />
+                        <textarea class="message" name="message" cols="40" rows="5" placeholder=" Enter notification (Your name will not be revealed)"></textarea>
+                        <br />
+                        <button class='submit-button' action="submit">Send</button>
+                      </form>
+                    </div>
                 </div>
             </div>
         </div>

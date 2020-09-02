@@ -101,6 +101,24 @@ router.post('/send_individual', middleware.isLoggedIn, (req, res) => {
 	}
 })
 
+router.post('/send_anonymous', (req, res) => {
+	User.findOne({username: req.body.recipient}, (err, foundUser) => { //Access users from User schema
+		if(err || !foundUser) {
+			req.flash('error', 'Unable to access Database');
+			res.redirect('back');
+
+		} else {
+			Notification.create({type: 'Anonymous Message', sender: null, text: req.body.message}, (err, notification) => {
+				notification.save()
+				foundUser.inbox.push(notification) //Add notif to recipient's
+				foundUser.save()
+				req.flash('success', `Notification sent to ${req.body.recipient}! Your identity has been kept anonymous`)
+				res.redirect('/notif')
+			})
+		}
+	})
+})
+
 //Route to display user inbox
 router.get('/inbox', middleware.isLoggedIn, (req, res) => {
 	User.findOne({_id: req.user._id}).populate({path: 'inbox', populate: { path: 'sender', select: ['username', 'imageUrl']}}).exec((err, foundUser) => {

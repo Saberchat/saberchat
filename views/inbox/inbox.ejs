@@ -38,7 +38,20 @@
               <ul class = "new_messages" id="new_messages">
                 <%notifs.forEach(notif => { %>
                   <div class="notification">
-                    <img class="profile-img" src="<%=notif.sender.imageUrl%>"/>
+                    <% if (notif.type == "Anonymous Message"){ %>
+
+                      <% if (parseInt(notif.created_at.toString().slice(16, 19)) > 12) { %>
+                        <input name=<%=notif['_id']%> type="checkbox" label = <span class="msg-info"><strong><%=notif.type%> </strong><span style="font-size: 10px;"><%=parseInt(notif.created_at.toString().slice(16, 19)) - 12%>:<%=notif.created_at.toString().slice(19,21)%>PM | <%=notif.created_at.toString().slice(4,10)%></span></span>
+                      <% } else if (parseInt(notif.created_at.toString().slice(16, 19)) == 0) { %>
+                        <input name=<%=notif['_id']%> type="checkbox" label= <span class="msg-info"><strong><%=notif.type%> </strong><span style="font-size: 10px;">12:<%=notif.created_at.toString().slice(19,21)%>AM | <%=notif.created_at.toString().slice(4,10)%></span></span>
+                      <% } else {%>
+                        <input name=<%=notif['_id']%> type="checkbox" label = <span class="msg-info"><strong><%=notif.type%> </strong><span style="font-size: 10px;"><%=notif.created_at.toString().slice(16,21)%>AM | <%=notif.created_at.toString().slice(4,10)%></span></span>
+                      <% } %>
+                      <br />
+                      <span class="message"><%=notif.text%></span>
+
+                    <% } else {%>
+                      <img class="profile-img" src="<%=notif.sender.imageUrl%>"/>
                       <% if (parseInt(notif.created_at.toString().slice(16, 19)) > 12) { %>
                         <input name=<%=notif['_id']%> type="checkbox" label = <span class="msg-info"><strong><%=notif.type%></strong> from <strong><%=notif.sender.username%></strong> <span style="font-size: 10px;"><%=parseInt(notif.created_at.toString().slice(16, 19)) - 12%>:<%=notif.created_at.toString().slice(19,21)%>PM | <%=notif.created_at.toString().slice(4,10)%></span></span>
                       <% } else if (parseInt(notif.created_at.toString().slice(16, 19)) == 0) { %>
@@ -48,6 +61,7 @@
                       <% } %>
                       <br />
                       <span class="message"><%=notif.text%></span>
+                    <% } %>
                   </div>
                 <% }) %>
               </ul>
