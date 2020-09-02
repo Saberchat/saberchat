@@ -29,17 +29,17 @@
         <div class="card mt-3">
           <div class="card-body">
             <h5 class="card-title">Order for <%= order.name %></h5>
-            <% if (!order.instructions) { %>
-              <p class="card-text">No instructions</p>
+            <% if (!order.instructions || order.instructions == "") { %>
+              <p class="card-text">No extra instructions</p>
             <% } else { %>
-              <p class="card-text"><%= order.instructions %></p>
+              <p class="card-text"><strong>Extra Instructions:</strong> <%= order.instructions %></p>
             <% } %>
             <ul class="list-group">
-              <% order.items.forEach(function(item) { %>
-                <li class="list-group-item"><%= item.name %></li>
-              <% }); %>
+              <% for (let i = 0; i < order.items.length; i++) { %>
+                  <li class="list-group-item"><%= order.items[i].name %>: <%=order.quantities[i] %> order(s)</li>
+              <% } %>
             </ul>
-            <p class="card-text mt-3"><%= order.charge %></p>
+            <p class="card-text mt-3"><strong>Cost:</strong> $<%= order.charge %></p>
             <p class="card-text"><%= order.date %></p>
             <form class="ready-form" action="<%= order._id %>/ready" method="post">
               <button type="submit" class="btn btn-primary" name="button">Order Ready</button>

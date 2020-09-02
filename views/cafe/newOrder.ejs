@@ -44,18 +44,24 @@
             </div>
 
             <div id="item-list">
+              <p style="color: blue">Select how many of each orders of an item you are ordering from dropdown before checking item</p>
               <% items.forEach(function(item) { %>
                 <div id="form-check" class="form-check">
                   <input name="check[<%= item._id %>]" id="<%= item._id%>" class="form-check-input" type="checkbox" value="">
+                  <select class="num-orders" id="dd_<%=item._id%>" name="<%=item.name%>">
+                    <% [0, 1, 2, 3, 4, 5].forEach(function(num) { %>
+                      <option><%=num%></option>
+                    <% }) %>
+                  </select>
                   <label class="form-check-label" for="<%= item._id%>"><%= item.name %>: $<%= item.price %></label>
                 </div>
               <% }); %>
             </div>
           </div>
           <br />
-          <strong id="total">Total Cost: $0</strong>
+          <span><strong >Total Cost: $</strong><input id="total" name="total" type="text" value="0" readonly/></span>
           <div class="form-group mt-3">
-            <textarea id="descInput" class="form-control" name="description" placeholder="Add special instructions for your order" maxlength="100" rows="5"></textarea>
+            <textarea id="descInput" class="form-control" name="instructions" placeholder="Add special instructions for your order" maxlength="100" rows="5"></textarea>
           </div>
           <button type="submit" class="btn btn-lg btn-primary btn-block">Complete your Order</button>
         </form>
@@ -64,9 +70,10 @@
     </div>
   </div>
   <script>
-  
+
     const fci = document.getElementsByClassName('form-check-input')
     const fcl = document.getElementsByClassName('form-check-label')
+    const numOrders = document.getElementsByClassName('num-orders')
     const total = document.getElementById('total')
     let sum = 0
 
@@ -76,11 +83,21 @@
           if (l.htmlFor == i.id) {
 
             if (i.checked) {
-              sum += parseInt(l.innerText.split('$')[1])
-              total.innerHTML = `Total Cost: $${sum}`
+
+              for (let no of numOrders) {
+                if (no.id.split('_')[1] == i.id) {
+                  sum += parseInt(no.value) * parseFloat(l.innerText.split('$')[1])
+                  total.value = `${sum}`
+                }
+              }
+
             } else {
-              sum -= parseInt(l.innerText.split('$')[1])
-              total.innerHTML = `Total Cost: $${sum}`
+              for (let no of numOrders) {
+                if (no.id.split('_')[1] == i.id) {
+                  sum -= parseInt(no.value) * parseFloat(l.innerText.split('$')[1])
+                  total.value = `${sum}`
+                }
+              }
             }
           }
         }

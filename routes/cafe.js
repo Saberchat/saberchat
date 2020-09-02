@@ -1,6 +1,7 @@
 const express = require('express');
 const middleware = require('../middleware');
 const router = express.Router();
+const dateFormat = require('dateformat');
 
 const User = require('../models/user');
 const Order = require('../models/order');
@@ -74,7 +75,42 @@ router.get('/new', middleware.isLoggedIn, (req, res) => {
 });
 
 router.post('/new', middleware.isLoggedIn, (req, res) => {
-  res.redirect('/cafe');
+  console.log(req.body)
+  Order.create({customer: req.user._id}, (err, order) => {
+
+    if (err) {
+      console.log(err);
+      req.flash("Error sending your order in.")
+      res.redirect('back')
+
+    } else {
+      order.name = `${req.user.firstName} ${req.user.lastName}`;
+      order.instructions = req.body.instructions;
+      order.charge = req.body.total;
+      order.date = dateFormat(order.created_at, "mmm d, h:MM TT");
+      order.present = true;
+
+      Item.find({}, (err, foundItems) => {
+
+        if (err || !foundItems) {
+          req.flash("Unable to access database")
+          res.redirect('back')
+
+        } else {
+          for (let item of foundItems) {
+            if (item._id in req.body.check) {
+              order.items.push(item._id)
+              order.quantities.push(req.body[item.name])
+            }
+          }
+          order.save();
+          console.log(order);
+          req.flash('Order sent!')
+          res.redirect('/cafe');
+        }
+      })
+    }
+  });
 });
 
 router.get('/orders', middleware.isLoggedIn, (req, res) => {
@@ -138,10 +174,10 @@ router.post('/:id/ready', middleware.isLoggedIn, (req, res) => {
 
               let itemText = [];
               for (var i = 0; i < foundOrder.items.length; i++) {
-                itemText.push(foundOrder.items[i].name);
+                itemText.push(`${foundOrder.quantities[i]} order(s) of ${foundOrder.items[i].name}`);
               }
 
-              notif.text = "Your order is ready: " + itemText.join(", ");
+              notif.text = "Your order (" + itemText.join(", ") + ") is ready (Total Cost: $" + foundOrder.charge + ")";
               notif.save();
               foundUser.inbox.push(notif);
               foundUser.save();

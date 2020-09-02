@@ -12,6 +12,7 @@ const orderSchema = new mongoose.Schema({
       ref: 'OrderItem'
     }
   ],
+  quantities: [{type: Number}],
   instructions: String,
   charge: Number,
   date: String,
