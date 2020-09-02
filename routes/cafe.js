@@ -75,25 +75,23 @@ router.get('/new', middleware.isLoggedIn, (req, res) => {
 });
 
 router.post('/new', middleware.isLoggedIn, (req, res) => {
-  console.log(req.body)
   Order.create({customer: req.user._id}, (err, order) => {
 
     if (err) {
       console.log(err);
-      req.flash("Error sending your order in.")
+      req.flash('error', "Error sending your order in.")
       res.redirect('back')
 
     } else {
       order.name = `${req.user.firstName} ${req.user.lastName}`;
       order.instructions = req.body.instructions;
-      order.charge = req.body.total;
       order.date = dateFormat(order.created_at, "mmm d, h:MM TT");
       order.present = true;
+      order.charge = 0
 
       Item.find({}, (err, foundItems) => {
-
         if (err || !foundItems) {
-          req.flash("Unable to access database")
+          req.flash('error', "Unable to access database")
           res.redirect('back')
 
         } else {
@@ -101,11 +99,11 @@ router.post('/new', middleware.isLoggedIn, (req, res) => {
             if (item._id in req.body.check) {
               order.items.push(item._id)
               order.quantities.push(req.body[item.name])
+              order.charge += (item.price * parseFloat(req.body[item.name]))
             }
           }
           order.save();
-          console.log(order);
-          req.flash('Order sent!')
+          req.flash('success', 'Order sent!')
           res.redirect('/cafe');
         }
       })
