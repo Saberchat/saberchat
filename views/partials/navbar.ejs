@@ -26,7 +26,11 @@
                     <i class="fas fa-align-justify"></i> Other
                     </a>
                     <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-                        <a class="dropdown-item" href="/announcements"><i class="fas fa-bullhorn"></i> Announcements</a>
+                      <%if (currentUser) { %>
+                        <% if(currentUser.permission == "admin" || currentUser.permission == "teacher") { %>
+                          <a class="dropdown-item" href="/announce"><i class="fas fa-bullhorn"></i> Send Announcement</a>
+                        <% } %>
+                      <% } %>
                         <a class="dropdown-item" href="/articles"><i class="far fa-newspaper"></i> Witherly Heights</a>
                         <a class="dropdown-item" href="/profiles"><i class="far fa-user"></i> Users</a>
 

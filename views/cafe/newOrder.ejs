@@ -59,8 +59,8 @@
             </div>
           </div>
           <br />
-          <button id="confirm" style="margin-bottom: 5px; color: white; background-color: green" type="button">Confirm Purchase/View Total</button><br />
-          <span id="total-cost"><strong >Total Cost: $</strong><input id="total" name="total" type="text" value="0" readonly/></span>
+          <button id="confirm" style="margin-bottom: 10px;" type="button" class="btn btn-secondary">Confirm Purchase/View Total</button><br />
+          <strong id="total-cost">Total Cost: $0</strong>
           <div class="form-group mt-3">
             <textarea id="descInput" class="form-control" name="instructions" placeholder="Add special instructions for your order" maxlength="100" rows="5"></textarea>
           </div>
@@ -75,7 +75,7 @@
     const fci = document.getElementsByClassName('form-check-input')
     const fcl = document.getElementsByClassName('form-check-label')
     const numOrders = document.getElementsByClassName('num-orders')
-    const total = document.getElementById('total')
+    const total = document.getElementById('total-cost')
     const confirm = document.getElementById("confirm")
     let sum = 0
 
@@ -94,7 +94,7 @@
           }
         }
       }
-      total.value = sum
+      total.innerText = `Total Cost: $${sum}`
     })
 
     order(orderForm, '<%= currentUser._id %>');
