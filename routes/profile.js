@@ -80,7 +80,8 @@ router.put('/edit', middleware.isLoggedIn, function(req, res) {
         lastName: req.body.lastName,
         username: filter.clean(req.body.username),
         description: filter.clean(req.body.description),
-        title: filter.clean(req.body.title)
+        title: filter.clean(req.body.title),
+        status: req.body.status
     }
     if(req.body.imageUrl) {
         user.imageUrl = req.body.imageUrl;
