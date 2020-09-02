@@ -40,7 +40,9 @@
                           <optgroup label="Recipient"></optgroup>
                           <option>everyone</option>
                           <%users.forEach(user => { %>
-                            <option><%=user.username%></option>
+                            <% if (user.username != currentUser.username) { %>
+                              <option><%=user.username%></option>
+                            <% } %>
                           <% }) %>
                         </select>
 
@@ -64,7 +66,9 @@
                         <select id="recipients">
                           <optgroup label="Recipient"></optgroup>
                           <%users.forEach(user => { %>
-                            <option class="add_recipient"><button><%=user.username%></button></option>
+                            <% if (user.username != currentUser.username) { %>
+                              <option><%=user.username%></option>
+                            <% } %>
                           <% }) %>
                         </select>
                         <label style="margin-left: 5px; color: blue; font-size: 15px;" for="recipients">Select Recipients from Dropdown</label>
@@ -85,7 +89,9 @@
                         <select id="recipient" name="recipient">
                           <optgroup label="Recipient"></optgroup>
                           <%users.forEach(user => { %>
-                            <option><%=user.username%></option>
+                            <% if (user.username != currentUser.username) { %>
+                              <option><%=user.username%></option>
+                            <% } %>
                           <% }) %>
                         </select>
                         <br /><br />

@@ -37,15 +37,10 @@ router.get('/', middleware.isLoggedIn, (req, res) => {
             announcements: foundAnns,
             announced: false
           });
-
         }
-
       });
-
     }
-
   });
-
 });
 
 router.get('/new', middleware.isLoggedIn, (req, res) => {
@@ -75,7 +70,8 @@ router.get('/new', middleware.isLoggedIn, (req, res) => {
 });
 
 router.post('/new', middleware.isLoggedIn, (req, res) => {
-  Order.create({customer: req.user._id}, (err, order) => {
+  Order.create({customer: req.user._id, name: `${req.user.firstName} ${req.user.lastName}`, instructions: req.body.instructions, date: dateFormat(order.created_at, "mmm d, h:MM TT"), present: true,
+  charge: 0}, (err, order) => {
 
     if (err) {
       console.log(err);
@@ -83,12 +79,6 @@ router.post('/new', middleware.isLoggedIn, (req, res) => {
       res.redirect('back')
 
     } else {
-      order.name = `${req.user.firstName} ${req.user.lastName}`;
-      order.instructions = req.body.instructions;
-      order.date = dateFormat(order.created_at, "mmm d, h:MM TT");
-      order.present = true;
-      order.charge = 0
-
       Item.find({}, (err, foundItems) => {
         if (err || !foundItems) {
           req.flash('error', "Unable to access database")
@@ -141,12 +131,10 @@ router.get('/orders', middleware.isLoggedIn, (req, res) => {
 });
 
 router.post('/:id/ready', middleware.isLoggedIn, (req, res) => {
-  Order.findById(req.params.id)
-  .populate('items').exec((err, foundOrder) => {
-
+  Order.findById(req.params.id).populate('items').exec((err, foundOrder) => {
     if (err || !foundOrder) {
-      req.flash('error', "Could not find order");
       console.log(err);
+      req.flash('error', "Could not find order");
       res.redirect('/cafe/manage');
 
     } else {
