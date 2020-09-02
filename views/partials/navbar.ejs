@@ -19,18 +19,17 @@
                     <a class="nav-link" href="/chat"><i class="far fa-comment-dots"></i> Chat</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="/profiles"><i class="far fa-user"></i> Users</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="/announcements"><i class="fas fa-bullhorn"></i>Announcements</a>
+                    <a class="nav-link" href="/cafe"><i class="fas fa-coffee"></i> EC Cafe</a>
                 </li>
                 <li class="nav-item dropdown">
                     <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                     <i class="fas fa-align-justify"></i> Other
                     </a>
                     <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                        <a class="dropdown-item" href="/announcements"><i class="fas fa-bullhorn"></i> Announcements</a>
                         <a class="dropdown-item" href="/articles"><i class="far fa-newspaper"></i> Witherly Heights</a>
-                        <a class="dropdown-item" href="/cafe"><i class="fas fa-coffee"></i> EC Cafe</a>
+                        <a class="dropdown-item" href="/profiles"><i class="far fa-user"></i> Users</a>
+
                     </div>
                 </li>
             </ul>
@@ -40,19 +39,16 @@
                     <li class="nav-item">
                         <a class="nav-link" href="/inbox"><i class="fas fa-inbox"></i> Inbox</a>
                     </li>
-                    <% if (currentUser.permission == 'admin' || currentUser.permission == 'principal') { %>
-                        <li class="nav-item">
-                            <a class="nav-link" href="/admin"><i class="fas fa-crown"></i> AdminCtrl</a>
-                        </li>
-                    <% } %>
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle" href="" id="navbarDropdownMenuLink" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                            <img src="<%= currentUser.imageUrl %>" alt="profile pic" style="width: 20px; height: 20px; object-fit: cover; border-radius: 50%; display: inline-block; margin-top: 3px;">
+                            <img src="<%= currentUser.imageUrl %>" alt="profile pic" style="width: 20px; height: 20px; object-fit: cover; border-radius: 50%; display: inline-block;">
                             <%= currentUser.firstName.charAt(0) %>.<%= currentUser.lastName.charAt(0) %>.
                         </a>
                         <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
                           <a class="dropdown-item" href="/profiles/<%= currentUser._id %>">View Profile</a>
-                          <a class="dropdown-item" href="/inbox">Inbox<span class="sr-only">unread messages</span></a>
+                          <% if (currentUser.permission == 'admin' || currentUser.permission == 'principal') { %>
+                                  <a class="dropdown-item" href="/admin">Admin Controls</a>
+                          <% } %>
                           <a class="dropdown-item" href="/logout">Logout</a>
                         </div>
                     </li>

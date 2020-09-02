@@ -14,20 +14,13 @@ router.get('/notif', middleware.isLoggedIn, (req, res) => {
 			res.redirect('back');
 
 		} else {
-			let mailingList = foundUsers; //Temporary list of users - operations will be performed on it, we don't want to modify the actual users
-			for (let user of foundUsers) {
-				if (user.username == req.user.username) {
-					mailingList.splice(foundUsers.indexOf(user), 1) //Removes current user from mailing list
-					break;
-				}
-			}
 
 			Announcement.find({}).populate({path: 'sender', select: ['username', 'imageUrl']}).populate('message').exec((err, foundAnns) => {
 				if (err || !foundAnns) {
 					req.flash('error', 'Unable to access database')
 					res.redirect('back')
 				} else {
-					res.render('inbox/sendNotification', {announcements: foundAnns, announced: false, users: mailingList, types, selected_users: []})
+					res.render('inbox/sendNotification', {announcements: foundAnns, announced: false, users: foundUsers, types, selected_users: []})
 				}
 			})
 		}
