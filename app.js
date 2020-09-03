@@ -17,7 +17,6 @@ const methodOverride = require('method-override');
 const dateFormat = require('dateformat');
 //pretty up the console
 const colors = require('colors');
-
 //profanity filter
 const Filter = require('bad-words');
 const filter = new Filter();
@@ -40,6 +39,7 @@ const inboxRoutes = require('./routes/inbox');
 const adminRoutes = require('./routes/admin');
 const cafeRoutes = require('./routes/cafe');
 const announcementRoutes = require('./routes/announcements');
+const projectRoutes = require('./routes/projects');
 
 //set up ports and socket.io
 const http = require('http').createServer(app);
@@ -114,8 +114,6 @@ app.use(function(req, res, next) {
   next();
 });
 
-
-
 // =======================
 // Routes
 // =======================
@@ -128,6 +126,7 @@ app.use(inboxRoutes);
 app.use(announcementRoutes);
 app.use('/admin', adminRoutes);
 app.use('/cafe', cafeRoutes);
+app.use(projectRoutes);
 
 // Catch-all route
 // app.get('*', function(req, res) {

@@ -78,7 +78,7 @@
                           <% }) %>
                         </select>
                         <br />
-                        <textarea class="message" name="message" cols="40" rows="5" placeholder="Enter notification (Your name will not be revealed)"></textarea>
+                        <textarea class="message" name="message" cols="40" rows="5" placeholder="Enter notification (Your name will not be revealed to anyone)"></textarea>
                         <br />
                         <button style=" margin-bottom: 10px;" class="btn btn-primary" class='submit-button' action="submit">Send Notification</button>
                       </form>
@@ -98,9 +98,13 @@
                           <% }) %>
                         </select>
                         <br />
-                        <input name="recipient_list"id="recipient_list" type="text" placeholder="Mailing List" style="width: 400px; margin-bottom: 25px; color: blue; font-size: 15px;" readonly/>
-                        <button type="button" class="btn btn-danger" id="clear">Clear Field</button>
-                        <br /><br />
+                        <div class="input-group mb-3">
+                          <input class="form-control" name="recipient_list"id="recipient_list" type="text" aria-describedby="basic-addon2" placeholder="Mailing List" style="width: 400px; color: blue;" readonly/>
+                          <div class="input-group-append">
+                            <button id="clear" class="btn btn-outline-secondary" type="button">Clear Field</button>
+                          </div>
+                        </div>
+                        <br />
                         <textarea class="message" name="message" cols="40" rows="5" placeholder="Enter notification"></textarea>
                         <br />
                         <button class="btn btn-primary" class='submit-button' action="submit" style="margin-bottom: 10px;">Send Notification</button>
