@@ -1,5 +1,5 @@
 body {
-  background-image: url('/images/Cloudy sunset.jpg');
+  /* background-image: url('/images/Cloudy sunset.jpg'); */
   background-size: cover;
 }
 
@@ -10,13 +10,14 @@ body {
 }
 
 .send-notif-type {
-  margin-bottom: 5px;
+  display: inline-block;
+  margin-right: 10px;
+  margin-left: 10px;
 }
 
 .send-notif-header {
   color: red;
   font-family: times;
-  font-style: italic;
   font-weight: bold;
 }
 

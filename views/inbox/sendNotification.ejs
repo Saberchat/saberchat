@@ -23,18 +23,24 @@
     <!-- include the navbar via ejs -->
     <%- include('../partials/navbar') %>
     </head>
-    <body>
-
+    <body style="text-align: center;">
+      <div class="container mt-5">
+        <div class="row">
+          <div class="col-12">
+            <div class="jumbotron text-center">
+              <h1><i class="far fa-comment-dots"></i> Send Notifications</h1>
+              <p>Send notifications to individuals, groups, or via the anonymous hotline</p>
+            </div>
+          </div>
+        </div>
+      </div>
         <div class="body">
             <div class="row">
                 <div class="col-md-10 offset-md-1 col-12">
-                    <h1 class="title" style="text-align: center; margin-top: 10px; color: black;">Send Notification</h1>
-                    <div class="search-filter">
-                    </div>
 
                     <!-- Send notification to individual -->
                     <div class="send-notif-type">
-                      <h5 class="send-notif-header">Individual</h5>
+                      <h5 class="send-notif-header" style="text-align: center;">Individual</h5>
                       <form action="/send_individual" method="post">
                         <select id="recipient" name="recipient">
                           <optgroup label="Recipient"></optgroup>
@@ -53,40 +59,17 @@
                           <% }) %>
                         </select>
                         <br />
-                        <textarea class="message" name="message" cols="40" rows="5" placeholder=" Enter notification"></textarea>
+                        <textarea class="message" name="message" cols="40" rows="5" placeholder="Enter notification"></textarea>
                         <br />
-                        <button class='submit-button' action="submit">Send</button>
-                      </form>
-                    </div>
-
-                    <!-- Send notification to group -->
-                    <div class="send-notif-type">
-                      <h5 class="send-notif-header">Mailing List</h5>
-                      <form action="/send_group" method="post">
-                        <select id="recipients">
-                          <optgroup label="Recipient"></optgroup>
-                          <%users.forEach(user => { %>
-                            <% if (user.username != currentUser.username) { %>
-                              <option><%=user.username%></option>
-                            <% } %>
-                          <% }) %>
-                        </select>
-                        <label style="margin-left: 5px; color: blue; font-size: 15px;" for="recipients">Select Recipients from Dropdown</label>
-                        <br /><br />
-                        <input name="recipient_list"id="recipient_list" type="text" placeholder=" Recipients " style="width: 400px; margin-bottom: 25px; color: blue;"/>
-                        <button type="button" id="clear" >Clear Field</button>
-                        <br />
-                        <textarea class="message" name="message" cols="40" rows="5" placeholder=" Enter notification"></textarea>
-                        <br />
-                        <button class='submit-button' action="submit">Send</button>
+                        <button style=" margin-bottom: 10px;" class="btn btn-primary" class='submit-button' action="submit">Send Notification</button>
                       </form>
                     </div>
 
                     <!-- Anonymous Hotline -->
                     <div class="send-notif-type">
-                      <h5 class="send-notif-header">Anonymous Hotline</h5>
+                      <h5 class="send-notif-header" style="text-align: center;">Anonymous Hotline</h5>
                       <form action="/send_anonymous" method="post">
-                        <select id="recipient" name="recipient">
+                        <select id="recipient" name="recipient" style="margin-bottom: 20px;">
                           <optgroup label="Recipient"></optgroup>
                           <%users.forEach(user => { %>
                             <% if (user.username != currentUser.username) { %>
@@ -94,10 +77,33 @@
                             <% } %>
                           <% }) %>
                         </select>
-                        <br /><br />
-                        <textarea class="message" name="message" cols="40" rows="5" placeholder=" Enter notification (Your name will not be revealed)"></textarea>
                         <br />
-                        <button class='submit-button' action="submit">Send</button>
+                        <textarea class="message" name="message" cols="40" rows="5" placeholder="Enter notification (Your name will not be revealed)"></textarea>
+                        <br />
+                        <button style=" margin-bottom: 10px;" class="btn btn-primary" class='submit-button' action="submit">Send Notification</button>
+                      </form>
+                    </div>
+
+                    <!-- Send notification to group -->
+                    <br />
+                    <div class="send-notif-type" style="margin-top: 20px; text-align: center;">
+                      <h5 class="send-notif-header">Group</h5>
+                      <form action="/send_group" method="post">
+                        <select id="recipients" style="margin-bottom: 20px;">
+                          <optgroup label="Add Recipients to Mailing List"></optgroup>
+                          <%users.forEach(user => { %>
+                            <% if (user.username != currentUser.username) { %>
+                              <option><%=user.username%></option>
+                            <% } %>
+                          <% }) %>
+                        </select>
+                        <br />
+                        <input name="recipient_list"id="recipient_list" type="text" placeholder="Mailing List" style="width: 400px; margin-bottom: 25px; color: blue; font-size: 15px;" readonly/>
+                        <button type="button" class="btn btn-danger" id="clear">Clear Field</button>
+                        <br /><br />
+                        <textarea class="message" name="message" cols="40" rows="5" placeholder="Enter notification"></textarea>
+                        <br />
+                        <button class="btn btn-primary" class='submit-button' action="submit" style="margin-bottom: 10px;">Send Notification</button>
                       </form>
                     </div>
                 </div>

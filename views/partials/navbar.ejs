@@ -14,6 +14,7 @@
 
         <!-- Navbar links -->
         <div class="collapse navbar-collapse" id="collapsibleNavbar">
+        <% if (currentUser) { %>
             <ul class="navbar-nav">
                 <li class="nav-item">
                     <a class="nav-link" href="/chat"><i class="far fa-comment-dots"></i> Chat</a>
@@ -33,10 +34,10 @@
                       <% } %>
                         <a class="dropdown-item" href="/articles"><i class="far fa-newspaper"></i> Witherly Heights</a>
                         <a class="dropdown-item" href="/profiles"><i class="far fa-user"></i> Users</a>
-
                     </div>
                 </li>
             </ul>
+          <% }%>
             <ul class="navbar-nav ml-auto">
                 <!-- ejs logic. If there is a user, show the bootstrap dropdown and links below -->
                 <% if(currentUser) { %>

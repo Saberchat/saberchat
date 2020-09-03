@@ -18,13 +18,25 @@
   </head>
   <body id="body">
     <%- include('../partials/navbar') %>
-
+    <div class="container mt-5">
+      <div class="row">
+        <div class="col-12">
+          <div class="jumbotron text-center">
+            <h1><i class="fas fa-bullhorn"></i> Send Announcement</h1>
+            <p>For teachers to send important messages to students, staff and parents</p>
+          </div>
+        </div>
+      </div>
+    </div>
     <form action="/sendAnnouncement" method="post">
-      <input type="text" maxlength="30"placeholder="Enter announcement subject" id="new-announcement-message" name="subject"/>
+      <div class="input-group mb-3">
+        <input id="new-announcement-message" name="subject" maxlength="50" style="margin-left: 300px; margin-right: 300px;"type="text" class="form-control" placeholder="Announcement Subject" aria-label="Username" aria-describedby="basic-addon1">
+      </div>
+      <div class="input-group">
+        <textarea name="message" placeholder="Announcement Message" style="margin-left: 300px; margin-right: 300px; height: 200px" class="form-control" aria-label="With textarea" ></textarea>
+      </div>
       <br />
-      <textarea placeholder="Enter announcement text here" id="new-announcement-text" name="message" cols=60 rows=10></textarea>
-      <br />
-      <button id="submit-announcement" type="submit">Send Announcement</button>
+      <button id="submit-announcement" class="btn btn-primary" type="submit">Send Announcement</button>
     </form>
 </body>
 <script>
