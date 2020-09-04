@@ -26,6 +26,25 @@ router.get('/projects', middleware.isLoggedIn, (req, res) => {
   })
 })
 
+router.get('/view_project', (req, res) => {
+  Project.findById(req.query.id, (err, foundProject) => {
+    if (err || !foundProject) {
+      req.flash('error', "Unable to access database")
+      res.redirect('back')
+
+    } else {
+      Announcement.find({}).populate({path: 'sender', select: ['username', 'imageUrl']}).populate('message').exec((err, foundAnns) => {
+        if (err || !foundAnns) {
+          req.flash('error', 'Unable to access database')
+          res.redirect('back')
+        } else {
+          res.render('projects/viewProject', {announcements: foundAnns, project: foundProject})
+        }
+      })
+    }
+  })
+})
+
 router.get('/addProject', middleware.isLoggedIn, (req, res) => {
   User.find({permission: 'student'}, (err, foundUsers) => {
     if (err || !foundUsers) {
@@ -56,7 +75,7 @@ router.post('/submitProject', (req, res) => {
     } else {
       project.save()
       req.flash('success', 'Project posted!')
-			res.redirect('/addProject')
+			res.redirect('/projects')
     }
     })
 

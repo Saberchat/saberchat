@@ -32,15 +32,17 @@
                 <div class="col-12">
                   <div class="jumbotron text-center">
                     <h1><i class="fas fa-inbox"></i> <%=username.charAt(0).toUpperCase() + username.slice(1)%>'s Inbox</h1>
-                    <p><%=notifs.length%> New Notification(s)</p>
+                    <p><strong>New Notifications:</strong> <%=notifs.length%></p>
                   </div>
                 </div>
               </div>
             </div>
             <div class="heading">
-              <button style="margin-bottom: 10px;" type="delete" class="btn btn-danger" class="delete-button">Delete Selected Notifications</button>
+              <button style="margin-bottom: 10px;" type="button" class="btn btn-danger" class="delete-button"><a id="notifButton" href="/clear"><i class="fas fa-trash-alt"></i> Clear Inbox</a></button>
               <br />
-              <button type="button" class="btn btn-primary" class="delete-button"><a id="notifButton" href="/notif"><i></i> Send Notifications</a></button>
+              <button style="margin-bottom: 10px;" type="delete" class="btn btn-danger" class="delete-button"><i class="fas fa-trash-alt"></i> Delete Selected Notifications</button>
+              <br />
+              <button type="button" class="btn btn-primary" class="delete-button"><a id="notifButton" href="/notif"><i class="far fa-comment-dots"></i> Send Notifications</a></button>
             </div>
               <div class="search-filter">
               </div>

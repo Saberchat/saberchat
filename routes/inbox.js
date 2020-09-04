@@ -130,6 +130,23 @@ router.get('/inbox', middleware.isLoggedIn, (req, res) => {
 	})
 })
 
+//Clear entire inbox
+router.get('/clear', (req, res) => {
+
+	Notification.deleteMany({_id: {$in: req.user.inbox}}, (err, deletedNotifs) => {
+		if (err || !deletedNotifs) {
+			req.flash('error', 'A Problem Occured, Unable to Delete');
+	    res.redirect('back');
+
+		} else {
+			req.user.inbox = []
+			req.user.save()
+			req.flash('success', 'Inbox cleared!');
+			res.redirect('/inbox');
+		}
+	})
+})
+
 //Delete already viewed notifications
 router.post('/delete', (req, res) => {
 	deletes = [] //List of messages to be deleted
