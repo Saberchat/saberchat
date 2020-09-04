@@ -33,14 +33,13 @@
       </div>
     </div>
 
-    <form action="/submitProject" method="post">
+    <form action="/submitProject" method="post" style="text-align: center;">
       <div class="input-group mb-3">
         <input name="title" maxlength="50" style="margin-left: 300px; margin-right: 300px;"type="text" class="form-control" placeholder="Enter Project Name" aria-label="Username" aria-describedby="basic-addon1">
       </div>
 
       <div class="input-group mb-3">
         <div class="input-group-prepend" style="margin-left: 300px;">
-          <button type="button" class="btn btn-outline-secondary">Choose Students</button>
           <button type="button" class="btn btn-outline-secondary dropdown-toggle dropdown-toggle-split" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
             <span class="sr-only">Toggle Dropdown</span>
           </button>
@@ -60,11 +59,8 @@
         <input type="text" style="margin-left: 300px; margin-right: 300px;" name="img" class="form-control" placeholder="Enter Image Url" aria-label="Username" aria-describedby="basic-addon1">
       </div>
 
-      <!-- <div class="input-group mb-3">
-        <input id="projectImgUrl" name="imgUrl" style="margin-left: 300px; margin-right: 300px;"type="text" class="form-control" placeholder="Enter Image Url (Optional)" aria-label="Username" aria-describedby="basic-addon1">
-      </div> -->
       <div class="input-group">
-        <textarea maxlength="250" name="text" placeholder="Write a little about the project" style="margin-left: 300px; margin-right: 300px; height: 200px" class="form-control" aria-label="With textarea" ></textarea>
+        <textarea maxlength="240" name="text" placeholder="Write a little about the project" style="margin-left: 300px; margin-right: 300px; height: 200px" class="form-control" aria-label="With textarea" ></textarea>
       </div>
       <br />
       <button class="btn btn-primary" type="submit">Submit Project</button>
