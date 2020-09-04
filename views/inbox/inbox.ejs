@@ -49,29 +49,54 @@
               <ul class = "new_messages" id="new_messages">
                 <%notifs.forEach(notif => { %>
                   <div class="notification">
-                    <% if (notif.type == "Anonymous Message"){ %>
+                    <!-- Anonymous messages -->
+                    <% if (notif.sender == null){ %>
 
                       <% if (parseInt(notif.created_at.toString().slice(16, 19)) > 12) { %>
-                        <input name=<%=notif['_id']%> type="checkbox" label = <span class="msg-info"><strong><%=notif.type%> </strong><span style="font-size: 10px;"><%=parseInt(notif.created_at.toString().slice(16, 19)) - 12%>:<%=notif.created_at.toString().slice(19,21)%>PM | <%=notif.created_at.toString().slice(4,10)%></span></span>
+                        <input name=<%=notif['_id']%> type="checkbox" />
+                        <label for=<%=notif['_id']%>> <a style="color: inherit;" href="/view_inbox_message?id=<%=notif._id%>"><span class="msg-info"><strong><%=notif.subject%> </strong><span style="font-size: 10px;"><%=parseInt(notif.created_at.toString().slice(16, 19)) - 12%>:<%=notif.created_at.toString().slice(19,21)%>PM | <%=notif.created_at.toString().slice(4,10)%></span></span></a></label>
+
                       <% } else if (parseInt(notif.created_at.toString().slice(16, 19)) == 0) { %>
-                        <input name=<%=notif['_id']%> type="checkbox" label= <span class="msg-info"><strong><%=notif.type%> </strong><span style="font-size: 10px;">12:<%=notif.created_at.toString().slice(19,21)%>AM | <%=notif.created_at.toString().slice(4,10)%></span></span>
+                        <input name=<%=notif['_id']%> type="checkbox" />
+                        <label for=<%=notif['_id']%>> <a style="color: inherit;" href="/view_inbox_message?id=<%=notif._id%>"><span class="msg-info"><strong><%=notif.subject%> </strong><span style="font-size: 10px;">12:<%=notif.created_at.toString().slice(19,21)%>AM | <%=notif.created_at.toString().slice(4,10)%></span></span></a></label>
+
                       <% } else {%>
-                        <input name=<%=notif['_id']%> type="checkbox" label = <span class="msg-info"><strong><%=notif.type%> </strong><span style="font-size: 10px;"><%=notif.created_at.toString().slice(16,21)%>AM | <%=notif.created_at.toString().slice(4,10)%></span></span>
+                        <input name=<%=notif['_id']%> type="checkbox" />
+                        <label for=<%=notif['_id']%>> <a style="color: inherit;" href="/view_inbox_message?id=<%=notif._id%>"><span class="msg-info"><strong><%=notif.subject%> </strong><span style="font-size: 10px;"><%=notif.created_at.toString().slice(16,21)%>AM | <%=notif.created_at.toString().slice(4,10)%></span></span></a></label>
                       <% } %>
                       <br />
-                      <span class="message"><%=notif.text%></span>
+
+                      <% if (notif.text.split(' ').length > 20) { %>
+                        <span class="message"><%=notif.text.split(' ').slice(0, 21).join(' ')%> <a style="color: inherit;" href="/view_inbox_message?id=<%=notif._id%>">(Read More)</a></span>
+                      <% } else { %>
+                        <span class="message"><%=notif.text%></span>
+                      <% } %>
+
+                    <!-- Known-sender message -->
 
                     <% } else {%>
                       <img class="profile-img" src="<%=notif.sender.imageUrl%>"/>
+
                       <% if (parseInt(notif.created_at.toString().slice(16, 19)) > 12) { %>
-                        <input name=<%=notif['_id']%> type="checkbox" label = <span class="msg-info"><strong><%=notif.type%></strong> from <strong><%=notif.sender.username%></strong> <span style="font-size: 10px;"><%=parseInt(notif.created_at.toString().slice(16, 19)) - 12%>:<%=notif.created_at.toString().slice(19,21)%>PM | <%=notif.created_at.toString().slice(4,10)%></span></span>
+                        <input name=<%=notif['_id']%> type="checkbox" />
+                        <label for=<%=notif['_id']%>><a style="color: inherit;" href="/view_inbox_message?id=<%=notif._id%>"><span><strong> <%=notif.sender.username%></strong></span>:<span class="msg-info"><strong><%=notif.subject%></strong> <span style="font-size: 10px;"><%=parseInt(notif.created_at.toString().slice(16, 19)) - 12%>:<%=notif.created_at.toString().slice(19,21)%>PM | <%=notif.created_at.toString().slice(4,10)%></span></span></a></label>
+
                       <% } else if (parseInt(notif.created_at.toString().slice(16, 19)) == 0) { %>
-                        <input name=<%=notif['_id']%> type="checkbox" label= <span class="msg-info"><strong><%=notif.type%></strong> from <strong><%=notif.sender.username%></strong> <span style="font-size: 10px;">12:<%=notif.created_at.toString().slice(19,21)%>AM | <%=notif.created_at.toString().slice(4,10)%></span></span>
+                        <input name=<%=notif['_id']%> type="checkbox" />
+                        <label for=<%=notif['_id']%>><a style="color: inherit;" href="/view_inbox_message?id=<%=notif._id%>"><span><strong> <%=notif.sender.username%></strong></span>:<span class="msg-info"><strong><%=notif.subject%></strong> <span style="font-size: 10px;">12:<%=notif.created_at.toString().slice(19,21)%>AM | <%=notif.created_at.toString().slice(4,10)%></span></span></a></label>
+
                       <% } else {%>
-                        <input name=<%=notif['_id']%> type="checkbox" label = <span class="msg-info"><strong><%=notif.type%></strong> from <strong><%=notif.sender.username%></strong> <span style="font-size: 10px;"><%=notif.created_at.toString().slice(16,21)%>AM | <%=notif.created_at.toString().slice(4,10)%></span></span>
+                        <input  name=<%=notif['_id']%> type="checkbox"/>
+                        <label for=<%=notif['_id']%>><a style="color: inherit;" href="/view_inbox_message?id=<%=notif._id%>"> <span><strong> <%=notif.sender.username%></strong></span>:<span class="msg-info"><strong><%=notif.subject%></strong> <span style="font-size: 10px;"><%=notif.created_at.toString().slice(16,21)%>AM | <%=notif.created_at.toString().slice(4,10)%></span></span> </a> </label>
                       <% } %>
                       <br />
-                      <span class="message"><%=notif.text%></span>
+
+                      <% if (notif.text.split(' ').length > 20) { %>
+                        <span class="message"><%=notif.text.split(' ').slice(0, 21).join(' ')%> <a style="color: inherit;" href="/view_inbox_message?id=<%=notif._id%>">(Read More)</a></span>
+                      <% } else { %>
+                        <span class="message"><%=notif.text%></span>
+                      <% } %>
+
                     <% } %>
                   </div>
                 <% }) %>

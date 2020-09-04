@@ -38,12 +38,12 @@
             <div class="row">
                 <div class="col-md-10 offset-md-1 col-12">
 
-                    <!-- Send notification to individual -->
-                    <div class="send-notif-type">
-                      <h5 class="send-notif-header" style="text-align: center;">Individual</h5>
-                      <form action="/send_individual" method="post">
-                        <select id="recipient" name="recipient">
-                          <optgroup label="Recipient"></optgroup>
+                    <!-- Send notification to group -->
+                    <div class="send-notif-type" style="margin-top: 20px; text-align: center;">
+                      <h5 class="send-notif-header">Group/Individual</h5>
+                      <form action="/send_group" method="post">
+                        <select id="recipients" style="margin-bottom: 20px;">
+                          <optgroup label="Add Recipients to Mailing List"></optgroup>
                           <option>everyone</option>
                           <%users.forEach(user => { %>
                             <% if (user.username != currentUser.username) { %>
@@ -51,19 +51,23 @@
                             <% } %>
                           <% }) %>
                         </select>
-
-                        <select id="type" name="type" style="margin-bottom: 20px;">
-                          <optgroup label="Message Type"></optgroup>
-                          <%types.forEach(type => { %>
-                            <option><%=type%></option>
-                          <% }) %>
-                        </select>
+                        <br />
+                        <input type="text" id="type" name="subject" style="margin-bottom: 20px;" placeholder="Enter subject"/>
+                        <br />
+                        <div class="input-group mb-3">
+                          <input class="form-control" name="recipient_list"id="recipient_list" type="text" aria-describedby="basic-addon2" placeholder="Mailing List" style="width: 400px; color: blue;" readonly/>
+                          <div class="input-group-append">
+                            <button id="clear" class="btn btn-outline-secondary" type="button">Clear Field</button>
+                          </div>
+                        </div>
+                        <input type="text" id="images" name="images" style="margin-bottom: 20px; width: 400px;" placeholder="Enter any image urls, separate by comma (optional)"/>
                         <br />
                         <textarea class="message" name="message" cols="40" rows="5" placeholder="Enter notification"></textarea>
                         <br />
-                        <button style=" margin-bottom: 10px;" class="btn btn-primary" class='submit-button' action="submit">Send Notification</button>
+                        <button class="btn btn-primary" class='submit-button' action="submit" style="margin-bottom: 10px;">Send Notification</button>
                       </form>
                     </div>
+                    <br /><br />
 
                     <!-- Anonymous Hotline -->
                     <div class="send-notif-type">
@@ -72,11 +76,15 @@
                         <select id="recipient" name="recipient" style="margin-bottom: 20px;">
                           <optgroup label="Recipient"></optgroup>
                           <%users.forEach(user => { %>
-                            <% if (user.username != currentUser.username) { %>
+                            <% if (user.username != currentUser.username && (user.permission == 'admin' || user.permission == 'teacher')) { %>
                               <option><%=user.username%></option>
                             <% } %>
                           <% }) %>
                         </select>
+                        <br />
+                        <input type="text" id="type" name="subject" style="margin-bottom: 20px;" placeholder="Enter subject"/>
+                        <br />
+                        <input type="text" id="images" name="images" style="margin-bottom: 20px; width: 400px;" placeholder="Enter any image urls, separate by comma (optional)"/>
                         <br />
                         <textarea class="message" name="message" cols="40" rows="5" placeholder="Enter notification (Your name will not be revealed to anyone)"></textarea>
                         <br />
@@ -84,32 +92,6 @@
                       </form>
                     </div>
 
-                    <!-- Send notification to group -->
-                    <br />
-                    <div class="send-notif-type" style="margin-top: 20px; text-align: center;">
-                      <h5 class="send-notif-header">Group</h5>
-                      <form action="/send_group" method="post">
-                        <select id="recipients" style="margin-bottom: 20px;">
-                          <optgroup label="Add Recipients to Mailing List"></optgroup>
-                          <%users.forEach(user => { %>
-                            <% if (user.username != currentUser.username) { %>
-                              <option><%=user.username%></option>
-                            <% } %>
-                          <% }) %>
-                        </select>
-                        <br />
-                        <div class="input-group mb-3">
-                          <input class="form-control" name="recipient_list"id="recipient_list" type="text" aria-describedby="basic-addon2" placeholder="Mailing List" style="width: 400px; color: blue;" readonly/>
-                          <div class="input-group-append">
-                            <button id="clear" class="btn btn-outline-secondary" type="button">Clear Field</button>
-                          </div>
-                        </div>
-                        <br />
-                        <textarea class="message" name="message" cols="40" rows="5" placeholder="Enter notification"></textarea>
-                        <br />
-                        <button class="btn btn-primary" class='submit-button' action="submit" style="margin-bottom: 10px;">Send Notification</button>
-                      </form>
-                    </div>
                 </div>
             </div>
         </div>
