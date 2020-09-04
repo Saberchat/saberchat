@@ -70,8 +70,7 @@ router.get('/new', middleware.isLoggedIn, (req, res) => {
 });
 
 router.post('/new', middleware.isLoggedIn, (req, res) => {
-  Order.create({customer: req.user._id, name: `${req.user.firstName} ${req.user.lastName}`, instructions: req.body.instructions, date: dateFormat(order.created_at, "mmm d, h:MM TT"), present: true,
-  charge: 0}, (err, order) => {
+  Order.create({customer: req.user._id, name: `${req.user.firstName} ${req.user.lastName}`, instructions: req.body.instructions, present: true, charge: 0}, (err, order) => {
 
     if (err) {
       console.log(err);
@@ -79,6 +78,7 @@ router.post('/new', middleware.isLoggedIn, (req, res) => {
       res.redirect('back')
 
     } else {
+      order.date = dateFormat(order.created_at, "mmm d, h:MM TT")
       Item.find({}, (err, foundItems) => {
         if (err || !foundItems) {
           req.flash('error', "Unable to access database")
