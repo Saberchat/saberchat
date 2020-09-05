@@ -74,7 +74,7 @@ router.post('/new', middleware.isLoggedIn, (req, res) => {
   //Conditionals ensure that sending time is between 9AM and 12:20 PM
   let currentTime = new Date(new Date().getTime()).toString().split(' ')[4]
 
-  if ((parseInt(currentTime.split(':')[0]) < 9 || parseInt(currentTime.split(':')[0]) > 12) || (parseInt(currentTime.split(':')[0]) == 12 && parseInt(currentTime.split(':')[1]) < 20)) {
+  if ((parseInt(currentTime.split(':')[0]) < 9 || parseInt(currentTime.split(':')[0]) > 12) || (parseInt(currentTime.split(':')[0]) == 12 && parseInt(currentTime.split(':')[1]) > 20)) {
     req.flash('error', "Send orders between 9AM and 12:20PM")
     res.redirect('back')
 
@@ -159,7 +159,7 @@ router.get('/delete_order', middleware.isLoggedIn, (req, res) => {
 
   //Conditionals ensure that sending time is between 9AM and 12PM
   let currentTime = new Date(new Date().getTime()).toString().split(' ')[4]
-  if (parseInt(currentTime.split(':')[0]) < 9 || parseInt(currentTime.split(':')[0]) > 12) {
+  if (parseInt(currentTime.split(':')[0]) < 9 || parseInt(currentTime.split(':')[0]) == 12) {
     req.flash('error', "Cannot delete orders after 12PM")
     res.redirect('back')
 
@@ -215,7 +215,7 @@ router.post('/:id/ready', middleware.isLoggedIn, (req, res) => {
 
               let itemText = [];
               for (var i = 0; i < foundOrder.items.length; i++) {
-                itemText.push(`${foundOrder.quantities[i]} order(s) of ${foundOrder.items[i].name}`);
+                itemText.push(`${foundOrder.items[i].name}: ${foundOrder.quantities[i]} order(s)`);
               }
 
               notif.text = "Your order (" + itemText.join(", ") + ") is ready (Total Cost: $" + foundOrder.charge + ")";

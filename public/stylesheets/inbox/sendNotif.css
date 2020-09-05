@@ -25,7 +25,7 @@ body {
   margin-bottom: 5px;
 }
 
-#clear {
+#clear, #clear_anonymous {
   background-color: red;
   color: white;
 }

@@ -90,32 +90,68 @@ router.post('/send_group', middleware.isLoggedIn, (req, res) => {
 })
 
 router.post('/send_anonymous', (req, res) => {
-	User.findOne({username: req.body.recipient}, (err, foundUser) => { //Access users from User schema
-		if(err || !foundUser) {
-			req.flash('error', 'Unable to access Database');
-			res.redirect('back');
+	let mailing_list = req.body.recipient_list_anonymous.split(', ') //Creates list of recipients based on user input
 
-		} else {
-
-			if (req.body.images.split(', ')[0] == '') {
-				Notification.create({subject: req.body.subject, sender: null, text: req.body.message, recipients: [req.body.recipient], images: []}, (err, notification) => {
-					notification.save()
-					foundUser.inbox.push(notification) //Add notif to recipient's
-					foundUser.save()
-				})
+	if (mailing_list.includes('All Teachers and Admins')) {
+		User.find({'permission': {$in: ['teacher', 'admin']}}, (err, foundUsers) => {
+			if(err || !foundUsers) {
+				req.flash('error', 'Unable to access Database');
+				res.redirect('back');
 
 			} else {
-				Notification.create({subject: req.body.subject, sender: null, text: req.body.message, recipients: [req.body.recipient], images: req.body.images.split(', ')}, (err, notification) => {
-					notification.save()
-					foundUser.inbox.push(notification) //Add notif to recipient's
-					foundUser.save()
-				})
-			}
+				for (let i of foundUsers) {
 
-			req.flash('success', `Notification sent to ${req.body.recipient}! Your identity has been kept anonymous`)
+					if (req.body.images.split(', ')[0] == '') {
+						Notification.create({subject: req.body.subject, sender: null, text: req.body.message, recipients: ['All teachers and admins'], images: []}, (err, notification) => {
+							notification.save()
+							i.inbox.push(notification) //Add notif to recipient's inbox
+							i.save()
+						})
+
+					} else {
+						Notification.create({subject: req.body.subject, sender: null, text: req.body.message, recipients: ['All teachers and admins'], images: req.body.images.split(', ')}, (err, notification) => {
+							notification.save()
+							i.inbox.push(notification) //Add notif to recipient's inbox
+							i.save()
+						})
+					}
+				}
+			}
+			req.flash('success', `Notification sent to all teachers! Your identity has been kept anonymous`)
 			res.redirect('/notif')
-		}
-	})
+		})
+
+	} else {
+
+		User.find({username: {$in: mailing_list}}, (err, foundUsers) => { //Access users from User schema
+			if(err || !foundUsers) {
+				req.flash('error', 'Unable to access Database');
+				res.redirect('back');
+
+			} else {
+
+				for (let i of foundUsers) {
+					if (req.body.images.split(', ')[0] == '') {
+						Notification.create({subject: req.body.subject, sender: null, text: req.body.message, recipients: mailing_list, images: []}, (err, notification) => {
+							notification.save()
+							i.inbox.push(notification) //Add notif to recipient's
+							i.save()
+						})
+
+					} else {
+						Notification.create({subject: req.body.subject, sender: null, text: req.body.message, recipients: mailing_list, images: req.body.images.split(', ')}, (err, notification) => {
+							notification.save()
+							i.inbox.push(notification) //Add notif to recipient's
+							i.save()
+						})
+					}
+				}
+
+				req.flash('success', `Notification sent to mailing list! Your identity has been kept anonymous`)
+				res.redirect('/notif')
+			}
+		})
+	}
 })
 
 //Route to display user inbox

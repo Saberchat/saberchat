@@ -23,6 +23,16 @@
   </head>
   <body>
     <%- include("../partials/navbar") %>
+    <div class="container mt-5">
+      <div class="row">
+        <div class="col-12">
+          <div class="jumbotron text-center">
+            <h1><i class="fas fa-coffee"></i> Orders</h1>
+            <p>All New Orders</p>
+          </div>
+        </div>
+      </div>
+    </div>
 
     <div id="output-stream" class="container mt-3">
       <% orders.reverse().forEach((order) => { %>
