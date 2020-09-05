@@ -45,6 +45,8 @@
                     <% itemText.push(order.items[i].name); %>
                   <% } %>
                   <%= itemText.join(", ") %>
+                  <br /><br />
+                  <button type="button" class="btn btn-danger"><a style="text-decoration: none; color: inherit;" href="cafe/delete_order?id=<%=order.id%>">Delete Order</a></button>
                 </li>
               <% } %>
             <% }); %>
