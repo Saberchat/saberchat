@@ -103,6 +103,11 @@ router.post('/new', middleware.isLoggedIn, (req, res) => {
                   order.items.push(item._id)
                   order.quantities.push(req.body[item.name])
                   order.charge += (item.price * parseFloat(req.body[item.name]))
+                  item.availableItems -= parseInt(req.body[item.name])
+                  if (item.availableItems == 0) {
+                    item.isAvailable = false
+                  }
+                  item.save()
                 }
               }
 
@@ -152,19 +157,25 @@ router.get('/orders', middleware.isLoggedIn, (req, res) => {
 
 router.get('/delete_order', middleware.isLoggedIn, (req, res) => {
 
-  //Conditionals ensure that sending time is between 9AM and 12:20 PM
+  //Conditionals ensure that sending time is between 9AM and 12PM
   let currentTime = new Date(new Date().getTime()).toString().split(' ')[4]
   if (parseInt(currentTime.split(':')[0]) < 9 || parseInt(currentTime.split(':')[0]) > 12) {
     req.flash('error', "Cannot delete orders after 12PM")
     res.redirect('back')
 
   } else {
-    Order.findByIdAndDelete(req.query.id, (err, foundOrder) => {
+    Order.findByIdAndDelete(req.query.id).populate('items').exec((err, foundOrder) => {
       if (err || !foundOrder) {
         req.flash("error", "Unable to access database")
         res.redirect('back')
 
       } else {
+        for (let i = 0; i < foundOrder.items.length; i += 1) {
+          foundOrder.items[i].availableItems += foundOrder.quantities[i]
+          foundOrder.items[i].isAvailable = true;
+          foundOrder.items[i].save()
+        }
+
         req.flash('success', "Order deleted!")
         res.redirect('/cafe')
       }
@@ -180,15 +191,6 @@ router.post('/:id/ready', middleware.isLoggedIn, (req, res) => {
       res.redirect('/cafe/manage');
 
     } else {
-
-      for (let i = 0; i < foundOrder.items.length; i++) {
-        console.log(foundOrder.items[i])
-        foundOrder.items[i].availableItems -= foundOrder.quantities[i]
-        if (foundOrder.items[i].availableItems == 0) {
-          foundOrder.items[i].isAvailable = false
-        }
-        foundOrder.items[i].save()
-      }
 
       foundOrder.present = false;
       foundOrder.save();
