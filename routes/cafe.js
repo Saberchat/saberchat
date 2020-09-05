@@ -73,46 +73,42 @@ router.post('/new', middleware.isLoggedIn, (req, res) => {
 
   //Conditionals ensure that sending time is between 9AM and 12:20 PM
   let currentTime = new Date(new Date().getTime()).toString().split(' ')[4]
-  if (parseInt(currentTime.split(':')[0]) < 9 || parseInt(currentTime.split(':')[0]) > 12) {
-    req.flash('error', "Send orders between 9AM and 12:20PM")
-    res.redirect('back')
-
-  } else if (parseInt(currentTime.split(':')[0]) == 12 && parseInt(currentTime.split(':')[1]) < 20) {
+  if ((parseInt(currentTime.split(':')[0]) < 9 || parseInt(currentTime.split(':')[0]) > 12) || (parseInt(currentTime.split(':')[0]) == 12 && parseInt(currentTime.split(':')[1]) < 20)) {
     req.flash('error', "Send orders between 9AM and 12:20PM")
     res.redirect('back')
 
   } else {
-  Order.create({customer: req.user._id, name: `${req.user.firstName} ${req.user.lastName}`, instructions: req.body.instructions, present: true, charge: 0}, (err, order) => {
+    Order.create({customer: req.user._id, name: `${req.user.firstName} ${req.user.lastName}`, instructions: req.body.instructions, present: true, charge: 0}, (err, order) => {
 
-    if (err) {
-      console.log(err);
-      req.flash('error', "Error sending your order in.")
-      res.redirect('back')
+      if (err) {
+        console.log(err);
+        req.flash('error', "Error sending your order in.")
+        res.redirect('back')
 
-    } else {
-      order.date = dateFormat(order.created_at, "mmm d, h:MM TT")
-      Item.find({}, (err, foundItems) => {
+      } else {
+        order.date = dateFormat(order.created_at, "mmm d, h:MM TT")
+        Item.find({}, (err, foundItems) => {
 
-        if (err || !foundItems) {
-          req.flash('error', "Unable to access database")
-          res.redirect('back')
+          if (err || !foundItems) {
+            req.flash('error', "Unable to access database")
+            res.redirect('back')
 
-        } else {
-          for (let item of foundItems) {
-          if (item._id in req.body.check) {
-              order.items.push(item._id)
-              order.quantities.push(req.body[item.name])
-              order.charge += (item.price * parseFloat(req.body[item.name]))
+          } else {
+            for (let item of foundItems) {
+            if (item._id in req.body.check) {
+                order.items.push(item._id)
+                order.quantities.push(req.body[item.name])
+                order.charge += (item.price * parseFloat(req.body[item.name]))
+              }
             }
-          }
 
-          order.save();
-          req.flash('success', 'Order sent!')
-          res.redirect('/cafe');
-        }
-      })
-    }
-  });
+            order.save();
+            req.flash('success', 'Order sent!')
+            res.redirect('/cafe');
+          }
+        })
+      }
+    });
   }
 });
 
@@ -146,16 +142,25 @@ router.get('/orders', middleware.isLoggedIn, (req, res) => {
 });
 
 router.get('/delete_order', middleware.isLoggedIn, (req, res) => {
-  Order.findByIdAndDelete(req.query.id, (err, foundOrder) => {
-    if (err || !foundOrder) {
-      req.flash("error", "Unable to access database")
-      res.redirect('back')
 
-    } else {
-      req.flash('success', "Order deleted!")
-      res.redirect('/cafe')
-    }
-  })
+  //Conditionals ensure that sending time is between 9AM and 12:20 PM
+  let currentTime = new Date(new Date().getTime()).toString().split(' ')[4]
+  if (parseInt(currentTime.split(':')[0]) < 9 || parseInt(currentTime.split(':')[0]) > 12) {
+    req.flash('error', "Cannot delete orders after 12PM")
+    res.redirect('back')
+
+  } else {
+    Order.findByIdAndDelete(req.query.id, (err, foundOrder) => {
+      if (err || !foundOrder) {
+        req.flash("error", "Unable to access database")
+        res.redirect('back')
+
+      } else {
+        req.flash('success', "Order deleted!")
+        res.redirect('/cafe')
+      }
+    })
+  }
 })
 
 router.post('/:id/ready', middleware.isLoggedIn, (req, res) => {
