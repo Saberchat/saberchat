@@ -78,7 +78,59 @@ router.post('/submitProject', (req, res) => {
 			res.redirect('/projects')
     }
     })
-
 })
 
+router.get('/edit_project', (req, res) => {
+  Project.findById(req.query.id, (err, foundProject) => {
+    if (err || !foundProject) {
+      req.flash('error', 'Unable to Access Database')
+      res.redirect('back')
+
+    } else {
+      User.find({permission: 'student'}, (err, foundUsers) => {
+        if (err || !foundUsers) {
+          console.log(err)
+          req.flash('error', 'Unable to access database')
+          res.redirect('back')
+
+        } else {
+          Announcement.find({}).populate({path: 'sender', select: ['username', 'imageUrl']}).populate('message').exec((err, foundAnns) => {
+            if (err || !foundAnns) {
+              req.flash('error', 'Unable to access database')
+              res.redirect('back')
+            } else {
+              res.render('projects/editProject', {announcements: foundAnns, project: foundProject, students: foundUsers})
+            }
+          })
+        }
+      })
+    }
+  })
+})
+
+router.post('/submit_project_edits', (req, res) => {
+  Project.findByIdAndUpdate(req.query.id, {title: req.body.title, imgUrl: req.body.img, creators: req.body.creators.split(', '), text: req.body.text}, (err, foundProject) => {
+    if (err || !foundProject) {
+      req.flash('error', "Unable to access database")
+      res.redirect('back')
+
+    } else {
+      req.flash("success", "Project Updated!")
+      res.redirect('/projects')
+    }
+  })
+})
+
+router.get('/delete_project', (req, res) => {
+  Project.findByIdAndDelete(req.query.id, (err, foundProject) => {
+    if (err || !foundProject) {
+      req.flash('error', "Unable to access database")
+      res.redirect('back')
+
+    } else {
+      req.flash("success", "Project Deleted!")
+      res.redirect('/projects')
+    }
+  })
+})
 module.exports = router;
