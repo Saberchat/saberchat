@@ -36,11 +36,14 @@
                 <a href="newOrderItem" class="btn btn-warning"><i class="fas fa-plus-circle"></i> Add new item</a>
               </span>
             </div>
-            <p class="mb-1">View cafe products that are currently available.</p>
+            <p class="mb-1">View cafe products</p>
           </li>
           <% items.forEach(item => { %>
-            <a href="item/<%= item._id %>" class="list-group-item list-group-item-action"><%= item.name %>
-            </a>
+            <% if (item.isAvailable == true) { %>
+              <a href="item/<%= item._id %>" class="list-group-item list-group-item-action"><%= item.name %> (<%= item.availableItems%> orders available)</a>
+            <% } else { %>
+              <a href="item/<%= item._id %>" class="list-group-item list-group-item-action"><%= item.name %> (Unavailable)</a>
+            <% }%>
           <% }) %>
           <a style="display: block; margin-top: 1rem;" href="/cafe/orders">Orders</a>
         </div>

@@ -73,42 +73,51 @@ router.post('/new', middleware.isLoggedIn, (req, res) => {
 
   //Conditionals ensure that sending time is between 9AM and 12:20 PM
   let currentTime = new Date(new Date().getTime()).toString().split(' ')[4]
+
   if ((parseInt(currentTime.split(':')[0]) < 9 || parseInt(currentTime.split(':')[0]) > 12) || (parseInt(currentTime.split(':')[0]) == 12 && parseInt(currentTime.split(':')[1]) < 20)) {
     req.flash('error', "Send orders between 9AM and 12:20PM")
     res.redirect('back')
 
   } else {
-    Order.create({customer: req.user._id, name: `${req.user.firstName} ${req.user.lastName}`, instructions: req.body.instructions, present: true, charge: 0}, (err, order) => {
 
-      if (err) {
-        console.log(err);
-        req.flash('error', "Error sending your order in.")
-        res.redirect('back')
+    if (req.body.check != undefined) {
 
-      } else {
-        order.date = dateFormat(order.created_at, "mmm d, h:MM TT")
-        Item.find({}, (err, foundItems) => {
+      Order.create({customer: req.user._id, name: `${req.user.firstName} ${req.user.lastName}`, instructions: req.body.instructions, present: true, charge: 0}, (err, order) => {
 
-          if (err || !foundItems) {
-            req.flash('error', "Unable to access database")
-            res.redirect('back')
+        if (err) {
+          console.log(err);
+          req.flash('error', "Error sending your order in.")
+          res.redirect('back')
 
-          } else {
-            for (let item of foundItems) {
-            if (item._id in req.body.check) {
-                order.items.push(item._id)
-                order.quantities.push(req.body[item.name])
-                order.charge += (item.price * parseFloat(req.body[item.name]))
+        } else {
+          order.date = dateFormat(order.created_at, "mmm d, h:MM TT")
+          Item.find({}, (err, foundItems) => {
+
+            if (err || !foundItems) {
+              req.flash('error', "Unable to access database")
+              res.redirect('back')
+
+            } else {
+              for (let item of foundItems) {
+              if (item._id in req.body.check) {
+                  order.items.push(item._id)
+                  order.quantities.push(req.body[item.name])
+                  order.charge += (item.price * parseFloat(req.body[item.name]))
+                }
               }
-            }
 
-            order.save();
-            req.flash('success', 'Order sent!')
-            res.redirect('/cafe');
-          }
-        })
-      }
-    });
+              order.save();
+              req.flash('success', 'Order sent!')
+              res.redirect('/cafe');
+            }
+          })
+        }
+      });
+
+    } else {
+      req.flash('error', "Cannot submit empty order")
+      res.redirect('back')
+    }
   }
 });
 
@@ -171,6 +180,16 @@ router.post('/:id/ready', middleware.isLoggedIn, (req, res) => {
       res.redirect('/cafe/manage');
 
     } else {
+
+      for (let i = 0; i < foundOrder.items.length; i++) {
+        console.log(foundOrder.items[i])
+        foundOrder.items[i].availableItems -= foundOrder.quantities[i]
+        if (foundOrder.items[i].availableItems == 0) {
+          foundOrder.items[i].isAvailable = false
+        }
+        foundOrder.items[i].save()
+      }
+
       foundOrder.present = false;
       foundOrder.save();
 
@@ -188,8 +207,9 @@ router.post('/:id/ready', middleware.isLoggedIn, (req, res) => {
               res.redirect('/cafe/manage');
 
             } else {
-              notif.type = "Cafe Order Status Update";
+              notif.subject = "Cafe Order Ready";
               notif.sender = req.user._id;
+              req.recipients = [foundUser.username]
 
               let itemText = [];
               for (var i = 0; i < foundOrder.items.length; i++) {
@@ -261,6 +281,7 @@ router.post('/newOrderItem', middleware.isLoggedIn, middleware.isMod, (req, res)
       res.redirect('/cafe/newOrderItem');
     } else {
       item.name = req.body.name;
+      item.availableItems = parseInt(req.body.available)
       item.description = req.body.description;
       if (parseFloat(req.body.price)) {
         item.price = parseFloat(req.body.price);
@@ -327,6 +348,8 @@ router.get('/item/:id', middleware.isLoggedIn, middleware.isMod, (req, res) => {
 router.put('/item/:id/update', middleware.isLoggedIn, middleware.isMod, (req, res) => {
   Item.findByIdAndUpdate(req.params.id, {
     name: req.body.name,
+    availableItems: parseInt(req.body.available),
+    isAvailable: (parseInt(req.body.available) > 0),
     description: req.body.description
   }, (err, foundItem) => {
     if (err || !foundItem) {

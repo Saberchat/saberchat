@@ -4,6 +4,7 @@ const orderItemSchema = new mongoose.Schema({
   name: String,
   description: String,
   price: Number,
+  availableItems: Number,
   isAvailable: Boolean,
 });
 

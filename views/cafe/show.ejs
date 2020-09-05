@@ -34,7 +34,7 @@
             <div class="row mb-3">
               <div class="col">
                 <label for="usernameInput">Name</label>
-                <input id="usernameInput" class="form-control" type="text" name="name" placeholder="<%= item.name %>" maxlength="45" required>
+                <input id="usernameInput" class="form-control" type="text" name="name" placeholder="name" value="<%= item.name %>" maxlength="45" required>
               </div>
               <div class="col">
                 <label for="priceInput">Price</label>
@@ -42,13 +42,17 @@
                   <div class="input-group-prepend">
                     <div class="input-group-text">$</div>
                   </div>
-                  <input id="priceInput" class="form-control" type="text" name="price" placeholder="<%= item.price %>" maxlength="10" required>
+                  <input id="priceInput" class="form-control" type="text" name="price" placeholder="price" value="<%= item.price %>" maxlength="10" required>
                 </div>
+              </div>
+              <div class="col">
+                <label for="usernameInput">Available</label>
+                <input id="usernameInput" class="form-control" type="text" name="available" placeholder="Available Orders" value="<%= item.availableItems %>" maxlength="45" required>
               </div>
             </div>
             <div class="form-group">
               <label for="descInput">Description</label>
-              <textarea id="descInput" class="form-control" name="description" placeholder="<%= item.description %>" maxlength="300" rows="5" required></textarea>
+              <textarea id="descInput" class="form-control" name="description" maxlength="300" rows="5" placeholder="Description" required><%= item.description %></textarea>
             </div>
             <button class="btn btn-lg btn-primary btn-block">Submit</button>
           </form>
