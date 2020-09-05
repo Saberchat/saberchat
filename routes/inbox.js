@@ -28,37 +28,43 @@ router.get('/notif', middleware.isLoggedIn, (req, res) => {
 
 //Route to send notification to a group of people
 router.post('/send_group', middleware.isLoggedIn, (req, res) => {
+
 	let mailing_list = req.body.recipient_list.split(', ') //Creates list of recipients based on user input
 
-	if (mailing_list.includes('everyone')) {
+	if (mailing_list.includes('everyone')) { //Send notif to everyone
 		User.find({'_id': {$nin: req.user._id}}, (err, foundUsers) => {
 			if(err || !foundUsers) {
 				req.flash('error', 'Unable to access Database');
 				res.redirect('back');
 
 			} else {
-				for (let i of foundUsers) {
-					if (req.body.images.split(', ')[0] == '') {
-						Notification.create({subject: req.body.subject, sender: req.user, text: req.body.message, recipients: ['everyone'], images: []}, (err, notification) => {
-							notification.save()
-							i.inbox.push(notification) //Add notif to recipient's inbox
-							i.save()
-						})
 
-					} else {
-						Notification.create({subject: req.body.subject, sender: req.user, text: req.body.message, recipients: ['everyone'], images: req.body.images.split(', ')}, (err, notification) => {
-							notification.save()
+				if (req.body.images.split(', ')[0] == '') { //No images attached
+					Notification.create({subject: req.body.subject, sender: req.user, text: req.body.message, recipients: ['everyone'], images: []}, (err, notification) => {
+						notification.save() //Create notification
+
+						for (let i of foundUsers) {
+							i.inbox.push(notification) //Add notif to each recipient's inbox
+							i.save()
+						}
+					})
+
+				} else { //Images are attached
+					Notification.create({subject: req.body.subject, sender: req.user, text: req.body.message, recipients: ['everyone'], images: req.body.images.split(', ')}, (err, notification) => {
+						notification.save() //Create notification
+
+						for (let i of foundUsers) {
 							i.inbox.push(notification) //Add notif to recipient's inbox
 							i.save()
-						})
-					}
+						}
+					})
 				}
 			}
 			req.flash('success', `Notification sent to everyone!`)
 			res.redirect('/notif')
 		})
 
-	} else {
+	} else { //Send notif to specific mailing list
 
 		User.find({'username': {$in: mailing_list}}, (err, foundUsers) => { //Access users from User schema
 			if(err || !foundUsers) {
@@ -66,24 +72,29 @@ router.post('/send_group', middleware.isLoggedIn, (req, res) => {
 				res.redirect('back');
 
 			} else {
-				for (let i of foundUsers) {
-					if (req.body.images.split(', ')[0] == '') {
-						Notification.create({subject: req.body.subject, sender: req.user, text: req.body.message, recipients: mailing_list, images: []}, (err, notification) => {
-							notification.save()
-							i.inbox.push(notification) //Add notif to each recipient's inbox
-							i.save()
-						})
 
-					} else {
-						Notification.create({subject: req.body.subject, sender: req.user, text: req.body.message, recipients: mailing_list, images: req.body.images.split(', ')}, (err, notification) => {
-							notification.save()
+				if (req.body.images.split(', ')[0] == '') {
+					Notification.create({subject: req.body.subject, sender: req.user, text: req.body.message, recipients: mailing_list, images: []}, (err, notification) => {
+						notification.save() //Create notification
+
+						for (let i of foundUsers) {
 							i.inbox.push(notification) //Add notif to each recipient's inbox
 							i.save()
-						})
-					}
-					req.flash('success', `Notification sent to mailing list!!`)
-					res.redirect('/notif')
+						}
+					})
+
+				} else {
+					Notification.create({subject: req.body.subject, sender: req.user, text: req.body.message, recipients: mailing_list, images: req.body.images.split(', ')}, (err, notification) => {
+						notification.save() //Create notification
+
+						for (let i of foundUsers) {
+							i.inbox.push(notification) //Add notif to each recipient's inbox
+							i.save()
+						}
+					})
 				}
+				req.flash('success', `Notification sent to mailing list!!`)
+				res.redirect('/notif')
 			}
 		})
 	}
@@ -92,36 +103,41 @@ router.post('/send_group', middleware.isLoggedIn, (req, res) => {
 router.post('/send_anonymous', (req, res) => {
 	let mailing_list = req.body.recipient_list_anonymous.split(', ') //Creates list of recipients based on user input
 
-	if (mailing_list.includes('All Teachers and Admins')) {
+	if (mailing_list.includes('All Teachers and Admins')) { //Send notif to all teachers and admins
 		User.find({'permission': {$in: ['teacher', 'admin']}}, (err, foundUsers) => {
 			if(err || !foundUsers) {
 				req.flash('error', 'Unable to access Database');
 				res.redirect('back');
 
 			} else {
-				for (let i of foundUsers) {
 
-					if (req.body.images.split(', ')[0] == '') {
-						Notification.create({subject: req.body.subject, sender: null, text: req.body.message, recipients: ['All teachers and admins'], images: []}, (err, notification) => {
-							notification.save()
+				if (req.body.images.split(', ')[0] == '') {
+					Notification.create({subject: req.body.subject, sender: null, text: req.body.message, recipients: ['All teachers and admins'], images: []}, (err, notification) => {
+						notification.save() //Create notification
+
+						for (let i of foundUsers) {
 							i.inbox.push(notification) //Add notif to recipient's inbox
 							i.save()
-						})
+						}
+					})
 
-					} else {
-						Notification.create({subject: req.body.subject, sender: null, text: req.body.message, recipients: ['All teachers and admins'], images: req.body.images.split(', ')}, (err, notification) => {
-							notification.save()
+				} else {
+					Notification.create({subject: req.body.subject, sender: null, text: req.body.message, recipients: ['All teachers and admins'], images: req.body.images.split(', ')}, (err, notification) => {
+						notification.save() //Create notification
+
+						for (let i of foundUsers) {
 							i.inbox.push(notification) //Add notif to recipient's inbox
 							i.save()
-						})
-					}
+						}
+					})
 				}
 			}
+
 			req.flash('success', `Notification sent to all teachers! Your identity has been kept anonymous`)
 			res.redirect('/notif')
 		})
 
-	} else {
+	} else { // Send notif to specific mailing list of teachers and admins
 
 		User.find({username: {$in: mailing_list}}, (err, foundUsers) => { //Access users from User schema
 			if(err || !foundUsers) {
@@ -130,21 +146,25 @@ router.post('/send_anonymous', (req, res) => {
 
 			} else {
 
-				for (let i of foundUsers) {
-					if (req.body.images.split(', ')[0] == '') {
-						Notification.create({subject: req.body.subject, sender: null, text: req.body.message, recipients: mailing_list, images: []}, (err, notification) => {
-							notification.save()
-							i.inbox.push(notification) //Add notif to recipient's
-							i.save()
-						})
+				if (req.body.images.split(', ')[0] == '') {
+					Notification.create({subject: req.body.subject, sender: null, text: req.body.message, recipients: mailing_list, images: []}, (err, notification) => {
+						notification.save() //Create notification
 
-					} else {
-						Notification.create({subject: req.body.subject, sender: null, text: req.body.message, recipients: mailing_list, images: req.body.images.split(', ')}, (err, notification) => {
-							notification.save()
-							i.inbox.push(notification) //Add notif to recipient's
+						for (let i of foundUsers) {
+							i.inbox.push(notification) //Add notif to recipient's inbox
 							i.save()
-						})
-					}
+						}
+					})
+
+				} else {
+					Notification.create({subject: req.body.subject, sender: null, text: req.body.message, recipients: mailing_list, images: req.body.images.split(', ')}, (err, notification) => {
+						notification.save() //Creat notification
+
+						for (let i of foundUsers) {
+							i.inbox.push(notification) //Add notif to recipient's inbox
+							i.save()
+						}
+					})
 				}
 
 				req.flash('success', `Notification sent to mailing list! Your identity has been kept anonymous`)
@@ -195,21 +215,31 @@ router.get('/view_inbox_message', (req, res) => {
 	})
 })
 
-//Clear entire inbox
-router.get('/clear', (req, res) => {
-
-	Notification.deleteMany({_id: {$in: req.user.inbox}}, (err, deletedNotifs) => {
-		if (err || !deletedNotifs) {
-			req.flash('error', 'A Problem Occured, Unable to Delete');
-	    res.redirect('back');
+router.get('/view_sent_notifs', (req, res) => {
+	Notification.find({'sender': req.user}, (err, foundNotifs) => {
+		if (err || !foundNotifs) {
+			req.flash('error', 'Unable to access database')
+			res.redirect('/inbox')
 
 		} else {
-			req.user.inbox = []
-			req.user.save()
-			req.flash('success', 'Inbox cleared!');
-			res.redirect('/inbox');
+			Announcement.find({}).populate({path: 'sender', select: ['username', 'imageUrl']}).populate('message').exec((err, foundAnns) => {
+				if (err || !foundAnns) {
+					req.flash('error', 'Unable to access database')
+					res.redirect('back')
+				} else {
+					res.render('inbox/sentNotifications', {announcements: foundAnns, announced: false, notifs: foundNotifs})
+				}
+			})
 		}
 	})
+})
+
+//Clear entire inbox
+router.get('/clear', (req, res) => {
+	req.user.inbox = []
+	req.user.save()
+	req.flash('success', 'Inbox cleared!');
+	res.redirect('/inbox');
 })
 
 //Delete already viewed notifications
@@ -225,16 +255,9 @@ router.post('/delete', (req, res) => {
 		req.user.inbox.splice(req.user.inbox.indexOf(notif), 1)
 	}
 
-	Notification.deleteMany({_id: {$in: deletes}}, (err, deletedNotifs) => { //Delete based on the notification's id
-		if (err || !deletedNotifs) {
-			req.flash('error', 'A Problem Occured, Unable to Delete');
-	    res.redirect('back');
-
-		} else {
-			req.flash('success', 'Notification(s) deleted!');
-			res.redirect('/inbox');
-		}
-	})
+	req.user.save()
+	req.flash('success', 'Notification(s) deleted!')
+	res.redirect('/inbox')
 })
 
 module.exports = router;
