@@ -72,16 +72,16 @@ router.get('/new', middleware.isLoggedIn, (req, res) => {
 router.post('/new', middleware.isLoggedIn, (req, res) => {
 
   //Conditionals ensure that sending time is between 9AM and 12:20 PM
-  // let currentTime = new Date(new Date().getTime()).toString().split(' ')[4]
-  // if (parseInt(currentTime.split(':')[0]) < 9 || parseInt(currentTime.split(':')[0]) > 12) {
-  //   req.flash('error', "Send orders between 9AM and 12:20PM")
-  //   res.redirect('back')
-  //
-  // } else if (parseInt(currentTime.split(':')[0]) == 12 && parseInt(currentTime.split(':')[1]) < 20) {
-  //   req.flash('error', "Send orders between 9AM and 12:20PM")
-  //   res.redirect('back')
-  //
-  // } else {
+  let currentTime = new Date(new Date().getTime()).toString().split(' ')[4]
+  if (parseInt(currentTime.split(':')[0]) < 9 || parseInt(currentTime.split(':')[0]) > 12) {
+    req.flash('error', "Send orders between 9AM and 12:20PM")
+    res.redirect('back')
+
+  } else if (parseInt(currentTime.split(':')[0]) == 12 && parseInt(currentTime.split(':')[1]) < 20) {
+    req.flash('error', "Send orders between 9AM and 12:20PM")
+    res.redirect('back')
+
+  } else {
   Order.create({customer: req.user._id, name: `${req.user.firstName} ${req.user.lastName}`, instructions: req.body.instructions, present: true, charge: 0}, (err, order) => {
 
     if (err) {
@@ -113,7 +113,7 @@ router.post('/new', middleware.isLoggedIn, (req, res) => {
       })
     }
   });
-  // }
+  }
 });
 
 router.get('/orders', middleware.isLoggedIn, (req, res) => {
