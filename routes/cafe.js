@@ -157,9 +157,11 @@ router.get('/orders', middleware.isLoggedIn, (req, res) => {
 
 router.get('/delete_order', middleware.isLoggedIn, (req, res) => {
 
-  //Conditionals ensure that sending time is between 9AM and 12PM
+  //Conditionals ensure that deletion time is between 9AM and 12PM
   let currentTime = new Date(new Date().getTime()).toString().split(' ')[4]
-  if (parseInt(currentTime.split(':')[0]) < 9 || parseInt(currentTime.split(':')[0]) == 12) {
+  console.log(currentTime)
+  console.log(currentTime.split(':')[0])
+  if (parseInt(currentTime.split(':')[0]) < 9 || parseInt(currentTime.split(':')[0]) >= 12) {
     req.flash('error', "Cannot delete orders after 12PM")
     res.redirect('back')
 
@@ -181,6 +183,35 @@ router.get('/delete_order', middleware.isLoggedIn, (req, res) => {
       }
     })
   }
+})
+
+router.get('/edit_order', middleware.isLoggedIn, (req, res) => {
+  Order.findById(req.query.id).populate('items').exec((err, foundOrder) => {
+    if (err || !foundOrder) {
+      req.flash('error', "Unable to access database")
+      res.redirect('back')
+
+    } else {
+      Item.find({}, (err, foundItems) => {
+        Announcement.find({}).populate({path: 'sender', select: ['username', 'imageUrl']}).populate('message').exec((err, foundAnns) => {
+          if (err || !foundAnns) {
+            req.flash('error', 'Unable to access database')
+            res.redirect('back')
+
+          } else {
+
+            let orderItems = []
+
+            for (let item of foundOrder.items) {
+              orderItems.push(item._id.toString())
+            }
+
+            res.render('cafe/editOrder', {announcements: foundAnns, announced: false, items: foundItems, orderItems})
+          }
+        })
+      })
+    }
+  })
 })
 
 router.post('/:id/ready', middleware.isLoggedIn, (req, res) => {
