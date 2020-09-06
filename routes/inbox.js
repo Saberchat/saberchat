@@ -100,6 +100,7 @@ router.post('/send_group', middleware.isLoggedIn, (req, res) => {
 	}
 })
 
+//Send message via anonymous hotline
 router.post('/send_anonymous', (req, res) => {
 	let mailing_list = req.body.recipient_list_anonymous.split(', ') //Creates list of recipients based on user input
 
@@ -195,6 +196,7 @@ router.get('/inbox', middleware.isLoggedIn, (req, res) => {
 	})
 })
 
+//View message in your inbox in more detail
 router.get('/view_inbox_message', middleware.isLoggedIn, (req, res) => {
 	Notification.findOne({_id: req.query.id}).populate({path: 'sender', select: ['username', 'imageUrl']})
 	.exec((err, foundNotif) => {
@@ -215,6 +217,7 @@ router.get('/view_inbox_message', middleware.isLoggedIn, (req, res) => {
 	})
 })
 
+//Accesses every notification that you have sent
 router.get('/view_sent_notifs', middleware.isLoggedIn, (req, res) => {
 	Notification.find({'sender': req.user}, (err, foundNotifs) => {
 		if (err || !foundNotifs) {
@@ -242,6 +245,31 @@ router.get('/clear', middleware.isLoggedIn, (req, res) => {
 	res.redirect('/inbox');
 })
 
+//Clears all notifications that you sent (permanently)
+router.get('/clear_sent', middleware.isLoggedIn, (req, res) => {
+	Notification.find({sender: req.user}, (err, foundNotifs) => {
+		if (err || !foundNotifs) {
+			req.flash('error', 'Unable to access database')
+			res.redirect('back')
+
+		} else {
+
+			for (let notif of foundNotifs) {
+				Notification.findByIdAndDelete(notif._id, (err, foundNotif) => {
+					if (err || !foundNotif) {
+						req.flash('error', 'Unable to access database')
+						res.redirect('back')
+
+					}
+				})
+			}
+
+			req.flash('success', "All Sent Notifications Cleared!")
+			res.redirect('/view_sent_notifs')
+		}
+	})
+})
+
 //Delete already viewed notifications
 router.post('/delete', middleware.isLoggedIn, (req, res) => {
 	deletes = [] //List of messages to be deleted
@@ -254,10 +282,36 @@ router.post('/delete', middleware.isLoggedIn, (req, res) => {
 	for (let notif of deletes) {
 		req.user.inbox.splice(req.user.inbox.indexOf(notif), 1)
 	}
-
 	req.user.save()
 	req.flash('success', 'Notification(s) deleted!')
 	res.redirect('/inbox')
+})
+
+//Delete selected notifications that you sent (permanently)
+router.post('/delete_sent', middleware.isLoggedIn, (req, res) => {
+	deletes = [] //List of messages to be deleted
+
+	Notification.find({sender: req.user}, (err, foundNotifs) => {
+		if (err || !foundNotifs) {
+			req.flash("error", "Unable to access database")
+			res.redirect('back')
+
+		} else {
+			for (let notif of foundNotifs) {
+
+				if (Object.keys(req.body).includes(notif._id.toString())) { //If item is selected to be deleted (checkbox)
+					Notification.findByIdAndDelete(notif._id, (err, foundNotif) => {
+						if (err || !foundNotif) {
+							req.flash("error", "Unable to access database")
+							res.redirect('back')
+						}
+					})
+				}
+			}
+			req.flash('success', 'Notification(s) deleted!')
+			res.redirect('/view_sent_notifs')
+		}
+	})
 })
 
 module.exports = router;
