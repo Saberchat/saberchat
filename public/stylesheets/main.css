@@ -6,4 +6,30 @@ html, body {
     min-width: 100vw;
 }
 
+.announcement-bar {
+  background-color: white;
+  width: 400px;
+  height: 750px;
+  padding-bottom: 10px;
+  margin-right: 200px;
+  float: left;
+}
 
+.announcement-notification {
+  margin-bottom: 5px;
+  font-size: 10px;
+}
+
+#announcement-bar-header {
+  text-align: center;
+  padding-top: 10px;
+  font-size: 15px;
+}
+
+.profile-img {
+  height:30px;
+  width: 30px;
+  margin-left: 5px;
+  margin-top: 5px;
+  border-radius: 50%;
+}

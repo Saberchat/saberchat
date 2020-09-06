@@ -32,15 +32,15 @@
                     <% users.forEach(function(user) { %>
                         <% if(!user._id.equals(currentUser._id)) { %>
                         <li class="list-group-item">
-                            <%= user.username %> (<%= user.firstName.charAt(0) %>.<%= user.lastName.charAt(0) %>) 
+                            <%= user.username %> (<%= user.firstName.charAt(0) %>.<%= user.lastName.charAt(0) %>)
                             <select name="permission" class="role-select" onchange="updateRole(this)" id="<%= user._id %>">
-                                <option value="admin" 
+                                <option value="admin"
                                 <% if(user.permission == 'admin'){ %> selected <% } %>
                                 >Administrator</option>
-                                <option value="mod" 
+                                <option value="mod"
                                 <% if(user.permission == 'mod'){ %> selected <% } %>
                                 >Moderator</option>
-                                <option value="student" 
+                                <option value="student"
                                 <% if(user.permission == 'student'){ %> selected <% } %>
                                 >Student</option>
                             </select>

@@ -64,6 +64,22 @@
                         <% } %>
                     </div>
                     <div class="form-group">
+                        <label for="status">Select Status</label>
+                        <select class="form-control" id="status" name="status">
+                          <option value="guest" selected>guest</option>
+                          <% if (currentUser.permission == 'admin') { %>
+                            <option value="7th">7th</option>
+                            <option value="8th">8th</option>
+                            <option value="9th">9th</option>
+                            <option value="10th">10th</option>
+                            <option value="11th">11th</option>
+                            <option value="12th">12th</option>
+                            <option value="parent">parent</option>
+                            <option value="faculty">faculty</option>
+                          <% } %>
+                        </select>
+                    </div>
+                    <div class="form-group">
                         <label for="imageInput">Profile Image Url</label>
                         <input id="imageInput" class="form-control" type="text" name="imageUrl" value="<%= currentUser.imageUrl %>" placeholder="Enter Image Url">
                     </div>

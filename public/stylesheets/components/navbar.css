@@ -1,4 +1,4 @@
-/* 
+/*
 ================================
 flash messages
 ================================
@@ -29,7 +29,7 @@ flash messages
 
 
 
-/* 
+/*
 ================================
 User login form
 ================================
@@ -50,7 +50,8 @@ User login form
 
 /* classes for animation */
 .signup.display {
-    height: 350px;
+    /* height: 350px; */
+    height: 525px;
     transition: height ease-out 500ms;
     -webkit-transition: height ease-out 500ms;
 }
@@ -89,7 +90,6 @@ User login form
 }
 
 /* 
-================================
 SignUp form animations
 ================================
  */
@@ -122,7 +122,7 @@ SignUp form animations
     width: calc(100% - 30px);
 }
 
-/* 
+/*
 ================================
 Custom styling for the bootstrap nav
 ================================
@@ -174,4 +174,40 @@ div.dropdown-menu.show {
         background-color: #000000c2;
         border-radius: 15px;
     }
+}
+.announcement-bar {
+  /* background-color: white; */
+  width: 400px;
+  height: 650px;
+  padding-bottom: 10px;
+  margin-right: 200px;
+  margin-left: 50px;
+  margin-top: 50px;
+  float: left;
+}
+
+.announcement-notification {
+  margin-bottom: 5px;
+  font-size: 10px;
+}
+
+#announcement-bar-header {
+  text-align: center;
+  padding-top: 10px;
+  font-size: 15px;
+}
+
+.carousel-item {
+  padding-top: 25px;
+  padding-bottom: 25px;
+}
+
+.profile-img {
+  height:25px;
+  width: 25px;
+  object-fit: cover;
+  display: inline-block;
+  margin-left: 5px;
+  margin-bottom: 5px;
+  border-radius: 50%;
 }

@@ -19,7 +19,8 @@ var userSchema = new mongoose.Schema({
 			ref: "Notification"
 		}
 	],
-	permission: {type: String, default: "student"}
+	permission: {type: String, default: "student"}, // for permissions
+	status: {type: String, default: 'guest'} // 7th, 8th, 9th, 10th, 11th, 12th, parents, faculty
 }, {timestamps: {createdAt: 'created_at'}});
 
 //adds authentication functionality

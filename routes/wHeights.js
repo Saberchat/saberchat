@@ -3,6 +3,7 @@ const router = express.Router();
 const middleware = require('../middleware');
 
 const Article = require('../models/article');
+const Announcement = require('../models/announcement');
 
 // index page
 router.get('/', function(req, res) {
@@ -11,14 +12,29 @@ router.get('/', function(req, res) {
             req.flash('error', 'Cannot access Database');
             res.redirect('/articles');
         } else {
-            res.render('wHeights/index', {articles: foundArticles});
+
+          Announcement.find({}).populate({path: 'sender', select: ['username', 'imageUrl']}).populate('message').exec((err, foundAnns) => {
+            if (err || !foundAnns) {
+              req.flash('error', 'Unable to access database')
+              res.redirect('back')
+            } else {
+              res.render('wHeights/index', {articles: foundArticles, announcements: foundAnns, announced: false})
+            }
+          })
         }
     });
 });
 
 // display form for creating articles
 router.get('/new', function(req, res) {
-    res.render('wHeights/new');
+  Announcement.find({}).populate({path: 'sender', select: ['username', 'imageUrl']}).populate('message').exec((err, foundAnns) => {
+    if (err || !foundAnns) {
+      req.flash('error', 'Unable to access database')
+      res.redirect('back')
+    } else {
+      res.render('wHeights/new', {announcements: foundAnns, announced: false})
+    }
+  })
 });
 
 // display specific article
@@ -28,7 +44,14 @@ router.get('/:id', function(req, res) {
             req.flash('error', 'Cannot find article');
             res.redirect('/articles');
         } else {
-            res.render('wHeights/show', {article: foundArticle});
+          Announcement.find({}).populate({path: 'sender', select: ['username', 'imageUrl']}).populate('message').exec((err, foundAnns) => {
+            if (err || !foundAnns) {
+              req.flash('error', 'Unable to access database')
+              res.redirect('back')
+            } else {
+              res.render('wHeights/show', {article: foundArticle, announcements: foundAnns, announced: false})
+            }
+          })
         }
     });
 });

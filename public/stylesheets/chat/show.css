@@ -1,3 +1,7 @@
+/* 
+===========================
+Chat template styling
+*/
 body {
     background-color: #9f9aa4;
     /* background-image: linear-gradient(90deg, #74EBD5 0%, #9FACE6 100%); */
@@ -97,6 +101,10 @@ span.username {
     width: 50px;
 }
 
+/* 
+===========================
+Exit button
+*/
 .exit-button {
     position: absolute;
     font-size: 1.3rem;
@@ -108,6 +116,11 @@ span.username {
 .exit-button:hover {
     background-color: rgba(255, 255, 255, 0.7);
 }
+
+/* 
+===========================
+General msgs and badword response
+*/
 .announcement {
     width: 100%;
     text-align: center;
@@ -125,6 +138,10 @@ span.username {
     margin-right: 1rem;
 }
 
+/* 
+===========================
+Report comment styling
+*/
 .flag {
     display: inline-block;
     height: 19px;
@@ -161,7 +178,47 @@ span.username {
     position: relative;
 }
 
+/* 
+===========================
+Scroll To Bottom Button
+*/
+.btn-scrolldown {
+    position: absolute;
+    z-index: 1;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    -webkit-transform: translateX(-50%);
+    -moz-transform: translateX(-50%);
+    -ms-transform: translateX(-50%);
 
+    height: 0;
+    overflow: hidden;
+
+    border: none;
+    border-radius: 0px 0px 15px 15px;
+    padding: 0;
+    background-color: #e6e4e48a;
+    color: #000000;
+    
+    transition: 0.3s linear;
+    -webkit-transition: 0.3s linear;
+    -moz-transition: 0.3s linear;
+}
+
+.btn-scrolldown.display {
+    padding: 15px;
+    height: 54px;
+}
+
+.btn-scrolldown:hover {
+    background-color: #e6e4e4;
+}
+
+/* 
+===========================
+Screen customizations
+ */
 @media (max-width: 550px) {
     .w-65 {
         width: 100%;
@@ -175,5 +232,11 @@ span.username {
 @media (min-width: 760px) {
     .w-65 {
         width: 50%;
+    }
+}
+
+@media (max-width: 992px) {
+    .btn-scrolldown {
+        background-color: #f7f7f7;
     }
 }

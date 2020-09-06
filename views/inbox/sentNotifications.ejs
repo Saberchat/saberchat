@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Saberchat</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/stylesheets/main.css">
+    <!-- link css for navbar. Don't need to include public/javascript/userForm.js since user is already logged in and does not need to access login and register forms.  -->
+    <link rel="stylesheet" href="/stylesheets/components/navbar.css">
+    <link rel="stylesheet" href="/stylesheets/inbox/inbox.css">
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js"></script>
+    <script src="../javascript/socket.js"></script>
+
+    <!-- I'm using my fontawesome kit -->
+    <script src="https://kit.fontawesome.com/dccc745c41.js" crossorigin="anonymous"></script>
+
+    <!-- include the navbar via ejs -->
+    <%- include('../partials/navbar') %>
+  </head>
+  <body>
+    <div class="container">
+      <div class="row">
+        <div class="col-md-10 offset-md-1 col-12">
+          <form action="/delete_sent" method="post">
+            <div class="container mt-5">
+              <div class="row">
+                <div class="col-12">
+                  <div class="jumbotron text-center">
+                    <h1><i class="fas fa-inbox"></i> <%=currentUser.username.charAt(0).toUpperCase() + currentUser.username.slice(1)%>'s Inbox</h1>
+                    <p><strong>Sent Notifications: </strong><%=notifs.length%></p>
+                    <a href="/inbox">Back to Inbox</a>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="heading" style="text-align: center;">
+              <button style="margin-bottom: 30px; margin-right: 15px; " type="button" class="btn btn-danger" class="delete-button"><a id="notifButton" href="/clear_sent"><i class="fas fa-trash-alt"></i> Clear All Notifications</a></button>
+              <button style="margin-bottom: 30px; margin-right: 15px;" type="delete" class="btn btn-danger" class="delete-button"><i class="fas fa-trash-alt"></i> Clear Selected Notifications</button>
+              <button style="margin-bottom: 30px; margin-right: 15px;" type="button" class="btn btn-primary" class="delete-button"><a id="notifButton" href="/notif"><i class="far fa-comment-dots"></i> Send Notification</a></button>
+            </div>
+              <div class="search-filter">
+              </div>
+              <ul class = "new_messages" id="new_messages">
+                <%notifs.forEach(notif => { %>
+                  <div class="notification">
+
+                    <!-- Known-sender message -->
+
+                      <% if (parseInt(notif.created_at.toString().slice(16, 19)) > 12) { %>
+                        <input name=<%=notif['_id']%> type="checkbox" />
+                        <label for=<%=notif['_id']%>><a style="color: inherit;" href="/view_inbox_message?id=<%=notif._id%>"><span class="msg-info"><strong><%=notif.subject%></strong> <span style="font-size: 10px;"><%=parseInt(notif.created_at.toString().slice(16, 19)) - 12%>:<%=notif.created_at.toString().slice(19,21)%>PM | <%=notif.created_at.toString().slice(4,10)%></span></span></a></label>
+
+                      <% } else if (parseInt(notif.created_at.toString().slice(16, 19)) == 0) { %>
+                        <input name=<%=notif['_id']%> type="checkbox" />
+                        <label for=<%=notif['_id']%>><a style="color: inherit;" href="/view_inbox_message?id=<%=notif._id%>"><span class="msg-info"><strong><%=notif.subject%></strong> <span style="font-size: 10px;">12:<%=notif.created_at.toString().slice(19,21)%>AM | <%=notif.created_at.toString().slice(4,10)%></span></span></a></label>
+
+                      <% } else {%>
+                        <input  name=<%=notif['_id']%> type="checkbox"/>
+                        <label for=<%=notif['_id']%>><a style="color: inherit;" href="/view_inbox_message?id=<%=notif._id%>"><span class="msg-info"><strong><%=notif.subject%></strong> <span style="font-size: 10px;"><%=notif.created_at.toString().slice(16,21)%>AM | <%=notif.created_at.toString().slice(4,10)%></span></span> </a> </label>
+                      <% } %>
+                      <br />
+
+                      <% if (notif.text.split(' ').length > 20) { %>
+                        <span class="message"><%=notif.text.split(' ').slice(0, 21).join(' ')%> <a style="color: inherit;" href="/view_inbox_message?id=<%=notif._id%>">(Read More)</a></span>
+                      <% } else { %>
+                        <span class="message"><%=notif.text%></span>
+                      <% } %>
+
+                  </div>
+                <% }) %>
+              </ul>
+          </form>
+      </div>
+    </div>
+  </body>
+</html>

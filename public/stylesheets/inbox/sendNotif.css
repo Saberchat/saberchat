@@ -1,0 +1,36 @@
+body {
+  /* background-image: url('/images/Cloudy sunset.jpg'); */
+  background-size: cover;
+}
+
+.submit-button {
+  background-color: green;
+  color: white;
+  margin-bottom: 15px;
+}
+
+.send-notif-type {
+  display: inline-block;
+  margin-right: 10px;
+  margin-left: 10px;
+}
+
+.send-notif-header {
+  color: red;
+  font-family: times;
+  font-weight: bold;
+}
+
+.message {
+  margin-bottom: 5px;
+}
+
+#clear, #clear_anonymous {
+  background-color: red;
+  color: white;
+}
+
+.notif-options {
+  background-color: lightgrey;
+  /* text-align: center; */
+}

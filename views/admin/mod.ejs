@@ -36,18 +36,18 @@
                             <p>Reported by <b><%= comment.statusBy.username %></b></p>
                             <span><b><%= comment.author.username %>:</b> <%= comment.text %></span>
                             <div class="btn-group mod-actions">
-                                <button 
-                                id="<%= comment._id %>" 
-                                class="btn btn-success" 
+                                <button
+                                id="<%= comment._id %>"
+                                class="btn btn-success"
                                 type="button"
                                 onclick="ignoreComment(this)"
                                 >Ignore Report</button>
 
                                 <a id="<%= comment._id %>" class="btn btn-primary text-light" type="button">Get Context</a>
 
-                                <button 
-                                id="<%= comment._id %>" 
-                                class="btn btn-danger" 
+                                <button
+                                id="<%= comment._id %>"
+                                class="btn btn-danger"
                                 type="button"
                                 onclick="deleteComment(this)"
                                 >Delete Comment</button>

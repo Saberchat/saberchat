@@ -30,6 +30,8 @@ const schedule = require('node-schedule');
 // require the models for database actions
 const Comment = require('./models/comment');
 const User = require("./models/user");
+const Order = require('./models/order');
+const Item = require('./models/orderItem');
 
 //require the routes
 const indexRoutes = require('./routes/index');
@@ -38,6 +40,9 @@ const profileRoutes = require('./routes/profile');
 const wHeightsRoutes = require('./routes/wHeights');
 const inboxRoutes = require('./routes/inbox');
 const adminRoutes = require('./routes/admin');
+const cafeRoutes = require('./routes/cafe');
+const announcementRoutes = require('./routes/announcements');
+const projectRoutes = require('./routes/projects');
 
 //set up ports and socket.io
 const http = require('http').createServer(app);
@@ -46,7 +51,11 @@ const port = process.env.PORT || 3000;
 
 //connect to db. We should set the link as environment variable for security purposes in the future.
 //mongodb+srv://<username>:<password>@cluster0-cpycz.mongodb.net/saberChat?retryWrites=true&w=majority
-mongoose.connect("mongodb+srv://admin_1:alsion2020@cluster0-cpycz.mongodb.net/saberChat?retryWrites=true&w=majority", {useNewUrlParser: true, useUnifiedTopology: true, useFindAndModify: false});
+mongoose.connect("mongodb+srv://admin_1:alsion2020@cluster0-cpycz.mongodb.net/saberChat?retryWrites=true&w=majority", {
+  useNewUrlParser: true,
+  useUnifiedTopology: true,
+  useFindAndModify: false
+});
 
 // ============================
 // app configuration
@@ -58,7 +67,9 @@ app.use(express.static(__dirname + "/public"));
 // try serving editorjs package to frontend
 app.use('/editor', express.static(__dirname + "/node_modules/@editorjs"));
 // use body parser
-app.use(bodyParser.urlencoded({extended: true}));
+app.use(bodyParser.urlencoded({
+  extended: true
+}));
 //set view engine to ejs
 app.set("view engine", "ejs");
 // I think yall already know what method override is
@@ -77,13 +88,15 @@ var MemoryStore = require('memorystore')(session);
 // 	saveUninitialized: false
 // }));
 app.use(session({
-	cookie: {maxAge: 86400000},
-	store: new MemoryStore({
-		checkPeriod: 86400000 //prune expired entries every 24hrs
-	}),
-	secret: "Programming For Alsion is Cool",
-	resave: false,
-	saveUninitialized: false
+  cookie: {
+    maxAge: 86400000
+  },
+  store: new MemoryStore({
+    checkPeriod: 86400000 //prune expired entries every 24hrs
+  }),
+  secret: "Programming For Alsion is Cool",
+  resave: false,
+  saveUninitialized: false
 }));
 
 // passport required authorization setup that I also know nothing about.
@@ -97,15 +110,13 @@ passport.deserializeUser(User.deserializeUser());
 
 // setting app locals, which can be accessed in all ejs views
 app.use(function(req, res, next) {
-	// puts user info into 'currentUser' variable
-	res.locals.currentUser = req.user;
-	// flash message stuff
-	res.locals.error = req.flash('error');
-	res.locals.success = req.flash('success');
-	next();
+  // puts user info into 'currentUser' variable
+  res.locals.currentUser = req.user;
+  // flash message stuff
+  res.locals.error = req.flash('error');
+  res.locals.success = req.flash('success');
+  next();
 });
-
-
 
 // =======================
 // Routes
@@ -116,24 +127,27 @@ app.use('/chat', chatRoutes);
 app.use('/profiles', profileRoutes);
 app.use('/articles', wHeightsRoutes);
 app.use(inboxRoutes);
+app.use(announcementRoutes);
 app.use('/admin', adminRoutes);
+app.use('/cafe', cafeRoutes);
+app.use(projectRoutes);
 
 // Catch-all route
-app.get('*', function(req, res) {
-	res.redirect('/');
-});
+// app.get('*', function(req, res) {
+// 	res.redirect('/');
+// });
 
 // list of responses to bad words
 const curseResponse = [
-	"Please Don't curse. Let's keep things family-friendly.",
-	"Give the word filter a break! Don't curse.",
-	"Not cool. Very not cool.",
-	"Come on. Be friendly."
+  "Please Don't curse. Let's keep things family-friendly.",
+  "Give the word filter a break! Don't curse.",
+  "Not cool. Very not cool.",
+  "Come on. Be friendly."
 ]
 
 // gets random item in array
 function getRandMessage(list) {
-	return list[Math.floor(Math.random() * list.length)]
+  return list[Math.floor(Math.random() * list.length)]
 }
 
 // deletes all comments at midnight
@@ -155,71 +169,131 @@ function getRandMessage(list) {
 
 // Socket.io server-side code
 io.on('connect', (socket) => {
-//   console.log("A user connected".cyan);
-//   socket.on('disconnect', () => {
-// 		console.log("A user disconnected".cyan);
-	// When 'switch room' event is detected, leave old room and join 'newroom';
-  	socket.on('switch room', (newroom) => {
-		socket.leave(socket.room);
-		socket.join(newroom);
-		socket.room = newroom;
-	});
+  // console.log("A user connected".cyan);
+  // socket.on('disconnect', () => {
+  // console.log("A user disconnected".cyan);
 
-	// When 'chat message' event is detected, emit msg to all clients in room
-	socket.on('chat message', (msg) => {
-		let profanity;
-		// clean the message
-		if(msg.text != filter.clean(msg.text)){
-			msg.text = filter.clean(msg.text);
-			profanity = true;
-		}
-		// create/save comment to db
-		Comment.create({text: msg.text, room: socket.room, author: msg.authorId}, function(err, comment) {
-			if(err) {
-				// sends error msg if comment could not be created
-				console.log(err);
-				req.flash('error', 'message could not be created');
-			} else {
-				// set msg id
-				msg.id = comment._id;
-				// broadcast message to all connected users in the room
-				socket.to(socket.room).emit('chat message', msg);
-				// format the date in the form we want.
-				comment.date = dateFormat(comment.created_at, "h:MM TT | mmm d");
-				// saves changes
-				comment.save();
-				// checks if bad language was used
-				if(profanity) {
-					// console.log('detected bad words'.green);
-					let notif = {text: getRandMessage(curseResponse), status: 'notif'};
-					// send announcement to all
-					io.in(socket.room).emit('announcement', notif);
-					// create announcement in db
-					Comment.create({text: notif, room: socket.room, status: notif.status}, function(err, comment) {
-						if(err) {
-							// sends error msg if comment could not be created
-							console.log(err);
-						} else {
-							// format the date in the form we want
-							comment.date = dateFormat(comment.created_at, "h:MM TT | mmm d");
-							// saves changes
-							comment.save();
-					// confirmation log
-							// console.log('Database Comment created: '.cyan);
-							// console.log(comment);
-						}
-					});
-				}
-		// confirmation log
-				// console.log('Database Comment created: '.cyan);
-				// console.log(comment);
-			}
-		});
-	});
+  // When 'switch room' event is detected, leave old room and join 'newroom';
+  socket.on('switch room', (newroom) => {
+    socket.leave(socket.room);
+    socket.join(newroom);
+    socket.room = newroom;
+  });
+
+  // When 'chat message' event is detected, emit msg to all clients in room
+  socket.on('chat message', (msg) => {
+    let profanity;
+    // clean the message
+    if (msg.text != filter.clean(msg.text)) {
+      msg.text = filter.clean(msg.text);
+      profanity = true;
+    }
+    // create/save comment to db
+    Comment.create({
+      text: msg.text,
+      room: socket.room,
+      author: msg.authorId
+    }, function(err, comment) {
+      if (err) {
+        // sends error msg if comment could not be created
+        console.log(err);
+        req.flash('error', 'message could not be created');
+      } else {
+        // set msg id
+        msg.id = comment._id;
+        // broadcast message to all connected users in the room
+        socket.to(socket.room).emit('chat message', msg);
+        // format the date in the form we want.
+        comment.date = dateFormat(comment.created_at, "h:MM TT | mmm d");
+        // saves changes
+        comment.save();
+        // checks if bad language was used
+        if (profanity) {
+          // console.log('detected bad words'.green);
+          let notif = {
+            text: getRandMessage(curseResponse),
+            status: 'notif'
+          };
+          // send announcement to all
+          io.in(socket.room).emit('announcement', notif);
+          // create announcement in db
+          Comment.create({
+            text: notif,
+            room: socket.room,
+            status: notif.status
+          }, function(err, comment) {
+            if (err) {
+              // sends error msg if comment could not be created
+              console.log(err);
+            } else {
+              // format the date in the form we want
+              comment.date = dateFormat(comment.created_at, "h:MM TT | mmm d");
+              // saves changes
+              comment.save();
+              // confirmation log
+              // console.log('Database Comment created: '.cyan);
+              // console.log(comment);
+            }
+          });
+        }
+        // confirmation log
+        // console.log('Database Comment created: '.cyan);
+        // console.log(comment);
+      }
+    });
+  });
+
+  // socket.on('order', (itemList, instructions, customerId) => {
+  //
+  //   var name;
+  //   User.findById(customerId, (err, foundUser) => {
+  //     if (err || !foundUser) {
+  //       console.log(err.red);
+  //     } else {
+  //       name = foundUser.firstName + " " + foundUser.lastName;
+  //     }
+  //   });
+  //
+  //   var totalCharge = 0;
+  //   itemList.forEach((id) => {
+  //     Item.findById(id, (err, foundItem) => {
+  //       if (err || !foundItem) {
+  //         console.log("Could not find item price".red);
+  //       } else {
+  //         totalCharge += foundItem.price;
+  //       }
+  //     });
+  //   });
+  //
+  //   var order;
+  //   Order.create({
+  //     customer: customerId
+  //   }, (err, order) => {
+  //     if (err) {
+  //       console.log(err);
+  //     } else {
+  //       order.name = name;
+  //       itemList.forEach((id) => {
+  //         order.items.push(id);
+  //       });
+  //       order.instructions = instructions;
+  //       order.charge = totalCharge;
+  //       order.date = dateFormat(order.created_at, "mmm d, h:MM TT");
+  //       order.present = true;
+  //
+  //       order.save();
+  //
+  //       console.log("New Order:".cyan);
+  //       console.log(order);
+  //     }
+  //
+  //     io.emit('order', order);
+  //   });
+  // });
 });
 
 // -----------------------
 // Start server
-http.listen(port,process.env.IP, () => {
-	console.log(":: App listening on port " + port + " ::");
+http.listen(port, process.env.IP, () => {
+  console.log(":: App listening on port " + port + " ::");
 });

@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Saberchat</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/stylesheets/main.css">
+    <!-- link css for navbar. Don't need to include public/javascript/userForm.js since user is already logged in and does not need to access login and register forms.  -->
+    <link rel="stylesheet" href="/stylesheets/components/navbar.css">
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js"></script>
+    <script src="../javascript/socket.js"></script>
+
+    <!-- I'm using my fontawesome kit -->
+    <script src="https://kit.fontawesome.com/dccc745c41.js" crossorigin="anonymous"></script>
+
+    <!-- include the navbar via ejs -->
+    <%- include('../partials/navbar') %>
+  </head>
+  <body>
+    <div class="container mt-5">
+      <div class="row">
+        <div class="col-12">
+          <div class="jumbotron text-center">
+            <h1><i class="fas fa-paint-brush"></i> Student Projects </h1>
+            <p>Our Students' Artwork, Gardening Projects, Science Projects and More</p>
+            <% if (currentUser.permission == 'admin' || currentUser.permission == 'teacher') { %>
+              <a href="/addProject">Add Project</a>
+            <%}%>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="projects" style="text-align: center;">
+      <%projects.forEach(project => { %>
+        <div class="container mt-5" style="width: 400px; display: inline-block;">
+          <div class="row">
+            <div class="col-12">
+              <div class="jumbotron text-center">
+                <div class="project-info" style="height: 450px; padding-bottom: 125px; margin-top: -100px; padding-top: 50px;">
+                  <a href="view_project?id=<%=project._id%>"><h1><%=project.title%></h1></a>
+                  <p><em>Posted by <strong><%=project.poster%></strong></em></p>
+                  <% if (project.creators.length > 2) {%>
+                    <p><strong>Creator(s):</strong> <em><%=project.creators[0]%> and <%=project.creators.length - 1%> others</em></p>
+                  <%} else {%>
+                    <p><strong>Creator(s):</strong> <em><%=project.creators.join(' and ')%></em></p>
+                  <%}%>
+                  <img style="width: 90%; height: 90%; object-fit: contain;" src="<%=project.imgUrl%>"/>
+                  <br />
+                  <% if (currentUser.username == project.poster) { %>
+                    <button style="margin-top: 20px; margin-right: 10px;" type="button" class="btn btn-success"><a style="color: white;" href="/edit_project?id=<%=project.id%>">Edit Project</a></button>
+                    <button style="margin-top: 20px;" class="btn btn-danger" type="button"><a href="/delete_project?id=<%=project._id%>" style="color: white;">Delete Project</a></button>
+                  <% } %>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      <% }) %>
+    </div>
+  </body>
+</html>

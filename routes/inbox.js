@@ -1,93 +1,317 @@
 const express = require('express');
 const middleware = require('../middleware');
-//start express router
-const router = express.Router();
-
-
+const router = express.Router(); //start express router
 const User = require('../models/user');
 const Notification = require('../models/notification');
+const Announcement = require('../models/announcement');
 
 //Access sendNotification file
-router.get('/notif', middleware.isLoggedIn, (req, res, next) => {
-	let types = ["Cafe Order Status Update", "Field Trip Notification", "PE Notification", "School Event Notification", "Class Schedule Change"] //Types of notifs
+router.get('/notif', middleware.isLoggedIn, (req, res) => {
 	User.find({}, (err, foundUsers) => {
 		if(err || !foundUsers) {
 			req.flash('error', 'Unable to access Database');
 			res.redirect('back');
+
 		} else {
-			res.render('inbox/sendNotification', {users: foundUsers, types})
+
+			Announcement.find({}).populate({path: 'sender', select: ['username', 'imageUrl']}).populate('message').exec((err, foundAnns) => {
+				if (err || !foundAnns) {
+					req.flash('error', 'Unable to access database')
+					res.redirect('back')
+				} else {
+					res.render('inbox/sendNotification', {announcements: foundAnns, announced: false, users: foundUsers, selected_users: [], currentUser: req.user})
+				}
+			})
 		}
 	})
 })
 
-//Route to send 'notification', different from 'comment'
-router.post('/new', middleware.isLoggedIn, (req, res) => {
-	//Access recipient from User schema
-	User.find({}, (err, foundUsers) => {
-		if(err || !foundUsers) {
-			req.flash('error', 'Unable to access Database');
-			res.redirect('back');
-		} else {
-			for (let i of foundUsers) {
-				if (i.username.toLowerCase() == req.body.recipient.toLowerCase()) {
-					//Create notification and save it to database
-					Notification.create({type: req.body.type, sender: req.user, text: req.body.message}, (err, notification) => {
-						notification.save()
-						i.inbox.push(notification) //Add notif to recipient's inbox
-						i.save()
-						req.flash('success', "Notification sent!")
-						res.redirect('/notif')
+//Route to send notification to a group of people
+router.post('/send_group', middleware.isLoggedIn, (req, res) => {
+
+	let mailing_list = req.body.recipient_list.split(', ') //Creates list of recipients based on user input
+
+	if (mailing_list.includes('everyone')) { //Send notif to everyone
+		User.find({'_id': {$nin: req.user._id}}, (err, foundUsers) => {
+			if(err || !foundUsers) {
+				req.flash('error', 'Unable to access Database');
+				res.redirect('back');
+
+			} else {
+
+				if (req.body.images.split(', ')[0] == '') { //No images attached
+					Notification.create({subject: req.body.subject, sender: req.user, text: req.body.message, recipients: ['everyone'], images: []}, (err, notification) => {
+						notification.save() //Create notification
+
+						for (let i of foundUsers) {
+							i.inbox.push(notification) //Add notif to each recipient's inbox
+							i.save()
+						}
+					})
+
+				} else { //Images are attached
+					Notification.create({subject: req.body.subject, sender: req.user, text: req.body.message, recipients: ['everyone'], images: req.body.images.split(', ')}, (err, notification) => {
+						notification.save() //Create notification
+
+						for (let i of foundUsers) {
+							i.inbox.push(notification) //Add notif to recipient's inbox
+							i.save()
+						}
 					})
 				}
 			}
+			req.flash('success', `Notification sent to everyone!`)
+			res.redirect('/notif')
+		})
+
+	} else { //Send notif to specific mailing list
+
+		User.find({'username': {$in: mailing_list}}, (err, foundUsers) => { //Access users from User schema
+			if(err || !foundUsers) {
+				req.flash('error', 'Unable to access Database');
+				res.redirect('back');
+
+			} else {
+
+				if (req.body.images.split(', ')[0] == '') {
+					Notification.create({subject: req.body.subject, sender: req.user, text: req.body.message, recipients: mailing_list, images: []}, (err, notification) => {
+						notification.save() //Create notification
+
+						for (let i of foundUsers) {
+							i.inbox.push(notification) //Add notif to each recipient's inbox
+							i.save()
+						}
+					})
+
+				} else {
+					Notification.create({subject: req.body.subject, sender: req.user, text: req.body.message, recipients: mailing_list, images: req.body.images.split(', ')}, (err, notification) => {
+						notification.save() //Create notification
+
+						for (let i of foundUsers) {
+							i.inbox.push(notification) //Add notif to each recipient's inbox
+							i.save()
+						}
+					})
+				}
+				req.flash('success', `Notification sent to mailing list!!`)
+				res.redirect('/notif')
+			}
+		})
+	}
+})
+
+//Send message via anonymous hotline
+router.post('/send_anonymous', (req, res) => {
+	let mailing_list = req.body.recipient_list_anonymous.split(', ') //Creates list of recipients based on user input
+
+	if (mailing_list.includes('All Teachers and Admins')) { //Send notif to all teachers and admins
+		User.find({'permission': {$in: ['teacher', 'admin']}}, (err, foundUsers) => {
+			if(err || !foundUsers) {
+				req.flash('error', 'Unable to access Database');
+				res.redirect('back');
+
+			} else {
+
+				if (req.body.images.split(', ')[0] == '') {
+					Notification.create({subject: req.body.subject, sender: null, text: req.body.message, recipients: ['All teachers and admins'], images: []}, (err, notification) => {
+						notification.save() //Create notification
+
+						for (let i of foundUsers) {
+							i.inbox.push(notification) //Add notif to recipient's inbox
+							i.save()
+						}
+					})
+
+				} else {
+					Notification.create({subject: req.body.subject, sender: null, text: req.body.message, recipients: ['All teachers and admins'], images: req.body.images.split(', ')}, (err, notification) => {
+						notification.save() //Create notification
+
+						for (let i of foundUsers) {
+							i.inbox.push(notification) //Add notif to recipient's inbox
+							i.save()
+						}
+					})
+				}
+			}
+
+			req.flash('success', `Notification sent to all teachers! Your identity has been kept anonymous`)
+			res.redirect('/notif')
+		})
+
+	} else { // Send notif to specific mailing list of teachers and admins
+
+		User.find({username: {$in: mailing_list}}, (err, foundUsers) => { //Access users from User schema
+			if(err || !foundUsers) {
+				req.flash('error', 'Unable to access Database');
+				res.redirect('back');
+
+			} else {
+
+				if (req.body.images.split(', ')[0] == '') {
+					Notification.create({subject: req.body.subject, sender: null, text: req.body.message, recipients: mailing_list, images: []}, (err, notification) => {
+						notification.save() //Create notification
+
+						for (let i of foundUsers) {
+							i.inbox.push(notification) //Add notif to recipient's inbox
+							i.save()
+						}
+					})
+
+				} else {
+					Notification.create({subject: req.body.subject, sender: null, text: req.body.message, recipients: mailing_list, images: req.body.images.split(', ')}, (err, notification) => {
+						notification.save() //Creat notification
+
+						for (let i of foundUsers) {
+							i.inbox.push(notification) //Add notif to recipient's inbox
+							i.save()
+						}
+					})
+				}
+
+				req.flash('success', `Notification sent to mailing list! Your identity has been kept anonymous`)
+				res.redirect('/notif')
+			}
+		})
+	}
+})
+
+//Route to display user inbox
+router.get('/inbox', middleware.isLoggedIn, (req, res) => {
+
+	User.findOne({_id: req.user._id}).populate({path: 'inbox', populate: { path: 'sender', select: ['username', 'imageUrl']}}).exec((err, foundUser) => {
+		if (err || !foundUser) {
+      req.flash('error', 'Unable to access database')
+      res.redirect('back')
+
+    } else {
+			Announcement.find({}).populate({path: 'sender', select: ['username', 'imageUrl']}).populate('message').exec((err, foundAnns) => {
+				if (err || !foundAnns) {
+					req.flash('error', 'Unable to access database')
+					res.redirect('back')
+				} else {
+					res.render('inbox/inbox', {announcements: foundAnns, announced: false, username: foundUser.username, notifs: foundUser.inbox.reverse()})
+				}
+			})
 		}
 	})
 })
 
-//Route to display user inbox
-router.get('/inbox', middleware.isLoggedIn, (req, res, next) => {
+//View message in your inbox in more detail
+router.get('/view_inbox_message', middleware.isLoggedIn, (req, res) => {
+	Notification.findOne({_id: req.query.id}).populate({path: 'sender', select: ['username', 'imageUrl']})
+	.exec((err, foundNotif) => {
+		if (err || !foundNotif) {
+			req.flash('error', "Unable to access database")
+			res.redirect('back')
 
-	//Collect all notifications, collect info on sender's username
-	let notifList = [] //List of notifications that will be displayed
-	Notification.find({
-
-	}).populate({path: 'sender', select: ['username', 'imageUrl']})
-	.exec((err, foundNotifs) => {
-		if (err || !foundNotifs) {
-			req.flash('error', 'Unable to access Database');
-				res.redirect('back')
-
-		} else { //If user's inbox contains notification's id, add to notifList []
-			for (let notif of foundNotifs) {
-				if (req.user.inbox.includes(notif['_id'])) {
-					notifList.unshift(notif)
+		} else {
+			Announcement.find({}).populate({path: 'sender', select: ['username', 'imageUrl']}).populate('message').exec((err, foundAnns) => {
+				if (err || !foundAnns) {
+					req.flash('error', 'Unable to access database')
+					res.redirect('back')
+				} else {
+					res.render('inbox/notification', {announcements: foundAnns, announced: false, notif: foundNotif})
 				}
+			})
+		}
+	})
+})
+
+//Accesses every notification that you have sent
+router.get('/view_sent_notifs', middleware.isLoggedIn, (req, res) => {
+	Notification.find({'sender': req.user}, (err, foundNotifs) => {
+		if (err || !foundNotifs) {
+			req.flash('error', 'Unable to access database')
+			res.redirect('/inbox')
+
+		} else {
+			Announcement.find({}).populate({path: 'sender', select: ['username', 'imageUrl']}).populate('message').exec((err, foundAnns) => {
+				if (err || !foundAnns) {
+					req.flash('error', 'Unable to access database')
+					res.redirect('back')
+				} else {
+					res.render('inbox/sentNotifications', {announcements: foundAnns, announced: false, notifs: foundNotifs.reverse()})
+				}
+			})
+		}
+	})
+})
+
+//Clear entire inbox
+router.get('/clear', middleware.isLoggedIn, (req, res) => {
+	req.user.inbox = []
+	req.user.save()
+	req.flash('success', 'Inbox cleared!');
+	res.redirect('/inbox');
+})
+
+//Clears all notifications that you sent (permanently)
+router.get('/clear_sent', middleware.isLoggedIn, (req, res) => {
+	Notification.find({sender: req.user}, (err, foundNotifs) => {
+		if (err || !foundNotifs) {
+			req.flash('error', 'Unable to access database')
+			res.redirect('back')
+
+		} else {
+
+			for (let notif of foundNotifs) {
+				Notification.findByIdAndDelete(notif._id, (err, foundNotif) => {
+					if (err || !foundNotif) {
+						req.flash('error', 'Unable to access database')
+						res.redirect('back')
+
+					}
+				})
 			}
-			res.render('inbox/inbox', {username: req.user.username, notifs: notifList})
+
+			req.flash('success', "All Sent Notifications Cleared!")
+			res.redirect('/view_sent_notifs')
 		}
 	})
 })
 
 //Delete already viewed notifications
-router.post('/delete', (req, res) => {
-	deletes = []
+router.post('/delete', middleware.isLoggedIn, (req, res) => {
+	deletes = [] //List of messages to be deleted
 	for (let item of req.user.inbox) {
-		if (Object.keys(req.body).includes(item._id.toString())) {
+		if (Object.keys(req.body).includes(item._id.toString())) { //If item is selected to be deleted (checkbox)
 			deletes.push(item)
 		}
 	}
 
-	for (let msg of deletes) {
-		Notification.findByIdAndDelete(msg, (err, deletedNotif) => {
-			if (err || !deletedNotif) {
-				console.log(err)
-				req.flash('error', 'A Problem Occured, Unable to Delete');
-	      res.redirect('back');
-			}
-		})
+	for (let notif of deletes) {
+		req.user.inbox.splice(req.user.inbox.indexOf(notif), 1)
 	}
-	req.flash('success', 'Notification(s) deleted!');
-	res.redirect('/inbox');
+	req.user.save()
+	req.flash('success', 'Notification(s) deleted!')
+	res.redirect('/inbox')
+})
+
+//Delete selected notifications that you sent (permanently)
+router.post('/delete_sent', middleware.isLoggedIn, (req, res) => {
+	deletes = [] //List of messages to be deleted
+
+	Notification.find({sender: req.user}, (err, foundNotifs) => {
+		if (err || !foundNotifs) {
+			req.flash("error", "Unable to access database")
+			res.redirect('back')
+
+		} else {
+			for (let notif of foundNotifs) {
+
+				if (Object.keys(req.body).includes(notif._id.toString())) { //If item is selected to be deleted (checkbox)
+					Notification.findByIdAndDelete(notif._id, (err, foundNotif) => {
+						if (err || !foundNotif) {
+							req.flash("error", "Unable to access database")
+							res.redirect('back')
+						}
+					})
+				}
+			}
+			req.flash('success', 'Notification(s) deleted!')
+			res.redirect('/view_sent_notifs')
+		}
+	})
 })
 
 module.exports = router;
