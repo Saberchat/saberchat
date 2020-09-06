@@ -65,7 +65,7 @@ router.get('/view_announcement', middleware.isLoggedIn, (req, res) => {
   })
 })
 
-router.get('/delete_announcement', (req, res) => {
+router.get('/delete_announcement', middleware.isLoggedIn, (req, res) => {
   Announcement.findByIdAndDelete(req.query.id, (err, foundAnn) => {
     if (err || !foundAnn) {
       req.flash('error', "Unable to access database")
@@ -78,4 +78,36 @@ router.get('/delete_announcement', (req, res) => {
   })
 })
 
+router.get('/edit_announcement', middleware.isLoggedIn, (req, res) => {
+  Announcement.findById(req.query.id, (err, foundAnn) => {
+    if (err || !foundAnn) {
+      req.flash('error', "Unable to access database")
+      res.redirect('back')
+
+    } else {
+      Announcement.find({}).populate({path: 'sender', select: ['username', 'imageUrl']}).populate('message').exec((err, foundAnns) => {
+        if (err || !foundAnns) {
+          req.flash('error', 'Unable to access database')
+          res.redirect('back')
+
+        } else {
+          res.render('announcements/editAnnouncement', {announcements: foundAnns, announced: false, announcement: foundAnn})
+        }
+      })
+    }
+  })
+})
+
+router.post('/submit_announcement_changes', middleware.isLoggedIn, (req, res) => {
+  Announcement.findByIdAndUpdate(req.query.id, {subject: req.body.subject, text: req.body.message}, (err, foundAnn) => {
+    if (err || !foundAnn) {
+      req.flash('error', "Unable to access database")
+      res.redirect('back')
+
+    } else {
+      req.flash('success', 'Announcement Updated!')
+      res.redirect(`/view_announcement?id=${foundAnn._id}`)
+    }
+  })
+})
 module.exports = router;

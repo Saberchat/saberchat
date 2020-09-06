@@ -50,12 +50,12 @@
                     <input name="check[<%= item._id %>]" id="<%= item._id%>" class="form-check-input" type="checkbox" value="">
                     <select class="num-orders" id="dd_<%=item._id%>" name="<%=item.name%>">
                       <% if (item.availableItems > 5) { %>
-                        <% [0, 1, 2, 3, 4, 5].forEach(function(num) { %>
+                        <% [1, 2, 3, 4, 5].forEach(function(num) { %>
                           <option><%=num%></option>
                         <% }) %>
                       <% } else { %>
-                        <% [...Array(item.availableItems + 1).keys()].forEach(function(num) { %>
-                          <option><%=num%></option>
+                        <% [...Array(item.availableItems).keys()].forEach(function(num) { %>
+                          <option><%=num+1%></option>
                         <% }) %>
                       <% } %>
                     </select>
