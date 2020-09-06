@@ -18,3 +18,14 @@ $(function() {
         $(".user-form.signup").removeClass("display");
     });
 });
+
+// class animations for the signup form
+function next() {
+    $('.user-info').removeClass('display');
+    $('.login-info').addClass('display');
+}
+
+function back() {
+    $('.user-info').addClass('display');
+    $('.login-info').removeClass('display');
+}

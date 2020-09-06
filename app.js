@@ -17,6 +17,9 @@ const methodOverride = require('method-override');
 const dateFormat = require('dateformat');
 //pretty up the console
 const colors = require('colors');
+// add favicon
+const favicon = require('serve-favicon');
+
 //profanity filter
 const Filter = require('bad-words');
 const filter = new Filter();
@@ -57,7 +60,8 @@ mongoose.connect("mongodb+srv://admin_1:alsion2020@cluster0-cpycz.mongodb.net/sa
 // ============================
 // app configuration
 // ============================
-
+// use favicon
+app.use(favicon(__dirname + '/public/images/favicon.ico'));
 // make public dir accessible in all views
 app.use(express.static(__dirname + "/public"));
 // try serving editorjs package to frontend

@@ -8,6 +8,7 @@
   <!-- link chat stylesheet -->
   <link rel="stylesheet" href="/stylesheets/chat/show.css">
   <link rel="stylesheet" href="/stylesheets/components/navbar.css">
+  <link rel="stylesheet" href="/stylesheets/components/header.css">
 
   <!-- using my fontawesome kit -->
   <script src="https://kit.fontawesome.com/dccc745c41.js" crossorigin="anonymous"></script>
@@ -21,7 +22,11 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-dateFormat/1.0/jquery.dateFormat.min.js"></script>
 </head>
 <body>
-  <%- include("../partials/navbar") %>
+  <!-- include the navbar via ejs -->
+  <%- include('../partials/navbar') %>
+  <!-- include the backdrop for nav -->
+  <%- include('../partials/header') %>
+
 <header class="text-center">
   <div class="container">
     <h1 class="display-4 text-dark"><%= room.name %></h1>

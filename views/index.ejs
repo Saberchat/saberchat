@@ -8,6 +8,7 @@
 
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css" integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk" crossorigin="anonymous">
     <link rel="stylesheet" href="/stylesheets/main.css">
+    <link rel="stylesheet" href="/stylesheets/home/index.css">
     <link rel="stylesheet" href="/stylesheets/components/background.css">
     <link rel="stylesheet" href="/stylesheets/components/navbar.css">
 
@@ -17,7 +18,9 @@
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js" integrity="sha384-OgVRvuATP1z7JjHLkuOU7Xw704+h835Lr+6QL9UvYjZE3Ipu6Tp75j7Bh/kR0JKI" crossorigin="anonymous"></script>
 
     <script src="https://kit.fontawesome.com/dccc745c41.js" crossorigin="anonymous"></script>
-    <script src="/javascript/userForm.js"></script>
+    <script src="/javascript/nav/userForm.js"></script>
+    <script src="/javascript/nav/navbar.js"></script>
+    <script src="/javascript/home/index.js"></script>
 </head>
 <body>
 <!-- insert navbar via ejs-->
@@ -36,47 +39,66 @@
 </section>
 
 <!-- Home Page content -->
-<section>
+<main id="main-container">
     <div class="container mt-5">
+        <!-- Block 1 -->
         <div class="row" style="margin-bottom: 5rem;">
-            <div class="col-md-6">
-                <h1>About</h1>
-                <p>SaberChat is a platform that connects and centralizes Alsion's various communication and notification platforms, streamlining communication between students, teachers, parents and more.</p>
-                <p>Users can quickly access any important information from teachers, communicate with others, and access some of Alsion's unique projects.</p>
-                <p>Centralizing our school's content to an inclusive platform will improve our school's identity, as well as relationships between students, parents and teachers across the school.</p>
-                <em><strong>Developers: </strong>Alexander Zhou, Kabir Samsi, Siddharth Chavan, Vibhav Darsha</em>
+            <div class="col-lg-6">
+                <article class="text-block">
+                    <div class="block-header green">
+                        <h1>About</h1>
+                    </div>
+                    <div class="block-content">
+                        <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Phasellus a placerat risus. Nullam ornare turpis bibendum scelerisque pharetra. Suspendisse placerat magna ac augue interdum, eget porttitor nibh sollicitudin. Aenean volutpat blandit ante. Vestibulum iaculis, justo vel mattis condimentum, metus massa cursus velit, ut scelerisque ligula quam ut ligula. Nulla justo augue, viverra in euismod aliquam, semper ac urna. Vestibulum porttitor massa ut augue maximus, quis aliquet dolor volutpat.</p>
+                    </div>
+                </article>
             </div>
-            <div class="col-md-6">
-              <img class="img-fluid rounded" src="https://pbs.twimg.com/media/BmLCEgeCAAAmESz.jpg:large" alt="Our community">
+            <div class="col-lg-6 block">
+                <img class="image-block" src="https://images.unsplash.com/photo-1595538154519-bc102fd25a97?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=1950&q=80" alt="fancy pic">
             </div>
         </div>
-        <div class="row" style="margin-bottom: 5rem;">
-            <div class="col-md-6 order-md-2">
-                <h1>Services</h1>
-                <ul>
-                  <li>Chat rooms for students and teachers</li>
-                  <li>A bulletin where teachers can post important announcements</li>
-                  <li>A more efficient ordering system for Early College's No Left Turn Cafe, which allows students to order online and receive status updates on their orders</li>
-                  <li>Access to Alsion's online magazine, Witherly Heights</li>
-                </ul>
+        <!-- Block 2 -->
+        <div class="row" style="margin-bottom: 5rem;" id="block-2">
+            <div class="col-lg-6 order-lg-2">
+                <article class="text-block">
+                    <div class="block-header yellow">
+                        <h1>Services</h1>
+                    </div>
+                    <div class="block-content">
+                        <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Phasellus a placerat risus. Nullam ornare turpis bibendum scelerisque pharetra. Suspendisse placerat magna ac augue interdum, eget porttitor nibh sollicitudin. Aenean volutpat blandit ante. Vestibulum iaculis, justo vel mattis condimentum, metus massa cursus velit, ut scelerisque ligula quam ut ligula. Nulla justo augue, viverra in euismod aliquam, semper ac urna. Vestibulum porttitor massa ut augue maximus, quis aliquet dolor volutpat.</p>
+                    </div>
+                </article>
             </div>
-            <div class="col-md-6 order-md-1">
-                <!-- <img class="img-fluid rounded" src="https://images.unsplash.com/photo-1593441259108-980416c4fda3?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=2089&q=80" alt="fancy pic"> -->
-                <img class="img-fluid rounded" src="https://pbs.twimg.com/media/BmLCEgeCAAAmESz.jpg:large" alt="Our community">
+            <div class="col-lg-6 block">
+                <img class="image-block" src="https://images.unsplash.com/photo-1595538154519-bc102fd25a97?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=1950&q=80" alt="fancy pic">
             </div>
         </div>
-        <div class="row" style="margin-bottom: 5rem;">
-            <div class="col-md-6">
-                <h1>Community</h1>
-                <p>SaberChat reaches out to all of our community members - students, teachers and parents in both Early College and Middle School. As members of a small, tight-nit school, we value our community deeply.
-                  SaberChat will strengthen the relationships between every Alsionite.</p>
+        <!-- Block 3 -->
+        <div class="row" style="margin-bottom: 5rem;" id="block-3">
+            <div class="col-lg-6">
+                <article class="text-block">
+                    <div class="block-header red">
+                        <h1>Community</h1>
+                    </div>
+                    <div class="block-content">
+                        <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Phasellus a placerat risus. Nullam ornare turpis bibendum scelerisque pharetra. Suspendisse placerat magna ac augue interdum, eget porttitor nibh sollicitudin. Aenean volutpat blandit ante. Vestibulum iaculis, justo vel mattis condimentum, metus massa cursus velit, ut scelerisque ligula quam ut ligula. Nulla justo augue, viverra in euismod aliquam, semper ac urna. Vestibulum porttitor massa ut augue maximus, quis aliquet dolor volutpat.</p>
+                    </div>
+                </article>
             </div>
-            <div class="col-md-6">
-                <img class="img-fluid rounded" src="https://pbs.twimg.com/media/BmLCEgeCAAAmESz.jpg:large" alt="Our community">
+            <div class="col-lg-6 block">
+                <img class="image-block" src="https://images.unsplash.com/photo-1595538154519-bc102fd25a97?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=1950&q=80" alt="fancy pic">
             </div>
         </div>
     </div>
-</section>
-
+</main>
+<%- include('./partials/footer') %>
+<script>
+    window.onload = function() {
+        window.onscroll = function() {
+            updateNav();
+            animateDisplay();
+        }
+    }
+</script>
 </body>
 </html>

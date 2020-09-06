@@ -5,12 +5,23 @@ background
 css for the background image and title
 ================================
  */
- #background{
-    background-image: url(https://images.unsplash.com/photo-1594793861747-136c34047e9d?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=1952&q=80);
+
+ #background {
+     position: relative;
+
+    min-height: 40rem;
+ }
+ #background::before{
+    content: "";
+    position: absolute;
+    background-image: url('https://images.unsplash.com/photo-1594793861747-136c34047e9d?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=1952&q=80');
     background-position: center;
     background-size: cover;
-    min-height: 40rem;
-    position: relative;
+    filter: brightness(50%);
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
 }
 
 .col-12.background-title {
@@ -33,4 +44,11 @@ css for the background image and title
 .col-12.background-title > p {
     font-size: 1.5rem;
     font-weight: 300;
+}
+
+@media only screen and (max-width: 576px) {
+    .col-12.background-title > h1 {
+        font-size: 4rem;
+        font-weight: 400;
+    }
 }

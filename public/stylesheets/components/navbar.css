@@ -7,9 +7,24 @@ flash messages
  #flash {
     position: absolute;
     z-index: 1;
-    min-width: 400px;
+    margin-top: 20px;
     left: 50%;
-    margin-left: -200px;
+    transform: translateX(-50%);
+    -ms-transform: translateX(-50%);
+    -webkit-transform: translateX(-50%);
+    -moz-transform: translateX(-50%);
+}
+
+.alert.alert-success {
+    color: #7ae448;
+    background-color: #000000ad;
+    border-color: #ffffff;
+}
+
+.alert.alert-danger {
+    color: #df514f;
+    background-color: #000000ad;
+    border-color: #ffffff;
 }
 
 
@@ -35,6 +50,7 @@ User login form
 
 /* classes for animation */
 .signup.display {
+    /* height: 350px; */
     height: 525px;
     transition: height ease-out 500ms;
     -webkit-transition: height ease-out 500ms;
@@ -59,13 +75,87 @@ User login form
     color: #9e2531;
 }
 
+.btn.btn-h {
+    width: 50%;
+    position: absolute;
+    display: inline-block;
+}
+
+.btn-l {
+    left: 0;
+}
+
+.btn-r {
+    right: 0;
+}
+
+/* 
+SignUp form animations
+================================
+ */
+.user-info {
+    position: absolute;
+    margin-left: -110%;
+    z-index: -1;
+    transition: margin 0.3s ease-out;
+    -moz-transition: margin 0.3s ease-out;
+    -webkit-transition: margin 0.3s ease-out;
+}
+
+.user-info.display {
+    margin-left: 0;
+    width: calc(100% - 30px);
+}
+
+.login-info {
+    position: absolute;
+    margin-left: 110%;
+    margin-right: -110%;
+    z-index: -1;
+    transition: margin 0.3s ease-out;
+    -moz-transition: margin 0.3s ease-out;
+    -webkit-transition: margin 0.3s ease-out;
+}
+
+.login-info.display {
+    margin-left: 0;
+    width: calc(100% - 30px);
+}
+
 /*
 ================================
 Custom styling for the bootstrap nav
 ================================
  */
 .bg-custom {
-    background-color: #c3423f;
+    background: none;
+}
+
+#nav-component {
+    position: absolute;
+    z-index: 3;
+    top: 0;
+    left: 0;
+    right: 0;
+}
+
+#nav-component.nav-fixed {
+    position: fixed;
+    background-color: #0000009c;
+    z-index: 1;
+}
+
+.dropdown-item {
+    color: #ffffff;
+}
+
+div.dropdown-menu.show {
+    color: white;
+    background-color: #000000c2;
+}
+
+.navbar-brand span {
+    color: #ff5451;
 }
 
 .navbar-custom .navbar-nav .nav-link {
@@ -78,6 +168,13 @@ Custom styling for the bootstrap nav
     color: #9f9aa4;
 }
 
+@media only screen and (max-width: 768px) {
+    #collapsibleNavbar {
+        padding: 0px 15px 15px 15px;
+        background-color: #000000c2;
+        border-radius: 15px;
+    }
+}
 .announcement-bar {
   /* background-color: white; */
   width: 400px;

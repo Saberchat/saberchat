@@ -1,6 +1,6 @@
 /* css for the view profile page */
 
-.profile-head{
+/* .profile-head{
     text-align: center;
   
 }
@@ -31,11 +31,159 @@
     border-radius: 50%;
     margin-top: -100px;
     background-color: #ffffff;
+} */
+
+/* 
+====================
+Body Background
+ */
+body {
+    background-color: #b2d4ff;
 }
 
-/* custom background without title */
-#background{
+/* 
+====================
+User banner 
+*/
+#banner{
     background-position: center;
     background-size: cover;
     height: 35vh;
+    filter: brightness(70%);
+}
+
+/* 
+====================
+Profile card info 
+*/
+.profile-card {
+    /* background-color: #0a91ab; */
+    background-color: #cee5ff;
+    border-radius: 15px;
+    overflow: hidden;
+    /* color: #def4fc; */
+    color: black;
+    border: 10px solid #edf2f9;
+    box-shadow: 0 10px 10px #95b4db;
+}
+
+/* - card head */
+.profile-head {
+    background-color: #4d8ed3;
+}
+
+.profile-head hr {
+    /* border: 3px solid #38c065; */
+    border: 3px solid #edf2f9;
+    margin-bottom: 5px;
+    margin-top: 10px;
+}
+
+.profile-head h1 {
+    text-align: center;
+    padding: 20px 15px 0px 15px;
+    font-size: 2rem;
+    color: #edf2f9;
+}
+
+/* - card body */
+.profile-body {
+    padding-left: 20px;
+    padding-right: 20px;
+}
+
+.profile-body span {
+    display: block;
+    text-align: center;
+}
+
+.profile-body h4 {
+    font-size: 1.3rem;
+    margin-bottom: 0px;
+    color: #043547;
+}
+
+.profile-body p {
+    font-size: 1rem;
+    font-weight: 300;
+}
+
+/* 
+====================
+Description 
+*/
+.profile-desc {
+    /* background-color: #0a91ab; */
+    background-color: #cee5ff;
+    border-radius: 15px;
+    overflow: hidden;
+    /* color: #def4fc; */
+    color: black;
+    border: 10px solid #edf2f9;
+    box-shadow: 0 10px 10px #95b4db;
+}
+
+.desc-head {
+    background-color: #3aa3c9;
+}
+
+.desc-head hr {
+    /* border: 3px solid #38c065; */
+    border: 3px solid #edf2f9;
+    margin-bottom: 5px;
+    margin-top: 10px;
+}
+
+.desc-head h1 {
+    text-align: center;
+    padding: 20px 15px 0px 15px;
+    font-size: 2rem;
+    color: #edf2f9;
+}
+
+.desc-body p {
+    padding: 10px 20px;
+    font-weight: 400;
+    margin-bottom: 0;
+}
+
+/* 
+====================
+Profile Image
+ */
+.profile-image {
+    position: relative;
+    display: block;
+    width: 230px;
+    height: 230px;
+    object-fit: cover;
+    margin: 0 auto;
+    margin-top: -115px;
+    border-radius: 50%;
+    box-shadow: 0px 10px 10px rgba(0, 0, 0, 0.3);
+    z-index: 1;
+}
+
+/* 
+====================
+Username
+ */
+.username {
+    margin-top: 1rem;
+    font-size: 2.3rem;
+    text-align: center;
+    margin-bottom: 1.7rem;
+    /* color: #042633; */
+    color: #102654;
+    background-color: #cee5ff;
+    padding: 10px 20px;
+    border-radius: 15px;
+    border: 10px solid #edf2f9;
+    box-shadow: 0 10px 10px #95b4db;
+}
+
+@media only screen and (max-width: 768px) {
+    .profile-desc {
+        margin: 1.7rem 0;
+    }
 }

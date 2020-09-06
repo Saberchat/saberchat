@@ -1,76 +1,73 @@
-<!-- navbar that you can plop into html with ejs -->
-<!-- <link rel=stylesheet href="/stylesheets/announcements/announcement_bar.css" /> -->
-<nav class="navbar navbar-expand-md navbar-dark navbar-custom bg-custom">
-    <div class="container" id="nav-container">
-        <!-- Brand  (change link to home page)-->
-        <a class="navbar-brand" href="/">
-            <i class="far fa-comments"></i>
-            SaberChat
-        </a>
-        <!-- Toggler/collapsibe Button -->
-        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#collapsibleNavbar">
-            <span class="navbar-toggler-icon"></span>
-        </button>
+<div id="nav-component">
+    <!-- navbar that you can plop into html with ejs -->
+    <nav class="navbar navbar-expand-md navbar-dark navbar-custom bg-custom" id="main-nav">
+        <div class="container" id="nav-container">
+            <!-- Brand  (change link to home page)-->
+            <a class="navbar-brand" href="/">
+                <i class="far fa-comments"></i>
+                <span>Saber</span>chat
+            </a>
+            <!-- Toggler/collapsibe Button -->
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#collapsibleNavbar">
+                <span class="navbar-toggler-icon"></span>
+            </button>
 
-        <!-- Navbar links -->
-        <div class="collapse navbar-collapse" id="collapsibleNavbar">
-        <% if (currentUser) { %>
-            <ul class="navbar-nav">
-                <li class="nav-item">
-                    <a class="nav-link" href="/chat"><i class="far fa-comment-dots"></i> Chat</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="/cafe"><i class="fas fa-coffee"></i> EC Cafe</a>
-                </li>
-                <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                    <i class="fas fa-align-justify"></i> Other
-                    </a>
-                    <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-                      <%if (currentUser) { %>
-                        <% if(currentUser.permission == "admin" || currentUser.permission == "teacher") { %>
-                          <a class="dropdown-item" href="/announce"><i class="fas fa-bullhorn"></i> Send Announcement</a>
-                        <% } %>
-                      <% } %>
-                        <a class="dropdown-item" href="/articles"><i class="far fa-newspaper"></i> Witherly Heights</a>
-                        <a class="dropdown-item" href="/projects"><i class="fas fa-paint-brush"></i> Student Projects</a>
-                        <a class="dropdown-item" href="/profiles"><i class="far fa-user"></i> Users</a>
-                    </div>
-                </li>
-            </ul>
-          <% }%>
-            <ul class="navbar-nav ml-auto">
-                <!-- ejs logic. If there is a user, show the bootstrap dropdown and links below -->
-                <% if(currentUser) { %>
+            <!-- Navbar links -->
+            <div class="collapse navbar-collapse" id="collapsibleNavbar">
+                <ul class="navbar-nav">
                     <li class="nav-item">
-                        <a class="nav-link" href="/inbox"><i class="fas fa-inbox"></i> Inbox</a>
+                        <a class="nav-link" href="/chat"><i class="far fa-comment-dots"></i> Chat</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/notif"><i class="far fa-comment-dots"></i> Notif.</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/profiles"><i class="far fa-user"></i> Users</a>
                     </li>
                     <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" href="" id="navbarDropdownMenuLink" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                            <img src="<%= currentUser.imageUrl %>" alt="profile pic" style="width: 20px; height: 20px; object-fit: cover; border-radius: 50%; display: inline-block;">
-                            <%= currentUser.firstName.charAt(0) %>.<%= currentUser.lastName.charAt(0) %>.
+                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        <i class="fas fa-align-justify"></i> Other
                         </a>
-                        <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
-                          <a class="dropdown-item" href="/profiles/<%= currentUser._id %>">View Profile</a>
-                          <% if (currentUser.permission == 'admin' || currentUser.permission == 'principal') { %>
-                                  <a class="dropdown-item" href="/admin">Admin Controls</a>
-                          <% } %>
-                          <a class="dropdown-item" href="/logout">Logout</a>
+                        <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                            <a class="dropdown-item" href="#"><i class="fas fa-bullhorn"></i> Announcements</a>
+                            <div class="dropdown-divider"></div>
+                            <a class="dropdown-item" href="/articles"><i class="far fa-newspaper"></i> Witherly Heights</a>
+                            <a class="dropdown-item" href="#"><i class="fas fa-coffee"></i> EC Cafe</a>
                         </div>
                     </li>
-                <!-- if there is no user, show the register and login links -->
-                <% } else { %>
-                    <li class="nav-item">
-                        <a class="nav-link user-form-btn signup">Register</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link user-form-btn login">Login</a>
-                    </li>
-                <% } %>
-            </ul>
+                </ul>
+                <ul class="navbar-nav ml-auto">
+                  <!-- ejs logic. If there is a user, show the bootstrap dropdown and links below -->
+                  <% if(currentUser) { %>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/inbox"><i class="fas fa-inbox"></i> Inbox</a>
+                        </li>
+                        <li class="nav-item dropdown">
+                          <a class="nav-link dropdown-toggle" href="" id="navbarDropdownMenuLink" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                              <img src="<%= currentUser.imageUrl %>" alt="profile pic" style="width: 20px; height: 20px; object-fit: cover; border-radius: 50%; display: inline-block;">
+                              <%= currentUser.firstName.charAt(0) %>.<%= currentUser.lastName.charAt(0) %>.
+                          </a>
+                          <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
+                            <a class="dropdown-item" href="/profiles/<%= currentUser._id %>">View Profile</a>
+                            <% if (currentUser.permission == 'admin' || currentUser.permission == 'principal') { %>
+                                    <a class="dropdown-item" href="/admin">Admin Controls</a>
+                            <% } %>
+                            <a class="dropdown-item" href="/logout">Logout</a>
+                          </div>
+                      </li>
+                  <!-- if there is no user, show the register and login links -->
+                  <% } else { %>
+                        <li class="nav-item">
+                            <a class="nav-link user-form-btn signup">Register</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link user-form-btn login">Login</a>
+                        </li>
+                  <% } %>
+                </ul>
+            </div>
         </div>
-    </div>
-</nav>
+    </nav>
 
 <!-- Login Form -->
 <form class="user-form login" action="/login" method="post">
@@ -113,18 +110,54 @@
     <button id="register-button" type="submit" class="btn btn-warning float-right">Sign Up</button>
 </form>
 
-<div class="mb-3" id="flash">
-    <% if(error && error.length > 0) { %>
-        <div class="alert alert-danger">
-            <%= error %>
+    <!-- Sign Up Form
+    <form class="user-form signup" action="/register" method="post">
+        <span class="form-close signup"><i class="far fa-window-close"></i></span>
+        <div class="user-info display">
+            <div class="form-group mt-3">
+                <label for="firstName-signup">First</label>
+                <input name="firstName" type="text" class="form-control" id="firstName-signup" placeholder="enter first name" required>
+            </div>
+            <div class="form-group">
+                <label for="lastName-signup">Last</label>
+                <input name="lastName" type="text" class="form-control" id="lastName-signup" placeholder="enter last" required>
+            </div>
+            <div class="form-group">
+                <label for="username-signup">Username</label>
+                <input name="username" type="text" class="form-control" id="username-signup" placeholder="(max 23) enter username" required maxlength="23">
+            </div>
+            <button type="button" class="btn btn-info btn-block" onclick="next()">Next <i class="fas fa-arrow-right"></i></button>
         </div>
-    <% } %>
+        <div class="login-info">
+            <div class="form-group mt-3">
+                <label for="email-signup">Email address</label>
+                <input name="email" type="email" class="form-control" id="email-signup" aria-describedby="emailHelp" placeholder="enter email" required>
+                <small id="emailHelp" class="form-text text-muted">We'll never share your email with anyone else.</small>
+            </div>
+            <div class="form-group">
+                <label for="password-signup">Password</label>
+                <input name="password" type="password" class="form-control" id="password-signup" placeholder="enter password" required>
+            </div>
+            <div style="position: relative;">
+                <button type="button" class="btn btn-secondary btn-h btn-l" onclick="back()"><i class="fas fa-arrow-left"></i> Back</button>
+                <button type="submit" class="btn btn-success btn-h btn-r"><i class="far fa-plus-square"></i> Sign Up</button>
+            </div>
+        </div>
+    </form> -->
 
-    <% if(success && success.length > 0) { %>
-        <div class="alert alert-success">
-            <%= success %>
-        </div>
-    <% } %>
+    <div class="mb-3" id="flash">
+        <% if(error && error.length > 0) { %>
+            <div class="alert alert-danger">
+                <%= error %>
+            </div>
+        <% } %>
+
+        <% if(success && success.length > 0) { %>
+            <div class="alert alert-success">
+                <%= success %>
+            </div>
+        <% } %>
+    </div>
 </div>
 
 <% if (announcements.length > 0 && currentUser) { %>
