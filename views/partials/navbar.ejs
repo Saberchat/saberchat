@@ -87,7 +87,7 @@
 </form>
 
 <!-- Sign Up Form -->
-<form class="user-form signup" action="/register" method="post">
+<form id="register-form" class="user-form signup" action="/register" method="post" onsubmit="buttonName.disabled=true; return true;">
     <span class="form-close signup"><i class="far fa-window-close"></i></span>
     <div class="form-group mt-3">
         <label for="firstName-signup">First</label>
@@ -110,7 +110,7 @@
         <label for="password-signup">Password</label>
         <input name="password" type="password" class="form-control" id="password-signup" placeholder="enter password" required>
     </div>
-    <button type="submit" class="btn btn-warning float-right">Sign Up</button>
+    <button id="register-button" type="submit" class="btn btn-warning float-right">Sign Up</button>
 </form>
 
 <div class="mb-3" id="flash">
@@ -169,3 +169,18 @@
     </div>
   </div>
 <%}%>
+
+<script>
+  const fn = document.getElementById('firstName-signup')
+  const ln = document.getElementById('lastName-signup')
+  const un = document.getElementById('username-signup')
+  const email = document.getElementById('email-signup')
+  const pwd = document.getElementById('password-signup')
+
+  document.getElementById("register-button").addEventListener('click', () => {
+    if (fn.value != '' && ln.value != '' && un.value != '' && email.value != '' && pwd.value != '')
+    $("#register-button").hide()
+  })
+
+
+</script>
