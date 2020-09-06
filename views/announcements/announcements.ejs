@@ -28,8 +28,17 @@
         </div>
       </div>
     </div>
+
     <% if (announced) { %>
+
       <div class="container">
+
+        <% if (announcement.sender.username == currentUser.username) { %>
+          <div style="text-align: center; margin-bottom: 30px;">
+          <button type="button" class="btn btn-danger"><a href="/delete_announcement?id=<%=announcement._id%>" style="color: white;">Delete Announcement</a></button>
+          </div>
+        <% } %>
+
         <div class="announcement">
           <img class="profile-img" src="<%=announcement.sender.imageUrl%>"/>
           <% if (parseInt(announcement.created_at.toString().slice(16, 19)) > 12) { %>

@@ -65,4 +65,17 @@ router.get('/view_announcement', middleware.isLoggedIn, (req, res) => {
   })
 })
 
+router.get('/delete_announcement', (req, res) => {
+  Announcement.findByIdAndDelete(req.query.id, (err, foundAnn) => {
+    if (err || !foundAnn) {
+      req.flash('error', "Unable to access database")
+      res.redirect('back')
+
+    } else {
+      req.flash('success', 'Announcement Deleted!')
+      res.redirect('/announce')
+    }
+  })
+})
+
 module.exports = router;
