@@ -38,20 +38,20 @@
               </div>
             </div>
             <div class="heading">
-              <button style="margin-bottom: 10px;" type="button" class="btn btn-danger" class="delete-button"><a id="notifButton" href="/clear"><i class="fas fa-trash-alt"></i> Clear Inbox</a></button>
+              <button style="margin-bottom: 10px; width: 250px;" type="button" class="btn btn-danger" class="delete-button"><a id="notifButton" href="/clear"><i class="fas fa-trash-alt"></i> Clear Inbox</a></button>
               <br />
-              <button style="margin-bottom: 10px;" type="delete" class="btn btn-danger" class="delete-button"><i class="fas fa-trash-alt"></i> Delete Selected Notifications</button>
+              <button style="margin-bottom: 10px; width: 250px;" type="delete" class="btn btn-danger" class="delete-button"><i class="fas fa-trash-alt"></i> Clear Selected Notifications</button>
               <br />
-              <button type="button" class="btn btn-primary" class="delete-button"><a id="notifButton" href="/notif"><i class="far fa-comment-dots"></i> Send Notifications</a></button>
+              <button style="width: 250px;" type="button" class="btn btn-primary" class="delete-button"><a id="notifButton" href="/notif"><i class="far fa-comment-dots"></i> Send Notifications</a></button>
               <br />
-              <button type="button" style="margin-top: 10px;" class="btn btn-success" class="delete-button"><a id="notifButton" href="/view_sent_notifs"><i class="far fa-comment-dots"></i> View All Sent Notifications</a></button>
+              <button style="width: 250px; margin-top: 10px; margin-bottom: 10px;" type="button" style="margin-top: 10px;" class="btn btn-success" class="delete-button"><a id="notifButton" href="/view_sent_notifs"><i class="far fa-comment-dots"></i> View All Sent Notifications</a></button>
             </div>
               <div class="search-filter">
               </div>
               <ul class = "new_messages" id="new_messages">
                 <%notifs.forEach(notif => { %>
                   <div class="notification">
-                    
+
                     <!-- Anonymous messages -->
                     <% if (notif.sender == null){ %>
 

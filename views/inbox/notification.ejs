@@ -55,8 +55,8 @@
 
             <% if (currentUser.username != notif.sender.username) { %>
               <% let tempRecipients = notif.recipients%>
-              <% tempRecipients.splice(tempRecipients.indexOf(currentUser.username), 1)%>
-              <strong>To: me, <%=tempRecipients.join(', ')%></strong>
+              <% tempRecipients[tempRecipients.indexOf(currentUser.username)] = 'me'%>
+              <strong>To: <%=tempRecipients.join(', ')%></strong>
 
             <% } else { %>
               <strong>To: <%=notif.recipients.join(', ')%></strong>
