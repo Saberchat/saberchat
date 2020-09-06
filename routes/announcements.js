@@ -28,7 +28,7 @@ router.post('/sendAnnouncement', middleware.isLoggedIn, (req, res) => {
     announcement.save()
   })
   req.flash('success', 'Announcement posted to bulletin!')
-  res.redirect('/announcements')
+  res.redirect('/announce')
 })
 
 
