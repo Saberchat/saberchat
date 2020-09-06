@@ -195,7 +195,7 @@ router.get('/inbox', middleware.isLoggedIn, (req, res) => {
 	})
 })
 
-router.get('/view_inbox_message', (req, res) => {
+router.get('/view_inbox_message', middleware.isLoggedIn, (req, res) => {
 	Notification.findOne({_id: req.query.id}).populate({path: 'sender', select: ['username', 'imageUrl']})
 	.exec((err, foundNotif) => {
 		if (err || !foundNotif) {
@@ -215,7 +215,7 @@ router.get('/view_inbox_message', (req, res) => {
 	})
 })
 
-router.get('/view_sent_notifs', (req, res) => {
+router.get('/view_sent_notifs', middleware.isLoggedIn, (req, res) => {
 	Notification.find({'sender': req.user}, (err, foundNotifs) => {
 		if (err || !foundNotifs) {
 			req.flash('error', 'Unable to access database')
@@ -227,7 +227,7 @@ router.get('/view_sent_notifs', (req, res) => {
 					req.flash('error', 'Unable to access database')
 					res.redirect('back')
 				} else {
-					res.render('inbox/sentNotifications', {announcements: foundAnns, announced: false, notifs: foundNotifs})
+					res.render('inbox/sentNotifications', {announcements: foundAnns, announced: false, notifs: foundNotifs.reverse()})
 				}
 			})
 		}
@@ -235,7 +235,7 @@ router.get('/view_sent_notifs', (req, res) => {
 })
 
 //Clear entire inbox
-router.get('/clear', (req, res) => {
+router.get('/clear', middleware.isLoggedIn, (req, res) => {
 	req.user.inbox = []
 	req.user.save()
 	req.flash('success', 'Inbox cleared!');
@@ -243,7 +243,7 @@ router.get('/clear', (req, res) => {
 })
 
 //Delete already viewed notifications
-router.post('/delete', (req, res) => {
+router.post('/delete', middleware.isLoggedIn, (req, res) => {
 	deletes = [] //List of messages to be deleted
 	for (let item of req.user.inbox) {
 		if (Object.keys(req.body).includes(item._id.toString())) { //If item is selected to be deleted (checkbox)
