@@ -14,7 +14,6 @@ router.get('/', middleware.isLoggedIn, function(req, res) {
             req.flash('error', 'Unable to access Database');
             res.redirect('back');
         } else {
-            console.log(foundUsers)
             res.render('profile/index', {users: foundUsers});
         }
     });

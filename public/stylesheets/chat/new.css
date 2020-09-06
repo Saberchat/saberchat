@@ -15,8 +15,13 @@ input#search-input {
     display: inline-block;
     width: 80%;
     border: none;
+    border-radius: 0;
     outline: 0;
     box-shadow: none;
+}
+
+#search-input:focus, #search-input:active {
+    border-bottom: 3px solid rgb(255, 177, 33);
 }
 
 label, h4 {

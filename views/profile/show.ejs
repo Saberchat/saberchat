@@ -57,40 +57,5 @@
             </div>
         </div>
     </div>
-    <!-- <div class="container">
-        <div class="row">
-            <div class="col-12">
-                <div class="profile-head">
-                    <img class="profile-image" src="<%= user.imageUrl %>" alt="profile picture">
-                    <h1><%= user.username %> </h1>
-                    <h4><%= user.firstName %> <%= user.lastName %></h4>
-
-                    <% if(user.title) { %>
-                        <p><%= user.title %></p>
-                    <% } %>
-
-                    <h4><%= user.permission %> | <%= user.email %></h4>
-                </div>
-            </div>
-            <div class="col-md-8 offset-md-2">
-                <h4>Description</h4>
-                <% if(!user.description) { %>
-                    <p>No description.</p>
-                <% } else { %>
-                    <p><%= user.description %></p>
-                <% } %>
-
-                <% if(user._id.equals(currentUser._id)) { %>
-                    <a class="btn btn-info" href= "/profiles/edit">
-                        Edit Profile
-                    </a>
-                    <a class="btn btn-info" href= "/profiles/change-login-info">
-                        Change Email or Password
-                    </a>
-                <% } %>
-                <a style="display: block; margin-top: 1rem; margin-bottom: 5rem;" href="/profiles">Go Back</a>
-            </div>
-        </div>
-    </div> -->
 </body>
 </html>

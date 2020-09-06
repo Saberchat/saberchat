@@ -151,7 +151,7 @@ Custom styling for the bootstrap nav
 
 div.dropdown-menu.show {
     color: white;
-    background-color: #0000009c;
+    background-color: #000000c2;
 }
 
 .navbar-brand span {
@@ -171,7 +171,7 @@ div.dropdown-menu.show {
 @media only screen and (max-width: 768px) {
     #collapsibleNavbar {
         padding: 0px 15px 15px 15px;
-        background-color: #0000009a;
+        background-color: #000000c2;
         border-radius: 15px;
     }
 }
