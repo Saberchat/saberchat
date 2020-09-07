@@ -51,13 +51,14 @@
 
             <% if (notif.sender == null) { %>
               <strong>From: Anonymous</strong><br />
+
             <%} else if (currentUser.username != notif.sender.username) { %>
               <strong>From: <%=notif.sender.username%></strong><br />
             <%} else {%>
               <strong>From: me</strong><br />
             <%}%>
 
-            <% if (currentUser.username != notif.sender.username) { %>
+            <% if (notif.sender != null && currentUser.username != notif.sender.username) { %>
               <% let tempRecipients = notif.recipients%>
               <% tempRecipients[tempRecipients.indexOf(currentUser.username)] = 'me'%>
               <strong>To: <%=tempRecipients.join(', ')%></strong>

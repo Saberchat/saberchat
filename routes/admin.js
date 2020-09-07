@@ -1,4 +1,5 @@
 const express = require('express');
+const dateFormat = require('dateFormat')
 //start express router
 const router = express.Router();
 
@@ -15,8 +16,15 @@ router.get('/', middlware.isLoggedIn, middlware.isAdmin, (req, res) => {
     if (err || !foundAnns) {
       req.flash('error', 'Unable to access database')
       res.redirect('back')
+
     } else {
-      res.render('admin/index', {announcements: foundAnns, announced: false})
+			let dates = []
+
+			for (let ann of foundAnns) {
+				dates.push(dateFormat(ann.created_at, "mmm d, h:MMTT"))
+			}
+
+      res.render('admin/index', {announcements: foundAnns.reverse(), announced: false, dates: dates.reverse()})
     }
   })
 })
@@ -37,8 +45,15 @@ router.get('/moderate', middlware.isLoggedIn, middleware.isMod, (req, res) => {
 		    if (err || !foundAnns) {
 		      req.flash('error', 'Unable to access database')
 		      res.redirect('back')
+
 		    } else {
-		      res.render('admin/mod', {comments: foundComments, announcements: foundAnns, announced: false})
+					let dates = []
+
+					for (let ann of foundAnns) {
+						dates.push(dateFormat(ann.created_at, "mmm d, h:MMTT"))
+					}
+
+		      res.render('admin/mod', {comments: foundComments, announcements: foundAnns.reverse(), announced: false, dates: dates.reverse()})
 		    }
 		  })
 		}
@@ -57,8 +72,15 @@ router.get('/permissions', middlware.isLoggedIn, middlware.isAdmin, (req, res) =
 		    if (err || !foundAnns) {
 		      req.flash('error', 'Unable to access database')
 		      res.redirect('back')
+
 		    } else {
-		      res.render('admin/permission', {users: foundUsers, announcements: foundAnns, announced: false})
+					let dates = []
+
+					for (let ann of foundAnns) {
+						dates.push(dateFormat(ann.created_at, "mmm d, h:MMTT"))
+					}
+
+		      res.render('admin/permission', {users: foundUsers, announcements: foundAnns.reverse(), announced: false, dates: dates.reverse()})
 		    }
 		  })
 		}
@@ -77,8 +99,15 @@ router.get('/status', middlware.isLoggedIn, middlware.isAdmin, (req, res) => {
 		    if (err || !foundAnns) {
 		      req.flash('error', 'Unable to access database')
 		      res.redirect('back')
+
 		    } else {
-		      res.render('admin/status', {users: foundUsers, announcements: foundAnns, announced: false})
+					let dates = []
+
+					for (let ann of foundAnns) {
+						dates.push(dateFormat(ann.created_at, "mmm d, h:MMTT"))
+					}
+
+		      res.render('admin/status', {users: foundUsers, announcements: foundAnns.reverse(), announced: false, dates: dates.reverse()})
 		    }
 		  })
 		}

@@ -7,6 +7,7 @@ const router = express.Router();
 const passport = require('passport');
 const middleware = require('../middleware');
 const textEncoding = require('text-encoding')
+const dateFormat = require('dateFormat')
 const TextDecoder = textEncoding.TextDecoder
 
 //import user schema for db actions
@@ -24,7 +25,14 @@ router.get('/', (req, res) => {
 			req.flash('error', 'Unable to access database')
 			res.redirect('back')
     } else {
-      res.render('index', {announcements: foundAnns})
+
+			let dates = []
+
+			for (let ann of foundAnns) {
+				dates.push(dateFormat(ann.created_at, "mmm d, h:MMTT"))
+			}
+
+      res.render('index', {announcements: foundAnns.reverse(), dates: dates.reverse()})
     }
   })
 });

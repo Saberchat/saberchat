@@ -1,5 +1,6 @@
 const express = require('express')
 const router = express.Router();
+const dateFormat = require('dateFormat')
 const Filter = require('bad-words');
 const filter = new Filter();
 
@@ -20,8 +21,15 @@ router.get('/', middleware.isLoggedIn, function(req, res) {
           if (err || !foundAnns) {
             req.flash('error', 'Unable to access database')
             res.redirect('back')
+
           } else {
-            res.render('profile/index', {users: foundUsers, announcements: foundAnns, announced: false})
+            let dates = []
+
+      			for (let ann of foundAnns) {
+      				dates.push(dateFormat(ann.created_at, "mmm d, h:MMTT"))
+      			}
+
+            res.render('profile/index', {users: foundUsers, announcements: foundAnns.reverse(), dates: dates.reverse(), announced: false})
           }
         })
       }
@@ -35,8 +43,16 @@ router.get('/edit', middleware.isLoggedIn, function(req, res) {
     if (err || !foundAnns) {
       req.flash('error', 'Unable to access database')
       res.redirect('back')
+
     } else {
-      res.render('profile/edit', {announcements: foundAnns, announced: false})
+
+      let dates = []
+
+			for (let ann of foundAnns) {
+				dates.push(dateFormat(ann.created_at, "mmm d, h:MMTT"))
+			}
+
+      res.render('profile/edit', {announcements: foundAnns.reverse(), dates: dates.reverse(), announced: false})
     }
   })
 });
@@ -47,8 +63,15 @@ router.get('/change-login-info', middleware.isLoggedIn, function(req, res) {
     if (err || !foundAnns) {
       req.flash('error', 'Unable to access database')
       res.redirect('back')
+
     } else {
-      res.render('profile/edit_pwd_email', {announcements: foundAnns, announced: false})
+      let dates = []
+
+			for (let ann of foundAnns) {
+				dates.push(dateFormat(ann.created_at, "mmm d, h:MMTT"))
+			}
+
+      res.render('profile/edit_pwd_email', {announcements: foundAnns.reverse(), dates: dates.reverse(), announced: false})
     }
   })
 });
@@ -65,8 +88,15 @@ router.get('/:id', middleware.isLoggedIn, function(req, res) {
             if (err || !foundAnns) {
               req.flash('error', 'Unable to access database')
               res.redirect('back')
+
             } else {
-              res.render('profile/show', {user: foundUser, announcements: foundAnns, announced: false})
+              let dates = []
+
+        			for (let ann of foundAnns) {
+        				dates.push(dateFormat(ann.created_at, "mmm d, h:MMTT"))
+        			}
+
+              res.render('profile/show', {user: foundUser, announcements: foundAnns.reverse(), dates: dates.reverse(), announced: false})
             }
           })
         }

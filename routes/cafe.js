@@ -32,9 +32,16 @@ router.get('/', middleware.isLoggedIn, (req, res) => {
 
         } else {
 
+          let dates = []
+
+    			for (let ann of foundAnns) {
+    				dates.push(dateFormat(ann.created_at, "mmm d, h:MMTT"))
+    			}
+
           res.render('cafe/index', {
             orders: foundOrders,
-            announcements: foundAnns,
+            announcements: foundAnns.reverse(),
+            dates: dates.reverse(),
             announced: false
           });
         }
@@ -57,10 +64,18 @@ router.get('/new', middleware.isLoggedIn, (req, res) => {
         if (err || !foundAnns) {
           req.flash('error', 'Unable to access database')
           res.redirect('back')
+
         } else {
+          let dates = []
+
+    			for (let ann of foundAnns) {
+    				dates.push(dateFormat(ann.created_at, "mmm d, h:MMTT"))
+    			}
+
           res.render('cafe/newOrder', {
             items: foundItems,
-            announcements: foundAnns,
+            announcements: foundAnns.reverse(),
+            dates: dates.reverse(),
             announced: false
           })
         }
@@ -144,9 +159,16 @@ router.get('/orders', middleware.isLoggedIn, (req, res) => {
           req.flash('error', 'Unable to access database')
           res.redirect('back')
         } else {
+          let dates = []
+
+    			for (let ann of foundAnns) {
+    				dates.push(dateFormat(ann.created_at, "mmm d, h:MMTT"))
+    			}
+
           res.render('cafe/orderDisplay', {
             orders: foundOrders,
-            announcements: foundAnns,
+            announcements: foundAnns.reverse(),
+            dates: dates.reverse(),
             announced: false
           })
         }
@@ -206,7 +228,13 @@ router.get('/edit_order', middleware.isLoggedIn, (req, res) => {
               orderItems.push(item._id.toString())
             }
 
-            res.render('cafe/editOrder', {announcements: foundAnns, announced: false, items: foundItems, orderItems})
+            let dates = []
+
+      			for (let ann of foundAnns) {
+      				dates.push(dateFormat(ann.created_at, "mmm d, h:MMTT"))
+      			}
+
+            res.render('cafe/editOrder', {announcements: foundAnns.reverse(), dates: dates.reverse(), announced: false, items: foundItems, orderItems})
           }
         })
       })
@@ -277,10 +305,18 @@ router.get('/manage', middleware.isLoggedIn, middleware.isMod, (req, res) => {
         if (err || !foundAnns) {
           req.flash('error', 'Unable to access database')
           res.redirect('back')
+
         } else {
+          let dates = []
+
+    			for (let ann of foundAnns) {
+    				dates.push(dateFormat(ann.created_at, "mmm d, h:MMTT"))
+    			}
+
           res.render('cafe/manage', {
             items: foundItems,
-            announcements: foundAnns,
+            announcements: foundAnns.reverse(),
+            dates: dates.reverse(),
             announced: false
           })
         }
@@ -298,8 +334,15 @@ router.get('/newOrderItem', middleware.isLoggedIn, middleware.isMod, (req, res) 
       req.flash('error', 'Unable to access database')
       res.redirect('back')
     } else {
+      let dates = []
+
+			for (let ann of foundAnns) {
+				dates.push(dateFormat(ann.created_at, "mmm d, h:MMTT"))
+			}
+
       res.render('cafe/newOrderItem', {
-        announcements: foundAnns,
+        announcements: foundAnns.reverse(),
+        dates: dates.reverse(),
         announced: false
       })
     }
@@ -340,8 +383,15 @@ router.get('/deleteItems', middleware.isLoggedIn, middleware.isMod, (req, res) =
       req.flash('error', 'Unable to access database')
       res.redirect('back')
     } else {
+      let dates = []
+
+			for (let ann of foundAnns) {
+				dates.push(dateFormat(ann.created_at, "mmm d, h:MMTT"))
+			}
+
       res.render('cafe/deleteitems', {
-        announcements: foundAnns,
+        announcements: foundAnns.reverse(),
+        dates: dates.reverse(),
         announced: false
       })
     }
@@ -366,10 +416,18 @@ router.get('/item/:id', middleware.isLoggedIn, middleware.isMod, (req, res) => {
         if (err || !foundAnns) {
           req.flash('error', 'Unable to access database')
           res.redirect('back')
+
         } else {
+          let dates = []
+
+    			for (let ann of foundAnns) {
+    				dates.push(dateFormat(ann.created_at, "mmm d, h:MMTT"))
+    			}
+
           res.render('cafe/show.ejs', {
             item: foundItem,
-            announcements: foundAnns,
+            announcements: foundAnns.reverse(),
+            dates: dates.reverse(),
             announced: false
           })
         }

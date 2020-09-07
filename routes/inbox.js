@@ -1,6 +1,7 @@
 const express = require('express');
 const middleware = require('../middleware');
 const router = express.Router(); //start express router
+const dateFormat = require('dateFormat')
 const User = require('../models/user');
 const Notification = require('../models/notification');
 const Announcement = require('../models/announcement');
@@ -18,8 +19,15 @@ router.get('/notif', middleware.isLoggedIn, (req, res) => {
 				if (err || !foundAnns) {
 					req.flash('error', 'Unable to access database')
 					res.redirect('back')
+
 				} else {
-					res.render('inbox/sendNotification', {announcements: foundAnns, announced: false, users: foundUsers, selected_users: [], currentUser: req.user})
+					let dates = []
+
+					for (let ann of foundAnns) {
+						dates.push(dateFormat(ann.created_at, "mmm d, h:MMTT"))
+					}
+
+					res.render('inbox/sendNotification', {announcements: foundAnns.reverse(), dates: dates.reverse(), announced: false, users: foundUsers, selected_users: [], currentUser: req.user})
 				}
 			})
 		}
@@ -184,12 +192,23 @@ router.get('/inbox', middleware.isLoggedIn, (req, res) => {
       res.redirect('back')
 
     } else {
+			let notifdates = []
+			for (let notif of foundUser.inbox) {
+				notifdates.push(dateFormat(notif.created_at, "mmm d, h:MMTT"))
+			}
 			Announcement.find({}).populate({path: 'sender', select: ['username', 'imageUrl']}).populate('message').exec((err, foundAnns) => {
 				if (err || !foundAnns) {
 					req.flash('error', 'Unable to access database')
 					res.redirect('back')
+
 				} else {
-					res.render('inbox/inbox', {announcements: foundAnns, announced: false, username: foundUser.username, notifs: foundUser.inbox.reverse()})
+					let dates = []
+
+					for (let ann of foundAnns) {
+						dates.push(dateFormat(ann.created_at, "mmm d, h:MMTT"))
+					}
+
+					res.render('inbox/inbox', {announcements: foundAnns.reverse(), dates: dates.reverse(), announced: false, username: foundUser.username, notifs: foundUser.inbox.reverse(), notifdates: notifdates.reverse()})
 				}
 			})
 		}
@@ -209,8 +228,15 @@ router.get('/view_inbox_message', middleware.isLoggedIn, (req, res) => {
 				if (err || !foundAnns) {
 					req.flash('error', 'Unable to access database')
 					res.redirect('back')
+
 				} else {
-					res.render('inbox/notification', {announcements: foundAnns, announced: false, notif: foundNotif})
+					let dates = []
+
+					for (let ann of foundAnns) {
+						dates.push(dateFormat(ann.created_at, "mmm d, h:MMTT"))
+					}
+
+					res.render('inbox/notification', {announcements: foundAnns.reverse(), dates: dates.reverse(), announced: false, notif: foundNotif})
 				}
 			})
 		}
@@ -225,12 +251,25 @@ router.get('/view_sent_notifs', middleware.isLoggedIn, (req, res) => {
 			res.redirect('/inbox')
 
 		} else {
+
+			let notifdates = []
+			for (let notif of foundNotifs) {
+				notifdates.push(dateFormat(notif.created_at, "mmm d, h:MMTT"))
+			}
+
 			Announcement.find({}).populate({path: 'sender', select: ['username', 'imageUrl']}).populate('message').exec((err, foundAnns) => {
 				if (err || !foundAnns) {
 					req.flash('error', 'Unable to access database')
 					res.redirect('back')
+
 				} else {
-					res.render('inbox/sentNotifications', {announcements: foundAnns, announced: false, notifs: foundNotifs.reverse()})
+					let dates = []
+
+					for (let ann of foundAnns) {
+						dates.push(dateFormat(ann.created_at, "mmm d, h:MMTT"))
+					}
+
+					res.render('inbox/sentNotifications', {announcements: foundAnns.reverse(), dates: dates.reverse(), announced: false, notifs: foundNotifs.reverse(), notifdates: notifdates.reverse()})
 				}
 			})
 		}

@@ -1,6 +1,7 @@
 const express = require('express');
 const Filter = require('bad-words');
 const filter = new Filter();
+const dateFormat = require('dateFormat')
 //create express router
 const router = express.Router();
 
@@ -26,7 +27,13 @@ router.get('/', middleware.isLoggedIn, (req, res) => {
           req.flash('error', 'Unable to access database')
           res.redirect('back')
         } else {
-          res.render('chat/index', {rooms: foundRooms, announcements: foundAnns, announced: false})
+          let dates = []
+
+    			for (let ann of foundAnns) {
+    				dates.push(dateFormat(ann.created_at, "mmm d, h:MMTT"))
+    			}
+
+          res.render('chat/index', {rooms: foundRooms, announcements: foundAnns.reverse(), dates: dates.reverse(), announced: false})
         }
       })
     }
@@ -45,8 +52,15 @@ router.get('/new', middleware.isLoggedIn, (req, res) => {
         if (err || !foundAnns) {
           req.flash('error', 'Unable to access database')
           res.redirect('back')
+
         } else {
-          res.render('chat/new', {users: foundUsers, announcements: foundAnns, announced: false})
+          let dates = []
+
+    			for (let ann of foundAnns) {
+    				dates.push(dateFormat(ann.created_at, "mmm d, h:MMTT"))
+    			}
+
+          res.render('chat/new', {users: foundUsers, announcements: foundAnns.reverse(), dates: dates.reverse(), announced: false})
         }
       })
     }
@@ -90,7 +104,13 @@ router.get('/:id', middleware.isLoggedIn, middleware.checkIfMember, (req, res) =
               req.flash('error', 'Unable to access database')
               res.redirect('back')
             } else {
-              res.render('chat/show', {announcements: foundAnns, announced: false, comments: foundComments, room: foundRoom})
+              let dates = []
+
+        			for (let ann of foundAnns) {
+        				dates.push(dateFormat(ann.created_at, "mmm d, h:MMTT"))
+        			}
+
+              res.render('chat/show', {announcements: foundAnns.reverse(), dates: dates.reverse(), announced: false, comments: foundComments, room: foundRoom})
             }
           })
         }
@@ -115,8 +135,15 @@ router.get('/:id/edit', middleware.isLoggedIn, middleware.checkRoomOwnership, (r
             if (err || !foundAnns) {
               req.flash('error', 'Unable to access database')
               res.redirect('back')
+
             } else {
-              res.render('chat/edit', {users: foundusers, room: foundRoom, announcements: foundAnns, announced: false})
+              let dates = []
+
+        			for (let ann of foundAnns) {
+        				dates.push(dateFormat(ann.created_at, "mmm d, h:MMTT"))
+        			}
+
+              res.render('chat/edit', {users: foundUsers, room: foundRoom, announcements: foundAnns.reverse(), dates: dates.reverse(), announced: false})
             }
           })
         }

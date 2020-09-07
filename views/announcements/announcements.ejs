@@ -47,13 +47,7 @@
 
         <div class="announcement">
           <img class="profile-img" src="<%=announcement.sender.imageUrl%>"/>
-          <% if (parseInt(announcement.created_at.toString().slice(16, 19)) > 12) { %>
-            <span class="msg-info"><strong><%=announcement.sender.username%></strong>: <i><strong class="subject"><%=announcement.subject%></strong></i> <span style="font-size: 10px;"><%=parseInt(announcement.created_at.toString().slice(16, 19)) - 12%>:<%=announcement.created_at.toString().slice(19,21)%>PM | <%=announcement.created_at.toString().slice(4,10)%></span></span>
-          <% } else if (parseInt(announcement.created_at.toString().slice(16, 19)) == 0) { %>
-            <span class="msg-info"><strong><%=announcement.sender.username%></strong>: <i><strong class="subject"><%=announcement.subject%></strong></i> <span style="font-size: 10px;">12:<%=announcement.created_at.toString().slice(19,21)%>AM | <%=announcement.created_at.toString().slice(4,10)%></span></span>
-          <% } else {%>
-            <span class="msg-info"><strong><%=announcement.sender.username%></strong>: <i><strong class="subject"><%=announcement.subject%></strong></i> <span style="font-size: 10px;"><%=announcement.created_at.toString().slice(16,21)%>AM | <%=announcement.created_at.toString().slice(4,10)%></span></span>
-          <% } %>
+            <span class="msg-info"><strong><%=announcement.sender.username%></strong>: <i><strong class="subject"><%=announcement.subject%></strong></i> <span style="font-size: 10px;"><%=date.split(', ')[1]%> | <%=date.split(', ')[0]%></span></span>
           <br />
           <span> <%=announcement.text%></span>
         </div>

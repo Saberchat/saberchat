@@ -1,5 +1,6 @@
 const express = require('express');
 const middleware = require('../middleware');
+const dateFormat = require('dateFormat')
 const router = express.Router(); //start express router
 const User = require('../models/user');
 const Announcement = require('../models/announcement')
@@ -18,8 +19,15 @@ router.get('/projects', middleware.isLoggedIn, (req, res) => {
         if (err || !foundAnns) {
           req.flash('error', 'Unable to access database')
           res.redirect('back')
+
         } else {
-          res.render('projects/projects', {announcements: foundAnns, projects: foundProjects})
+          let dates = []
+
+    			for (let ann of foundAnns) {
+    				dates.push(dateFormat(ann.created_at, "mmm d, h:MMTT"))
+    			}
+
+          res.render('projects/projects', {announcements: foundAnns.reverse(), dates: dates.reverse(), projects: foundProjects})
         }
       })
     }
@@ -37,8 +45,15 @@ router.get('/view_project', (req, res) => {
         if (err || !foundAnns) {
           req.flash('error', 'Unable to access database')
           res.redirect('back')
+
         } else {
-          res.render('projects/viewProject', {announcements: foundAnns, project: foundProject})
+          let dates = []
+
+    			for (let ann of foundAnns) {
+    				dates.push(dateFormat(ann.created_at, "mmm d, h:MMTT"))
+    			}
+
+          res.render('projects/viewProject', {announcements: foundAnns.reverse(), dates: dates.reverse(), project: foundProject})
         }
       })
     }
@@ -57,8 +72,15 @@ router.get('/addProject', middleware.isLoggedIn, (req, res) => {
         if (err || !foundAnns) {
           req.flash('error', 'Unable to access database')
           res.redirect('back')
+
         } else {
-          res.render('projects/addProject', {announcements: foundAnns, students: foundUsers})
+          let dates = []
+
+    			for (let ann of foundAnns) {
+    				dates.push(dateFormat(ann.created_at, "mmm d, h:MMTT"))
+    			}
+
+          res.render('projects/addProject', {announcements: foundAnns.reverse(), dates: dates.reverse(), students: foundUsers})
         }
       })
     }
@@ -98,8 +120,15 @@ router.get('/edit_project', (req, res) => {
             if (err || !foundAnns) {
               req.flash('error', 'Unable to access database')
               res.redirect('back')
+
             } else {
-              res.render('projects/editProject', {announcements: foundAnns, project: foundProject, students: foundUsers})
+              let dates = []
+
+        			for (let ann of foundAnns) {
+        				dates.push(dateFormat(ann.created_at, "mmm d, h:MMTT"))
+        			}
+
+              res.render('projects/editProject', {announcements: foundAnns.reverse(), dates: dates.reverse(), project: foundProject, students: foundUsers})
             }
           })
         }

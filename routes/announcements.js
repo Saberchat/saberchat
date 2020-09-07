@@ -1,6 +1,7 @@
 const express = require('express');
 const middleware = require('../middleware');
 const router = express.Router(); //start express router
+const dateFormat = require('dateFormat')
 const User = require('../models/user');
 const Announcement = require('../models/announcement');
 
@@ -12,7 +13,14 @@ router.get('/announce', middleware.isLoggedIn, (req, res) => {
         req.flash('error', 'Unable to access database')
         res.redirect('back')
       } else {
-        res.render('announcements/sendAnnouncement', {announcements: foundAnns, announced: false})
+
+        let dates = []
+
+  			for (let ann of foundAnns) {
+  				dates.push(dateFormat(ann.created_at, "mmm d, h:MMTT"))
+  			}
+
+        res.render('announcements/sendAnnouncement', {announcements: foundAnns.reverse(), announced: false, dates: dates.reverse()})
       }
     })
 
@@ -38,8 +46,14 @@ router.get('/announcements', middleware.isLoggedIn, (req, res) => {
     if (err || !foundAnns) {
       req.flash('error', 'Unable to access database')
       res.redirect('back')
+
     } else {
-      res.render('announcements/announcements', {announcements: foundAnns, announced: false})
+      let dates = []
+
+			for (let ann of foundAnns) {
+				dates.push(dateFormat(ann.created_at, "mmm d, h:MMTT"))
+			}
+      res.render('announcements/announcements', {announcements: foundAnns.reverse(), announced: false, dates: dates.reverse()})
     }
   })
 })
@@ -58,7 +72,12 @@ router.get('/view_announcement', middleware.isLoggedIn, (req, res) => {
           res.redirect('back')
 
         } else {
-          res.render('announcements/announcements', {announcements: foundAnns, announced: true, announcement: foundAnn})
+          let dates = []
+
+    			for (let ann of foundAnns) {
+    				dates.push(dateFormat(ann.created_at, "mmm d, h:MMTT"))
+    			}
+          res.render('announcements/announcements', {announcements: foundAnns.reverse(), dates: dates.reverse(), announced: true, announcement: foundAnn, date: dateFormat(foundAnn.created_at, "mmm d, h:MMTT")})
         }
       })
     }
@@ -91,7 +110,13 @@ router.get('/edit_announcement', middleware.isLoggedIn, (req, res) => {
           res.redirect('back')
 
         } else {
-          res.render('announcements/editAnnouncement', {announcements: foundAnns, announced: false, announcement: foundAnn})
+          let dates = []
+
+    			for (let ann of foundAnns) {
+    				dates.push(dateFormat(ann.created_at, "mmm d, h:MMTT"))
+    			}
+
+          res.render('announcements/editAnnouncement', {announcements: foundAnns.reverse(), dates: dates.reverse(), announced: false, announcement: foundAnn})
         }
       })
     }
