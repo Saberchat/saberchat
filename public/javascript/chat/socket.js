@@ -89,7 +89,7 @@ function chatInit(username, userId, messageForm, input, chatDisplay, room, userI
 
   socket.on('announcement', function(notif) {
     $(chatDisplay).append(`
-    <div class="announcement mb-2">
+    <div class="announcement mb-1">
     <h4>${notif.text}</h4>
     </div>`);
     if(autoScroll) {

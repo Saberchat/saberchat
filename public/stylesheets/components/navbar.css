@@ -50,8 +50,7 @@ User login form
 
 /* classes for animation */
 .signup.display {
-    /* height: 350px; */
-    height: 525px;
+    height: 350px;
     transition: height ease-out 500ms;
     -webkit-transition: height ease-out 500ms;
 }
