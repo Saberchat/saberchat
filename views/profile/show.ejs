@@ -9,6 +9,8 @@
     <link rel="stylesheet" href="/stylesheets/main.css">
     <!-- link css for navbar. Don't need to include public/javascript/userForm.js since user is already logged in and does not need to access login and register forms.  -->
     <link rel="stylesheet" href="/stylesheets/components/navbar.css">
+    <link rel="stylesheet" href="/stylesheets/components/header.css">
+    <link rel="stylesheet" href="/stylesheets/components/announcement.css">
     <link rel="stylesheet" href="/stylesheets/profile/show.css">
 
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
@@ -21,6 +23,9 @@
 <body>
     <!-- include the navbar via ejs -->
     <%- include('../partials/navbar') %>
+    <%- include('../partials/header') %>
+    <%- include('../partials/announcement') %>
+
     <!-- big background image -->
     <div id="banner" style="background-image: url('<%= user.bannerUrl %>');">
     </div>

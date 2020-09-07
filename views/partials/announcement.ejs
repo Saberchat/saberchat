@@ -1,16 +1,16 @@
-<% if (announcements.length > 0 && currentUser) { %>
-
+<div id="announcement-component">
+  <% if (announcements.length > 0 && currentUser) { %>
     <% if (announcements.length < 5) { %>
-      <div id="carouselExampleControls" class="carousel slide" data-ride="carousel" style="text-align: center; margin-bottom: 0px; height: 50px;">
+      <div id="carouselExampleControls" class="carousel slide" data-ride="carousel" style="text-align: center; margin-bottom: 0px;">
         <div class="carousel-inner">
 
-          <div class="carousel-item active" style="background-color: #dcdcdc; height: 50px;">
+          <div class="carousel-item active" style="background-color: #dcdcdc;">
             <img class="profile-img" src="<%=announcements[0].sender.imageUrl%>"/>
             <% if (parseInt(announcements[0].created_at.toString().slice(16, 19)) > 12) { %>
               <a href="/view_announcement?id=<%=announcements[0]._id%>"><span><strong><%=announcements[0].sender.username%></strong>: <i><strong><%=announcements[0].subject%></strong></i> <span style="font-size: 10px;"><%=parseInt(announcements[0].created_at.toString().slice(16, 19)) - 12%>:<%=announcements[0].created_at.toString().slice(19,21)%>PM | <%=announcements[0].created_at.toString().slice(4,10)%></span></span></a>
             <% } else if (parseInt(announcements[0].created_at.toString().slice(16, 19)) == 0) { %>
               <a href="/view_announcement?id=<%=announcements[0]._id%>">><span><strong><%=announcements[0].sender.username%></strong>: <i><strong><%=announcements[0].subject%></strong></i> <span style="font-size: 10px;">12:<%=announcements[0].created_at.toString().slice(19,21)%>AM | <%=announcements[0].created_at.toString().slice(4,10)%></span></span></a>
-            <% } else {%>
+            <% } else { %>
               <a href="/view_announcement?id=<%=announcements[0]._id%>"><span><strong><%=announcements[0].sender.username%></strong>: <i><strong><%=announcements[0].subject%></strong></i> <span style="font-size: 10px;"><%=announcements[0].created_at.toString().slice(16,21)%>AM | <%=announcements[0].created_at.toString().slice(4,10)%></span></span></a>
             <% } %>
             <br />
@@ -19,6 +19,7 @@
           <%announcements.slice(1).forEach(announcement => { %>
             <div class="carousel-item" style="background-color: #dcdcdc;">
               <img class="profile-img" src="<%=announcement.sender.imageUrl%>"/>
+              <% if (parseInt(announcement.created_at.toString().slice(16, 19)) > 12) {%>
                 <a href="/view_announcement?id=<%=announcement._id%>"><span><strong><%=announcement.sender.username%></strong>: <i><strong><%=announcement.subject%></strong></i> <span style="font-size: 10px;"><%=parseInt(announcement.created_at.toString().slice(16, 19)) - 12%>:<%=announcement.created_at.toString().slice(19,21)%>PM | <%=announcement.created_at.toString().slice(4,10)%></span></span></a>
               <% } else if (parseInt(announcement.created_at.toString().slice(16, 19)) == 0) { %>
                 <a href="/view_announcement?id=<%=announcement._id%>"><span><strong><%=announcement.sender.username%></strong>: <i><strong><%=announcement.subject%></strong></i> <span style="font-size: 10px;">12:<%=announcement.created_at.toString().slice(19,21)%>AM | <%=announcement.created_at.toString().slice(4,10)%></span></span></a>
@@ -85,3 +86,5 @@
       </div>
     <% }%>
   <%}%>
+
+</div>
