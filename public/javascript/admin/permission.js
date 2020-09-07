@@ -15,6 +15,6 @@ function updateRole(select) {
         } else if(data.error) {
             loading.style.color = 'red';
             loading.innerHTML = data.error;
-        } 
+        }
     });
 }

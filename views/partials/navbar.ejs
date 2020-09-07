@@ -25,18 +25,18 @@
                         <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                         <i class="fas fa-align-justify"></i> Other
                         </a>
+
                         <div class="dropdown-menu" aria-labelledby="navbarDropdown">
                           <% if (currentUser) { %>
                             <% if (currentUser.permission == 'admin' || currentUser.permission == 'teacher') { %>
                               <a class="dropdown-item" href="announce"><i class="fas fa-bullhorn"></i> Send Announcement</a>
-                              <div class="dropdown-divider"></div>
                             <% } %>
                           <% } %>
-
                           <a class="dropdown-item" href="/articles"><i class="far fa-newspaper"></i> Witherly Heights</a>
                           <a class="dropdown-item" href="/projects"><i class="fas fa-paint-brush"></i> Student Projects</a>
                           <a class="dropdown-item" href="/profiles"><i class="fas fa-user"></i> Users</a>
                         </div>
+
                     </li>
                   <% } %>
 
@@ -45,7 +45,7 @@
                   <!-- ejs logic. If there is a user, show the bootstrap dropdown and links below -->
                   <% if(currentUser) { %>
                         <li class="nav-item">
-                            <a class="nav-link" href="/inbox"><i class="fas fa-inbox"></i> Inbox</a>
+                            <a class="nav-link" href="/inbox"><i class="fas fa-inbox"></i> Inbox (<%=currentUser.inbox.length%>)</a>
                         </li>
                         <li class="nav-item dropdown">
                           <a class="nav-link dropdown-toggle" href="" id="navbarDropdownMenuLink" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
