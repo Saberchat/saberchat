@@ -69,81 +69,55 @@
         </div>
     </nav>
 
-<!-- Login Form -->
-<form class="user-form login" action="/login" method="post">
-    <span class="form-close login"><i class="far fa-window-close"></i></span>
-    <div class="form-group mt-3">
-        <label for="email-login">Email address</label>
-        <input name="email" type="email" class="form-control" id="email-login" placeholder="enter email" required>
-    </div>
-    <div class="form-group">
-        <label for="password-login">Password</label>
-        <input name="password" type="password" class="form-control" id="password-login" placeholder="enter password" required>
-    </div>
-    <button type="submit" class="btn btn-success float-right">Login</button>
-</form>
+    <!-- Login Form -->
+    <form class="user-form login" action="/login" method="post">
+        <span class="form-close login"><i class="far fa-window-close"></i></span>
+        <div class="form-group mt-3">
+            <label for="email-login">Email address</label>
+            <input name="email" type="email" class="form-control" id="email-login" placeholder="enter email" required>
+        </div>
+        <div class="form-group">
+            <label for="password-login">Password</label>
+            <input name="password" type="password" class="form-control" id="password-login" placeholder="enter password" required>
+        </div>
+        <button type="submit" class="btn btn-success float-right">Login</button>
+    </form>
 
-<!-- Sign Up Form -->
-<form id="register-form" class="user-form signup" action="/register" method="post" onsubmit="buttonName.disabled=true; return true;">
-    <span class="form-close signup"><i class="far fa-window-close"></i></span>
-    <div class="form-group mt-3">
-        <label for="firstName-signup">First</label>
-        <input name="firstName" type="text" class="form-control" id="firstName-signup" placeholder="enter first name" required>
-    </div>
-    <div class="form-group">
-        <label for="lastName-signup">Last</label>
-        <input name="lastName" type="text" class="form-control" id="lastName-signup" placeholder="enter last" required>
-    </div>
-    <div class="form-group">
-        <label for="username-signup">Username</label>
-        <input name="username" type="text" class="form-control" id="username-signup" placeholder="(max 23) enter username" required maxlength="23">
-    </div>
-    <div class="form-group">
-        <label for="email-signup">Email address</label>
-        <input name="email" type="email" class="form-control" id="email-signup" aria-describedby="emailHelp" placeholder="enter email" required>
-        <small id="emailHelp" class="form-text text-muted">We'll never share your email with anyone else.</small>
-    </div>
-    <div class="form-group">
-        <label for="password-signup">Password</label>
-        <input name="password" type="password" class="form-control" id="password-signup" placeholder="enter password" required>
-    </div>
-    <button id="register-button" type="submit" class="btn btn-warning float-right">Sign Up</button>
-</form>
-
-    <!-- Sign Up Form
-    <form class="user-form signup" action="/register" method="post">
+    <!-- onsubmit="disableBtn()" -->
+    <!-- Sign Up Form -->
+    <form name="signup" class="user-form signup" action="/register" method="post" onsubmit="return submitActions()">
         <span class="form-close signup"><i class="far fa-window-close"></i></span>
         <div class="user-info display">
             <div class="form-group mt-3">
                 <label for="firstName-signup">First</label>
-                <input name="firstName" type="text" class="form-control" id="firstName-signup" placeholder="enter first name" required>
+                <input name="firstName" type="text" class="form-control" id="firstName-signup">
             </div>
             <div class="form-group">
                 <label for="lastName-signup">Last</label>
-                <input name="lastName" type="text" class="form-control" id="lastName-signup" placeholder="enter last" required>
+                <input name="lastName" type="text" class="form-control" id="lastName-signup">
             </div>
             <div class="form-group">
                 <label for="username-signup">Username</label>
-                <input name="username" type="text" class="form-control" id="username-signup" placeholder="(max 23) enter username" required maxlength="23">
+                <input name="username" type="text" class="form-control" id="username-signup" placeholder="(max 23)" maxlength="23" >
             </div>
             <button type="button" class="btn btn-info btn-block" onclick="next()">Next <i class="fas fa-arrow-right"></i></button>
         </div>
         <div class="login-info">
             <div class="form-group mt-3">
                 <label for="email-signup">Email address</label>
-                <input name="email" type="email" class="form-control" id="email-signup" aria-describedby="emailHelp" placeholder="enter email" required>
+                <input name="email" type="email" class="form-control" id="email-signup" aria-describedby="emailHelp">
                 <small id="emailHelp" class="form-text text-muted">We'll never share your email with anyone else.</small>
             </div>
             <div class="form-group">
                 <label for="password-signup">Password</label>
-                <input name="password" type="password" class="form-control" id="password-signup" placeholder="enter password" required>
+                <input name="password" type="password" class="form-control" id="password-signup">
             </div>
             <div style="position: relative;">
                 <button type="button" class="btn btn-secondary btn-h btn-l" onclick="back()"><i class="fas fa-arrow-left"></i> Back</button>
-                <button type="submit" class="btn btn-success btn-h btn-r"><i class="far fa-plus-square"></i> Sign Up</button>
+                <button type="submit" id="register-button" class="btn btn-success btn-h btn-r"><i class="far fa-plus-square"></i> Sign Up</button>
             </div>
         </div>
-    </form> -->
+    </form>
 
     <div class="mb-3" id="flash">
         <% if(error && error.length > 0) { %>
@@ -160,17 +134,4 @@
     </div>
 </div>
 
-<script>
-  const fn = document.getElementById('firstName-signup')
-  const ln = document.getElementById('lastName-signup')
-  const un = document.getElementById('username-signup')
-  const email = document.getElementById('email-signup')
-  const pwd = document.getElementById('password-signup')
 
-  document.getElementById("register-button").addEventListener('click', () => {
-    if (fn.value != '' && ln.value != '' && un.value != '' && email.value != '' && pwd.value != '')
-    $("#register-button").hide()
-  })
-
-
-</script>
