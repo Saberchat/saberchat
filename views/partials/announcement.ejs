@@ -7,7 +7,7 @@
 
           <div class="carousel-item active" style="background-color: #dcdcdc;">
             <img class="profile-img" src="<%=announcements[0].sender.imageUrl%>"/>
-            <a href="/view_announcement?id=<%=announcements[0]._id%>"<span><strong><%=announcements[0].sender.username%></strong>: <i><strong><%=announcements[0].subject%></strong></i> <span style="font-size: 10px;"><%=dates[0].split(', ')[1]%> | <%=dates[0].split(', ')[0]%></span></span></a>
+            <a href="/view_announcement/<%=announcements[0]._id%>"<span><strong><%=announcements[0].sender.username%></strong>: <i><strong><%=announcements[0].subject%></strong></i> <span style="font-size: 10px;"><%=dates[0].split(', ')[1]%> | <%=dates[0].split(', ')[0]%></span></span></a>
             <br />
           </div>
 
@@ -28,14 +28,14 @@
 
           <div class="carousel-item active" style="background-color: #dcdcdc;">
             <img class="profile-img" src="<%=announcements[0].sender.imageUrl%>"/>
-            <a href="/view_announcement?id=<%=announcements[0]._id%>"<span><strong><%=announcements[0].sender.username%></strong>: <i><strong><%=announcements[0].subject%></strong></i> <span style="font-size: 10px;"><%=dates[0].split(', ')[1]%> | <%=dates[0].split(', ')[0]%></span></span></a>
+            <a href="/view_announcement/<%=announcements[0]._id%>"<span><strong><%=announcements[0].sender.username%></strong>: <i><strong><%=announcements[0].subject%></strong></i> <span style="font-size: 10px;"><%=dates[0].split(', ')[1]%> | <%=dates[0].split(', ')[0]%></span></span></a>
             <br />
           </div>
 
           <% [...Array(announcements.length - 2).keys()].forEach(i => { %>
             <div class="carousel-item" style="background-color: #dcdcdc;">
               <img class="profile-img" src="<%=announcements[i+1].sender.imageUrl%>"/>
-              <a href="/view_announcement?id=<%=announcements[i+1]._id%>"><span><strong><%=announcements[i+1].sender.username%></strong>: <i><strong><%=announcements[i+1].subject%></strong></i> <span style="font-size: 10px;"><%=dates[i+1].split(', ')[1]%> | <%=dates[i+1].split(', ')[0]%></span></span></a>
+              <a href="/view_announcement/<%=announcements[i+1]._id%>"><span><strong><%=announcements[i+1].sender.username%></strong>: <i><strong><%=announcements[i+1].subject%></strong></i> <span style="font-size: 10px;"><%=dates[i+1].split(', ')[1]%> | <%=dates[i+1].split(', ')[0]%></span></span></a>
               <br />
             </div>
           <%})%>
@@ -57,14 +57,14 @@
 
             <div class="carousel-item active" style="background-color: #dcdcdc;">
               <img class="profile-img" src="<%=announcements[0].sender.imageUrl%>"/>
-              <a href="/view_announcement?id=<%=announcements[0]._id%>"<span><strong><%=announcements[0].sender.username%></strong>: <i><strong><%=announcements[0].subject%></strong></i> <span style="font-size: 10px;"><%=dates[0].split(', ')[1]%> | <%=dates[0].split(', ')[0]%></span></span></a>
+              <a href="/view_announcement/<%=announcements[0]._id%>"<span><strong><%=announcements[0].sender.username%></strong>: <i><strong><%=announcements[0].subject%></strong></i> <span style="font-size: 10px;"><%=dates[0].split(', ')[1]%> | <%=dates[0].split(', ')[0]%></span></span></a>
               <br />
             </div>
 
             <% [...Array(4).keys()].forEach(i => { %>
               <div class="carousel-item" style="background-color: #dcdcdc;">
                 <img class="profile-img" src="<%=announcements[i+1].sender.imageUrl%>"/>
-                <a href="/view_announcement?id=<%=announcements[i+1]._id%>"><span><strong><%=announcements[i+1].sender.username%></strong>: <i><strong><%=announcements[i+1].subject%></strong></i> <span style="font-size: 10px;"><%=dates[i+1].split(', ')[1]%> | <%=dates[i+1].split(', ')[0]%></span></span></a>
+                <a href="/view_announcement/<%=announcements[i+1]._id%>"><span><strong><%=announcements[i+1].sender.username%></strong>: <i><strong><%=announcements[i+1].subject%></strong></i> <span style="font-size: 10px;"><%=dates[i+1].split(', ')[1]%> | <%=dates[i+1].split(', ')[0]%></span></span></a>
                 <br />
               </div>
             <%})%>

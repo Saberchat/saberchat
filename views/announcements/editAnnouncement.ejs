@@ -34,7 +34,7 @@
         </div>
       </div>
     </div>
-    <form action="/submit_announcement_changes?id=<%=announcement._id%>" method="post">
+    <form action="/submit_announcement_changes/<%=announcement._id%>" method="post">
       <div class="input-group mb-3">
         <input id="new-announcement-message" name="subject" maxlength="50" style="margin-left: 300px; margin-right: 300px;"type="text" class="form-control" placeholder="Announcement Subject" value="<%=announcement.subject%>" aria-label="Username" aria-describedby="basic-addon1">
       </div>

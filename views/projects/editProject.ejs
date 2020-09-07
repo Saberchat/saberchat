@@ -39,7 +39,7 @@
       </div>
     </div>
 
-    <form action="/submit_project_edits?id=<%=project._id%>" method="post" style="text-align: center;">
+    <form action="/submit_project_edits/<%=project._id%>" method="post" style="text-align: center;">
       <div class="input-group mb-3">
         <input name="title" maxlength="50" style="margin-left: 300px; margin-right: 300px;"type="text" class="form-control" value = "<%=project.title%>" placeholder="Enter Project Name" aria-label="Username" aria-describedby="basic-addon1">
       </div>

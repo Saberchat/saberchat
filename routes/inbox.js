@@ -216,8 +216,8 @@ router.get('/inbox', middleware.isLoggedIn, (req, res) => {
 })
 
 //View message in your inbox in more detail
-router.get('/view_inbox_message', middleware.isLoggedIn, (req, res) => {
-	Notification.findOne({_id: req.query.id}).populate({path: 'sender', select: ['username', 'imageUrl']})
+router.get('/view_inbox_message/:id', middleware.isLoggedIn, (req, res) => {
+	Notification.findOne({_id: req.params.id}).populate({path: 'sender', select: ['username', 'imageUrl']})
 	.exec((err, foundNotif) => {
 		if (err || !foundNotif) {
 			req.flash('error', "Unable to access database")

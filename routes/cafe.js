@@ -177,7 +177,7 @@ router.get('/orders', middleware.isLoggedIn, (req, res) => {
   });
 });
 
-router.get('/delete_order', middleware.isLoggedIn, (req, res) => {
+router.get('/delete_order/:id', middleware.isLoggedIn, (req, res) => {
 
   //Conditionals ensure that deletion time is between 9AM and 12PM
   let currentTime = new Date(new Date().getTime()).toString().split(' ')[4]
@@ -188,7 +188,7 @@ router.get('/delete_order', middleware.isLoggedIn, (req, res) => {
     res.redirect('back')
 
   } else {
-    Order.findByIdAndDelete(req.query.id).populate('items').exec((err, foundOrder) => {
+    Order.findByIdAndDelete(req.params.id).populate('items').exec((err, foundOrder) => {
       if (err || !foundOrder) {
         req.flash("error", "Unable to access database")
         res.redirect('back')
@@ -205,41 +205,6 @@ router.get('/delete_order', middleware.isLoggedIn, (req, res) => {
       }
     })
   }
-})
-
-router.get('/edit_order', middleware.isLoggedIn, (req, res) => {
-  Order.findById(req.query.id).populate('items').exec((err, foundOrder) => {
-    if (err || !foundOrder) {
-      req.flash('error', "Unable to access database")
-      res.redirect('back')
-
-    } else {
-      Item.find({}, (err, foundItems) => {
-        Announcement.find({}).populate({path: 'sender', select: ['username', 'imageUrl']}).populate('message').exec((err, foundAnns) => {
-          if (err || !foundAnns) {
-            req.flash('error', 'Unable to access database')
-            res.redirect('back')
-
-          } else {
-
-            let orderItems = []
-
-            for (let item of foundOrder.items) {
-              orderItems.push(item._id.toString())
-            }
-
-            let dates = []
-
-      			for (let ann of foundAnns) {
-      				dates.push(dateFormat(ann.created_at, "mmm d, h:MMTT"))
-      			}
-
-            res.render('cafe/editOrder', {announcements: foundAnns.reverse(), dates: dates.reverse(), announced: false, items: foundItems, orderItems})
-          }
-        })
-      })
-    }
-  })
 })
 
 router.post('/:id/ready', middleware.isLoggedIn, (req, res) => {

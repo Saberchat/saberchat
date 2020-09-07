@@ -58,7 +58,7 @@
                     <!-- Known-sender message -->
 
                       <input name=<%=notifs[i]['_id']%> type="checkbox"/>
-                      <label for=<%=notifs[i]['_id']%>><a style="color: inherit;" href="/view_inbox_message?id=<%=notifs[i]._id%>"> <span><span class="msg-info"><strong><%=notifs[i].subject%></strong> <span style="font-size: 10px;"><%=notifdates[i].split(", ")[1]%> | <%=notifdates[i].split(", ")[0]%></span></span> </a> </label>
+                      <label for=<%=notifs[i]['_id']%>><a style="color: inherit;" href="/view_inbox_message/<%=notifs[i]._id%>"> <span><span class="msg-info"><strong><%=notifs[i].subject%></strong> <span style="font-size: 10px;"><%=notifdates[i].split(", ")[1]%> | <%=notifdates[i].split(", ")[0]%></span></span> </a> </label>
                     <br />
 
                     <% if (notifs[i].text.split(' ').length > 20) { %>

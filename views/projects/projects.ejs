@@ -48,7 +48,7 @@
             <div class="col-12">
               <div class="jumbotron text-center">
                 <div class="project-info" style="height: 450px; padding-bottom: 125px; margin-top: -100px; padding-top: 50px;">
-                  <a href="view_project?id=<%=project._id%>"><h1><%=project.title%></h1></a>
+                  <a href="view_project/<%=project._id%>"><h1><%=project.title%></h1></a>
                   <p><em>Posted by <strong><%=project.poster%></strong></em></p>
                   <% if (project.creators.length > 2) {%>
                     <p><strong>Creator(s):</strong> <em><%=project.creators[0]%> and <%=project.creators.length - 1%> others</em></p>
@@ -58,8 +58,8 @@
                   <img style="width: 90%; height: 90%; object-fit: contain;" src="<%=project.imgUrl%>"/>
                   <br />
                   <% if (currentUser.username == project.poster) { %>
-                    <button style="margin-top: 20px; margin-right: 10px;" type="button" class="btn btn-success"><a style="color: white;" href="/edit_project?id=<%=project.id%>">Edit Project</a></button>
-                    <button style="margin-top: 20px;" class="btn btn-danger" type="button"><a href="/delete_project?id=<%=project._id%>" style="color: white;">Delete Project</a></button>
+                    <button style="margin-top: 20px; margin-right: 10px;" type="button" class="btn btn-success"><a style="color: white;" href="/edit_project/<%=project.id%>">Edit Project</a></button>
+                    <button style="margin-top: 20px;" class="btn btn-danger" type="button"><a href="/delete_project/<%=project._id%>" style="color: white;">Delete Project</a></button>
                   <% } %>
                 </div>
               </div>

@@ -58,8 +58,8 @@ router.get('/announcements', middleware.isLoggedIn, (req, res) => {
   })
 })
 
-router.get('/view_announcement', middleware.isLoggedIn, (req, res) => {
-  Announcement.findOne({_id: req.query.id}).populate({path: 'sender', select: ['username', 'imageUrl']}).exec((err, foundAnn) => {
+router.get('/view_announcement/:id', middleware.isLoggedIn, (req, res) => {
+  Announcement.findOne({_id: req.params.id}).populate({path: 'sender', select: ['username', 'imageUrl']}).exec((err, foundAnn) => {
     if (err || !foundAnn) {
       req.flash('error', 'Unable to access database')
       res.redirect('back')
@@ -84,8 +84,8 @@ router.get('/view_announcement', middleware.isLoggedIn, (req, res) => {
   })
 })
 
-router.get('/delete_announcement', middleware.isLoggedIn, (req, res) => {
-  Announcement.findByIdAndDelete(req.query.id, (err, foundAnn) => {
+router.get('/delete_announcement/:id', middleware.isLoggedIn, (req, res) => {
+  Announcement.findByIdAndDelete(req.params.id, (err, foundAnn) => {
     if (err || !foundAnn) {
       req.flash('error', "Unable to access database")
       res.redirect('back')
@@ -97,8 +97,8 @@ router.get('/delete_announcement', middleware.isLoggedIn, (req, res) => {
   })
 })
 
-router.get('/edit_announcement', middleware.isLoggedIn, (req, res) => {
-  Announcement.findById(req.query.id, (err, foundAnn) => {
+router.get('/edit_announcement/:id', middleware.isLoggedIn, (req, res) => {
+  Announcement.findById(req.params.id, (err, foundAnn) => {
     if (err || !foundAnn) {
       req.flash('error', "Unable to access database")
       res.redirect('back')
@@ -123,15 +123,15 @@ router.get('/edit_announcement', middleware.isLoggedIn, (req, res) => {
   })
 })
 
-router.post('/submit_announcement_changes', middleware.isLoggedIn, (req, res) => {
-  Announcement.findByIdAndUpdate(req.query.id, {subject: req.body.subject, text: req.body.message}, (err, foundAnn) => {
+router.post('/submit_announcement_changes/:id', middleware.isLoggedIn, (req, res) => {
+  Announcement.findByIdAndUpdate(req.params.id, {subject: req.body.subject, text: req.body.message}, (err, foundAnn) => {
     if (err || !foundAnn) {
       req.flash('error', "Unable to access database")
       res.redirect('back')
 
     } else {
       req.flash('success', 'Announcement Updated!')
-      res.redirect(`/view_announcement?id=${foundAnn._id}`)
+      res.redirect(`/view_announcement/${foundAnn._id}`)
     }
   })
 })

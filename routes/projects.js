@@ -34,8 +34,8 @@ router.get('/projects', middleware.isLoggedIn, (req, res) => {
   })
 })
 
-router.get('/view_project', (req, res) => {
-  Project.findById(req.query.id, (err, foundProject) => {
+router.get('/view_project/:id', (req, res) => {
+  Project.findById(req.params.id, (err, foundProject) => {
     if (err || !foundProject) {
       req.flash('error', "Unable to access database")
       res.redirect('back')
@@ -102,8 +102,8 @@ router.post('/submitProject', (req, res) => {
     })
 })
 
-router.get('/edit_project', (req, res) => {
-  Project.findById(req.query.id, (err, foundProject) => {
+router.get('/edit_project/:id', (req, res) => {
+  Project.findById(req.params.id, (err, foundProject) => {
     if (err || !foundProject) {
       req.flash('error', 'Unable to Access Database')
       res.redirect('back')
@@ -137,8 +137,8 @@ router.get('/edit_project', (req, res) => {
   })
 })
 
-router.post('/submit_project_edits', (req, res) => {
-  Project.findByIdAndUpdate(req.query.id, {title: req.body.title, imgUrl: req.body.img, creators: req.body.creators.split(', '), text: req.body.text}, (err, foundProject) => {
+router.post('/submit_project_edits/:id', (req, res) => {
+  Project.findByIdAndUpdate(req.params.id, {title: req.body.title, imgUrl: req.body.img, creators: req.body.creators.split(', '), text: req.body.text}, (err, foundProject) => {
     if (err || !foundProject) {
       req.flash('error', "Unable to access database")
       res.redirect('back')
@@ -150,8 +150,8 @@ router.post('/submit_project_edits', (req, res) => {
   })
 })
 
-router.get('/delete_project', (req, res) => {
-  Project.findByIdAndDelete(req.query.id, (err, foundProject) => {
+router.get('/delete_project/:id', (req, res) => {
+  Project.findByIdAndDelete(req.params.id, (err, foundProject) => {
     if (err || !foundProject) {
       req.flash('error', "Unable to access database")
       res.redirect('back')
