@@ -67,8 +67,8 @@
               <% if (room.type == 'private' && !(room.members.includes(currentUser._id))) { %>
                 <li class="list-group-item list-group-item-action list-group-item-light">
                   <%= room.name %>
-                  <form action="" class="float-right">
-                    <button class="btn btn-success btn-sm">Request Invite</button></li>
+                  <form action="/chat/<%= room._id %>/request-access" method="post" class="float-right">
+                    <button class="btn btn-success btn-sm">Request Access</button></li>
                   </form>
               <% } %>
             <% }) %>

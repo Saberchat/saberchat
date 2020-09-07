@@ -11,7 +11,8 @@ const middleware = require('../middleware');
 const Comment = require('../models/comment');
 const User = require('../models/user');
 const Room = require('../models/room');
-const Announcement = require('../models/announcement')
+const Announcement = require('../models/announcement');
+const AccessReq = require('../models/accessRequest');
 
 //route for displaying room list
 router.get('/', middleware.isLoggedIn, (req, res) => {
@@ -174,6 +175,49 @@ router.post('/:id/leave', middleware.isLoggedIn, middleware.checkForLeave, funct
         res.redirect('/chat');
       }
     }
+  });
+});
+
+// handles access requests
+router.post('/:id/request-access', middleware.isLoggedIn, function(req, res) {
+  async function handleRequest() {
+    // find the room
+    const foundRoom = await Room.findById(req.params.id);
+    // if no found room, exit
+    if(!foundRoom) {req.flash('error', 'Room does not Exist'); return res.redirect('back');}
+    
+    // find if the request already exists to prevent spam
+    const foundReq = await AccessReq.findOne({requester: req.user._id, room: foundRoom._id});
+
+    if(foundReq) {
+      req.flash('error', 'Identical request has already been sent');
+      res.redirect('back');
+    } else {
+      
+      const request = {
+        requester: req.user._id,
+        room: foundRoom._id
+      }
+      // create the request and find the room creator
+      const [createdReq, roomCreator] = await Promise.all([
+        AccessReq.create(request),
+        User.findById(foundRoom.creator.id)
+      ]);
+
+      if(!createdReq || !roomCreator) {req.flash('error', 'An error occured'); return res.redirect('back');}
+
+      roomCreator.requests.push(createdReq._id);
+      roomCreator.save();
+
+      req.flash('success', 'Request for access sent');
+      res.redirect('back');
+    }
+
+  }
+
+  handleRequest().catch(err => {
+    req.flash('error', 'Cannot access Database');
+    res.redirect('back');
   });
 });
 

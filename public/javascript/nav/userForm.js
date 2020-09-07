@@ -68,12 +68,12 @@ function validateForm() {
         return false;
     } else if(form.password.value == '') {
         enableBtn();
-        form.email.style.border = '2px solid red';
-        form.email.placeholder = 'Enter password';
+        form.password.style.border = '2px solid red';
+        form.password.placeholder = 'Enter password';
         return false;
     } else if(form.password.value.length <= 8) {
         enableBtn();
-        form.email.style.border = '2px solid red';
+        form.password.style.border = '2px solid red';
         return false;
     } else if(!/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test(form.email.value)) {
         enableBtn();
