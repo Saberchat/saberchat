@@ -36,38 +36,58 @@ router.get('/', (req, res) => {
 
 //new registered user
 router.post("/register",  function(req, res) {
-	//creates new user from form info
-	newUser = new User(
-		{
-			email: req.body.email,
-			firstName: req.body.firstName,
-			lastName: req.body.lastName,
-			username: filter.clean(req.body.username)
-		}
-	);
-
-	//registers the user
-	User.register(newUser, req.body.password, function(err, user) {
-		if(err) {
-			//flash message the error if there is an error registering user
-			if(err.name == 'UserExistsError') {
-				req.flash('error', 'Email is already taken');
-			} else {
-				req.flash("error", err.message);
+	if(req.body.email == '') {
+		req.flash('error', 'Fill in email');
+		res.redirect('/');
+	} else if(!/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test(req.body.email)) {
+		req.flash('error', 'Fill in valid email');
+		res.redirect('/');
+	} else if(req.body.firstName == '') {
+		req.flash('error', 'Fill in first name');
+		res.redirect('/');
+	} else if(req.body.lastName == '') {
+		req.flash('error', 'Fill in last name');
+		res.redirect('/');
+	} else if(req.body.username == '') {
+		req.flash('error', 'Fill in username');
+		res.redirect('/');
+	} else if(req.body.password == '') {
+		req.flash('error', 'Fill in password name');
+		res.redirect('/');
+	} else {
+		//creates new user from form info
+		newUser = new User(
+			{
+				email: req.body.email,
+				firstName: req.body.firstName,
+				lastName: req.body.lastName,
+				username: filter.clean(req.body.username)
 			}
-			console.log(err);
-			//redirect to root
-			return res.redirect("/");
-		}
+		);
 
-		//if registration is successful, login user.
-		passport.authenticate("local")(req, res, function() {
-			//flash message for succesful login
-			req.flash("success", "Welcome to Saberchat " + user.firstName);
-			res.redirect("/");
-			console.log('succesfully registered and logged in user')
+		//registers the user
+		User.register(newUser, req.body.password, function(err, user) {
+			if(err) {
+				//flash message the error if there is an error registering user
+				if(err.name == 'UserExistsError') {
+					req.flash('error', 'Email is already taken');
+				} else {
+					req.flash("error", err.message);
+				}
+				console.log(err);
+				//redirect to root
+				return res.redirect("/");
+			}
+
+			//if registration is successful, login user.
+			passport.authenticate("local")(req, res, function() {
+				//flash message for succesful login
+				req.flash("success", "Welcome to Saberchat " + user.firstName);
+				res.redirect("/");
+				console.log('succesfully registered and logged in user')
+			});
 		});
-	});
+	}
 });
 
 // Custom login handling so that flash messages can be sent. I'm not entirely sure how it works. Copy pasted from official doc
