@@ -62,6 +62,9 @@ router.post("/register",  function(req, res) {
 	} else if(req.body.password == '') {
 		req.flash('error', 'Fill in password name');
 		res.redirect('/');
+	} else if(req.body.password.length <= 8) {
+		req.flash('error', 'Password too short');
+		res.redirect('/');
 	} else {
 		//creates new user from form info
 		newUser = new User(
