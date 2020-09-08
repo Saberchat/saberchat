@@ -84,7 +84,7 @@ router.post('/new', middleware.isLoggedIn, (req, res) => {
 
   } else {
 
-    if (req.body.check != undefined) {
+    if (req.body.check) { //Order form is not empty, something is selected
 
       Order.create({customer: req.user._id, name: `${req.user.firstName} ${req.user.lastName}`, instructions: req.body.instructions, present: true, charge: 0}, (err, order) => {
 
@@ -218,6 +218,7 @@ router.post('/:id/ready', middleware.isLoggedIn, (req, res) => {
             } else {
               notif.subject = "Cafe Order Ready";
               notif.sender = req.user._id;
+              notif.date = dateFormat(notif.created_at, "mmm d, h:MMTT")
               req.recipients = [foundUser.username]
 
               let itemText = [];
