@@ -7,7 +7,7 @@ const Announcement = require('../models/announcement');
 
 //Route to render 'sendAnnouncement' page
 router.get('/announce', middleware.isLoggedIn, (req, res) => {
-  if (req.user.permission == 'teacher' || req.user.permission == 'admin') {
+  if (req.user.status == 'faculty' || req.user.permission == 'admin') {
     Announcement.find({}).populate({path: 'sender', select: ['username', 'imageUrl']}).populate('message').exec((err, foundAnns) => {
       if (err || !foundAnns) {
         req.flash('error', 'Unable to access database')
@@ -26,7 +26,10 @@ router.get('/announce', middleware.isLoggedIn, (req, res) => {
 
 //Route to send announcements to bulletin
 router.post('/sendAnnouncement', middleware.isLoggedIn, (req, res) => {
-  Announcement.create({sender: req.user, subject: req.body.subject, images: req.body.imgUrls.split(', '), text: req.body.message}, (err, announcement) => {
+  Announcement.create({sender: req.user, subject: req.body.subject, text: req.body.message}, (err, announcement) => {
+    if (req.body.imgUrls != '') {
+      announcement.images = req.body.imgUrls.split(', ')
+    }
     announcement.date = dateFormat(announcement.created_at, "mmm d, h:MMTT")
     announcement.save()
   })

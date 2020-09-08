@@ -82,13 +82,13 @@
                         <h5 class="send-notif-header" style="text-align: center;">Anonymous Hotline</h5>
                         <form action="/send_anonymous" method="post">
                           <select id="recipients_anonymous" name="recipient" style="margin-bottom: 20px; width: 400px;">
-                            <optgroup label="Recipient (Must be Teacher or Admin)"></optgroup>
+                            <optgroup label="Recipient (Must be Faculty)"></optgroup>
                             <%users.forEach(user => { %>
-                              <% if (user.username != currentUser.username && (user.permission == 'admin' || user.permission == 'teacher')) { %>
+                              <% if (user.username != currentUser.username && (user.status == 'faculty')) { %>
                                 <option><%=user.username%></option>
                               <% } %>
                             <% }) %>
-                            <option>All Teachers and Admins</option>
+                            <option>All Faculty</option>
                           </select>
                           <br />
                           <div class="input-group mb-3">
@@ -144,7 +144,7 @@
     if (recipient_list_anonymous.value == '') {
       recipient_list_anonymous.value += `${x}`
     } else {
-      if ((!(recipient_list_anonymous.value.split(', ').includes(x))) && (!(recipient_list_anonymous.value.split(', ').includes('All Teachers and Admins'))) && (x != "All Teachers and Admins")) {
+      if ((!(recipient_list_anonymous.value.split(', ').includes(x))) && (!(recipient_list_anonymous.value.split(', ').includes('All Faculty'))) && (x != "All Faculty")) {
         recipient_list_anonymous.value += `, ${x}`
       }
     }

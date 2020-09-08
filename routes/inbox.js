@@ -111,8 +111,8 @@ router.post('/send_group', middleware.isLoggedIn, (req, res) => {
 router.post('/send_anonymous', (req, res) => {
 	let mailing_list = req.body.recipient_list_anonymous.split(', ') //Creates list of recipients based on user input
 
-	if (mailing_list.includes('All Teachers and Admins')) { //Send notif to all teachers and admins
-		User.find({'permission': {$in: ['teacher', 'admin']}}, (err, foundUsers) => {
+	if (mailing_list.includes('All Faculty')) { //Send notif to all faculty
+		User.find({'status': 'faculty'}, (err, foundUsers) => {
 			if(err || !foundUsers) {
 				req.flash('error', 'Unable to access Database');
 				res.redirect('back');
@@ -120,7 +120,7 @@ router.post('/send_anonymous', (req, res) => {
 			} else {
 
 				if (req.body.images.split(', ')[0] == '') {
-					Notification.create({subject: req.body.subject, sender: null, text: req.body.message, recipients: ['All teachers and admins'], images: []}, (err, notification) => {
+					Notification.create({subject: req.body.subject, sender: null, text: req.body.message, recipients: ['All Faculty'], images: []}, (err, notification) => {
 						notification.date = dateFormat(notification.created_at, "mmm d, h:MMTT")
 						notification.save() //Create notification
 
@@ -131,7 +131,7 @@ router.post('/send_anonymous', (req, res) => {
 					})
 
 				} else {
-					Notification.create({subject: req.body.subject, sender: null, text: req.body.message, recipients: ['All teachers and admins'], images: req.body.images.split(', ')}, (err, notification) => {
+					Notification.create({subject: req.body.subject, sender: null, text: req.body.message, recipients: ['All Faculty'], images: req.body.images.split(', ')}, (err, notification) => {
 						notification.date = dateFormat(notification.created_at, "mmm d, h:MMTT")
 						notification.save() //Create notification
 
@@ -143,11 +143,11 @@ router.post('/send_anonymous', (req, res) => {
 				}
 			}
 
-			req.flash('success', `Notification sent to all teachers! Your identity has been kept anonymous`)
+			req.flash('success', `Notification sent to all faculty! Your identity has been kept anonymous`)
 			res.redirect('/notif')
 		})
 
-	} else { // Send notif to specific mailing list of teachers and admins
+	} else { // Send notif to specific mailing list of faculty
 
 		User.find({username: {$in: mailing_list}}, (err, foundUsers) => { //Access users from User schema
 			if(err || !foundUsers) {
