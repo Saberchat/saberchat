@@ -185,35 +185,48 @@ router.post('/send_anonymous', (req, res) => {
 
 //Route to display user inbox
 router.get('/inbox', middleware.isLoggedIn, (req, res) => {
+	async function inboxGet() {
+		await req.user.populate({path: 'inbox', populate: { path: 'sender', select: ['username', 'imageUrl']}}).execPopulate();
+		console.log(req.user);
+		res.render('inbox/index');
+	}
+	inboxGet().catch(err => {
+		console.log(err);
+		req.flash('error', 'An error occured');
+		res.redirect('back');
+	});
+});
 
-	User.findOne({_id: req.user._id}).populate({path: 'inbox', populate: { path: 'sender', select: ['username', 'imageUrl']}}).exec((err, foundUser) => {
-		if (err || !foundUser) {
-      req.flash('error', 'Unable to access database')
-      res.redirect('back')
+// router.get('/inbox', middleware.isLoggedIn, (req, res) => {
 
-    } else {
-			let notifdates = []
-			for (let notif of foundUser.inbox) {
-				notifdates.push(dateFormat(notif.created_at, "mmm d, h:MMTT"))
-			}
-			Announcement.find({}).populate({path: 'sender', select: ['username', 'imageUrl']}).populate('message').exec((err, foundAnns) => {
-				if (err || !foundAnns) {
-					req.flash('error', 'Unable to access database')
-					res.redirect('back')
+// 	User.findOne({_id: req.user._id}).populate({path: 'inbox', populate: { path: 'sender', select: ['username', 'imageUrl']}}).exec((err, foundUser) => {
+// 		if (err || !foundUser) {
+//       req.flash('error', 'Unable to access database')
+//       res.redirect('back')
 
-				} else {
-					let dates = []
+//     } else {
+// 			let notifdates = []
+// 			for (let notif of foundUser.inbox) {
+// 				notifdates.push(dateFormat(notif.created_at, "mmm d, h:MMTT"))
+// 			}
+// 			Announcement.find({}).populate({path: 'sender', select: ['username', 'imageUrl']}).populate('message').exec((err, foundAnns) => {
+// 				if (err || !foundAnns) {
+// 					req.flash('error', 'Unable to access database')
+// 					res.redirect('back')
 
-					for (let ann of foundAnns) {
-						dates.push(dateFormat(ann.created_at, "mmm d, h:MMTT"))
-					}
+// 				} else {
+// 					let dates = []
 
-					res.render('inbox/inbox', {announcements: foundAnns.reverse(), dates: dates.reverse(), announced: false, username: foundUser.username, notifs: foundUser.inbox.reverse(), notifdates: notifdates.reverse()})
-				}
-			})
-		}
-	})
-})
+// 					for (let ann of foundAnns) {
+// 						dates.push(dateFormat(ann.created_at, "mmm d, h:MMTT"))
+// 					}
+
+// 					res.render('inbox/inbox', {announcements: foundAnns.reverse(), dates: dates.reverse(), announced: false, username: foundUser.username, notifs: foundUser.inbox.reverse(), notifdates: notifdates.reverse()})
+// 				}
+// 			})
+// 		}
+// 	})
+// })
 
 //View message in your inbox in more detail
 router.get('/view_inbox_message/:id', middleware.isLoggedIn, (req, res) => {

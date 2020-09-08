@@ -26,24 +26,15 @@
     <%- include('../partials/navbar') %>
     <!-- include the backdrop for nav -->
     <%- include('../partials/header') %>
-    <%- include('../partials/announcement') %>
 
     </head>
     <body>
         <div class="container">
             <div class="row">
                 <div class="col-md-10 offset-md-1 col-12">
-                    <h1 class="title" style="text-align: center; margin-top: 10px; color: black;"><%=username%>'s Inbox</h1>
-                    <div class="search-filter">
-                    </div>
-                    <ul class = "new_messages" id="new_messages">
-                      <%notifs.forEach(notif => { %>
-                          <div class="notification">
-                            <span class="msg-info">New <strong><%=notif.type%></strong> from <strong><%=notif.sender.username%></strong></span>
-                            <br />
-                            <span class="message">- <%=notif.text%></span>
-                          </div>
-                      <% }) %>
+                    <h1 class="title" style="text-align: center; margin-top: 10px; color: black;">PlaceHolder's Inbox</h1>
+                    <ul>
+                      <li>notif</li>
                     </ul>
                 </div>
             </div>
