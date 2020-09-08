@@ -54,36 +54,50 @@
             <% if (notif.sender == null) { %>
               <strong>From</strong>: <span>Anonymous</span><br />
 
-            <%} else if (currentUser.username != notif.sender.username) { %>
-              <strong>From</strong>: <a style="color: inherit;" href="/profiles/<%=notif.sender._id%>"> <%=notif.sender.username%></a><br />
-            <%} else {%>
+            <% } else if (currentUser.username != notif.sender.username) { %>
+              <strong>From</strong>: <a style="color: inherit;" href="/profiles/<%=notif.sender._id%>"><%=notif.sender.username%></a><br />
+
+            <% } else { %>
               <strong>From</strong>: <a style="color: inherit;" href="/profiles/<%=currentUser._id%>">me</a><br />
-            <%}%>
+            <% } %>
 
             <% if (notif.recipients[0] == 'everyone') { %>
               <strong>To:</strong><span> everyone</span>
 
-            <% } else if (notif.sender != null && currentUser.username != notif.sender.username) { %>
+            <% } else if ((notif.sender != null) && (currentUser.username != notif.sender.username)) { %>
               <strong>To:</strong>
+
               <% let tempRecipients = notif.recipients.slice(0, notif.recipients.length - 1) %>
 
               <% tempRecipients.forEach(recipient => { %>
+
                 <% if (recipient == currentUser.username) { %>
-                  <a style="color: black;" href="../profiles?username=<%=recipient%>">me, </a>
-                <% } else {%>
-                  <a style="color: black;" href="../profiles?username=<%=recipient%>"><%=recipient%>, </a>
+                  <a style="color: black;" href="../profiles/<%=currentUser._id%>">me, </a>
+
+                <% } else { %>
+
+                  <% recipient_profiles.forEach(user => { %>
+                    <% if (user.username == recipient) { %>
+                      <a style="color: black;" href="../profiles/<%=user._id%>"><%=user.username%>, </a>
+                    <% } %>
+                  <% }) %>
+
                 <% } %>
+
               <% }) %>
 
-
               <% if (notif.recipients[notif.recipients.length - 1] == currentUser.username) { %>
-                <a style="color: black;" href="../profiles?username=<%=notif.recipients[notif.recipients.length - 1]%>">me</a>
+                <a style="color: black;" href="../profiles/<%=currentUser._id%>">me</a>
 
               <% } else { %>
-                <a style="color: black;" href="../profiles?username=<%=notif.recipients[notif.recipients.length - 1]%>"><%=notif.recipients[notif.recipients.length - 1]%></a>
+
+                <% recipient_profiles.forEach(user => { %>
+                  <% if (user.username == notif.recipients[notif.recipients.length - 1]) { %>
+                    <a style="color: black;" href="../profiles/<%=user._id%>"><%=user.username%></a>
+                  <% } %>
+                <% }) %>
+
               <% } %>
-
-
 
             <% } else { %>
 
@@ -91,23 +105,34 @@
               <% let tempRecipients = notif.recipients.slice(0, notif.recipients.length - 1) %>
 
               <% tempRecipients.forEach(recipient => { %>
-                <% if (recipient == currentUser.username) { %>
-                  <a style="color: black;" href="../profiles?username=<%=recipient%>">me, </a>
 
-                <% } else {%>
-                  <a style="color: black;" href="../profiles?username=<%=recipient%>"><%=recipient%>, </a>
+                <% if (recipient == currentUser.username) { %>
+                  <a style="color: black;" href="../profiles/<%=currentUser._id%>">me, </a>
+
+                <% } else { %>
+
+                  <% recipient_profiles.forEach(user => { %>
+                    <% if (user.username == recipient) { %>
+                      <a style="color: black;" href="../profiles/<%=user._id%>"><%=user.username%>, </a>
+                    <% } %>
+                  <% }) %>
 
                 <% } %>
+
               <% }) %>
 
-
               <% if (notif.recipients[notif.recipients.length - 1] == currentUser.username) { %>
-                <a style="color: black;" href="../profiles?username=<%=notif.recipients[notif.recipients.length - 1]%>">me</a>
+                <a style="color: black;" href="../profiles/<%=currentUser._id%>">me</a>
 
-              <% } else { %>
-                <a style="color: black;" href="../profiles?username=<%=notif.recipients[notif.recipients.length - 1]%>"><%=notif.recipients[notif.recipients.length - 1]%></a>
+              <% } else {  %>
+
+                <% recipient_profiles.forEach(user => { %>
+                  <% if (user.username == notif.recipients[notif.recipients.length - 1]) { %>
+                    <a style="color: black;" href="../profiles/<%=user._id%>"><%=user.username%></a>
+                  <% } %>
+                <% }) %>
+
               <% } %>
-
             <% } %>
 
             <p style="margin-top: 10px;"><%=notif.text%></p>

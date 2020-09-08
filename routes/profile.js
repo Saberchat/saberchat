@@ -12,48 +12,24 @@ const middleware = require('../middleware');
 // renders the list of users page
 router.get('/', middleware.isLoggedIn, function(req, res) {
 
-  if (Object.keys(req.query).length != 0) {
+  User.find({}, function(err, foundUsers) {
+      if(err || !foundUsers) {
+          req.flash('error', 'Unable to access Database');
+          res.redirect('back');
+      } else {
 
-    User.findOne({'username': req.query.username}, function(err, foundUser) {
-        if(err || !foundUser) {
-            req.flash('error', 'Unable to access Database');
-            res.redirect('back');
-        } else {
+        Announcement.find({}).populate({path: 'sender', select: ['username', 'imageUrl']}).populate('message').exec((err, foundAnns) => {
+          if (err || !foundAnns) {
+            req.flash('error', 'Unable to access database')
+            res.redirect('back')
 
-          Announcement.find({}).populate({path: 'sender', select: ['username', 'imageUrl']}).populate('message').exec((err, foundAnns) => {
-            if (err || !foundAnns) {
-              req.flash('error', 'Unable to access database')
-              res.redirect('back')
+          } else {
 
-            } else {
-
-              res.render('profile/show', {user: foundUser, announcements: foundAnns.reverse(),  announced: false})
-            }
-          })
-        }
-    });
-
-  } else {
-    User.find({}, function(err, foundUsers) {
-        if(err || !foundUsers) {
-            req.flash('error', 'Unable to access Database');
-            res.redirect('back');
-        } else {
-
-          Announcement.find({}).populate({path: 'sender', select: ['username', 'imageUrl']}).populate('message').exec((err, foundAnns) => {
-            if (err || !foundAnns) {
-              req.flash('error', 'Unable to access database')
-              res.redirect('back')
-
-            } else {
-
-              res.render('profile/index', {users: foundUsers, announcements: foundAnns.reverse(), announced: false})
-            }
-          })
-        }
-    });
-  }
-
+            res.render('profile/index', {users: foundUsers, announcements: foundAnns.reverse(), announced: false})
+          }
+        })
+      }
+  });
 });
 
 //renders profiles edit page
