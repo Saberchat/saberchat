@@ -21,13 +21,8 @@ router.get('/notif', middleware.isLoggedIn, (req, res) => {
 					res.redirect('back')
 
 				} else {
-					let dates = []
 
-					for (let ann of foundAnns) {
-						dates.push(dateFormat(ann.created_at, "mmm d, h:MMTT"))
-					}
-
-					res.render('inbox/sendNotification', {announcements: foundAnns.reverse(), dates: dates.reverse(), announced: false, users: foundUsers, selected_users: [], currentUser: req.user})
+					res.render('inbox/sendNotification', {announcements: foundAnns.reverse(), announced: false, users: foundUsers, selected_users: [], currentUser: req.user})
 				}
 			})
 		}
@@ -49,6 +44,7 @@ router.post('/send_group', middleware.isLoggedIn, (req, res) => {
 
 				if (req.body.images.split(', ')[0] == '') { //No images attached
 					Notification.create({subject: req.body.subject, sender: req.user, text: req.body.message, recipients: ['everyone'], images: []}, (err, notification) => {
+						notification.date = dateFormat(notification.created_at, "mmm d, h:MMTT")
 						notification.save() //Create notification
 
 						for (let i of foundUsers) {
@@ -59,6 +55,7 @@ router.post('/send_group', middleware.isLoggedIn, (req, res) => {
 
 				} else { //Images are attached
 					Notification.create({subject: req.body.subject, sender: req.user, text: req.body.message, recipients: ['everyone'], images: req.body.images.split(', ')}, (err, notification) => {
+						notification.date = dateFormat(notification.created_at, "mmm d, h:MMTT")
 						notification.save() //Create notification
 
 						for (let i of foundUsers) {
@@ -83,6 +80,7 @@ router.post('/send_group', middleware.isLoggedIn, (req, res) => {
 
 				if (req.body.images.split(', ')[0] == '') {
 					Notification.create({subject: req.body.subject, sender: req.user, text: req.body.message, recipients: mailing_list, images: []}, (err, notification) => {
+						notification.date = dateFormat(notification.created_at, "mmm d, h:MMTT")
 						notification.save() //Create notification
 
 						for (let i of foundUsers) {
@@ -93,6 +91,7 @@ router.post('/send_group', middleware.isLoggedIn, (req, res) => {
 
 				} else {
 					Notification.create({subject: req.body.subject, sender: req.user, text: req.body.message, recipients: mailing_list, images: req.body.images.split(', ')}, (err, notification) => {
+						notification.date = dateFormat(notification.created_at, "mmm d, h:MMTT")
 						notification.save() //Create notification
 
 						for (let i of foundUsers) {
@@ -122,6 +121,7 @@ router.post('/send_anonymous', (req, res) => {
 
 				if (req.body.images.split(', ')[0] == '') {
 					Notification.create({subject: req.body.subject, sender: null, text: req.body.message, recipients: ['All teachers and admins'], images: []}, (err, notification) => {
+						notification.date = dateFormat(notification.created_at, "mmm d, h:MMTT")
 						notification.save() //Create notification
 
 						for (let i of foundUsers) {
@@ -132,6 +132,7 @@ router.post('/send_anonymous', (req, res) => {
 
 				} else {
 					Notification.create({subject: req.body.subject, sender: null, text: req.body.message, recipients: ['All teachers and admins'], images: req.body.images.split(', ')}, (err, notification) => {
+						notification.date = dateFormat(notification.created_at, "mmm d, h:MMTT")
 						notification.save() //Create notification
 
 						for (let i of foundUsers) {
@@ -157,6 +158,7 @@ router.post('/send_anonymous', (req, res) => {
 
 				if (req.body.images.split(', ')[0] == '') {
 					Notification.create({subject: req.body.subject, sender: null, text: req.body.message, recipients: mailing_list, images: []}, (err, notification) => {
+						notification.date = dateFormat(notification.created_at, "mmm d, h:MMTT")
 						notification.save() //Create notification
 
 						for (let i of foundUsers) {
@@ -167,6 +169,7 @@ router.post('/send_anonymous', (req, res) => {
 
 				} else {
 					Notification.create({subject: req.body.subject, sender: null, text: req.body.message, recipients: mailing_list, images: req.body.images.split(', ')}, (err, notification) => {
+						notification.date = dateFormat(notification.created_at, "mmm d, h:MMTT")
 						notification.save() //Creat notification
 
 						for (let i of foundUsers) {
@@ -192,23 +195,15 @@ router.get('/inbox', middleware.isLoggedIn, (req, res) => {
       res.redirect('back')
 
     } else {
-			let notifdates = []
-			for (let notif of foundUser.inbox) {
-				notifdates.push(dateFormat(notif.created_at, "mmm d, h:MMTT"))
-			}
+
 			Announcement.find({}).populate({path: 'sender', select: ['username', 'imageUrl']}).populate('message').exec((err, foundAnns) => {
 				if (err || !foundAnns) {
 					req.flash('error', 'Unable to access database')
 					res.redirect('back')
 
 				} else {
-					let dates = []
 
-					for (let ann of foundAnns) {
-						dates.push(dateFormat(ann.created_at, "mmm d, h:MMTT"))
-					}
-
-					res.render('inbox/inbox', {announcements: foundAnns.reverse(), dates: dates.reverse(), announced: false, username: foundUser.username, notifs: foundUser.inbox.reverse(), notifdates: notifdates.reverse()})
+					res.render('inbox/inbox', {announcements: foundAnns.reverse(), announced: false, username: foundUser.username, notifs: foundUser.inbox.reverse()})
 				}
 			})
 		}
@@ -230,13 +225,8 @@ router.get('/view_inbox_message/:id', middleware.isLoggedIn, (req, res) => {
 					res.redirect('back')
 
 				} else {
-					let dates = []
 
-					for (let ann of foundAnns) {
-						dates.push(dateFormat(ann.created_at, "mmm d, h:MMTT"))
-					}
-
-					res.render('inbox/notification', {announcements: foundAnns.reverse(), dates: dates.reverse(), announced: false, notif: foundNotif, notifDate: dateFormat(foundNotif.created_at, "mmm d, h:MMTT")})
+					res.render('inbox/notification', {announcements: foundAnns.reverse(), announced: false, notif: foundNotif})
 				}
 			})
 		}
@@ -252,24 +242,14 @@ router.get('/view_sent_notifs', middleware.isLoggedIn, (req, res) => {
 
 		} else {
 
-			let notifdates = []
-			for (let notif of foundNotifs) {
-				notifdates.push(dateFormat(notif.created_at, "mmm d, h:MMTT"))
-			}
-
 			Announcement.find({}).populate({path: 'sender', select: ['username', 'imageUrl']}).populate('message').exec((err, foundAnns) => {
 				if (err || !foundAnns) {
 					req.flash('error', 'Unable to access database')
 					res.redirect('back')
 
 				} else {
-					let dates = []
 
-					for (let ann of foundAnns) {
-						dates.push(dateFormat(ann.created_at, "mmm d, h:MMTT"))
-					}
-
-					res.render('inbox/sentNotifications', {announcements: foundAnns.reverse(), dates: dates.reverse(), announced: false, notifs: foundNotifs.reverse(), notifdates: notifdates.reverse()})
+					res.render('inbox/sentNotifications', {announcements: foundAnns.reverse(), announced: false, notifs: foundNotifs.reverse()})
 				}
 			})
 		}

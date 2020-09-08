@@ -26,13 +26,8 @@ router.get('/projects', middleware.isLoggedIn, (req, res) => {
           res.redirect('back')
 
         } else {
-          let dates = []
 
-    			for (let ann of foundAnns) {
-    				dates.push(dateFormat(ann.created_at, "mmm d, h:MMTT"))
-    			}
-
-          res.render('projects/projects', {announcements: foundAnns.reverse(), dates: dates.reverse(), projects: foundProjects})
+          res.render('projects/projects', {announcements: foundAnns.reverse(), projects: foundProjects})
         }
       })
     }
@@ -55,13 +50,8 @@ router.get('/view_project/:id', middleware.isLoggedIn, (req, res) => {
           res.redirect('back')
 
         } else {
-          let dates = []
 
-    			for (let ann of foundAnns) {
-    				dates.push(dateFormat(ann.created_at, "mmm d, h:MMTT"))
-    			}
-
-          res.render('projects/viewProject', {announcements: foundAnns.reverse(), dates: dates.reverse(), project: foundProject})
+          res.render('projects/viewProject', {announcements: foundAnns.reverse(), project: foundProject})
         }
       })
     }
@@ -82,13 +72,8 @@ router.get('/addProject', middleware.isLoggedIn, (req, res) => {
           res.redirect('back')
 
         } else {
-          let dates = []
 
-    			for (let ann of foundAnns) {
-    				dates.push(dateFormat(ann.created_at, "mmm d, h:MMTT"))
-    			}
-
-          res.render('projects/addProject', {announcements: foundAnns.reverse(), dates: dates.reverse(), students: foundUsers})
+          res.render('projects/addProject', {announcements: foundAnns.reverse(), students: foundUsers})
         }
       })
     }
@@ -151,13 +136,8 @@ router.get('/edit_project/:id', middleware.isLoggedIn, (req, res) => {
               res.redirect('back')
 
             } else {
-              let dates = []
 
-        			for (let ann of foundAnns) {
-        				dates.push(dateFormat(ann.created_at, "mmm d, h:MMTT"))
-        			}
-
-              res.render('projects/editProject', {announcements: foundAnns.reverse(), dates: dates.reverse(), project: foundProject, students: foundUsers, creatornames})
+              res.render('projects/editProject', {announcements: foundAnns.reverse(), project: foundProject, students: foundUsers, creatornames})
             }
           })
         }

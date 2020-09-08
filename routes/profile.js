@@ -26,13 +26,8 @@ router.get('/', middleware.isLoggedIn, function(req, res) {
               res.redirect('back')
 
             } else {
-              let dates = []
 
-        			for (let ann of foundAnns) {
-        				dates.push(dateFormat(ann.created_at, "mmm d, h:MMTT"))
-        			}
-
-              res.render('profile/show', {user: foundUser, announcements: foundAnns.reverse(), dates: dates.reverse(), announced: false})
+              res.render('profile/show', {user: foundUser, announcements: foundAnns.reverse(),  announced: false})
             }
           })
         }
@@ -51,13 +46,8 @@ router.get('/', middleware.isLoggedIn, function(req, res) {
               res.redirect('back')
 
             } else {
-              let dates = []
 
-        			for (let ann of foundAnns) {
-        				dates.push(dateFormat(ann.created_at, "mmm d, h:MMTT"))
-        			}
-
-              res.render('profile/index', {users: foundUsers, announcements: foundAnns.reverse(), dates: dates.reverse(), announced: false})
+              res.render('profile/index', {users: foundUsers, announcements: foundAnns.reverse(), announced: false})
             }
           })
         }
@@ -76,13 +66,7 @@ router.get('/edit', middleware.isLoggedIn, function(req, res) {
 
     } else {
 
-      let dates = []
-
-			for (let ann of foundAnns) {
-				dates.push(dateFormat(ann.created_at, "mmm d, h:MMTT"))
-			}
-
-      res.render('profile/edit', {announcements: foundAnns.reverse(), dates: dates.reverse(), announced: false})
+      res.render('profile/edit', {announcements: foundAnns.reverse(), announced: false})
     }
   })
 });
@@ -95,13 +79,8 @@ router.get('/change-login-info', middleware.isLoggedIn, function(req, res) {
       res.redirect('back')
 
     } else {
-      let dates = []
 
-			for (let ann of foundAnns) {
-				dates.push(dateFormat(ann.created_at, "mmm d, h:MMTT"))
-			}
-
-      res.render('profile/edit_pwd_email', {announcements: foundAnns.reverse(), dates: dates.reverse(), announced: false})
+      res.render('profile/edit_pwd_email', {announcements: foundAnns.reverse(), announced: false})
     }
   })
 });
@@ -120,13 +99,8 @@ router.get('/:id', middleware.isLoggedIn, function(req, res) {
               res.redirect('back')
 
             } else {
-              let dates = []
 
-        			for (let ann of foundAnns) {
-        				dates.push(dateFormat(ann.created_at, "mmm d, h:MMTT"))
-        			}
-
-              res.render('profile/show', {user: foundUser, announcements: foundAnns.reverse(), dates: dates.reverse(), announced: false})
+              res.render('profile/show', {user: foundUser, announcements: foundAnns.reverse(), announced: false})
             }
           })
         }

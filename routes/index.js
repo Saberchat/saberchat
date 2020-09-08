@@ -26,13 +26,7 @@ router.get('/', (req, res) => {
 			res.redirect('back')
     } else {
 
-			let dates = []
-
-			for (let ann of foundAnns) {
-				dates.push(dateFormat(ann.created_at, "mmm d, h:MMTT"))
-			}
-
-      res.render('index', {announcements: foundAnns.reverse(), dates: dates.reverse()})
+      res.render('index', {announcements: foundAnns.reverse()})
     }
   })
 });

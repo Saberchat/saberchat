@@ -14,13 +14,7 @@ router.get('/announce', middleware.isLoggedIn, (req, res) => {
         res.redirect('back')
       } else {
 
-        let dates = []
-
-  			for (let ann of foundAnns) {
-  				dates.push(dateFormat(ann.created_at, "mmm d, h:MMTT"))
-  			}
-
-        res.render('announcements/sendAnnouncement', {announcements: foundAnns.reverse(), announced: false, dates: dates.reverse()})
+        res.render('announcements/sendAnnouncement', {announcements: foundAnns.reverse(), announced: false})
       }
     })
 
@@ -33,6 +27,7 @@ router.get('/announce', middleware.isLoggedIn, (req, res) => {
 //Route to send announcements to bulletin
 router.post('/sendAnnouncement', middleware.isLoggedIn, (req, res) => {
   Announcement.create({sender: req.user, subject: req.body.subject, images: req.body.imgUrls.split(', '), text: req.body.message}, (err, announcement) => {
+    announcement.date = dateFormat(announcement.created_at, "mmm d, h:MMTT")
     announcement.save()
   })
   req.flash('success', 'Announcement posted to bulletin!')
@@ -48,12 +43,7 @@ router.get('/announcements', middleware.isLoggedIn, (req, res) => {
       res.redirect('back')
 
     } else {
-      let dates = []
-
-			for (let ann of foundAnns) {
-				dates.push(dateFormat(ann.created_at, "mmm d, h:MMTT"))
-			}
-      res.render('announcements/announcements', {announcements: foundAnns.reverse(), announced: false, dates: dates.reverse()})
+      res.render('announcements/announcements', {announcements: foundAnns.reverse(), announced: false})
     }
   })
 })
@@ -72,12 +62,7 @@ router.get('/view_announcement/:id', middleware.isLoggedIn, (req, res) => {
           res.redirect('back')
 
         } else {
-          let dates = []
-
-    			for (let ann of foundAnns) {
-    				dates.push(dateFormat(ann.created_at, "mmm d, h:MMTT"))
-    			}
-          res.render('announcements/announcements', {announcements: foundAnns.reverse(), dates: dates.reverse(), announced: true, announcement: foundAnn, date: dateFormat(foundAnn.created_at, "mmm d, h:MMTT")})
+          res.render('announcements/announcements', {announcements: foundAnns.reverse(), announced: true, announcement: foundAnn})
         }
       })
     }
@@ -110,13 +95,8 @@ router.get('/edit_announcement/:id', middleware.isLoggedIn, (req, res) => {
           res.redirect('back')
 
         } else {
-          let dates = []
 
-    			for (let ann of foundAnns) {
-    				dates.push(dateFormat(ann.created_at, "mmm d, h:MMTT"))
-    			}
-
-          res.render('announcements/editAnnouncement', {announcements: foundAnns.reverse(), dates: dates.reverse(), announced: false, announcement: foundAnn})
+          res.render('announcements/editAnnouncement', {announcements: foundAnns.reverse(), announced: false, announcement: foundAnn})
         }
       })
     }

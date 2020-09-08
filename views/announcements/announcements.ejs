@@ -48,7 +48,7 @@
             <div class="jumbotron text-center" style="width: 700px; padding: 50px;">
               <h1><%=announcement.subject%></h1>
               <p><em>Posted by <a style="color: black;" href="/profiles/<%=announcement.sender._id%>"><strong><%=announcement.sender.username%></strong></a></em></p>
-              <p style="font-size: 10px; margin-top: 5px;"><%=date.split(', ')[1]%> | <%=date.split(', ')[0]%></p>
+              <p style="font-size: 10px; margin-top: 5px;"><%=announcement.date.split(', ')[1]%> | <%=announcement.date.split(', ')[0]%></p>
               <p style="margin-top: 10px;"><%=announcement.text%></p>
 
               <%announcement.images.forEach(image => {%>

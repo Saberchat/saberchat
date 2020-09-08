@@ -49,7 +49,7 @@
           <div class="jumbotron text-center" style="width: 700px; padding: 50px;">
             <h2 style="color: red;"><%=notif.subject%></h2>
 
-            <p style="font-size: 15px;"><%=notifDate.split(', ')[1]%> | <%=notifDate.split(', ')[0]%></p>
+            <p style="font-size: 15px;"><%=notif.date.split(', ')[1]%> | <%=notif.date.split(', ')[0]%></p>
 
             <% if (notif.sender == null) { %>
               <strong>From</strong>: <span>Anonymous</span><br />

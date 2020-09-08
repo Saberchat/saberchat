@@ -52,19 +52,19 @@
               <div class="search-filter">
               </div>
               <ul class = "new_messages" id="new_messages">
-                <% [...Array(notifs.length).keys()].forEach(i => { %>
+                <% notifs.forEach(notif => { %>
                   <div class="notification">
 
                     <!-- Known-sender message -->
 
-                      <input name=<%=notifs[i]['_id']%> type="checkbox"/>
-                      <label for=<%=notifs[i]['_id']%>><a style="color: inherit;" href="/view_inbox_message/<%=notifs[i]._id%>"> <span><span class="msg-info"><strong><%=notifs[i].subject%></strong> <span style="font-size: 10px;"><%=notifdates[i].split(", ")[1]%> | <%=notifdates[i].split(", ")[0]%></span></span> </a> </label>
+                      <input name=<%=notif['_id']%> type="checkbox"/>
+                      <label for=<%=notif['_id']%>><a style="color: inherit;" href="/view_inbox_message/<%=notif._id%>"> <span><span class="msg-info"><strong><%=notif.subject%></strong> <span style="font-size: 10px;"><%=notif.date.split(", ")[1]%> | <%=notif.date.split(", ")[0]%></span></span> </a> </label>
                     <br />
 
-                    <% if (notifs[i].text.split(' ').length > 20) { %>
-                      <span class="message"><%=notifs[i].text.split(' ').slice(0, 21).join(' ')%> <a style="color: inherit;" href="/view_inbox_message?id=<%=notifs[i]._id%>">(Read More)</a></span>
+                    <% if (notif.text.split(' ').length > 20) { %>
+                      <span class="message"><%=notif.text.split(' ').slice(0, 21).join(' ')%> <a style="color: inherit;" href="/view_inbox_message?id=<%=notif._id%>">(Read More)</a></span>
                     <% } else { %>
-                      <span class="message"><%=notifs[i].text%></span>
+                      <span class="message"><%=notif.text%></span>
                     <% } %>
 
                   </div>

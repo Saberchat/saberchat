@@ -9,6 +9,7 @@ var notificationSchema = new mongoose.Schema({
         ref: "User"
     },
     text: String,
+    date: String,
 }, {timestamps: {createdAt: 'created_at'}});
 
 module.exports = mongoose.model("Notification", notificationSchema);

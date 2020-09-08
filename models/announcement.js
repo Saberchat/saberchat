@@ -7,7 +7,8 @@ var announcementSchema = new mongoose.Schema({
         ref: "User"
     },
     images: [{type: String}],
-    text: String
+    text: String,
+    date: String,
 }, {timestamps: {createdAt: 'created_at'}});
 
 module.exports = mongoose.model("Announcement", announcementSchema);
