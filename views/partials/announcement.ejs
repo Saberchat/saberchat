@@ -64,7 +64,7 @@
             <% [...Array(4).keys()].forEach(i => { %>
               <div class="carousel-item" style="background-color: #dcdcdc;">
                 <img class="profile-img" src="<%=announcements[i+1].sender.imageUrl%>"/>
-                <a href="/view_announcement/<%=announcements[i+1]._id%>"><span><strong><%=announcements[i+1].sender.username%></strong>: <i><strong><%=announcements[i+1].subject%></strong></i> <span style="font-size: 10px;"><%=announcements[i+1].date.split(', ')[1]%> | <%=announcment[i+1].dates.split(', ')[0]%></span></span></a>
+                <a href="/view_announcement/<%=announcements[i+1]._id%>"><span><strong><%=announcements[i+1].sender.username%></strong>: <i><strong><%=announcements[i+1].subject%></strong></i> <span style="font-size: 10px;"><%=announcements[i+1].date.split(', ')[1]%> | <%=announcements[i+1].dates.split(', ')[0]%></span></span></a>
                 <br />
               </div>
             <%})%>
