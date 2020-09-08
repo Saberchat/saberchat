@@ -74,7 +74,7 @@
                       <img class="profile-img" src="<%=notifs[i].sender.imageUrl%>"/>
 
                         <input name=<%=notifs[i]['_id']%> type="checkbox"/>
-                        <label for=<%=notifs[i]['_id']%>><a style="color: inherit;" href="/view_inbox_message/<%=notifs[i]._id%>"> <span><strong> <%=notifs[i].sender.username%></strong></span>:<span class="msg-info"><strong><%=notifs[i].subject%></strong> <span style="font-size: 10px;"><%=notifdates[i].split(", ")[1]%> | <%=notifdates[i].split(", ")[0]%></span></span> </a> </label>
+                        <label for=<%=notifs[i]['_id']%>> <span><strong><a style="color: inherit;" href="/profiles/<%=notifs[i].sender._id%>"><%=notifs[i].sender.username%></a></strong></span>:<span class="msg-info"><a style="color: inherit;" href="/view_inbox_message/<%=notifs[i]._id%>"><strong><%=notifs[i].subject%></strong> <span style="font-size: 10px;"><%=notifdates[i].split(", ")[1]%> | <%=notifdates[i].split(", ")[0]%></span></span> </a> </label>
                       <br />
 
                       <% if (notifs[i].text.split(' ').length > 20) { %>

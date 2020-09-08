@@ -236,7 +236,7 @@ router.get('/view_inbox_message/:id', middleware.isLoggedIn, (req, res) => {
 						dates.push(dateFormat(ann.created_at, "mmm d, h:MMTT"))
 					}
 
-					res.render('inbox/notification', {announcements: foundAnns.reverse(), dates: dates.reverse(), announced: false, notif: foundNotif})
+					res.render('inbox/notification', {announcements: foundAnns.reverse(), dates: dates.reverse(), announced: false, notif: foundNotif, notifDate: dateFormat(foundNotif.created_at, "mmm d, h:MMTT")})
 				}
 			})
 		}

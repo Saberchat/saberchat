@@ -6,6 +6,7 @@ var announcementSchema = new mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: "User"
     },
+    images: [{type: String}],
     text: String
 }, {timestamps: {createdAt: 'created_at'}});
 

@@ -11,29 +11,59 @@ const middleware = require('../middleware');
 
 // renders the list of users page
 router.get('/', middleware.isLoggedIn, function(req, res) {
-  User.find({}, function(err, foundUsers) {
-      if(err || !foundUsers) {
-          req.flash('error', 'Unable to access Database');
-          res.redirect('back');
-      } else {
 
-        Announcement.find({}).populate({path: 'sender', select: ['username', 'imageUrl']}).populate('message').exec((err, foundAnns) => {
-          if (err || !foundAnns) {
-            req.flash('error', 'Unable to access database')
-            res.redirect('back')
+  if (Object.keys(req.query).length != 0) {
 
-          } else {
-            let dates = []
+    User.findOne({'username': req.query.username}, function(err, foundUser) {
+        if(err || !foundUser) {
+            req.flash('error', 'Unable to access Database');
+            res.redirect('back');
+        } else {
 
-      			for (let ann of foundAnns) {
-      				dates.push(dateFormat(ann.created_at, "mmm d, h:MMTT"))
-      			}
+          Announcement.find({}).populate({path: 'sender', select: ['username', 'imageUrl']}).populate('message').exec((err, foundAnns) => {
+            if (err || !foundAnns) {
+              req.flash('error', 'Unable to access database')
+              res.redirect('back')
 
-            res.render('profile/index', {users: foundUsers, announcements: foundAnns.reverse(), dates: dates.reverse(), announced: false})
-          }
-        })
-      }
-  });
+            } else {
+              let dates = []
+
+        			for (let ann of foundAnns) {
+        				dates.push(dateFormat(ann.created_at, "mmm d, h:MMTT"))
+        			}
+
+              res.render('profile/show', {user: foundUser, announcements: foundAnns.reverse(), dates: dates.reverse(), announced: false})
+            }
+          })
+        }
+    });
+
+  } else {
+    User.find({}, function(err, foundUsers) {
+        if(err || !foundUsers) {
+            req.flash('error', 'Unable to access Database');
+            res.redirect('back');
+        } else {
+
+          Announcement.find({}).populate({path: 'sender', select: ['username', 'imageUrl']}).populate('message').exec((err, foundAnns) => {
+            if (err || !foundAnns) {
+              req.flash('error', 'Unable to access database')
+              res.redirect('back')
+
+            } else {
+              let dates = []
+
+        			for (let ann of foundAnns) {
+        				dates.push(dateFormat(ann.created_at, "mmm d, h:MMTT"))
+        			}
+
+              res.render('profile/index', {users: foundUsers, announcements: foundAnns.reverse(), dates: dates.reverse(), announced: false})
+            }
+          })
+        }
+    });
+  }
+
 });
 
 //renders profiles edit page

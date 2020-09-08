@@ -29,7 +29,7 @@
           <div class="jumbotron text-center">
             <h1><i class="fas fa-bullhorn"></i> Edit Announcement</h1>
             <p>Modify Announcements You Posted Earlier</p>
-            <a></a>
+            <a href="../view_announcement/<%=announcement._id%>">Back to Announcement</a>
           </div>
         </div>
       </div>
@@ -37,6 +37,9 @@
     <form action="/submit_announcement_changes/<%=announcement._id%>" method="post">
       <div class="input-group mb-3">
         <input id="new-announcement-message" name="subject" maxlength="50" style="margin-left: 300px; margin-right: 300px;"type="text" class="form-control" placeholder="Announcement Subject" value="<%=announcement.subject%>" aria-label="Username" aria-describedby="basic-addon1">
+      </div>
+      <div class="input-group mb-3">
+        <input id="new-announcement-message" name="imgUrls" style="margin-left: 300px; margin-right: 300px;"type="text" class="form-control" placeholder="Any Image Urls" aria-label="Username" value="<%=announcement.images.join(', ')%>" aria-describedby="basic-addon1">
       </div>
       <div class="input-group">
         <textarea name="message" placeholder="Announcement Message" style="margin-left: 300px; margin-right: 300px; height: 200px" class="form-control" aria-label="With textarea" ><%=announcement.text%></textarea>

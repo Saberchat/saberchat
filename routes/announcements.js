@@ -32,7 +32,7 @@ router.get('/announce', middleware.isLoggedIn, (req, res) => {
 
 //Route to send announcements to bulletin
 router.post('/sendAnnouncement', middleware.isLoggedIn, (req, res) => {
-  Announcement.create({sender: req.user, subject: req.body.subject, text: req.body.message}, (err, announcement) => {
+  Announcement.create({sender: req.user, subject: req.body.subject, images: req.body.imgUrls.split(', '), text: req.body.message}, (err, announcement) => {
     announcement.save()
   })
   req.flash('success', 'Announcement posted to bulletin!')
@@ -124,7 +124,7 @@ router.get('/edit_announcement/:id', middleware.isLoggedIn, (req, res) => {
 })
 
 router.post('/submit_announcement_changes/:id', middleware.isLoggedIn, (req, res) => {
-  Announcement.findByIdAndUpdate(req.params.id, {subject: req.body.subject, text: req.body.message}, (err, foundAnn) => {
+  Announcement.findByIdAndUpdate(req.params.id, {subject: req.body.subject, images: req.body.imgUrls.split(', '), text: req.body.message}, (err, foundAnn) => {
     if (err || !foundAnn) {
       req.flash('error', "Unable to access database")
       res.redirect('back')
