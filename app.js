@@ -133,9 +133,9 @@ app.use('/cafe', cafeRoutes);
 app.use(projectRoutes);
 
 // Catch-all route
-// app.get('*', function(req, res) {
-// 	res.redirect('/');
-// });
+app.get('*', function(req, res) {
+	res.redirect('/');
+});
 
 // list of responses to bad words
 const curseResponse = [
