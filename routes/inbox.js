@@ -187,8 +187,20 @@ router.post('/send_anonymous', (req, res) => {
 router.get('/inbox', middleware.isLoggedIn, (req, res) => {
 	async function inboxGet() {
 		await req.user.populate({path: 'inbox', populate: { path: 'sender', select: ['username', 'imageUrl']}}).execPopulate();
+
+		await req.user.populate(
+			{
+				path: 'requests', 
+				populate: [
+					{ path: 'requester', select: ['username', 'imageUrl']},
+					{ path: 'room', select: 'name'}
+				]
+			}).execPopulate();
+
+		console.log('inbox route');
 		console.log(req.user);
-		res.render('inbox/index');
+
+		res.render('inbox/index', {inbox: req.user.inbox, requests: req.user.requests});
 	}
 	inboxGet().catch(err => {
 		console.log(err);
