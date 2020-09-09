@@ -274,7 +274,7 @@ router.get('/clear', middleware.isLoggedIn, (req, res) => {
 })
 
 //Delete already viewed notifications
-router.post('/delete', middleware.isLoggedIn, (req, res) => {
+router.delete('/delete', middleware.isLoggedIn, (req, res) => {
 	deletes = [] //List of messages to be deleted
 	for (let item of req.user.inbox) {
 		if (Object.keys(req.body).includes(item._id.toString())) { //If item is selected to be deleted (checkbox)
