@@ -247,12 +247,12 @@ io.on('connect', (socket) => {
 
     //Conditionals ensure that sending time is between 9AM and 12:20 PM
 
-    let currentTime = new Date(new Date().getTime()).toString().split(' ')[4]
-
-    if ((parseInt(currentTime.split(':')[0]) < 9 || parseInt(currentTime.split(':')[0]) > 12) || (parseInt(currentTime.split(':')[0]) == 12 && parseInt(currentTime.split(':')[1]) > 20)) {
-      console.log("Send orders between 9AM and 12:20PM");
-
-    } else {
+    // let currentTime = new Date(new Date().getTime()).toString().split(' ')[4]
+    //
+    // if ((parseInt(currentTime.split(':')[0]) < 9 || parseInt(currentTime.split(':')[0]) > 12) || (parseInt(currentTime.split(':')[0]) == 12 && parseInt(currentTime.split(':')[1]) > 20)) {
+    //   console.log("Send orders between 9AM and 12:20PM");
+    //
+    // } else {
 
       if (itemList.length != 0) { //Order form is not empty, something is selected
 
@@ -268,7 +268,6 @@ io.on('connect', (socket) => {
 
               } else {
                 order.date = dateFormat(order.created_at, "mmm d, h:MM TT")
-
                 order.items = itemList;
                 order.quantities = itemCount;
 
@@ -301,9 +300,7 @@ io.on('connect', (socket) => {
                         }
 
                         foundItems[i].save();
-
                       }
-
                     }
 
                     if (!unavailable) {
@@ -315,7 +312,17 @@ io.on('connect', (socket) => {
                       io.emit('order', order);
 
                     } else {
-                      console.log("Error sending in order")
+
+                      order.save() //Create order, will be deleted immediately
+
+                      Order.findByIdAndDelete(order._id, (err, foundOrder) => { //Delete this false order! instantaneously!
+                        if (err || !foundOrder) {
+                          console.log(err)
+
+                        } else {
+                          console.log("Unable to send order") //If there are no errors deleting the order, DELETE and tell the user SUCKA WE DELETED
+                        }
+                      })
                     }
                   }
                 })
@@ -327,7 +334,7 @@ io.on('connect', (socket) => {
       } else {
         console.log('Empty order')
       }
-    }
+    // }
   });
 });
 

@@ -74,45 +74,56 @@ router.get('/new', middleware.isLoggedIn, (req, res) => {
 });
 
 router.post('/new', middleware.isLoggedIn, (req, res) => {
-  let currentTime = new Date(new Date().getTime()).toString().split(' ')[4]
+  // let currentTime = new Date(new Date().getTime()).toString().split(' ')[4]
+  //
+  // if ((parseInt(currentTime.split(':')[0]) < 9 || parseInt(currentTime.split(':')[0]) > 12) || (parseInt(currentTime.split(':')[0]) == 12 && parseInt(currentTime.split(':')[1]) > 20)) {
+  //   req.flash('error', "Send orders between 9AM and 12:20PM");
+  //   res.redirect('back');
+  //
+  // } else {
 
-  if ((parseInt(currentTime.split(':')[0]) < 9 || parseInt(currentTime.split(':')[0]) > 12) || (parseInt(currentTime.split(':')[0]) == 12 && parseInt(currentTime.split(':')[1]) > 20)) {
-    req.flash('error', "Send orders between 9AM and 12:20PM");
-    res.redirect('back');
+    if (req.body.check) {
 
-  } else {
-
-    if (req.body.checked) {
       Item.find({}, (err, foundItems) => {
+        let unavailable = false
+
         if (err || !foundItems) {
           req.flash('error', "Unable to access database")
           res.redirect('back')
 
         } else {
-          let unavailable = false
           for (let item of foundItems) {
             if (Object.keys(req.body).includes(item._id.toString())) { //If item is selected to be ordered
+              console.log(item.availableItems)
+              console.log(parseInt(req.body[item.name]))
               if (item.availableItems < parseInt(req.body[item.name])) {
                 unavailable = true
+                console.log("Here's the error")
                 req.flash("error", "Unable to send order. Most likely, a new order has removed all available orders of your item")
-                res.redirect('/cafe');
+                res.redirect('/cafe/new');
               }
-
+              console.log(unavailable)
             }
           }
         }
 
+        console.log(unavailable)
+
         if (!unavailable) {
           req.flash("success", "Order Sent!")
-          res.redirect('/cafe');
+          res.redirect('/cafe/new');
+
+        } else {
+          req.flash("error", "Unable to send order. Most likely, a new order has removed all available orders of your item")
+          res.redirect('/cafe/new');
         }
       })
 
     } else {
       req.flash('error', "Cannot send empty order")
-      res.redirect('/cafe');
+      res.redirect('/cafe/new');
     }
-  }
+  // }
 });
 
 router.get('/orders', middleware.isLoggedIn, (req, res) => {
