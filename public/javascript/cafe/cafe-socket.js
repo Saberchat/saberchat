@@ -6,16 +6,19 @@ function order(form, customer) {
 
     var instructions = $('#descInput').val();
     var itemList = [];
-    $('#item-list > .form-check > input').each(function(index) {
+    var itemCount = [];
+    $('#item-list > .form-check').each(function(index) {
 
-      if ($(this).is(':checked')) {
-        let currentItemName = $(this).attr('id');
+      if ($(this).find('input').is(':checked')) {
+        let currentItemName = $(this).find('input').attr('id');
         itemList.push(currentItemName);
+        let currentItemCount = $(this).find('select').val();
+        itemCount.push(currentItemCount);
       }
       // this = current accessed element
       // index = int index of current element relative to parent list
     });
-    socket.emit('order', itemList, instructions, customer);
+    socket.emit('order', itemList, itemCount, instructions, customer);
     console.log("_" + instructions + "_");
   });
 }

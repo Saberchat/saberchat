@@ -74,60 +74,60 @@ router.get('/new', middleware.isLoggedIn, (req, res) => {
 });
 
 router.post('/new', middleware.isLoggedIn, (req, res) => {
-
-  //Conditionals ensure that sending time is between 9AM and 12:20 PM
-  let currentTime = new Date(new Date().getTime()).toString().split(' ')[4]
-
-  if ((parseInt(currentTime.split(':')[0]) < 9 || parseInt(currentTime.split(':')[0]) > 12) || (parseInt(currentTime.split(':')[0]) == 12 && parseInt(currentTime.split(':')[1]) > 20)) {
-    req.flash('error', "Send orders between 9AM and 12:20PM")
-    res.redirect('back')
-
-  } else {
-
-    if (req.body.check) { //Order form is not empty, something is selected
-
-      Order.create({customer: req.user._id, name: `${req.user.firstName} ${req.user.lastName}`, instructions: req.body.instructions, present: true, charge: 0}, (err, order) => {
-
-        if (err) {
-          console.log(err);
-          req.flash('error', "Error sending your order in.")
-          res.redirect('back')
-
-        } else {
-          order.date = dateFormat(order.created_at, "mmm d, h:MM TT")
-          Item.find({}, (err, foundItems) => {
-
-            if (err || !foundItems) {
-              req.flash('error', "Unable to access database")
-              res.redirect('back')
-
-            } else {
-              for (let item of foundItems) {
-              if (item._id in req.body.check) {
-                  order.items.push(item._id)
-                  order.quantities.push(req.body[item.name])
-                  order.charge += (item.price * parseFloat(req.body[item.name]))
-                  item.availableItems -= parseInt(req.body[item.name])
-                  if (item.availableItems == 0) {
-                    item.isAvailable = false
-                  }
-                  item.save()
-                }
-              }
-
-              order.save();
-              req.flash('success', 'Order sent!')
-              res.redirect('/cafe');
-            }
-          })
-        }
-      });
-
-    } else {
-      req.flash('error', "Cannot submit empty order")
-      res.redirect('back')
-    }
-  }
+  res.redirect('cafe');
+  // //Conditionals ensure that sending time is between 9AM and 12:20 PM
+  // let currentTime = new Date(new Date().getTime()).toString().split(' ')[4]
+  //
+  // if ((parseInt(currentTime.split(':')[0]) < 9 || parseInt(currentTime.split(':')[0]) > 12) || (parseInt(currentTime.split(':')[0]) == 12 && parseInt(currentTime.split(':')[1]) > 20)) {
+  //   req.flash('error', "Send orders between 9AM and 12:20PM")
+  //   res.redirect('back')
+  //
+  // } else {
+  //
+  //   if (req.body.check) { //Order form is not empty, something is selected
+  //
+  //     Order.create({customer: req.user._id, name: `${req.user.firstName} ${req.user.lastName}`, instructions: req.body.instructions, present: true, charge: 0}, (err, order) => {
+  //
+  //       if (err) {
+  //         console.log(err);
+  //         req.flash('error', "Error sending your order in.")
+  //         res.redirect('back')
+  //
+  //       } else {
+  //         order.date = dateFormat(order.created_at, "mmm d, h:MM TT")
+  //         Item.find({}, (err, foundItems) => {
+  //
+  //           if (err || !foundItems) {
+  //             req.flash('error', "Unable to access database")
+  //             res.redirect('back')
+  //
+  //           } else {
+  //             for (let item of foundItems) {
+  //             if (item._id in req.body.check) {
+  //                 order.items.push(item._id)
+  //                 order.quantities.push(req.body[item.name])
+  //                 order.charge += (item.price * parseFloat(req.body[item.name]))
+  //                 item.availableItems -= parseInt(req.body[item.name])
+  //                 if (item.availableItems == 0) {
+  //                   item.isAvailable = false
+  //                 }
+  //                 item.save()
+  //               }
+  //             }
+  //
+  //             order.save();
+  //             req.flash('success', 'Order sent!')
+  //             res.redirect('/cafe');
+  //           }
+  //         })
+  //       }
+  //     });
+  //
+  //   } else {
+  //     req.flash('error', "Cannot submit empty order")
+  //     res.redirect('back')
+  //   }
+  // }
 });
 
 router.get('/orders', middleware.isLoggedIn, (req, res) => {

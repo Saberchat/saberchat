@@ -243,53 +243,74 @@ io.on('connect', (socket) => {
     });
   });
 
-  // socket.on('order', (itemList, instructions, customerId) => {
-  //
-  //   var name;
-  //   User.findById(customerId, (err, foundUser) => {
-  //     if (err || !foundUser) {
-  //       console.log(err.red);
-  //     } else {
-  //       name = foundUser.firstName + " " + foundUser.lastName;
-  //     }
-  //   });
-  //
-  //   var totalCharge = 0;
-  //   itemList.forEach((id) => {
-  //     Item.findById(id, (err, foundItem) => {
-  //       if (err || !foundItem) {
-  //         console.log("Could not find item price".red);
-  //       } else {
-  //         totalCharge += foundItem.price;
-  //       }
-  //     });
-  //   });
-  //
-  //   var order;
-  //   Order.create({
-  //     customer: customerId
-  //   }, (err, order) => {
-  //     if (err) {
-  //       console.log(err);
-  //     } else {
-  //       order.name = name;
-  //       itemList.forEach((id) => {
-  //         order.items.push(id);
-  //       });
-  //       order.instructions = instructions;
-  //       order.charge = totalCharge;
-  //       order.date = dateFormat(order.created_at, "mmm d, h:MM TT");
-  //       order.present = true;
-  //
-  //       order.save();
-  //
-  //       console.log("New Order:".cyan);
-  //       console.log(order);
-  //     }
-  //
-  //     io.emit('order', order);
-  //   });
-  // });
+  socket.on('order', (itemList, itemCount, instructions, customerId) => {
+
+    //Conditionals ensure that sending time is between 9AM and 12:20 PM
+    let currentTime = new Date(new Date().getTime()).toString().split(' ')[4]
+
+    if (
+      // (parseInt(currentTime.split(':')[0]) < 9 || parseInt(currentTime.split(':')[0]) > 12) || (parseInt(currentTime.split(':')[0]) == 12 && parseInt(currentTime.split(':')[1]) > 20)
+      false
+    ) {
+      req.flash('error', "Send orders between 9AM and 12:20PM");
+      res.redirect('back');
+
+    } else {
+
+      if (itemList.length != 0) { //Order form is not empty, something is selected
+
+        User.findById(customerId, (err, user) => {
+          if (err || !user) {
+            console.log(err);
+          } else {
+            Order.create({customer: customerId, name: `${user.firstName} ${user.lastName}`, instructions: instructions, present: true, charge: 0}, (err, order) => {
+
+              if (err) {
+                console.log(err);
+
+              } else {
+                order.date = dateFormat(order.created_at, "mmm d, h:MM TT")
+
+                order.items = itemList;
+                order.quantities = itemCount;
+
+                var charge = 0;
+
+                itemList.forEach((id, i) => {
+                  Item.findById(id, (err, foundItem) => {
+                    if (err || !foundItem) {
+                      console.log(err);
+                      console.log("i hate js");
+                    } else {
+                      charge += foundItem.price * parseFloat(itemCount[i]);
+                      foundItem.availableItems -= parseInt(itemCount[i]);
+                      if (foundItem.availableItems == 0) {
+                        foundItem.isAvailable = false
+                      }
+                      foundItem.save();
+                    }
+                  });
+                  console.log(charge);
+                  order.charge = charge;
+                  console.log(order.charge);
+                });
+
+                order.save();
+                io.emit('order', order);
+
+              }
+            });
+          }
+        });
+
+
+
+      } else {
+        req.flash('error', "Cannot submit empty order");
+        res.redirect('back');
+      }
+    }
+  });
 });
 
 // -----------------------
