@@ -41,7 +41,7 @@
             <p class="mb-1">View your currently active orders.</p>
           </li>
           <ul class="list-group">
-            <% orders.forEach(function(order) { %>
+            <% orders.reverse().forEach(function(order) { %>
               <% if (order.present == true) { %>
                 <li class="list-group-item">
                   <h4>Order - $<%= order.charge %></h4>

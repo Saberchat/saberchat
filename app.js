@@ -246,12 +246,10 @@ io.on('connect', (socket) => {
   socket.on('order', (itemList, itemCount, instructions, customerId) => {
 
     //Conditionals ensure that sending time is between 9AM and 12:20 PM
+
     let currentTime = new Date(new Date().getTime()).toString().split(' ')[4]
 
-    if (
-      // (parseInt(currentTime.split(':')[0]) < 9 || parseInt(currentTime.split(':')[0]) > 12) || (parseInt(currentTime.split(':')[0]) == 12 && parseInt(currentTime.split(':')[1]) > 20)
-      false
-    ) {
+    if ((parseInt(currentTime.split(':')[0]) < 9 || parseInt(currentTime.split(':')[0]) > 12) || (parseInt(currentTime.split(':')[0]) == 12 && parseInt(currentTime.split(':')[1]) > 20)) {
       req.flash('error', "Send orders between 9AM and 12:20PM");
       res.redirect('back');
 
@@ -262,6 +260,7 @@ io.on('connect', (socket) => {
         User.findById(customerId, (err, user) => {
           if (err || !user) {
             console.log(err);
+
           } else {
             Order.create({customer: customerId, name: `${user.firstName} ${user.lastName}`, instructions: instructions, present: true, charge: 0}, (err, order) => {
 
@@ -276,34 +275,38 @@ io.on('connect', (socket) => {
 
                 var charge = 0;
 
-                itemList.forEach((id, i) => {
-                  Item.findById(id, (err, foundItem) => {
-                    if (err || !foundItem) {
-                      console.log(err);
-                      console.log("i hate js");
-                    } else {
-                      charge += foundItem.price * parseFloat(itemCount[i]);
-                      foundItem.availableItems -= parseInt(itemCount[i]);
-                      if (foundItem.availableItems == 0) {
-                        foundItem.isAvailable = false
-                      }
-                      foundItem.save();
-                    }
-                  });
-                  console.log(charge);
-                  order.charge = charge;
-                  console.log(order.charge);
-                });
+                Item.find({_id: {$in: itemList}}, (err, foundItems) => {
+                  if (err || !foundItems) {
+                    console.log(err);
+                    console.log("i hate js");
 
-                order.save();
-                io.emit('order', order);
+                  } else {
+
+                    for (let i = 0; i < foundItems.length; i++) {
+                      charge += foundItems[i].price * parseFloat(itemCount[i]);
+                      foundItems[i].availableItems -= parseInt(itemCount[i]);
+                      console.log(charge)
+
+                      if (foundItems[i].availableItems == 0) {
+                        foundItems[i].isAvailable = false
+                      }
+                      foundItems[i].save();
+
+                    }
+
+                    console.log(charge);
+                    order.charge = charge;
+                    console.log(order.charge);
+
+                    order.save()
+                    io.emit('order', order);
+                  }
+                })
 
               }
             });
           }
         });
-
-
 
       } else {
         req.flash('error', "Cannot submit empty order");
