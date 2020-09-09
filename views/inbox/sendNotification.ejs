@@ -61,16 +61,16 @@
                         </select>
                         <br />
                         <div class="input-group mb-3">
-                          <input class="form-control" name="recipient_list"id="recipient_list" type="text" aria-describedby="basic-addon2" placeholder="Recipients" style="width: 300px; color: blue;" readonly/>
+                          <input class="form-control" autocomplete="off" name="recipient_list"id="recipient_list" type="text" aria-describedby="basic-addon2" placeholder="Recipients" style="width: 300px; color: blue;" required/>
                           <div class="input-group-append">
                             <button id="clear" class="btn btn-outline-secondary" type="button">Clear</button>
                           </div>
                         </div>
-                        <input type="text" id="type" name="subject" style="margin-bottom: 20px; width: 400px;" placeholder="Enter subject"/>
+                        <input type="text" id="type" name="subject" style="margin-bottom: 20px; width: 400px;" placeholder="Enter subject" required/>
                         <br />
                         <input type="text" id="images" name="images" style="margin-bottom: 20px; width: 400px;" placeholder="Enter any image urls, separate by comma (optional)"/>
                         <br />
-                        <textarea class="message" name="message" cols="40" rows="5" style="width: 400px;" placeholder="Enter notification"></textarea>
+                        <textarea class="message" name="message" cols="40" rows="5" style="width: 400px;" placeholder="Enter notification" required></textarea>
                         <br />
                         <button class="btn btn-primary" class='submit-button' action="submit" style="margin-bottom: 10px; width: 400px;">Send Notification</button>
                       </form>
@@ -78,6 +78,7 @@
                     <!-- <br /><br /> -->
 
                     <% if (currentUser.permission == 'student') { %>
+
                       <!-- Anonymous Hotline for students-->
                       <div class="send-notif-type" style="margin-left: 100px;">
                         <h5 class="send-notif-header" style="text-align: center;">Anonymous Hotline</h5>
@@ -94,16 +95,16 @@
                           </select>
                           <br />
                           <div class="input-group mb-3">
-                            <input class="form-control" name="recipient_list_anonymous" id="recipient_list_anonymous" type="text" aria-describedby="basic-addon2" placeholder="Recipients" style="width: 300px; color: blue;" readonly/>
+                            <input class="form-control" autocomplete="off" name="recipient_list_anonymous" id="recipient_list_anonymous" type="text" aria-describedby="basic-addon2" placeholder="Recipients" style="width: 300px; color: blue;" required/>
                             <div class="input-group-append">
                               <button id="clear_anonymous" class="btn btn-outline-secondary" type="button">Clear</button>
                             </div>
                           </div>
-                          <input type="text" id="type" name="subject" style="margin-bottom: 20px; width: 400px;" placeholder="Enter subject"/>
+                          <input type="text" id="type" name="subject" style="margin-bottom: 20px; width: 400px;" placeholder="Enter subject" required/>
                           <br />
                           <input type="text" id="images" name="images" style="margin-bottom: 20px; width: 400px;" placeholder="Enter any image urls, separate by comma (optional)"/>
                           <br />
-                          <textarea class="message" name="message" cols="40" rows="5" style="width: 400px;" placeholder="Enter notification (Your name will not be revealed to anyone)"></textarea>
+                          <textarea class="message" name="message" cols="40" rows="5" style="width: 400px;" placeholder="Enter notification" required></textarea>
                           <br />
                           <button style=" margin-bottom: 10px; width: 400px;" class="btn btn-primary" class='submit-button' action="submit">Send Notification</button>
                         </form>
@@ -116,6 +117,14 @@
   </body>
 
   <script>
+
+  $("#recipient_list").on('keydown paste', function(e){
+      e.preventDefault();
+  });
+
+  $("#recipient_list_anonymous").on('keydown paste', function(e){
+      e.preventDefault();
+  });
 
   let recipients = document.getElementById('recipients')
   let recipient_list = document.getElementById('recipient_list')
