@@ -281,39 +281,56 @@ io.on('connect', (socket) => {
 
                   } else {
 
-                    for (let i = 0; i < foundItems.length; i++) {
-                      charge += foundItems[i].price * parseFloat(itemCount[i]);
-                      foundItems[i].availableItems -= parseInt(itemCount[i]);
-                      console.log(charge)
+                    let unavailable = false
 
-                      if (foundItems[i].availableItems == 0) {
-                        foundItems[i].isAvailable = false
+                    for (let i = 0; i < foundItems.length; i++) {
+
+                      if (foundItems[i].availableItems < parseInt(itemCount[i])) {
+                        unavailable = true
+                        console.log("we are out")
+                        break
+
+                      } else {
+
+                        charge += foundItems[i].price * parseFloat(itemCount[i]);
+                        foundItems[i].availableItems -= parseInt(itemCount[i]);
+                        console.log(charge)
+
+                        if (foundItems[i].availableItems == 0) {
+                          foundItems[i].isAvailable = false
+                        }
+
+                        foundItems[i].save();
+
                       }
-                      foundItems[i].save();
 
                     }
 
-                    console.log(charge);
-                    order.charge = charge;
-                    console.log(order.charge);
+                    if (!unavailable) {
+                      console.log(charge);
+                      order.charge = charge;
+                      console.log(order.charge);
 
-                    order.save()
-                    io.emit('order', order);
+                      order.save()
+                      io.emit('order', order);
+
+                    } else {
+                      console.log("Error sending in order")
+                    }
                   }
                 })
-
               }
             });
           }
         });
 
       } else {
-        req.flash('error', "Cannot submit empty order");
-        res.redirect('back');
+        console.log('Empty order')
       }
     }
   });
 });
+
 
 // -----------------------
 // Start server

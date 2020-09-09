@@ -81,7 +81,37 @@ router.post('/new', middleware.isLoggedIn, (req, res) => {
     res.redirect('back');
 
   } else {
-    res.redirect('/cafe');
+
+    if (req.body.checked) {
+      Item.find({}, (err, foundItems) => {
+        if (err || !foundItems) {
+          req.flash('error', "Unable to access database")
+          res.redirect('back')
+
+        } else {
+          let unavailable = false
+          for (let item of foundItems) {
+            if (Object.keys(req.body).includes(item._id.toString())) { //If item is selected to be ordered
+              if (item.availableItems < parseInt(req.body[item.name])) {
+                unavailable = true
+                req.flash("error", "Unable to send order. Most likely, a new order has removed all available orders of your item")
+                res.redirect('/cafe');
+              }
+
+            }
+          }
+        }
+
+        if (!unavailable) {
+          req.flash("success", "Order Sent!")
+          res.redirect('/cafe');
+        }
+      })
+
+    } else {
+      req.flash('error', "Cannot send empty order")
+      res.redirect('/cafe');
+    }
   }
 });
 

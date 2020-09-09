@@ -14,6 +14,7 @@ function order(form, customer) {
         itemList.push(currentItemName);
         let currentItemCount = $(this).find('select').val();
         itemCount.push(currentItemCount);
+        console.log(itemList)
       }
       // this = current accessed element
       // index = int index of current element relative to parent list
