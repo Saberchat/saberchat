@@ -74,13 +74,16 @@ router.get('/new', middleware.isLoggedIn, (req, res) => {
 });
 
 router.post('/new', middleware.isLoggedIn, (req, res) => {
-  // let currentTime = new Date(new Date().getTime()).toString().split(' ')[4]
-  //
-  // if ((parseInt(currentTime.split(':')[0]) < 9 || parseInt(currentTime.split(':')[0]) > 12) || (parseInt(currentTime.split(':')[0]) == 12 && parseInt(currentTime.split(':')[1]) > 20)) {
-  //   req.flash('error', "Send orders between 9AM and 12:20PM");
-  //   res.redirect('back');
-  //
-  // } else {
+
+  //Conditionals to make sure that the orders are done between 9 - 12:20
+
+  let currentTime = new Date(new Date().getTime()).toString().split(' ')[4]
+
+  if ((parseInt(currentTime.split(':')[0]) < 9 || parseInt(currentTime.split(':')[0]) > 12) || (parseInt(currentTime.split(':')[0]) == 12 && parseInt(currentTime.split(':')[1]) > 20)) {
+    req.flash('error', "Send orders between 9AM and 12:20PM");
+    res.redirect('back');
+
+  } else {
 
     if (req.body.check) {
 
@@ -128,7 +131,7 @@ router.post('/new', middleware.isLoggedIn, (req, res) => {
       req.flash('error', "Cannot send empty order")
       res.redirect('/cafe/new');
     }
-  // }
+  }
 });
 
 router.get('/orders', middleware.isLoggedIn, (req, res) => {
