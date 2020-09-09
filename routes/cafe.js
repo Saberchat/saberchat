@@ -74,7 +74,15 @@ router.get('/new', middleware.isLoggedIn, (req, res) => {
 });
 
 router.post('/new', middleware.isLoggedIn, (req, res) => {
-  res.redirect('/cafe');
+  let currentTime = new Date(new Date().getTime()).toString().split(' ')[4]
+
+  if ((parseInt(currentTime.split(':')[0]) < 9 || parseInt(currentTime.split(':')[0]) > 12) || (parseInt(currentTime.split(':')[0]) == 12 && parseInt(currentTime.split(':')[1]) > 20)) {
+    req.flash('error', "Send orders between 9AM and 12:20PM");
+    res.redirect('back');
+
+  } else {
+    res.redirect('/cafe');
+  }
 });
 
 router.get('/orders', middleware.isLoggedIn, (req, res) => {

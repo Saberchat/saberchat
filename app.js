@@ -250,8 +250,7 @@ io.on('connect', (socket) => {
     let currentTime = new Date(new Date().getTime()).toString().split(' ')[4]
 
     if ((parseInt(currentTime.split(':')[0]) < 9 || parseInt(currentTime.split(':')[0]) > 12) || (parseInt(currentTime.split(':')[0]) == 12 && parseInt(currentTime.split(':')[1]) > 20)) {
-      req.flash('error', "Send orders between 9AM and 12:20PM");
-      res.redirect('back');
+      console.log("Send orders between 9AM and 12:20PM")
 
     } else {
 
