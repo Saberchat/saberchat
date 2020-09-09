@@ -1,0 +1,78 @@
+.inbox-container {
+    border-radius: 15px;
+    border: 1px solid gray;
+    background: rgb(180, 180, 180);
+    overflow: hidden;
+    position: relative;
+}
+
+/* 
+===============================
+Message and request lists
+*/
+.message-list, .request-list {
+    width: 100%;
+}
+
+/* 
+===============================
+Navigation tabs
+*/
+
+.nav-tab {
+    border: none;
+    background: none;
+}
+
+/* 
+===============================
+Action Buttons
+*/
+.action-btn {
+    border: none;
+    background: none;
+    padding-left: 20px;
+    padding-right: 20px;
+    width: 100%;
+}
+
+/* 
+===============================
+Style variances for screen sizes
+*/
+/* md and larger */
+@media only screen and (min-width: 768px) {
+    .inbox-container {
+        height: 500px;
+    }
+
+    .action-bar {
+        height: 100%;
+        width: 150px;
+        background: white;
+        float: left;
+        border-right: 3px solid gray;
+    }
+
+    .inbox-display {
+        width: auto;
+        overflow: auto;
+    }
+}
+
+/* smaller than md */
+@media only screen and (max-width: 768px) {
+
+}
+
+/* 
+===============================
+Classes to toggle displays 
+*/
+.message-list, .request-list, .message-actions, .request-actions {
+    display: none;
+}
+
+.display {
+    display: inline-block;
+}

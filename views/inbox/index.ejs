@@ -7,6 +7,7 @@
 
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css">
     <link rel="stylesheet" href="/stylesheets/main.css">
+    <link rel="stylesheet" href="/stylesheets/inbox/index.css">
     <!-- link css for navbar. Don't need to include public/javascript/userForm.js since user is already logged in and does not need to access login and register forms.  -->
     <link rel="stylesheet" href="/stylesheets/components/navbar.css">
     <link rel="stylesheet" href="/stylesheets/components/header.css">
@@ -14,7 +15,6 @@
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js"></script>
-    <script src="../javascript/socket.js"></script>
 
     <!-- I'm using my fontawesome kit -->
     <script src="https://kit.fontawesome.com/dccc745c41.js" crossorigin="anonymous"></script>
@@ -29,54 +29,65 @@
       <div class="container">
         <div class="row">
           <div class="col-12">
-            <!-- actions -->
-            <div class="action-bar">
-              <!-- message actions -->
-              <div class="message-actions">
-                <button>Clear All</button>
-                <button>Clear Selected</button>
-                <button>Send New</button>
-                <button>View Sent</button>
-              </div>
-              <!-- request actions -->
-              <div class="request-actions">
-                <button>Current</button>
-                <button>History</button>
-              </div>
-            </div>
 
-            <!-- main inbox list -->
-            <div class="inbox-display">
-              <!-- navigation between tabs -->
-              <nav>
-                <button>Messages</button>
-                <button>Requests</button>
-              </nav>
+            <div class="inbox-container">
 
-              <!-- messages -->
-              <div class="message-list">
-                <div class="list-group">
-                  <% inbox.forEach((notif) => { %>
-                    <a href="#" class="list-group-item list-group-item-action">
-                      <%= notif.subject %> 
-                    </a>
-                  <% }); %>
+              <!-- actions -->
+              <div class="action-bar">
+                <!-- message actions -->
+                <div class="message-actions display">
+                  <button class="action-btn">Send New</button>
+                  <button class="action-btn">View Sent</button>
+                  <button class="action-btn">Clear All</button>
+                  <button class="action-btn">Clear Selected</button>
+                </div>
+                <!-- request actions -->
+                <div class="request-actions">
+                  <button class="action-btn">Current</button>
+                  <button class="action-btn">History</button>
                 </div>
               </div>
-              <hr>
-              <!-- requests -->
-              <div class="request-list">
-                <div class="list-group">
-                  <% requests.forEach((request) => { %>
-                    <a href="#" class="list-group-item list-group-item-action">
-                      <%= request.room.name %> 
-                    </a>
-                  <% }); %>
+
+              <!-- main inbox list -->
+              <div class="inbox-display">
+                <!-- navigation between tabs -->
+                <nav>
+                  <button class="nav-tab" onclick="setMessages()">Messages</button>
+                  <button class="nav-tab" onclick="setRequests()">Requests</button>
+                </nav>
+
+                <!-- messages -->
+                <div class="message-list display">
+                  <ul class="list-group">
+                    <% inbox.forEach((notif) => { %>
+                      <li class="list-group-item list-group-item-action">
+                        <input type="checkbox" name="<%= notif._id %>">
+                        <div class="" style="display: inline-block;">
+                          <a href="#">
+                            <%= notif.subject %>
+                          </a>
+                        </div>
+                      </li>
+                    <% }); %>
+                  </ul>
+                </div>
+
+                <!-- requests -->
+                <div class="request-list">
+                  <div class="list-group">
+                    <% requests.forEach((request) => { %>
+                      <a href="#" class="list-group-item list-group-item-action">
+                        <%= request.room.name %> 
+                      </a>
+                    <% }); %>
+                  </div>
                 </div>
               </div>
             </div>
           </div>
+
         </div>
       </div>
+      <script src="/javascript/inbox/index.js"></script>
   </body>
 </html>
