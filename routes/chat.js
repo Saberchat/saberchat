@@ -134,7 +134,7 @@ router.get('/:id/edit', middleware.isLoggedIn, middleware.checkRoomOwnership, (r
 });
 
 // create new rooms
-router.post('/new', middleware.isLoggedIn, function(req, res) {
+router.post('/', middleware.isLoggedIn, function(req, res) {
   Room.create({name: filter.clean(req.body.name), 'creator.id': req.user._id, 'creator.username': req.user.username, members: [req.user._id]}, function(err, room) {
     if (err) {
       console.log(err);
@@ -229,9 +229,9 @@ router.post('/:id/request-access', middleware.isLoggedIn, function(req, res) {
 });
 
 // handles reports on comments from users
-router.put('/comments/report', middleware.isLoggedIn, function(req, res) {
-  Comment.findById(req.body.comment, function(err, comment) {
-    if(err) {
+router.put('/comments/:id/report', middleware.isLoggedIn, function(req, res) {
+  Comment.findById(req.params.id, function(err, comment) {
+    if(err || !comment) {
       res.json('Error');
     } else if(comment.status == 'flagged'){
       res.json('Already Reported');

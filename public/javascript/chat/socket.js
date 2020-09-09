@@ -13,9 +13,8 @@ function scrollToElement(innerElement) {
 // function for reporting messages
 function report(element) {
   let id = element.id;
-  let url = '/chat/comments/report?_method=put'
+  let url = '/chat/comments/' + id + '/report?_method=put'
   let data = {
-    comment: id,
     user: userId
   };
   let parent = element.parentNode;
