@@ -197,8 +197,8 @@ io.on('connect', (socket) => {
       if (err) {
         // sends error msg if comment could not be created
         console.log(err);
-        req.flash('error', 'message could not be created');
       } else {
+
         // set msg id
         msg.id = comment._id;
         // broadcast message to all connected users in the room
@@ -261,75 +261,57 @@ io.on('connect', (socket) => {
             console.log(err);
 
           } else {
-            Order.create({customer: customerId, name: `${user.firstName} ${user.lastName}`, instructions: instructions, present: true, charge: 0}, (err, order) => {
 
-              if (err) {
+            Item.find({_id: {$in: itemList}}, (err, foundItems) => {
+              if (err || !foundItems) {
                 console.log(err);
 
               } else {
-                order.date = dateFormat(order.created_at, "mmm d, h:MM TT")
-                order.items = itemList;
-                order.quantities = itemCount;
 
-                var charge = 0;
+                let unavailable = false
 
-                Item.find({_id: {$in: itemList}}, (err, foundItems) => {
-                  if (err || !foundItems) {
-                    console.log(err);
-                    console.log("i hate js");
+                for (let i = 0; i < foundItems.length; i++) {
 
-                  } else {
+                  if (foundItems[i].availableItems < parseInt(itemCount[i])) {
+                    unavailable = true
+                    break
 
-                    let unavailable = false
+                  }
+                }
 
-                    for (let i = 0; i < foundItems.length; i++) {
+                if (!unavailable) {
+                  Order.create({customer: customerId, name: `${user.firstName} ${user.lastName}`, instructions: instructions, present: true, charge: 0}, (err, order) => {
 
-                      if (foundItems[i].availableItems < parseInt(itemCount[i])) {
-                        unavailable = true
-                        console.log("we are out")
-                        break
+                    if (err) {
+                      console.log(err);
 
-                      } else {
+                    } else {
+                      order.date = dateFormat(order.created_at, "mmm d, h:MM TT")
+                      order.items = itemList;
+                      order.quantities = itemCount;
 
-                        charge += foundItems[i].price * parseFloat(itemCount[i]);
-                        foundItems[i].availableItems -= parseInt(itemCount[i]);
-                        console.log(charge)
+                      var charge = 0;
 
-                        if (foundItems[i].availableItems == 0) {
-                          foundItems[i].isAvailable = false
-                        }
-
-                        foundItems[i].save();
+                      for (let i = 0; i < foundItems.length; i++) {
+                        charge += (foundItems[i].price * parseInt(itemCount[i]))
                       }
-                    }
 
-                    if (!unavailable) {
-                      console.log(charge);
                       order.charge = charge;
-                      console.log(order.charge);
-
                       order.save()
                       io.emit('order', order);
 
-                    } else {
-
-                      order.save() //Create order, will be deleted immediately
-
-                      Order.findByIdAndDelete(order._id, (err, foundOrder) => { //Delete this false order! instantaneously!
-                        if (err || !foundOrder) {
-                          console.log(err)
-
-                        } else {
-                          console.log("Unable to send order") //If there are no errors deleting the order, DELETE and tell the user SUCKA WE DELETED
-                        }
-                      })
                     }
-                  }
-                })
+
+                  })
+
+                } else {
+                  console.log("Some items are unavailable in the quantities you requested")
+                  // req.flash('error', "Some items are unavailable in the quantities you requested")
+                }
               }
             });
           }
-        });
+        })
 
       } else {
         console.log('Empty order')

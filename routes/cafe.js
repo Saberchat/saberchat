@@ -85,6 +85,7 @@ router.post('/new', middleware.isLoggedIn, (req, res) => {
     if (req.body.check) {
 
       Item.find({}, (err, foundItems) => {
+
         let unavailable = false
 
         if (err || !foundItems) {
@@ -92,29 +93,33 @@ router.post('/new', middleware.isLoggedIn, (req, res) => {
           res.redirect('back')
 
         } else {
-          for (let item of foundItems) {
-            if (Object.keys(req.body).includes(item._id.toString())) { //If item is selected to be ordered
-              console.log(item.availableItems)
-              console.log(parseInt(req.body[item.name]))
-              if (item.availableItems < parseInt(req.body[item.name])) {
+          for (let i = 0; i < foundItems.length; i ++) {
+            if (Object.keys(req.body.check).includes(foundItems[i]._id.toString())) { //If item is selected to be ordered
+
+              if (foundItems[i].availableItems < parseInt(req.body[foundItems[i].name])) { //First test to see if all items are available
                 unavailable = true
-                console.log("Here's the error")
-                req.flash("error", "Unable to send order. Most likely, a new order has removed all available orders of your item")
-                res.redirect('/cafe/new');
+                break //Immediately quit
+
+              } else { //If all items are available, perform these operations
+                foundItems[i].availableItems -= parseInt(req.body[foundItems[i].name])
+
+                if (foundItems[i].availableItems == 0) {
+                  foundItems[i].isAvailable = false;
+                }
+
+                foundItems[i].save()
+
               }
-              console.log(unavailable)
             }
           }
         }
-
-        console.log(unavailable)
 
         if (!unavailable) {
           req.flash("success", "Order Sent!")
           res.redirect('/cafe/new');
 
         } else {
-          req.flash("error", "Unable to send order. Most likely, a new order has removed all available orders of your item")
+          req.flash("error", "Some items are unavailable in the quantities you requested")
           res.redirect('/cafe/new');
         }
       })
