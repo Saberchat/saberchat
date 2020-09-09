@@ -51,6 +51,7 @@
                       <form action="/send_group" method="post">
                         <select id="recipients" style="margin-bottom: 20px; width: 400px;">
                           <optgroup label="Add Recipients to Mailing List"></optgroup>
+                          <option></option>
                           <%users.forEach(user => { %>
                             <% if (user.username != currentUser.username) { %>
                               <option><%=user.username%></option>
@@ -83,6 +84,7 @@
                         <form action="/send_anonymous" method="post">
                           <select id="recipients_anonymous" name="recipient" style="margin-bottom: 20px; width: 400px;">
                             <optgroup label="Recipient (Must be Faculty)"></optgroup>
+                            <option></option>
                             <%users.forEach(user => { %>
                               <% if (user.username != currentUser.username && (user.status == 'faculty')) { %>
                                 <option><%=user.username%></option>
@@ -125,34 +127,39 @@
 
   recipients.onchange = () => {
     let x = recipients.value;
-    if (recipient_list.value == '') {
-      recipient_list.value += `${x}`
-    } else {
-      if ((!(recipient_list.value.split(', ').includes(x))) && (!(recipient_list.value.split(', ').includes('everyone'))) && (x != "everyone")) {
-        recipient_list.value += `, ${x}`
+    if (x != '') {
+      if (recipient_list.value == '') {
+        recipient_list.value += `${x}`
+      } else {
+        if ((!(recipient_list.value.split(', ').includes(x))) && (!(recipient_list.value.split(', ').includes('everyone'))) && (x != "everyone")) {
+          recipient_list.value += `, ${x}`
+        }
       }
     }
   }
 
   clear.addEventListener('click', () => {
     recipient_list.value = ""
-    recipients.value = "Alsion Student"
+    recipients.value = ''
   })
 
   recipients_anonymous.onchange = () => {
     let x = recipients_anonymous.value;
-    if (recipient_list_anonymous.value == '') {
-      recipient_list_anonymous.value += `${x}`
-    } else {
-      if ((!(recipient_list_anonymous.value.split(', ').includes(x))) && (!(recipient_list_anonymous.value.split(', ').includes('All Faculty'))) && (x != "All Faculty")) {
-        recipient_list_anonymous.value += `, ${x}`
+
+    if (x != '') {
+      if (recipient_list_anonymous.value == '') {
+        recipient_list_anonymous.value += `${x}`
+      } else {
+        if ((!(recipient_list_anonymous.value.split(', ').includes(x))) && (!(recipient_list_anonymous.value.split(', ').includes('All Faculty'))) && (x != "All Faculty")) {
+          recipient_list_anonymous.value += `, ${x}`
+        }
       }
     }
   }
 
   clear_anonymous.addEventListener('click', () => {
     recipient_list_anonymous.value = ""
-    recipients_anonymous.value = "Alsion Student"
+    recipients_anonymous.value = ''
   })
 
   </script>
