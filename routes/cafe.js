@@ -10,6 +10,7 @@ const Announcement = require('../models/announcement');
 const Notification = require('../models/notification');
 
 router.get('/', middleware.isLoggedIn, (req, res) => {
+  
   Order.find({customer: req.user._id})
   .populate('items').exec((err, foundOrders) => {
 
