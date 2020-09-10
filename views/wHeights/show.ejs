@@ -21,11 +21,11 @@
     <nav class="navbar navbar-expand-md navbar-dark bg-dark">
         <div class="container">
           <a class="navbar-brand" href="#">Witherly Heights</a>
-  
+
           <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarToggler" aria-controls="navbarToggler" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
           </button>
-        
+
           <div class="collapse navbar-collapse" id="navbarToggler">
             <ul class="navbar-nav mr-auto mt-2 mt-md-0">
               <li class="nav-item">
@@ -43,18 +43,24 @@
     </nav>
 
     <!-- article -->
-    <div class="container">
+    <div class="container mt-5" style="display: flex; justify-content: center;">
+      <div class="row">
+        <div class="col-12">
+          <div class="jumbotron text-center" style="width: 700px; padding: 50px;">
+
+    <!-- <div class="container">
         <div class="row">
-            <div class="col-md-8 offset-md-2 col-12">
-                <h1><%= article.title %></h1>
-                <h4><%= article.author %></h4>
-                <% article.content.forEach(element => { %>
-                    <% if (element.type == 'paragraph') { %>
-                    <p><%- element.data.text %></p>
-                    <% } %>
-                <% }) %> 
+            <div class="col-md-8 offset-md-2 col-12"> -->
+              <h1><%= article.title %></h1>
+              <h4><%= article.author %></h4>
+              <% article.content.forEach(element => { %>
+                  <% if (element.type == 'paragraph') { %>
+                  <p><%- element.data.text %></p>
+                  <% } %>
+              <% }) %>
             </div>
         </div>
+      </div>
     </div>
 </body>
 </html>

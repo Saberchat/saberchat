@@ -135,7 +135,7 @@
               <% } %>
             <% } %>
 
-            <p style="margin-top: 10px;"><%=notif.text%></p>
+            <p style="margin-top: 10px; white-space: pre-wrap; text-align: left;"><%=notif.text%></p>
             <%notif.images.forEach(image => { %>
               <img style="width: 50%; height: 50%; object-fit: contain; margin-bottom: 20px;" src="<%=image%>"/>
             <%})%>

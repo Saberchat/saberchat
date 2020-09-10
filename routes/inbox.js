@@ -270,20 +270,21 @@ router.get('/view_inbox_message/:id', middleware.isLoggedIn, (req, res) => {
 		} else {
 
 			if (foundNotif.sender.username != req.user.username) {
-				req.user.notifCount -= 1
-				req.user.save()
-				foundNotif.read[foundNotif.recipients.indexOf(req.user.username)] = true
-				foundNotif.save()
 
-				Notification.findByIdAndUpdate(foundNotif._id, {read: foundNotif.read}, (err, fn) => { //For some reason, foundNotif.save() wasn't saving file properly. Had to add this
-					if (err || !fn) {
-						req.flash('error', "Unable to access database")
-						res.redirect('back')
+				if (!foundNotif.read[foundNotif.recipients.indexOf(req.user.username)]) {
+					req.user.notifCount -= 1
+					req.user.save()
+					foundNotif.read[foundNotif.recipients.indexOf(req.user.username)] = true
+					foundNotif.save()
 
-					} else {
+					Notification.findByIdAndUpdate(foundNotif._id, {read: foundNotif.read}, (err, fn) => { //For some reason, foundNotif.save() wasn't saving file properly. Had to add this
+						if (err || !fn) {
+							req.flash('error', "Unable to access database")
+							res.redirect('back')
 
-					}
-				})
+						}
+					})
+				}
 			}
 
 			User.find({username: {$in: foundNotif.recipients}}, (err, foundUsers) => {
@@ -350,14 +351,103 @@ router.delete('/delete', middleware.isLoggedIn, (req, res) => {
 		}
 	}
 
-	for (let notif of deletes) {
-		req.user.inbox.splice(req.user.inbox.indexOf(notif), 1)
+	Notification.find({_id: {$in: deletes}}, (err, foundNotifs) => {
+		if (err || !foundNotifs) {
+			req.flash('error', "Unable to access database")
+			res.redirect('back')
+
+		} else {
+
+			for (let notif of foundNotifs) {
+
+				for (let i of req.user.inbox) {
+					if (notif._id.toString() == i.toString()) {
+						req.user.inbox.splice(req.user.inbox.indexOf(i), 1)
+					}
+				}
+
+				if (!notif.read[notif.recipients.indexOf(req.user.username)]) { //If you haven't read it yet but want to delete it, it's no longer new.
+					req.user.notifCount -= 1
+				}
+			}
+		}
+
+		req.user.save()
+		req.flash('success', 'Notification(s) deleted!')
+		res.redirect('/inbox')
+	})
+})
+
+router.get('/mark_all', middleware.isLoggedIn, (req, res) => {
+	Notification.find({_id: {$in: req.user.inbox}}, (err, foundNotifs) => {
+		if (err || !foundNotifs) {
+			req.flash('error', "Unable to access database")
+			res.redirect('back')
+
+		} else {
+			for (let notif of foundNotifs) {
+				notif.read[notif.recipients.indexOf(req.user.username)] = true
+				notif.save()
+
+				Notification.findByIdAndUpdate(notif._id, {read: notif.read}, (err, fn) => { //For some reason, foundNotif.save() wasn't saving file properly. Had to add this
+					if (err || !fn) {
+						req.flash('error', "Unable to access database")
+						res.redirect('back')
+
+					}
+				})
+			}
+
+			req.user.notifCount = 0
+			req.user.save()
+
+			req.flash("success", "All notifications marked as read")
+			res.redirect('/inbox')
+		}
+
+	})
+})
+
+router.post('/mark_selected', middleware.isLoggedIn, (req, res) => {
+	selected = [] //List of messages that are selected
+	for (let item of req.user.inbox) {
+		if (Object.keys(req.body).includes(item._id.toString())) { //If item is selected (checkbox)
+			selected.push(item)
+		}
 	}
 
-	req.user.notifCount -= deletes.length
-	req.user.save()
-	req.flash('success', 'Notification(s) deleted!')
-	res.redirect('/inbox')
+	Notification.find({_id: {$in: selected}}, (err, foundNotifs) => {
+		if (err || !foundNotifs) {
+			req.flash('error', "Unable to access database")
+			res.redirect('back')
+
+		} else {
+
+			for (let notif of foundNotifs) {
+
+				for (let i of req.user.inbox) {
+					if (notif._id.toString() == i.toString()) {
+						notif.read[notif.recipients.indexOf(req.user.username)] = true
+						notif.save()
+						req.user.notifCount -= 1
+
+						Notification.findByIdAndUpdate(notif._id, {read: notif.read}, (err, fn) => { //For some reason, foundNotif.save() wasn't saving file properly. Had to add this
+							if (err || !fn) {
+								req.flash('error', "Unable to access database")
+								res.redirect('back')
+
+							}
+						})
+
+					}
+				}
+			}
+		}
+
+		req.user.save()
+		req.flash('success', 'Notification(s) marked as read!')
+		res.redirect('/inbox')
+	})
 })
 
 module.exports = router;

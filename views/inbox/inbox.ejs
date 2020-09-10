@@ -31,7 +31,7 @@
     <div class="container">
       <div class="row">
         <div class="col-md-10 offset-md-1 col-12">
-          <form action="/delete?_method=delete" method="post">
+          <form method="post">
             <div class="container mt-5">
               <div class="row">
                 <div class="col-12">
@@ -44,7 +44,9 @@
             </div>
             <div class="heading" style="text-align: center;">
               <button style="margin-bottom: 30px; margin-right: 15px; " type="button" class="btn btn-danger" class="delete-button"><a id="notifButton" href="/clear"><i class="fas fa-trash-alt"></i> Clear All</a></button>
-              <button style="margin-bottom: 30px; margin-right: 15px;" type="delete" class="btn btn-danger" class="delete-button"><i class="fas fa-trash-alt"></i> Clear Selected</button>
+              <button style="margin-bottom: 30px; margin-right: 15px;" type="delete" class="btn btn-danger" class="delete-button" formaction="/delete?_method=delete"><i class="fas fa-trash-alt"></i> Clear Selected</button>
+              <button style="margin-bottom: 30px; margin-right: 15px;" type="button" class="btn btn-warning" class="delete-button"><a id="notifButton" style="color: black;" href="/mark_all"><i class="fas fa-check-square"></i> Mark All As Read</a></button>
+              <button style="margin-bottom: 30px; margin-right: 15px;" type="delete" class="btn btn-warning" class="delete-button" formaction="/mark_selected" ><i class="fas fa-check-square"></i> Mark Selected</button>
               <button style="margin-bottom: 30px; margin-right: 15px;" type="button" class="btn btn-primary" class="delete-button"><a id="notifButton" href="/notif"><i class="far fa-comment-dots"></i> Send</a></button>
               <button style=" margin-bottom: 30px;" type="button" style="margin-top: 10px;" class="btn btn-success" class="delete-button"><a id="notifButton" href="/view_sent_notifs"><i class="far fa-comment-dots"></i> View Sent</a></button>
             </div>
