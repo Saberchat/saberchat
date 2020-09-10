@@ -427,24 +427,26 @@ router.post('/mark_selected', middleware.isLoggedIn, (req, res) => {
 
 				for (let i of req.user.inbox) {
 					if (notif._id.toString() == i.toString()) {
-						notif.read[notif.recipients.indexOf(req.user.username)] = true
-						notif.save()
-						req.user.notifCount -= 1
+						if (!notif.read[notif.recipients.indexOf(req.user.username)]) {
+							notif.read[notif.recipients.indexOf(req.user.username)] = true
+							notif.save()
+							req.user.notifCount -= 1
 
-						Notification.findByIdAndUpdate(notif._id, {read: notif.read}, (err, fn) => { //For some reason, foundNotif.save() wasn't saving file properly. Had to add this
-							if (err || !fn) {
-								req.flash('error', "Unable to access database")
-								res.redirect('back')
+							Notification.findByIdAndUpdate(notif._id, {read: notif.read}, (err, fn) => { //For some reason, foundNotif.save() wasn't saving file properly. Had to add this
+								if (err || !fn) {
+									req.flash('error', "Unable to access database")
+									res.redirect('back')
 
-							}
-						})
-
+								}
+							})
+						}
 					}
 				}
 			}
 		}
 
 		req.user.save()
+		
 		req.flash('success', 'Notification(s) marked as read!')
 		res.redirect('/inbox')
 	})
