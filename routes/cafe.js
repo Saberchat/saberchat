@@ -51,7 +51,10 @@ router.get('/new', middleware.isLoggedIn, (req, res) => {
 
   let currentTime = new Date(new Date().getTime()).toString().split(' ')[4]
 
-  if ((parseInt(currentTime.split(':')[0]) < 9 || parseInt(currentTime.split(':')[0]) > 12) || (parseInt(currentTime.split(':')[0]) == 12 && parseInt(currentTime.split(':')[1]) > 20)) {
+  if (
+    // (parseInt(currentTime.split(':')[0]) < 9 || parseInt(currentTime.split(':')[0]) > 12) || (parseInt(currentTime.split(':')[0]) == 12 && parseInt(currentTime.split(':')[1]) > 20)
+    false
+  ) {
     req.flash('error', "Send orders between 9AM and 12:20PM");
     res.redirect('back');
 
@@ -91,7 +94,10 @@ router.post('/new', middleware.isLoggedIn, (req, res) => {
 
   let currentTime = new Date(new Date().getTime()).toString().split(' ')[4]
 
-  if ((parseInt(currentTime.split(':')[0]) < 9 || parseInt(currentTime.split(':')[0]) > 12) || (parseInt(currentTime.split(':')[0]) == 12 && parseInt(currentTime.split(':')[1]) > 20)) {
+  if (
+    // (parseInt(currentTime.split(':')[0]) < 9 || parseInt(currentTime.split(':')[0]) > 12) || (parseInt(currentTime.split(':')[0]) == 12 && parseInt(currentTime.split(':')[1]) > 20)
+    false
+  ) {
     req.flash('error', "Send orders between 9AM and 12:20PM");
     res.redirect('back');
 
@@ -211,7 +217,7 @@ router.post('/:id/ready', middleware.isLoggedIn, (req, res) => {
     if (err || !foundOrder) {
       console.log(err);
       req.flash('error', "Could not find order");
-      res.redirect('/cafe/manage');
+      res.redirect('/cafe/orders');
 
     } else {
 
@@ -222,14 +228,14 @@ router.post('/:id/ready', middleware.isLoggedIn, (req, res) => {
         if (err || !foundUser) {
           req.flash('error', "Could not find user");
           console.log(err);
-          res.redirect('/cafe/manage');
+          res.redirect('/cafe/orders');
 
         } else {
           Notification.create({}, (err, notif) => {
             if (err) {
               req.flash('error', "Could not create notif");
               console.log(err);
-              res.redirect('/cafe/manage');
+              res.redirect('/cafe/orders');
 
             } else {
               notif.subject = "Cafe Order Ready";
@@ -248,7 +254,7 @@ router.post('/:id/ready', middleware.isLoggedIn, (req, res) => {
               foundUser.notifCount += 1
               foundUser.save();
 
-              res.redirect('/cafe/manage');
+              res.redirect('/cafe/orders');
             }
           });
         }

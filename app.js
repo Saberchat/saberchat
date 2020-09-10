@@ -249,7 +249,10 @@ io.on('connect', (socket) => {
 
     let currentTime = new Date(new Date().getTime()).toString().split(' ')[4]
 
-    if ((parseInt(currentTime.split(':')[0]) < 9 || parseInt(currentTime.split(':')[0]) > 12) || (parseInt(currentTime.split(':')[0]) == 12 && parseInt(currentTime.split(':')[1]) > 20)) {
+    if (
+      // (parseInt(currentTime.split(':')[0]) < 9 || parseInt(currentTime.split(':')[0]) > 12) || (parseInt(currentTime.split(':')[0]) == 12 && parseInt(currentTime.split(':')[1]) > 20)
+      false
+    ) {
       console.log("Send orders between 9AM and 12:20PM");
 
     } else {
@@ -298,7 +301,14 @@ io.on('connect', (socket) => {
 
                       order.charge = charge;
                       order.save()
-                      io.emit('order', order);
+
+                      Item.find({_id: {$in: itemList}}, (err, foundItems) => {
+                        if (err || !foundItems) {
+                          console.log(err);
+                        } else {
+                          io.emit('order', order, foundItems);
+                        }
+                      });
 
                     }
 
