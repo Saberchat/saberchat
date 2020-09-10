@@ -43,23 +43,35 @@ router.post('/send_group', middleware.isLoggedIn, (req, res) => {
 			} else {
 
 				if (req.body.images.split(', ')[0] == '') { //No images attached
-					Notification.create({subject: req.body.subject, sender: req.user, text: req.body.message, recipients: ['everyone'], images: []}, (err, notification) => {
+					Notification.create({subject: req.body.subject, sender: req.user, text: req.body.message, recipients: ['everyone'], read: new Array(foundUsers.length).fill(false), images: []}, (err, notification) => {
 						notification.date = dateFormat(notification.created_at, "mmm d, h:MMTT")
 						notification.save() //Create notification
 
 						for (let i of foundUsers) {
 							i.inbox.push(notification) //Add notif to each recipient's inbox
+							if (i.notifCount == undefined) {
+								i.notifCount = 1
+
+							} else {
+								i.notifCount += 1
+							}
 							i.save()
 						}
 					})
 
 				} else { //Images are attached
-					Notification.create({subject: req.body.subject, sender: req.user, text: req.body.message, recipients: ['everyone'], images: req.body.images.split(', ')}, (err, notification) => {
+					Notification.create({subject: req.body.subject, sender: req.user, text: req.body.message, recipients: ['everyone'], read: new Array(foundUsers.length).fill(false), images: req.body.images.split(', ')}, (err, notification) => {
 						notification.date = dateFormat(notification.created_at, "mmm d, h:MMTT")
 						notification.save() //Create notification
 
 						for (let i of foundUsers) {
 							i.inbox.push(notification) //Add notif to recipient's inbox
+							if (i.notifCount == undefined) {
+								i.notifCount = 1
+
+							} else {
+								i.notifCount += 1
+							}
 							i.save()
 						}
 					})
@@ -79,23 +91,35 @@ router.post('/send_group', middleware.isLoggedIn, (req, res) => {
 			} else {
 
 				if (req.body.images.split(', ')[0] == '') {
-					Notification.create({subject: req.body.subject, sender: req.user, text: req.body.message, recipients: mailing_list, images: []}, (err, notification) => {
+					Notification.create({subject: req.body.subject, sender: req.user, text: req.body.message, recipients: mailing_list, read: new Array(mailing_list.length).fill(false), images: []}, (err, notification) => {
 						notification.date = dateFormat(notification.created_at, "mmm d, h:MMTT")
 						notification.save() //Create notification
 
 						for (let i of foundUsers) {
 							i.inbox.push(notification) //Add notif to each recipient's inbox
+							if (i.notifCount == undefined) {
+								i.notifCount = 1
+
+							} else {
+								i.notifCount += 1
+							}
 							i.save()
 						}
 					})
 
 				} else {
-					Notification.create({subject: req.body.subject, sender: req.user, text: req.body.message, recipients: mailing_list, images: req.body.images.split(', ')}, (err, notification) => {
+					Notification.create({subject: req.body.subject, sender: req.user, text: req.body.message, recipients: mailing_list, read: new Array(mailing_list.length).fill(false), images: req.body.images.split(', ')}, (err, notification) => {
 						notification.date = dateFormat(notification.created_at, "mmm d, h:MMTT")
 						notification.save() //Create notification
 
 						for (let i of foundUsers) {
 							i.inbox.push(notification) //Add notif to each recipient's inbox
+							if (i.notifCount == undefined) {
+								i.notifCount = 1
+
+							} else {
+								i.notifCount += 1
+							}
 							i.save()
 						}
 					})
@@ -120,23 +144,35 @@ router.post('/send_anonymous', (req, res) => {
 			} else {
 
 				if (req.body.images.split(', ')[0] == '') {
-					Notification.create({subject: req.body.subject, sender: null, text: req.body.message, recipients: ['All Faculty'], images: []}, (err, notification) => {
+					Notification.create({subject: req.body.subject, sender: null, text: req.body.message, recipients: ['All Faculty'], read: new Array(foundUsers.length).fill(false), images: []}, (err, notification) => {
 						notification.date = dateFormat(notification.created_at, "mmm d, h:MMTT")
 						notification.save() //Create notification
 
 						for (let i of foundUsers) {
 							i.inbox.push(notification) //Add notif to recipient's inbox
+							if (i.notifCount == undefined) {
+								i.notifCount = 1
+
+							} else {
+								i.notifCount += 1
+							}
 							i.save()
 						}
 					})
 
 				} else {
-					Notification.create({subject: req.body.subject, sender: null, text: req.body.message, recipients: ['All Faculty'], images: req.body.images.split(', ')}, (err, notification) => {
+					Notification.create({subject: req.body.subject, sender: null, text: req.body.message, recipients: ['All Faculty'], read: new Array(foundUsers.length).fill(false), images: req.body.images.split(', ')}, (err, notification) => {
 						notification.date = dateFormat(notification.created_at, "mmm d, h:MMTT")
 						notification.save() //Create notification
 
 						for (let i of foundUsers) {
 							i.inbox.push(notification) //Add notif to recipient's inbox
+							if (i.notifCount == undefined) {
+								i.notifCount = 1
+
+							} else {
+								i.notifCount += 1
+							}
 							i.save()
 						}
 					})
@@ -157,23 +193,36 @@ router.post('/send_anonymous', (req, res) => {
 			} else {
 
 				if (req.body.images.split(', ')[0] == '') {
-					Notification.create({subject: req.body.subject, sender: null, text: req.body.message, recipients: mailing_list, images: []}, (err, notification) => {
+					Notification.create({subject: req.body.subject, sender: null, text: req.body.message, recipients: mailing_list, read: new Array(mailing_list.length).fill(false), images: []}, (err, notification) => {
 						notification.date = dateFormat(notification.created_at, "mmm d, h:MMTT")
 						notification.save() //Create notification
 
 						for (let i of foundUsers) {
 							i.inbox.push(notification) //Add notif to recipient's inbox
+							if (i.notifCount == undefined) {
+								i.notifCount = 1
+
+							} else {
+								i.notifCount += 1
+							}
 							i.save()
 						}
 					})
 
 				} else {
-					Notification.create({subject: req.body.subject, sender: null, text: req.body.message, recipients: mailing_list, images: req.body.images.split(', ')}, (err, notification) => {
+					Notification.create({subject: req.body.subject, sender: null, text: req.body.message, recipients: mailing_list, read: new Array(mailing_list.length).fill(false), images: req.body.images.split(', ')}, (err, notification) => {
 						notification.date = dateFormat(notification.created_at, "mmm d, h:MMTT")
 						notification.save() //Creat notification
 
 						for (let i of foundUsers) {
 							i.inbox.push(notification) //Add notif to recipient's inbox
+
+							if (i.notifCount == undefined) {
+								i.notifCount = 1
+
+							} else {
+								i.notifCount += 1
+							}
 							i.save()
 						}
 					})
@@ -219,6 +268,24 @@ router.get('/view_inbox_message/:id', middleware.isLoggedIn, (req, res) => {
 			res.redirect('back')
 
 		} else {
+
+			if (foundNotif.sender.username != req.user.username) {
+				req.user.notifCount -= 1
+				req.user.save()
+				foundNotif.read[foundNotif.recipients.indexOf(req.user.username)] = true
+				foundNotif.save()
+
+				Notification.findByIdAndUpdate(foundNotif._id, {read: foundNotif.read}, (err, fn) => { //For some reason, foundNotif.save() wasn't saving file properly. Had to add this
+					if (err || !fn) {
+						req.flash('error', "Unable to access database")
+						res.redirect('back')
+
+					} else {
+
+					}
+				})
+			}
+
 			User.find({username: {$in: foundNotif.recipients}}, (err, foundUsers) => {
 				if (err || !foundUsers) {
 					req.flash('error', 'Unable to access database')
@@ -268,6 +335,7 @@ router.get('/view_sent_notifs', middleware.isLoggedIn, (req, res) => {
 //Clear entire inbox
 router.get('/clear', middleware.isLoggedIn, (req, res) => {
 	req.user.inbox = []
+	req.user.notifCount = 0
 	req.user.save()
 	req.flash('success', 'Inbox cleared!');
 	res.redirect('/inbox');
@@ -286,6 +354,7 @@ router.delete('/delete', middleware.isLoggedIn, (req, res) => {
 		req.user.inbox.splice(req.user.inbox.indexOf(notif), 1)
 	}
 
+	req.user.notifCount -= deletes.length
 	req.user.save()
 	req.flash('success', 'Notification(s) deleted!')
 	res.redirect('/inbox')

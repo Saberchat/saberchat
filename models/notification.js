@@ -4,6 +4,7 @@ var notificationSchema = new mongoose.Schema({
     subject: String,
     images: [{type: String}],
     recipients: [{type: String}],
+    read: [{type: Boolean}],
     sender: {
         type: mongoose.Schema.Types.ObjectId,
         ref: "User"

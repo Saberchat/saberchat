@@ -233,6 +233,7 @@ router.post('/:id/ready', middleware.isLoggedIn, (req, res) => {
               notif.text = "Your order (" + itemText.join(", ") + ") is ready (Total Cost: $" + foundOrder.charge + ")";
               notif.save();
               foundUser.inbox.push(notif);
+              foundUser.notifCount += 1
               foundUser.save();
 
               res.redirect('/cafe/manage');
