@@ -10,7 +10,7 @@ const Announcement = require('../models/announcement');
 const Notification = require('../models/notification');
 
 router.get('/', middleware.isLoggedIn, (req, res) => {
-  
+
   Order.find({customer: req.user._id})
   .populate('items').exec((err, foundOrders) => {
 
@@ -47,31 +47,42 @@ router.get('/', middleware.isLoggedIn, (req, res) => {
 });
 
 router.get('/new', middleware.isLoggedIn, (req, res) => {
-  Item.find({}, (err, foundItems) => {
-    if (err || !foundItems) {
-      req.flash('error', 'Could not access database');
-      res.redirect('/');
-    } else {
+  //Conditionals to make sure that the orders are done between 9 - 12:20
 
-      Announcement.find({}).populate({
-        path: 'sender',
-        select: ['username', 'imageUrl']
-      }).populate('message').exec((err, foundAnns) => {
-        if (err || !foundAnns) {
-          req.flash('error', 'Unable to access database')
-          res.redirect('back')
+  let currentTime = new Date(new Date().getTime()).toString().split(' ')[4]
 
-        } else {
+  if ((parseInt(currentTime.split(':')[0]) < 9 || parseInt(currentTime.split(':')[0]) > 12) || (parseInt(currentTime.split(':')[0]) == 12 && parseInt(currentTime.split(':')[1]) > 20)) {
+    req.flash('error', "Send orders between 9AM and 12:20PM");
+    res.redirect('back');
 
-          res.render('cafe/newOrder', {
-            items: foundItems,
-            announcements: foundAnns.reverse(),
-            announced: false
-          })
-        }
-      })
-    }
-  });
+  } else {
+
+    Item.find({}, (err, foundItems) => {
+      if (err || !foundItems) {
+        req.flash('error', 'Could not access database');
+        res.redirect('/');
+      } else {
+
+        Announcement.find({}).populate({
+          path: 'sender',
+          select: ['username', 'imageUrl']
+        }).populate('message').exec((err, foundAnns) => {
+          if (err || !foundAnns) {
+            req.flash('error', 'Unable to access database')
+            res.redirect('back')
+
+          } else {
+
+            res.render('cafe/newOrder', {
+              items: foundItems,
+              announcements: foundAnns.reverse(),
+              announced: false
+            })
+          }
+        })
+      }
+    });
+  }
 });
 
 router.post('/new', middleware.isLoggedIn, (req, res) => {
