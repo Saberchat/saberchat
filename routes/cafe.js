@@ -188,7 +188,10 @@ router.get('/delete_order/:id', middleware.isLoggedIn, (req, res) => {
   let currentTime = new Date(new Date().getTime()).toString().split(' ')[4]
   console.log(currentTime)
   console.log(currentTime.split(':')[0])
-  if (parseInt(currentTime.split(':')[0]) < 9 || parseInt(currentTime.split(':')[0]) >= 12) {
+  if (
+    // parseInt(currentTime.split(':')[0]) < 9 || parseInt(currentTime.split(':')[0]) >= 12
+    false
+  ) {
     req.flash('error', "Cannot delete orders after 12PM")
     res.redirect('back')
 
