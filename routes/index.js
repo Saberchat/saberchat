@@ -125,5 +125,26 @@ router.get("/logout", function(req, res) {
 	req.flash("success", "Logged you out!");
 	res.redirect("/");
 });
+
+router.get('/contact', middleware.isLoggedIn, (req, res) => {
+	User.find({status: '11th'}, (err, juniors) => {
+		if (err || !juniors) {
+			req.flash('error', "Unable to access database")
+			res.redirect('back')
+
+		} else {
+			User.find({status: 'faculty'}, (err, faculty) => {
+				if (err || !faculty) {
+					req.flash('error', "Unable to access database")
+					res.redirect('back')
+
+				} else {
+					res.render('other/contact', {developers: juniors, faculty})
+				}
+			})
+		}
+	})
+})
+
 //export router with all the routes connected
 module.exports = router;

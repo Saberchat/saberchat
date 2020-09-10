@@ -4,7 +4,11 @@
             <div class="col-12">
                 <nav>
                     <a href="/" class="footer-link">About</a>
-                    <a href="/" class="footer-link">Contact Us!</a>
+
+                    <% if (currentUser) { %>
+                      <a href="/contact" class="footer-link">Contact Us!</a>
+                    <% } %>
+                    
                     <a href="/" class="footer-link">Witherly Heights</a>
                     <a href="/" class="footer-link">Our School</a>
                 </nav>

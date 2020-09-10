@@ -32,43 +32,41 @@
     <div class="container">
       <div class="row">
         <div class="col-md-10 offset-md-1 col-12">
-          <form action="/delete_sent" method="post">
-            <div class="container mt-5">
-              <div class="row">
-                <div class="col-12">
-                  <div class="jumbotron text-center">
-                    <h1><i class="fas fa-inbox"></i> <%=currentUser.username.charAt(0).toUpperCase() + currentUser.username.slice(1)%>'s Inbox</h1>
-                    <p><strong>Sent Notifications: </strong><%=notifs.length%></p>
-                    <a href="/inbox">Back to Inbox</a>
-                  </div>
+          <div class="container mt-5">
+            <div class="row">
+              <div class="col-12">
+                <div class="jumbotron text-center">
+                  <h1><i class="fas fa-inbox"></i> <%=currentUser.username.charAt(0).toUpperCase() + currentUser.username.slice(1)%>'s Inbox</h1>
+                  <p><strong>Sent Notifications: </strong><%=notifs.length%></p>
+                  <a href="/inbox">Back to Inbox</a>
                 </div>
               </div>
             </div>
-            <div class="heading" style="text-align: center;">
-              <button style="margin-bottom: 30px; margin-right: 15px;" type="button" class="btn btn-primary" class="delete-button"><a id="notifButton" href="/notif"><i class="far fa-comment-dots"></i> Send Notification</a></button>
+          </div>
+          <div class="heading" style="text-align: center;">
+            <button style="margin-bottom: 30px; margin-right: 15px;" type="button" class="btn btn-primary" class="delete-button"><a id="notifButton" href="/notif"><i class="far fa-comment-dots"></i> Send Notification</a></button>
+          </div>
+            <div class="search-filter">
             </div>
-              <div class="search-filter">
-              </div>
-              <ul class = "new_messages" id="new_messages">
-                <% notifs.forEach(notif => { %>
-                  <div class="notification">
+            <ul class = "new_messages" id="new_messages">
+              <% notifs.forEach(notif => { %>
+                <div class="notification">
 
-                    <!-- Known-sender message -->
+                  <!-- Known-sender message -->
 
-                      <input name=<%=notif['_id']%> type="checkbox"/>
-                      <label for=<%=notif['_id']%>><a style="color: inherit;" href="/view_inbox_message/<%=notif._id%>"> <span><span class="msg-info"><strong><%=notif.subject%></strong> <span style="font-size: 10px;"><%=notif.date.split(", ")[1]%> | <%=notif.date.split(", ")[0]%></span></span> </a> </label>
-                    <br />
+                    <!-- <input name=<%=notif['_id']%> type="checkbox"/> -->
+                    <span style="margin-bottom: 10px;"><a style="color: inherit;" href="/view_inbox_message/<%=notif._id%>"> <span><span class="msg-info"><strong><%=notif.subject%></strong> <span style="font-size: 10px;"><%=notif.date.split(", ")[1]%> | <%=notif.date.split(", ")[0]%></span></span> </a> </span>
+                  <br />
 
-                    <% if (notif.text.split(' ').length > 20) { %>
-                      <span class="message"><%=notif.text.split(' ').slice(0, 21).join(' ')%> <a style="color: inherit;" href="/view_inbox_message/<%=notif._id%>">(Read More)</a></span>
-                    <% } else { %>
-                      <span class="message"><%=notif.text%></span>
-                    <% } %>
+                  <% if (notif.text.split(' ').length > 20) { %>
+                    <span class="message" style="margin-left: 5px;"><%=notif.text.split(' ').slice(0, 21).join(' ')%> <a style="color: inherit;" href="/view_inbox_message/<%=notif._id%>">(Read More)</a></span>
+                  <% } else { %>
+                    <span class="message" style="margin-left: 5px;"><%=notif.text%></span>
+                  <% } %>
 
-                  </div>
-                <% }) %>
-              </ul>
-          </form>
+                </div>
+              <% }) %>
+            </ul>
       </div>
     </div>
   </body>
