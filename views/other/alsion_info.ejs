@@ -24,11 +24,8 @@
     <script src="/javascript/home/index.js"></script>
 </head>
 <body>
-
-  <!-- include the navbar via ejs -->
-  <%- include('../partials/navbar') %>
-  <!-- include the backdrop for nav -->
-  <%- include('../partials/header') %>
+<!-- insert navbar via ejs-->
+<%- include('../partials/navbar') %>
 
 <!-- Background image and text -->
 <section id="background">
@@ -50,22 +47,12 @@
             <div class="col-lg-6">
                 <article class="text-block">
                     <div class="block-header green">
-                        <h1>Developers</h1>
+                        <h1>Our School</h1>
                     </div>
                     <div class="block-content">
-                      <p>
-                        Alexander Zhou, Kabir Samsi, Siddharth Chavan and Vibhav Darsha are four juniors who are enrolled in Alsion Early College. They developed SaberChat over our 2020
-                        Summer Break in an effort to improve our school's communication platforms, and to practice their
-                        software development skills.
-                      </p>
-                      <% developers.forEach(dev => { %>
-                        <strong><%=dev.firstName%> <%=dev.lastName%></strong>
-                        <ul>
-                          <li>
-                            <strong>Email: </strong> <a href="mailto: <%=dev.email%>"><%=dev.email%></a>
-                          </li>
-                        </ul>
-                      <% }) %>
+                        <p>Alsion Middle/High School offers an experiential and rigorous academic program that is just a bit different. Students complete a challenging 3-year Middle School program inspired by Montessori principles, designed to foster intellectual curiosity and love of learning.
+                          Then they advance to our accelerated High School program where they earn credits that are transferable to 4-year universities and gain a valuable head start on college.</p>
+                        <em><strong>Faculty: </strong><%=faculty%></em>
                     </div>
                 </article>
             </div>
@@ -73,35 +60,7 @@
                 <img class="image-block" src="https://alsionschool.org/images/middle-school/MiddleSchoolMainPage.jpg" alt="fancy pic">
             </div>
         </div>
-
-        <!-- Block 2 -->
-        <div class="row" style="margin-bottom: 5rem;">
-          <div class="col-lg-6 block">
-              <img class="image-block" src="https://alsionschool.org/images/middle-school/MiddleSchoolMainPage.jpg" alt="fancy pic">
-          </div>
-            <div class="col-lg-6">
-                <article class="text-block">
-                    <div class="block-header green">
-                        <h1>Faculty</h1>
-                    </div>
-                  <div class="block-content">
-                    <p>
-                      Our teachers have helped the Alsion community for years.
-                      They are deeply involved in our student's studies and are devoted to giving students a thorough, interesting and entertaining education.
-                    </p>
-                    <% faculty.forEach(fac => { %>
-                      <strong><%=fac.firstName%> <%=fac.lastName%></strong>
-                      <ul>
-                        <li>
-                          <strong>Email: </strong> <a href="mailto: <%=fac.email%>"><%=fac.email%></a>
-                        </li>
-                      </ul>
-                    <% }) %>
-                  </div>
-                </article>
-            </div>
-        </div>
-
+      </div>
 </main>
 <%- include('../partials/footer') %>
 <script>
