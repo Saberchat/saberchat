@@ -1,9 +1,10 @@
 .inbox-container {
     border-radius: 15px;
-    border: 1px solid gray;
-    background: rgb(180, 180, 180);
+    background-color: #d1ecff;
     overflow: hidden;
     position: relative;
+    margin-top: 3rem;
+    box-shadow: 0px 10px 20px #c2c2c2;
 }
 
 /* 
@@ -14,27 +15,129 @@ Message and request lists
     width: 100%;
 }
 
+.list-group {
+    overflow-y: scroll;
+}
+
 /* 
 ===============================
-Navigation tabs
+Action bar
 */
+
+.message-actions, .request-actions {
+    width: 100%;
+}
+
+/* 
+===============================
+Navigation
+*/
+.inbox-nav {
+    background-color: #1f2d53;
+    border-bottom: 5px solid #3671c9;
+    box-shadow: 0px 3px 3px rgb(155, 154, 154);
+    z-index: 100;
+}
 
 .nav-tab {
     border: none;
-    background: none;
+    color: white;
+    background-color: #374877;
+    padding: 0.5rem 2rem 0.3rem 2rem;
+}
+
+.nav-tab.active {
+    background-color: #3671c9;
+}
+
+.nav-tab:hover:enabled {
+    filter: brightness(120%);
 }
 
 /* 
 ===============================
-Action Buttons
+Actions
 */
+.action-bar {
+    background-color: #4b9ed4;
+}
+
+.action-bar hr {
+    border: 1px solid #ffffff;
+    margin: 0.2rem 1rem;
+}
+
 .action-btn {
+    display: inline-block;
     border: none;
     background: none;
-    padding-left: 20px;
-    padding-right: 20px;
+    padding: 2px 20px;
     width: 100%;
+    text-align: center;
+    color: #ffffff;
 }
+
+.action-btn:hover {
+    text-decoration: none;
+    color: #a3c8ff;
+}
+
+/* 
+===============================
+Messages
+*/
+.list-group-item {
+    padding: 0;
+}
+
+.list-group-item .message-body {
+    display: inline-block;
+    height: 100%;
+    padding: 0.5rem;
+    width: 90%;
+    text-decoration: none;
+    color: #424651;
+}
+
+.list-group-item .message-check {
+    margin-left: 1rem;
+    width: 15px;
+    height: 15px;
+    vertical-align: middle;
+}
+
+.message-head {
+    display: inline-block;
+    width: 6rem;
+    font-weight: 700;
+    margin-right: 2rem;
+    white-space: nowrap;
+    overflow-x: hidden;
+    text-overflow: ellipsis;
+    vertical-align: middle;
+}
+
+.message-from {
+    display: inline-block;
+    width: 6rem;
+    font-weight: 500;
+    margin-right: 2rem;
+    white-space: nowrap;
+    overflow-x: hidden;
+    text-overflow: ellipsis;
+    vertical-align: middle;
+}
+
+.message-text {
+    display: inline-block;
+    width: 50%;
+    font-weight: 400;
+    white-space: nowrap;
+    overflow-x: hidden;
+    text-overflow: ellipsis;
+    vertical-align: middle;
+}
+
 
 /* 
 ===============================
@@ -46,12 +149,16 @@ Style variances for screen sizes
         height: 500px;
     }
 
+    .inbox-nav {
+        padding: 20px 0px 0px 150px;
+    }
+
     .action-bar {
         height: 100%;
         width: 150px;
-        background: white;
         float: left;
-        border-right: 3px solid gray;
+        border-right: 3px solid #3671c9;
+        padding-top: 1rem;
     }
 
     .inbox-display {

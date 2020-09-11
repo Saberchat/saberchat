@@ -31,14 +31,32 @@
           <div class="col-12">
 
             <div class="inbox-container">
+              <!-- navigation between tabs -->
+              <nav class="inbox-nav">
+                <div class="btn-group" role="group" aria-label="inbox navigation">
+                  <button 
+                    class="nav-tab active" 
+                    id="view-msg" 
+                    onclick="setMessages()" 
+                    disabled
+                    >Messages</button>
+
+                  <button 
+                    class="nav-tab" 
+                    id="view-req" 
+                    onclick="setRequests()"
+                    >Requests</button>
+                </div>
+              </nav>
 
               <!-- actions -->
               <div class="action-bar">
                 <!-- message actions -->
                 <div class="message-actions display">
-                  <button class="action-btn">Send New</button>
+                  <a href="/notif" class="action-btn">Send New</a>
                   <button class="action-btn">View Sent</button>
-                  <button class="action-btn">Clear All</button>
+                  <hr>
+                  <a href="/clear" class="action-btn">Clear All</a>
                   <button class="action-btn">Clear Selected</button>
                 </div>
                 <!-- request actions -->
@@ -50,23 +68,24 @@
 
               <!-- main inbox list -->
               <div class="inbox-display">
-                <!-- navigation between tabs -->
-                <nav>
-                  <button class="nav-tab" onclick="setMessages()">Messages</button>
-                  <button class="nav-tab" onclick="setRequests()">Requests</button>
-                </nav>
 
                 <!-- messages -->
                 <div class="message-list display">
                   <ul class="list-group">
                     <% inbox.forEach((notif) => { %>
                       <li class="list-group-item list-group-item-action">
-                        <input type="checkbox" name="<%= notif._id %>">
-                        <div class="" style="display: inline-block;">
-                          <a href="#">
+                        <input type="checkbox" class="message-check" name="<%= notif._id %>">
+                        <a href="/view_inbox_message/<%= notif._id %>" class="message-body">
+                          <div class="message-head">
                             <%= notif.subject %>
-                          </a>
-                        </div>
+                          </div>
+                          <div class="message-from">
+                            <%= notif.sender.username %>
+                          </div>
+                          <div class="message-text">
+                            <%= notif.text %>
+                          </div>
+                        </a>
                       </li>
                     <% }); %>
                   </ul>
@@ -76,9 +95,11 @@
                 <div class="request-list">
                   <div class="list-group">
                     <% requests.forEach((request) => { %>
-                      <a href="#" class="list-group-item list-group-item-action">
-                        <%= request.room.name %> 
-                      </a>
+                      <li class="list-group-item list-group-item-action">
+                        <a href="#" class="request-body">
+                          <%= request.room.name %> 
+                        </a>
+                      </li>
                     <% }); %>
                   </div>
                 </div>
