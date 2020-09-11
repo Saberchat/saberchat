@@ -1,9 +1,9 @@
 .inbox-container {
     border-radius: 15px;
     background-color: #d1ecff;
-    overflow: hidden;
     position: relative;
     margin-top: 3rem;
+    margin-bottom: 3rem;
     box-shadow: 0px 10px 20px #c2c2c2;
 }
 
@@ -13,10 +13,6 @@ Message and request lists
 */
 .message-list, .request-list {
     width: 100%;
-}
-
-.list-group {
-    overflow-y: scroll;
 }
 
 /* 
@@ -35,6 +31,7 @@ Navigation
 .inbox-nav {
     background-color: #1f2d53;
     border-bottom: 5px solid #3671c9;
+    border-radius: 15px 15px 0px 0px;
     box-shadow: 0px 3px 3px rgb(155, 154, 154);
     z-index: 100;
 }
@@ -87,85 +84,149 @@ Actions
 ===============================
 Messages
 */
-.list-group-item {
-    padding: 0;
-    height: 52px;
-}
-
-.list-group-item .message-body {
-    display: block;
-    height: 100%;
-    padding: 0.5rem;
-    margin-right: 5rem;
-    width: auto;
-    overflow: hidden;
-    text-decoration: none;
-    color: #424651;
-}
-
-.list-group-item .message-check {
-    position: relative;
-    float: left;
-    width: 30px;
-    height: 100%;
-}
-
-.list-group-item .message-check input {
-    position: absolute;
-    width: 15px;
-    height: 15px;
-    top: 50%;
-    left: 50%;
-    transform: translateY(-50%);
-    -ms-transform: translateY(-50%);
-    -webkit-transform: translateY(-50%);
-    -moz-transform: translateY(-50%);
+@media only screen and (min-width: 768px) {
+    .list-group-item {
+        padding: 0;
+        height: 52px;
+    }
     
+    .list-group-item .message-body {
+        display: block;
+        height: 100%;
+        padding: 0.5rem;
+        margin-right: 5rem;
+        width: auto;
+        overflow: hidden;
+        text-decoration: none;
+        color: #424651;
+    }
+    
+    .list-group-item .message-check {
+        position: relative;
+        float: left;
+        width: 30px;
+        height: 100%;
+    }
+    
+    .list-group-item .message-check input {
+        position: absolute;
+        width: 15px;
+        height: 15px;
+        top: 50%;
+        left: 50%;
+        transform: translateY(-50%);
+        -ms-transform: translateY(-50%);
+        -webkit-transform: translateY(-50%);
+        -moz-transform: translateY(-50%);
+        
+    }
+    
+    .message-subject {
+        display: inline-block;
+        width: 6rem;
+        height: 100%;
+        font-weight: 700;
+        margin-right: 1rem;
+        line-height: 34px;
+        white-space: nowrap;
+        overflow-x: hidden;
+        text-overflow: ellipsis;
+    }
+    
+    .message-from {
+        display: inline-block;
+        width: 6rem;
+        height: 100%;
+        font-weight: 500;
+        margin-right: 1rem;
+        line-height: 34px;
+        white-space: nowrap;
+        overflow-x: hidden;
+        text-overflow: ellipsis;
+    }
+    
+    .message-text {
+        font-weight: 400;
+        line-height: 34px;
+        white-space: nowrap;
+        overflow-x: hidden;
+        text-overflow: ellipsis;
+    }
+    
+    .message-date {
+        display: inline-block;
+        position: absolute;
+        right: 1rem;
+        top: 50%;
+        transform: translateY(-50%);
+        -ms-transform: translateY(-50%);
+        -webkit-transform: translateY(-50%);
+        -moz-transform: translateY(-50%);
+        color: #838383;
+    }
 }
 
-.message-subject {
-    display: inline-block;
-    width: 6rem;
-    height: 100%;
-    font-weight: 700;
-    margin-right: 1rem;
-    line-height: 34px;
-    white-space: nowrap;
-    overflow-x: hidden;
-    text-overflow: ellipsis;
+@media only screen and (max-width: 768px) {
+    .message-check, .message-head, .message-subject, .message-from {
+        display: inline-block;
+        color: #424651;
+        text-decoration: none;
+    }
+
+    .list-group-item .message-body {
+        text-decoration: none;
+    }
+
+    .message-subject {
+        font-weight: 700;
+        width: 6rem;
+        white-space: nowrap;
+        overflow-x: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .message-from {
+        font-weight: 500;
+        float: right;
+        width: 6rem;
+        white-space: nowrap;
+        overflow-x: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .message-text {
+        color: #424651;
+        font-weight: 400;
+        height: auto;
+        white-space: nowrap;
+        overflow-x: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .message-date {
+        float: right;
+        color: #838383;
+    }
+
+    .message-check {
+        float: left;
+        width: 25px;
+    }
+
+    .message-check input {
+        width: 15px;
+        height: 15px;
+        vertical-align: middle;
+    }
+
+    .message-head {
+        display: inline-block;
+        width: calc(100% - 25px);
+        overflow: auto;
+    }
 }
 
-.message-from {
-    display: inline-block;
-    width: 6rem;
-    height: 100%;
-    font-weight: 500;
-    margin-right: 1rem;
-    line-height: 34px;
-    white-space: nowrap;
-    overflow-x: hidden;
-    text-overflow: ellipsis;
-}
 
-.message-text {
-    font-weight: 400;
-    line-height: 34px;
-    white-space: nowrap;
-    overflow-x: hidden;
-    text-overflow: ellipsis;
-}
-
-.message-date {
-    display: inline-block;
-    position: absolute;
-    right: 1rem;
-    top: 50%;
-    transform: translateY(-50%);
-    -ms-transform: translateY(-50%);
-    -webkit-transform: translateY(-50%);
-    -moz-transform: translateY(-50%);
-    color: #838383;
-}
 
 /* 
 ===============================
@@ -186,6 +247,7 @@ Style variances for screen sizes
         width: 150px;
         float: left;
         border-right: 3px solid #3671c9;
+        border-radius: 0px 0px 0px 15px;
         padding-top: 1rem;
     }
 
@@ -193,6 +255,7 @@ Style variances for screen sizes
         width: auto;
         overflow-y: scroll;
         height: calc(100% - 63px);
+        border-radius: 0px 0px 15px 0px;
     }
 
     .message-head {
@@ -210,6 +273,17 @@ Style variances for screen sizes
 
 /* smaller than md */
 @media only screen and (max-width: 768px) {
+
+    .inbox-nav {
+        padding-top: 20px;
+        padding-left: 15px;
+    }
+
+    .inbox-display {
+        border-radius: 0px 0px 15px 15px;
+        max-height: 450px;
+        overflow-y: scroll;
+    }
 
 }
 
