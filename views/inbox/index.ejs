@@ -61,8 +61,8 @@
                 </div>
                 <!-- request actions -->
                 <div class="request-actions">
-                  <button class="action-btn">Current</button>
-                  <button class="action-btn">History</button>
+                  <button id="current-req" class="action-btn" onclick="seeCurrentReq()" disabled>Current</button>
+                  <button id="past-req" class="action-btn" onclick="seePastReq()">History</button>
                 </div>
               </div>
 
@@ -105,8 +105,9 @@
 
                 <!-- requests -->
                 <div class="request-list">
-                  <div class="list-group">
+                  <div class="list-group current display" id="current-req-list">
                     <% requests.forEach((request) => { %>
+                      <% if(request.status == 'pending') { %> 
                       <li class="list-group-item list-group-item-action">
                         <a href="#" class="request-body">
                           <div class="request-room">
@@ -117,6 +118,7 @@
                           </div>
                         </a>
                       </li>
+                      <% } %> 
                     <% }); %>
                     <li class="list-group-item list-group-item-action">
                       <a href="#" class="request-body">
@@ -205,6 +207,51 @@
                         </div>
                         <div class="request-from">
                           KabirSamsi 
+                        </div>
+                      </a>
+                    </li>
+                  </div>
+                  <div class="list-group history" id="past-req-list">
+                    <% requests.forEach((request) => { %>
+                      <% if(request.status != 'pending') { %> 
+                      <li class="list-group-item list-group-item-action">
+                        <a href="#" class="request-body">
+                          <div class="request-room">
+                            <%= request.room.name %> 
+                          </div>
+                          <div class="request-from">
+                            <%= request.requester.username %> 
+                          </div>
+                          <div class="request-status">
+                            <%= request.status %> 
+                          </div>
+                        </a>
+                      </li>
+                      <% } %> 
+                    <% }); %>
+                    <li class="list-group-item list-group-item-action">
+                      <a href="#" class="request-body">
+                        <div class="request-room">
+                          Room
+                        </div>
+                        <div class="request-from">
+                          Sender
+                        </div>
+                        <div class="request-status">
+                          Approved 
+                        </div>
+                      </a>
+                    </li>
+                    <li class="list-group-item list-group-item-action">
+                      <a href="#" class="request-body">
+                        <div class="request-room">
+                          Room 
+                        </div>
+                        <div class="request-from">
+                          Sender 
+                        </div>
+                        <div class="request-status">
+                          Rejected 
                         </div>
                       </a>
                     </li>

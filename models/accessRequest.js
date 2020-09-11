@@ -9,7 +9,8 @@ var accessReqSchema = new mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Room'
     },
-    text: String
+    text: String,
+    status: {type: String, default: 'pending'}
 }, {timestamps: {createdAt: 'created_at'}});
 
 module.exports = mongoose.model("AccessRequest", accessReqSchema);

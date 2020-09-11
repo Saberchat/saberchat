@@ -80,6 +80,14 @@ Actions
     color: #a3c8ff;
 }
 
+#current-req:disabled, #past-req:disabled {
+    background-color: #3d74af;
+}
+
+#current-req:hover:disabled, #past-req:hover:disabled {
+    color: #ffffff;
+}
+
 /* 
 ===============================
 Messages
@@ -230,6 +238,14 @@ Messages
 ===============================
 Requests
 */
+.current, .history {
+    display: none;
+}
+
+.request-list .current.display, .request-list .history.display {
+    display: block;
+}
+
 @media only screen and (min-width: 768px) {
     .list-group-item .request-body {
         display: inline-block;
@@ -242,6 +258,7 @@ Requests
 
     .request-room, .request-from {
         display: inline-block;
+        color: #424651;
     }
 
     .request-room {
@@ -259,8 +276,15 @@ Requests
         overflow-x: hidden;
         text-overflow: ellipsis;
     }
-}
 
+    .request-status {
+        display: inline-block;
+        position: absolute;
+        right: 1rem;
+        vertical-align: middle;
+        color: #838383;
+    }
+}
 
 /* 
 ===============================
