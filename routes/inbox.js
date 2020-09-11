@@ -260,7 +260,7 @@ router.get('/inbox', middleware.isLoggedIn, (req, res) => {
 })
 
 //View message in your inbox in more detail
-router.get('/view_inbox_message/:id', middleware.isLoggedIn, (req, res) => {
+router.get('/message/:id', middleware.isLoggedIn, (req, res) => {
 	Notification.findOne({_id: req.params.id}).populate({path: 'sender', select: ['username', 'imageUrl']})
 	.exec((err, foundNotif) => {
 		if (err || !foundNotif) {
@@ -311,7 +311,7 @@ router.get('/view_inbox_message/:id', middleware.isLoggedIn, (req, res) => {
 })
 
 //Accesses every notification that you have sent
-router.get('/view_sent_notifs', middleware.isLoggedIn, (req, res) => {
+router.get('/sent', middleware.isLoggedIn, (req, res) => {
 	Notification.find({'sender': req.user}, (err, foundNotifs) => {
 		if (err || !foundNotifs) {
 			req.flash('error', 'Unable to access database')
@@ -446,7 +446,7 @@ router.post('/mark_selected', middleware.isLoggedIn, (req, res) => {
 		}
 
 		req.user.save()
-		
+
 		req.flash('success', 'Notification(s) marked as read!')
 		res.redirect('/inbox')
 	})
