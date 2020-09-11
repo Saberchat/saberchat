@@ -3,7 +3,7 @@
 
     <% if (announcements.length == 1) { %>
       <div id="carouselExampleControls" class="carousel slide" data-ride="carousel" style="text-align: center; margin-bottom: 0px;">
-        <div class="carousel-inner">
+        <div class="carousel-inner" style="background-color: #dcdcdc; border-radius: 25px; border-color: black; border-width:2px; ">
 
           <div class="carousel-item active" style="background-color: #dcdcdc; border-radius: 25px; padding: 20px; border-color: black; border-width:2px;">
             <img class="profile-img" src="<%=announcements[0].sender.imageUrl%>"/>
@@ -24,7 +24,7 @@
 
     <% } else if (announcements.length < 5) { %>
       <div id="carouselExampleControls" class="carousel slide" data-ride="carousel" style="text-align: center; margin-bottom: 0px; border-radius: 25px; padding: 20px; border-color: black; border-width:2px; margin-right: 100px; margin-left: 100px;">
-        <div class="carousel-inner">
+        <div class="carousel-inner" style="background-color: #dcdcdc; border-radius: 25px; border-color: black; border-width:2px; ">
 
           <div class="carousel-item active" style="background-color: #dcdcdc; border-radius: 25px; padding: 20px; border-color: black; border-width:2px; ">
             <img class="profile-img" src="<%=announcements[0].sender.imageUrl%>"/>
@@ -54,7 +54,7 @@
 
     <% } else { %>
         <div id="carouselExampleControls" class="carousel slide" data-ride="carousel" style="text-align: center; margin-bottom: 0px;">
-          <div class="carousel-inner">
+          <div class="carousel-inner" style="background-color: #dcdcdc; border-radius: 25px; border-color: black; border-width:2px; ">
 
             <div class="carousel-item active" style="background-color: #dcdcdc; border-radius: 25px; padding: 20px; border-color: black; border-width:2px;">
               <img class="profile-img" src="<%=announcements[0].sender.imageUrl%>"/>
