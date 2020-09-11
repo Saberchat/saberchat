@@ -146,5 +146,23 @@ router.get('/contact', middleware.isLoggedIn, (req, res) => {
 	})
 })
 
+router.get('/alsion', (req, res) => {
+	User.find({status: 'faculty'}, (err, faculty) => {
+		if (err || !faculty) {
+			req.flash('error', "Unable to access database")
+			res.redirect('back')
+
+		} else {
+			let teacherNames = []
+
+			for (let fac of faculty) {
+				teacherNames.push(`${fac.firstName} ${fac.lastName}`)
+			}
+
+			res.render('other/alsion_info', {faculty: teacherNames})
+		}
+	})
+})
+
 //export router with all the routes connected
 module.exports = router;
