@@ -54,10 +54,10 @@
                 <!-- message actions -->
                 <div class="message-actions display">
                   <a href="/notif" class="action-btn">Send New</a>
-                  <button class="action-btn">View Sent</button>
+                  <a href="/view_sent_notifs" class="action-btn">View Sent</a>
                   <hr>
-                  <a href="/clear" class="action-btn">Clear All</a>
-                  <button class="action-btn">Clear Selected</button>
+                  <a href="/clear" class="action-btn">Delete All</a>
+                  <button class="action-btn" onclick="submitDelete()">Delete Selected</button>
                 </div>
                 <!-- request actions -->
                 <div class="request-actions">
@@ -71,24 +71,36 @@
 
                 <!-- messages -->
                 <div class="message-list display">
+
+                  <form action="/delete" method="post" id="del-select-form">
+
                   <ul class="list-group">
                     <% inbox.forEach((notif) => { %>
                       <li class="list-group-item list-group-item-action">
-                        <input type="checkbox" class="message-check" name="<%= notif._id %>">
+                        <div class="message-check">
+                          <input type="checkbox" name="<%= notif._id %>" value="">
+                        </div>
                         <a href="/view_inbox_message/<%= notif._id %>" class="message-body">
                           <div class="message-head">
-                            <%= notif.subject %>
-                          </div>
-                          <div class="message-from">
-                            <%= notif.sender.username %>
+                            <div class="message-subject">
+                              <%= notif.subject %>
+                            </div>
+                            <div class="message-from">
+                              <%= notif.sender.username %>
+                            </div>
                           </div>
                           <div class="message-text">
                             <%= notif.text %>
                           </div>
                         </a>
+                        <span class="message-date">
+                          Aug 29
+                        </span>
                       </li>
                     <% }); %>
                   </ul>
+
+                  </form>
                 </div>
 
                 <!-- requests -->

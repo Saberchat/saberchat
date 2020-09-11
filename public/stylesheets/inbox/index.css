@@ -41,6 +41,7 @@ Navigation
 
 .nav-tab {
     border: none;
+    border-radius: 15px 15px 0px 0px;
     color: white;
     background-color: #374877;
     padding: 0.5rem 2rem 0.3rem 2rem;
@@ -88,56 +89,83 @@ Messages
 */
 .list-group-item {
     padding: 0;
+    height: 52px;
 }
 
 .list-group-item .message-body {
-    display: inline-block;
+    display: block;
     height: 100%;
     padding: 0.5rem;
-    width: 90%;
+    margin-right: 5rem;
+    width: auto;
+    overflow: hidden;
     text-decoration: none;
     color: #424651;
 }
 
 .list-group-item .message-check {
-    margin-left: 1rem;
-    width: 15px;
-    height: 15px;
-    vertical-align: middle;
+    position: relative;
+    float: left;
+    width: 30px;
+    height: 100%;
 }
 
-.message-head {
+.list-group-item .message-check input {
+    position: absolute;
+    width: 15px;
+    height: 15px;
+    top: 50%;
+    left: 50%;
+    transform: translateY(-50%);
+    -ms-transform: translateY(-50%);
+    -webkit-transform: translateY(-50%);
+    -moz-transform: translateY(-50%);
+    
+}
+
+.message-subject {
     display: inline-block;
     width: 6rem;
+    height: 100%;
     font-weight: 700;
-    margin-right: 2rem;
+    margin-right: 1rem;
+    line-height: 34px;
     white-space: nowrap;
     overflow-x: hidden;
     text-overflow: ellipsis;
-    vertical-align: middle;
 }
 
 .message-from {
     display: inline-block;
     width: 6rem;
+    height: 100%;
     font-weight: 500;
-    margin-right: 2rem;
+    margin-right: 1rem;
+    line-height: 34px;
     white-space: nowrap;
     overflow-x: hidden;
     text-overflow: ellipsis;
-    vertical-align: middle;
 }
 
 .message-text {
-    display: inline-block;
-    width: 50%;
     font-weight: 400;
+    line-height: 34px;
     white-space: nowrap;
     overflow-x: hidden;
     text-overflow: ellipsis;
-    vertical-align: middle;
 }
 
+.message-date {
+    display: inline-block;
+    position: absolute;
+    right: 1rem;
+    top: 50%;
+    transform: translateY(-50%);
+    -ms-transform: translateY(-50%);
+    -webkit-transform: translateY(-50%);
+    -moz-transform: translateY(-50%);
+    color: #838383;
+}
 
 /* 
 ===============================
@@ -154,7 +182,7 @@ Style variances for screen sizes
     }
 
     .action-bar {
-        height: 100%;
+        height: calc(100% - 62px);
         width: 150px;
         float: left;
         border-right: 3px solid #3671c9;
@@ -163,7 +191,20 @@ Style variances for screen sizes
 
     .inbox-display {
         width: auto;
-        overflow: auto;
+        overflow-y: scroll;
+        height: calc(100% - 63px);
+    }
+
+    .message-head {
+        position: relative;
+        float: left;
+        width: 15rem;
+        height: 100%;
+    }
+
+    .message-text {
+        width: auto;
+        height: 100%;
     }
 }
 

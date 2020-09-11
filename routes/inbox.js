@@ -336,20 +336,26 @@ router.get('/clear_sent', middleware.isLoggedIn, (req, res) => {
 
 //Delete already viewed notifications
 router.post('/delete', middleware.isLoggedIn, (req, res) => {
-	deletes = [] //List of messages to be deleted
+	deletes = []; //List of messages to be deleted
 	for (let item of req.user.inbox) {
 		if (Object.keys(req.body).includes(item._id.toString())) { //If item is selected to be deleted (checkbox)
-			deletes.push(item)
+			deletes.push(item);
 		}
 	}
 
 	for (let notif of deletes) {
-		req.user.inbox.splice(req.user.inbox.indexOf(notif), 1)
+		req.user.inbox.splice(req.user.inbox.indexOf(notif), 1);
 	}
-	req.user.save()
-	req.flash('success', 'Notification(s) deleted!')
-	res.redirect('/inbox')
-})
+	req.user.save(function(err, savedUser, rows) {
+		if(err) {
+			req.flash('error', 'Unable to access database');
+			res.redirect('back');
+		} else {
+			req.flash('success', 'Notification(s) deleted!');
+			res.redirect('/inbox');
+		}
+	});
+});
 
 //Delete selected notifications that you sent (permanently)
 router.post('/delete_sent', middleware.isLoggedIn, (req, res) => {
