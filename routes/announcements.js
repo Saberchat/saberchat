@@ -8,6 +8,7 @@ const Announcement = require('../models/announcement');
 //Route to render 'sendAnnouncement' page
 router.get('/announce', middleware.isLoggedIn, (req, res) => {
   if (req.user.status == 'faculty' || req.user.permission == 'admin') {
+    
     Announcement.find({}).populate({path: 'sender', select: ['username', 'imageUrl']}).populate('message').exec((err, foundAnns) => {
       if (err || !foundAnns) {
         req.flash('error', 'Unable to access database')
@@ -54,7 +55,8 @@ router.get('/announcements', middleware.isLoggedIn, (req, res) => {
 router.get('/view_announcement/:id', middleware.isLoggedIn, (req, res) => {
   Announcement.findOne({_id: req.params.id}).populate({path: 'sender', select: ['username', 'imageUrl']}).exec((err, foundAnn) => {
     if (err || !foundAnn) {
-      req.flash('error', 'Unable to access database')
+      console.log(err)
+      req.flash('error', 'Problem Unable to access database')
       res.redirect('back')
 
     } else {

@@ -54,18 +54,19 @@
                     </div>
                     <div class="block-content">
                       <p>
-                        Alexander Zhou, Kabir Samsi, Siddharth Chavan and Vibhav Darsha are four juniors who are enrolled in Alsion Early College. They developed SaberChat over our 2020
-                        Summer Break in an effort to improve our school's communication platforms, and to practice their
-                        software development skills.
+                        Alexander Zhou, Kabir Samsi, Siddharth Chavan and Vibhav Darsha are juniors who are all enrolled in Alsion's Early College program. They developed SaberChat over the 2020
+                        Summer Break in an effort to improve Alsion's communication platforms, and to exercise their software development skills.
                       </p>
-                      <% developers.forEach(dev => { %>
-                        <strong><%=dev.firstName%> <%=dev.lastName%></strong>
+
+                      <% [["Alexander Zhou", "alexanderz@alsionschool.org"], ["Kabir Samsi", "kabirs@alsionschool.org"], ["Siddharth Chavan", "siddharthc@alsionschool.org"], ["Vibhav Darsha", "vibhavec@alsionschool.org"]].forEach(developer => { %>
+                        <strong><%=developer[0]%></strong>
                         <ul>
                           <li>
-                            <strong>Email: </strong> <a href="mailto: <%=dev.email%>"><%=dev.email%></a>
+                            <strong>Email: </strong> <a href="mailto: <%=developer[1]%>"><%=developer[1]%></a>
                           </li>
                         </ul>
                       <% }) %>
+
                     </div>
                 </article>
             </div>

@@ -127,21 +127,13 @@ router.get("/logout", function(req, res) {
 });
 
 router.get('/contact', middleware.isLoggedIn, (req, res) => {
-	User.find({status: '11th'}, (err, juniors) => {
-		if (err || !juniors) {
+	User.find({status: 'faculty'}, (err, faculty) => {
+		if (err || !faculty) {
 			req.flash('error', "Unable to access database")
 			res.redirect('back')
 
 		} else {
-			User.find({status: 'faculty'}, (err, faculty) => {
-				if (err || !faculty) {
-					req.flash('error', "Unable to access database")
-					res.redirect('back')
-
-				} else {
-					res.render('other/contact', {developers: juniors, faculty})
-				}
-			})
+			res.render('other/contact', {faculty})
 		}
 	})
 })
