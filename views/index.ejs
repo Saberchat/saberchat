@@ -27,12 +27,10 @@
 <body>
 
 <!-- insert navbar via ejs-->
-<%- include('./partials/header') %>
 <%- include('./partials/navbar') %>
 
 <!-- Background image and text -->
 <section id="background">
-  <%- include('./partials/announcement')%>
     <div class="container-fluid text-center" style="margin-bottom:0">
         <div class="row">
             <div class="col-12 background-title">
@@ -43,6 +41,7 @@
     </div>
 </section>
 
+<%- include('./partials/announcement')%>
 
 
 <!-- Home Page content -->
