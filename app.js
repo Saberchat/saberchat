@@ -249,10 +249,7 @@ io.on('connect', (socket) => {
 
     let currentTime = new Date(new Date().getTime()).toString().split(' ')[4]
 
-    if (
-      // (parseInt(currentTime.split(':')[0]) < 9 || parseInt(currentTime.split(':')[0]) > 12) || (parseInt(currentTime.split(':')[0]) == 12 && parseInt(currentTime.split(':')[1]) > 20)
-      false
-    ) {
+    if ((parseInt(currentTime.split(':')[0]) < 9 || parseInt(currentTime.split(':')[0]) > 12) || (parseInt(currentTime.split(':')[0]) == 12 && parseInt(currentTime.split(':')[1]) > 20)) {
       console.log("Send orders between 9AM and 12:20PM");
 
     } else {
@@ -316,7 +313,6 @@ io.on('connect', (socket) => {
 
                 } else {
                   console.log("Some items are unavailable in the quantities you requested")
-                  // req.flash('error', "Some items are unavailable in the quantities you requested")
                 }
               }
             });
