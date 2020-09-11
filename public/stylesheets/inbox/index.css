@@ -226,6 +226,40 @@ Messages
     }
 }
 
+/* 
+===============================
+Requests
+*/
+@media only screen and (min-width: 768px) {
+    .list-group-item .request-body {
+        display: inline-block;
+        width: 100%;
+        height: 100%;
+        padding: 1rem;
+        padding-left: 2rem;
+        text-decoration: none;
+    }
+
+    .request-room, .request-from {
+        display: inline-block;
+    }
+
+    .request-room {
+        width: 9rem;
+        font-weight: 700;
+        white-space: nowrap;
+        overflow-x: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .request-from {
+        width: 9rem;
+        font-weight: 400;
+        white-space: nowrap;
+        overflow-x: hidden;
+        text-overflow: ellipsis;
+    }
+}
 
 
 /* 
