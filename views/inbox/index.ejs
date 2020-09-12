@@ -11,6 +11,7 @@
     <!-- link css for navbar. Don't need to include public/javascript/userForm.js since user is already logged in and does not need to access login and register forms.  -->
     <link rel="stylesheet" href="/stylesheets/components/navbar.css">
     <link rel="stylesheet" href="/stylesheets/components/header.css">
+    <link rel="stylesheet" href="/stylesheets/components/announcement.css">
 
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
@@ -23,6 +24,7 @@
     <%- include('../partials/navbar') %>
     <!-- include the backdrop for nav -->
     <%- include('../partials/header') %>
+    <%- include('../partials/announcement') %>
 
     </head>
     <body>
@@ -87,7 +89,25 @@
                       <% inbox.forEach((notif) => { %>
                         <li class="list-group-item list-group-item-action">
 
-                          <% if (notif.sender._id.toString() == currentUser._id.toString()) { %>
+                          <% if (notif.sender == null) { %>
+                            <div class="message-check">
+                              <input class="del-form-input" type="checkbox" name="<%= notif._id %>" value="" onchange="updateDelete()">
+                            </div>
+                            <a href="/message/<%= notif._id %>" class="message-body">
+                              <div class="message-head">
+                                <div class="message-from">
+                                  <%= notif.subject %>
+                                </div>
+                                <div class="message-from">
+                                  Anonymous
+                                </div>
+                              </div>
+                              <div class="message-text">
+                                <%= notif.text %>
+                              </div>
+                            </a>
+
+                          <% } else if (notif.sender._id.toString() == currentUser._id.toString()) { %>
 
                             <a href="/message/<%= notif._id %>" class="message-body">
                               <div class="message-head">

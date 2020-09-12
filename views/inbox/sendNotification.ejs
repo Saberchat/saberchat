@@ -8,11 +8,12 @@
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css">
     <link rel="stylesheet" href="/stylesheets/main.css">
     <!-- link css for navbar. Don't need to include public/javascript/userForm.js since user is already logged in and does not need to access login and register forms.  -->
+    <link rel="stylesheet" href="/stylesheets/inbox/index.css">
     <link rel="stylesheet" href="/stylesheets/components/navbar.css">
     <link rel="stylesheet" href="/stylesheets/components/header.css">
     <link rel="stylesheet" href="/stylesheets/components/announcement.css">
     <link rel="stylesheet" href="/stylesheets/chat/edit.css">
-    <link rel="stylesheet" href="/stylesheets/inbox/sendNotif.css">
+    <!-- <link rel="stylesheet" href="/stylesheets/inbox/sendNotif.css"> -->
 
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
@@ -30,57 +31,88 @@
 
     </head>
     <body style="text-align: center;">
-      <div class="container mt-5">
+      <div class="container">
         <div class="row">
           <div class="col-12">
-            <div class="jumbotron text-center">
-              <h1><i class="far fa-comment-dots"></i> Send Notifications</h1>
-              <p>Send notifications to individuals, groups, or via the anonymous hotline</p>
-              <a href="/inbox">Back to Inbox</a>
-            </div>
-          </div>
-        </div>
-      </div>
-        <div class="body">
-            <div class="row">
-                <div class="col-md-10 offset-md-1 col-12">
+
+            <div class="inbox-container">
+              <!-- navigation between tabs -->
+              <nav class="inbox-nav">
+                <div class="btn-group" role="group" aria-label="inbox navigation">
+                  <button
+                    class="nav-tab active"
+                    id="view-msg"
+                    onclick="setMessages()"
+                    disabled
+                    >Messages</button>
+
+                  <button
+                    class="nav-tab"
+                    id="view-req"
+                    onclick="setRequests()"
+                    >Requests</button>
+                </div>
+                <button id="refresh-btn" onclick="window.location.reload();">Refresh</button>
+              </nav>
+
+                <!-- actions -->
+                <div class="action-bar" style="padding-bottom: 20px;">
+                  <!-- message actions -->
+                  <div class="message-actions display">
+                    <a href="/inbox" class="action-btn">Inbox</a>
+                    <a href="/notif" class="action-btn">Send New</a>
+                    <a href="/sent" class="action-btn">View Sent</a>
+                  </div>
+                  <!-- request actions -->
+                  <div class="request-actions">
+                    <button id="current-req" class="action-btn" onclick="seeCurrentReq()" disabled>Current</button>
+                    <button id="past-req" class="action-btn" onclick="seePastReq()">History</button>
+                  </div>
+                </div>
+
 
                     <!-- Send notification to group -->
-                    <div class="send-notif-type" style="margin-top: 20px; text-align: center;">
-                      <h5 class="send-notif-header">Regular Notification</h5>
-                      <form action="/send_group" method="post">
-                        <select id="recipients" style="margin-bottom: 20px; width: 400px;">
-                          <optgroup label="Add Recipients to Mailing List"></optgroup>
-                          <option></option>
-                          <%users.forEach(user => { %>
-                            <% if (user.username != currentUser.username) { %>
-                              <option><%=user.username%></option>
-                            <% } %>
-                          <% }) %>
-                          <option>everyone</option>
-                        </select>
-                        <br />
-                        <div class="input-group mb-3">
-                          <input class="form-control" autocomplete="off" name="recipient_list"id="recipient_list" type="text" aria-describedby="basic-addon2" placeholder="Recipients" style="width: 300px; color: blue;" required/>
-                          <div class="input-group-append">
-                            <button id="clear" class="btn btn-outline-secondary" type="button">Clear</button>
+                    <% if (currentUser.permission == 'student') { %>
+                      <div class="send-notif-type" style="margin-left: 50px; margin-top: 20px; text-align: center; display: inline-block; float: left;">
+
+                    <% } else { %>
+                      <div class="send-notif-type" style="margin-top: 20px; text-align: center; display: inline-block;">
+                    <% } %>
+
+                        <h5 class="send-notif-header">Regular Notification</h5>
+                        <form action="/send_group" method="post">
+                          <select id="recipients" style="margin-bottom: 20px; width: 400px;">
+                            <optgroup label="Add Recipients to Mailing List"></optgroup>
+                            <option></option>
+                            <%users.forEach(user => { %>
+                              <% if (user.username != currentUser.username) { %>
+                                <option><%=user.username%></option>
+                              <% } %>
+                            <% }) %>
+                            <option>everyone</option>
+                          </select>
+                          <br />
+                          <div class="input-group mb-3">
+                            <input class="form-control" autocomplete="off" name="recipient_list"id="recipient_list" type="text" aria-describedby="basic-addon2" placeholder="Recipients" style="width: 300px; color: blue;" required/>
+                            <div class="input-group-append">
+                              <button id="clear" class="btn btn-outline-secondary" type="button" style="color: white; background-color: red;">Clear</button>
+                            </div>
                           </div>
-                        </div>
-                        <input type="text" id="type" name="subject" style="margin-bottom: 20px; width: 400px;" placeholder="Enter subject" required/>
-                        <br />
-                        <input type="text" id="images" name="images" style="margin-bottom: 20px; width: 400px;" placeholder="Enter any image urls, separate by comma (optional)"/>
-                        <br />
-                        <textarea class="message" name="message" cols="40" rows="5" style="width: 400px;" placeholder="Enter notification" required></textarea>
-                        <br />
-                        <button class="btn btn-primary" class='submit-button' action="submit" style="margin-bottom: 10px; width: 400px;">Send Notification</button>
-                      </form>
-                    </div>
-                    <!-- <br /><br /> -->
+                          <input type="text" id="type" name="subject" style="margin-bottom: 20px; width: 400px;" placeholder="Enter subject" required/>
+                          <br />
+                          <input type="text" id="images" name="images" style="margin-bottom: 20px; width: 400px;" placeholder="Enter any image urls, separate by comma (optional)"/>
+                          <br />
+                          <textarea class="message" name="message" cols="40" rows="5" style="width: 400px;" placeholder="Enter notification" required></textarea>
+                          <br />
+                          <button class="btn btn-primary" class='submit-button' action="submit" style="margin-bottom: 10px; width: 400px;">Send Notification</button>
+                        </form>
+                      </div>
+                      <!-- <br /><br /> -->
 
                     <% if (currentUser.permission == 'student') { %>
 
                       <!-- Anonymous Hotline for students-->
-                      <div class="send-notif-type" style="margin-left: 100px;">
+                      <div class="send-notif-type" style="margin-left: 50px; margin-top: 20px; display: inline-block; float: left;">
                         <h5 class="send-notif-header" style="text-align: center;">Anonymous Hotline</h5>
                         <form action="/send_anonymous" method="post">
                           <select id="recipients_anonymous" name="recipient" style="margin-bottom: 20px; width: 400px;">
@@ -97,7 +129,7 @@
                           <div class="input-group mb-3">
                             <input class="form-control" autocomplete="off" name="recipient_list_anonymous" id="recipient_list_anonymous" type="text" aria-describedby="basic-addon2" placeholder="Recipients" style="width: 300px; color: blue;" required/>
                             <div class="input-group-append">
-                              <button id="clear_anonymous" class="btn btn-outline-secondary" type="button">Clear</button>
+                              <button id="clear_anonymous" class="btn btn-outline-secondary" type="button" style="color: white; background-color: red;">Clear</button>
                             </div>
                           </div>
                           <input type="text" id="type" name="subject" style="margin-bottom: 20px; width: 400px;" placeholder="Enter subject" required/>

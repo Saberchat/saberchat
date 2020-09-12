@@ -280,7 +280,7 @@ router.get('/message/:id', middleware.isLoggedIn, (req, res) => {
 
 		} else {
 
-			if (foundNotif.sender.username != req.user.username) {
+				if (foundNotif.sender == null || foundNotif.sender.username != req.user.username) {
 
 				if (!foundNotif.read[foundNotif.recipients.indexOf(req.user.username)]) {
 					req.user.notifCount -= 1
