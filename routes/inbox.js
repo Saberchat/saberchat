@@ -250,7 +250,7 @@ router.get('/inbox', middleware.isLoggedIn, (req, res) => {
 					{ path: 'room', select: 'name'}
 				]
 			}).execPopulate();
-		
+
 		foundAnns = await Announcement.find({}).populate({path: 'sender', select: ['username', 'imageUrl']}).populate('message');
 		if(!foundAnns) {req.flash('error', 'Unable to access database'); return res.redirect('back');}
 
@@ -330,9 +330,7 @@ router.get('/sent', middleware.isLoggedIn, (req, res) => {
 					res.redirect('back')
 
 				} else {
-					// why are you rendering the index? I'll make it redirect for now
-					res.redirect('/inbox');
-					// res.render('inbox/index', {announcements: foundAnns.reverse(), announced: false, inbox: foundNotifs.reverse(), requests: req.user.requests, viewing_sent: true})
+					res.render('inbox/index', {announcements: foundAnns.reverse(), announced: false, inbox: foundNotifs.reverse(), requests: req.user.requests, viewing_sent: true})
 
 				}
 			})
@@ -493,12 +491,48 @@ router.post('/inbox/requests/:id/accept', middleware.isLoggedIn, (req, res) => {
 		} else if(Req.status != 'pending') {
 			req.flash('error', 'Request already handled');
 			return res.redirect('back');
+
 		} else {
+			req.user.requests.splice(req.user.requests.indexOf(req.params.id), 1)
+			req.user.save()
 			const foundRoom = await Room.findById(Req.room._id);
+
 			if(!foundRoom) {req.flash("error", "Unable to access database");return res.redirect('back');}
 
 			foundRoom.members.push(Req.requester);
 			Req.status = 'accepted';
+
+			User.findById(Req.requester, (err, foundUser) => {
+				if (err || !foundUser) {
+					req.flash("error", 'Unable to access database')
+					res.redirect('back')
+
+				} else {
+
+					Notification.create({subject: "Room Join Request Accepted", sender: req.user, text: `Your request to join room '${foundRoom.name}' has been accepted`, recipients: [foundUser.username], read: [0]}, (err, notification) => {
+
+						if (err || !foundUser) {
+							req.flash('error', "Unable to access database")
+							res.redirect('back')
+
+						} else {
+							notification.date = dateFormat(notification.created_at, "mmm d, h:MMTT")
+							notification.save() //Create notification
+
+							foundUser.inbox.push(notification)
+
+							if (foundUser.notifCount == undefined) {
+								foundUser.notifCount = 1
+
+							} else {
+								foundUser.notifCount += 1
+							}
+
+							foundUser.save()
+						}
+					})
+				}
+			})
 
 			await foundRoom.save();
 			await Req.save();
@@ -530,7 +564,52 @@ router.post('/inbox/requests/:id/reject', middleware.isLoggedIn, (req, res) => {
 			return res.redirect('back');
 
 		} else {
+			req.user.requests.splice(req.user.requests.indexOf(req.params.id), 1)
+			req.user.save()
+
 			Req.status = 'rejected';
+
+			User.findById(Req.requester, (err, foundUser) => {
+				if (err || !foundUser) {
+					req.flash("error", 'Unable to access database')
+					res.redirect('back')
+
+				} else {
+
+					Room.findById(Req.room._id, (err, foundRoom) => {
+						if (err || !foundRoom) {
+							req.flash("error", "Unable to access database")
+							res.redirect('back')
+
+						} else {
+							Notification.create({subject: "Room Join Request Rejected", sender: req.user, text: `Your request to join room '${foundRoom.name}' has been rejected`, recipients: [foundUser.username], read: [0]}, (err, notification) => {
+
+								if (err || !foundUser) {
+									req.flash('error', "Unable to access database")
+									res.redirect('back')
+
+								} else {
+									notification.date = dateFormat(notification.created_at, "mmm d, h:MMTT")
+									notification.save() //Create notification
+
+									foundUser.inbox.push(notification)
+
+									if (foundUser.notifCount == undefined) {
+										foundUser.notifCount = 1
+
+									} else {
+										foundUser.notifCount += 1
+									}
+
+									foundUser.save()
+								}
+							})
+						}
+					})
+				}
+			})
+
+
 			await Req.save();
 
 			req.flash('success', 'Request rejected');
