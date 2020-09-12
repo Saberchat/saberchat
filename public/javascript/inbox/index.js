@@ -19,6 +19,10 @@ const pastReqBtn = document.getElementById('past-req');
 const delAllBtn = document.getElementById('del-all-btn');
 const delSelBtn = document.getElementById('del-sel-btn');
 
+//buttons to mark messages
+const markAllBtn = document.getElementById('mark-all-btn');
+const markSelBtn = document.getElementById('mark-sel-btn');
+
 const delSelForm = document.getElementById('del-select-form');
 
 // tracks inbox state
@@ -105,8 +109,12 @@ function updateDelete() {
     if(selected) {
         delAllBtn.style.display = 'none';
         delSelBtn.style.display = 'block';
+        markAllBtn.style.display = 'none';
+        markSelBtn.style.display = 'block';
     } else {
         delSelBtn.style.display = 'none';
         delAllBtn.style.display = 'block';
+        markSelBtn.style.display = 'none';
+        markAllBtn.style.display = 'block';
     }
 }

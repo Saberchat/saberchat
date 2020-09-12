@@ -244,14 +244,24 @@ router.get('/inbox', middleware.isLoggedIn, (req, res) => {
 
 		await req.user.populate(
 			{
-				path: 'requests', 
+				path: 'requests',
 				populate: [
 					{ path: 'requester', select: ['username', 'imageUrl']},
 					{ path: 'room', select: 'name'}
 				]
 			}).execPopulate();
 
-		res.render('inbox/index', {inbox: req.user.inbox, requests: req.user.requests});
+		Announcement.find({}).populate({path: 'sender', select: ['username', 'imageUrl']}).populate('message').exec((err, foundAnns) => {
+			if (err || !foundAnns) {
+				req.flash('error', 'Unable to access database')
+				res.redirect('back')
+
+			} else {
+
+				res.render('inbox/index', {announcements: foundAnns.reverse(), announced: false, inbox: req.user.inbox.reverse(), requests: req.user.requests.reverse(), viewing_sent: false});
+			}
+		})
+
 	}
 	inboxGet().catch(err => {
 		console.log(err);
@@ -327,7 +337,7 @@ router.get('/sent', middleware.isLoggedIn, (req, res) => {
 
 				} else {
 
-					res.render('inbox/sentNotifications', {announcements: foundAnns.reverse(), announced: false, notifs: foundNotifs.reverse()})
+					res.render('inbox/index', {announcements: foundAnns.reverse(), announced: false, inbox: foundNotifs.reverse(), requests: req.user.requests, viewing_sent: true})
 				}
 			})
 		}
@@ -479,7 +489,7 @@ router.post('/inbox/requests/:id/accept', middleware.isLoggedIn, (req, res) => {
 		if(!Req) {
 			req.flash("error", "Unable to access database");
 			return res.redirect('back');
-			
+
 		} else if(!Req.room.creator.id.equals(req.user._id)) {
 			req.flash("error", "You do not have permission to do that");
 			return res.redirect('back');
@@ -514,11 +524,11 @@ router.post('/inbox/requests/:id/reject', middleware.isLoggedIn, (req, res) => {
 		if(!Req) {
 			req.flash("error", "Unable to access database");
 			return res.redirect('back');
-			
+
 		} else if(!Req.room.creator.id.equals(req.user._id)) {
 			req.flash("error", "You do not have permission to do that");
 			return res.redirect('back');
-			
+
 		} else if(Req.status != 'pending') {
 			req.flash('error', 'Request already handled');
 			return res.redirect('back');

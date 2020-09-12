@@ -249,8 +249,8 @@ io.on('connect', (socket) => {
 
     let currentTime = new Date(new Date().getTime()).toString().split(' ')[4]
 
-    if ((parseInt(currentTime.split(':')[0]) < 9 || parseInt(currentTime.split(':')[0]) > 12) || (parseInt(currentTime.split(':')[0]) == 12 && parseInt(currentTime.split(':')[1]) > 20)) {
-      console.log("Send orders between 9AM and 12:20PM");
+    if ((parseInt(currentTime.split(':')[0]) < 8 || parseInt(currentTime.split(':')[0]) >= 12)) {
+      console.log("Send orders between 8AM and 12PM");
 
     } else {
 
@@ -262,60 +262,73 @@ io.on('connect', (socket) => {
 
           } else {
 
-            Item.find({_id: {$in: itemList}}, (err, foundItems) => {
-              if (err || !foundItems) {
-                console.log(err);
+            Order.find({name: `${user.firstName} ${user.lastName}`}, (err, foundOrders) => {
+              if (err || !foundOrders) {
+                console.log(err)
 
               } else {
+                if (foundOrders.length  >= 3) {
+                  console.log("Max orders made")
 
-                let unavailable = false
+                } else {
 
-                for (let i = 0; i < foundItems.length; i++) {
-
-                  if (foundItems[i].availableItems < parseInt(itemCount[i])) {
-                    unavailable = true
-                    break
-
-                  }
-                }
-
-                if (!unavailable) {
-                  Order.create({customer: customerId, name: `${user.firstName} ${user.lastName}`, instructions: instructions, present: true, charge: 0}, (err, order) => {
-
-                    if (err) {
+                  Item.find({_id: {$in: itemList}}, (err, foundItems) => {
+                    if (err || !foundItems) {
                       console.log(err);
 
                     } else {
-                      order.date = dateFormat(order.created_at, "mmm d, h:MM TT")
-                      order.items = itemList;
-                      order.quantities = itemCount;
 
-                      var charge = 0;
+                      let unavailable = false
 
                       for (let i = 0; i < foundItems.length; i++) {
-                        charge += (foundItems[i].price * parseInt(itemCount[i]))
+
+                        if (foundItems[i].availableItems < parseInt(itemCount[i])) {
+                          unavailable = true
+                          break
+
+                        }
                       }
 
-                      order.charge = charge;
-                      order.save()
+                      if (!unavailable) {
+                        Order.create({customer: customerId, name: `${user.firstName} ${user.lastName}`, instructions: instructions, present: true, charge: 0}, (err, order) => {
 
-                      Item.find({_id: {$in: itemList}}, (err, foundItems) => {
-                        if (err || !foundItems) {
-                          console.log(err);
-                        } else {
-                          io.emit('order', order, foundItems);
-                        }
-                      });
+                          if (err) {
+                            console.log(err);
 
+                          } else {
+                            order.date = dateFormat(order.created_at, "mmm d, h:MM TT")
+                            order.items = itemList;
+                            order.quantities = itemCount;
+
+                            var charge = 0;
+
+                            for (let i = 0; i < foundItems.length; i++) {
+                              charge += (foundItems[i].price * parseInt(itemCount[i]))
+                            }
+
+                            order.charge = charge;
+                            order.save()
+
+                            Item.find({_id: {$in: itemList}}, (err, foundItems) => {
+                              if (err || !foundItems) {
+                                console.log(err);
+                              } else {
+                                io.emit('order', order, foundItems);
+                              }
+                            });
+
+                          }
+
+                        })
+
+                      } else {
+                        console.log("Some items are unavailable in the quantities you requested")
+                      }
                     }
-
                   })
-
-                } else {
-                  console.log("Some items are unavailable in the quantities you requested")
                 }
               }
-            });
+            })
           }
         })
 
@@ -323,7 +336,7 @@ io.on('connect', (socket) => {
         console.log('Empty order')
       }
     }
-  });
+  })
 });
 
 

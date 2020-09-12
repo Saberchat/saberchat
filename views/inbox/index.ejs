@@ -34,111 +34,160 @@
               <!-- navigation between tabs -->
               <nav class="inbox-nav">
                 <div class="btn-group" role="group" aria-label="inbox navigation">
-                  <button 
-                    class="nav-tab active" 
-                    id="view-msg" 
-                    onclick="setMessages()" 
+                  <button
+                    class="nav-tab active"
+                    id="view-msg"
+                    onclick="setMessages()"
                     disabled
                     >Messages</button>
 
-                  <button 
-                    class="nav-tab" 
-                    id="view-req" 
+                  <button
+                    class="nav-tab"
+                    id="view-req"
                     onclick="setRequests()"
                     >Requests</button>
                 </div>
                 <button id="refresh-btn" onclick="window.location.reload();">Refresh</button>
               </nav>
 
-              <!-- actions -->
-              <div class="action-bar">
-                <!-- message actions -->
-                <div class="message-actions display">
-                  <a href="/notif" class="action-btn">Send New</a>
-                  <a href="/view_sent_notifs" class="action-btn">View Sent</a>
-                  <hr>
-                  <a href="/clear" class="action-btn" id="del-all-btn">Delete All</a>
-                  <button class="action-btn" onclick="submitDelete()" id="del-sel-btn">Delete Selected</button>
+              <form method="post" id="del-select-form">
+
+                <!-- actions -->
+                <div class="action-bar" style="padding-bottom: 20px;">
+                  <!-- message actions -->
+                  <div class="message-actions display">
+                    <a href="/inbox" class="action-btn">Inbox</a>
+                    <a href="/notif" class="action-btn">Send New</a>
+                    <a href="/sent" class="action-btn">View Sent</a>
+                    <% if (viewing_sent == false)  { %>
+                      <hr>
+                      <a href="/clear" class="action-btn" id="del-all-btn">Clear All</a>
+                      <button class="action-btn" formAction="/delete?_method=delete" id="del-sel-btn">Clear Selected</button>
+
+                      <a href="/mark_all" class="action-btn" id="mark-all-btn">Mark All As Read</a>
+                      <button class="action-btn" formAction="/mark_selected" id="mark-sel-btn" style="display: none;">Mark Selected As Read</button>
+                    <% } %>
+
+                  </div>
+                  <!-- request actions -->
+                  <div class="request-actions">
+                    <button id="current-req" class="action-btn" onclick="seeCurrentReq()" disabled>Current</button>
+                    <button id="past-req" class="action-btn" onclick="seePastReq()">History</button>
+                  </div>
                 </div>
-                <!-- request actions -->
-                <div class="request-actions">
-                  <button id="current-req" class="action-btn" onclick="seeCurrentReq()" disabled>Current</button>
-                  <button id="past-req" class="action-btn" onclick="seePastReq()">History</button>
-                </div>
-              </div>
 
-              <!-- main inbox list -->
-              <div class="inbox-display">
+                <!-- main inbox list -->
+                <div class="inbox-display">
 
-                <!-- messages -->
-                <div class="message-list display">
+                  <!-- messages -->
+                  <div class="message-list display">
 
-                  <form action="/delete" method="post" id="del-select-form">
+                    <ul class="list-group">
 
-                  <ul class="list-group">
-                    <% inbox.forEach((notif) => { %>
-                      <li class="list-group-item list-group-item-action">
-                        <div class="message-check">
-                          <input class="del-form-input" type="checkbox" name="<%= notif._id %>" value="" onchange="updateDelete()">
-                        </div>
-                        <a href="/view_inbox_message/<%= notif._id %>" class="message-body">
-                          <div class="message-head">
-                            <div class="message-subject">
-                              <%= notif.subject %>
+                      <% inbox.forEach((notif) => { %>
+                        <li class="list-group-item list-group-item-action">
+
+                          <% if (notif.sender._id.toString() == currentUser._id.toString()) { %>
+
+                            <a href="/message/<%= notif._id %>" class="message-body">
+                              <div class="message-head">
+                                <div class="message-from">
+                                  <%= notif.subject %>
+                                </div>
+                                <div class="message-from">
+                                  <%= notif.sender.username %>
+                                </div>
+                              </div>
+                              <div class="message-text">
+                                <%= notif.text %>
+                              </div>
+                            </a>
+
+                          <% } else { %>
+                            <div class="message-check">
+                              <input class="del-form-input" type="checkbox" name="<%= notif._id %>" value="" onchange="updateDelete()">
                             </div>
-                            <div class="message-from">
-                              <%= notif.sender.username %>
-                            </div>
-                          </div>
-                          <div class="message-text">
-                            <%= notif.text %>
-                          </div>
-                        </a>
-                        <span class="message-date">
-                          Aug 29
-                        </span>
-                      </li>
-                    <% }); %>
-                  </ul>
+                            <% if (notif.read[notif.recipients.indexOf(currentUser.username)] == true) { %>
 
-                  </form>
-                </div>
+                              <a href="/message/<%= notif._id %>" class="message-body">
+                                <div class="message-head">
+                                  <div class="message-from">
+                                    <%= notif.subject %>
+                                  </div>
+                                  <div class="message-from">
+                                    <%= notif.sender.username %>
+                                  </div>
+                                </div>
+                                <div class="message-text">
+                                  <%= notif.text %>
+                                </div>
+                              </a>
+
+                            <% } else { %>
+
+                              <a href="/message/<%= notif._id %>" class="message-body">
+                                <div class="message-head">
+                                  <div class="message-subject">
+                                    <%= notif.subject %>
+                                  </div>
+                                  <div class="message-from">
+                                    <%= notif.sender.username %>
+                                  </div>
+                                </div>
+                                <div class="message-text">
+                                  <%= notif.text %>
+                                </div>
+                              </a>
+                            <% } %>
+                          <% }%>
+
+
+                          <span class="message-date">
+                            <%=notif.date.split(',')[0]%>
+                          </span>
+                        </li>
+                      <% }); %>
+                    </ul>
+
+                    </form>
+                  </div>
+              </form>
 
                 <!-- requests -->
                 <div class="request-list">
                   <div class="list-group current display" id="current-req-list">
                     <% requests.forEach((request) => { %>
-                      <% if(request.status == 'pending') { %> 
+                      <% if(request.status == 'pending') { %>
                       <li class="list-group-item list-group-item-action">
                         <a href="/inbox/requests/<%= request._id %>" class="request-body">
                           <div class="request-room">
-                            <%= request.room.name %> 
+                            <%= request.room.name %>
                           </div>
                           <div class="request-from">
-                            <%= request.requester.username %> 
+                            <%= request.requester.username %>
                           </div>
                         </a>
                       </li>
-                      <% } %> 
+                      <% } %>
                     <% }); %>
                   </div>
                   <div class="list-group history" id="past-req-list">
                     <% requests.forEach((request) => { %>
-                      <% if(request.status != 'pending') { %> 
+                      <% if(request.status != 'pending') { %>
                       <li class="list-group-item list-group-item-action">
                         <a href="/inbox/requests/<%= request._id %>" class="request-body">
                           <div class="request-room">
-                            <%= request.room.name %> 
+                            <%= request.room.name %>
                           </div>
                           <div class="request-from">
-                            <%= request.requester.username %> 
+                            <%= request.requester.username %>
                           </div>
                           <div class="request-status">
-                            <%= request.status %> 
+                            <%= request.status %>
                           </div>
                         </a>
                       </li>
-                      <% } %> 
+                      <% } %>
                     <% }); %>
                   </div>
                 </div>

@@ -51,8 +51,8 @@ router.get('/new', middleware.isLoggedIn, (req, res) => {
 
   let currentTime = new Date(new Date().getTime()).toString().split(' ')[4]
 
-  if ((parseInt(currentTime.split(':')[0]) < 9 || parseInt(currentTime.split(':')[0]) > 12) || (parseInt(currentTime.split(':')[0]) == 12 && parseInt(currentTime.split(':')[1]) > 20)) {
-    req.flash('error', "Send orders between 9AM and 12:20PM");
+  if ((parseInt(currentTime.split(':')[0]) < 8 || parseInt(currentTime.split(':')[0]) >= 12)) {
+    req.flash('error', "Send orders between 8AM and 12PM");
     res.redirect('back');
 
   } else {
@@ -91,58 +91,72 @@ router.post('/new', middleware.isLoggedIn, (req, res) => {
 
   let currentTime = new Date(new Date().getTime()).toString().split(' ')[4]
 
-  if ((parseInt(currentTime.split(':')[0]) < 9 || parseInt(currentTime.split(':')[0]) > 12) || (parseInt(currentTime.split(':')[0]) == 12 && parseInt(currentTime.split(':')[1]) > 20)) {
+  if ((parseInt(currentTime.split(':')[0]) < 8 || parseInt(currentTime.split(':')[0]) >= 12)) {
     req.flash('error', "Send orders between 9AM and 12:20PM");
     res.redirect('back');
 
   } else {
 
-    if (req.body.check) {
+    Order.find({name: `${req.user.firstName} ${req.user.lastName}`}, (err, foundOrders) => {
+      if (err || !foundOrders) {
+        req.flash("error", "Unable to access database")
+        res.redirect('back')
 
-      Item.find({}, (err, foundItems) => {
-
-        let unavailable = false
-
-        if (err || !foundItems) {
-          req.flash('error', "Unable to access database")
+      } else {
+        if (foundOrders.length >= 3) {
+          req.flash("error", "You have made the maximum number of orders for one day")
           res.redirect('back')
 
         } else {
-          for (let i = 0; i < foundItems.length; i ++) {
-            if (Object.keys(req.body.check).includes(foundItems[i]._id.toString())) { //If item is selected to be ordered
+          if (req.body.check) {
 
-              if (foundItems[i].availableItems < parseInt(req.body[foundItems[i].name])) { //First test to see if all items are available
-                unavailable = true
-                break //Immediately quit
+            Item.find({}, (err, foundItems) => {
 
-              } else { //If all items are available, perform these operations
-                foundItems[i].availableItems -= parseInt(req.body[foundItems[i].name])
+              let unavailable = false
 
-                if (foundItems[i].availableItems == 0) {
-                  foundItems[i].isAvailable = false;
+              if (err || !foundItems) {
+                req.flash('error', "Unable to access database")
+                res.redirect('back')
+
+              } else {
+                for (let i = 0; i < foundItems.length; i ++) {
+                  if (Object.keys(req.body.check).includes(foundItems[i]._id.toString())) { //If item is selected to be ordered
+
+                    if (foundItems[i].availableItems < parseInt(req.body[foundItems[i].name])) { //First test to see if all items are available
+                      unavailable = true
+                      break //Immediately quit
+
+                    } else { //If all items are available, perform these operations
+                      foundItems[i].availableItems -= parseInt(req.body[foundItems[i].name])
+
+                      if (foundItems[i].availableItems == 0) {
+                        foundItems[i].isAvailable = false;
+                      }
+
+                      foundItems[i].save()
+
+                    }
+                  }
                 }
-
-                foundItems[i].save()
-
               }
-            }
+
+              if (!unavailable) {
+                req.flash("success", "Order Sent!")
+                res.redirect('/cafe');
+
+              } else {
+                req.flash("error", "Some items are unavailable in the quantities you requested")
+                res.redirect('/cafe/new');
+              }
+            })
+
+          } else {
+            req.flash('error', "Cannot send empty order")
+            res.redirect('/cafe/new');
           }
         }
-
-        if (!unavailable) {
-          req.flash("success", "Order Sent!")
-          res.redirect('/cafe');
-
-        } else {
-          req.flash("error", "Some items are unavailable in the quantities you requested")
-          res.redirect('/cafe/new');
-        }
-      })
-
-    } else {
-      req.flash('error', "Cannot send empty order")
-      res.redirect('/cafe/new');
-    }
+      }
+    })
   }
 });
 
@@ -182,7 +196,7 @@ router.get('/delete_order/:id', middleware.isLoggedIn, (req, res) => {
   let currentTime = new Date(new Date().getTime()).toString().split(' ')[4]
   console.log(currentTime)
   console.log(currentTime.split(':')[0])
-  if (parseInt(currentTime.split(':')[0]) < 9 || parseInt(currentTime.split(':')[0]) >= 12) {
+  if (parseInt(currentTime.split(':')[0]) < 8 || parseInt(currentTime.split(':')[0]) >= 12) {
     req.flash('error', "Cannot delete orders after 12PM")
     res.redirect('back')
 
