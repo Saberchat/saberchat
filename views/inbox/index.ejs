@@ -7,17 +7,14 @@
 
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css">
     <link rel="stylesheet" href="/stylesheets/main.css">
+    <link rel="stylesheet" href="/stylesheets/inbox/index.css">
     <!-- link css for navbar. Don't need to include public/javascript/userForm.js since user is already logged in and does not need to access login and register forms.  -->
     <link rel="stylesheet" href="/stylesheets/components/navbar.css">
     <link rel="stylesheet" href="/stylesheets/components/header.css">
-    <link rel="stylesheet" href="/stylesheets/components/announcement.css">
-    <link rel="stylesheet" href="/stylesheets/chat/edit.css">
-    <link rel="stylesheet" href="/stylesheets/chat/inbox.css">
 
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js"></script>
-    <script src="../javascript/socket.js"></script>
 
     <!-- I'm using my fontawesome kit -->
     <script src="https://kit.fontawesome.com/dccc745c41.js" crossorigin="anonymous"></script>
@@ -26,27 +23,131 @@
     <%- include('../partials/navbar') %>
     <!-- include the backdrop for nav -->
     <%- include('../partials/header') %>
-    <%- include('../partials/announcement') %>
 
     </head>
     <body>
-        <div class="container">
-            <div class="row">
-                <div class="col-md-10 offset-md-1 col-12">
-                    <h1 class="title" style="text-align: center; margin-top: 10px; color: black;"><%=username%>'s Inbox</h1>
-                    <div class="search-filter">
-                    </div>
-                    <ul class = "new_messages" id="new_messages">
-                      <%notifs.forEach(notif => { %>
-                          <div class="notification">
-                            <span class="msg-info">New <strong><%=notif.type%></strong> from <strong><%=notif.sender.username%></strong></span>
-                            <br />
-                            <span class="message">- <%=notif.text%></span>
-                          </div>
-                      <% }) %>
-                    </ul>
+      <div class="container">
+        <div class="row">
+          <div class="col-12">
+
+            <div class="inbox-container">
+              <!-- navigation between tabs -->
+              <nav class="inbox-nav">
+                <div class="btn-group" role="group" aria-label="inbox navigation">
+                  <button 
+                    class="nav-tab active" 
+                    id="view-msg" 
+                    onclick="setMessages()" 
+                    disabled
+                    >Messages</button>
+
+                  <button 
+                    class="nav-tab" 
+                    id="view-req" 
+                    onclick="setRequests()"
+                    >Requests</button>
                 </div>
+                <button id="refresh-btn" onclick="window.location.reload();">Refresh</button>
+              </nav>
+
+              <!-- actions -->
+              <div class="action-bar">
+                <!-- message actions -->
+                <div class="message-actions display">
+                  <a href="/notif" class="action-btn">Send New</a>
+                  <a href="/view_sent_notifs" class="action-btn">View Sent</a>
+                  <hr>
+                  <a href="/clear" class="action-btn" id="del-all-btn">Delete All</a>
+                  <button class="action-btn" onclick="submitDelete()" id="del-sel-btn">Delete Selected</button>
+                </div>
+                <!-- request actions -->
+                <div class="request-actions">
+                  <button id="current-req" class="action-btn" onclick="seeCurrentReq()" disabled>Current</button>
+                  <button id="past-req" class="action-btn" onclick="seePastReq()">History</button>
+                </div>
+              </div>
+
+              <!-- main inbox list -->
+              <div class="inbox-display">
+
+                <!-- messages -->
+                <div class="message-list display">
+
+                  <form action="/delete" method="post" id="del-select-form">
+
+                  <ul class="list-group">
+                    <% inbox.forEach((notif) => { %>
+                      <li class="list-group-item list-group-item-action">
+                        <div class="message-check">
+                          <input class="del-form-input" type="checkbox" name="<%= notif._id %>" value="" onchange="updateDelete()">
+                        </div>
+                        <a href="/view_inbox_message/<%= notif._id %>" class="message-body">
+                          <div class="message-head">
+                            <div class="message-subject">
+                              <%= notif.subject %>
+                            </div>
+                            <div class="message-from">
+                              <%= notif.sender.username %>
+                            </div>
+                          </div>
+                          <div class="message-text">
+                            <%= notif.text %>
+                          </div>
+                        </a>
+                        <span class="message-date">
+                          Aug 29
+                        </span>
+                      </li>
+                    <% }); %>
+                  </ul>
+
+                  </form>
+                </div>
+
+                <!-- requests -->
+                <div class="request-list">
+                  <div class="list-group current display" id="current-req-list">
+                    <% requests.forEach((request) => { %>
+                      <% if(request.status == 'pending') { %> 
+                      <li class="list-group-item list-group-item-action">
+                        <a href="/inbox/requests/<%= request._id %>" class="request-body">
+                          <div class="request-room">
+                            <%= request.room.name %> 
+                          </div>
+                          <div class="request-from">
+                            <%= request.requester.username %> 
+                          </div>
+                        </a>
+                      </li>
+                      <% } %> 
+                    <% }); %>
+                  </div>
+                  <div class="list-group history" id="past-req-list">
+                    <% requests.forEach((request) => { %>
+                      <% if(request.status != 'pending') { %> 
+                      <li class="list-group-item list-group-item-action">
+                        <a href="/inbox/requests/<%= request._id %>" class="request-body">
+                          <div class="request-room">
+                            <%= request.room.name %> 
+                          </div>
+                          <div class="request-from">
+                            <%= request.requester.username %> 
+                          </div>
+                          <div class="request-status">
+                            <%= request.status %> 
+                          </div>
+                        </a>
+                      </li>
+                      <% } %> 
+                    <% }); %>
+                  </div>
+                </div>
+              </div>
             </div>
+          </div>
+
         </div>
+      </div>
+      <script src="/javascript/inbox/index.js"></script>
   </body>
 </html>

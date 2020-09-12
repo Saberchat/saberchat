@@ -1,0 +1,429 @@
+.inbox-container {
+    border-radius: 15px;
+    background-color: #d1ecff;
+    position: relative;
+    margin-top: 3rem;
+    margin-bottom: 3rem;
+    box-shadow: 0px 10px 20px #c2c2c2;
+}
+
+/* 
+===============================
+Message and request lists
+*/
+.message-list, .request-list {
+    width: 100%;
+}
+
+/* 
+===============================
+Action bar
+*/
+
+.message-actions, .request-actions {
+    width: 100%;
+}
+
+/* 
+===============================
+Navigation
+*/
+.inbox-nav {
+    background-color: #1f2d53;
+    border-bottom: 5px solid #3671c9;
+    border-radius: 15px 15px 0px 0px;
+    box-shadow: 0px 3px 3px rgb(155, 154, 154);
+    z-index: 100;
+}
+
+.nav-tab {
+    border: none;
+    border-radius: 15px 15px 0px 0px;
+    color: white;
+    background-color: #374877;
+    padding: 0.5rem 2rem 0.3rem 2rem;
+}
+
+.nav-tab.active {
+    background-color: #3671c9;
+}
+
+.nav-tab:hover:enabled {
+    background-color: #42568F;
+}
+
+/* 
+===============================
+Actions
+*/
+.action-bar {
+    background-color: #4b9ed4;
+}
+
+.action-bar hr {
+    border: 1px solid #202D53;
+    margin: 0.2rem 1rem;
+}
+
+.action-btn {
+    display: inline-block;
+    border: none;
+    background: none;
+    padding: 2px 20px;
+    width: 100%;
+    text-align: center;
+    color: #ffffff;
+}
+
+.action-btn:hover {
+    text-decoration: none;
+    color: #a3c8ff;
+}
+
+#current-req:disabled, #past-req:disabled {
+    background-color: #3d74af;
+}
+
+#current-req:hover:disabled, #past-req:hover:disabled {
+    color: #ffffff;
+}
+
+/* 
+===============================
+Messages
+*/
+@media only screen and (min-width: 768px) {
+    .list-group-item {
+        padding: 0;
+        height: 52px;
+    }
+    
+    .list-group-item .message-body {
+        display: block;
+        height: 100%;
+        padding: 0.5rem;
+        margin-right: 5rem;
+        width: auto;
+        overflow: hidden;
+        text-decoration: none;
+        color: #424651;
+    }
+    
+    .list-group-item .message-check {
+        position: relative;
+        float: left;
+        width: 30px;
+        height: 100%;
+    }
+    
+    .list-group-item .message-check input {
+        position: absolute;
+        width: 15px;
+        height: 15px;
+        top: 50%;
+        left: 50%;
+        transform: translateY(-50%);
+        -ms-transform: translateY(-50%);
+        -webkit-transform: translateY(-50%);
+        -moz-transform: translateY(-50%);
+        
+    }
+    
+    .message-subject {
+        display: inline-block;
+        width: 6rem;
+        height: 100%;
+        font-weight: 700;
+        margin-right: 1rem;
+        line-height: 34px;
+        white-space: nowrap;
+        overflow-x: hidden;
+        text-overflow: ellipsis;
+    }
+    
+    .message-from {
+        display: inline-block;
+        width: 6rem;
+        height: 100%;
+        font-weight: 500;
+        margin-right: 1rem;
+        line-height: 34px;
+        white-space: nowrap;
+        overflow-x: hidden;
+        text-overflow: ellipsis;
+    }
+    
+    .message-text {
+        font-weight: 400;
+        line-height: 34px;
+        white-space: nowrap;
+        overflow-x: hidden;
+        text-overflow: ellipsis;
+    }
+    
+    .message-date {
+        display: inline-block;
+        position: absolute;
+        right: 1rem;
+        top: 50%;
+        transform: translateY(-50%);
+        -ms-transform: translateY(-50%);
+        -webkit-transform: translateY(-50%);
+        -moz-transform: translateY(-50%);
+        color: #838383;
+    }
+}
+
+@media only screen and (max-width: 768px) {
+    .message-check, .message-head, .message-subject, .message-from {
+        display: inline-block;
+        color: #424651;
+        text-decoration: none;
+    }
+
+    .list-group-item .message-body {
+        text-decoration: none;
+    }
+
+    .message-subject {
+        font-weight: 700;
+        width: 6rem;
+        white-space: nowrap;
+        overflow-x: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .message-from {
+        font-weight: 500;
+        float: right;
+        width: 6rem;
+        white-space: nowrap;
+        overflow-x: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .message-text {
+        color: #424651;
+        font-weight: 400;
+        height: auto;
+        white-space: nowrap;
+        overflow-x: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .message-date {
+        float: right;
+        color: #838383;
+    }
+
+    .message-check {
+        float: left;
+        width: 25px;
+    }
+
+    .message-check input {
+        width: 15px;
+        height: 15px;
+        vertical-align: middle;
+    }
+
+    .message-head {
+        display: inline-block;
+        width: calc(100% - 25px);
+        overflow: auto;
+    }
+}
+
+/* 
+===============================
+Requests
+*/
+.current, .history {
+    display: none;
+}
+
+.request-list .current.display, .request-list .history.display {
+    display: block;
+}
+
+@media only screen and (min-width: 768px) {
+    .list-group-item .request-body {
+        display: inline-block;
+        width: 100%;
+        height: 100%;
+        padding: 1rem;
+        padding-left: 2rem;
+        text-decoration: none;
+    }
+
+    .request-room, .request-from {
+        display: inline-block;
+        color: #424651;
+    }
+
+    .request-room {
+        width: 9rem;
+        font-weight: 700;
+        white-space: nowrap;
+        overflow-x: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .request-from {
+        width: 9rem;
+        font-weight: 400;
+        white-space: nowrap;
+        overflow-x: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .request-status {
+        display: inline-block;
+        position: absolute;
+        right: 1rem;
+        vertical-align: middle;
+        color: #838383;
+    }
+}
+
+@media only screen and (max-width: 768px) {
+    .list-group-item .request-body {
+        text-decoration: none;
+    }
+
+    .request-room {
+        width: 50%;
+        font-weight: 700;
+        color: #424651;
+        white-space: nowrap;
+        overflow-x: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .request-from {
+        font-weight: 400;
+        color: #424651;
+    }
+
+    .request-status {
+        position: absolute;
+        top: 1rem;
+        right: 1rem;
+        float: right;
+        color: #838383;
+    }
+}
+
+/* 
+===============================
+Misc.
+*/
+
+/* refresh btn */
+#refresh-btn {
+    position: absolute;
+    right: 1rem;
+    vertical-align: middle;
+    border: none;
+    border-radius: 10px;
+    padding: 2px 30px;
+    background-color: #3771C9;
+    color: white;
+}
+
+#refresh-btn:hover {
+    background-color: #4185eb;
+}
+
+@media only screen and (max-width: 768px) {
+    #refresh-btn {
+        display: none;
+    }
+}
+
+/* delete selected btn */
+#del-sel-btn {
+    display: none;
+}
+
+/* 
+===============================
+Style variances for screen sizes
+*/
+/* md and larger */
+@media only screen and (min-width: 768px) {
+    .inbox-container {
+        height: 500px;
+    }
+
+    .inbox-nav {
+        padding: 20px 0px 0px 150px;
+    }
+
+    .action-bar {
+        height: calc(100% - 62px);
+        width: 150px;
+        float: left;
+        border-right: 3px solid #3671c9;
+        border-radius: 0px 0px 0px 15px;
+        padding-top: 1rem;
+    }
+
+    .inbox-display {
+        width: auto;
+        overflow-y: scroll;
+        height: calc(100% - 63px);
+        border-radius: 0px 0px 15px 0px;
+    }
+
+    .message-head {
+        position: relative;
+        float: left;
+        width: 15rem;
+        height: 100%;
+    }
+
+    .message-text {
+        width: auto;
+        height: 100%;
+    }
+}
+
+/* smaller than md */
+@media only screen and (max-width: 768px) {
+
+    .inbox-nav {
+        padding-top: 20px;
+        padding-left: 15px;
+    }
+
+    .inbox-display {
+        border-radius: 0px 0px 15px 15px;
+        min-height: 50px;
+        max-height: 450px;
+        overflow-y: scroll;
+    }
+
+    #current-req, #past-req {
+        padding: 0.75rem;
+        margin: 0;
+    }
+
+    .action-btn {
+        padding: 0.2rem;
+        margin: 0.5rem;
+    }
+
+}
+
+/* 
+===============================
+Classes to toggle displays 
+*/
+.message-list, .request-list, .message-actions, .request-actions {
+    display: none;
+}
+
+.display {
+    display: inline-block;
+}

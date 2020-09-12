@@ -196,14 +196,20 @@ router.post('/:id/request-access', middleware.isLoggedIn, function(req, res) {
     // find if the request already exists to prevent spam
     const foundReq = await AccessReq.findOne({requester: req.user._id, room: foundRoom._id});
 
-    if(foundReq) {
+    if(foundReq && foundReq.status != 'pending') {
+      req.flash('error', 'Request has already been ' + foundReq.status);
+      res.redirect('back');
+
+    } else if(foundReq) {
       req.flash('error', 'Identical request has already been sent');
       res.redirect('back');
+
     } else {
 
       const request = {
         requester: req.user._id,
-        room: foundRoom._id
+        room: foundRoom._id,
+        receiver: foundRoom.creator.id
       }
       // create the request and find the room creator
       const [createdReq, roomCreator] = await Promise.all([
