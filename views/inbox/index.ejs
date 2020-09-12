@@ -55,7 +55,7 @@
                 <!-- message actions -->
                 <div class="message-actions display">
                   <a href="/notif" class="action-btn">Send New</a>
-                  <a href="/view_sent_notifs" class="action-btn">View Sent</a>
+                  <a href="/sent" class="action-btn">View Sent</a>
                   <hr>
                   <a href="/clear" class="action-btn" id="del-all-btn">Delete All</a>
                   <button class="action-btn" onclick="submitDelete()" id="del-sel-btn">Delete Selected</button>
@@ -73,7 +73,7 @@
                 <!-- messages -->
                 <div class="message-list display">
 
-                  <form action="/delete" method="post" id="del-select-form">
+                  <form action="/delete?_method=delete" method="post" id="del-select-form">
 
                   <ul class="list-group">
                     <% inbox.forEach((notif) => { %>
