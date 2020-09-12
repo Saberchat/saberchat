@@ -3,11 +3,11 @@
 
     <% if (announcements.length == 1) { %>
       <div id="carouselExampleControls" class="carousel slide" data-ride="carousel" style="text-align: center; margin-bottom: 0px;">
-        <div class="carousel-inner">
+        <div class="carousel-inner" style="background-color: #dcdcdc; border-radius: 25px; border-color: black; border-width:2px; ">
 
-          <div class="carousel-item active" style="background-color: #dcdcdc;">
+          <div class="carousel-item active" style="background-color: #dcdcdc; border-radius: 25px; padding: 20px; border-color: black; border-width:2px;">
             <img class="profile-img" src="<%=announcements[0].sender.imageUrl%>"/>
-            <a href="/view_announcement/<%=announcements[0]._id%>"<span><strong><%=announcements[0].sender.username%></strong>: <i><strong><%=announcements[0].subject%></strong></i> <span style="font-size: 10px;"><%=dates[0].split(', ')[1]%> | <%=dates[0].split(', ')[0]%></span></span></a>
+            <a href="/view_announcement/<%=announcements[0]._id%>"<span><strong><%=announcements[0].sender.username%></strong>: <i><strong><%=announcements[0].subject%></strong></i> <span style="font-size: 10px;"><%=announcements[0].date.split(', ')[1]%> | <%=announcements[0].date.split(', ')[0]%></span></span></a>
             <br />
           </div>
 
@@ -23,19 +23,20 @@
     </div>
 
     <% } else if (announcements.length < 5) { %>
-      <div id="carouselExampleControls" class="carousel slide" data-ride="carousel" style="text-align: center; margin-bottom: 0px;">
-        <div class="carousel-inner">
+      <div id="carouselExampleControls" class="carousel slide" data-ride="carousel" style="text-align: center; margin-bottom: 0px; border-radius: 25px; padding: 20px; border-color: black; border-width:2px; margin-right: 100px; margin-left: 100px;">
+        <div class="carousel-inner" style="background-color: #dcdcdc; border-radius: 25px; border-color: black; border-width:2px; ">
 
-          <div class="carousel-item active" style="background-color: #dcdcdc;">
+          <div class="carousel-item active" style="background-color: #dcdcdc; border-radius: 25px; padding: 20px; border-color: black; border-width:2px; ">
             <img class="profile-img" src="<%=announcements[0].sender.imageUrl%>"/>
-            <a href="/view_announcement/<%=announcements[0]._id%>"<span><strong><%=announcements[0].sender.username%></strong>: <i><strong><%=announcements[0].subject%></strong></i> <span style="font-size: 10px;"><%=dates[0].split(', ')[1]%> | <%=dates[0].split(', ')[0]%></span></span></a>
+            <a href="/view_announcement/<%=announcements[0]._id%>"<span><strong><%=announcements[0].sender.username%></strong>: <i><strong><%=announcements[0].subject%></strong></i> <span style="font-size: 10px;"><%=announcements[0].date.split(', ')[1]%> | <%=announcements[0].date.split(', ')[0]%></span></span></a>
             <br />
           </div>
 
-          <% [...Array(announcements.length - 2).keys()].forEach(i => { %>
-            <div class="carousel-item" style="background-color: #dcdcdc;">
-              <img class="profile-img" src="<%=announcements[i+1].sender.imageUrl%>"/>
-              <a href="/view_announcement/<%=announcements[i+1]._id%>"><span><strong><%=announcements[i+1].sender.username%></strong>: <i><strong><%=announcements[i+1].subject%></strong></i> <span style="font-size: 10px;"><%=dates[i+1].split(', ')[1]%> | <%=dates[i+1].split(', ')[0]%></span></span></a>
+          <% announcements.slice(1).forEach(i => { %>
+            <div class="carousel-item" style="background-color: #dcdcdc; border-radius: 25px; padding: 20px; border-color: black; border-width:2px; ">
+
+              <img class="profile-img" src="<%=i.sender.imageUrl%>"/>
+              <a href="/view_announcement/<%=i._id%>"><span><strong><%=i.sender.username%></strong>: <i><strong><%=i.subject%></strong></i> <span style="font-size: 10px;"><%=i.date.split(', ')[1]%> | <%=i.date.split(', ')[0]%></span></span></a>
               <br />
             </div>
           <%})%>
@@ -53,18 +54,18 @@
 
     <% } else { %>
         <div id="carouselExampleControls" class="carousel slide" data-ride="carousel" style="text-align: center; margin-bottom: 0px;">
-          <div class="carousel-inner">
+          <div class="carousel-inner" style="background-color: #dcdcdc; border-radius: 25px; border-color: black; border-width:2px; ">
 
-            <div class="carousel-item active" style="background-color: #dcdcdc;">
+            <div class="carousel-item active" style="background-color: #dcdcdc; border-radius: 25px; padding: 20px; border-color: black; border-width:2px;">
               <img class="profile-img" src="<%=announcements[0].sender.imageUrl%>"/>
-              <a href="/view_announcement/<%=announcements[0]._id%>"<span><strong><%=announcements[0].sender.username%></strong>: <i><strong><%=announcements[0].subject%></strong></i> <span style="font-size: 10px;"><%=dates[0].split(', ')[1]%> | <%=dates[0].split(', ')[0]%></span></span></a>
+              <a href="/view_announcement/<%=announcements[0]._id%>"<span><strong><%=announcements[0].sender.username%></strong>: <i><strong><%=announcements[0].subject%></strong></i> <span style="font-size: 10px;"><%=announcements[0].date.split(', ')[1]%> | <%=announcements[0].date.split(', ')[0]%></span></span></a>
               <br />
             </div>
 
             <% [...Array(4).keys()].forEach(i => { %>
-              <div class="carousel-item" style="background-color: #dcdcdc;">
+              <div class="carousel-item" style="background-color: #dcdcdc; border-radius: 25px; padding: 20px; border-color: black; border-width:2px;">
                 <img class="profile-img" src="<%=announcements[i+1].sender.imageUrl%>"/>
-                <a href="/view_announcement/<%=announcements[i+1]._id%>"><span><strong><%=announcements[i+1].sender.username%></strong>: <i><strong><%=announcements[i+1].subject%></strong></i> <span style="font-size: 10px;"><%=dates[i+1].split(', ')[1]%> | <%=dates[i+1].split(', ')[0]%></span></span></a>
+                <a href="/view_announcement/<%=announcements[i+1]._id%>"><span><strong><%=announcements[i+1].sender.username%></strong>: <i><strong><%=announcements[i+1].subject%></strong></i> <span style="font-size: 10px;"><%=announcements[i+1].date.split(', ')[1]%> | <%=announcements[i+1].dates.split(', ')[0]%></span></span></a>
                 <br />
               </div>
             <%})%>
@@ -83,3 +84,6 @@
   <%}%>
 
 </div>
+<script>
+  console.log(document.getElementsByClassName("carousel-item")[1].style.width)
+</script>

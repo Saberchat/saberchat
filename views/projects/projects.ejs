@@ -33,7 +33,7 @@
           <div class="jumbotron text-center">
             <h1><i class="fas fa-paint-brush"></i> Student Projects </h1>
             <p>Our Students' Artwork, Gardening Projects, Science Projects and More</p>
-            <% if (currentUser.permission == 'admin' || currentUser.permission == 'teacher') { %>
+            <% if (currentUser.status == 'faculty') { %>
               <a href="/addProject">Add Project</a>
             <%}%>
           </div>
@@ -48,16 +48,20 @@
             <div class="col-12">
               <div class="jumbotron text-center">
                 <div class="project-info" style="height: 450px; padding-bottom: 125px; margin-top: -100px; padding-top: 50px;">
-                  <a href="view_project/<%=project._id%>"><h1><%=project.title%></h1></a>
-                  <p><em>Posted by <strong><%=project.poster%></strong></em></p>
+                  <a href="view_project/<%=project._id%>"><h3 style="font-size: 20px; margin-top: 10px;"><%=project.title%></h3></a>
+                  <p><em>Posted by <a style="color: black;" href="profiles/<%=project.poster._id%>"><strong><%=project.poster.username%></a></strong></em></p>
                   <% if (project.creators.length > 2) {%>
-                    <p><strong>Creator(s):</strong> <em><%=project.creators[0]%> and <%=project.creators.length - 1%> others</em></p>
+                    <p><strong>Creators:</strong> <em><a style="color: black" href="profiles/<%=project.creators[0]._id%>"><%=project.creators[0].username%></a> and <%=project.creators.length - 1%> others</em></p>
+
+                  <%} else if (project.creators.length == 2){%>
+                    <p><strong>Creators:</strong> <em><a style="color: black" href="profiles/<%=project.creators[0]._id%>"><%=project.creators[0].username%></a> and <a style="color: black" href="profiles/<%=project.creators[1]._id%>"><%=project.creators[1].username%></a></em></p>
+
                   <%} else {%>
-                    <p><strong>Creator(s):</strong> <em><%=project.creators.join(' and ')%></em></p>
+                    <p><strong>Creator:</strong> <a style="color: black" href="profiles/<%=project.creators[0]._id%>"><em><%=project.creators[0].username%></em></a></p>
                   <%}%>
                   <img style="width: 90%; height: 90%; object-fit: contain;" src="<%=project.imgUrl%>"/>
                   <br />
-                  <% if (currentUser.username == project.poster) { %>
+                  <% if (currentUser.username == project.poster.username) { %>
                     <button style="margin-top: 20px; margin-right: 10px;" type="button" class="btn btn-success"><a style="color: white;" href="/edit_project/<%=project.id%>">Edit Project</a></button>
                     <button style="margin-top: 20px;" class="btn btn-danger" type="button"><a href="/delete_project/<%=project._id%>" style="color: white;">Delete Project</a></button>
                   <% } %>

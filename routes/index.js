@@ -26,13 +26,7 @@ router.get('/', (req, res) => {
 			res.redirect('back')
     } else {
 
-			let dates = []
-
-			for (let ann of foundAnns) {
-				dates.push(dateFormat(ann.created_at, "mmm d, h:MMTT"))
-			}
-
-      res.render('index', {announcements: foundAnns.reverse(), dates: dates.reverse()})
+      res.render('index', {announcements: foundAnns.reverse()})
     }
   })
 });
@@ -72,7 +66,8 @@ router.post("/register",  function(req, res) {
 				email: req.body.email,
 				firstName: req.body.firstName,
 				lastName: req.body.lastName,
-				username: filter.clean(req.body.username)
+				username: filter.clean(req.body.username),
+				notifCount: 0
 			}
 		);
 
@@ -130,5 +125,36 @@ router.get("/logout", function(req, res) {
 	req.flash("success", "Logged you out!");
 	res.redirect("/");
 });
+
+router.get('/contact', middleware.isLoggedIn, (req, res) => {
+	User.find({status: 'faculty'}, (err, faculty) => {
+		if (err || !faculty) {
+			req.flash('error', "Unable to access database")
+			res.redirect('back')
+
+		} else {
+			res.render('other/contact', {faculty})
+		}
+	})
+})
+
+router.get('/alsion', (req, res) => {
+	User.find({status: 'faculty'}, (err, faculty) => {
+		if (err || !faculty) {
+			req.flash('error', "Unable to access database")
+			res.redirect('back')
+
+		} else {
+			let teacherNames = []
+
+			for (let fac of faculty) {
+				teacherNames.push(`${fac.firstName} ${fac.lastName}`)
+			}
+
+			res.render('other/alsion_info', {faculty: teacherNames})
+		}
+	})
+})
+
 //export router with all the routes connected
 module.exports = router;

@@ -7,20 +7,15 @@ const Announcement = require('../models/announcement');
 
 //Route to render 'sendAnnouncement' page
 router.get('/announce', middleware.isLoggedIn, (req, res) => {
-  if (req.user.permission == 'teacher' || req.user.permission == 'admin') {
+  if (req.user.status == 'faculty' || req.user.permission == 'admin') {
+    
     Announcement.find({}).populate({path: 'sender', select: ['username', 'imageUrl']}).populate('message').exec((err, foundAnns) => {
       if (err || !foundAnns) {
         req.flash('error', 'Unable to access database')
         res.redirect('back')
       } else {
 
-        let dates = []
-
-  			for (let ann of foundAnns) {
-  				dates.push(dateFormat(ann.created_at, "mmm d, h:MMTT"))
-  			}
-
-        res.render('announcements/sendAnnouncement', {announcements: foundAnns.reverse(), announced: false, dates: dates.reverse()})
+        res.render('announcements/sendAnnouncement', {announcements: foundAnns.reverse(), announced: false})
       }
     })
 
@@ -33,6 +28,10 @@ router.get('/announce', middleware.isLoggedIn, (req, res) => {
 //Route to send announcements to bulletin
 router.post('/sendAnnouncement', middleware.isLoggedIn, (req, res) => {
   Announcement.create({sender: req.user, subject: req.body.subject, text: req.body.message}, (err, announcement) => {
+    if (req.body.imgUrls != '') {
+      announcement.images = req.body.imgUrls.split(', ')
+    }
+    announcement.date = dateFormat(announcement.created_at, "mmm d, h:MMTT")
     announcement.save()
   })
   req.flash('success', 'Announcement posted to bulletin!')
@@ -48,12 +47,7 @@ router.get('/announcements', middleware.isLoggedIn, (req, res) => {
       res.redirect('back')
 
     } else {
-      let dates = []
-
-			for (let ann of foundAnns) {
-				dates.push(dateFormat(ann.created_at, "mmm d, h:MMTT"))
-			}
-      res.render('announcements/announcements', {announcements: foundAnns.reverse(), announced: false, dates: dates.reverse()})
+      res.render('announcements/announcements', {announcements: foundAnns.reverse(), announced: false})
     }
   })
 })
@@ -61,7 +55,8 @@ router.get('/announcements', middleware.isLoggedIn, (req, res) => {
 router.get('/view_announcement/:id', middleware.isLoggedIn, (req, res) => {
   Announcement.findOne({_id: req.params.id}).populate({path: 'sender', select: ['username', 'imageUrl']}).exec((err, foundAnn) => {
     if (err || !foundAnn) {
-      req.flash('error', 'Unable to access database')
+      console.log(err)
+      req.flash('error', 'Problem Unable to access database')
       res.redirect('back')
 
     } else {
@@ -72,12 +67,7 @@ router.get('/view_announcement/:id', middleware.isLoggedIn, (req, res) => {
           res.redirect('back')
 
         } else {
-          let dates = []
-
-    			for (let ann of foundAnns) {
-    				dates.push(dateFormat(ann.created_at, "mmm d, h:MMTT"))
-    			}
-          res.render('announcements/announcements', {announcements: foundAnns.reverse(), dates: dates.reverse(), announced: true, announcement: foundAnn, date: dateFormat(foundAnn.created_at, "mmm d, h:MMTT")})
+          res.render('announcements/announcements', {announcements: foundAnns.reverse(), announced: true, announcement: foundAnn})
         }
       })
     }
@@ -110,13 +100,8 @@ router.get('/edit_announcement/:id', middleware.isLoggedIn, (req, res) => {
           res.redirect('back')
 
         } else {
-          let dates = []
 
-    			for (let ann of foundAnns) {
-    				dates.push(dateFormat(ann.created_at, "mmm d, h:MMTT"))
-    			}
-
-          res.render('announcements/editAnnouncement', {announcements: foundAnns.reverse(), dates: dates.reverse(), announced: false, announcement: foundAnn})
+          res.render('announcements/editAnnouncement', {announcements: foundAnns.reverse(), announced: false, announcement: foundAnn})
         }
       })
     }
@@ -124,7 +109,7 @@ router.get('/edit_announcement/:id', middleware.isLoggedIn, (req, res) => {
 })
 
 router.post('/submit_announcement_changes/:id', middleware.isLoggedIn, (req, res) => {
-  Announcement.findByIdAndUpdate(req.params.id, {subject: req.body.subject, text: req.body.message}, (err, foundAnn) => {
+  Announcement.findByIdAndUpdate(req.params.id, {subject: req.body.subject, images: req.body.imgUrls.split(', '), text: req.body.message}, (err, foundAnn) => {
     if (err || !foundAnn) {
       req.flash('error', "Unable to access database")
       res.redirect('back')

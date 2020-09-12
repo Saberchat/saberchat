@@ -10,6 +10,7 @@ const Announcement = require('../models/announcement');
 const Notification = require('../models/notification');
 
 router.get('/', middleware.isLoggedIn, (req, res) => {
+
   Order.find({customer: req.user._id})
   .populate('items').exec((err, foundOrders) => {
 
@@ -32,16 +33,11 @@ router.get('/', middleware.isLoggedIn, (req, res) => {
 
         } else {
 
-          let dates = []
 
-    			for (let ann of foundAnns) {
-    				dates.push(dateFormat(ann.created_at, "mmm d, h:MMTT"))
-    			}
 
           res.render('cafe/index', {
             orders: foundOrders,
             announcements: foundAnns.reverse(),
-            dates: dates.reverse(),
             announced: false
           });
         }
@@ -51,92 +47,101 @@ router.get('/', middleware.isLoggedIn, (req, res) => {
 });
 
 router.get('/new', middleware.isLoggedIn, (req, res) => {
-  Item.find({}, (err, foundItems) => {
-    if (err || !foundItems) {
-      req.flash('error', 'Could not access database');
-      res.redirect('/');
-    } else {
+  //Conditionals to make sure that the orders are done between 9 - 12:20
 
-      Announcement.find({}).populate({
-        path: 'sender',
-        select: ['username', 'imageUrl']
-      }).populate('message').exec((err, foundAnns) => {
-        if (err || !foundAnns) {
-          req.flash('error', 'Unable to access database')
-          res.redirect('back')
+  let currentTime = new Date(new Date().getTime()).toString().split(' ')[4]
 
-        } else {
-          let dates = []
+  if ((parseInt(currentTime.split(':')[0]) < 9 || parseInt(currentTime.split(':')[0]) > 12) || (parseInt(currentTime.split(':')[0]) == 12 && parseInt(currentTime.split(':')[1]) > 20)) {
+    req.flash('error', "Send orders between 9AM and 12:20PM");
+    res.redirect('back');
 
-    			for (let ann of foundAnns) {
-    				dates.push(dateFormat(ann.created_at, "mmm d, h:MMTT"))
-    			}
+  } else {
 
-          res.render('cafe/newOrder', {
-            items: foundItems,
-            announcements: foundAnns.reverse(),
-            dates: dates.reverse(),
-            announced: false
-          })
-        }
-      })
-    }
-  });
+    Item.find({}, (err, foundItems) => {
+      if (err || !foundItems) {
+        req.flash('error', 'Could not access database');
+        res.redirect('/');
+      } else {
+
+        Announcement.find({}).populate({
+          path: 'sender',
+          select: ['username', 'imageUrl']
+        }).populate('message').exec((err, foundAnns) => {
+          if (err || !foundAnns) {
+            req.flash('error', 'Unable to access database')
+            res.redirect('back')
+
+          } else {
+
+            res.render('cafe/newOrder', {
+              items: foundItems,
+              announcements: foundAnns.reverse(),
+              announced: false
+            })
+          }
+        })
+      }
+    });
+  }
 });
 
 router.post('/new', middleware.isLoggedIn, (req, res) => {
 
-  //Conditionals ensure that sending time is between 9AM and 12:20 PM
+  //Conditionals to make sure that the orders are done between 9 - 12:20
+
   let currentTime = new Date(new Date().getTime()).toString().split(' ')[4]
 
   if ((parseInt(currentTime.split(':')[0]) < 9 || parseInt(currentTime.split(':')[0]) > 12) || (parseInt(currentTime.split(':')[0]) == 12 && parseInt(currentTime.split(':')[1]) > 20)) {
-    req.flash('error', "Send orders between 9AM and 12:20PM")
-    res.redirect('back')
+    req.flash('error', "Send orders between 9AM and 12:20PM");
+    res.redirect('back');
 
   } else {
 
-    if (req.body.check != undefined) {
+    if (req.body.check) {
 
-      Order.create({customer: req.user._id, name: `${req.user.firstName} ${req.user.lastName}`, instructions: req.body.instructions, present: true, charge: 0}, (err, order) => {
+      Item.find({}, (err, foundItems) => {
 
-        if (err) {
-          console.log(err);
-          req.flash('error', "Error sending your order in.")
+        let unavailable = false
+
+        if (err || !foundItems) {
+          req.flash('error', "Unable to access database")
           res.redirect('back')
 
         } else {
-          order.date = dateFormat(order.created_at, "mmm d, h:MM TT")
-          Item.find({}, (err, foundItems) => {
+          for (let i = 0; i < foundItems.length; i ++) {
+            if (Object.keys(req.body.check).includes(foundItems[i]._id.toString())) { //If item is selected to be ordered
 
-            if (err || !foundItems) {
-              req.flash('error', "Unable to access database")
-              res.redirect('back')
+              if (foundItems[i].availableItems < parseInt(req.body[foundItems[i].name])) { //First test to see if all items are available
+                unavailable = true
+                break //Immediately quit
 
-            } else {
-              for (let item of foundItems) {
-              if (item._id in req.body.check) {
-                  order.items.push(item._id)
-                  order.quantities.push(req.body[item.name])
-                  order.charge += (item.price * parseFloat(req.body[item.name]))
-                  item.availableItems -= parseInt(req.body[item.name])
-                  if (item.availableItems == 0) {
-                    item.isAvailable = false
-                  }
-                  item.save()
+              } else { //If all items are available, perform these operations
+                foundItems[i].availableItems -= parseInt(req.body[foundItems[i].name])
+
+                if (foundItems[i].availableItems == 0) {
+                  foundItems[i].isAvailable = false;
                 }
-              }
 
-              order.save();
-              req.flash('success', 'Order sent!')
-              res.redirect('/cafe');
+                foundItems[i].save()
+
+              }
             }
-          })
+          }
         }
-      });
+
+        if (!unavailable) {
+          req.flash("success", "Order Sent!")
+          res.redirect('/cafe');
+
+        } else {
+          req.flash("error", "Some items are unavailable in the quantities you requested")
+          res.redirect('/cafe/new');
+        }
+      })
 
     } else {
-      req.flash('error', "Cannot submit empty order")
-      res.redirect('back')
+      req.flash('error', "Cannot send empty order")
+      res.redirect('/cafe/new');
     }
   }
 });
@@ -159,16 +164,10 @@ router.get('/orders', middleware.isLoggedIn, (req, res) => {
           req.flash('error', 'Unable to access database')
           res.redirect('back')
         } else {
-          let dates = []
-
-    			for (let ann of foundAnns) {
-    				dates.push(dateFormat(ann.created_at, "mmm d, h:MMTT"))
-    			}
 
           res.render('cafe/orderDisplay', {
             orders: foundOrders,
             announcements: foundAnns.reverse(),
-            dates: dates.reverse(),
             announced: false
           })
         }
@@ -212,7 +211,7 @@ router.post('/:id/ready', middleware.isLoggedIn, (req, res) => {
     if (err || !foundOrder) {
       console.log(err);
       req.flash('error', "Could not find order");
-      res.redirect('/cafe/manage');
+      res.redirect('/cafe/orders');
 
     } else {
 
@@ -223,18 +222,19 @@ router.post('/:id/ready', middleware.isLoggedIn, (req, res) => {
         if (err || !foundUser) {
           req.flash('error', "Could not find user");
           console.log(err);
-          res.redirect('/cafe/manage');
+          res.redirect('/cafe/orders');
 
         } else {
           Notification.create({}, (err, notif) => {
             if (err) {
               req.flash('error', "Could not create notif");
               console.log(err);
-              res.redirect('/cafe/manage');
+              res.redirect('/cafe/orders');
 
             } else {
               notif.subject = "Cafe Order Ready";
               notif.sender = req.user._id;
+              notif.date = dateFormat(notif.created_at, "mmm d, h:MMTT")
               req.recipients = [foundUser.username]
 
               let itemText = [];
@@ -245,9 +245,10 @@ router.post('/:id/ready', middleware.isLoggedIn, (req, res) => {
               notif.text = "Your order (" + itemText.join(", ") + ") is ready (Total Cost: $" + foundOrder.charge + ")";
               notif.save();
               foundUser.inbox.push(notif);
+              foundUser.notifCount += 1
               foundUser.save();
 
-              res.redirect('/cafe/manage');
+              res.redirect('/cafe/orders');
             }
           });
         }
@@ -272,16 +273,10 @@ router.get('/manage', middleware.isLoggedIn, middleware.isMod, (req, res) => {
           res.redirect('back')
 
         } else {
-          let dates = []
-
-    			for (let ann of foundAnns) {
-    				dates.push(dateFormat(ann.created_at, "mmm d, h:MMTT"))
-    			}
 
           res.render('cafe/manage', {
             items: foundItems,
             announcements: foundAnns.reverse(),
-            dates: dates.reverse(),
             announced: false
           })
         }
@@ -299,15 +294,9 @@ router.get('/newOrderItem', middleware.isLoggedIn, middleware.isMod, (req, res) 
       req.flash('error', 'Unable to access database')
       res.redirect('back')
     } else {
-      let dates = []
-
-			for (let ann of foundAnns) {
-				dates.push(dateFormat(ann.created_at, "mmm d, h:MMTT"))
-			}
 
       res.render('cafe/newOrderItem', {
         announcements: foundAnns.reverse(),
-        dates: dates.reverse(),
         announced: false
       })
     }
@@ -348,15 +337,9 @@ router.get('/deleteItems', middleware.isLoggedIn, middleware.isMod, (req, res) =
       req.flash('error', 'Unable to access database')
       res.redirect('back')
     } else {
-      let dates = []
-
-			for (let ann of foundAnns) {
-				dates.push(dateFormat(ann.created_at, "mmm d, h:MMTT"))
-			}
 
       res.render('cafe/deleteitems', {
         announcements: foundAnns.reverse(),
-        dates: dates.reverse(),
         announced: false
       })
     }
@@ -383,16 +366,10 @@ router.get('/item/:id', middleware.isLoggedIn, middleware.isMod, (req, res) => {
           res.redirect('back')
 
         } else {
-          let dates = []
-
-    			for (let ann of foundAnns) {
-    				dates.push(dateFormat(ann.created_at, "mmm d, h:MMTT"))
-    			}
 
           res.render('cafe/show.ejs', {
             item: foundItem,
             announcements: foundAnns.reverse(),
-            dates: dates.reverse(),
             announced: false
           })
         }

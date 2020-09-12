@@ -4,8 +4,17 @@ var projectSchema = new mongoose.Schema({
     title: String,
     imgUrl: String,
     text: String,
-    poster: String,
-    creators: [String],
+    poster: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'User'
+    },
+
+    creators: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User'
+      }
+    ],
 
 }, {timestamps: {createdAt: 'created_at'}});
 

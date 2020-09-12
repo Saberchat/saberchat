@@ -16,7 +16,6 @@
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js"></script>
-    <script src="../javascript/socket.js"></script>
 
     <!-- I'm using my fontawesome kit -->
     <script src="https://kit.fontawesome.com/dccc745c41.js" crossorigin="anonymous"></script>
@@ -30,55 +29,70 @@
     <div class="container">
       <div class="row">
         <div class="col-md-10 offset-md-1 col-12">
-          <form action="/delete" method="post">
+          <form method="post">
             <div class="container mt-5">
               <div class="row">
                 <div class="col-12">
                   <div class="jumbotron text-center">
                     <h1><i class="fas fa-inbox"></i> <%=username.charAt(0).toUpperCase() + username.slice(1)%>'s Inbox</h1>
-                    <p><strong>New Notifications:</strong> <%=notifs.length%></p>
+                    <p><strong>New Notifications:</strong> <%=currentUser.notifCount%></p>
                   </div>
                 </div>
               </div>
             </div>
             <div class="heading" style="text-align: center;">
               <button style="margin-bottom: 30px; margin-right: 15px; " type="button" class="btn btn-danger" class="delete-button"><a id="notifButton" href="/clear"><i class="fas fa-trash-alt"></i> Clear All</a></button>
-              <button style="margin-bottom: 30px; margin-right: 15px;" type="delete" class="btn btn-danger" class="delete-button"><i class="fas fa-trash-alt"></i> Clear Selected</button>
+              <button style="margin-bottom: 30px; margin-right: 15px;" type="delete" class="btn btn-danger" class="delete-button" formaction="/delete?_method=delete"><i class="fas fa-trash-alt"></i> Clear Selected</button>
+              <button style="margin-bottom: 30px; margin-right: 15px;" type="button" class="btn btn-warning" class="delete-button"><a id="notifButton" style="color: black;" href="/mark_all"><i class="fas fa-check-square"></i> Mark All As Read</a></button>
+              <button style="margin-bottom: 30px; margin-right: 15px;" type="delete" class="btn btn-warning" class="delete-button" formaction="/mark_selected" ><i class="fas fa-check-square"></i> Mark Selected</button>
               <button style="margin-bottom: 30px; margin-right: 15px;" type="button" class="btn btn-primary" class="delete-button"><a id="notifButton" href="/notif"><i class="far fa-comment-dots"></i> Send</a></button>
-              <button style=" margin-bottom: 30px;" type="button" style="margin-top: 10px;" class="btn btn-success" class="delete-button"><a id="notifButton" href="/view_sent_notifs"><i class="far fa-comment-dots"></i> View Sent</a></button>
+              <button style=" margin-bottom: 30px;" type="button" style="margin-top: 10px;" class="btn btn-success" class="delete-button"><a id="notifButton" href="/sent"><i class="far fa-comment-dots"></i> View Sent</a></button>
             </div>
               <div class="search-filter">
               </div>
               <ul class = "new_messages" id="new_messages">
-                <% [...Array(notifs.length).keys()].forEach(i => { %>
+                <% notifs.forEach(notif => { %>
                   <div class="notification">
 
                     <!-- Anonymous messages -->
-                    <% if (notifs[i].sender == null){ %>
+                    <% if (notif.sender == null){ %>
 
-                        <input name=<%=notifs[i]['_id']%> type="checkbox" />
-                        <label for=<%=notifs[i]['_id']%>> <a style="color: inherit;" href="/view_inbox_message/<%=notifs[i]._id%>"><span class="msg-info"><strong><%=notifs[i].subject%> </strong><span style="font-size: 10px;"><%=notifdates[i].split(", ")[1]%> | <%=notifdates[i].split(", ")[0]%></span></span></a></label>
+                        <input name=<%=notif['_id']%> type="checkbox" />
+
+                        <% if (notif.read[notif.recipients.indexOf(currentUser.username)] == true) { %>
+                          <label for=<%=notif['_id']%>> <a style="color: black;" href="/message/<%=notif._id%>"><span class="msg-info"><strong><%=notif.subject%> </strong><span style="font-size: 10px;"><%=notif.date.split(", ")[1]%> | <%=notif.date.split(", ")[0]%></span></span></a></label>
+
+                        <% } else { %>
+                          <label for=<%=notif['_id']%>> <a style="color: #10ad3a;" href="/message/<%=notif._id%>"><span class="msg-info"><strong><%=notif.subject%> </strong><span style="font-size: 10px;"><%=notif.date.split(", ")[1]%> | <%=notif.date.split(", ")[0]%></span></span></a></label>
+
+                        <% } %>
                       <br />
 
-                      <% if (notifs[i].text.split(' ').length > 20) { %>
-                        <span class="message"><%=notifs[i].text.split(' ').slice(0, 21).join(' ')%> <a style="color: inherit;" href="/view_inbox_message/<%=notifs[i]._id%>">(Read More)</a></span>
+                      <% if (notif.text.split(' ').length > 20) { %>
+                        <span class="message"><%=notif.text.split(' ').slice(0, 21).join(' ')%> <a style="color: inherit;" href="/message/<%=notif._id%>">(Read More)</a></span>
                       <% } else { %>
-                        <span class="message"><%=notifs[i].text%></span>
+                        <span class="message"><%=notif.text%></span>
                       <% } %>
 
                     <!-- Known-sender message -->
 
                     <% } else {%>
-                      <img class="profile-img" src="<%=notifs[i].sender.imageUrl%>"/>
+                      <img class="profile-img" src="<%=notif.sender.imageUrl%>"/>
 
-                        <input name=<%=notifs[i]['_id']%> type="checkbox"/>
-                        <label for=<%=notifs[i]['_id']%>><a style="color: inherit;" href="/view_inbox_message/<%=notifs[i]._id%>"> <span><strong> <%=notifs[i].sender.username%></strong></span>:<span class="msg-info"><strong><%=notifs[i].subject%></strong> <span style="font-size: 10px;"><%=notifdates[i].split(", ")[1]%> | <%=notifdates[i].split(", ")[0]%></span></span> </a> </label>
+                        <input name=<%=notif['_id']%> type="checkbox"/>
+                        <% if (notif.read[notif.recipients.indexOf(currentUser.username)] == true) { %>
+                          <label for=<%=notif['_id']%>> <span><strong><a style="color: black;" href="/profiles/<%=notif.sender._id%>"><%=notif.sender.username%></a></strong></span>:<span class="msg-info"><a style="color: black;" href="/message/<%=notif._id%>"><strong><%=notif.subject%></strong> <span style="font-size: 10px;"><%=notif.date.split(", ")[1]%> | <%=notif.date.split(", ")[0]%></span></span> </a> </label>
+
+                        <% } else { %>
+                          <label for=<%=notif['_id']%>> <span><strong><a style="color: #10ad3a;" href="/profiles/<%=notif.sender._id%>"><%=notif.sender.username%></a></strong></span>:<span class="msg-info"><a style="color: #10ad3a;" href="/message/<%=notif._id%>"><strong><%=notif.subject%></strong> <span style="font-size: 10px;"><%=notif.date.split(", ")[1]%> | <%=notif.date.split(", ")[0]%></span></span> </a></label>
+
+                        <% } %>
                       <br />
 
-                      <% if (notifs[i].text.split(' ').length > 20) { %>
-                        <span class="message"><%=notifs[i].text.split(' ').slice(0, 21).join(' ')%> <a style="color: inherit;" href="/view_inbox_message/<%=notifs[i]._id%>">(Read More)</a></span>
+                      <% if (notif.text.split(' ').length > 20) { %>
+                        <span class="message"><%=notif.text.split(' ').slice(0, 21).join(' ')%> <a style="color: inherit;" href="/message/<%=notif._id%>">(Read More)</a></span>
                       <% } else { %>
-                        <span class="message"><%=notifs[i].text%></span>
+                        <span class="message"><%=notif.text%></span>
                       <% } %>
 
                     <% } %>

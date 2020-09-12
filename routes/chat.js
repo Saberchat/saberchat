@@ -28,13 +28,8 @@ router.get('/', middleware.isLoggedIn, (req, res) => {
           req.flash('error', 'Unable to access database')
           res.redirect('back')
         } else {
-          let dates = []
 
-    			for (let ann of foundAnns) {
-    				dates.push(dateFormat(ann.created_at, "mmm d, h:MMTT"))
-    			}
-
-          res.render('chat/index', {rooms: foundRooms, announcements: foundAnns.reverse(), dates: dates.reverse(), announced: false})
+          res.render('chat/index', {rooms: foundRooms, announcements: foundAnns.reverse(), announced: false})
         }
       })
     }
@@ -55,13 +50,8 @@ router.get('/new', middleware.isLoggedIn, (req, res) => {
           res.redirect('back')
 
         } else {
-          let dates = []
 
-    			for (let ann of foundAnns) {
-    				dates.push(dateFormat(ann.created_at, "mmm d, h:MMTT"))
-    			}
-
-          res.render('chat/new', {users: foundUsers, announcements: foundAnns.reverse(), dates: dates.reverse(), announced: false})
+          res.render('chat/new', {users: foundUsers, announcements: foundAnns.reverse(), announced: false})
         }
       })
     }
@@ -105,13 +95,8 @@ router.get('/:id', middleware.isLoggedIn, middleware.checkIfMember, (req, res) =
               req.flash('error', 'Unable to access database')
               res.redirect('back')
             } else {
-              let dates = []
 
-        			for (let ann of foundAnns) {
-        				dates.push(dateFormat(ann.created_at, "mmm d, h:MMTT"))
-        			}
-
-              res.render('chat/show', {announcements: foundAnns.reverse(), dates: dates.reverse(), announced: false, comments: foundComments, room: foundRoom})
+              res.render('chat/show', {announcements: foundAnns.reverse(), announced: false, comments: foundComments, room: foundRoom})
             }
           })
         }
@@ -138,13 +123,8 @@ router.get('/:id/edit', middleware.isLoggedIn, middleware.checkRoomOwnership, (r
               res.redirect('back')
 
             } else {
-              let dates = []
 
-        			for (let ann of foundAnns) {
-        				dates.push(dateFormat(ann.created_at, "mmm d, h:MMTT"))
-        			}
-
-              res.render('chat/edit', {users: foundUsers, room: foundRoom, announcements: foundAnns.reverse(), dates: dates.reverse(), announced: false})
+              res.render('chat/edit', {users: foundUsers, room: foundRoom, announcements: foundAnns.reverse(), announced: false})
             }
           })
         }
@@ -154,7 +134,7 @@ router.get('/:id/edit', middleware.isLoggedIn, middleware.checkRoomOwnership, (r
 });
 
 // create new rooms
-router.post('/new', middleware.isLoggedIn, function(req, res) {
+router.post('/', middleware.isLoggedIn, function(req, res) {
   Room.create({name: filter.clean(req.body.name), 'creator.id': req.user._id, 'creator.username': req.user.username, members: [req.user._id]}, function(err, room) {
     if (err) {
       console.log(err);
@@ -212,7 +192,7 @@ router.post('/:id/request-access', middleware.isLoggedIn, function(req, res) {
     const foundRoom = await Room.findById(req.params.id);
     // if no found room, exit
     if(!foundRoom) {req.flash('error', 'Room does not Exist'); return res.redirect('back');}
-    
+
     // find if the request already exists to prevent spam
     const foundReq = await AccessReq.findOne({requester: req.user._id, room: foundRoom._id});
 
@@ -225,7 +205,7 @@ router.post('/:id/request-access', middleware.isLoggedIn, function(req, res) {
       res.redirect('back');
 
     } else {
-      
+
       const request = {
         requester: req.user._id,
         room: foundRoom._id,
@@ -255,9 +235,9 @@ router.post('/:id/request-access', middleware.isLoggedIn, function(req, res) {
 });
 
 // handles reports on comments from users
-router.put('/comments/report', middleware.isLoggedIn, function(req, res) {
-  Comment.findById(req.body.comment, function(err, comment) {
-    if(err) {
+router.put('/comments/:id/report', middleware.isLoggedIn, function(req, res) {
+  Comment.findById(req.params.id, function(err, comment) {
+    if(err || !comment) {
       res.json('Error');
     } else if(comment.status == 'flagged'){
       res.json('Already Reported');

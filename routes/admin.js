@@ -18,13 +18,8 @@ router.get('/', middlware.isLoggedIn, middlware.isAdmin, (req, res) => {
       res.redirect('back')
 
     } else {
-			let dates = []
 
-			for (let ann of foundAnns) {
-				dates.push(dateFormat(ann.created_at, "mmm d, h:MMTT"))
-			}
-
-      res.render('admin/index', {announcements: foundAnns.reverse(), announced: false, dates: dates.reverse()})
+      res.render('admin/index', {announcements: foundAnns.reverse(), announced: false})
     }
   })
 })
@@ -47,13 +42,8 @@ router.get('/moderate', middlware.isLoggedIn, middleware.isMod, (req, res) => {
 		      res.redirect('back')
 
 		    } else {
-					let dates = []
 
-					for (let ann of foundAnns) {
-						dates.push(dateFormat(ann.created_at, "mmm d, h:MMTT"))
-					}
-
-		      res.render('admin/mod', {comments: foundComments, announcements: foundAnns.reverse(), announced: false, dates: dates.reverse()})
+		      res.render('admin/mod', {comments: foundComments, announcements: foundAnns.reverse(), announced: false})
 		    }
 		  })
 		}
@@ -74,13 +64,8 @@ router.get('/permissions', middlware.isLoggedIn, middlware.isAdmin, (req, res) =
 		      res.redirect('back')
 
 		    } else {
-					let dates = []
 
-					for (let ann of foundAnns) {
-						dates.push(dateFormat(ann.created_at, "mmm d, h:MMTT"))
-					}
-
-		      res.render('admin/permission', {users: foundUsers, announcements: foundAnns.reverse(), announced: false, dates: dates.reverse()})
+		      res.render('admin/permission', {users: foundUsers, announcements: foundAnns.reverse(), announced: false})
 		    }
 		  })
 		}
@@ -101,13 +86,8 @@ router.get('/status', middlware.isLoggedIn, middlware.isAdmin, (req, res) => {
 		      res.redirect('back')
 
 		    } else {
-					let dates = []
 
-					for (let ann of foundAnns) {
-						dates.push(dateFormat(ann.created_at, "mmm d, h:MMTT"))
-					}
-
-		      res.render('admin/status', {users: foundUsers, announcements: foundAnns.reverse(), announced: false, dates: dates.reverse()})
+		      res.render('admin/status', {users: foundUsers, announcements: foundAnns.reverse(), announced: false})
 		    }
 		  })
 		}

@@ -41,7 +41,7 @@
 
     <form action="/submit_project_edits/<%=project._id%>" method="post" style="text-align: center;">
       <div class="input-group mb-3">
-        <input name="title" maxlength="50" style="margin-left: 300px; margin-right: 300px;"type="text" class="form-control" value = "<%=project.title%>" placeholder="Enter Project Name" aria-label="Username" aria-describedby="basic-addon1">
+        <input name="title" maxlength="30" style="margin-left: 300px; margin-right: 300px;"type="text" class="form-control" value = "<%=project.title%>" placeholder="Enter Project Name" aria-label="Username" aria-describedby="basic-addon1" required>
       </div>
 
       <div class="input-group mb-3">
@@ -55,18 +55,18 @@
             <% }) %>
           </div>
         </div>
-        <input class="form-control" name="creators" id="creators" type="text" aria-describedby="basic-addon2" value = "<%=project.creators.join(', ')%>" placeholder="Creators" style="width: 400px; color: blue;" readonly/>
+        <input class="form-control" autocomplete="off" name="creators" id="creators" type="text" aria-describedby="basic-addon2" value = "<%=creatornames.join(', ')%>" placeholder="Creators" style="width: 400px; color: blue;" required/>
         <div class="input-group-append">
           <button id="clear" class="btn btn-outline-secondary" style="margin-right: 300px; "type="button">Clear Field</button>
         </div>
       </div>
 
       <div class="input-group mb-3">
-        <input type="text" style="margin-left: 300px; margin-right: 300px;" name="img" class="form-control" value = "<%=project.imgUrl%>" placeholder="Enter Image Url" aria-label="Username" aria-describedby="basic-addon1">
+        <input type="text" style="margin-left: 300px; margin-right: 300px;" name="img" class="form-control" value = "<%=project.imgUrl%>" placeholder="Enter Image Url" aria-label="Username" aria-describedby="basic-addon1" required>
       </div>
 
       <div class="input-group">
-        <textarea maxlength="500" name="text" placeholder="Write a little about the project" style="margin-left: 300px; margin-right: 300px; height: 200px" class="form-control" aria-label="With textarea"><%=project.text%></textarea>
+        <textarea maxlength="500" name="text" placeholder="Write a little about the project" style="margin-left: 300px; margin-right: 300px; height: 200px" class="form-control" aria-label="With textarea" required><%=project.text%></textarea>
       </div>
       <br />
       <button class="btn btn-primary" type="submit">Submit Changes</button>
@@ -74,6 +74,11 @@
   </body>
 
   <script>
+
+  $("#creators").on('keydown paste', function(e){
+      e.preventDefault();
+  });
+
   let creator_options = document.getElementsByClassName('dropdown-item')
   let creators_list = document.getElementById('creators')
   let clear = document.getElementById('clear')

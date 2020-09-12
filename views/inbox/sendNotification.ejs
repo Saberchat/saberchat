@@ -51,6 +51,7 @@
                       <form action="/send_group" method="post">
                         <select id="recipients" style="margin-bottom: 20px; width: 400px;">
                           <optgroup label="Add Recipients to Mailing List"></optgroup>
+                          <option></option>
                           <%users.forEach(user => { %>
                             <% if (user.username != currentUser.username) { %>
                               <option><%=user.username%></option>
@@ -60,16 +61,16 @@
                         </select>
                         <br />
                         <div class="input-group mb-3">
-                          <input class="form-control" name="recipient_list"id="recipient_list" type="text" aria-describedby="basic-addon2" placeholder="Recipients" style="width: 300px; color: blue;" readonly/>
+                          <input class="form-control" autocomplete="off" name="recipient_list"id="recipient_list" type="text" aria-describedby="basic-addon2" placeholder="Recipients" style="width: 300px; color: blue;" required/>
                           <div class="input-group-append">
                             <button id="clear" class="btn btn-outline-secondary" type="button">Clear</button>
                           </div>
                         </div>
-                        <input type="text" id="type" name="subject" style="margin-bottom: 20px; width: 400px;" placeholder="Enter subject"/>
+                        <input type="text" id="type" name="subject" style="margin-bottom: 20px; width: 400px;" placeholder="Enter subject" required/>
                         <br />
                         <input type="text" id="images" name="images" style="margin-bottom: 20px; width: 400px;" placeholder="Enter any image urls, separate by comma (optional)"/>
                         <br />
-                        <textarea class="message" name="message" cols="40" rows="5" style="width: 400px;" placeholder="Enter notification"></textarea>
+                        <textarea class="message" name="message" cols="40" rows="5" style="width: 400px;" placeholder="Enter notification" required></textarea>
                         <br />
                         <button class="btn btn-primary" class='submit-button' action="submit" style="margin-bottom: 10px; width: 400px;">Send Notification</button>
                       </form>
@@ -77,31 +78,33 @@
                     <!-- <br /><br /> -->
 
                     <% if (currentUser.permission == 'student') { %>
+
                       <!-- Anonymous Hotline for students-->
                       <div class="send-notif-type" style="margin-left: 100px;">
                         <h5 class="send-notif-header" style="text-align: center;">Anonymous Hotline</h5>
                         <form action="/send_anonymous" method="post">
                           <select id="recipients_anonymous" name="recipient" style="margin-bottom: 20px; width: 400px;">
-                            <optgroup label="Recipient (Must be Teacher or Admin)"></optgroup>
+                            <optgroup label="Recipient (Must be Faculty)"></optgroup>
+                            <option></option>
                             <%users.forEach(user => { %>
-                              <% if (user.username != currentUser.username && (user.permission == 'admin' || user.permission == 'teacher')) { %>
+                              <% if (user.username != currentUser.username && (user.status == 'faculty')) { %>
                                 <option><%=user.username%></option>
                               <% } %>
                             <% }) %>
-                            <option>All Teachers and Admins</option>
+                            <option>All Faculty</option>
                           </select>
                           <br />
                           <div class="input-group mb-3">
-                            <input class="form-control" name="recipient_list_anonymous" id="recipient_list_anonymous" type="text" aria-describedby="basic-addon2" placeholder="Recipients" style="width: 300px; color: blue;" readonly/>
+                            <input class="form-control" autocomplete="off" name="recipient_list_anonymous" id="recipient_list_anonymous" type="text" aria-describedby="basic-addon2" placeholder="Recipients" style="width: 300px; color: blue;" required/>
                             <div class="input-group-append">
                               <button id="clear_anonymous" class="btn btn-outline-secondary" type="button">Clear</button>
                             </div>
                           </div>
-                          <input type="text" id="type" name="subject" style="margin-bottom: 20px; width: 400px;" placeholder="Enter subject"/>
+                          <input type="text" id="type" name="subject" style="margin-bottom: 20px; width: 400px;" placeholder="Enter subject" required/>
                           <br />
                           <input type="text" id="images" name="images" style="margin-bottom: 20px; width: 400px;" placeholder="Enter any image urls, separate by comma (optional)"/>
                           <br />
-                          <textarea class="message" name="message" cols="40" rows="5" style="width: 400px;" placeholder="Enter notification (Your name will not be revealed to anyone)"></textarea>
+                          <textarea class="message" name="message" cols="40" rows="5" style="width: 400px;" placeholder="Enter notification" required></textarea>
                           <br />
                           <button style=" margin-bottom: 10px; width: 400px;" class="btn btn-primary" class='submit-button' action="submit">Send Notification</button>
                         </form>
@@ -115,6 +118,14 @@
 
   <script>
 
+  $("#recipient_list").on('keydown paste', function(e){
+      e.preventDefault();
+  });
+
+  $("#recipient_list_anonymous").on('keydown paste', function(e){
+      e.preventDefault();
+  });
+
   let recipients = document.getElementById('recipients')
   let recipient_list = document.getElementById('recipient_list')
   let clear = document.getElementById('clear')
@@ -125,34 +136,39 @@
 
   recipients.onchange = () => {
     let x = recipients.value;
-    if (recipient_list.value == '') {
-      recipient_list.value += `${x}`
-    } else {
-      if ((!(recipient_list.value.split(', ').includes(x))) && (!(recipient_list.value.split(', ').includes('everyone'))) && (x != "everyone")) {
-        recipient_list.value += `, ${x}`
+    if (x != '') {
+      if (recipient_list.value == '') {
+        recipient_list.value += `${x}`
+      } else {
+        if ((!(recipient_list.value.split(', ').includes(x))) && (!(recipient_list.value.split(', ').includes('everyone'))) && (x != "everyone")) {
+          recipient_list.value += `, ${x}`
+        }
       }
     }
   }
 
   clear.addEventListener('click', () => {
     recipient_list.value = ""
-    recipients.value = "Alsion Student"
+    recipients.value = ''
   })
 
   recipients_anonymous.onchange = () => {
     let x = recipients_anonymous.value;
-    if (recipient_list_anonymous.value == '') {
-      recipient_list_anonymous.value += `${x}`
-    } else {
-      if ((!(recipient_list_anonymous.value.split(', ').includes(x))) && (!(recipient_list_anonymous.value.split(', ').includes('All Teachers and Admins'))) && (x != "All Teachers and Admins")) {
-        recipient_list_anonymous.value += `, ${x}`
+
+    if (x != '') {
+      if (recipient_list_anonymous.value == '') {
+        recipient_list_anonymous.value += `${x}`
+      } else {
+        if ((!(recipient_list_anonymous.value.split(', ').includes(x))) && (!(recipient_list_anonymous.value.split(', ').includes('All Faculty'))) && (x != "All Faculty")) {
+          recipient_list_anonymous.value += `, ${x}`
+        }
       }
     }
   }
 
   clear_anonymous.addEventListener('click', () => {
     recipient_list_anonymous.value = ""
-    recipients_anonymous.value = "Alsion Student"
+    recipients_anonymous.value = ''
   })
 
   </script>

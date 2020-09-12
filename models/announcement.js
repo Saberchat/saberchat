@@ -6,7 +6,9 @@ var announcementSchema = new mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: "User"
     },
-    text: String
+    images: [{type: String}],
+    text: String,
+    date: String,
 }, {timestamps: {createdAt: 'created_at'}});
 
 module.exports = mongoose.model("Announcement", announcementSchema);

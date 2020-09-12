@@ -44,9 +44,30 @@
         <div class="col-12">
           <div class="jumbotron text-center" style="width: 700px; padding: 50px;">
             <h1><%=project.title%></h1>
-            <p><em>Posted by <strong><%=project.poster%></strong></em></p>
-            <p><strong>Creators:</strong> <em><%=project.creators.join(', ')%></em></p>
-            <p style="margin-top: 10px;"><%=project.text%></p>
+            <p><em>Posted by <strong><a style="color: black;" href="../profiles/<%=project.poster._id%>"><%=project.poster.username%></a></strong></em></p>
+
+            <% if (project.creators.length > 2) {%>
+              <span><strong>Creators:</strong>
+
+                <% let tempcreators = project.creators.slice(0, project.creators.length - 2)%>
+
+                <%tempcreators.forEach(creator => { %>
+                   <em><a style="color: black" href="../profiles/<%=creator._id%>"><%=creator.username%></a>,</em>
+                <%})%>
+
+                <em><a style="color: black" href="../profiles/<%=project.creators[project.creators.length - 2]._id%>"><%=project.creators[project.creators.length - 2].username%></a></em>
+                and <em><a style="color: black" href="../profiles/<%=project.creators[project.creators.length - 1]._id%>"><%=project.creators[project.creators.length - 1].username%></a></em>
+
+              </span>
+
+            <%} else if (project.creators.length == 2){%>
+              <p><strong>Creators:</strong> <a style="color: black" href="../profiles/<%=project.creators[0]._id%>"><em><%=project.creators[0].username%></a> and <a style="color: black" href="profiles/<%=project.creators[0]._id%>"><%=project.creators[1].username%></a></em></p>
+
+            <%} else {%>
+              <p><strong>Creator:</strong> <a style="color: black" href="../profiles/<%=project.creators[0]._id%>"><em><%=project.creators[0].username%></em></a></p>
+            <%}%>
+
+            <p style="margin-top: 10px; white-space: pre-wrap;"><%=project.text%></p>
             <img style="width: 100%; height: 100%; object-fit: contain;" src="<%=project.imgUrl%>"/>
           </div>
         </div>

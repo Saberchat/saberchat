@@ -44,8 +44,15 @@
                         <h4>Role</h4>
                         <p><%= user.permission %></p>
 
+                        <h4>Status</h4>
+                        <p><%= user.status %></p>
+
                         <h4>Email</h4>
                         <p><%= user.email %></p>
+
+                        <% if (currentUser._id.toString() == user._id.toString()) { %>
+                          <button class="btn btn-primary" style="margin-bottom: 10px;"><a style="color: white" href="/profiles/edit">Edit Profile</a></button>
+                        <% } %>
                     </div>
                 </section>
             </div>
