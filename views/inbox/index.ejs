@@ -81,7 +81,7 @@
                         <div class="message-check">
                           <input class="del-form-input" type="checkbox" name="<%= notif._id %>" value="" onchange="updateDelete()">
                         </div>
-                        <a href="/view_inbox_message/<%= notif._id %>" class="message-body">
+                        <a href="/message/<%= notif._id %>" class="message-body">
                           <div class="message-head">
                             <div class="message-subject">
                               <%= notif.subject %>
@@ -95,7 +95,7 @@
                           </div>
                         </a>
                         <span class="message-date">
-                          Aug 29
+                          <%= notif.date %> 
                         </span>
                       </li>
                     <% }); %>
