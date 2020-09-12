@@ -45,8 +45,12 @@
                         <textarea id="descInput" class="form-control" name="description" placeholder="(max 300) Enter a short description about the room" maxlength="300" rows="5"></textarea>
                     </div>
                     <div class="form-check mb-3">
+                        <input name="moderate" id="moderate" type="checkbox" class="form-check-input" value="false">
+                        <label for="moderate" class="form-check-label">Disable moderation and reporting comments (enabled if left blank)</label>
+                    </div>
+                    <div class="form-check mb-3">
                         <input name="type" id="roomType" type="checkbox" onclick="updateDisplay()" class="form-check-input" value="true">
-                        <label for="roomType" class="form-check-label">Private (limited to only certain users)</label>
+                        <label for="roomType" class="form-check-label">Private (limited to only specified users)</label>
                     </div>
                     <div id="user-selection" style="display: none;">
                         <h4>Select Members</h4>

@@ -102,18 +102,32 @@ function chatInit(username, userId, messageForm, input, chatDisplay, room, userI
 
   socket.on('chat message', function(msg) {
     // appends the message to the ul element displaying the messages
-    $(chatDisplay).append(
+    let element;
+    if(moderate == 'true') {
+      element = 
       `<div class="media mb-2">
-      <img src="${msg.userImage}" alt="user" class="user-image">
-      <div class="media-body ml-3">
-        <div class="bg-grey rounded py-2 px-3 mb-2 w-65">
-          <p class="text-small mb-0 text-dark">${msg.text}</p>
+        <img src="${msg.userImage}" alt="user" class="user-image">
+        <div class="media-body ml-3">
+          <div class="bg-grey rounded py-2 px-3 mb-2 w-65">
+            <p class="text-small mb-0 text-dark">${msg.text}</p>
+          </div>
+          <p class="small text-muted msg-info"><span class="username">${msg.username}</span>, ${$.format.date(Date.now(), "h:mm a | MMM d")}</p>
+          <button class="flag" id="${msg.id}" onclick="report(this)"><i class="far fa-flag"></i> <span class="flag-tooltip">Report comment</span></button>
         </div>
-        <p class="small text-muted msg-info"><span class="username">${msg.username}</span>, ${$.format.date(Date.now(), "h:mm a | MMM d")}</p>
-        <button class="flag" id="${msg.id}" onclick="report(this)"><i class="far fa-flag"></i> <span class="flag-tooltip">Report comment</span></button>
-      </div>
-    </div>`
-    );
+      </div>`;
+    } else {
+      element = 
+      `<div class="media mb-2">
+        <img src="${msg.userImage}" alt="user" class="user-image">
+        <div class="media-body ml-3">
+          <div class="bg-grey rounded py-2 px-3 mb-2 w-65">
+            <p class="text-small mb-0 text-dark">${msg.text}</p>
+          </div>
+          <p class="small text-muted msg-info"><span class="username">${msg.username}</span>, ${$.format.date(Date.now(), "h:mm a | MMM d")}</p>
+        </div>
+      </div>`;
+    }
+    $(chatDisplay).append(element);
     if(autoScroll) {
       // scroll to latest message
       let messages = document.getElementsByClassName('media');
