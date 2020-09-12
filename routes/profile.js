@@ -107,7 +107,6 @@ router.put('/edit', middleware.isLoggedIn, function(req, res) {
         } else {
             req.flash('success', 'Updated your profile');
             res.redirect('/profiles/' + req.user._id);
-            console.log(updatedUser);
         }
     });
 });
