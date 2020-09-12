@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>Saberchat</title>
+
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css">
+        <link rel="stylesheet" href="/stylesheets/main.css">
+        <!-- link css for navbar. Don't need to include public/javascript/userForm.js since user is already logged in and does not need to access login and register forms.  -->
+        <link rel="stylesheet" href="/stylesheets/components/navbar.css">
+        <link rel="stylesheet" href="/stylesheets/components/header.css">
+
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js"></script>
+        <script src="../javascript/socket.js"></script>
+
+        <!-- I'm using my fontawesome kit -->
+        <script src="https://kit.fontawesome.com/dccc745c41.js" crossorigin="anonymous"></script>
+
+    </head>
+    <body>
+        <!-- include the navbar via ejs -->
+        <%- include('../../partials/navbar') %>
+        <!-- include the backdrop for nav -->
+        <%- include('../../partials/header') %>
+        
+        <div class="container mt-5" style="text-align: center;">
+            <div class="row">
+                <div class="col-md-8 col-12 offset-md-2">
+                    <div class="jumbotron">
+                        <h1>Access Request</h1>
+                        <hr>
+                        <h4><%= request.room.name %></h4>
+                        <p>From: <%= request.requester.username %>, To: <%= request.room.creator.username %></p>
+
+                        <% if(request.receiver.equals(currentUser._id) && request.status == 'pending') {%> 
+                            <form action="/inbox/requests/<%= request._id %>/reject" method="post" style="display: inline-block;">
+                                <button type="submit" class="btn btn-danger">Reject</button>
+                            </form>
+                            <form action="/inbox/requests/<%= request._id %>/accept" method="post" style="display: inline-block;">
+                                <button type="submit" class="btn btn-success">Accept</button>
+                            </form>
+                        <% } else { %>
+                            <p><em><%= request.status %></em></p>
+                        <% } %>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </body>
+</html>

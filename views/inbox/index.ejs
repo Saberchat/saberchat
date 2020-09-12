@@ -47,6 +47,7 @@
                     onclick="setRequests()"
                     >Requests</button>
                 </div>
+                <button id="refresh-btn" onclick="window.location.reload();">Refresh</button>
               </nav>
 
               <!-- actions -->
@@ -56,8 +57,8 @@
                   <a href="/notif" class="action-btn">Send New</a>
                   <a href="/view_sent_notifs" class="action-btn">View Sent</a>
                   <hr>
-                  <a href="/clear" class="action-btn">Delete All</a>
-                  <button class="action-btn" onclick="submitDelete()">Delete Selected</button>
+                  <a href="/clear" class="action-btn" id="del-all-btn">Delete All</a>
+                  <button class="action-btn" onclick="submitDelete()" id="del-sel-btn">Delete Selected</button>
                 </div>
                 <!-- request actions -->
                 <div class="request-actions">
@@ -78,7 +79,7 @@
                     <% inbox.forEach((notif) => { %>
                       <li class="list-group-item list-group-item-action">
                         <div class="message-check">
-                          <input type="checkbox" name="<%= notif._id %>" value="">
+                          <input class="del-form-input" type="checkbox" name="<%= notif._id %>" value="" onchange="updateDelete()">
                         </div>
                         <a href="/view_inbox_message/<%= notif._id %>" class="message-body">
                           <div class="message-head">
@@ -109,7 +110,7 @@
                     <% requests.forEach((request) => { %>
                       <% if(request.status == 'pending') { %> 
                       <li class="list-group-item list-group-item-action">
-                        <a href="#" class="request-body">
+                        <a href="/inbox/requests/<%= request._id %>" class="request-body">
                           <div class="request-room">
                             <%= request.room.name %> 
                           </div>
@@ -120,102 +121,12 @@
                       </li>
                       <% } %> 
                     <% }); %>
-                    <li class="list-group-item list-group-item-action">
-                      <a href="#" class="request-body">
-                        <div class="request-room">
-                          Private Room 
-                        </div>
-                        <div class="request-from">
-                          KabirSamsi 
-                        </div>
-                      </a>
-                    </li>
-                    <li class="list-group-item list-group-item-action">
-                      <a href="#" class="request-body">
-                        <div class="request-room">
-                          Private Room 
-                        </div>
-                        <div class="request-from">
-                          KabirSamsi 
-                        </div>
-                      </a>
-                    </li>
-                    <li class="list-group-item list-group-item-action">
-                      <a href="#" class="request-body">
-                        <div class="request-room">
-                          Private Room 
-                        </div>
-                        <div class="request-from">
-                          KabirSamsi 
-                        </div>
-                      </a>
-                    </li>
-                    <li class="list-group-item list-group-item-action">
-                      <a href="#" class="request-body">
-                        <div class="request-room">
-                          Private Room 
-                        </div>
-                        <div class="request-from">
-                          KabirSamsi 
-                        </div>
-                      </a>
-                    </li>
-                    <li class="list-group-item list-group-item-action">
-                      <a href="#" class="request-body">
-                        <div class="request-room">
-                          Private Room 
-                        </div>
-                        <div class="request-from">
-                          KabirSamsi 
-                        </div>
-                      </a>
-                    </li>
-                    <li class="list-group-item list-group-item-action">
-                      <a href="#" class="request-body">
-                        <div class="request-room">
-                          Private Room 
-                        </div>
-                        <div class="request-from">
-                          KabirSamsi 
-                        </div>
-                      </a>
-                    </li>
-                    <li class="list-group-item list-group-item-action">
-                      <a href="#" class="request-body">
-                        <div class="request-room">
-                          Private Room 
-                        </div>
-                        <div class="request-from">
-                          KabirSamsi 
-                        </div>
-                      </a>
-                    </li>
-                    <li class="list-group-item list-group-item-action">
-                      <a href="#" class="request-body">
-                        <div class="request-room">
-                          Private Room 
-                        </div>
-                        <div class="request-from">
-                          KabirSamsi 
-                        </div>
-                      </a>
-                    </li>
-                    <li class="list-group-item list-group-item-action">
-                      <a href="#" class="request-body">
-                        <div class="request-room">
-                          Private Room 
-                        </div>
-                        <div class="request-from">
-                          KabirSamsi 
-                        </div>
-                      </a>
-                    </li>
                   </div>
                   <div class="list-group history" id="past-req-list">
                     <% requests.forEach((request) => { %>
                       <% if(request.status != 'pending') { %> 
                       <li class="list-group-item list-group-item-action">
-                        <a href="#" class="request-body">
+                        <a href="/inbox/requests/<%= request._id %>" class="request-body">
                           <div class="request-room">
                             <%= request.room.name %> 
                           </div>
@@ -229,32 +140,6 @@
                       </li>
                       <% } %> 
                     <% }); %>
-                    <li class="list-group-item list-group-item-action">
-                      <a href="#" class="request-body">
-                        <div class="request-room">
-                          Room
-                        </div>
-                        <div class="request-from">
-                          Sender
-                        </div>
-                        <div class="request-status">
-                          Approved 
-                        </div>
-                      </a>
-                    </li>
-                    <li class="list-group-item list-group-item-action">
-                      <a href="#" class="request-body">
-                        <div class="request-room">
-                          Room 
-                        </div>
-                        <div class="request-from">
-                          Sender 
-                        </div>
-                        <div class="request-status">
-                          Rejected 
-                        </div>
-                      </a>
-                    </li>
                   </div>
                 </div>
               </div>

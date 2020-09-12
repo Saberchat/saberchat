@@ -15,6 +15,10 @@ const viewReq = document.getElementById('view-req');
 const currentReqBtn = document.getElementById('current-req');
 const pastReqBtn = document.getElementById('past-req');
 
+// buttons to delete messages
+const delAllBtn = document.getElementById('del-all-btn');
+const delSelBtn = document.getElementById('del-sel-btn');
+
 const delSelForm = document.getElementById('del-select-form');
 
 // tracks inbox state
@@ -83,5 +87,26 @@ function seePastReq() {
         currentReqBtn.disabled = false;
 
         reqDisplay = 'history';
+    }
+}
+
+// switches between delete all to delete selected
+function updateDelete() {
+    const inputs = document.getElementsByClassName('del-form-input');
+    let selected = false;
+    for (let i = 0; i < inputs.length; i++) {
+        const input = inputs[i];
+        if(input.checked == true) {
+            selected = true;
+            break;
+        }
+    }
+
+    if(selected) {
+        delAllBtn.style.display = 'none';
+        delSelBtn.style.display = 'block';
+    } else {
+        delSelBtn.style.display = 'none';
+        delAllBtn.style.display = 'block';
     }
 }

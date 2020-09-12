@@ -2,6 +2,7 @@
 
 const Room = require("../models/room");
 const user = require("../models/user");
+const accessReq = require('../models/accessRequest');
 
 //create a 'middleware' object to store middleware functions
 middleware = {};
@@ -58,7 +59,7 @@ middleware.checkForLeave = function(req, res, next) {
 		}
 	});
 }
-
+// check if room owner
 middleware.checkRoomOwnership = function(req, res, next) {
 	Room.findById(req.params.id, function(err, foundRoom) {
 		if(err || !foundRoom) {

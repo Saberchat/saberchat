@@ -49,7 +49,7 @@ Navigation
 }
 
 .nav-tab:hover:enabled {
-    filter: brightness(120%);
+    background-color: #42568F;
 }
 
 /* 
@@ -61,7 +61,7 @@ Actions
 }
 
 .action-bar hr {
-    border: 1px solid #ffffff;
+    border: 1px solid #202D53;
     margin: 0.2rem 1rem;
 }
 
@@ -286,6 +286,66 @@ Requests
     }
 }
 
+@media only screen and (max-width: 768px) {
+    .list-group-item .request-body {
+        text-decoration: none;
+    }
+
+    .request-room {
+        width: 50%;
+        font-weight: 700;
+        color: #424651;
+        white-space: nowrap;
+        overflow-x: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .request-from {
+        font-weight: 400;
+        color: #424651;
+    }
+
+    .request-status {
+        position: absolute;
+        top: 1rem;
+        right: 1rem;
+        float: right;
+        color: #838383;
+    }
+}
+
+/* 
+===============================
+Misc.
+*/
+
+/* refresh btn */
+#refresh-btn {
+    position: absolute;
+    right: 1rem;
+    vertical-align: middle;
+    border: none;
+    border-radius: 10px;
+    padding: 2px 30px;
+    background-color: #3771C9;
+    color: white;
+}
+
+#refresh-btn:hover {
+    background-color: #4185eb;
+}
+
+@media only screen and (max-width: 768px) {
+    #refresh-btn {
+        display: none;
+    }
+}
+
+/* delete selected btn */
+#del-sel-btn {
+    display: none;
+}
+
 /* 
 ===============================
 Style variances for screen sizes
@@ -339,8 +399,19 @@ Style variances for screen sizes
 
     .inbox-display {
         border-radius: 0px 0px 15px 15px;
+        min-height: 50px;
         max-height: 450px;
         overflow-y: scroll;
+    }
+
+    #current-req, #past-req {
+        padding: 0.75rem;
+        margin: 0;
+    }
+
+    .action-btn {
+        padding: 0.2rem;
+        margin: 0.5rem;
     }
 
 }

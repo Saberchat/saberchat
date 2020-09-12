@@ -5,6 +5,8 @@ const dateFormat = require('dateFormat')
 const User = require('../models/user');
 const Notification = require('../models/notification');
 const Announcement = require('../models/announcement');
+const AccessReq = require('../models/accessRequest');
+const Room = require('../models/room');
 
 //Access sendNotification file
 router.get('/notif', middleware.isLoggedIn, (req, res) => {
@@ -197,8 +199,6 @@ router.get('/inbox', middleware.isLoggedIn, (req, res) => {
 				]
 			}).execPopulate();
 
-		console.log('inbox route');
-		console.log(req.user);
 
 		res.render('inbox/index', {inbox: req.user.inbox, requests: req.user.requests});
 	}
@@ -208,37 +208,6 @@ router.get('/inbox', middleware.isLoggedIn, (req, res) => {
 		res.redirect('back');
 	});
 });
-
-// router.get('/inbox', middleware.isLoggedIn, (req, res) => {
-
-// 	User.findOne({_id: req.user._id}).populate({path: 'inbox', populate: { path: 'sender', select: ['username', 'imageUrl']}}).exec((err, foundUser) => {
-// 		if (err || !foundUser) {
-//       req.flash('error', 'Unable to access database')
-//       res.redirect('back')
-
-//     } else {
-// 			let notifdates = []
-// 			for (let notif of foundUser.inbox) {
-// 				notifdates.push(dateFormat(notif.created_at, "mmm d, h:MMTT"))
-// 			}
-// 			Announcement.find({}).populate({path: 'sender', select: ['username', 'imageUrl']}).populate('message').exec((err, foundAnns) => {
-// 				if (err || !foundAnns) {
-// 					req.flash('error', 'Unable to access database')
-// 					res.redirect('back')
-
-// 				} else {
-// 					let dates = []
-
-// 					for (let ann of foundAnns) {
-// 						dates.push(dateFormat(ann.created_at, "mmm d, h:MMTT"))
-// 					}
-
-// 					res.render('inbox/inbox', {announcements: foundAnns.reverse(), dates: dates.reverse(), announced: false, username: foundUser.username, notifs: foundUser.inbox.reverse(), notifdates: notifdates.reverse()})
-// 				}
-// 			})
-// 		}
-// 	})
-// })
 
 //View message in your inbox in more detail
 router.get('/view_inbox_message/:id', middleware.isLoggedIn, (req, res) => {
@@ -372,16 +341,99 @@ router.post('/delete_sent', middleware.isLoggedIn, (req, res) => {
 				if (Object.keys(req.body).includes(notif._id.toString())) { //If item is selected to be deleted (checkbox)
 					Notification.findByIdAndDelete(notif._id, (err, foundNotif) => {
 						if (err || !foundNotif) {
-							req.flash("error", "Unable to access database")
-							res.redirect('back')
+							req.flash("error", "Unable to access database");
+							res.redirect('back');
 						}
 					})
 				}
 			}
-			req.flash('success', 'Notification(s) deleted!')
-			res.redirect('/view_sent_notifs')
+			req.flash('success', 'Notification(s) deleted!');
+			res.redirect('/view_sent_notifs');
 		}
-	})
-})
+	});
+});
+
+// ========================================
+// access request routes
+// ========================================
+
+// displays single access request
+router.get('/inbox/requests/:id', middleware.isLoggedIn, (req, res) => {
+	AccessReq.findById(req.params.id)
+	.populate({path: 'requester', select: 'username'})
+	.populate({path: 'room', select: ['creator', 'name']}).exec((err, foundReq) => {
+		if(err || !foundReq) {
+			req.flash("error", "Unable to access database");
+			res.redirect('back');
+		} else {
+			res.render('inbox/requests/show', {request: foundReq});
+		}
+	});
+});
+
+// route to accept request
+router.post('/inbox/requests/:id/accept', middleware.isLoggedIn, (req, res) => {
+	async function handleAccept() {
+		const Req = await AccessReq.findById(req.params.id)
+		.populate({path: 'room', select: ['creator']});
+
+		if(!Req) {
+			req.flash("error", "Unable to access database");
+			return res.redirect('back');
+			
+		} else if(!Req.room.creator.id.equals(req.user._id)) {
+			req.flash("error", "You do not have permission to do that");
+			return res.redirect('back');
+
+		} else if(Req.status != 'pending') {
+			req.flash('error', 'Request already handled');
+			return res.redirect('back');
+		} else {
+			const foundRoom = await Room.findById(Req.room._id);
+			if(!foundRoom) {req.flash("error", "Unable to access database");return res.redirect('back');}
+
+			foundRoom.members.push(Req.requester);
+			Req.status = 'accepted';
+
+			await foundRoom.save();
+			await Req.save();
+
+			req.flash('success', 'Request accepted');
+			res.redirect('/inbox');
+		}
+	}
+
+	handleAccept().catch(err => {console.log(err); req.flash("error", "Unable to access database");return res.redirect('back');});
+});
+
+// route to reject request
+router.post('/inbox/requests/:id/reject', middleware.isLoggedIn, (req, res) => {
+	async function handleReject() {
+		const Req = await AccessReq.findById(req.params.id)
+		.populate({path: 'room', select: ['creator']});
+
+		if(!Req) {
+			req.flash("error", "Unable to access database");
+			return res.redirect('back');
+			
+		} else if(!Req.room.creator.id.equals(req.user._id)) {
+			req.flash("error", "You do not have permission to do that");
+			return res.redirect('back');
+			
+		} else if(Req.status != 'pending') {
+			req.flash('error', 'Request already handled');
+			return res.redirect('back');
+
+		} else {
+			Req.status = 'rejected';
+			await Req.save();
+
+			req.flash('success', 'Request rejected');
+			res.redirect('/inbox');
+		}
+	}
+
+	handleReject().catch(err => {console.log(err); req.flash("error", "Unable to access database");return res.redirect('back');});
+});
 
 module.exports = router;
