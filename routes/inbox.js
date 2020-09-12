@@ -34,10 +34,15 @@ router.get('/notif', middleware.isLoggedIn, (req, res) => {
 //Route to send notification to a group of people
 router.post('/send_group', middleware.isLoggedIn, (req, res) => {
 
+	if(!req.body.recipient_list || req.body.recipient_list.length == 0) {
+		req.flash('error', 'Please select recipients');
+		return res.redirect('back');
+	}
+
 	let mailing_list = req.body.recipient_list.split(', ') //Creates list of recipients based on user input
 
 	if (mailing_list.includes('everyone')) { //Send notif to everyone
-		User.find({'_id': {$nin: req.user._id}}, (err, foundUsers) => {
+		User.find({_id: {$ne: req.user._id}}, (err, foundUsers) => {
 			if(err || !foundUsers) {
 				req.flash('error', 'Unable to access Database');
 				res.redirect('back');
@@ -493,8 +498,7 @@ router.post('/inbox/requests/:id/accept', middleware.isLoggedIn, (req, res) => {
 			return res.redirect('back');
 
 		} else {
-			req.user.requests.splice(req.user.requests.indexOf(req.params.id), 1)
-			req.user.save()
+			
 			const foundRoom = await Room.findById(Req.room._id);
 
 			if(!foundRoom) {req.flash("error", "Unable to access database");return res.redirect('back');}
@@ -564,8 +568,6 @@ router.post('/inbox/requests/:id/reject', middleware.isLoggedIn, (req, res) => {
 			return res.redirect('back');
 
 		} else {
-			req.user.requests.splice(req.user.requests.indexOf(req.params.id), 1)
-			req.user.save()
 
 			Req.status = 'rejected';
 

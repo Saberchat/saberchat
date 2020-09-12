@@ -71,6 +71,8 @@ input::placeholder {
 header {
     background-color: rgba(255, 255, 255, 0.8);
     padding: 50px 10px;
+    box-shadow: 0px 10px 10px #868686,
+                0px -5px 15px #727272;
 }
 
 #message-display a {

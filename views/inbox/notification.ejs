@@ -42,21 +42,20 @@
                   <button
                     class="nav-tab active"
                     id="view-msg"
-                    onclick="setMessages()"
                     disabled
                     >Messages</button>
 
-                  <button
+                  <!-- <button
                     class="nav-tab"
                     id="view-req"
                     onclick="setRequests()"
-                    >Requests</button>
+                    >Requests</button> -->
                 </div>
-                <button id="refresh-btn" onclick="window.location.reload();">Refresh</button>
+                <!-- <button id="refresh-btn" onclick="window.location.reload();">Refresh</button> -->
               </nav>
 
                 <!-- actions -->
-                <div class="action-bar" style="padding-bottom: 20px; margin-right: 20px;">
+                <div class="action-bar">
                   <!-- message actions -->
                   <div class="message-actions display">
                     <a href="/inbox" class="action-btn">Inbox</a>
@@ -70,7 +69,7 @@
                   </div>
                 </div>
 
-                <div class="main-section" style="overflow: auto; margin-top: 10px;">
+                <div class="main-section" style="overflow: auto; padding: 1.5rem; ">
                   <h3><%=notif.subject%></h3>
 
                   <p style="font-size: 15px;"><%=notif.date.split(', ')[1]%> | <%=notif.date.split(', ')[0]%></p>
