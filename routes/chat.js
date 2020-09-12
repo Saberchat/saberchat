@@ -314,11 +314,19 @@ router.delete('/:id/delete', middleware.isLoggedIn, middleware.checkRoomOwnershi
       Comment.deleteMany({room: deletedRoom._id}, function(err, result) {
         if(err) {
           console.log(err);
-          req.flash('error', 'Group comments could not be deleted')
+          req.flash('error', 'comments could not be deleted')
           res.redirect('/chat');
         } else {
-          req.flash('success', 'Successfully deleted group');
-          res.redirect('/chat');
+          AccessReq.deleteMany({room: deletedRoom._id}, function(err, result) {
+            if(err) {
+              console.log(err);
+              req.flash('error', 'requests could not be deleted')
+              res.redirect('/chat');
+            } else {
+              req.flash('success', 'Successfully deleted group');
+              res.redirect('/chat');
+            }
+          });
         }
       });
     }

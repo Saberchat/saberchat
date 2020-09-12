@@ -347,6 +347,11 @@ Misc.
     display: none;
 }
 
+/* select form */
+#del-select-form {
+    height: 100%;
+}
+
 /* 
 ===============================
 Style variances for screen sizes
@@ -373,7 +378,7 @@ Style variances for screen sizes
     .inbox-display {
         width: auto;
         overflow-y: scroll;
-        height: calc(100% - 63px);
+        height: calc(100% - 62px);
         border-radius: 0px 0px 15px 0px;
     }
 
@@ -411,8 +416,8 @@ Style variances for screen sizes
     }
 
     .action-btn {
-        padding: 0.2rem;
-        margin: 0.5rem;
+        padding: 0.2rem 0;
+        margin-bottom: 0.5rem;
     }
 
 }

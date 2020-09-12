@@ -250,17 +250,11 @@ router.get('/inbox', middleware.isLoggedIn, (req, res) => {
 					{ path: 'room', select: 'name'}
 				]
 			}).execPopulate();
+		
+		foundAnns = await Announcement.find({}).populate({path: 'sender', select: ['username', 'imageUrl']}).populate('message');
+		if(!foundAnns) {req.flash('error', 'Unable to access database'); return res.redirect('back');}
 
-		Announcement.find({}).populate({path: 'sender', select: ['username', 'imageUrl']}).populate('message').exec((err, foundAnns) => {
-			if (err || !foundAnns) {
-				req.flash('error', 'Unable to access database')
-				res.redirect('back')
-
-			} else {
-
-				res.render('inbox/index', {announcements: foundAnns.reverse(), announced: false, inbox: req.user.inbox.reverse(), requests: req.user.requests.reverse(), viewing_sent: false});
-			}
-		})
+		res.render('inbox/index', {announcements: foundAnns.reverse(), announced: false, inbox: req.user.inbox.reverse(), requests: req.user.requests.reverse(), viewing_sent: false});
 
 	}
 	inboxGet().catch(err => {
@@ -336,8 +330,10 @@ router.get('/sent', middleware.isLoggedIn, (req, res) => {
 					res.redirect('back')
 
 				} else {
+					// why are you rendering the index? I'll make it redirect for now
+					res.redirect('/inbox');
+					// res.render('inbox/index', {announcements: foundAnns.reverse(), announced: false, inbox: foundNotifs.reverse(), requests: req.user.requests, viewing_sent: true})
 
-					res.render('inbox/index', {announcements: foundAnns.reverse(), announced: false, inbox: foundNotifs.reverse(), requests: req.user.requests, viewing_sent: true})
 				}
 			})
 		}
