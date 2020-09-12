@@ -135,7 +135,13 @@ router.get('/:id/edit', middleware.isLoggedIn, middleware.checkRoomOwnership, (r
 
 // create new rooms
 router.post('/', middleware.isLoggedIn, function(req, res) {
-  Room.create({name: filter.clean(req.body.name), 'creator.id': req.user._id, 'creator.username': req.user.username, members: [req.user._id]}, function(err, room) {
+  const room = {
+    name: filter.clean(req.body.name),
+    'creator.id': req.user._id,
+    'creator.username': req.user.username,
+    members: [req.user._id]
+  }
+  Room.create(room, function(err, room) {
     if (err) {
       console.log(err);
       req.flash('error', 'group could not be created');
@@ -146,6 +152,9 @@ router.post('/', middleware.isLoggedIn, function(req, res) {
           room.members.push(user);
         }
         room.type = 'private';
+      }
+      if(req.body.moderate == 'false') {
+        room.moderate = false;
       }
       if(req.body.description) {
         room.description = filter.clean(req.body.description);
@@ -236,9 +245,13 @@ router.post('/:id/request-access', middleware.isLoggedIn, function(req, res) {
 
 // handles reports on comments from users
 router.put('/comments/:id/report', middleware.isLoggedIn, function(req, res) {
-  Comment.findById(req.params.id, function(err, comment) {
+  Comment.findById(req.params.id)
+  .populate({path: 'room', select: 'moderate'})
+  .exec(function(err, comment) {
     if(err || !comment) {
       res.json('Error');
+    } else if(!comment.room.moderate) {
+      res.json('Reporting Is Disabled');
     } else if(comment.status == 'flagged'){
       res.json('Already Reported');
     } else if(comment.status == 'ignored') {
@@ -255,7 +268,7 @@ router.put('/comments/:id/report', middleware.isLoggedIn, function(req, res) {
 });
 
 // edit room
-router.put('/:id/edit', middleware.isLoggedIn, middleware.checkRoomOwnership, (req, res) => {
+router.put('/:id', middleware.isLoggedIn, middleware.checkRoomOwnership, (req, res) => {
   Room.findByIdAndUpdate(req.params.id, {name: filter.clean(req.body.name), description: filter.clean(req.body.description)}, function(err, room) {
     if (err || !room) {
       req.flash('error', 'Unable to access Database');
@@ -274,6 +287,12 @@ router.put('/:id/edit', middleware.isLoggedIn, middleware.checkRoomOwnership, (r
         room.type = 'private';
       } else {
         room.type = 'public';
+      }
+
+      if(req.body.moderate == 'false') {
+        room.moderate = false;
+      } else {
+        room.moderate = true;
       }
 
       room.save()
@@ -295,11 +314,19 @@ router.delete('/:id/delete', middleware.isLoggedIn, middleware.checkRoomOwnershi
       Comment.deleteMany({room: deletedRoom._id}, function(err, result) {
         if(err) {
           console.log(err);
-          req.flash('error', 'Group comments could not be deleted')
+          req.flash('error', 'comments could not be deleted')
           res.redirect('/chat');
         } else {
-          req.flash('success', 'Successfully deleted group');
-          res.redirect('/chat');
+          AccessReq.deleteMany({room: deletedRoom._id}, function(err, result) {
+            if(err) {
+              console.log(err);
+              req.flash('error', 'requests could not be deleted')
+              res.redirect('/chat');
+            } else {
+              req.flash('success', 'Successfully deleted group');
+              res.redirect('/chat');
+            }
+          });
         }
       });
     }

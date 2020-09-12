@@ -37,7 +37,7 @@
       <div class="row">
         <div class="col-md-8 offset-md-2 col-12">
 
-          <form action="/chat/<%= room._id %>/edit?_method=put" method="post">
+          <form action="/chat/<%= room._id %>?_method=put" method="post">
 
             <div class="form-group">
               <label for="usernameInput">Name</label>
@@ -46,6 +46,14 @@
             <div class="form-group">
               <label for="descInput">Description</label>
               <textarea id="descInput" class="form-control" name="description" placeholder="(max 300) Enter room description" maxlength="300" rows="5"><%= room.description %></textarea>
+            </div>
+            <div class="form-check mb-3">
+              <input name="moderate" id="moderate" type="checkbox" class="form-check-input" value="false"
+              <% if (!room.moderate) { %>
+               checked
+              <% } %>
+              >
+              <label for="moderate" class="form-check-label">Disable moderation and reporting comments (enabled if left blank)</label>
             </div>
             <div class="form-check mb-3">
               <input name="type" id="roomType" type="checkbox" onclick="updateDisplay()" class="form-check-input" value="true"
