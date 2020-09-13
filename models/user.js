@@ -10,7 +10,7 @@ var userSchema = new mongoose.Schema({
 	lastName:String,
 	description: String,
 	title: String,
-	bannerUrl: {type: String, default: 'https://images.unsplash.com/photo-1594793861747-136c34047e9d?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=1952&q=80'},
+	bannerUrl: {type: String, default: 'https://i.imgur.com/Wnbn7Ei.gif'},
 	imageUrl: {type: String, default: 'https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_640.png'},
 	notifCount: Number,
 	inbox: [
