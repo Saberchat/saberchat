@@ -1,9 +1,10 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
-    <meta charset="UTF-8">
-    <meta name="viewport">
+    
     <title>Saberchat</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
 
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css" integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk" crossorigin="anonymous">
     <link rel="stylesheet" href="/stylesheets/main.css">
@@ -24,7 +25,7 @@
     <%- include('../partials/header') %>
     <!-- include announcements -->
     <%- include('../partials/announcement') %>
-
+    
     <div class="container mt-5">
       <div class="row">
         <div class="col-12">
@@ -39,7 +40,7 @@
           <li class="list-group-item list-group-item-info">
             <div class="d-flex w-100 justify-content-between">
               <h2 class="mb-1"><i class="fas fa-user-friends"></i> Your rooms</h2>
-              <a href="chat/new" class="btn btn-info"><i class="fas fa-plus-circle"></i> Create a chat room</a>
+              <a href="chat/new" class="btn btn-info"><i class="fas fa-plus-circle"></i> Create Room</a>
             </div>
             <p class="mb-1">Rooms you are a member of.</p>
           </li>
@@ -76,5 +77,6 @@
         </div>
       </div>
     </div>
+  
   </body>
 </html>

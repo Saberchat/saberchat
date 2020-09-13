@@ -2,7 +2,7 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8">
-    <meta name="viewport">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Saberchat</title>
 
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css" integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk" crossorigin="anonymous">
@@ -45,7 +45,7 @@
       <div class="container mt-5" style="display: flex; justify-content: center;">
         <div class="row">
           <div class="col-12">
-            <div class="jumbotron text-center" style="width: 700px; padding: 50px;">
+            <div class="jumbotron text-center" style="padding: 50px;">
               <h1><%=announcement.subject%></h1>
               <p><em>Posted by <a style="color: black;" href="/profiles/<%=announcement.sender._id%>"><strong><%=announcement.sender.username%></strong></a></em></p>
               <p style="font-size: 10px; margin-top: 5px;"><%=announcement.date.split(', ')[1]%> | <%=announcement.date.split(', ')[0]%></p>
