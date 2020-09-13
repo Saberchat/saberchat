@@ -16,13 +16,13 @@ body {
 
 .chat-box::-webkit-scrollbar-track {
     width: 5px;
-    background: #f5f5f5;
+    background: #e6e6e6;
 }
 
 .chat-box::-webkit-scrollbar-thumb {
     width: 1em;
-    background-color: #ddd;
-    outline: 1px solid slategrey;
+    background-color: rgb(179, 179, 179);
+    /* outline: 1px solid slategrey; */
     border-radius: 1rem;
 }
 

@@ -169,28 +169,36 @@ router.post('/', middleware.isLoggedIn, function(req, res) {
 
 // leave a room
 router.post('/:id/leave', middleware.isLoggedIn, middleware.checkForLeave, function(req, res) {
-  Room.findById(req.params.id, function(err, foundRoom) {
-    if(err) {
-      console.log(err);
-      req.flash('error', 'Error accessing Database');
-      res.redirect('back');
-    } else {
-      if(foundRoom.creator.id.equals(req.user._id)) {
-        req.flash('error', 'You cannot leave a room you created');
-        res.redirect('back');
-      } else {
-        //remove user from room's member list and confirmed list
-        let index = foundRoom.members.indexOf(req.user._id);
-        foundRoom.members.splice(index, 1);
-        index = foundRoom.confirmed.indexOf(req.user._id);
-        foundRoom.confirmed.splice(index, 1);
+  (async () => {
+    const room = await Room.findById(req.params.id);
+    if(!room) {req.flash('error', 'Room does not exist'); return res.redirect('back');}
 
-        foundRoom.save();
-
-        req.flash('success', 'You have left ' + foundRoom.name);
-        res.redirect('/chat');
-      }
+    if(room.creator.id.equals(req.user._id)) {
+      req.flash('error', 'You cannot leave a room you created');
+      return res.redirect('back');
     }
+    
+    const request = await AccessReq.findOne({requester: req.user._id, room: room._id, status: 'accepted'});
+    
+    if(request) {
+      // will delete past request for now
+      await request.remove();
+    }
+
+    //remove user from room's member list and confirmed list
+    let index = room.members.indexOf(req.user._id);
+    room.members.splice(index, 1);
+    index = room.confirmed.indexOf(req.user._id);
+    room.confirmed.splice(index, 1);
+    await room.save();
+
+    req.flash('success', 'You have left ' + room.name);
+    res.redirect('/chat');
+
+  })().catch(err => {
+    console.log(err);
+    req.flash('Error accessing Database');
+    res.redirect('back');
   });
 });
 
@@ -201,6 +209,10 @@ router.post('/:id/request-access', middleware.isLoggedIn, function(req, res) {
     const foundRoom = await Room.findById(req.params.id);
     // if no found room, exit
     if(!foundRoom) {req.flash('error', 'Room does not Exist'); return res.redirect('back');}
+    if(foundRoom.type == 'public') {
+      req.flash('error', 'Room is public');
+      return res.redirect('back');
+    }
 
     // find if the request already exists to prevent spam
     const foundReq = await AccessReq.findOne({requester: req.user._id, room: foundRoom._id});
