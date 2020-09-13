@@ -6,15 +6,11 @@ const router = express.Router();
 //import passport for authentication
 const passport = require('passport');
 const middleware = require('../middleware');
-const textEncoding = require('text-encoding')
-const dateFormat = require('dateFormat')
+const textEncoding = require('text-encoding');
 const TextDecoder = textEncoding.TextDecoder
 
 //import user schema for db actions
 const User = require('../models/user');
-const Room = require('../models/room');
-const Comment = require('../models/comment')
-const Notification = require('../models/notification')
 const Announcement = require('../models/announcement')
 
 // Home route. gives the landing or home or index page (whatever you want to call it).

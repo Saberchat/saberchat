@@ -1,6 +1,5 @@
 const express = require('express')
 const router = express.Router();
-const dateFormat = require('dateFormat')
 const Filter = require('bad-words');
 const filter = new Filter();
 
