@@ -335,7 +335,7 @@ router.get('/sent', middleware.isLoggedIn, (req, res) => {
 					res.redirect('back')
 
 				} else {
-					res.render('inbox/index', {announcements: foundAnns.reverse(), announced: false, inbox: foundNotifs.reverse(), requests: req.user.requests, viewing_sent: true})
+					res.render('inbox/sentNotifications', {announcements: foundAnns.reverse(), announced: false, inbox: foundNotifs.reverse()})
 
 				}
 			})
@@ -498,7 +498,7 @@ router.post('/inbox/requests/:id/accept', middleware.isLoggedIn, (req, res) => {
 			return res.redirect('back');
 
 		} else {
-			
+
 			const foundRoom = await Room.findById(Req.room._id);
 
 			if(!foundRoom) {req.flash("error", "Unable to access database");return res.redirect('back');}

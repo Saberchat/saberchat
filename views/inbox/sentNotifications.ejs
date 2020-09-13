@@ -7,16 +7,15 @@
 
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css">
     <link rel="stylesheet" href="/stylesheets/main.css">
+    <link rel="stylesheet" href="/stylesheets/inbox/index.css">
     <!-- link css for navbar. Don't need to include public/javascript/userForm.js since user is already logged in and does not need to access login and register forms.  -->
     <link rel="stylesheet" href="/stylesheets/components/navbar.css">
     <link rel="stylesheet" href="/stylesheets/components/header.css">
     <link rel="stylesheet" href="/stylesheets/components/announcement.css">
-    <link rel="stylesheet" href="/stylesheets/inbox/inbox.css">
 
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js"></script>
-    <script src="../javascript/socket.js"></script>
 
     <!-- I'm using my fontawesome kit -->
     <script src="https://kit.fontawesome.com/dccc745c41.js" crossorigin="anonymous"></script>
@@ -27,47 +26,139 @@
     <%- include('../partials/header') %>
     <%- include('../partials/announcement') %>
 
-  </head>
-  <body>
-    <div class="container">
-      <div class="row">
-        <div class="col-md-10 offset-md-1 col-12">
-          <div class="container mt-5">
-            <div class="row">
-              <div class="col-12">
-                <div class="jumbotron text-center">
-                  <h1><i class="fas fa-inbox"></i> <%=currentUser.username.charAt(0).toUpperCase() + currentUser.username.slice(1)%>'s Inbox</h1>
-                  <p><strong>Sent Notifications: </strong><%=notifs.length%></p>
-                  <a href="/inbox">Back to Inbox</a>
+    </head>
+    <body>
+      <div class="container">
+        <div class="row">
+          <div class="col-12">
+
+            <div class="inbox-container">
+              <!-- navigation between tabs -->
+              <nav class="inbox-nav">
+                <div class="btn-group" role="group" aria-label="inbox navigation">
+                  <button
+                    class="nav-tab active"
+                    id="view-msg"
+                    disabled
+                    >Messages</button>
+
                 </div>
+                <button id="refresh-btn" onclick="window.location.reload();">Refresh</button>
+              </nav>
+
+              <form method="post" id="del-select-form">
+
+                <!-- actions -->
+                <div class="action-bar">
+                  <!-- message actions -->
+                  <div class="message-actions display">
+                    <a href="/inbox" class="action-btn">Inbox</a>
+                    <a href="/notif" class="action-btn">Send New</a>
+                    <a href="/sent" class="action-btn">View Sent</a>
+
+                  </div>
+                </div>
+
+                <!-- main inbox list -->
+                <div class="inbox-display">
+
+                  <!-- messages -->
+                  <div class="message-list display">
+
+                    <ul class="list-group">
+
+                      <% inbox.forEach((notif) => { %>
+                        <li class="list-group-item list-group-item-action">
+
+                          <% if (notif.sender == null) { %>
+                            <div class="message-check">
+                              <input class="del-form-input" type="checkbox" name="<%= notif._id %>" value="" onchange="updateDelete()">
+                            </div>
+                            <a href="/message/<%= notif._id %>" class="message-body">
+                              <div class="message-head">
+                                <div class="message-from">
+                                  <%= notif.subject %>
+                                </div>
+                                <div class="message-from">
+                                  Anonymous
+                                </div>
+                              </div>
+                              <div class="message-text">
+                                <%= notif.text %>
+                              </div>
+                            </a>
+
+                          <% } else if (notif.sender._id.toString() == currentUser._id.toString()) { %>
+
+                            <a href="/message/<%= notif._id %>" class="message-body">
+                              <div class="message-head">
+                                <div class="message-from">
+                                  <%= notif.subject %>
+                                </div>
+                                <div class="message-from">
+                                  <%= notif.sender.username %>
+                                </div>
+                              </div>
+                              <div class="message-text">
+                                <%= notif.text %>
+                              </div>
+                            </a>
+
+                          <% } else { %>
+                            <div class="message-check">
+                              <input class="del-form-input" type="checkbox" name="<%= notif._id %>" value="" onchange="updateDelete()">
+                            </div>
+                            <% if (notif.read[notif.recipients.indexOf(currentUser.username)] == true) { %>
+
+                              <a href="/message/<%= notif._id %>" class="message-body">
+                                <div class="message-head">
+                                  <div class="message-from">
+                                    <%= notif.subject %>
+                                  </div>
+                                  <div class="message-from">
+                                    <%= notif.sender.username %>
+                                  </div>
+                                </div>
+                                <div class="message-text">
+                                  <%= notif.text %>
+                                </div>
+                              </a>
+
+                            <% } else { %>
+
+                              <a href="/message/<%= notif._id %>" class="message-body">
+                                <div class="message-head">
+                                  <div class="message-subject">
+                                    <%= notif.subject %>
+                                  </div>
+                                  <div class="message-from">
+                                    <%= notif.sender.username %>
+                                  </div>
+                                </div>
+                                <div class="message-text">
+                                  <%= notif.text %>
+                                </div>
+                              </a>
+                            <% } %>
+                          <% }%>
+
+
+                          <span class="message-date">
+                            <%=notif.date.split(',')[0]%>
+                          </span>
+                        </li>
+                      <% }); %>
+                    </ul>
+
+                    </form>
+                  </div>
+              </form>
               </div>
             </div>
           </div>
-          <div class="heading" style="text-align: center;">
-            <button style="margin-bottom: 30px; margin-right: 15px;" type="button" class="btn btn-primary" class="delete-button"><a id="notifButton" href="/notif"><i class="far fa-comment-dots"></i> Send Notification</a></button>
-          </div>
-            <div class="search-filter">
-            </div>
-            <ul class = "new_messages" id="new_messages">
-              <% notifs.forEach(notif => { %>
-                <div class="notification">
 
-                  <!-- Known-sender message -->
-
-                    <!-- <input name=<%=notif['_id']%> type="checkbox"/> -->
-                    <span style="margin-bottom: 10px;"><a style="color: inherit;" href="/message/<%=notif._id%>"> <span><span class="msg-info"><strong><%=notif.subject%></strong> <span style="font-size: 10px;"><%=notif.date.split(", ")[1]%> | <%=notif.date.split(", ")[0]%></span></span> </a> </span>
-                  <br />
-
-                  <% if (notif.text.split(' ').length > 20) { %>
-                    <span class="message" style="margin-left: 5px;"><%=notif.text.split(' ').slice(0, 21).join(' ')%> <a style="color: inherit;" href="/message/<%=notif._id%>">(Read More)</a></span>
-                  <% } else { %>
-                    <span class="message" style="margin-left: 5px;"><%=notif.text%></span>
-                  <% } %>
-
-                </div>
-              <% }) %>
-            </ul>
+        </div>
       </div>
-    </div>
+      <script src="/javascript/inbox/index.js"></script>
   </body>
 </html>
