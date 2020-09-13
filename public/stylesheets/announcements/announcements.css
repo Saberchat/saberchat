@@ -100,3 +100,37 @@ body {
   margin-top: 5px;
   border-radius: 50%;
 }
+
+.input-group-mb3 {
+  width: 100%;
+  text-align: center;
+  color: orange;"
+}
+
+#new-announcement-message, #new-announcement-txt {
+  width: 100%;
+  margin-left: 300px;
+  margin-right: 300px;
+}
+
+#new-announcement-txt {
+  height: 200px;
+}
+
+@media only screen and (max-width: 600px) {
+  #new-announcement-message, #new-announcement-txt {
+    width: 100%;
+    margin-left: 50px;
+    margin-right: 50px;
+  }
+
+  #new-announcement-txt {
+    height: 100px;
+  }
+
+  #delete-ann-button, #edit-ann-button, #send-ann-button {
+    width: 40%;
+    padding-right: 10px;
+    margin-bottom: 20px;
+  }
+}
