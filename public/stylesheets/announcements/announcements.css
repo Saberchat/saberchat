@@ -117,7 +117,7 @@ body {
   height: 200px;
 }
 
-@media only screen and (max-width: 600px) {
+@media only screen and (max-width: 768px) {
   #new-announcement-message, #new-announcement-txt {
     width: 100%;
     margin-left: 50px;
@@ -129,8 +129,7 @@ body {
   }
 
   #delete-ann-button, #edit-ann-button, #send-ann-button {
-    width: 40%;
-    padding-right: 10px;
+    width: 50%;
     margin-bottom: 20px;
   }
 }
