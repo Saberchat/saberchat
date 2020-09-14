@@ -190,6 +190,34 @@ router.get('/orders', middleware.isLoggedIn, (req, res) => {
   });
 });
 
+router.get('/view_items', middleware.isLoggedIn, (req, res) => {
+
+  Item.find({isAvailable: true}, (err, foundItems) => {
+
+    if (err || !foundItems) {
+      req.flash('error', "Unable to access database")
+      res.redirect('back')
+
+    } else {
+
+      Announcement.find({}).populate({
+        path: 'sender',
+        select: ['username', 'imageUrl']
+      }).populate('message').exec((err, foundAnns) => {
+        if (err || !foundAnns) {
+          req.flash('error', 'Unable to access database')
+          res.redirect('back')
+
+        } else {
+
+          res.render('cafe/items', {items: foundItems, announcements: foundAnns, announced: false})
+        }
+      })
+    }
+  })
+})
+
+
 router.get('/delete_order/:id', middleware.isLoggedIn, (req, res) => {
 
   //Conditionals ensure that deletion time is between 9AM and 12PM

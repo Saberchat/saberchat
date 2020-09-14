@@ -5,6 +5,12 @@
   padding-top: 50px;
 }
 
+#project-container {
+  width: 50%;
+  height: 50%;
+  display: inline-block;
+}
+
 #new-project-message, #new-project-images {
   margin-left: 300px;
   margin-right: 300px;
@@ -62,5 +68,10 @@
 
   #clear {
     margin-right: 50px;
+  }
+
+  #project-container {
+    width: 100%;
+    display: inline-block;
   }
 }
