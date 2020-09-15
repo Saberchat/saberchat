@@ -221,7 +221,7 @@ const Notification = require('../models/notification');
 // })
 //
 // router.post('/:id/ready', middleware.isLoggedIn, (req, res) => {
-//   Order.findById(req.params.id).populate('items').exec((err, foundOrder) => {
+//   Order.findById(req.params.id).popualate('items').exec((err, foundOrder) => {
 //     if (err || !foundOrder) {
 //       console.log(err);
 //       req.flash('error', "Could not find order");
