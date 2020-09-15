@@ -58,7 +58,7 @@
                   <div class="message-actions display">
                     <a href="/inbox" class="action-btn">Inbox</a>
                     <!-- <a href="/notif" class="action-btn">Send New</a> -->
-                    <a href="/sent" class="action-btn">View Sent</a>
+                    <a href="/inbox/sent" class="action-btn">View Sent</a>
                   </div>
                   <!-- request actions -->
                   <!-- <div class="request-actions">
@@ -76,7 +76,7 @@
                   <% } %>
 
                       <strong class="send-notif-header">Regular Notification</strong>
-                      <form action="/send_group" method="post" style="margin-bottom: 25px;">
+                      <form action="/inbox/send_group" method="post" style="margin-bottom: 25px;">
 
                         <div class="input-group mb-3" style="width: 100%;">
                           <select id="recipients" name="recipients" style="width: 100%;">
@@ -113,7 +113,7 @@
                     <!-- Anonymous Hotline for students-->
                     <div class="send-notif-type" style="margin-top: 20px; margin-bottom: 50px; text-align: center; display: inline-block;">
                       <strong class="send-notif-header">Anonymous Hotline</strong>
-                      <form action="/send_anonymous" method="post" style="margin-bottom: 25px;">
+                      <form action="/inbox/send_anonymous" method="post" style="margin-bottom: 25px;">
 
                         <div class="input-group mb-3" style="width: 100%;">
                           <select id="recipients_anonymous" name="recipient" style=" width: 100%;">

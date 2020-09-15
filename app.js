@@ -127,11 +127,11 @@ app.use(indexRoutes);
 app.use('/chat', chatRoutes);
 app.use('/profiles', profileRoutes);
 app.use('/articles', wHeightsRoutes);
-app.use(inboxRoutes);
-app.use(announcementRoutes);
+app.use('/inbox', inboxRoutes);
+app.use('/announcements', announcementRoutes);
 app.use('/admin', adminRoutes);
 app.use('/cafe', cafeRoutes);
-app.use(projectRoutes);
+app.use('/projects', projectRoutes);
 
 // Catch-all route
 app.get('*', function(req, res) {

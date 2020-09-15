@@ -1,3 +1,13 @@
+.projects {
+  text-align: center;
+}
+
+.project-img {
+  width: 90%;
+  height: 90%;
+  object-fit: contain;
+}
+
 .project-info {
   width: 100%;
   height: 100%px;
@@ -9,6 +19,10 @@
   width: 50%;
   height: 50%;
   display: inline-block;
+}
+
+.project-title {
+  margin-top: 10px;
 }
 
 #new-project-message, #new-project-images {
@@ -59,7 +73,6 @@
     width: 100%;
     margin-left: 50px;
     margin-right: 50px;
-    height: 200px;
   }
 
   #dropdown-button {
@@ -74,4 +87,10 @@
     width: 100%;
     display: inline-block;
   }
+}
+
+#edit-button {
+  margin-top: 20px;
+  margin-right: 10px;
+  display: inline-block;
 }

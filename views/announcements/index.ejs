@@ -19,7 +19,7 @@
     <script src="https://kit.fontawesome.com/dccc745c41.js" crossorigin="anonymous"></script>
     <%- include('../partials/navbar') %>
     <%- include('../partials/header') %>
-    <%- include('../partials/announcement') %>
+
   </head>
   <body>
     <div class="container mt-5">
@@ -35,10 +35,12 @@
 
     <% if (announced) { %>
       <% if (announcement.sender.username == currentUser.username) { %>
-        <div style="text-align: center; margin-bottom: 30px;">
-        <button type="button" id="delete-ann-button" class="btn btn-danger" style="margin-right: 15px;"><a href="/delete_announcement/<%=announcement._id%>" style="color: white;">Delete Announcement</a></button>
-        <button type="button" id="edit-ann-button" class="btn btn-success" style="margin-right: 15px;"><a href="/edit_announcement/<%=announcement._id%>" style="color: white;">Edit Announcement</a></button>
-        <button type="button" id="send-ann-button" class="btn btn-primary"><a href="/announce%>" style="color: white;">Send Announcement</a></button>
+        <div class="button-set">
+        <form action="/announcements/destroy/<%=announcement._id%>?_method=delete" method="post" style="display: inline-block;">
+          <button type="submit" id="delete-ann-button" class="btn btn-danger">Delete Announcement</a></button>
+        </form>
+        <button type="button" id="edit-ann-button" class="btn btn-success" style="margin-right: 15px;"><a href="/announcements/edit/<%=announcement._id%>" style="color: white;">Edit Announcement</a></button>
+        <button type="button" id="send-ann-button" class="btn btn-primary"><a href="/announcements/new" style="color: white;">Send Announcement</a></button>
         </div>
       <% } %>
 
@@ -48,7 +50,7 @@
             <div class="jumbotron text-center" style="padding: 50px;">
               <h1><%=announcement.subject%></h1>
               <p><em>Posted by <a style="color: black;" href="/profiles/<%=announcement.sender._id%>"><strong><%=announcement.sender.username%></strong></a></em></p>
-              <p style="font-size: 10px; margin-top: 5px;"><%=announcement.date.split(', ')[1]%> | <%=announcement.date.split(', ')[0]%></p>
+              <p style="font-size: 20%; margin-top: 5px;"><%=announcement.date.split(', ')[1]%> | <%=announcement.date.split(', ')[0]%></p>
 
               <p style="margin-top: 10px; white-space: pre-wrap; text-align: left;"><%=announcement.text%></p>
 

@@ -35,22 +35,22 @@
             <h1><i class="fas fa-paint-brush"></i> Student Projects </h1>
             <p>Our Students' Artwork, Gardening Projects, Science Projects and More</p>
             <% if (currentUser.status == 'faculty') { %>
-              <a href="/addProject">Add Project</a>
+              <a href="projects/new">Add Project</a>
             <%}%>
           </div>
         </div>
       </div>
     </div>
 
-    <div class="projects" style="text-align: center;">
-      <%projects.forEach(project => { %>
+    <div class="projects">
+      <%projects.reverse().forEach(project => { %>
         <div class="container mt-5" id="project-container">
           <div class="row">
             <div class="col-12">
               <div class="jumbotron text-center">
                 <div class="project-info">
-                  <a href="view_project/<%=project._id%>"><h3 style="font-size: 20px; margin-top: 10px;"><%=project.title%></h3></a>
-                  <p><em>Posted by <a style="color: black;" href="profiles/<%=project.poster._id%>"><strong><%=project.poster.username%></a></strong></em></p>
+                  <a href="projects/show/<%=project._id%>"><h2 class="project-title"><%=project.title%></h2></a>
+                  <p><em>Posted by <a style="color: black;" href="profiles/<%=project.poster._id%>"><strong><%=project.poster.username%></a></strong></em> on <%=project.date%></p>
                   <% if (project.creators.length > 2) {%>
                     <p><strong>Creators:</strong> <em><a style="color: black" href="profiles/<%=project.creators[0]._id%>"><%=project.creators[0].username%></a> and <%=project.creators.length - 1%> others</em></p>
 
@@ -60,11 +60,14 @@
                   <%} else {%>
                     <p><strong>Creator:</strong> <a style="color: black" href="profiles/<%=project.creators[0]._id%>"><em><%=project.creators[0].username%></em></a></p>
                   <%}%>
-                  <img style="width: 90%; height: 90%; object-fit: contain;" src="<%=project.imgUrl%>"/>
+                  <img class="project-img" src="<%=project.imgUrl%>"/>
                   <br />
                   <% if (currentUser.username == project.poster.username) { %>
-                    <button style="margin-top: 20px; margin-right: 10px;" type="button" class="btn btn-success"><a style="color: white;" href="/edit_project/<%=project.id%>">Edit Project</a></button>
-                    <button style="margin-top: 20px;" class="btn btn-danger" type="button"><a href="/delete_project/<%=project._id%>" style="color: white;">Delete Project</a></button>
+                    <button id="edit-button" type="button" class="btn btn-success"><a style="color: white;" href="projects/edit/<%=project._id%>">Edit Project</a></button>
+
+                    <form action="projects/destroy/<%=project._id%>?_method=delete" method="post" style="display: inline-block;">
+                      <button style="margin-top: 20px; color: white;" class="btn btn-danger" type="submit">Delete Project</button>
+                    </form>
                   <% } %>
                 </div>
               </div>

@@ -8,8 +8,36 @@ const Announcement = require('../models/announcement');
 const AccessReq = require('../models/accessRequest');
 const Room = require('../models/room');
 
+//Route to display user inbox
+router.get('/', middleware.isLoggedIn, (req, res) => {
+	async function inboxGet() {
+		await req.user.populate({path: 'inbox', populate: { path: 'sender', select: ['username', 'imageUrl']}}).execPopulate();
+
+		await req.user.populate(
+			{
+				path: 'requests',
+				populate: [
+					{ path: 'requester', select: ['username', 'imageUrl']},
+					{ path: 'room', select: 'name'}
+				]
+			}).execPopulate();
+
+		foundAnns = await Announcement.find({}).populate({path: 'sender', select: ['username', 'imageUrl']}).populate('message');
+		if(!foundAnns) {req.flash('error', 'Unable to access database'); return res.redirect('back');}
+
+		res.render('inbox/index', {announcements: foundAnns.reverse(), announced: false, inbox: req.user.inbox.reverse(), requests: req.user.requests.reverse(), viewing_sent: false});
+
+	}
+	inboxGet().catch(err => {
+		console.log(err);
+		req.flash('error', 'An error occured');
+		res.redirect('back');
+	});
+});
+
+
 //Access sendNotification file
-router.get('/notif', middleware.isLoggedIn, (req, res) => {
+router.get('/new', middleware.isLoggedIn, (req, res) => {
 	User.find({}, (err, foundUsers) => {
 		if(err || !foundUsers) {
 			req.flash('error', 'Unable to access Database');
@@ -24,7 +52,7 @@ router.get('/notif', middleware.isLoggedIn, (req, res) => {
 
 				} else {
 
-					res.render('inbox/sendNotification', {announcements: foundAnns.reverse(), announced: false, users: foundUsers, selected_users: [], currentUser: req.user})
+					res.render('inbox/new', {announcements: foundAnns.reverse(), announced: false, users: foundUsers, selected_users: [], currentUser: req.user})
 				}
 			})
 		}
@@ -85,7 +113,7 @@ router.post('/send_group', middleware.isLoggedIn, (req, res) => {
 				}
 			}
 			req.flash('success', `Notification sent to everyone!`)
-			res.redirect('/notif')
+			res.redirect('/inbox/new')
 		})
 
 	} else { //Send notif to specific mailing list
@@ -132,7 +160,7 @@ router.post('/send_group', middleware.isLoggedIn, (req, res) => {
 					})
 				}
 				req.flash('success', `Notification sent to mailing list!!`)
-				res.redirect('/notif')
+				res.redirect('/inbox/new')
 			}
 		})
 	}
@@ -187,7 +215,7 @@ router.post('/send_anonymous', (req, res) => {
 			}
 
 			req.flash('success', `Notification sent to all faculty! Your identity has been kept anonymous`)
-			res.redirect('/notif')
+			res.redirect('/inbox/new')
 		})
 
 	} else { // Send notif to specific mailing list of faculty
@@ -236,41 +264,14 @@ router.post('/send_anonymous', (req, res) => {
 				}
 
 				req.flash('success', `Notification sent to mailing list! Your identity has been kept anonymous`)
-				res.redirect('/notif')
+				res.redirect('/inbox/new')
 			}
 		})
 	}
 })
 
-//Route to display user inbox
-router.get('/inbox', middleware.isLoggedIn, (req, res) => {
-	async function inboxGet() {
-		await req.user.populate({path: 'inbox', populate: { path: 'sender', select: ['username', 'imageUrl']}}).execPopulate();
-
-		await req.user.populate(
-			{
-				path: 'requests',
-				populate: [
-					{ path: 'requester', select: ['username', 'imageUrl']},
-					{ path: 'room', select: 'name'}
-				]
-			}).execPopulate();
-
-		foundAnns = await Announcement.find({}).populate({path: 'sender', select: ['username', 'imageUrl']}).populate('message');
-		if(!foundAnns) {req.flash('error', 'Unable to access database'); return res.redirect('back');}
-
-		res.render('inbox/index', {announcements: foundAnns.reverse(), announced: false, inbox: req.user.inbox.reverse(), requests: req.user.requests.reverse(), viewing_sent: false});
-
-	}
-	inboxGet().catch(err => {
-		console.log(err);
-		req.flash('error', 'An error occured');
-		res.redirect('back');
-	});
-});
-
 //View message in your inbox in more detail
-router.get('/message/:id', middleware.isLoggedIn, (req, res) => {
+router.get('/show/:id', middleware.isLoggedIn, (req, res) => {
 	Notification.findOne({_id: req.params.id}).populate({path: 'sender', select: ['username', 'imageUrl']})
 	.exec((err, foundNotif) => {
 		if (err || !foundNotif) {
@@ -311,7 +312,7 @@ router.get('/message/:id', middleware.isLoggedIn, (req, res) => {
 
 						} else {
 
-							res.render('inbox/notification', {announcements: foundAnns.reverse(), announced: false, notif: foundNotif, recipient_profiles: foundUsers})
+							res.render('inbox/show', {announcements: foundAnns.reverse(), announced: false, notif: foundNotif, recipient_profiles: foundUsers})
 						}
 					})
 				}
@@ -335,7 +336,7 @@ router.get('/sent', middleware.isLoggedIn, (req, res) => {
 					res.redirect('back')
 
 				} else {
-					res.render('inbox/sentNotifications', {announcements: foundAnns.reverse(), announced: false, inbox: foundNotifs.reverse()})
+					res.render('inbox/indexSent', {announcements: foundAnns.reverse(), announced: false, inbox: foundNotifs.reverse()})
 
 				}
 			})
@@ -344,7 +345,7 @@ router.get('/sent', middleware.isLoggedIn, (req, res) => {
 })
 
 //Clear entire inbox
-router.get('/clear', middleware.isLoggedIn, (req, res) => {
+router.delete('/clear', middleware.isLoggedIn, (req, res) => {
 	req.user.inbox = []
 	req.user.notifCount = 0
 	req.user.save()
@@ -388,7 +389,7 @@ router.delete('/delete', middleware.isLoggedIn, (req, res) => {
 	})
 })
 
-router.get('/mark_all', middleware.isLoggedIn, (req, res) => {
+router.put('/mark_all', middleware.isLoggedIn, (req, res) => {
 	Notification.find({_id: {$in: req.user.inbox}}, (err, foundNotifs) => {
 		if (err || !foundNotifs) {
 			req.flash('error', "Unable to access database")
@@ -418,7 +419,7 @@ router.get('/mark_all', middleware.isLoggedIn, (req, res) => {
 	})
 })
 
-router.post('/mark_selected', middleware.isLoggedIn, (req, res) => {
+router.put('/mark_selected', middleware.isLoggedIn, (req, res) => {
 	selected = [] //List of messages that are selected
 	for (let item of req.user.inbox) {
 		if (Object.keys(req.body).includes(item._id.toString())) { //If item is selected (checkbox)
@@ -466,7 +467,7 @@ router.post('/mark_selected', middleware.isLoggedIn, (req, res) => {
 // ========================================
 
 // displays single access request
-router.get('/inbox/requests/:id', middleware.isLoggedIn, (req, res) => {
+router.get('/requests/:id', middleware.isLoggedIn, (req, res) => {
 	AccessReq.findById(req.params.id)
 	.populate({path: 'requester', select: 'username'})
 	.populate({path: 'room', select: ['creator', 'name']}).exec((err, foundReq) => {
@@ -480,7 +481,7 @@ router.get('/inbox/requests/:id', middleware.isLoggedIn, (req, res) => {
 });
 
 // route to accept request
-router.post('/inbox/requests/:id/accept', middleware.isLoggedIn, (req, res) => {
+router.post('/requests/:id/accept', middleware.isLoggedIn, (req, res) => {
 	async function handleAccept() {
 		const Req = await AccessReq.findById(req.params.id)
 		.populate({path: 'room', select: ['creator']});
@@ -550,7 +551,7 @@ router.post('/inbox/requests/:id/accept', middleware.isLoggedIn, (req, res) => {
 });
 
 // route to reject request
-router.post('/inbox/requests/:id/reject', middleware.isLoggedIn, (req, res) => {
+router.post('/requests/:id/reject', middleware.isLoggedIn, (req, res) => {
 	async function handleReject() {
 		const Req = await AccessReq.findById(req.params.id)
 		.populate({path: 'room', select: ['creator']});

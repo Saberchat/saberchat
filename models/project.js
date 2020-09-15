@@ -4,6 +4,7 @@ var projectSchema = new mongoose.Schema({
     title: String,
     imgUrl: String,
     text: String,
+    date: String,
     poster: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'User'

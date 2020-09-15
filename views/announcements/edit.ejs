@@ -7,7 +7,6 @@
 
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css" integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk" crossorigin="anonymous">
     <link rel="stylesheet" href="/stylesheets/main.css">
-
     <link rel="stylesheet" href="/stylesheets/components/announcement.css">
     <link rel="stylesheet" href="/stylesheets/components/header.css">
     <link rel="stylesheet" href="/stylesheets/components/navbar.css">
@@ -20,35 +19,32 @@
     <script src="https://kit.fontawesome.com/dccc745c41.js" crossorigin="anonymous"></script>
   </head>
   <body id="body">
-
     <%- include('../partials/navbar') %>
     <%- include('../partials/header') %>
-    <%- include('../partials/announcement') %>
 
     <div class="container mt-5">
       <div class="row">
         <div class="col-12">
           <div class="jumbotron text-center">
-            <h1><i class="fas fa-bullhorn"></i> Send Announcement</h1>
-            <p>For teachers to send important messages to students, staff and parents</p>
+            <h1><i class="fas fa-bullhorn"></i> Edit Announcement</h1>
+            <p>Modify Announcements You Posted Earlier</p>
+            <a href="../show/<%=announcement._id%>">Back to Announcement</a>
           </div>
         </div>
       </div>
     </div>
-    <form action="/sendAnnouncement" id="sendform" method="post">
-      <div class="info">
-        <div class="input-group mb-3">
-          <input id="new-announcement-message" name="subject" maxlength="50" type="text" class="form-control" placeholder="Announcement Subject" aria-label="Username" aria-describedby="basic-addon1" required>
-        </div>
-        <div class="input-group mb-3">
-          <input id="new-announcement-message" name="imgUrls" type="text" class="form-control" placeholder="Any Image URLs" aria-label="Username" aria-describedby="basic-addon1">
-        </div>
-        <div class="input-group">
-          <textarea id="new-announcement-txt" name="message" placeholder="Announcement Message" class="form-control" aria-label="With textarea" required></textarea>
-        </div>
-        <br />
-        <button id="submit-announcement" class="btn btn-primary" type="submit">Send Announcement</button>
+    <form action="/announcements/update/<%=announcement._id%>?_method=put" method="post">
+      <div class="input-group mb-3">
+        <input id="new-announcement-message" name="subject" maxlength="50" type="text" class="form-control" placeholder="Announcement Subject" value="<%=announcement.subject%>" aria-label="Username" aria-describedby="basic-addon1" required>
       </div>
+      <div class="input-group mb-3">
+        <input id="new-announcement-message" name="imgUrls" type="text" class="form-control" placeholder="Any Image Urls" aria-label="Username" value="<%=announcement.images.join(', ')%>" aria-describedby="basic-addon1">
+      </div>
+      <div class="input-group">
+        <textarea id="new-announcement-txt" name="message" placeholder="Announcement Message"  class="form-control" aria-label="With textarea" required><%=announcement.text%></textarea>
+      </div>
+      <br />
+      <button id="submit-announcement" class="btn btn-primary" type="submit">Submit Changes</button>
     </form>
 </body>
 <script>

@@ -42,9 +42,19 @@
     <div class="container mt-5" style="display: flex; justify-content: center;">
       <div class="row">
         <div class="col-12">
-          <div class="jumbotron text-center" style="width: 700px; padding: 50px;">
+          <div class="jumbotron text-center" style="padding: 50px;">
             <h1><%=project.title%></h1>
-            <p><em>Posted by <strong><a style="color: black;" href="../profiles/<%=project.poster._id%>"><%=project.poster.username%></a></strong></em></p>
+
+            <% if (currentUser.username == project.poster.username) { %>
+              <button id="edit-button" type="button" class="btn btn-success"><a style="color: white;" href="projects/edit/<%=project._id%>">Edit Project</a></button>
+
+              <form action="projects/destroy/<%=project._id%>?_method=delete" method="post" style="display: inline-block;">
+                <button class="btn btn-danger" type="submit" style="color: white;">Delete Project</button>
+              </form>
+            <% } %>
+            <br /><br />
+
+            <p><em>Posted by <strong><a style="color: black;" href="../profiles/<%=project.poster._id%>"><%=project.poster.username%></a></strong></em> on <%=project.date%></p>
 
             <% if (project.creators.length > 2) {%>
               <span><strong>Creators:</strong>

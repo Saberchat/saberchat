@@ -1,15 +1,14 @@
-body {
-  /* background-image: url('https://images.unsplash.com/photo-1594793861747-136c34047e9d?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=1952&q=80') */
-  /* background-image: url('https://us.123rf.com/450wm/funkyplayer/funkyplayer1803/funkyplayer180300215/97421592-bright-color-seamless-pattern-with-geometric-figures-repeated-diamond-ornamental-abstract-background.jpg?ver=6') */
-  /* background-image: url('/images/pattern.jpg'); */
-}
-
 #body {
   text-align: center;
 }
 
 .heading {
   text-align: center;
+}
+
+.button-set {
+  text-align: center;
+  margin-bottom: 30px;"
 }
 
 .title {
@@ -50,15 +49,10 @@ body {
   border-color: black;
   border-width: 2px;
 }
-#delete-button {
-  border-radius: 25px;
-  width: 200px;
-  height: 30px;
-  font-size: 10px;
-  color: white;
-  background-color: #db391d;
-  border-color: 'black';
-  border-width: 1px;
+
+#delete-ann-button {
+  margin-right: 15px;
+  color: white;"
 }
 
 #new-announcement-text {

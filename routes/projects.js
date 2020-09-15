@@ -1,11 +1,12 @@
 const express = require('express');
 const middleware = require('../middleware');
 const router = express.Router(); //start express router
+const dateFormat = require('dateformat')
 const User = require('../models/user');
 const Announcement = require('../models/announcement')
 const Project = require('../models/project');
 
-router.get('/projects', middleware.isLoggedIn, (req, res) => {
+router.get('/', middleware.isLoggedIn, (req, res) => {
 
   Project.find({})
   .populate('creators')
@@ -26,14 +27,14 @@ router.get('/projects', middleware.isLoggedIn, (req, res) => {
 
         } else {
 
-          res.render('projects/projects', {announcements: foundAnns.reverse(), projects: foundProjects})
+          res.render('projects/index', {announcements: foundAnns.reverse(), projects: foundProjects})
         }
       })
     }
   })
 })
 
-router.get('/view_project/:id', middleware.isLoggedIn, (req, res) => {
+router.get('/show/:id', middleware.isLoggedIn, (req, res) => {
   Project.findById(req.params.id)
   .populate('poster')
   .populate('creators')
@@ -50,14 +51,14 @@ router.get('/view_project/:id', middleware.isLoggedIn, (req, res) => {
 
         } else {
 
-          res.render('projects/viewProject', {announcements: foundAnns.reverse(), project: foundProject})
+          res.render('projects/show', {announcements: foundAnns.reverse(), project: foundProject})
         }
       })
     }
   })
 })
 
-router.get('/addProject', middleware.isLoggedIn, (req, res) => {
+router.get('/new', middleware.isLoggedIn, (req, res) => {
   User.find({permission: 'student'}, (err, foundUsers) => {
     if (err || !foundUsers) {
       console.log(err)
@@ -72,14 +73,14 @@ router.get('/addProject', middleware.isLoggedIn, (req, res) => {
 
         } else {
 
-          res.render('projects/addProject', {announcements: foundAnns.reverse(), students: foundUsers})
+          res.render('projects/new', {announcements: foundAnns.reverse(), students: foundUsers})
         }
       })
     }
   })
 })
 
-router.post('/submitProject', middleware.isLoggedIn, (req, res) => {
+router.post('/create', middleware.isLoggedIn, (req, res) => {
 
   User.find({username: {$in: req.body.creators.split(', ')}}, (err, foundCreators) => {
     if (err || !foundCreators) {
@@ -95,9 +96,10 @@ router.post('/submitProject', middleware.isLoggedIn, (req, res) => {
           res.redirect('back')
 
         } else {
+          project.date = dateFormat(project.created_at, "mmm d, h:MMTT")
           project.save()
           req.flash('success', 'Project posted!')
-    			res.redirect('/projects')
+    			res.redirect(`/projects/show/${project._id}`)
         }
       })
 
@@ -106,7 +108,7 @@ router.post('/submitProject', middleware.isLoggedIn, (req, res) => {
 
 })
 
-router.get('/edit_project/:id', middleware.isLoggedIn, (req, res) => {
+router.get('/edit/:id', middleware.isLoggedIn, (req, res) => {
   Project.findById(req.params.id)
   .populate('poster')
   .populate('creators')
@@ -136,7 +138,7 @@ router.get('/edit_project/:id', middleware.isLoggedIn, (req, res) => {
 
             } else {
 
-              res.render('projects/editProject', {announcements: foundAnns.reverse(), project: foundProject, students: foundUsers, creatornames})
+              res.render('projects/edit', {announcements: foundAnns.reverse(), project: foundProject, students: foundUsers, creatornames})
             }
           })
         }
@@ -145,7 +147,7 @@ router.get('/edit_project/:id', middleware.isLoggedIn, (req, res) => {
   })
 })
 
-router.post('/submit_project_edits/:id', middleware.isLoggedIn, (req, res) => {
+router.put('/update/:id', middleware.isLoggedIn, (req, res) => {
   User.find({username: {$in: req.body.creators.split(', ')}}, (err, foundCreators) => {
     if (err || !foundCreators) {
       req.flash('error', 'Unable to access database')
@@ -160,23 +162,34 @@ router.post('/submit_project_edits/:id', middleware.isLoggedIn, (req, res) => {
 
         } else {
           req.flash("success", "Project Updated!")
-          res.redirect('/projects')
+          res.redirect(`/projects/show/${foundProject._id}`)
         }
       })
     }
   })
 })
 
-router.get('/delete_project/:id', (req, res) => {
-  Project.findByIdAndDelete(req.params.id, (err, foundProject) => {
-    if (err || !foundProject) {
-      req.flash('error', "Unable to access database")
+router.delete('/destroy/:id', (req, res) => {
+
+  Project.findById(req.params.id, (err, foundProj) => {
+    if (foundProj.poster._id.toString() != req.user._id.toString()) {
+      req.flash('error', "You can only delete projects you posted")
       res.redirect('back')
 
     } else {
-      req.flash("success", "Project Deleted!")
-      res.redirect('/projects')
+      Project.findByIdAndDelete(req.params.id, (err, foundProject) => {
+        if (err || !foundProject) {
+          req.flash('error', "Unable to access database")
+          res.redirect('back')
+
+        } else {
+          req.flash("success", "Project Deleted!")
+          res.redirect('/projects')
+        }
+      })
     }
   })
+
 })
+
 module.exports = router;
