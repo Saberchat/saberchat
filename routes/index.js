@@ -146,7 +146,7 @@ router.get('/alsion', (req, res) => {
 				teacherNames.push(`${fac.firstName} ${fac.lastName}`)
 			}
 
-			res.render('other/alsion_info', {faculty: teacherNames})
+			res.render('other/alsion_info', {faculty: teacherNames.join(', ')})
 		}
 	})
 })
