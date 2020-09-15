@@ -85,7 +85,7 @@ const Notification = require('../models/notification');
 //   }
 // });
 //
-// router.post('/new', middleware.isLoggedIn, (req, res) => {
+// router.get('/new', middleware.isLoggedIn, (req, res) => {
 //
 //   //Conditionals to make sure that the orders are done between 9 - 12:20
 //
