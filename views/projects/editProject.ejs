@@ -11,6 +11,7 @@
     <link rel="stylesheet" href="/stylesheets/components/header.css">
     <link rel="stylesheet" href="/stylesheets/components/navbar.css">
     <link rel="stylesheet" href="/stylesheets/components/announcement.css">
+    <link rel="stylesheet" href="/stylesheets/projects/projects.css">
 
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
@@ -41,11 +42,11 @@
 
     <form action="/submit_project_edits/<%=project._id%>" method="post" style="text-align: center;">
       <div class="input-group mb-3">
-        <input name="title" maxlength="30" style="margin-left: 300px; margin-right: 300px;"type="text" class="form-control" value = "<%=project.title%>" placeholder="Enter Project Name" aria-label="Username" aria-describedby="basic-addon1" required>
+        <input id="new-project-message" name="title" maxlength="30" type="text" class="form-control" value = "<%=project.title%>" placeholder="Enter Project Name" aria-label="Username" aria-describedby="basic-addon1" required>
       </div>
 
       <div class="input-group mb-3">
-        <div class="input-group-prepend" style="margin-left: 300px;">
+        <div id="dropdown-button" class="input-group-prepend">
           <button type="button" class="btn btn-outline-secondary dropdown-toggle dropdown-toggle-split" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
             <span class="sr-only">Toggle Dropdown</span>
           </button>
@@ -55,18 +56,18 @@
             <% }) %>
           </div>
         </div>
-        <input class="form-control" autocomplete="off" name="creators" id="creators" type="text" aria-describedby="basic-addon2" value = "<%=creatornames.join(', ')%>" placeholder="Creators" style="width: 400px; color: blue;" required/>
+        <input id="creators" class="form-control" autocomplete="off" name="creators" type="text" aria-describedby="basic-addon2" value = "<%=creatornames.join(', ')%>" placeholder="Creators" required/>
         <div class="input-group-append">
-          <button id="clear" class="btn btn-outline-secondary" style="margin-right: 300px; "type="button">Clear Field</button>
+          <button id="clear" class="btn btn-outline-secondary" type="button">Clear Field</button>
         </div>
       </div>
 
       <div class="input-group mb-3">
-        <input type="text" style="margin-left: 300px; margin-right: 300px;" name="img" class="form-control" value = "<%=project.imgUrl%>" placeholder="Enter Image Url" aria-label="Username" aria-describedby="basic-addon1" required>
+        <input id="new-project-images" type="text" name="img" class="form-control" value = "<%=project.imgUrl%>" placeholder="Enter Image Url" aria-label="Username" aria-describedby="basic-addon1" required>
       </div>
 
       <div class="input-group">
-        <textarea maxlength="500" name="text" placeholder="Write a little about the project" style="margin-left: 300px; margin-right: 300px; height: 200px" class="form-control" aria-label="With textarea" required><%=project.text%></textarea>
+        <textarea id="new-project-text" maxlength="500" name="text" placeholder="Write a little about the project" class="form-control" aria-label="With textarea" required><%=project.text%></textarea>
       </div>
       <br />
       <button class="btn btn-primary" type="submit">Submit Changes</button>

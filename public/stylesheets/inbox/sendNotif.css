@@ -1,36 +1,41 @@
-body {
-  /* background-image: url('/images/Cloudy sunset.jpg'); */
-  background-size: cover;
-}
-
 .submit-button {
   background-color: green;
   color: white;
-  margin-bottom: 15px;
+  margin-bottom: 25px;
+  width: 100%:
 }
 
 .send-notif-type {
   display: inline-block;
-  margin-right: 10px;
-  margin-left: 10px;
+  margin: 50px;
 }
 
 .send-notif-header {
   color: red;
   font-family: times;
+  font-size: 20px;
   font-weight: bold;
 }
 
-.message {
-  margin-bottom: 5px;
-}
 
 #clear, #clear_anonymous {
-  background-color: red;
   color: white;
 }
 
 .notif-options {
   background-color: lightgrey;
-  /* text-align: center; */
+}
+
+.send-box {
+  text-align: center;
+  width: 100%
+}
+
+@media only screen and (max-width: 768px) {
+  .form-control {
+    text-align: center;
+    display: inline-block;
+    width: 100%;
+    padding-right: 2px;
+  }
 }

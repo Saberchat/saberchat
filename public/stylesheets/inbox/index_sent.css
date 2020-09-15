@@ -7,7 +7,7 @@
     box-shadow: 0px 10px 20px #c2c2c2;
 }
 
-/* 
+/*
 ===============================
 Message and request lists
 */
@@ -15,7 +15,7 @@ Message and request lists
     width: 100%;
 }
 
-/* 
+/*
 ===============================
 Action bar
 */
@@ -24,7 +24,7 @@ Action bar
     width: 100%;
 }
 
-/* 
+/*
 ===============================
 Navigation
 */
@@ -52,7 +52,7 @@ Navigation
     background-color: #42568F;
 }
 
-/* 
+/*
 ===============================
 Actions
 */
@@ -88,7 +88,7 @@ Actions
     color: #ffffff;
 }
 
-/* 
+/*
 ===============================
 Messages
 */
@@ -97,7 +97,7 @@ Messages
         padding: 0;
         height: 52px;
     }
-    
+
     .list-group-item .message-body {
         display: block;
         height: 100%;
@@ -108,14 +108,14 @@ Messages
         text-decoration: none;
         color: #424651;
     }
-    
+
     .list-group-item .message-check {
         position: relative;
         float: left;
         width: 30px;
         height: 100%;
     }
-    
+
     .list-group-item .message-check input {
         position: absolute;
         width: 15px;
@@ -126,9 +126,9 @@ Messages
         -ms-transform: translateY(-50%);
         -webkit-transform: translateY(-50%);
         -moz-transform: translateY(-50%);
-        
+
     }
-    
+
     .message-subject {
         display: inline-block;
         width: 6rem;
@@ -140,7 +140,7 @@ Messages
         overflow-x: hidden;
         text-overflow: ellipsis;
     }
-    
+
     .message-from {
         display: inline-block;
         width: 6rem;
@@ -152,7 +152,7 @@ Messages
         overflow-x: hidden;
         text-overflow: ellipsis;
     }
-    
+
     .message-text {
         font-weight: 400;
         line-height: 34px;
@@ -160,7 +160,7 @@ Messages
         overflow-x: hidden;
         text-overflow: ellipsis;
     }
-    
+
     .message-date {
         display: inline-block;
         position: absolute;
@@ -235,7 +235,7 @@ Messages
     }
 }
 
-/* 
+/*
 ===============================
 Requests
 */
@@ -315,7 +315,7 @@ Requests
     }
 }
 
-/* 
+/*
 ===============================
 Misc.
 */
@@ -352,7 +352,7 @@ Misc.
     height: 100%;
 }
 
-/* 
+/*
 ===============================
 Style variances for screen sizes
 */
@@ -422,9 +422,9 @@ Style variances for screen sizes
 
 }
 
-/* 
+/*
 ===============================
-Classes to toggle displays 
+Classes to toggle displays
 */
 .message-list, .request-list, .message-actions, .request-actions {
     display: none;

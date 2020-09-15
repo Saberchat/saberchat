@@ -11,6 +11,7 @@
     <link rel="stylesheet" href="/stylesheets/components/header.css">
     <link rel="stylesheet" href="/stylesheets/components/navbar.css">
     <link rel="stylesheet" href="/stylesheets/components/announcement.css">
+    <link rel="stylesheet" href="/stylesheets/projects/projects.css">
 
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
@@ -43,11 +44,11 @@
 
     <div class="projects" style="text-align: center;">
       <%projects.forEach(project => { %>
-        <div class="container mt-5" style="width: 400px; display: inline-block;">
+        <div class="container mt-5" id="project-container">
           <div class="row">
             <div class="col-12">
               <div class="jumbotron text-center">
-                <div class="project-info" style="height: 450px; padding-bottom: 125px; margin-top: -100px; padding-top: 50px;">
+                <div class="project-info">
                   <a href="view_project/<%=project._id%>"><h3 style="font-size: 20px; margin-top: 10px;"><%=project.title%></h3></a>
                   <p><em>Posted by <a style="color: black;" href="profiles/<%=project.poster._id%>"><strong><%=project.poster.username%></a></strong></em></p>
                   <% if (project.creators.length > 2) {%>

@@ -15,6 +15,10 @@ article.text-block {
     width: 100%;
 }
 
+.image-block-half {
+    height: 50%
+}
+
 .text-block .block-header {
     padding: 15px 30px 5px 30px;
     background-color: #424651;
