@@ -39,6 +39,11 @@ router.post("/register",  function(req, res) {
 	} else if(!/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test(req.body.email)) {
 		req.flash('error', 'Fill in valid email');
 		res.redirect('/');
+
+	} else if (req.body.email.split('@')[1] != 'alsionschool.org') { //THIS IS A PLACEHOLDER FOR UNTIL WE HAVE MR. JOEY SET UP A PROPER WHITELIST
+		req.flash('error', 'Only members of the Alsion community may sign up');
+		res.redirect('/');
+
 	} else if(req.body.firstName == '') {
 		req.flash('error', 'Fill in first name');
 		res.redirect('/');
@@ -150,6 +155,12 @@ router.get('/alsion', (req, res) => {
 		}
 	})
 })
+
+// NOTE: Remove this line when enabling cafe
+router.get('/cafe', middleware.isLoggedIn, (req, res) => {
+  req.flash('error', "The cafe is currently closed");
+  res.redirect('back');
+});
 
 //export router with all the routes connected
 module.exports = router;

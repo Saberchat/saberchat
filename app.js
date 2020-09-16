@@ -40,7 +40,7 @@ const profileRoutes = require('./routes/profile');
 const wHeightsRoutes = require('./routes/wHeights');
 const inboxRoutes = require('./routes/inbox');
 const adminRoutes = require('./routes/admin');
-const cafeRoutes = require('./routes/cafe');
+// const cafeRoutes = require('./routes/cafe');
 const announcementRoutes = require('./routes/announcements');
 const projectRoutes = require('./routes/projects');
 
@@ -51,7 +51,7 @@ const port = process.env.PORT || 3000;
 
 //connect to db. We should set the link as environment variable for security purposes in the future.
 // mongoose.connect(process.env.DATABASE_URL,
-mongoose.connect(process.env.DATABASE_URL,
+mongoose.connect(process.env.DATABASE_URL || 'mongodb+srv://admin_1:alsion2020@cluster0-cpycz.mongodb.net/saberChat?retryWrites=true&w=majority',
 {
   useNewUrlParser: true,
   useUnifiedTopology: true,
@@ -130,7 +130,7 @@ app.use('/articles', wHeightsRoutes);
 app.use('/inbox', inboxRoutes);
 app.use('/announcements', announcementRoutes);
 app.use('/admin', adminRoutes);
-app.use('/cafe', cafeRoutes);
+// app.use('/cafe', cafeRoutes);
 app.use('/projects', projectRoutes);
 
 // Catch-all route

@@ -96,7 +96,7 @@
                               <input class="del-form-input" type="checkbox" name="<%= notif._id %>" value="" onchange="updateDelete()">
                             </div>
 
-                            <% if (notif.read[notif.recipients.indexOf(currentUser.username)] == true) { %>
+                            <% if (notif.read[notif.recipient_ids.indexOf(currentUser._id)] == true) { %>
 
                               <a href="/inbox/show/<%= notif._id %>" class="message-body">
                                 <div class="message-head">
@@ -151,7 +151,7 @@
                               <input class="del-form-input" type="checkbox" name="<%= notif._id %>" value="" onchange="updateDelete()">
                             </div>
 
-                            <% if (notif.read[notif.recipients.indexOf(currentUser.username)] == true) { %>
+                            <% if (notif.read[notif.recipient_ids.indexOf(currentUser._id.toString())] == true) { %>
 
                               <a href="/inbox/show/<%= notif._id %>" class="message-body">
                                 <div class="message-head">
