@@ -60,14 +60,22 @@ router.post("/register",  function(req, res) {
 	} else if(req.body.password.length <= 8) {
 		req.flash('error', 'Password too short');
 		res.redirect('/');
+
 	} else {
+
+		let username = req.body.username;
+
+		if (username[username.length - 1] == ' ') { //Space at the end of usrname causes errors that are hard to fix, and unnecessary if we nip it in the bud here
+			username = username.slice(0, username.length - 1);
+		}
+
 		//creates new user from form info
 		newUser = new User(
 			{
 				email: req.body.email,
 				firstName: req.body.firstName,
 				lastName: req.body.lastName,
-				username: filter.clean(req.body.username),
+				username: filter.clean(username),
 				notifCount: 0
 			}
 		);

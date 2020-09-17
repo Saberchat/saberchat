@@ -63,6 +63,10 @@ router.post('/',[middleware.isLoggedIn, middleware.isFaculty], (req, res) => {
       req.flash('error', 'Unable to access database')
       res.redirect('back')
 
+    } else if(foundCreators.length != req.body.creators.split(', ').length) {
+      req.flash('error', 'Some profiles were changed. Please create project again');
+      res.redirect('back');
+
     } else {
 
       Project.create({title: req.body.title, imgUrl: req.body.img, text: req.body.text, poster: req.user, creators: foundCreators}, (err, project) => {
@@ -154,6 +158,10 @@ router.put('/:id', [middleware.isLoggedIn, middleware.isFaculty], (req, res) => 
       req.flash('error', 'Unable to access database')
       res.redirect('back')
 
+    } else if(foundCreators.length != req.body.creators.split(', ').length) {
+      req.flash('error', 'Some profiles were changed. Please create project again');
+      res.redirect('back');
+      
     } else {
 
       Project.findByIdAndUpdate(req.params.id, {title: req.body.title, imgUrl: req.body.img, creators: foundCreators, text: req.body.text}, (err, foundProject) => {
