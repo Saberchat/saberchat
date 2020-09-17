@@ -34,7 +34,7 @@ router.get('/', middleware.isLoggedIn, (req, res) => {
   })
 })
 
-router.get('/new', middleware.isLoggedIn, (req, res) => {
+router.get('/new', [middleware.isLoggedIn, middleware.isFaculty], (req, res) => {
   User.find({permission: 'student'}, (err, foundUsers) => {
     if (err || !foundUsers) {
       console.log(err)
@@ -56,7 +56,7 @@ router.get('/new', middleware.isLoggedIn, (req, res) => {
   })
 })
 
-router.post('/create', middleware.isLoggedIn, (req, res) => {
+router.post('/create',[middleware.isLoggedIn, middleware.isFaculty], (req, res) => {
 
   User.find({username: {$in: req.body.creators.split(', ')}}, (err, foundCreators) => {
     if (err || !foundCreators) {
@@ -84,7 +84,7 @@ router.post('/create', middleware.isLoggedIn, (req, res) => {
 
 })
 
-router.get('/:id/edit', middleware.isLoggedIn, (req, res) => {
+router.get('/:id/edit', [middleware.isLoggedIn, middleware.isFaculty], (req, res) => {
   Project.findById(req.params.id)
   .populate('poster')
   .populate('creators')
@@ -148,7 +148,7 @@ router.get('/:id', middleware.isLoggedIn, (req, res) => {
 })
 
 
-router.put('/:id', middleware.isLoggedIn, (req, res) => {
+router.put('/:id', [middleware.isLoggedIn, middleware.isFaculty], (req, res) => {
   User.find({username: {$in: req.body.creators.split(', ')}}, (err, foundCreators) => {
     if (err || !foundCreators) {
       req.flash('error', 'Unable to access database')
@@ -170,7 +170,7 @@ router.put('/:id', middleware.isLoggedIn, (req, res) => {
   })
 })
 
-router.delete('/:id', (req, res) => {
+router.delete('/:id', [middleware.isLoggedIn, middleware.isFaculty], (req, res) => {
 
   Project.findById(req.params.id, (err, foundProj) => {
     if (foundProj.poster._id.toString() != req.user._id.toString()) {

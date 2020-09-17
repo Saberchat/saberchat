@@ -94,5 +94,15 @@ middleware.isMod = function(req, res, next) {
 	}
 }
 
+middleware.isFaculty = function(req, res, next) {
+	if(req.user.status == 'faculty') {
+		next();
+	} else {
+		req.flash('error', 'You do not have permission to do that');
+		res.redirect('back');
+	}
+}
+
+
 //export the object with all the functions
 module.exports = middleware;
