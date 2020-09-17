@@ -86,7 +86,7 @@
 
                   <!-- To everyone  -->
 
-                  <% if (notif.recipient_names[0] == 'everyone') { %>
+                  <% if (notif.toEveryone == true && notif.sender != null) { %>
                     <strong>To:</strong><span> everyone</span>
 
                   <!-- To a group including the user  -->

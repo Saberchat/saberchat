@@ -46,9 +46,9 @@
             <h1><%=project.title%></h1>
 
             <% if (currentUser.username == project.poster.username) { %>
-              <button id="edit-button" type="button" class="btn btn-success"><a style="color: white;" href="projects/edit/<%=project._id%>">Edit Project</a></button>
+              <button id="edit-button" type="button" class="btn btn-success"><a style="color: white;" href="projects/<%=project._id%>/edit">Edit Project</a></button>
 
-              <form action="projects/destroy/<%=project._id%>?_method=delete" method="post" style="display: inline-block;">
+              <form action="projects/<%=project._id%>?_method=delete" method="post" style="display: inline-block;">
                 <button class="btn btn-danger" type="submit" style="color: white;">Delete Project</button>
               </form>
             <% } %>

@@ -34,30 +34,6 @@ router.get('/', middleware.isLoggedIn, (req, res) => {
   })
 })
 
-router.get('/show/:id', middleware.isLoggedIn, (req, res) => {
-  Project.findById(req.params.id)
-  .populate('poster')
-  .populate('creators')
-  .exec((err, foundProject) => {
-    if (err || !foundProject) {
-      req.flash('error', "Unable to access database")
-      res.redirect('back')
-
-    } else {
-      Announcement.find({}).populate({path: 'sender', select: ['username', 'imageUrl']}).populate('message').exec((err, foundAnns) => {
-        if (err || !foundAnns) {
-          req.flash('error', 'Unable to access database')
-          res.redirect('back')
-
-        } else {
-
-          res.render('projects/show', {announcements: foundAnns.reverse(), project: foundProject})
-        }
-      })
-    }
-  })
-})
-
 router.get('/new', middleware.isLoggedIn, (req, res) => {
   User.find({permission: 'student'}, (err, foundUsers) => {
     if (err || !foundUsers) {
@@ -99,7 +75,7 @@ router.post('/create', middleware.isLoggedIn, (req, res) => {
           project.date = dateFormat(project.created_at, "mmm d, h:MMTT")
           project.save()
           req.flash('success', 'Project posted!')
-    			res.redirect(`/projects/show/${project._id}`)
+    			res.redirect(`/projects/${project._id}`)
         }
       })
 
@@ -108,7 +84,7 @@ router.post('/create', middleware.isLoggedIn, (req, res) => {
 
 })
 
-router.get('/edit/:id', middleware.isLoggedIn, (req, res) => {
+router.get('/:id/edit', middleware.isLoggedIn, (req, res) => {
   Project.findById(req.params.id)
   .populate('poster')
   .populate('creators')
@@ -147,7 +123,32 @@ router.get('/edit/:id', middleware.isLoggedIn, (req, res) => {
   })
 })
 
-router.put('/update/:id', middleware.isLoggedIn, (req, res) => {
+router.get('/:id', middleware.isLoggedIn, (req, res) => {
+  Project.findById(req.params.id)
+  .populate('poster')
+  .populate('creators')
+  .exec((err, foundProject) => {
+    if (err || !foundProject) {
+      req.flash('error', "Unable to access database")
+      res.redirect('back')
+
+    } else {
+      Announcement.find({}).populate({path: 'sender', select: ['username', 'imageUrl']}).populate('message').exec((err, foundAnns) => {
+        if (err || !foundAnns) {
+          req.flash('error', 'Unable to access database')
+          res.redirect('back')
+
+        } else {
+
+          res.render('projects/show', {announcements: foundAnns.reverse(), project: foundProject})
+        }
+      })
+    }
+  })
+})
+
+
+router.put('/:id', middleware.isLoggedIn, (req, res) => {
   User.find({username: {$in: req.body.creators.split(', ')}}, (err, foundCreators) => {
     if (err || !foundCreators) {
       req.flash('error', 'Unable to access database')
@@ -162,14 +163,14 @@ router.put('/update/:id', middleware.isLoggedIn, (req, res) => {
 
         } else {
           req.flash("success", "Project Updated!")
-          res.redirect(`/projects/show/${foundProject._id}`)
+          res.redirect(`/projects/${foundProject._id}`)
         }
       })
     }
   })
 })
 
-router.delete('/destroy/:id', (req, res) => {
+router.delete('/:id', (req, res) => {
 
   Project.findById(req.params.id, (err, foundProj) => {
     if (foundProj.poster._id.toString() != req.user._id.toString()) {

@@ -52,7 +52,7 @@ router.post('/create', middleware.isLoggedIn, (req, res) => {
 })
 
 
-router.get('/show/:id', middleware.isLoggedIn, (req, res) => {
+router.get('/:id', middleware.isLoggedIn, (req, res) => {
   Announcement.findOne({_id: req.params.id}).populate({path: 'sender', select: ['username', 'imageUrl']}).exec((err, foundAnn) => {
     if (err || !foundAnn) {
       console.log(err)
@@ -74,7 +74,7 @@ router.get('/show/:id', middleware.isLoggedIn, (req, res) => {
   })
 })
 
-router.get('/edit/:id', middleware.isLoggedIn, (req, res) => {
+router.get('/:id/edit', middleware.isLoggedIn, (req, res) => {
   Announcement.findById(req.params.id, (err, foundAnn) => {
     if (err || !foundAnn) {
       req.flash('error', "Unable to access database")
@@ -95,7 +95,7 @@ router.get('/edit/:id', middleware.isLoggedIn, (req, res) => {
   })
 })
 
-router.put('/update/:id', middleware.isLoggedIn, (req, res) => {
+router.put('/:id', middleware.isLoggedIn, (req, res) => {
   Announcement.findByIdAndUpdate(req.params.id, {subject: req.body.subject, images: req.body.imgUrls.split(', '), text: req.body.message}, (err, foundAnn) => {
     if (err || !foundAnn) {
       req.flash('error', "Unable to access database")
@@ -103,12 +103,12 @@ router.put('/update/:id', middleware.isLoggedIn, (req, res) => {
 
     } else {
       req.flash('success', 'Announcement Updated!')
-      res.redirect(`/announcements/show/${foundAnn._id}`)
+      res.redirect(`/announcements/${foundAnn._id}`)
     }
   })
 })
 
-router.delete('/destroy/:id', middleware.isLoggedIn, (req, res) => {
+router.delete('/:id', middleware.isLoggedIn, (req, res) => {
   Announcement.findByIdAndDelete(req.params.id, (err, foundAnn) => {
     if (err || !foundAnn) {
       req.flash('error', "Unable to access database")

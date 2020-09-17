@@ -88,6 +88,7 @@
                     <ul class="list-group">
 
                       <% inbox.forEach((notif) => { %>
+
                         <li class="list-group-item list-group-item-action">
 
                           <% if (notif.sender == null) { %>
@@ -96,9 +97,9 @@
                               <input class="del-form-input" type="checkbox" name="<%= notif._id %>" value="" onchange="updateDelete()">
                             </div>
 
-                            <% if (notif.read[notif.recipient_ids.indexOf(currentUser._id)] == true) { %>
+                            <% if (notif.read[notif.recipients.indexOf(currentUser._id)] == true) { %>
 
-                              <a href="/inbox/show/<%= notif._id %>" class="message-body">
+                              <a href="/inbox/<%= notif._id %>" class="message-body">
                                 <div class="message-head">
                                   <div class="message-from">
                                     <%= notif.subject %>
@@ -114,7 +115,7 @@
 
                             <% } else { %>
 
-                              <a href="/inbox/show/<%= notif._id %>" class="message-body">
+                              <a href="/inbox/<%= notif._id %>" class="message-body">
                                 <div class="message-head">
                                   <div class="message-subject">
                                     <%= notif.subject %>
@@ -132,7 +133,7 @@
 
                           <% } else if (notif.sender._id.toString() == currentUser._id.toString()) { %>
 
-                            <a href="/inbox/show/<%= notif._id %>" class="message-body">
+                            <a href="/inbox/<%= notif._id %>" class="message-body">
                               <div class="message-head">
                                 <div class="message-from">
                                   <%= notif.subject %>
@@ -151,9 +152,9 @@
                               <input class="del-form-input" type="checkbox" name="<%= notif._id %>" value="" onchange="updateDelete()">
                             </div>
 
-                            <% if (notif.read[notif.recipient_ids.indexOf(currentUser._id.toString())] == true) { %>
+                            <% if (notif.read[notif.recipients.indexOf(currentUser._id.toString())] == true) { %>
 
-                              <a href="/inbox/show/<%= notif._id %>" class="message-body">
+                              <a href="/inbox/<%= notif._id %>" class="message-body">
                                 <div class="message-head">
                                   <div class="message-from">
                                     <%= notif.subject %>
@@ -169,7 +170,7 @@
 
                             <% } else { %>
 
-                              <a href="/inbox/show/<%= notif._id %>" class="message-body">
+                              <a href="/inbox/<%= notif._id %>" class="message-body">
                                 <div class="message-head">
                                   <div class="message-subject">
                                     <%= notif.subject %>

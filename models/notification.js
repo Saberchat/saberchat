@@ -16,9 +16,6 @@ var notificationSchema = new mongoose.Schema({
       }
     ],
 
-    recipient_names: [{type: String}],
-    recipient_ids: [{type: String}],
-
     text: String,
     toEveryone: Boolean,
     date: String,

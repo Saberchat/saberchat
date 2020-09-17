@@ -36,10 +36,10 @@
     <% if (announced) { %>
       <% if (announcement.sender.username == currentUser.username) { %>
         <div class="button-set">
-        <form action="/announcements/destroy/<%=announcement._id%>?_method=delete" method="post" style="display: inline-block;">
+        <form action="/announcements/<%=announcement._id%>?_method=delete" method="post" style="display: inline-block;">
           <button type="submit" id="delete-ann-button" class="btn btn-danger">Delete Announcement</a></button>
         </form>
-        <button type="button" id="edit-ann-button" class="btn btn-success" style="margin-right: 15px;"><a href="/announcements/edit/<%=announcement._id%>" style="color: white;">Edit Announcement</a></button>
+        <button type="button" id="edit-ann-button" class="btn btn-success" style="margin-right: 15px;"><a href="/announcements/<%=announcement._id%>/edit" style="color: white;">Edit Announcement</a></button>
         <button type="button" id="send-ann-button" class="btn btn-primary"><a href="/announcements/new" style="color: white;">Send Announcement</a></button>
         </div>
       <% } %>

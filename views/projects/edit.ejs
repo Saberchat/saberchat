@@ -40,7 +40,7 @@
       </div>
     </div>
 
-    <form action="/projects/update/<%=project._id%>?_method=put" method="post" style="text-align: center;">
+    <form action="/projects/<%=project._id%>?_method=put" method="post" style="text-align: center;">
       <div class="input-group mb-3">
         <input id="new-project-message" name="title" maxlength="30" type="text" class="form-control" value = "<%=project.title%>" placeholder="Enter Project Name" aria-label="Username" aria-describedby="basic-addon1" required>
       </div>

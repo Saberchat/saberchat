@@ -15,6 +15,7 @@ const Announcement = require('../models/announcement')
 
 // Home route. gives the landing or home or index page (whatever you want to call it).
 router.get('/', (req, res) => {
+
 	Announcement.find({}).populate({path: 'sender', select: ['username', 'imageUrl']}).populate('message').exec((err, foundAnns) => {
 		if (err || !foundAnns) {
 			req.flash('error', 'Unable to access database')
