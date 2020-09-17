@@ -172,7 +172,7 @@ router.post('/send_group', middleware.isLoggedIn, (req, res) => {
 })
 
 //Send message via anonymous hotline
-router.post('/send_anonymous', (req, res) => {
+router.post('/send_anonymous', [middleware.isLoggedIn, middleware.isStudent], (req, res) => {
 	let mailing_list = req.body.recipient_list_anonymous.split(', ') //Creates list of recipients based on user input
 
 	if (mailing_list.includes('All Faculty')) { //Send notif to all faculty

@@ -103,6 +103,15 @@ middleware.isFaculty = function(req, res, next) {
 	}
 }
 
+middleware.isStudent = function(req, res, next) {
+	if(req.user.status != 'faculty' && req.user.status != "parent") {
+		next();
+	} else {
+		req.flash('error', 'You do not have permission to do that');
+		res.redirect('back');
+	}
+}
+
 
 //export the object with all the functions
 module.exports = middleware;
