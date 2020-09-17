@@ -250,9 +250,7 @@ router.post('/:id/ready', middleware.isLoggedIn, (req, res) => {
               notif.sender = req.user._id;
               notif.date = dateFormat(notif.created_at, "mmm d, h:MMTT")
               req.recipients = [foundUser]
-              req.recipient_names = [foundUser.username]
-              req.recipient_ids = [foundUser._id]
-//
+
               let itemText = [];
               for (var i = 0; i < foundOrder.items.length; i++) {
                 itemText.push(`${foundOrder.items[i].name}: ${foundOrder.quantities[i]} order(s)`);
