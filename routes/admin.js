@@ -124,33 +124,17 @@ router.put('/permissions', middlware.isLoggedIn, middlware.isAdmin, (req, res) =
 
 // changes status
 router.put('/status', middlware.isLoggedIn, middlware.isAdmin, (req, res) => {
-	// check if trying to change to admin
-	if(req.body.role == 'admin') {
-		// check if it's the principal
-		if(req.user.permission == 'principal') {
-			User.findByIdAndUpdate(req.body.user, {permission: req.body.status}, (err, updatedUser) => {
-				if(err || !updatedUser) {
-					res.json({error: 'Error. Could not change'});
-				} else {
-					res.json({success: 'Succesfully changed'});
-				}
-			});
+	User.findByIdAndUpdate(req.body.user, {status: req.body.status}, (err, updatedUser) => {
+		if(err || !updatedUser) {
+			res.json({error: 'Error. Could not change'});
 		} else {
-			res.json({error: 'You do not have permissions to do that'});
+			res.json({success: 'Succesfully changed'});
 		}
-	} else {
-		// else continue
-		User.findByIdAndUpdate(req.body.user, {status: req.body.status}, (err, updatedUser) => {
-			if(err || !updatedUser) {
-				res.json({error: 'Error. Could not change'});
-			} else {
-				res.json({success: 'Succesfully changed'});
-			}
-		});
-	}
+	});
 
 });
 
+// route for ignoring reported comments
 router.put('/moderate', middlware.isLoggedIn, middlware.isMod, (req, res) => {
 	Comment.findByIdAndUpdate(req.body.id, {status: 'ignored'}, (err, updatedComment) => {
 		if(err || !updatedComment) {
@@ -161,6 +145,7 @@ router.put('/moderate', middlware.isLoggedIn, middlware.isMod, (req, res) => {
 	});
 });
 
+// route for deleting reported comments
 router.delete('/moderate', middlware.isLoggedIn, middlware.isMod, (req, res) => {
 	Comment.findByIdAndUpdate(req.body.id, {status: 'deleted'}, (err, updatedComment) => {
 		if(err || !updatedComment) {

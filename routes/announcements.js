@@ -19,62 +19,61 @@ router.get('/', middleware.isLoggedIn, (req, res) => {
 })
 
 //Route to render 'sendAnnouncement' page
-router.get('/new', middleware.isLoggedIn, (req, res) => {
-  if (req.user.status == 'faculty' || req.user.permission == 'admin') {
-
+router.get('/new', middleware.isLoggedIn, middleware.isAdmin, (req, res) => {
     Announcement.find({}).populate({path: 'sender', select: ['username', 'imageUrl']}).populate('message').exec((err, foundAnns) => {
       if (err || !foundAnns) {
-        req.flash('error', 'Unable to access database')
-        res.redirect('back')
+        req.flash('error', 'Unable to access database');
+        res.redirect('back');
       } else {
 
-        res.render('announcements/new', {announcements: foundAnns.reverse(), announced: false})
+        res.render('announcements/new', {announcements: foundAnns.reverse(), announced: false});
       }
-    })
-
-  } else {
-    req.flash('error', 'Your status does not permit you to send announcements.')
-    res.redirect('/announcements')
-  }
-})
+    });
+});
 
 //Route to send announcements to bulletin
-router.post('/create', middleware.isLoggedIn, (req, res) => {
+router.post('/create', middleware.isLoggedIn, middleware.isAdmin, (req, res) => {
   Announcement.create({sender: req.user, subject: req.body.subject, text: req.body.message}, (err, announcement) => {
-    if (req.body.imgUrls != '') {
-      announcement.images = req.body.imgUrls.split(', ')
+    if(err || !announcement) {
+      req.flash('error', 'Unable to access database');
+      return res.redirect('back');
     }
-    announcement.date = dateFormat(announcement.created_at, "mmm d, h:MMTT")
-    announcement.save()
-  })
-  req.flash('success', 'Announcement posted to bulletin!')
-  res.redirect('/announcements/new')
+    if (req.body.imgUrls != '') {
+      announcement.images = req.body.imgUrls.split(', ');
+    }
+    announcement.date = dateFormat(announcement.created_at, "mmm d, h:MMTT");
+    announcement.save();
+
+    req.flash('success', 'Announcement posted to bulletin!');
+    res.redirect('/announcements/new');
+  });
 })
 
 
 router.get('/show/:id', middleware.isLoggedIn, (req, res) => {
-  Announcement.findOne({_id: req.params.id}).populate({path: 'sender', select: ['username', 'imageUrl']}).exec((err, foundAnn) => {
+  Announcement.findOne({_id: req.params.id})
+  .populate({path: 'sender', select: ['username', 'imageUrl']})
+  .exec((err, foundAnn) => {
     if (err || !foundAnn) {
-      console.log(err)
-      req.flash('error', 'Problem Unable to access database')
-      res.redirect('back')
+      req.flash('error', 'Unable to access database');
+      res.redirect('back');
 
     } else {
 
       Announcement.find({}).populate({path: 'sender', select: ['username', 'imageUrl']}).populate('message').exec((err, foundAnns) => {
         if (err || !foundAnns) {
-          req.flash('error', 'Unable to access database')
-          res.redirect('back')
+          req.flash('error', 'Unable to access database');
+          res.redirect('back');
 
         } else {
-          res.render('announcements/index', {announcements: foundAnns.reverse(), announced: true, announcement: foundAnn})
+          res.render('announcements/index', {announcements: foundAnns.reverse(), announced: true, announcement: foundAnn});
         }
-      })
+      });
     }
-  })
-})
+  });
+});
 
-router.get('/edit/:id', middleware.isLoggedIn, (req, res) => {
+router.get('/edit/:id', middleware.isLoggedIn, middleware.isAdmin, (req, res) => {
   Announcement.findById(req.params.id, (err, foundAnn) => {
     if (err || !foundAnn) {
       req.flash('error', "Unable to access database")
@@ -95,23 +94,24 @@ router.get('/edit/:id', middleware.isLoggedIn, (req, res) => {
   })
 })
 
-router.put('/update/:id', middleware.isLoggedIn, (req, res) => {
+router.put('/update/:id', middleware.isLoggedIn, middleware.isAdmin, (req, res) => {
   Announcement.findByIdAndUpdate(req.params.id, {subject: req.body.subject, images: req.body.imgUrls.split(', '), text: req.body.message}, (err, foundAnn) => {
     if (err || !foundAnn) {
-      req.flash('error', "Unable to access database")
-      res.redirect('back')
+      req.flash('error', "Unable to access database");
+      res.redirect('back');
 
     } else {
-      req.flash('success', 'Announcement Updated!')
-      res.redirect(`/announcements/show/${foundAnn._id}`)
+      req.flash('success', 'Announcement Updated!');
+      res.redirect(`/announcements/show/${foundAnn._id}`);
     }
   })
 })
 
-router.delete('/destroy/:id', middleware.isLoggedIn, (req, res) => {
+// this needs change
+router.delete('/destroy/:id', middleware.isLoggedIn, middleware.isAdmin, (req, res) => {
   Announcement.findByIdAndDelete(req.params.id, (err, foundAnn) => {
     if (err || !foundAnn) {
-      req.flash('error', "Unable to access database")
+      req.flash('error', "Unable to access database");
       res.redirect('back')
 
     } else {

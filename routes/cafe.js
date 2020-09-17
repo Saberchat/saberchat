@@ -33,8 +33,6 @@ router.get('/', middleware.isLoggedIn, (req, res) => {
 
         } else {
 
-
-
           res.render('cafe/index', {
             orders: foundOrders,
             announcements: foundAnns.reverse(),
@@ -48,6 +46,7 @@ router.get('/', middleware.isLoggedIn, (req, res) => {
 
 router.post('/new', middleware.isLoggedIn, (req, res) => {
   //Conditionals to make sure that the orders are done between 9 - 12:20
+  // Alex: turn this into middleware and make the times editable, meaning you probably have to connect to db.
 
   let currentTime = new Date(new Date().getTime()).toString().split(' ')[4]
 
@@ -68,8 +67,8 @@ router.post('/new', middleware.isLoggedIn, (req, res) => {
           select: ['username', 'imageUrl']
         }).populate('message').exec((err, foundAnns) => {
           if (err || !foundAnns) {
-            req.flash('error', 'Unable to access database')
-            res.redirect('back')
+            req.flash('error', 'Unable to access database');
+            res.redirect('back');
 
           } else {
 
@@ -77,9 +76,9 @@ router.post('/new', middleware.isLoggedIn, (req, res) => {
               items: foundItems,
               announcements: foundAnns.reverse(),
               announced: false
-            })
+            });
           }
-        })
+        });
       }
     });
   }
