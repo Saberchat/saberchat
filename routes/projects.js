@@ -56,7 +56,7 @@ router.get('/new', [middleware.isLoggedIn, middleware.isFaculty], (req, res) => 
   })
 })
 
-router.post('/create',[middleware.isLoggedIn, middleware.isFaculty], (req, res) => {
+router.post('/',[middleware.isLoggedIn, middleware.isFaculty], (req, res) => {
 
   User.find({username: {$in: req.body.creators.split(', ')}}, (err, foundCreators) => {
     if (err || !foundCreators) {
