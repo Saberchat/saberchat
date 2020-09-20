@@ -18,7 +18,7 @@ const methodOverride = require('method-override');
 // package for formating dates on the serverside
 const dateFormat = require('dateformat');
 //pretty up the console
-const colors = require('colors');
+// const colors = require('colors');
 // add favicon
 const favicon = require('serve-favicon');
 

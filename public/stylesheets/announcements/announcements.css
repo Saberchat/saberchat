@@ -8,7 +8,7 @@
 
 .button-set {
   text-align: center;
-  margin-bottom: 30px;"
+  margin-bottom: 30px;
 }
 
 .title {
@@ -52,7 +52,7 @@
 
 #delete-ann-button {
   margin-right: 15px;
-  color: white;"
+  color: white;
 }
 
 #new-announcement-text {
@@ -98,7 +98,7 @@
 .input-group-mb3 {
   width: 100%;
   text-align: center;
-  color: orange;"
+  color: orange;
 }
 
 #new-announcement-message, #new-announcement-txt {
