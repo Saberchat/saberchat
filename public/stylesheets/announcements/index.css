@@ -1,0 +1,32 @@
+.btn-setting {
+    width: 8rem;
+}
+
+.ann-container {
+    border-radius: 15px;
+    box-shadow: 0px 3px 15px rgb(168, 168, 168);
+}
+
+.ann-head {
+    padding: 2rem 5rem;
+    text-align: center;
+}
+
+.ann-head span {
+    color: rgb(105, 105, 105);
+    font-weight: 300;
+}
+
+.ann-body {
+    padding:2rem 5rem;
+}
+
+.ann-body hr {
+    border-radius: 5px;
+    border: 1px solid #525252;
+}
+
+.ann-images img {
+    margin-bottom: 2rem;
+    box-shadow: 0px 1px 5px #6d6d6d;
+}
