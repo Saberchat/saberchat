@@ -203,7 +203,7 @@ router.post('/:id/leave', middleware.isLoggedIn, middleware.checkForLeave, funct
 
 // handles access requests
 router.post('/:id/request-access', middleware.isLoggedIn, function(req, res) {
-  async function handleRequest() {
+  (async () => {
     // find the room
     const foundRoom = await Room.findById(req.params.id);
     // if no found room, exit
@@ -246,9 +246,7 @@ router.post('/:id/request-access', middleware.isLoggedIn, function(req, res) {
       res.redirect('back');
     }
 
-  }
-
-  handleRequest().catch(err => {
+  })().catch(err => {
     req.flash('error', 'Cannot access Database');
     res.redirect('back');
   });
@@ -311,7 +309,6 @@ router.put('/:id', middleware.isLoggedIn, middleware.checkRoomOwnership, (req, r
       res.redirect('/chat/' + room._id);
     }
   });
-  // res.send(req.params.id + " " + req.body.newname);
 });
 
 // delete room

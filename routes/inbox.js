@@ -10,7 +10,7 @@ const Room = require('../models/room');
 
 //Route to display user inbox
 router.get('/', middleware.isLoggedIn, (req, res) => {
-	async function inboxGet() {
+	(async () => {
 		await req.user.populate({path: 'inbox', populate: { path: 'sender', select: ['username', 'imageUrl']}}).execPopulate();
 
 		await req.user.populate(
@@ -27,8 +27,7 @@ router.get('/', middleware.isLoggedIn, (req, res) => {
 
 		res.render('inbox/index', {announcements: foundAnns.reverse(), announced: false, inbox: req.user.inbox.reverse(), requests: req.user.requests.reverse(), viewing_sent: false});
 
-	}
-	inboxGet().catch(err => {
+	})().catch(err => {
 		console.log(err);
 		req.flash('error', 'An error occured');
 		res.redirect('back');
