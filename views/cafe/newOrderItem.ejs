@@ -55,6 +55,27 @@
                   <input id="usernameInput" class="form-control" type="text" name="available" placeholder="Enter Number Available" maxlength="45" required>
                 </div>
               </div>
+
+              <div class="row">
+                <div class="col">
+                  <div class="input-group mb-3" style="width: 100%;">
+                    <label style="padding-top: 20px;" for="typeInput">Type</label>
+                    <select id="typeInput" name="type" style="width: 100%;">
+                      <option disabled selected required >Meal Type</option>
+                      <% types.forEach(type => { %>
+                        <option><%=type.name%></option>
+                      <% }) %>
+                    </select>
+                  </div>
+                </div>
+              </div>
+
+              <div class="row">
+                <div class="col">
+                  <label for="usernameInput">Image</label>
+                  <input id="usernameInput" class="form-control" type="text" name="image" placeholder="Enter URL for Item Image">
+                </div>
+              </div>
             </div>
             <div class="form-group">
               <label for="descInput">Description</label>

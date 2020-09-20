@@ -40,7 +40,7 @@ const profileRoutes = require('./routes/profile');
 const wHeightsRoutes = require('./routes/wHeights');
 const inboxRoutes = require('./routes/inbox');
 const adminRoutes = require('./routes/admin');
-// const cafeRoutes = require('./routes/cafe');
+const cafeRoutes = require('./routes/cafe');
 const announcementRoutes = require('./routes/announcements');
 const projectRoutes = require('./routes/projects');
 
@@ -131,7 +131,7 @@ app.use('/articles', wHeightsRoutes);
 app.use('/inbox', inboxRoutes);
 app.use('/announcements', announcementRoutes);
 app.use('/admin', adminRoutes);
-// app.use('/cafe', cafeRoutes);
+app.use('/cafe', cafeRoutes);
 app.use('/projects', projectRoutes);
 
 // Catch-all route

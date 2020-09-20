@@ -26,30 +26,87 @@
       <div class="row">
         <div class="col-12">
           <div class="jumbotron text-center">
-            <h1><i class="fas fa-coffee"></i> Manage EC Cafe</h1>
+            <h1><i class="fas fa-coffee"></i> Manage EC Cafe</h1><br />
+            <!-- Block out until Sidd figures out routing -->
+            <!-- <a href="deleteItems" class="btn btn-danger disabled"><i class="fas fa-minus-circle"></i> Delete All Items</a> -->
+            <a href="/cafe/orders" class="btn btn-primary"><i class="fas fa-coffee"></i> Student Orders</a>
+            <a href="newOrderItem" class="btn btn-warning"><i class="fas fa-plus-circle"></i> Add New Item</a>
+            <a href="/cafe/type/new" class="btn btn-success"><i class="fas fa-plus-circle"></i> Add New Category</a>
           </div>
         </div>
       </div>
       <div class="row">
         <div class="col-12">
-          <li class="list-group-item list-group-item-info">
+          <!-- <li class="list-group-item list-group-item-info">
             <div class="d-flex w-100 justify-content-between">
-              <h2 class="mb-1">Current Items</h2>
+              <h2 class="mb-1">Cafe Items</h2>
               <span>
-                <a href="deleteItems" class="btn btn-danger disabled"><i class="fas fa-minus-circle"></i> Delete all items</a>
-                <a href="newOrderItem" class="btn btn-warning"><i class="fas fa-plus-circle"></i> Add new item</a>
+                <a href="deleteItems" class="btn btn-danger disabled"><i class="fas fa-minus-circle"></i> Delete All Items</a>
+                <a href="/cafe/orders" class="btn btn-primary"><i class="fas fa-coffee"></i> Student Orders</a>
+                <a href="newOrderItem" class="btn btn-warning"><i class="fas fa-plus-circle"></i> Add New Item</a>
+                <a href="/cafe/type/new" class="btn btn-success"><i class="fas fa-plus-circle"></i> Add New Item Type</a>
               </span>
             </div>
             <p class="mb-1">View cafe products</p>
-          </li>
-          <% items.forEach(item => { %>
-            <% if (item.isAvailable == true) { %>
-              <a href="item/<%= item._id %>" class="list-group-item list-group-item-action"><%= item.name %> (<%= item.availableItems%> orders available)</a>
-            <% } else { %>
-              <a href="item/<%= item._id %>" class="list-group-item list-group-item-action"><%= item.name %> (Unavailable)</a>
-            <% }%>
+          </li> -->
+
+          <% types.forEach(type => { %>
+            <% if (type.items.length > 0) { %>
+              <br />
+              <li class="list-group-item list-group-item-success">
+                <div class="d-flex w-100 justify-content-between">
+                  <h2 class="mb-1"><%=type.name%></h2>
+                </div>
+              </li>
+              <% type.items.forEach(item => { %>
+                <% if (item.isAvailable == true) { %>
+                  <a href="item/<%= item._id %>" class="list-group-item list-group-item-action"><strong><%= item.name %></strong> (<%= item.availableItems%> orders available)</a>
+                <% } else {%>
+                  <a href="item/<%= item._id %>" class="list-group-item list-group-item-action"><strong><%= item.name %></strong> (Unavailable)</a>
+                <% } %>
+              <% }) %>
+            <% } %>
           <% }) %>
-          <a style="display: block; margin-top: 1rem;" href="/cafe/orders">Orders</a>
+
+          <br />
+          <li class="list-group-item list-group-item-danger">
+            <div class="d-flex w-100 justify-content-between">
+              <h2 class="mb-1">Item Order Types</h2>
+            </div>
+          </li>
+          <% types.forEach(type => { %>
+            <% if (type.name != "Other") { %>
+              <div class="list-group-item list-group-item-action"><strong><%=type.name%></strong> (<%=type.items.length%> items)
+                <br />
+                <% if (type.name != "Other") { %>
+                  <a style="margin-top: 5px;" href="type/<%=type._id%>" class="btn btn-success">Edit</a>
+                  <form action="type/<%=type._id%>?_method=delete" method="post" style="display: inline-block;">
+                    <button type="submit" style="margin-top: 5px;" class="btn btn-danger">Delete</button>
+                  </form>
+                <% } %>
+              </div>
+            <% } %>
+          <% }) %>
+
+          <!-- Ensures that 'other' will be last -->
+          <% types.forEach(type => { %>
+            <% if (type.name == "Other") { %>
+              <div class="list-group-item list-group-item-action"><strong><%=type.name%></strong> (<%=type.items.length%> items)
+                <br />
+                <% if (type.name != "Other") { %>
+                  <a style="margin-top: 5px;" href="type/<%=type._id%>" class="btn btn-success">Edit</a>
+                  <form action="type/<%=type._id%>?_method=delete" method="post" style="display: inline-block;">
+                    <button type="submit" style="margin-top: 5px;" class="btn btn-danger">Delete</button>
+                  </form>
+                <% } %>
+              </div>
+            <% } %>
+          <% }) %>
+
+          <br />
+
+
+          <!-- <a style="display: block; margin-top: 1rem;" href="/cafe/orders">Student Orders</a> -->
         </div>
       </div>
     </div>

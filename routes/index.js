@@ -166,10 +166,10 @@ router.get('/alsion', (req, res) => {
 })
 
 // NOTE: Remove this line when enabling cafe
-router.get('/cafe', middleware.isLoggedIn, (req, res) => {
-  req.flash('error', "The cafe is currently closed");
-  res.redirect('back');
-});
+// router.get('/cafe', middleware.isLoggedIn, (req, res) => {
+//   req.flash('error', "The cafe is currently closed");
+//   res.redirect('back');
+// });
 
 //export router with all the routes connected
 module.exports = router;
