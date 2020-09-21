@@ -1,5 +1,7 @@
 const express = require('express')
 const router = express.Router();
+const multer = require('multer');
+const upload = multer({dest: __dirname + '/public/uploads'});
 const Filter = require('bad-words');
 const filter = new Filter();
 
@@ -92,12 +94,15 @@ router.put('/edit', middleware.isLoggedIn, function(req, res) {
         title: filter.clean(req.body.title),
         status: req.body.status
     }
+
     if(req.body.imageUrl) {
         user.imageUrl = req.body.imageUrl;
     }
     if(req.body.bannerUrl) {
         user.bannerUrl = req.body.bannerUrl;
     }
+
+
     //find and update the user with new info
     User.findByIdAndUpdate(req.user._id, user, function(err, updatedUser) {
         if(err || !updatedUser) {

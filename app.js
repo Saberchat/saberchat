@@ -15,6 +15,10 @@ const bodyParser = require('body-parser');
 const methodOverride = require('method-override');
 // package for formating dates on the serverside
 const dateFormat = require('dateformat');
+//Image upload control
+const multer = require('multer');
+const upload = multer({dest: __dirname + '/../public/uploads'});
+
 //pretty up the console
 const colors = require('colors');
 // add favicon

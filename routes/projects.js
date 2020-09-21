@@ -2,6 +2,9 @@ const express = require('express');
 const middleware = require('../middleware');
 const router = express.Router(); //start express router
 const dateFormat = require('dateformat')
+const multer = require('multer')
+const upload = multer({dest: __dirname + '/../public/uploads'});
+
 const User = require('../models/user');
 const Announcement = require('../models/announcement')
 const Project = require('../models/project');
@@ -56,7 +59,7 @@ router.get('/new', [middleware.isLoggedIn, middleware.isFaculty], (req, res) => 
   })
 })
 
-router.post('/',[middleware.isLoggedIn, middleware.isFaculty], (req, res) => {
+router.post('/',[middleware.isLoggedIn, middleware.isFaculty], upload.single('img'), (req, res) => {
 
   User.find({username: {$in: req.body.creators.split(', ')}}, (err, foundCreators) => {
     if (err || !foundCreators) {
@@ -78,8 +81,18 @@ router.post('/',[middleware.isLoggedIn, middleware.isFaculty], (req, res) => {
         } else {
           project.date = dateFormat(project.created_at, "mmm d, h:MMTT")
           project.save()
-          req.flash('success', 'Project posted!')
-    			res.redirect(`/projects/${project._id}`)
+
+          // if(req.file) {
+          //   project.imgUrl = `uploads/${req.file.filename}`
+          //   project.save()
+          //   req.flash('success', 'Project posted!')
+      		// 	res.redirect(`/projects/${project._id}`)
+          // }
+          //
+          // else {
+          //   throw 'error';
+          // }
+
         }
       })
 
@@ -161,7 +174,7 @@ router.put('/:id', [middleware.isLoggedIn, middleware.isFaculty], (req, res) => 
     } else if(foundCreators.length != req.body.creators.split(', ').length) {
       req.flash('error', 'Some profiles were changed. Please create project again');
       res.redirect('back');
-      
+
     } else {
 
       Project.findByIdAndUpdate(req.params.id, {title: req.body.title, imgUrl: req.body.img, creators: foundCreators, text: req.body.text}, (err, foundProject) => {
