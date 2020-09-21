@@ -5,19 +5,6 @@ const dateFormat = require('dateformat');
 const User = require('../models/user');
 const Announcement = require('../models/announcement');
 
-//Route to access bulletin
-// router.get('/', middleware.isLoggedIn, (req, res) => {
-//   Announcement.find({}).populate({path: 'sender', select: ['username', 'imageUrl']}).populate('message').exec((err, foundAnns) => {
-//     if (err || !foundAnns) {
-//       req.flash('error', 'Unable to access database')
-//       res.redirect('back')
-
-//     } else {
-//       res.render('announcements/index', {announcements: foundAnns.reverse(), announced: false})
-//     }
-//   })
-// })
-
 // display create form
 router.get('/new', middleware.isLoggedIn, middleware.isAdmin, (req, res) => {
     Announcement.find({}).populate({path: 'sender', select: ['username', 'imageUrl']}).populate('message').exec((err, foundAnns) => {
@@ -66,8 +53,10 @@ router.post('/create', middleware.isLoggedIn, middleware.isAdmin, (req, res) => 
       req.flash('error', 'Unable to access database');
       return res.redirect('back');
     }
-    if (req.body.imgUrls != '') {
-      announcement.images = req.body.imgUrls.split(', ');
+    if (req.body.images["0"]) {
+      for(const image in req.body.images) {
+        announcement.images.push(req.body.images[image]);
+      }
     }
     announcement.date = dateFormat(announcement.created_at, "mmm d, h:MMTT");
     announcement.save();
@@ -79,14 +68,23 @@ router.post('/create', middleware.isLoggedIn, middleware.isAdmin, (req, res) => 
 
 // edit announcement
 router.put('/:id', middleware.isLoggedIn, middleware.isAdmin, (req, res) => {
-  Announcement.findByIdAndUpdate(req.params.id, {subject: req.body.subject, images: req.body.imgUrls.split(', '), text: req.body.message}, (err, foundAnn) => {
+  Announcement.findByIdAndUpdate(req.params.id, {subject: req.body.subject, text: req.body.message}, (err, foundAnn) => {
     if (err || !foundAnn) {
       req.flash('error', "Unable to access database");
       res.redirect('back');
 
     } else {
+      foundAnn.images = [];
+      if(req.body.images["0"]) {
+        for(const image in req.body.images) {
+          foundAnn.images.push(req.body.images[image]);
+        }
+      }
+      
+      foundAnn.save();
+
       req.flash('success', 'Announcement Updated!');
-      res.redirect(`/announcements/show/${foundAnn._id}`);
+      res.redirect(`/announcements/${foundAnn._id}`);
     }
   })
 })

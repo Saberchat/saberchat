@@ -38,6 +38,12 @@
               <h1><%= announcement.subject %></h1>
               <p>Posted by <%= announcement.sender.username %></p>
               <span><%=announcement.date.split(', ')[1]%> | <%=announcement.date.split(', ')[0]%></span>
+              <% if(announcement.sender._id.equals(currentUser._id)) { %> 
+                <form action="/announcements/<%= announcement._id %>?_method=delete" method="post" id="delete-form">
+                  <button type="submit" class="btn btn-danger"><i class="far fa-trash-alt"></i> Delete</button>
+                </form>
+                <a href="/announcements/<%= announcement._id %>/edit" class="btn btn-info"><i class="fas fa-cog"></i> Edit</a>
+              <% } %> 
             </div>
             <div class="ann-body">
               <p><%= announcement.text %></p>
@@ -52,28 +58,5 @@
         </div>
       </div>
     </div>
-
-      <!-- <div class="container mt-5" style="display: flex; justify-content: center;">
-        <div class="row">
-          <div class="col-12">
-            <div class="jumbotron text-center" style="padding: 50px;">
-              <h1><%=announcement.subject%></h1>
-              <p><em>Posted by <a style="color: black;" href="/profiles/<%=announcement.sender._id%>"><strong><%=announcement.sender.username%></strong></a></em></p>
-              <p style="font-size: 20%; margin-top: 5px;"><%=announcement.date.split(', ')[1]%> | <%=announcement.date.split(', ')[0]%></p>
-
-              <p style="margin-top: 10px; white-space: pre-wrap; text-align: left;"><%=announcement.text%></p>
-
-              <% if (announcement.images.length > 0) { %>
-                <%announcement.images.forEach(image => {%>
-                  <img style="margin-bottom: 30px; width: 100%; height: 100%; object-fit: contain;" src="<%=image%>"/>
-                  <br />
-
-                <%})%>
-
-              <% } %>
-            </div>
-          </div>
-        </div>
-      </div> -->
 </body>
 </html>

@@ -2,6 +2,10 @@
     width: 8rem;
 }
 
+#delete-form {
+    display: inline-block;
+}
+
 .ann-container {
     border-radius: 15px;
     box-shadow: 0px 3px 15px rgb(168, 168, 168);
@@ -13,8 +17,10 @@
 }
 
 .ann-head span {
+    display: block;
     color: rgb(105, 105, 105);
     font-weight: 300;
+    margin-bottom: 2rem;
 }
 
 .ann-body {
