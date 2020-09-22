@@ -52,7 +52,7 @@ const io = require('socket.io')(http);
 const port = process.env.PORT || 3000;
 
 //connect to db. We should set the link as environment variable for security purposes in the future.
-mongoose.connect(process.env.DATABASE_URL
+mongoose.connect(process.env.DATABASE_URL,
 {
   useNewUrlParser: true,
   useUnifiedTopology: true,
