@@ -24,34 +24,60 @@
     <!-- include the navbar via ejs -->
     <%- include('../partials/navbar') %>
     <%- include('../partials/header') %>
-    <%- include('../partials/announcement') %>
 
     <div class="container mt-5">
       <div class="row">
         <div class="col-12">
-          <h1 style="text-align: center; width: 100%">Edit Cafe Item</h1>
+          <h1 style="text-align: center; width: 100%">Edit Cafe Item<h1>
         </div>
       </div>
       <div class="row">
         <div class="col-md-8 offset-md-2 col-12">
           <form action="/cafe/item/<%= item._id %>/update?_method=put" method="post">
-            <div class="row mb-3">
-              <div class="col">
-                <label for="usernameInput">Name</label>
-                <input id="usernameInput" class="form-control" type="text" name="name" placeholder="name" value="<%= item.name %>" maxlength="45" required>
-              </div>
-              <div class="col">
-                <label for="priceInput">Price</label>
-                <div class="input-group">
-                  <div class="input-group-prepend">
-                    <div class="input-group-text">$</div>
+            <div class="form-group">
+              <div class="row mb-3">
+                <div class="col">
+                  <label for="usernameInput">Name</label>
+                  <input id="usernameInput" class="form-control" type="text" name="name" placeholder="name" value="<%= item.name %>" maxlength="45" required>
+                </div>
+                <div class="col">
+                  <label for="priceInput">Price</label>
+                  <div class="input-group">
+                    <div class="input-group-prepend">
+                      <div class="input-group-text">$</div>
+                    </div>
+                    <input id="priceInput" class="form-control" type="text" name="price" placeholder="price" value="<%= item.price %>" maxlength="10" required>
                   </div>
-                  <input id="priceInput" class="form-control" type="text" name="price" placeholder="price" value="<%= item.price %>" maxlength="10" required>
+                </div>
+                <div class="col">
+                  <label for="usernameInput">Available</label>
+                  <input id="usernameInput" class="form-control" type="text" name="available" placeholder="Available Orders" value="<%= item.availableItems %>" maxlength="45" required>
                 </div>
               </div>
-              <div class="col">
-                <label for="usernameInput">Available</label>
-                <input id="usernameInput" class="form-control" type="text" name="available" placeholder="Available Orders" value="<%= item.availableItems %>" maxlength="45" required>
+
+              <div class="row">
+                <div class="col">
+                  <div class="input-group mb-3" style="width: 100%;">
+                    <label style="padding-top: 20px;" for="typeInput">Type</label>
+                    <select id="typeInput" name="type" style="width: 100%;">
+                      <option disabled selected required >Meal Type</option>
+                      <% types.forEach(type => { %>
+                        <% if (type.items.includes(item._id)) { %>
+                            <option selected><%=type.name%></option>
+                        <% } else {%>
+                          <option><%=type.name%></option>
+                        <% } %>
+                      <% }) %>
+                    </select>
+                  </div>
+                </div>
+              </div>
+
+              <div class="row">
+                <div class="col">
+                  <label for="usernameInput">Image</label>
+                  <input id="usernameInput" class="form-control" type="text" name="image" value="<%=item.imgUrl%>" placeholder="Enter URL for Item Image" required>
+                </div>
               </div>
             </div>
             <div class="form-group">

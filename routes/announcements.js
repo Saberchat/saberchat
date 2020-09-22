@@ -65,6 +65,10 @@ router.put('/:id', middleware.isLoggedIn, middleware.isAdmin, (req, res) => {
       req.flash('error', "Unable to access database");
       res.redirect('back');
 
+    } else if (!foundAnn.sender._id.equals(req.user._id)) {
+      req.flash('error', "You can only edit announcements that you have sent.")
+      res.redirect('back')
+
     } else {
       foundAnn.images = [];
       if(req.body.images["0"]) {
@@ -87,6 +91,10 @@ router.delete('/:id', middleware.isLoggedIn, middleware.isAdmin, (req, res) => {
     if (err || !deletedAnn) {
       req.flash('error', "Unable to access database");
       res.redirect('back');
+
+    } else if (foundAnn.sender._id != req.user._id) {
+      req.flash('error', "You can only delete announcements that you have sent.")
+      res.redirect('back')
 
     } else {
       req.flash('success', 'Deleted');

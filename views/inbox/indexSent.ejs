@@ -24,7 +24,6 @@
     <%- include('../partials/navbar') %>
     <!-- include the backdrop for nav -->
     <%- include('../partials/header') %>
-    <%- include('../partials/announcement') %>
 
     </head>
     <body>
@@ -73,7 +72,7 @@
                             <div class="message-check">
                               <input class="del-form-input" type="checkbox" name="<%= notif._id %>" value="" onchange="updateDelete()">
                             </div>
-                            <a href="/inbox/show/<%= notif._id %>" class="message-body">
+                            <a href="/inbox/<%= notif._id %>" class="message-body">
                               <div class="message-head">
                                 <div class="message-from">
                                   <%= notif.subject %>
@@ -89,7 +88,7 @@
 
                           <% } else if (notif.sender._id.toString() == currentUser._id.toString()) { %>
 
-                            <a href="/inbox/show/<%= notif._id %>" class="message-body">
+                            <a href="/inbox/<%= notif._id %>" class="message-body">
                               <div class="message-head">
                                 <div class="message-from">
                                   <%= notif.subject %>
@@ -107,9 +106,9 @@
                             <div class="message-check">
                               <input class="del-form-input" type="checkbox" name="<%= notif._id %>" value="" onchange="updateDelete()">
                             </div>
-                            <% if (notif.read[notif.recipients.indexOf(currentUser.username)] == true) { %>
+                            <% if (notif.read[notif.recipients.indexOf(currentUser._id)] == true) { %>
 
-                              <a href="/inbox/show/<%= notif._id %>" class="message-body">
+                              <a href="/inbox/<%= notif._id %>" class="message-body">
                                 <div class="message-head">
                                   <div class="message-from">
                                     <%= notif.subject %>
@@ -125,7 +124,7 @@
 
                             <% } else { %>
 
-                              <a href="/inbox/show/<%= notif._id %>" class="message-body">
+                              <a href="/inbox/<%= notif._id %>" class="message-body">
                                 <div class="message-head">
                                   <div class="message-subject">
                                     <%= notif.subject %>

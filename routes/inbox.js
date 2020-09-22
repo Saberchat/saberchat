@@ -180,7 +180,7 @@ router.post('/messages', middleware.isLoggedIn, (req, res) => {
 });
 
 //Send message via anonymous hotline
-router.post('/send_anonymous', (req, res) => {
+router.post('/send_anonymous', [middleware.isLoggedIn, middleware.isStudent], (req, res) => {
 	let mailing_list = req.body.recipient_list_anonymous.split(', ') //Creates list of recipients based on user input
 
 	if (mailing_list.includes('All Faculty')) { //Send notif to all faculty
@@ -189,16 +189,14 @@ router.post('/send_anonymous', (req, res) => {
 				req.flash('error', 'Unable to access Database');
 				res.redirect('back');
 
+			} else if(foundUsers.length != mailing_list.length) {
+				req.flash('error', 'Some profiles were changed. Please send again');
+				res.redirect('back');
+
 			} else {
 
-				let userIds = []
-
-				for (let user of foundUsers) {
-					userIds.push(user._id)
-				}
-
 				if (req.body.images.split(', ')[0] == '') {
-					Notification.create({subject: req.body.subject, sender: null, text: req.body.message, recipients: foundUsers, recipient_names: ['All Faculty'], recipient_ids: userIds, read: new Array(foundUsers.length).fill(false), images: [], toEveryone: true}, (err, notification) => {
+					Notification.create({subject: req.body.subject, sender: null, text: req.body.message, recipients: foundUsers, read: new Array(foundUsers.length).fill(false), images: [], toEveryone: true}, (err, notification) => {
 						notification.date = dateFormat(notification.created_at, "mmm d, h:MMTT")
 						notification.save() //Create notification
 
@@ -215,7 +213,7 @@ router.post('/send_anonymous', (req, res) => {
 					})
 
 				} else {
-					Notification.create({subject: req.body.subject, sender: null, text: req.body.message, recipients: foundUsers, recipient_names: ['All Faculty'], recipient_ids: userIds, read: new Array(foundUsers.length).fill(false), images: req.body.images.split(', '), toEveryone: true}, (err, notification) => {
+					Notification.create({subject: req.body.subject, sender: null, text: req.body.message, recipients: foundUsers, read: new Array(foundUsers.length).fill(false), images: req.body.images.split(', '), toEveryone: true}, (err, notification) => {
 						notification.date = dateFormat(notification.created_at, "mmm d, h:MMTT")
 						notification.save() //Create notification
 
@@ -244,16 +242,14 @@ router.post('/send_anonymous', (req, res) => {
 				req.flash('error', 'Unable to access Database');
 				res.redirect('back');
 
+			} else if(foundUsers.length != mailing_list.length) {
+				req.flash('error', 'Some profiles were changed. Please send again');
+				res.redirect('back');
+
 			} else {
 
-				let userIds = []
-
-				for (let user of foundUsers) {
-					userIds.push(user._id)
-				}
-
 				if (req.body.images.split(', ')[0] == '') {
-					Notification.create({subject: req.body.subject, sender: null, text: req.body.message, recipients: foundUsers, recipient_names: mailing_list, recipient_ids: userIds, read: new Array(mailing_list.length).fill(false), images: [], toEveryone: false}, (err, notification) => {
+					Notification.create({subject: req.body.subject, sender: null, text: req.body.message, recipients: foundUsers, read: new Array(mailing_list.length).fill(false), images: [], toEveryone: false}, (err, notification) => {
 						notification.date = dateFormat(notification.created_at, "mmm d, h:MMTT")
 						notification.save() //Create notification
 
@@ -270,7 +266,7 @@ router.post('/send_anonymous', (req, res) => {
 					})
 
 				} else {
-					Notification.create({subject: req.body.subject, sender: null, text: req.body.message, recipients: foundUsers, recipient_names: mailing_list, recipient_ids: userIds, read: new Array(mailing_list.length).fill(false), images: req.body.images.split(', '), toEveryone: false}, (err, notification) => {
+					Notification.create({subject: req.body.subject, sender: null, text: req.body.message, recipients: foundUsers, read: new Array(mailing_list.length).fill(false), images: req.body.images.split(', '), toEveryone: false}, (err, notification) => {
 						notification.date = dateFormat(notification.created_at, "mmm d, h:MMTT")
 						notification.save() //Creat notification
 
@@ -295,57 +291,6 @@ router.post('/send_anonymous', (req, res) => {
 	}
 })
 
-//View message in your inbox in more detail
-router.get('/show/:id', middleware.isLoggedIn, (req, res) => {
-	Notification.findOne({_id: req.params.id}).populate({path: 'sender', select: ['username', 'imageUrl']})
-	.exec((err, foundNotif) => {
-		if (err || !foundNotif) {
-			req.flash('error', "Unable to access database")
-			res.redirect('back')
-
-		} else {
-
-				if (foundNotif.sender == null || foundNotif.sender.username != req.user.username) {
-
-				if (!foundNotif.read[foundNotif.recipient_ids.indexOf(req.user._id.toString())]) {
-					req.user.notifCount -= 1
-					req.user.save()
-					foundNotif.read[foundNotif.recipient_ids.indexOf(req.user._id)] = true
-					foundNotif.save()
-
-					Notification.findByIdAndUpdate(foundNotif._id, {read: foundNotif.read}, (err, fn) => { //For some reason, foundNotif.save() wasn't saving file properly. Had to add this
-						if (err || !fn) {
-							req.flash('error', "Unable to access database")
-							res.redirect('back')
-
-						}
-					})
-				}
-			}
-
-			User.find({_id: {$in: foundNotif.recipient_ids}}, (err, foundUsers) => {
-				if (err || !foundUsers) {
-					req.flash('error', 'Unable to access database')
-					res.redirect('back')
-
-				} else {
-
-					Announcement.find({}).populate({path: 'sender', select: ['username', 'imageUrl']}).populate('message').exec((err, foundAnns) => {
-						if (err || !foundAnns) {
-							req.flash('error', 'Unable to access database')
-							res.redirect('back')
-
-						} else {
-
-							res.render('inbox/show', {announcements: foundAnns.reverse(), announced: false, notif: foundNotif, recipient_profiles: foundUsers})
-						}
-					})
-				}
-			})
-		}
-	})
-})
-
 //Accesses every notification that you have sent
 router.get('/sent', middleware.isLoggedIn, (req, res) => {
 	Notification.find({'sender': req.user}, (err, foundNotifs) => {
@@ -368,6 +313,59 @@ router.get('/sent', middleware.isLoggedIn, (req, res) => {
 		}
 	})
 })
+
+//View message in your inbox in more detail
+router.get('/:id', middleware.isLoggedIn, (req, res) => {
+	Notification.findOne({_id: req.params.id}).populate({path: 'sender', select: ['username', 'imageUrl']})
+	.exec((err, foundNotif) => {
+		if (err || !foundNotif) {
+			req.flash('error', "Unable to access database1")
+			console.log(err)
+			res.redirect('back')
+
+		} else {
+
+				if (foundNotif.sender == null || foundNotif.sender.username != req.user.username) {
+
+				if (!foundNotif.read[foundNotif.recipients.indexOf(req.user._id.toString())]) {
+					req.user.notifCount -= 1
+					req.user.save()
+					foundNotif.read[foundNotif.recipients.indexOf(req.user._id)] = true
+					foundNotif.save()
+
+					Notification.findByIdAndUpdate(foundNotif._id, {read: foundNotif.read}, (err, fn) => { //For some reason, foundNotif.save() wasn't saving file properly. Had to add this
+						if (err || !fn) {
+							req.flash('error', "Unable to access database")
+							res.redirect('back')
+
+						}
+					})
+				}
+			}
+
+			User.find({_id: {$in: foundNotif.recipients}}, (err, foundUsers) => {
+				if (err || !foundUsers) {
+					req.flash('error', 'Unable to access database')
+					res.redirect('back')
+
+				} else {
+
+					Announcement.find({}).populate({path: 'sender', select: ['username', 'imageUrl']}).populate('message').exec((err, foundAnns) => {
+						if (err || !foundAnns) {
+							req.flash('error', 'Unable to access database')
+							res.redirect('back')
+
+						} else {
+
+							res.render(`inbox/show`, {announcements: foundAnns.reverse(), announced: false, notif: foundNotif, recipient_profiles: foundUsers})
+						}
+					})
+				}
+			})
+		}
+	})
+})
+
 
 //Clear entire inbox
 router.delete('/clear', middleware.isLoggedIn, (req, res) => {
@@ -402,7 +400,7 @@ router.delete('/delete', middleware.isLoggedIn, (req, res) => {
 					}
 				}
 
-				if (!notif.read[notif.recipient_ids.indexOf(req.user._id)]) { //If you haven't read it yet but want to delete it, it's no longer new.
+				if (!notif.read[notif.recipients.indexOf(req.user._id)]) { //If you haven't read it yet but want to delete it, it's no longer new.
 					req.user.notifCount -= 1
 				}
 			}
@@ -422,7 +420,7 @@ router.put('/mark_all', middleware.isLoggedIn, (req, res) => {
 
 		} else {
 			for (let notif of foundNotifs) {
-				notif.read[notif.recipient_ids.indexOf(req.user._id)] = true
+				notif.read[notif.recipients.indexOf(req.user._id)] = true
 				notif.save()
 
 				Notification.findByIdAndUpdate(notif._id, {read: notif.read}, (err, fn) => { //For some reason, foundNotif.save() wasn't saving file properly. Had to add this
@@ -462,8 +460,8 @@ router.put('/mark_selected', middleware.isLoggedIn, (req, res) => {
 			for (let notif of foundNotifs) {
 				for (let i of req.user.inbox) {
 					if (notif._id.toString() == i.toString()) {
-						if (!notif.read[notif.recipient_ids.indexOf(req.user._id)]) {
-							notif.read[notif.recipient_ids.indexOf(req.user._id)] = true
+						if (!notif.read[notif.recipients.indexOf(req.user._id)]) {
+							notif.read[notif.recipients.indexOf(req.user._id)] = true
 							notif.save()
 							req.user.notifCount -= 1
 
@@ -542,7 +540,7 @@ router.post('/requests/:id/accept', middleware.isLoggedIn, (req, res) => {
 
 				} else {
 
-					Notification.create({subject: "Room Join Request Accepted", sender: req.user, text: `Your request to join room '${foundRoom.name}' has been accepted`, recipients: [foundUser], recipient_names: [foundUser.username], recipient_ids: [foundUser._id], read: [0], toEveryone: false}, (err, notification) => {
+					Notification.create({subject: "Room Join Request Accepted", sender: req.user, text: `Your request to join room '${foundRoom.name}' has been accepted`, recipients: [foundUser], read: [0], toEveryone: false}, (err, notification) => {
 
 						if (err || !foundUser) {
 							req.flash('error', "Unable to access database")
@@ -616,7 +614,7 @@ router.post('/requests/:id/reject', middleware.isLoggedIn, (req, res) => {
 							res.redirect('back')
 
 						} else {
-							Notification.create({subject: "Room Join Request Rejected", sender: req.user, text: `Your request to join room '${foundRoom.name}' has been rejected`, recipients: [foundUser], recipient_names: [foundUser.username], recipient_ids: [foundUser._id], read: [0], toEveryone: false}, (err, notification) => {
+							Notification.create({subject: "Room Join Request Rejected", sender: req.user, text: `Your request to join room '${foundRoom.name}' has been rejected`, recipients: [foundUser], read: [0], toEveryone: false}, (err, notification) => {
 
 								if (err || !foundUser) {
 									req.flash('error', "Unable to access database")

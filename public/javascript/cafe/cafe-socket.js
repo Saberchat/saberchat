@@ -1,5 +1,7 @@
 function order(form, customer) {
   var socket = io();
+  let items = document.getElementById('item-list')
+  console.log(items)
 
   $(form).submit(function (e) {
     // e.preventDefault();
@@ -7,14 +9,14 @@ function order(form, customer) {
     var instructions = $('#descInput').val();
     var itemList = [];
     var itemCount = [];
-    $('#item-list > .form-check').each(function(index) {
+
+    $('#item-list > .form-check > .style-div').each(function(index) {
 
       if ($(this).find('input').is(':checked')) {
         let currentItemName = $(this).find('input').attr('id');
         itemList.push(currentItemName);
         let currentItemCount = $(this).find('select').val();
         itemCount.push(currentItemCount);
-        console.log(itemList)
       }
       // this = current accessed element
       // index = int index of current element relative to parent list
@@ -48,6 +50,8 @@ function getOrders(outputStream) {
       for (let i = 0; i < order.items.length; i++) {
         str += `<li class="list-group-item">${foundItems[i].name}: ${order.quantities[i]} order(s)</li>\n`;
       }
+
+      alert("HAW")
 
       return str;
     }

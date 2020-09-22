@@ -17,6 +17,10 @@ const bodyParser = require('body-parser');
 const methodOverride = require('method-override');
 // package for formating dates on the serverside
 const dateFormat = require('dateformat');
+//Image upload control
+const multer = require('multer');
+const upload = multer({dest: __dirname + '/../public/uploads'});
+
 //pretty up the console
 // const colors = require('colors');
 // add favicon
@@ -42,7 +46,7 @@ const profileRoutes = require('./routes/profile');
 const wHeightsRoutes = require('./routes/wHeights');
 const inboxRoutes = require('./routes/inbox');
 const adminRoutes = require('./routes/admin');
-// const cafeRoutes = require('./routes/cafe');
+const cafeRoutes = require('./routes/cafe');
 const announcementRoutes = require('./routes/announcements');
 const projectRoutes = require('./routes/projects');
 
@@ -52,6 +56,7 @@ const io = require('socket.io')(http);
 const port = process.env.PORT || 3000;
 
 //connect to db. We should set the link as environment variable for security purposes in the future.
+// mongoose.connect(process.env.DATABASE_URL,
 mongoose.connect(process.env.DATABASE_URL,
 {
   useNewUrlParser: true,
@@ -131,7 +136,7 @@ app.use('/articles', wHeightsRoutes);
 app.use('/inbox', inboxRoutes);
 app.use('/announcements', announcementRoutes);
 app.use('/admin', adminRoutes);
-// app.use('/cafe', cafeRoutes);
+app.use('/cafe', cafeRoutes);
 app.use('/projects', projectRoutes);
 
 // Catch-all route
@@ -255,6 +260,7 @@ io.on('connect', (socket) => {
       console.log("Send orders between 8AM and 12PM");
 
     } else {
+      console.log(itemList)
 
       if (itemList.length != 0) { //Order form is not empty, something is selected
 
@@ -264,7 +270,7 @@ io.on('connect', (socket) => {
 
           } else {
 
-            Order.find({name: `${user.firstName} ${user.lastName}`}, (err, foundOrders) => {
+            Order.find({name: `${user.firstName} ${user.lastName}`, present: true}, (err, foundOrders) => {
               if (err || !foundOrders) {
                 console.log(err)
 

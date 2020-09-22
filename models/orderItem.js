@@ -1,9 +1,14 @@
 const mongoose = require('mongoose');
 
-const orderItemSchema = new mongoose.Schema({
+var orderItemSchema = new mongoose.Schema({
   name: String,
   description: String,
   price: Number,
+  imgUrl: String,
+  // type: {
+  //   type: mongoose.Schema.Types.ObjectId,
+  //   ref: "ItemType"
+  // },
   availableItems: Number,
   isAvailable: Boolean,
 });

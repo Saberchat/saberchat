@@ -15,6 +15,7 @@ const Announcement = require('../models/announcement')
 
 // Home route. gives the landing or home or index page (whatever you want to call it).
 router.get('/', (req, res) => {
+
 	Announcement.find({}).populate({path: 'sender', select: ['username', 'imageUrl']}).populate('message').exec((err, foundAnns) => {
 		if (err || !foundAnns) {
 			req.flash('error', 'Unable to access database')
@@ -59,14 +60,22 @@ router.post("/register",  function(req, res) {
 	} else if(req.body.password.length <= 8) {
 		req.flash('error', 'Password too short');
 		res.redirect('/');
+
 	} else {
+
+		let username = req.body.username;
+
+		if (username[username.length - 1] == ' ') { //Space at the end of usrname causes errors that are hard to fix, and unnecessary if we nip it in the bud here
+			username = username.slice(0, username.length - 1);
+		}
+
 		//creates new user from form info
 		newUser = new User(
 			{
 				email: req.body.email,
 				firstName: req.body.firstName,
 				lastName: req.body.lastName,
-				username: filter.clean(req.body.username),
+				username: filter.clean(username),
 				notifCount: 0
 			}
 		);
@@ -157,10 +166,10 @@ router.get('/alsion', (req, res) => {
 })
 
 // NOTE: Remove this line when enabling cafe
-router.get('/cafe', middleware.isLoggedIn, (req, res) => {
-  req.flash('error', "The cafe is currently closed");
-  res.redirect('back');
-});
+// router.get('/cafe', middleware.isLoggedIn, (req, res) => {
+//   req.flash('error', "The cafe is currently closed");
+//   res.redirect('back');
+// });
 
 //export router with all the routes connected
 module.exports = router;

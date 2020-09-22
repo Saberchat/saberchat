@@ -24,7 +24,6 @@
     <!-- include the navbar via ejs -->
     <%- include('../partials/navbar') %>
     <%- include('../partials/header') %>
-    <%- include('../partials/announcement') %>
 
   </head>
   <body style="text-align: center;">
@@ -40,7 +39,7 @@
       </div>
     </div>
 
-    <form action="/projects/create" method="post" style="text-align: center;">
+    <form action="/projects" method="post" style="text-align: center;" enctype="multipart/form-data">
       <div class="input-group mb-3">
         <input id="new-project-message" name="title" maxlength="30" type="text" class="form-control" placeholder="Enter Project Name" aria-label="Username" aria-describedby="basic-addon1" required>
       </div>
@@ -63,6 +62,8 @@
       </div>
 
       <div class="input-group mb-3">
+        <!-- <input id="project-file" type="file" accept="image/*" name="img" ><br /> -->
+        <label for='project-file'>Project Image URL</label>
         <input id="new-project-images" type="text" name="img" class="form-control" placeholder="Enter Image Url" aria-label="Username" aria-describedby="basic-addon1" required>
       </div>
 
