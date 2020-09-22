@@ -31,7 +31,9 @@ router.get('/:id/edit', middleware.isLoggedIn, middleware.isAdmin, (req, res) =>
     if (err || !foundAnn) {
       req.flash('error', "Unable to access database");
       res.redirect('back');
-
+    } else if(!foundAnn.sender._id.equals(req.user._id)) {
+      req.flash('error', 'You do not have permission to do that');
+      res.redirect('back');
     } else {
       res.render('announcements/edit', {announcement: foundAnn});
     }
