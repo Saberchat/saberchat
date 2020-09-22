@@ -7,20 +7,12 @@ const Announcement = require('../models/announcement');
 
 // display create form
 router.get('/new', middleware.isLoggedIn, middleware.isAdmin, (req, res) => {
-    Announcement.find({}).populate({path: 'sender', select: ['username', 'imageUrl']}).populate('message').exec((err, foundAnns) => {
-      if (err || !foundAnns) {
-        req.flash('error', 'Unable to access database');
-        res.redirect('back');
-      } else {
-
-        res.render('announcements/new', {announcements: foundAnns.reverse(), announced: false});
-      }
-    });
+  res.render('announcements/new');
 });
 
 // show announcement
 router.get('/:id', middleware.isLoggedIn, (req, res) => {
-  Announcement.findOne({_id: req.params.id})
+  Announcement.findById(req.params.id)
   .populate({path: 'sender', select: 'username'})
   .exec((err, foundAnn) => {
     if (err || !foundAnn) {
