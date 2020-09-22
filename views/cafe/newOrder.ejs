@@ -44,54 +44,54 @@
     <div class="row">
       <div class="col-md-8 offset-md-2 col-12">
         <form id="orderForm" action="/cafe/new" method="post">
-          <div id="item-selection">
+          <!-- <div id="item-selection"> -->
             <!-- <h4>Select Items</h4> -->
 
             <!-- <div class="search-filter mb-3">
               <i class="fas fa-search"></i>
               <input id="search-input" onkeyup="searchFunction()" class="form-control" type="text" placeholder="Search..." title="Type in itemname">
             </div> -->
+          <!-- </div> -->
 
-            <div id="item-list">
-              <% types.forEach(type => { %>
-                <% if (type.items.length > 0) { %>
-                  <br />
-                  <li class="list-group-item list-group-item-success">
-                    <div class="d-flex w-100 justify-content-between">
-                      <h2 class="mb-1"><%=type.name%></h2>
-                    </div>
-                  </li>
+          <div id="item-list">
+            <% types.forEach(type => { %>
+              <% if (type.items.length > 0) { %>
+                <br />
+                <li class="list-group-item list-group-item-success">
+                  <div class="d-flex w-100 justify-content-between">
+                    <h2 class="mb-1"><%=type.name%></h2>
+                  </div>
+                </li>
 
-                  <% type.items.forEach(function(item) { %>
-                    <% if (item.isAvailable == true) { %>
-                      <div class="list-group-item list-group-item-action" id="form-check" class="form-check">
+                <% type.items.forEach(function(item) { %>
+                  <% if (item.isAvailable == true) { %>
+                    <div class="list-group-item list-group-item-action form-check">
 
-                        <!-- Div to put margins on text inside outer div -->
-                        <div style="margin-left: 2%;">
+                      <!-- Div to put margins on text inside outer div -->
+                      <div style="margin-left: 2%;" class="style-div">
 
-                          <input name="check[<%= item._id %>]" id="<%= item._id%>" class="form-check-input" type="checkbox" value="">
-                          <select class="num-orders" id="dd_<%=item._id%>" name="<%=item.name%>">
-                            <% if (item.availableItems > 5) { %>
-                              <% [1, 2, 3, 4, 5].forEach(function(num) { %>
-                                <option><%=num%></option>
-                              <% }) %>
-                            <% } else { %>
-                              <% let val = 0 %>
-                              <% [...Array(item.availableItems).keys()].forEach(function(num) { %>
-                                <% val = num + 1 %>
-                                <option><%=val%></option>
-                              <% }) %>
-                            <% } %>
-                          </select>
-                          <label style="margin-left: 1%;" class="form-check-label" for="<%= item._id%>"><strong><%= item.name %></strong> (<%= item.availableItems %> orders available) - $<%= item.price %></label>
-                          <!-- <span class="form-check-label"><%= item.name %>: $<%= item.price %></span> -->
-                        </div>
+                        <input name="check[<%= item._id %>]" id="<%= item._id%>" class="form-check-input" type="checkbox" value="">
+                        <select class="num-orders" id="dd_<%=item._id%>" name="<%=item.name%>">
+                          <% if (item.availableItems > 5) { %>
+                            <% [1, 2, 3, 4, 5].forEach(function(num) { %>
+                              <option><%=num%></option>
+                            <% }) %>
+                          <% } else { %>
+                            <% let val = 0 %>
+                            <% [...Array(item.availableItems).keys()].forEach(function(num) { %>
+                              <% val = num + 1 %>
+                              <option><%=val%></option>
+                            <% }) %>
+                          <% } %>
+                        </select>
+                        <label style="margin-left: 1%;" class="form-check-label" for="<%= item._id%>"><strong><%= item.name %></strong> (<%= item.availableItems %> orders available) - $<%= item.price %></label>
+                        <!-- <span class="form-check-label"><%= item.name %>: $<%= item.price %></span> -->
                       </div>
-                    <% }%>
-                  <% }); %>
-                <% } %>
-              <% }) %>
-            </div>
+                    </div>
+                  <% }%>
+                <% }); %>
+              <% } %>
+            <% }) %>
           </div>
           <br />
           <button id="confirm" style="margin-bottom: 10px;" type="button" class="btn btn-secondary">View Total</button><br />

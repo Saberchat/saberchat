@@ -9,7 +9,8 @@ function order(form, customer) {
     var instructions = $('#descInput').val();
     var itemList = [];
     var itemCount = [];
-    $('#item-list > .form-check').each(function(index) {
+
+    $('#item-list > .form-check > .style-div').each(function(index) {
 
       if ($(this).find('input').is(':checked')) {
         let currentItemName = $(this).find('input').attr('id');
