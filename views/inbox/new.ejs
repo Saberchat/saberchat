@@ -8,16 +8,14 @@
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css">
     <link rel="stylesheet" href="/stylesheets/main.css">
     <!-- link css for navbar. Don't need to include public/javascript/userForm.js since user is already logged in and does not need to access login and register forms.  -->
-    <link rel="stylesheet" href="/stylesheets/inbox/index.css">
     <link rel="stylesheet" href="/stylesheets/components/navbar.css">
     <link rel="stylesheet" href="/stylesheets/components/header.css">
-    <link rel="stylesheet" href="/stylesheets/components/announcement.css">
-    <link rel="stylesheet" href="/stylesheets/inbox/sendNotif.css">
+    <link rel="stylesheet" href="/stylesheets/inbox/form.css">
+    <link rel="stylesheet" href="/stylesheets/inbox/new.css">
 
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js"></script>
-    <script src="../javascript/socket.js"></script>
 
     <!-- I'm using my fontawesome kit -->
     <script src="https://kit.fontawesome.com/dccc745c41.js" crossorigin="anonymous"></script>
@@ -26,48 +24,65 @@
     <%- include('../partials/navbar') %>
     <!-- include the backdrop for nav -->
     <%- include('../partials/header') %>
-    <%- include('../partials/announcement') %>
 
     </head>
     <body>
       <div class="container">
         <div class="row">
-          <div class="col-12">
-
-            <div class="inbox-container">
-              <!-- navigation between tabs -->
+          <div class="col-md-8 offset-md-2 col-12">
+            <div class="form-container">
+              <h1>New Message</h1>
+              <form action="/inbox/messages" method="post" onsubmit="process()" id="message-form">
+                <div id="to-block">
+                  <div class="form-group">
+                    <label for="user-select" class="label-custom">Recipients</label>
+                    <select id="user-select" class="form-control" onchange="addRecipient()" required>
+                      <option value="" selected disabled>Select User</option>
+                      <% users.forEach(user => { %>
+                        <option value="<%= user._id %>"><%= user.username %> (<%= user.firstName.charAt(0) %>.<%= user.lastName.charAt(0) %>.)</option>
+                      <% }) %> 
+                    </select>
+                  </div>
+                  <div class="form-check">
+                    <input onchange="updateTo(this)" type="checkbox" class="form-check-input" name="all" value="true" id="all">
+                    <label class="form-check-label" for="all">Send to everyone</label>
+                  </div>
+                </div>
+                
+                <div class="form-group">
+                  <label for="subject">Subject</label>
+                  <input id="subject" placeholder="A short title..." class="form-control" type="text" name="subject" required>
+                </div>
+                <div class="form-group">
+                  <label for="message">Message</label>
+                  <textarea name="message" id="message" placeholder="Message text..." rows="5" class="form-control" required></textarea>
+                </div>
+    
+                <div id="image-block">
+                  <h4>Images</h4>
+                  <button type="button" onclick="addImg()" class="btn btn-primary"><i class="fas fa-plus"></i> Image</button>
+                  <hr>
+                </div>
+                <button type="submit" class="btn btn-primary btn-block">Send</button>
+              </form>
+            </div>
+            <!-- <div class="inbox-container">
               <nav class="inbox-nav">
                 <div class="btn-group" role="group" aria-label="inbox navigation">
                   <button
                     class="nav-tab active"
                     id="view-msg"
                     >Messages</button>
-
-                  <!-- <button
-                    class="nav-tab"
-                    id="view-req"
-                    onclick="setRequests()"
-                    >Requests</button> -->
                 </div>
-                <!-- <button id="refresh-btn" onclick="window.location.reload();">Refresh</button> -->
               </nav>
 
-                <!-- actions -->
                 <div class="action-bar" style="padding-bottom: 20px;">
-                  <!-- message actions -->
                   <div class="message-actions display">
                     <a href="/inbox" class="action-btn">Inbox</a>
-                    <!-- <a href="/notif" class="action-btn">Send New</a> -->
                     <a href="/inbox/sent" class="action-btn">View Sent</a>
                   </div>
-                  <!-- request actions -->
-                  <!-- <div class="request-actions">
-                    <button id="current-req" class="action-btn" onclick="seeCurrentReq()" disabled>Current</button>
-                    <button id="past-req" class="action-btn" onclick="seePastReq()">History</button>
-                  </div> -->
                 </div>
                 <div class='send-box'>
-                  <!-- Send notification to group -->
                   <% if (currentUser.status != 'faculty') { %>
                     <div class="send-notif-type" style="margin-top: 20px; margin-bottom: 50px; text-align: center; display: inline-block;">
 
@@ -110,7 +125,6 @@
 
                   <% if (currentUser.status != 'faculty') { %>
 
-                    <!-- Anonymous Hotline for students-->
                     <div class="send-notif-type" style="margin-top: 20px; margin-bottom: 50px; text-align: center; display: inline-block;">
                       <strong class="send-notif-header">Anonymous Hotline</strong>
                       <form action="/inbox/send_anonymous" method="post" style="margin-bottom: 25px;">
@@ -148,68 +162,12 @@
                         <button style=" margin-bottom: 10px; width: 100%;" class="btn btn-primary" class='submit-button' action="submit">Send Notification</button>
                       </form>
                     </div>
-                  <% } %>
+                  <% } %> -->
 
-                </div>
-            </div>
         </div>
+      </div> 
+    </div>
+    <script src="/javascript/inbox/form.js"></script>
+    <script src="/javascript/inbox/new.js"></script>
   </body>
-
-  <script>
-
-  $("#recipient_list").on('keydown paste', function(e){
-      e.preventDefault();
-  });
-
-  $("#recipient_list_anonymous").on('keydown paste', function(e){
-      e.preventDefault();
-  });
-
-  let recipients = document.getElementById('recipients')
-  let recipient_list = document.getElementById('recipient_list')
-  let clear = document.getElementById('clear')
-
-  let recipients_anonymous = document.getElementById('recipients_anonymous')
-  let recipient_list_anonymous = document.getElementById('recipient_list_anonymous')
-  let clear_anonymous = document.getElementById('clear_anonymous')
-
-  recipients.onchange = () => {
-    let x = recipients.value;
-    if (x != '') {
-      if (recipient_list.value == '') {
-        recipient_list.value += `${x}`
-      } else {
-        if ((!(recipient_list.value.split(', ').includes(x))) && (!(recipient_list.value.split(', ').includes('everyone'))) && (x != "everyone")) {
-          recipient_list.value += `, ${x}`
-        }
-      }
-    }
-  }
-
-  clear.addEventListener('click', () => {
-    recipient_list.value = "";
-    recipients.value = 'none';
-  })
-
-  recipients_anonymous.onchange = () => {
-    let x = recipients_anonymous.value;
-
-    if (x != '') {
-      if (recipient_list_anonymous.value == '') {
-        recipient_list_anonymous.value += `${x}`
-      } else {
-        if ((!(recipient_list_anonymous.value.split(', ').includes(x))) && (!(recipient_list_anonymous.value.split(', ').includes('All Faculty'))) && (x != "All Faculty")) {
-          recipient_list_anonymous.value += `, ${x}`
-        }
-      }
-    }
-  }
-
-  clear_anonymous.addEventListener('click', () => {
-    recipient_list_anonymous.value = ""
-    recipients_anonymous.value = ''
-  })
-
-  </script>
-
 </html>

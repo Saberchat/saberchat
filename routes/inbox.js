@@ -36,7 +36,7 @@ router.get('/', middleware.isLoggedIn, (req, res) => {
 
 
 //Access sendNotification file
-router.get('/new', middleware.isLoggedIn, (req, res) => {
+router.get('/messages/new', middleware.isLoggedIn, (req, res) => {
 	User.find({}, (err, foundUsers) => {
 		if(err || !foundUsers) {
 			req.flash('error', 'Unable to access Database');
@@ -59,123 +59,125 @@ router.get('/new', middleware.isLoggedIn, (req, res) => {
 })
 
 //Route to send notification to a group of people
-router.post('/send_group', middleware.isLoggedIn, (req, res) => {
+router.post('/messages', middleware.isLoggedIn, (req, res) => {
+	console.log('-------Req------');
+	console.log(req.body);
+	res.redirect('back');
+	// if(!req.body.recipient_list || req.body.recipient_list.length == 0) {
+	// 	req.flash('error', 'Please select recipients');
+	// 	return res.redirect('back');
+	// }
 
-	if(!req.body.recipient_list || req.body.recipient_list.length == 0) {
-		req.flash('error', 'Please select recipients');
-		return res.redirect('back');
-	}
+	// let mailing_list = req.body.recipient_list.split(', ') //Creates list of recipients based on user input
 
-	let mailing_list = req.body.recipient_list.split(', ') //Creates list of recipients based on user input
+	// if (mailing_list.includes('everyone')) { //Send notif to everyone
+	// 	User.find({_id: {$ne: req.user._id}}, (err, foundUsers) => {
+	// 		if(err || !foundUsers) {
+	// 			req.flash('error', 'Unable to access Database');
+	// 			res.redirect('back');
 
-	if (mailing_list.includes('everyone')) { //Send notif to everyone
-		User.find({_id: {$ne: req.user._id}}, (err, foundUsers) => {
-			if(err || !foundUsers) {
-				req.flash('error', 'Unable to access Database');
-				res.redirect('back');
+	// 		} else {
 
-			} else {
+	// 			let userIds = []
 
-				let userIds = []
+	// 			for (let user of foundUsers) {
+	// 				userIds.push(user._id)
+	// 			}
 
-				for (let user of foundUsers) {
-					userIds.push(user._id)
-				}
+	// 			if (req.body.images.split(', ')[0] == '') { //No images attached
+	// 				Notification.create({subject: req.body.subject, sender: req.user, text: req.body.message, recipients: foundUsers, recipient_names: ['everyone'], recipient_ids: userIds, read: new Array(foundUsers.length).fill(false), images: [], toEveryone: true}, (err, notification) => {
+	// 					notification.date = dateFormat(notification.created_at, "mmm d, h:MMTT")
+	// 					notification.save() //Create notification
 
-				if (req.body.images.split(', ')[0] == '') { //No images attached
-					Notification.create({subject: req.body.subject, sender: req.user, text: req.body.message, recipients: foundUsers, recipient_names: ['everyone'], recipient_ids: userIds, read: new Array(foundUsers.length).fill(false), images: [], toEveryone: true}, (err, notification) => {
-						notification.date = dateFormat(notification.created_at, "mmm d, h:MMTT")
-						notification.save() //Create notification
+	// 					for (let i of foundUsers) {
+	// 						i.inbox.push(notification) //Add notif to each recipient's inbox
+	// 						if (i.notifCount == undefined) {
+	// 							i.notifCount = 1
 
-						for (let i of foundUsers) {
-							i.inbox.push(notification) //Add notif to each recipient's inbox
-							if (i.notifCount == undefined) {
-								i.notifCount = 1
+	// 						} else {
+	// 							i.notifCount += 1
+	// 						}
+	// 						i.save()
+	// 					}
+	// 				})
 
-							} else {
-								i.notifCount += 1
-							}
-							i.save()
-						}
-					})
+	// 			} else { //Images are attached
+	// 				Notification.create({subject: req.body.subject, sender: req.user, text: req.body.message, recipients: foundUsers, recipient_names: ['everyone'], recipient_ids: userIds, read: new Array(foundUsers.length).fill(false), images: req.body.images.split(', '), toEveryone: true}, (err, notification) => {
+	// 					notification.date = dateFormat(notification.created_at, "mmm d, h:MMTT")
+	// 					notification.save() //Create notification
 
-				} else { //Images are attached
-					Notification.create({subject: req.body.subject, sender: req.user, text: req.body.message, recipients: foundUsers, recipient_names: ['everyone'], recipient_ids: userIds, read: new Array(foundUsers.length).fill(false), images: req.body.images.split(', '), toEveryone: true}, (err, notification) => {
-						notification.date = dateFormat(notification.created_at, "mmm d, h:MMTT")
-						notification.save() //Create notification
+	// 					for (let i of foundUsers) {
+	// 						i.inbox.push(notification) //Add notif to recipient's inbox
+	// 						if (i.notifCount == undefined) {
+	// 							i.notifCount = 1
 
-						for (let i of foundUsers) {
-							i.inbox.push(notification) //Add notif to recipient's inbox
-							if (i.notifCount == undefined) {
-								i.notifCount = 1
+	// 						} else {
+	// 							i.notifCount += 1
+	// 						}
+	// 						i.save()
+	// 					}
+	// 				})
+	// 			}
+	// 		}
+	// 		req.flash('success', `Notification sent to everyone!`)
+	// 		res.redirect('/inbox/new')
+	// 	})
 
-							} else {
-								i.notifCount += 1
-							}
-							i.save()
-						}
-					})
-				}
-			}
-			req.flash('success', `Notification sent to everyone!`)
-			res.redirect('/inbox/new')
-		})
+	// } else { //Send notif to specific mailing list
 
-	} else { //Send notif to specific mailing list
+	// 	User.find({'username': {$in: mailing_list}}, (err, foundUsers) => { //Access users from User schema
+	// 		if(err || !foundUsers) {
+	// 			req.flash('error', 'Unable to access Database');
+	// 			res.redirect('back');
 
-		User.find({'username': {$in: mailing_list}}, (err, foundUsers) => { //Access users from User schema
-			if(err || !foundUsers) {
-				req.flash('error', 'Unable to access Database');
-				res.redirect('back');
+	// 		} else {
 
-			} else {
+	// 			let userIds = []
 
-				let userIds = []
+	// 			for (let user of foundUsers) {
+	// 				userIds.push(user._id)
+	// 			}
 
-				for (let user of foundUsers) {
-					userIds.push(user._id)
-				}
+	// 			if (req.body.images.split(', ')[0] == '') {
+	// 				Notification.create({subject: req.body.subject, sender: req.user, text: req.body.message, recipients: foundUsers, recipient_names: mailing_list, recipient_ids: userIds, read: new Array(mailing_list.length).fill(false), images: [], toEveryone: false}, (err, notification) => {
+	// 					notification.date = dateFormat(notification.created_at, "mmm d, h:MMTT")
+	// 					notification.save() //Create notification
 
-				if (req.body.images.split(', ')[0] == '') {
-					Notification.create({subject: req.body.subject, sender: req.user, text: req.body.message, recipients: foundUsers, recipient_names: mailing_list, recipient_ids: userIds, read: new Array(mailing_list.length).fill(false), images: [], toEveryone: false}, (err, notification) => {
-						notification.date = dateFormat(notification.created_at, "mmm d, h:MMTT")
-						notification.save() //Create notification
+	// 					for (let i of foundUsers) {
+	// 						i.inbox.push(notification) //Add notif to each recipient's inbox
+	// 						if (i.notifCount == undefined) {
+	// 							i.notifCount = 1
 
-						for (let i of foundUsers) {
-							i.inbox.push(notification) //Add notif to each recipient's inbox
-							if (i.notifCount == undefined) {
-								i.notifCount = 1
+	// 						} else {
+	// 							i.notifCount += 1
+	// 						}
+	// 						i.save()
+	// 					}
+	// 				})
 
-							} else {
-								i.notifCount += 1
-							}
-							i.save()
-						}
-					})
+	// 			} else {
+	// 				Notification.create({subject: req.body.subject, sender: req.user, text: req.body.message, recipients: foundUsers, recipient_names: [mailing_list], recipient_ids: userIds, read: new Array(mailing_list.length).fill(false), images: req.body.images.split(', '), toEveryone: false}, (err, notification) => {
+	// 					notification.date = dateFormat(notification.created_at, "mmm d, h:MMTT")
+	// 					notification.save() //Create notification
 
-				} else {
-					Notification.create({subject: req.body.subject, sender: req.user, text: req.body.message, recipients: foundUsers, recipient_names: [mailing_list], recipient_ids: userIds, read: new Array(mailing_list.length).fill(false), images: req.body.images.split(', '), toEveryone: false}, (err, notification) => {
-						notification.date = dateFormat(notification.created_at, "mmm d, h:MMTT")
-						notification.save() //Create notification
+	// 					for (let i of foundUsers) {
+	// 						i.inbox.push(notification) //Add notif to each recipient's inbox
+	// 						if (i.notifCount == undefined) {
+	// 							i.notifCount = 1
 
-						for (let i of foundUsers) {
-							i.inbox.push(notification) //Add notif to each recipient's inbox
-							if (i.notifCount == undefined) {
-								i.notifCount = 1
-
-							} else {
-								i.notifCount += 1
-							}
-							i.save()
-						}
-					})
-				}
-				req.flash('success', `Notification sent to mailing list!!`)
-				res.redirect('/inbox/new')
-			}
-		})
-	}
-})
+	// 						} else {
+	// 							i.notifCount += 1
+	// 						}
+	// 						i.save()
+	// 					}
+	// 				})
+	// 			}
+	// 			req.flash('success', `Notification sent to mailing list!!`)
+	// 			res.redirect('/inbox/new')
+	// 		}
+	// 	})
+	// }
+});
 
 //Send message via anonymous hotline
 router.post('/send_anonymous', (req, res) => {

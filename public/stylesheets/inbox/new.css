@@ -1,0 +1,26 @@
+.form-container {
+    margin: 3rem 0;
+    padding: 2rem;
+    border-radius: 15px;
+    box-shadow: 0px 7px 15px rgb(116, 116, 116);
+}
+
+.form-container h1 {
+    text-align: center;
+    font-size: 2rem;
+}
+
+.form-container .form-group label {
+    font-weight: 500;
+    font-size: 1.2rem;
+}
+
+/* Recipients block */
+#to-block {
+    margin-bottom: 2rem;
+}
+
+#to-block .form-check-input {
+    width: 15px;
+    height: 15px;
+}
