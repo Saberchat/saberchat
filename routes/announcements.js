@@ -19,27 +19,20 @@ router.get('/', middleware.isLoggedIn, (req, res) => {
 })
 
 //Route to render 'sendAnnouncement' page
-router.get('/new', [middleware.isLoggedIn, middleware.isAdmin], (req, res) => {
-  if (req.user.status == 'faculty' || req.user.permission == 'admin') {
+router.get('/new', [middleware.isLoggedIn, middleware.adminOrFaculty], (req, res) => {
+  Announcement.find({}).populate({path: 'sender', select: ['username', 'imageUrl']}).populate('message').exec((err, foundAnns) => {
+    if (err || !foundAnns) {
+      req.flash('error', 'Unable to access database')
+      res.redirect('back')
+    } else {
 
-    Announcement.find({}).populate({path: 'sender', select: ['username', 'imageUrl']}).populate('message').exec((err, foundAnns) => {
-      if (err || !foundAnns) {
-        req.flash('error', 'Unable to access database')
-        res.redirect('back')
-      } else {
-
-        res.render('announcements/new', {announcements: foundAnns.reverse(), announced: false})
-      }
-    })
-
-  } else {
-    req.flash('error', 'Your status does not permit you to send announcements.')
-    res.redirect('/announcements')
-  }
+      res.render('announcements/new', {announcements: foundAnns.reverse(), announced: false})
+    }
+  })
 })
 
 //Route to send announcements to bulletin
-router.post('/', [middleware.isLoggedIn, middleware.isAdmin], (req, res) => {
+router.post('/', [middleware.isLoggedIn, middleware.adminOrFaculty], (req, res) => {
   Announcement.create({sender: req.user, subject: req.body.subject, text: req.body.message}, (err, announcement) => {
     if (req.body.imgUrls != '') {
       announcement.images = req.body.imgUrls.split(', ')
@@ -75,10 +68,14 @@ router.get('/:id', middleware.isLoggedIn, (req, res) => {
   })
 })
 
-router.get('/:id/edit', [middleware.isLoggedIn, middleware.isAdmin], (req, res) => {
+router.get('/:id/edit', [middleware.isLoggedIn, middleware.adminOrFaculty], (req, res) => {
   Announcement.findById(req.params.id, (err, foundAnn) => {
     if (err || !foundAnn) {
       req.flash('error', "Unable to access database")
+      res.redirect('back')
+
+    } else if (foundAnn.sender._id != req.user._id) {
+      req.flash('error', "You can only edit announcements that you have sent.")
       res.redirect('back')
 
     } else {
@@ -96,10 +93,14 @@ router.get('/:id/edit', [middleware.isLoggedIn, middleware.isAdmin], (req, res) 
   })
 })
 
-router.put('/:id', [middleware.isLoggedIn, middleware.isAdmin], (req, res) => {
+router.put('/:id', [middleware.isLoggedIn, middleware.adminOrFaculty], (req, res) => {
   Announcement.findByIdAndUpdate(req.params.id, {subject: req.body.subject, images: req.body.imgUrls.split(', '), text: req.body.message}, (err, foundAnn) => {
     if (err || !foundAnn) {
       req.flash('error', "Unable to access database")
+      res.redirect('back')
+
+    } else if (foundAnn.sender._id != req.user._id) {
+      req.flash('error', "You can only edit announcements that you have sent.")
       res.redirect('back')
 
     } else {
@@ -109,10 +110,14 @@ router.put('/:id', [middleware.isLoggedIn, middleware.isAdmin], (req, res) => {
   })
 })
 
-router.delete('/:id', [middleware.isLoggedIn, middleware.isAdmin], (req, res) => {
+router.delete('/:id', [middleware.isLoggedIn, middleware.adminOrFaculty], (req, res) => {
   Announcement.findByIdAndDelete(req.params.id, (err, foundAnn) => {
     if (err || !foundAnn) {
       req.flash('error', "Unable to access database")
+      res.redirect('back')
+
+    } else if (foundAnn.sender._id != req.user._id) {
+      req.flash('error', "You can only delete announcements that you have sent.")
       res.redirect('back')
 
     } else {

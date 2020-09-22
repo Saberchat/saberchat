@@ -103,6 +103,15 @@ middleware.isFaculty = function(req, res, next) {
 	}
 }
 
+middleware.adminOrFaculty = function(req, res, next) {
+	if(req.user.status == 'faculty' || req.user.permission == 'admin') {
+		next();
+	} else {
+		req.flash('error', 'You do not have permission to do that');
+		res.redirect('back');
+	}
+}
+
 middleware.isStudent = function(req, res, next) {
 	if(req.user.status != 'faculty' && req.user.status != "parent") {
 		next();

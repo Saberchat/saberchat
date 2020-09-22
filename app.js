@@ -255,10 +255,11 @@ io.on('connect', (socket) => {
 
     let currentTime = new Date(new Date().getTime()).toString().split(' ')[4]
 
-    if ((parseInt(currentTime.split(':')[0]) < 8 || parseInt(currentTime.split(':')[0]) >= 12)) {
-      console.log("Send orders between 8AM and 12PM");
-
-    } else {
+    // if ((parseInt(currentTime.split(':')[0]) < 8 || parseInt(currentTime.split(':')[0]) >= 12)) {
+    //   console.log("Send orders between 8AM and 12PM");
+    //
+    // } else {
+      console.log(itemList)
 
       if (itemList.length != 0) { //Order form is not empty, something is selected
 
@@ -268,7 +269,7 @@ io.on('connect', (socket) => {
 
           } else {
 
-            Order.find({name: `${user.firstName} ${user.lastName}`}, (err, foundOrders) => {
+            Order.find({name: `${user.firstName} ${user.lastName}`, present: true}, (err, foundOrders) => {
               if (err || !foundOrders) {
                 console.log(err)
 
@@ -341,7 +342,7 @@ io.on('connect', (socket) => {
       } else {
         console.log('Empty order')
       }
-    }
+    // }
   })
 });
 

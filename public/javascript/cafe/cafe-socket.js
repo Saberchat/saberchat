@@ -1,5 +1,7 @@
 function order(form, customer) {
   var socket = io();
+  let items = document.getElementById('item-list')
+  console.log(items)
 
   $(form).submit(function (e) {
     // e.preventDefault();
@@ -14,7 +16,6 @@ function order(form, customer) {
         itemList.push(currentItemName);
         let currentItemCount = $(this).find('select').val();
         itemCount.push(currentItemCount);
-        console.log(itemList)
       }
       // this = current accessed element
       // index = int index of current element relative to parent list
@@ -48,6 +49,8 @@ function getOrders(outputStream) {
       for (let i = 0; i < order.items.length; i++) {
         str += `<li class="list-group-item">${foundItems[i].name}: ${order.quantities[i]} order(s)</li>\n`;
       }
+
+      alert("HAW")
 
       return str;
     }
