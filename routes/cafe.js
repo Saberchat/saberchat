@@ -34,8 +34,6 @@ router.get('/', middleware.isLoggedIn, (req, res) => {
 
         } else {
 
-
-
           res.render('cafe/index', {
             orders: foundOrders,
             announcements: foundAnns.reverse(),
@@ -81,8 +79,8 @@ router.get('/new', middleware.isLoggedIn, (req, res) => {
           select: ['username', 'imageUrl']
         }).populate('message').exec((err, foundAnns) => {
           if (err || !foundAnns) {
-            req.flash('error', 'Unable to access database')
-            res.redirect('back')
+            req.flash('error', 'Unable to access database');
+            res.redirect('back');
 
           } else {
 
@@ -90,9 +88,9 @@ router.get('/new', middleware.isLoggedIn, (req, res) => {
               types: foundTypes,
               announcements: foundAnns.reverse(),
               announced: false
-            })
+            });
           }
-        })
+        });
       }
     })
   }

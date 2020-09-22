@@ -1,3 +1,5 @@
+//set up env vars
+require('dotenv').config();
 // Require NodeJS modules
 //set up and start the express server
 const express = require('express');
@@ -20,7 +22,7 @@ const multer = require('multer');
 const upload = multer({dest: __dirname + '/../public/uploads'});
 
 //pretty up the console
-const colors = require('colors');
+// const colors = require('colors');
 // add favicon
 const favicon = require('serve-favicon');
 
@@ -56,7 +58,6 @@ const port = process.env.PORT || 3000;
 //connect to db. We should set the link as environment variable for security purposes in the future.
 // mongoose.connect(process.env.DATABASE_URL,
 mongoose.connect(process.env.DATABASE_URL,
-
 {
   useNewUrlParser: true,
   useUnifiedTopology: true,

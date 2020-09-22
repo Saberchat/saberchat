@@ -1,0 +1,31 @@
+/* Image block/area */
+#image-block {
+    margin: 2rem 0;
+    position: relative;
+}
+
+#image-block h4 {
+    font-weight: 500;
+    font-size: 1.3rem;
+
+    display: inline-block;
+    width: 5rem;
+}
+
+#image-block button {
+    float: right;
+}
+
+/* Individual Images */
+.image-group {
+    margin: 1rem 0;
+}
+
+.image-group .input-container {
+    width: 80%;
+    display: inline-block;
+}
+
+#image-block .image-group button {
+    float: right;
+}

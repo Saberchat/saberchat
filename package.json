@@ -46,5 +46,7 @@
     "socket.io": "^2.3.0",
     "text-encoding": "^0.7.0"
   },
-  "devDependencies": {}
+  "devDependencies": {
+    "dotenv": "^8.2.0"
+  }
 }
