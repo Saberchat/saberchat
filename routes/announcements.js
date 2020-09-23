@@ -5,6 +5,18 @@ const dateFormat = require('dateformat');
 const User = require('../models/user');
 const Announcement = require('../models/announcement');
 
+router.get('/', middleware.isLoggedIn, (req, res) => {
+  Announcement.find({}, (err, foundAnns) => {
+    if (err || !foundAnns) {
+      req.flash('error', "Unable to access database")
+      res.redirect('back')
+
+    } else {
+      res.render('announcements/index', {announcements: foundAnns})
+    }
+  })
+})
+
 // display create form
 router.get('/new', middleware.isLoggedIn, middleware.isAdmin, (req, res) => {
   res.render('announcements/new');
@@ -20,7 +32,7 @@ router.get('/:id', middleware.isLoggedIn, (req, res) => {
       res.redirect('back');
 
     } else {
-      res.render('announcements/index', {announced: true, announcement: foundAnn});
+      res.render('announcements/show', {announced: true, announcement: foundAnn});
     }
   });
 });
