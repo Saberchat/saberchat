@@ -57,118 +57,97 @@ router.get('/menu', middleware.isLoggedIn, (req, res) => {
   })
 })
 
-router.get('/new', middleware.isLoggedIn, (req, res) => {
-  //Conditionals to make sure that the orders are done between 8 - 12:20
+router.get('/new', [middleware.isLoggedIn, middleware.cafeOpen], (req, res) => {
 
-  let currentTime = new Date(new Date().getTime()).toString().split(' ')[4]
+  Type.find({}).populate('items').exec((err, foundTypes) => {
+    if (err || !foundTypes) {
+      req.flash('error', "Unable to access database")
+      res.redirect('back')
 
-  if ((parseInt(currentTime.split(':')[0]) < 8 || parseInt(currentTime.split(':')[0]) >= 12)) {
-    req.flash('error', "Send orders between 8AM and 12PM");
-    res.redirect('back');
-
-  } else {
-
-    Type.find({}).populate('items').exec((err, foundTypes) => {
-      if (err || !foundTypes) {
-        req.flash('error', "Unable to access database")
-        res.redirect('back')
-
-      } else {
-        Announcement.find({}).populate({
-          path: 'sender',
-          select: ['username', 'imageUrl']
-        }).populate('message').exec((err, foundAnns) => {
-          if (err || !foundAnns) {
-            req.flash('error', 'Unable to access database');
-            res.redirect('back');
-
-          } else {
-
-            res.render('cafe/newOrder', {
-              types: foundTypes,
-              announcements: foundAnns.reverse(),
-              announced: false
-            });
-          }
-        });
-      }
-    })
-  }
-});
-
-router.post('/new', middleware.isLoggedIn, (req, res) => {
-
-  //Conditionals to make sure that the orders are done between 9 - 12:20
-
-  let currentTime = new Date(new Date().getTime()).toString().split(' ')[4]
-
-  if ((parseInt(currentTime.split(':')[0]) < 8 || parseInt(currentTime.split(':')[0]) >= 12)) {
-    req.flash('error', "Send orders between 8AM and 12:20PM");
-    res.redirect('back');
-
-  } else {
-
-    Order.find({name: `${req.user.firstName} ${req.user.lastName}`, present: true}, (err, foundOrders) => {
-      if (err || !foundOrders) {
-        req.flash("error", "Unable to access database")
-        res.redirect('back')
-
-      } else {
-        if (foundOrders.length >= 3) {
-          req.flash("error", "You have made the maximum number of orders for one day")
-          res.redirect('back')
+    } else {
+      Announcement.find({}).populate({
+        path: 'sender',
+        select: ['username', 'imageUrl']
+      }).populate('message').exec((err, foundAnns) => {
+        if (err || !foundAnns) {
+          req.flash('error', 'Unable to access database');
+          res.redirect('back');
 
         } else {
-          if (req.body.check) {
 
-            Item.find({}, (err, foundItems) => {
+          res.render('cafe/newOrder', {
+            types: foundTypes,
+            announcements: foundAnns.reverse(),
+            announced: false
+          });
+        }
+      });
+    }
+  })
+});
 
-              let unavailable = false
+router.post('/new', [middleware.isLoggedIn, middleware.cafeOpen], (req, res) => {
 
-              if (err || !foundItems) {
-                req.flash('error', "Unable to access database")
-                res.redirect('back')
+  Order.find({name: `${req.user.firstName} ${req.user.lastName}`, present: true}, (err, foundOrders) => {
+    if (err || !foundOrders) {
+      req.flash("error", "Unable to access database")
+      res.redirect('back')
 
-              } else {
-                for (let i = 0; i < foundItems.length; i ++) {
-                  if (Object.keys(req.body.check).includes(foundItems[i]._id.toString())) { //If item is selected to be ordered
+    } else {
+      if (foundOrders.length >= 3) {
+        req.flash("error", "You have made the maximum number of orders for one day")
+        res.redirect('back')
 
-                    if (foundItems[i].availableItems < parseInt(req.body[foundItems[i].name])) { //First test to see if all items are available
-                      unavailable = true
-                      break //Immediately quit
+      } else {
+        if (req.body.check) {
 
-                    } else { //If all items are available, perform these operations
-                      foundItems[i].availableItems -= parseInt(req.body[foundItems[i].name])
+          Item.find({}, (err, foundItems) => {
 
-                      if (foundItems[i].availableItems == 0) {
-                        foundItems[i].isAvailable = false;
-                      }
+            let unavailable = false
 
-                      foundItems[i].save()
+            if (err || !foundItems) {
+              req.flash('error', "Unable to access database")
+              res.redirect('back')
 
+            } else {
+              for (let i = 0; i < foundItems.length; i ++) {
+                if (Object.keys(req.body.check).includes(foundItems[i]._id.toString())) { //If item is selected to be ordered
+
+                  if (foundItems[i].availableItems < parseInt(req.body[foundItems[i].name])) { //First test to see if all items are available
+                    unavailable = true
+                    break //Immediately quit
+
+                  } else { //If all items are available, perform these operations
+                    foundItems[i].availableItems -= parseInt(req.body[foundItems[i].name])
+
+                    if (foundItems[i].availableItems == 0) {
+                      foundItems[i].isAvailable = false;
                     }
+
+                    foundItems[i].save()
+
                   }
                 }
               }
+            }
 
-              if (!unavailable) {
-                req.flash("success", "Order Sent!")
-                res.redirect('/cafe');
+            if (!unavailable) {
+              req.flash("success", "Order Sent!")
+              res.redirect('/cafe');
 
-              } else {
-                req.flash("error", "Some items are unavailable in the quantities you requested")
-                res.redirect('/cafe/new');
-              }
-            })
+            } else {
+              req.flash("error", "Some items are unavailable in the quantities you requested")
+              res.redirect('/cafe/new');
+            }
+          })
 
-          } else {
-            req.flash('error', "Cannot send empty order")
-            res.redirect('/cafe/new');
-          }
+        } else {
+          req.flash('error', "Cannot send empty order")
+          res.redirect('/cafe/new');
         }
       }
-    })
-  }
+    }
+  })
 });
 
 router.get('/orders', middleware.isLoggedIn, (req, res) => {
@@ -201,34 +180,24 @@ router.get('/orders', middleware.isLoggedIn, (req, res) => {
   });
 });
 
-router.get('/delete_order/:id', middleware.isLoggedIn, (req, res) => {
+router.get('/delete_order/:id', [middleware.isLoggedIn, middleware.cafeOpen], (req, res) => {
 
-  //Conditionals ensure that deletion time is between 9AM and 12PM
-  let currentTime = new Date(new Date().getTime()).toString().split(' ')[4]
-  console.log(currentTime)
-  console.log(currentTime.split(':')[0])
-  if (parseInt(currentTime.split(':')[0]) < 8 || parseInt(currentTime.split(':')[0]) >= 12) {
-    req.flash('error', "Cannot delete orders after 12PM")
-    res.redirect('back')
+  Order.findByIdAndDelete(req.params.id).populate('items').exec((err, foundOrder) => {
+    if (err || !foundOrder) {
+      req.flash("error", "Unable to access database")
+      res.redirect('back')
 
-  } else {
-    Order.findByIdAndDelete(req.params.id).populate('items').exec((err, foundOrder) => {
-      if (err || !foundOrder) {
-        req.flash("error", "Unable to access database")
-        res.redirect('back')
-
-      } else {
-        for (let i = 0; i < foundOrder.items.length; i += 1) {
-          foundOrder.items[i].availableItems += foundOrder.quantities[i]
-          foundOrder.items[i].isAvailable = true;
-          foundOrder.items[i].save()
-        }
-
-        req.flash('success', "Order deleted!")
-        res.redirect('/cafe')
+    } else {
+      for (let i = 0; i < foundOrder.items.length; i += 1) {
+        foundOrder.items[i].availableItems += foundOrder.quantities[i]
+        foundOrder.items[i].isAvailable = true;
+        foundOrder.items[i].save()
       }
-    })
-  }
+
+      req.flash('success', "Order deleted!")
+      res.redirect('/cafe')
+    }
+  })
 })
 
 router.post('/:id/ready', middleware.isLoggedIn, (req, res) => {

@@ -112,6 +112,18 @@ middleware.isStudent = function(req, res, next) {
 	}
 }
 
+middleware.cafeOpen = function(req, res, next) { //Cafe time restrictions
+	let currentTime = new Date(new Date().getTime()).toString().split(' ')[4]
+
+  if ((parseInt(currentTime.split(':')[0]) < 8 || parseInt(currentTime.split(':')[0]) >= 12)) {
+    req.flash('error', "Send orders between 8AM and 12PM");
+    res.redirect('back');
+
+	} else {
+		next();
+	}
+}
+
 
 //export the object with all the functions
 module.exports = middleware;
