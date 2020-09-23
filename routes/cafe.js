@@ -62,11 +62,11 @@ router.get('/new', middleware.isLoggedIn, (req, res) => {
 
   let currentTime = new Date(new Date().getTime()).toString().split(' ')[4]
 
-  // if ((parseInt(currentTime.split(':')[0]) < 8 || parseInt(currentTime.split(':')[0]) >= 12)) {
-  //   req.flash('error', "Send orders between 8AM and 12PM");
-  //   res.redirect('back');
-  //
-  // } else {
+  if ((parseInt(currentTime.split(':')[0]) < 8 || parseInt(currentTime.split(':')[0]) >= 12)) {
+    req.flash('error', "Send orders between 8AM and 12PM");
+    res.redirect('back');
+
+  } else {
 
     Type.find({}).populate('items').exec((err, foundTypes) => {
       if (err || !foundTypes) {
@@ -93,7 +93,7 @@ router.get('/new', middleware.isLoggedIn, (req, res) => {
         });
       }
     })
-  // }
+  }
 });
 
 router.post('/new', middleware.isLoggedIn, (req, res) => {
