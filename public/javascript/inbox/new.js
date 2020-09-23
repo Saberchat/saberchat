@@ -30,15 +30,33 @@ function updateTo(check) {
 
 // adds recipients to list
 function addRecipient() {
-    const info = userSelect.value;
-    console.log(JSON.parse(users));
-    recipients.push(userSelect.value);
-    const tag = document.createElement('div');
+    const id = userSelect.value;
+    const username = userSelect.options[userSelect.selectedIndex].text;
+    recipients.push({id: id, username: username});
 
-    console.log(recipients);
+    refreshDisplay();
 }
 
-// refreshes the user list display
-function refreshUserList() {
+// remove recipients
+function remReicipient(id) {
+    const user = recipients.find(user => user.id === id);
+    const i = recipients.indexOf(user);
+    recipients.splice(i, 1);
 
+    refreshDisplay();
+}
+
+// refreshes user-list display
+function refreshDisplay() {
+    userDisplay.innerHTML = '';
+    for (let i = 0; i < recipients.length; i++) {
+        const id = recipients[i];
+
+        const tag = document.createElement('div');
+        tag.classList.add('user-tag');
+        tag.innerHTML = `<span>${username}</span>
+        <button type="button" onclick="remRecipient(${id})">&times;</button>`;
+
+        userDisplay.appendChild(tag);
+    }
 }
