@@ -5,6 +5,18 @@ const dateFormat = require('dateformat');
 const User = require('../models/user');
 const Announcement = require('../models/announcement');
 
+router.get('/', middleware.isLoggedIn, (req, res) => {
+  Announcement.find({}, (err, foundAnns) => {
+    if (err || !foundAnns) {
+      req.flash('error', "Unable to access database")
+      res.redirect('back')
+
+    } else {
+      res.render('announcements/index', {announcements: foundAnns})
+    }
+  })
+})
+
 // display create form
 router.get('/new', middleware.isLoggedIn, middleware.isAdmin, (req, res) => {
   res.render('announcements/new');
@@ -20,7 +32,7 @@ router.get('/:id', middleware.isLoggedIn, (req, res) => {
       res.redirect('back');
 
     } else {
-      res.render('announcements/index', {announced: true, announcement: foundAnn});
+      res.render('announcements/show', {announced: true, announcement: foundAnn});
     }
   });
 });
@@ -41,13 +53,13 @@ router.get('/:id/edit', middleware.isLoggedIn, middleware.isAdmin, (req, res) =>
 })
 
 // create announcement
-router.post('/create', middleware.isLoggedIn, middleware.isAdmin, (req, res) => {
+router.post('/', middleware.isLoggedIn, middleware.isAdmin, (req, res) => {
   Announcement.create({sender: req.user, subject: req.body.subject, text: req.body.message}, (err, announcement) => {
     if(err || !announcement) {
       req.flash('error', 'Unable to access database');
       return res.redirect('back');
     }
-    if (req.body.images["0"]) {
+    if (req.body.images[0]) {
       for(const image in req.body.images) {
         announcement.images.push(req.body.images[image]);
       }
@@ -78,7 +90,7 @@ router.put('/:id', middleware.isLoggedIn, middleware.isAdmin, (req, res) => {
           foundAnn.images.push(req.body.images[image]);
         }
       }
-      
+
       foundAnn.save();
 
       req.flash('success', 'Announcement Updated!');

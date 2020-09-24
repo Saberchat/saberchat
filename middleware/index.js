@@ -103,8 +103,8 @@ middleware.isFaculty = function(req, res, next) {
 	}
 }
 
-middleware.adminOrFaculty = function(req, res, next) {
-	if(req.user.status == 'faculty' || req.user.permission == 'admin') {
+middleware.isStudent = function(req, res, next) {
+	if(req.user.status != 'faculty' && req.user.status != "parent") {
 		next();
 	} else {
 		req.flash('error', 'You do not have permission to do that');
@@ -112,12 +112,15 @@ middleware.adminOrFaculty = function(req, res, next) {
 	}
 }
 
-middleware.isStudent = function(req, res, next) {
-	if(req.user.status != 'faculty' && req.user.status != "parent") {
-		next();
+middleware.cafeOpen = function(req, res, next) { //Cafe time restrictions
+	let currentTime = new Date(new Date().getTime()).toString().split(' ')[4]
+
+  if ((parseInt(currentTime.split(':')[0]) < 8 || parseInt(currentTime.split(':')[0]) >= 12)) {
+    req.flash('error', "Send orders between 8AM and 12PM");
+    res.redirect('back');
+
 	} else {
-		req.flash('error', 'You do not have permission to do that');
-		res.redirect('back');
+		next();
 	}
 }
 

@@ -26,6 +26,10 @@
 }
 
 /* user tags */
+#user-display {
+    padding-top: 1rem;
+}
+
 .user-tag {
     background-color: #1ba6bb;
     color: #ffffff;
@@ -33,7 +37,6 @@
     display: inline-block;
     overflow: hidden;
     height: 2.3rem;
-    margin-top: 1rem;
 }
 
 .user-tag span {
