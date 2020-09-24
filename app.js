@@ -59,7 +59,7 @@ const port = process.env.PORT || 3000;
 
 //connect to db. We should set the link as environment variable for security purposes in the future.
 // mongoose.connect(process.env.DATABASE_URL,
-mongoose.connect(process.env.DATABASE_URL,
+mongoose.connect(process.env.DATABASE_URL || 'mongodb+srv://admin_1:alsion2020@cluster0-cpycz.mongodb.net/saberChat?retryWrites=true&w=majority',
 {
   useNewUrlParser: true,
   useUnifiedTopology: true,
