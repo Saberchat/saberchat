@@ -26,11 +26,14 @@
       <div class="row">
         <div class="col-12">
           <div class="jumbotron text-center">
-            <h1><i class="fas fa-sign-in-alt"></i> Announcements</h1>
-            <p>The latest news from staff.</p>
+            <h1><i class="fas fa-bullhorn"></i> Announcements</h1>
+            <p>The latest news from staff</p>
+            <% if (currentUser.permission == "admin") { %>
+              <a href="/announcements/new" class="btn btn-primary" style="color: white;"><i class="fas fa-bullhorn"></i> Send Announcement</a>
+            <% } %>
           </div>
         </div>
       </div>
     </div>
-    
+
 </html>
