@@ -6,7 +6,7 @@ const User = require('../models/user');
 const Announcement = require('../models/announcement');
 
 router.get('/', middleware.isLoggedIn, (req, res) => {
-  Announcement.find({}, (err, foundAnns) => {
+  Announcement.find({}).populate('sender').exec((err, foundAnns) => {
     if (err || !foundAnns) {
       req.flash('error', "Unable to access database")
       res.redirect('back')
