@@ -12,7 +12,7 @@ router.get('/', middleware.isLoggedIn, (req, res) => {
       res.redirect('back')
 
     } else {
-      res.render('announcements/index', {announcements: foundAnns})
+      res.render('announcements/index', {announcements: foundAnns.reverse()})
     }
   })
 })
