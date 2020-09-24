@@ -1,4 +1,5 @@
-const body = document.getElementsByTagName('body')[0]
+const container = document.getElementById('container')
+console.log(container)
 const dropdown = document.getElementsByTagName('select')
 const fci = document.getElementsByClassName('form-check-input')
 const fcl = document.getElementsByClassName('form-check-label')
@@ -9,7 +10,7 @@ let orderedItem; //Order that will show up in your 'confirm order' page
 let sum = 0
 
 
-body.addEventListener('click', () => {
+container.addEventListener('click', () => {
   sum = 0
 
   while (orderConfirm.firstChild) {

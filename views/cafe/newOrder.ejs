@@ -22,9 +22,6 @@
   <!-- I'm using my fontawesome kit -->
   <script src="https://kit.fontawesome.com/dccc745c41.js" crossorigin="anonymous"></script>
 
-  <!--  Cafe front-end js files -->
-  <script src="/javascript/cafe/cafe-socket.js"></script>
-  <script src="/javascript/cafe/newOrder.js"></script>
 </head>
 
 <body>
@@ -33,7 +30,7 @@
   <%- include('../partials/header') %>
   <%- include('../partials/announcement') %>
 
-  <div class="container mt-5">
+  <div class="container mt-5" id="container">
     <div class="row">
       <div class="col-12">
         <div class="jumbotron text-center">
@@ -126,5 +123,7 @@
     </div>
   </div>
 </body>
-
+<!--  Cafe front-end js files -->
+<script src="/javascript/cafe/cafe-socket.js"></script>
+<script src="/javascript/cafe/newOrder.js"></script>
 </html>
