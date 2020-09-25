@@ -263,7 +263,6 @@ io.on('connect', (socket) => {
     //   console.log("Send orders between 8AM and 12PM");
     //
     // } else {
-      console.log(itemList)
 
       if (itemList.length != 0) { //Order form is not empty, something is selected
 

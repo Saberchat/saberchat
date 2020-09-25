@@ -54,21 +54,24 @@
               <% if (order.present == true) { %>
                 <li class="list-group-item">
 
-                  <% if (order.charge.toString().length < 3) { %>
-                    <h4>Order - $<%= order.charge %>.00</h4>
+                  <% if (!order.charge.toString().includes('.')) { %>
+                    <h4><strong>Order - $<%= order.charge %>.00</strong></h4>
 
-                  <% } else if ((order.charge.toString().length == 3) || (order.charge.toString().length == 4 && !(order.charge.toString().includes('.')))){ %>
-                    <h4>Order - $<%= order.charge %>0</h4>
+                  <% } else if (order.charge.toString().split('.')[1].length == 1){ %>
+                    <h4><strong>Order - $<%= order.charge %>0</strong></h4>
 
                   <% } else { %>
-                    <h4>Order - $<%= order.charge %></h4>
+                    <h4><strong>Order - $<%= order.charge %></strong></h4>
                   <% } %>
 
                   <% let itemText = []; %>
-                  <% for (var i = 0; i < order.items.length; i++) { %>
-                    <% itemText.push(order.items[i].name); %>
-                  <% } %>
-                  <%= itemText.join(", ") %>
+                  <ul>
+                    <% for (var i = 0; i < order.items.length; i++) { %>
+                      <li>
+                        <%=order.items[i].name + " (" + order.quantities[i] + " orders)"%>
+                      </li>
+                    <% } %>
+                  </ul>
                   <p style="margin-top: 10px;"><em><%= order.date %></em></p>
                   <button type="button" class="btn btn-danger"><a style="text-decoration: none; color: inherit;" href="cafe/delete_order/<%= order._id %>">Cancel Order</a></button>
                 </li>
@@ -89,21 +92,21 @@
             <% if (order.present == false) { %>
               <li class="list-group-item">
 
-                <% if (order.charge.toString().length < 3) { %>
-                  <h4>Order - $<%= order.charge %>.00</h4>
+                <% if (!order.charge.toString().includes('.')) { %>
+                  <h4><strong>Order - $<%= order.charge %>.00</strong></h4>
 
-                <% } else if ((order.charge.toString().length == 3) || (order.charge.toString().length == 4 && !(order.charge.toString().includes('.')))){ %>
-                  <h4>Order - $<%= order.charge %>0</h4>
+                <% } else if (order.charge.toString().split('.')[1].length == 1){ %>
+                  <h4><strong>Order - $<%= order.charge %>0</strong></h4>
 
                 <% } else { %>
-                  <h4>Order - $<%= order.charge %></h4>
+                  <h4><strong>Order - $<%= order.charge %></strong></h4>
                 <% } %>
 
-                <% let itemText = []; %>
-                <% for (var i = 0; i < order.items.length; i++) { %>
-                  <% itemText.push(order.items[i].name); %>
-                <% } %>
-                <%= itemText.join(", ") %>
+                <ul>
+                  <% for (var i = 0; i < order.items.length; i++) { %>
+                    <li><%=order.items[i].name%> (<%=order.quantities[i]%> Orders)</li>
+                  <% } %>
+                </ul>
               </li>
             <% } %>
           <% }); %>

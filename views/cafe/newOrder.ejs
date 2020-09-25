@@ -17,6 +17,7 @@
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js"></script>
+  <script src="/javascript/cafe/cafe-socket.js"></script>
 
   <!-- I'm using my fontawesome kit -->
   <script src="https://kit.fontawesome.com/dccc745c41.js" crossorigin="anonymous"></script>
@@ -83,16 +84,15 @@
                           <% } %>
                         </select>
 
-                        <% if (item.price.toString().length < 3) { %>
+                        <% if (!item.price.toString().includes('.')) { %>
                           <label style="margin-left: 1%;" class="form-check-label" for="<%= item._id%>"><strong><%= item.name %></strong> (<%= item.availableItems %> orders available) - $<%= item.price %>.00 </label>
 
-                        <% } else if ((item.price.toString().length == 3) || (item.price.toString().length == 4 && !(item.price.toString().includes('.')))){ %>
+                        <% } else if (item.price.toString().split('.')[1].length == 1){ %>
                           <label style="margin-left: 1%;" class="form-check-label" for="<%= item._id%>"><strong><%= item.name %></strong> (<%= item.availableItems %> orders available) - $<%= item.price %>0 </label>
 
                         <% } else { %>
                           <label style="margin-left: 1%;" class="form-check-label" for="<%= item._id%>"><strong><%= item.name %></strong> (<%= item.availableItems %> orders available) - $<%= item.price %></label>
                         <% } %>
-
 
                         <br />
                         <!-- <span class="form-check-label"><%= item.name %>: $<%= item.price %></span> -->
@@ -134,6 +134,26 @@
   </div>
 </body>
 <!--  Cafe front-end js files -->
-<script src="/javascript/cafe/cafe-socket.js"></script>
 <script src="/javascript/cafe/newOrder.js"></script>
+
+<script>
+  order(orderForm, '<%=currentUser._id%>');
+
+  function searchFunction() {
+    let input = document.getElementById("search-input");
+    let filter = input.value.toUpperCase();
+    let list = document.getElementById("item-list");
+    let items = list.getElementsByClassName('form-check');
+    for (i = 0; i < items.length; i++) {
+      let item = items[i].getElementsByTagName('label')[0];
+      let txtValue = item.textContent || item.innerText;
+      if (txtValue.toUpperCase().indexOf(filter) > -1) {
+        items[i].style.display = "";
+      } else {
+        items[i].style.display = "none";
+      }
+    }
+  }
+
+</script>
 </html>

@@ -51,8 +51,6 @@ function getOrders(outputStream) {
         str += `<li class="list-group-item">${foundItems[i].name}: ${order.quantities[i]} order(s)</li>\n`;
       }
 
-      alert("HAW")
-
       return str;
     }
 

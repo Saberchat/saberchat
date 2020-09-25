@@ -187,11 +187,31 @@ router.post('/:id/ready', middleware.isLoggedIn, (req, res) => {
               }
 
               if (foundOrder.instructions == "") {
-                notif.text = "Your order is ready:\n" + itemText.join("\n") + "\n\nExtra Instructions: None\nTotal Cost: $" + foundOrder.charge + "";
+
+                if (!foundOrder.charge.toString().includes('.')) {
+                  notif.text = "Your order is ready:\n" + itemText.join("\n") + "\n\nExtra Instructions: None\nTotal Cost: $" + foundOrder.charge + ".00";
+
+                } else if (foundOrder.charge.toString().split('.')[1].length == 1){
+                  notif.text = "Your order is ready:\n" + itemText.join("\n") + "\n\nExtra Instructions: None\nTotal Cost: $" + foundOrder.charge + "0";
+
+                } else {
+                  notif.text = "Your order is ready:\n" + itemText.join("\n") + "\n\nExtra Instructions: None\nTotal Cost: $" + foundOrder.charge + "";
+                }
+
 
               } else {
-                notif.text = "Your order is ready:\n" + itemText.join("\n") + "\n\nExtra Instructions: " + foundOrder.instructions + "\nTotal Cost: $" + foundOrder.charge + "";
+
+                if (!foundOrder.charge.toString().includes('.')) {
+                  notif.text = "Your order is ready:\n" + itemText.join("\n") + "\n\nExtra Instructions: " + foundOrder.instructions + "\nTotal Cost: $" + foundOrder.charge + ".00";
+
+                } else if (foundOrder.charge.toString().split('.')[1].length == 1){
+                  notif.text = "Your order is ready:\n" + itemText.join("\n") + "\n\nExtra Instructions: " + foundOrder.instructions + "\nTotal Cost: $" + foundOrder.charge + "0";
+
+                } else {
+                  notif.text = "Your order is ready:\n" + itemText.join("\n") + "\n\nExtra Instructions: " + foundOrder.instructions + "\nTotal Cost: $" + foundOrder.charge + "";
+                }
               }
+
               notif.save();
               foundUser.inbox.push(notif);
               foundUser.notifCount += 1
@@ -309,6 +329,24 @@ router.put('/item/:id/update', middleware.isLoggedIn, middleware.isMod, (req, re
       res.redirect('back')
 
     } else {
+
+      Order.find({present:true}).populate('items').exec((err, foundOrders) => {
+        if (err || !foundOrders) {
+          req.flash('error', "Unable to access database")
+          res.redirect('back')
+
+        } else {
+
+          for (let order of foundOrders) {
+            order.charge = 0
+
+            for (let i = 0; i < order.items.length; i += 1) {
+              order.charge += order.items[i].price * order.quantities[i]
+            }
+            order.save()
+          }
+        }
+      })
 
       Type.find({}, (err, foundTypes) => {
         if (err || !foundTypes) {

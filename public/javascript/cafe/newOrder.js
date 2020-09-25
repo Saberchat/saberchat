@@ -42,10 +42,12 @@ container.addEventListener('click', () => {
   totalNew.style = 'color: green;'
   totalNew.className = "list-group-item list-group-item-action form-check"
 
-  if (sum.toString().length < 3) {
+
+
+  if (!sum.toString().includes('.')) {
     totalNew.innerText = `Total: $${sum}.00`
 
-  } else if ((sum.toString().length == 3) || (sum.toString().length == 4 && !(sum.toString().includes('.')))){
+  } else if (sum.toString().split('.')[1].length == 1){
     totalNew.innerText = `Total: $${sum}0`
 
   } else {
@@ -88,35 +90,18 @@ for (let dd of dropdown) { //Every quantity dropdown menu
     totalNew.style = 'color: green;'
     totalNew.className = "list-group-item list-group-item-action form-check"
 
-    if (sum.toString().length < 3) {
+    if (!sum.toString().includes('.')) {
       totalNew.innerText = `Total: $${sum}.00`
 
-    } else if ((sum.toString().length == 3) || (sum.toString().length == 4 && !(sum.toString().includes('.')))){
+    } else if (sum.toString().split('.')[1].length == 1){
       totalNew.innerText = `Total: $${sum}0`
 
     } else {
       totalNew.innerText = `Total: $${sum}`
     }
 
+
     orderConfirm.appendChild(totalNew)
 
-  }
-}
-
-order(orderForm, '<%= currentUser._id %>');
-
-function searchFunction() {
-  let input = document.getElementById("search-input");
-  let filter = input.value.toUpperCase();
-  let list = document.getElementById("item-list");
-  let items = list.getElementsByClassName('form-check');
-  for (i = 0; i < items.length; i++) {
-    let item = items[i].getElementsByTagName('label')[0];
-    let txtValue = item.textContent || item.innerText;
-    if (txtValue.toUpperCase().indexOf(filter) > -1) {
-      items[i].style.display = "";
-    } else {
-      items[i].style.display = "none";
-    }
   }
 }

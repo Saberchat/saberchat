@@ -32,7 +32,7 @@
           <div class="jumbotron text-center">
             <h1><i class="fas fa-coffee"></i> Orders</h1>
             <p>All New Orders</p>
-            <a href="manage">Back to Cafe</a>
+            <a class="btn btn-primary" href="manage"><i class="fas fa-arrow-left"></i> Back to Cafe</a>
           </div>
         </div>
       </div>
@@ -53,7 +53,17 @@
                   <li class="list-group-item"><%= order.items[i].name %>: <%=order.quantities[i] %> order(s)</li>
               <% } %>
             </ul>
-            <p class="card-text mt-3"><strong>Cost:</strong> $<%= order.charge %></p>
+
+            <% if (!order.charge.toString().includes('.')) { %>
+              <p class="card-text mt-3"><strong>Cost:</strong> $<%= order.charge %>.00</p>
+
+            <% } else if (order.charge.toString().split('.')[1].length == 1){ %>
+              <p class="card-text mt-3"><strong>Cost:</strong> $<%= order.charge %>0</p>
+
+            <% } else { %>
+              <p class="card-text mt-3"><strong>Cost:</strong> $<%= order.charge %></p>
+            <% } %>
+
             <p class="card-text"><%= order.date %></p>
             <form class="ready-form" action="<%= order._id %>/ready" method="post">
               <button type="submit" class="btn btn-primary" name="button">Order Ready</button>
