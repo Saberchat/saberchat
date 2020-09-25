@@ -27,26 +27,56 @@
     <div class="container mt-5">
       <div class="row">
         <div class="col-12">
-          <h1 style="text-align: center; width: 100%">Edit Cafe Item Type - "<%=type.name%>"</h1>
-          <a style="display: block; text-align: center; margin-bottom: 1rem;" href="/cafe/manage">Go Back</a>
+          <div class="jumbotron text-center">
+            <h1 style="text-align: center; width: 100%">Edit Cafe Item Type - "<%=type.name%>"</h1>
+            <br /><a class="btn btn-primary" href="/cafe/manage"><i class="fas fa-arrow-left"></i> Back</a>
+          </div>
         </div>
       </div>
-      <div class="row">
-        <div class="col-md-8 offset-md-2 col-12">
-          <form action="/cafe/type/<%=type._id%>?_method=put" method="post">
-            <div class="form-group">
-              <div class="row">
-                <div class="input-group mb-3">
-                  <input id="usernameInput" class="form-control" type="text" name="name" value="<%=type.name%>" placeholder="Enter Item Name" maxlength="45" required style="display: inline-block;"/>
-                  <div class="input-group-append">
-                    <button class="btn btn-primary" type="submit">Submit Changes</button>
+      <form action="/cafe/type/<%=type._id%>?_method=put" method="post">
+
+        <h2 style="text-align: center;">Name</h2>
+        <div class="row">
+          <div class="col-md-8 offset-md-2 col-12">
+              <div class="form-group">
+                <div class="row">
+                  <div class="input-group mb-3">
+                    <input id="usernameInput" class="form-control" type="text" name="name" value="<%=type.name%>" placeholder="Enter Item Name" maxlength="45" required style="display: inline-block;"/>
                   </div>
                 </div>
               </div>
-            </div>
-          </form>
+          </div>
         </div>
-      </div>
+
+        <h2 style="text-align: center;">Items</h2>
+        <div class="row">
+          <div class="col-md-8 offset-md-2 col-12">
+            <div class="form-group">
+              <% items.forEach(item => { %>
+                <% if (type.items.includes(item._id)) { %>
+                  <input id="item" type="checkbox" name="<%=item._id%>" checked/>
+                  <label for="item"><%=item.name%></label>
+                  <br />
+
+                <% } else { %>
+                  <input id="item" type="checkbox" name="<%=item._id%>"/>
+                  <label for="item"><%=item.name%></label>
+                  <br />
+
+                <% }%>
+              <% }) %>
+            </div>
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="col-md-8 offset-md-2 col-12">
+            <button type="submit" class="btn btn-lg btn-primary btn-block">Submit Changes</button>
+          </div>
+        </div>
+        <br />
+
+      </form>
     </div>
   </body>
 </html>

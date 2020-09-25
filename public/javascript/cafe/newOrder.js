@@ -29,7 +29,18 @@ container.addEventListener('click', () => {
 
               orderedItem = document.createElement('strong')
               orderedItem.className = "list-group-item list-group-item-action form-check"
-              orderedItem.innerText = `${no.name} (${no.value} orders) - \$${parseInt(no.value) * parseFloat(l.innerText.split('$')[1])}`
+
+              if (! (parseInt(no.value) * parseFloat(l.innerText.split('$')[1])).toString().includes('.') ) {
+                orderedItem.innerText = `${no.name} (${no.value} orders) - \$${parseInt(no.value) * parseFloat(l.innerText.split('$')[1])}.00`
+
+              } else if ((parseInt(no.value) * parseFloat(l.innerText.split('$')[1])).toString().split('.')[1].length == 1){
+                orderedItem.innerText = `${no.name} (${no.value} orders) - \$${parseInt(no.value) * parseFloat(l.innerText.split('$')[1])}0`
+
+              } else {
+                orderedItem.innerText = `${no.name} (${no.value} orders) - \$${parseInt(no.value) * parseFloat(l.innerText.split('$')[1])}`
+              }
+
+
               orderConfirm.appendChild(orderedItem)
             }
           }
@@ -77,7 +88,18 @@ for (let dd of dropdown) { //Every quantity dropdown menu
 
                 orderedItem = document.createElement('strong')
                 orderedItem.className = "list-group-item list-group-item-action form-check"
-                orderedItem.innerText = `${no.name} (${no.value} orders) - \$${parseInt(no.value) * parseFloat(l.innerText.split('$')[1])}`
+
+
+                if (! (parseInt(no.value) * parseFloat(l.innerText.split('$')[1])).toString().includes('.') ) {
+                  orderedItem.innerText = `${no.name} (${no.value} orders) - \$${parseInt(no.value) * parseFloat(l.innerText.split('$')[1])}.00`
+
+                } else if ((parseInt(no.value) * parseFloat(l.innerText.split('$')[1])).toString().split('.')[1].length == 1){
+                  orderedItem.innerText = `${no.name} (${no.value} orders) - \$${parseInt(no.value) * parseFloat(l.innerText.split('$')[1])}0`
+
+                } else {
+                  orderedItem.innerText = `${no.name} (${no.value} orders) - \$${parseInt(no.value) * parseFloat(l.innerText.split('$')[1])}`
+                }
+
                 orderConfirm.appendChild(orderedItem)
               }
             }

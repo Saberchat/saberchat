@@ -38,7 +38,7 @@ router.get('/menu', middleware.isLoggedIn, (req, res) => {
   })
 })
 
-router.get('/new', [middleware.isLoggedIn], (req, res) => {
+router.get('/new', [middleware.isLoggedIn, middleware.cafeOpen], (req, res) => {
 
   Type.find({}).populate('items').exec((err, foundTypes) => {
     if (err || !foundTypes) {
@@ -51,7 +51,7 @@ router.get('/new', [middleware.isLoggedIn], (req, res) => {
   })
 });
 
-router.post('/new', [middleware.isLoggedIn], (req, res) => {
+router.post('/new', [middleware.isLoggedIn, middleware.cafeOpen], (req, res) => {
 
   Order.find({name: `${req.user.firstName} ${req.user.lastName}`, present: true}, (err, foundOrders) => {
     if (err || !foundOrders) {
@@ -176,7 +176,7 @@ router.post('/:id/ready', middleware.isLoggedIn, (req, res) => {
 
             } else {
               notif.subject = "Cafe Order Ready";
-              notif.sender = req.user._id;
+              notif.sender = req.user;
               notif.date = dateFormat(notif.created_at, "mmm d, h:MMTT");
               notif.recipients = [foundUser];
               notif.read = [false];
@@ -348,36 +348,36 @@ router.put('/item/:id/update', middleware.isLoggedIn, middleware.isMod, (req, re
         }
       })
 
-      Type.find({}, (err, foundTypes) => {
+      Type.find({name: {$ne: req.body.type}}, (err, foundTypes) => {
         if (err || !foundTypes) {
           req.flash('error', "Unable to access database")
           res.redirect('back')
 
         } else {
 
-          loop1:
           for (let type of foundTypes) {
-            loop2:
-            for (let i = 0; i < type.items.length; i += 1) {
-              if ((type.items[i]._id.toString() == foundItem._id.toString()) && (type.name != req.body.type)) {
-                type.items.splice(i, 1)
-                type.save()
-
-              } else {
-                break loop1;
-              }
+            if (type.items.includes(foundItem._id)) {
+              type.items.splice(type.items.indexOf(foundItem._id), 1)
             }
 
-            if (type.name == req.body.type) {
-              type.items.push(foundItem);
-              type.save();
-            }
+            type.save()
           }
         }
       })
+
+      Type.findOne({name: req.body.type}, (err, foundType) => {
+        if (foundType.items.includes(foundItem._id)) {
+          foundType.items.splice(foundType.items.indexOf(foundItem._id), 1)
+        }
+
+        foundType.items.push(foundItem)
+        foundType.save()
+      })
+
+      req.flash('success', "Item updated!")
+      res.redirect('/cafe/manage');
     }
-    res.redirect('/cafe/manage');
-  });
+  })
 });
 
 router.delete('/item/:id/delete', middleware.isLoggedIn, middleware.isMod, (req, res) => {
@@ -446,7 +446,15 @@ router.get('/type/:id', [middleware.isLoggedIn, middleware.isMod], (req, res) =>
       res.redirect('back')
 
     } else {
-      res.render('cafe/editItemType', {type})
+      Item.find({}, (err, foundItems) => {
+        if (err || !foundItems) {
+          req.flash('error', "Unable to access database")
+          res.redirect('back')
+
+        } else {
+          res.render('cafe/editItemType', {type, items: foundItems})
+        }
+      })
     }
   })
 });
@@ -458,6 +466,27 @@ router.put('/type/:id', [middleware.isLoggedIn, middleware.isMod], (req, res) =>
       res.redirect('back')
 
     } else {
+      Type.find({_id: {$ne: type._id}}, (err, foundTypes) => {
+        for (let type of foundTypes) {
+          for (let i = 0; i < type.items.length; i += 1) {
+            if(req.body[type.items[i].toString()]) {
+              type.items.splice(i, 1)
+            }
+          }
+          type.save()
+        }
+      })
+
+      type.items = []
+      Item.find({}, (err, foundItems) => {
+        for (let item of foundItems) {
+          if(req.body[item._id.toString()]) {
+            type.items.push(item)
+          }
+        }
+        type.save()
+      })
+
       req.flash('success', "Item type updated!")
       res.redirect('/cafe/manage')
     }
