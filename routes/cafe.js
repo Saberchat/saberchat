@@ -6,7 +6,6 @@ const dateFormat = require('dateformat');
 const User = require('../models/user');
 const Order = require('../models/order');
 const Item = require('../models/orderItem');
-const Announcement = require('../models/announcement');
 const Notification = require('../models/notification');
 const Type = require('../models/itemType');
 
@@ -22,25 +21,7 @@ router.get('/', middleware.isLoggedIn, (req, res) => {
       res.redirect('back');
 
     } else {
-
-      Announcement.find({}).populate({
-        path: 'sender',
-        select: ['username', 'imageUrl']
-      }).populate('message').exec((err, foundAnns) => {
-        if (err || !foundAnns) {
-
-          req.flash('error', 'Unable to access database');
-          res.redirect('back');
-
-        } else {
-
-          res.render('cafe/index', {
-            orders: foundOrders,
-            announcements: foundAnns.reverse(),
-            announced: false
-          });
-        }
-      });
+      res.render('cafe/index', {orders: foundOrders});
     }
   });
 });
@@ -65,23 +46,7 @@ router.get('/new', [middleware.isLoggedIn, middleware.cafeOpen], (req, res) => {
       res.redirect('back')
 
     } else {
-      Announcement.find({}).populate({
-        path: 'sender',
-        select: ['username', 'imageUrl']
-      }).populate('message').exec((err, foundAnns) => {
-        if (err || !foundAnns) {
-          req.flash('error', 'Unable to access database');
-          res.redirect('back');
-
-        } else {
-
-          res.render('cafe/newOrder', {
-            types: foundTypes,
-            announcements: foundAnns.reverse(),
-            announced: false
-          });
-        }
-      });
+      res.render('cafe/newOrder', {types: foundTypes});
     }
   })
 });
@@ -159,23 +124,7 @@ router.get('/orders', middleware.isLoggedIn, (req, res) => {
       res.redirect('back');
 
     } else {
-
-      Announcement.find({}).populate({
-        path: 'sender',
-        select: ['username', 'imageUrl']
-      }).populate('message').exec((err, foundAnns) => {
-        if (err || !foundAnns) {
-          req.flash('error', 'Unable to access database')
-          res.redirect('back')
-        } else {
-
-          res.render('cafe/orderDisplay', {
-            orders: foundOrders,
-            announcements: foundAnns.reverse(),
-            announced: false
-          })
-        }
-      })
+      res.render('cafe/orderDisplay', {orders: foundOrders})
     }
   });
 });
@@ -262,24 +211,9 @@ router.get('/manage', middleware.isLoggedIn, middleware.isMod, (req, res) => {
     if (err || !foundTypes) {
       req.flash('error', 'Cannot access Database');
       res.redirect('/cafe');
+
     } else {
-      Announcement.find({}).populate({
-        path: 'sender',
-        select: ['username', 'imageUrl']
-      }).populate('message').exec((err, foundAnns) => {
-        if (err || !foundAnns) {
-          req.flash('error', 'Unable to access database')
-          res.redirect('back')
-
-        } else {
-
-          res.render('cafe/manage', {
-            types: foundTypes,
-            announcements: foundAnns.reverse(),
-            announced: false
-          })
-        }
-      })
+      res.render('cafe/manage', {types: foundTypes})
     }
   })
 });
@@ -290,23 +224,7 @@ router.get('/newOrderItem', middleware.isLoggedIn, middleware.isMod, (req, res) 
       req.flash('error', "Unable to access database")
 
     } else {
-
-      Announcement.find({}).populate({
-        path: 'sender',
-        select: ['username', 'imageUrl']
-      }).populate('message').exec((err, foundAnns) => {
-        if (err || !foundAnns) {
-          req.flash('error', 'Unable to access database')
-          res.redirect('back')
-        } else {
-
-          res.render('cafe/newOrderItem', {
-            types: foundTypes,
-            announcements: foundAnns.reverse(),
-            announced: false
-          })
-        }
-      })
+      res.render('cafe/newOrderItem', {types: foundTypes})
     }
   })
 });
@@ -350,21 +268,7 @@ router.post('/newOrderItem', middleware.isLoggedIn, middleware.isMod, (req, res)
 });
 
 router.get('/deleteItems', middleware.isLoggedIn, middleware.isMod, (req, res) => {
-  Announcement.find({}).populate({
-    path: 'sender',
-    select: ['username', 'imageUrl']
-  }).populate('message').exec((err, foundAnns) => {
-    if (err || !foundAnns) {
-      req.flash('error', 'Unable to access database')
-      res.redirect('back')
-    } else {
-
-      res.render('cafe/deleteitems', {
-        announcements: foundAnns.reverse(),
-        announced: false
-      })
-    }
-  })
+  res.render('cafe/deleteitems')
 });
 
 router.delete('/deleteItems', middleware.isLoggedIn, middleware.isMod, (req, res) => {
@@ -383,23 +287,7 @@ router.get('/item/:id', middleware.isLoggedIn, middleware.isMod, (req, res) => {
           req.flash('error', "Unable to access database")
 
         } else {
-          Announcement.find({}).populate({
-            path: 'sender',
-            select: ['username', 'imageUrl']
-          }).populate('message').exec((err, foundAnns) => {
-            if (err || !foundAnns) {
-              req.flash('error', 'Unable to access database')
-              res.redirect('back')
-
-            } else {
-              res.render('cafe/show.ejs', {
-                types: foundTypes,
-                item: foundItem,
-                announcements: foundAnns.reverse(),
-                announced: false
-              })
-            }
-          })
+          res.render('cafe/show.ejs', {types: foundTypes, item: foundItem})
         }
       });
     }
@@ -484,17 +372,7 @@ router.delete('/item/:id/delete', middleware.isLoggedIn, middleware.isMod, (req,
 });
 
 router.get('/type/new', [middleware.isLoggedIn, middleware.isMod], (req, res) => { // RESTful route "New" for type
-  Announcement.find({}).populate({
-    path: 'sender',
-    select: ['username', 'imageUrl']
-  }).populate('message').exec((err, foundAnns) => {
-    if (err || !foundAnns) {
-      req.flash('error', 'Unable to access database')
-      res.redirect('back')
-    } else {
-      res.render('cafe/newItemType', {announcements: foundAnns, announced: false})
-    }
-  })
+  res.render('cafe/newItemType')
 })
 
 router.post('/type', [middleware.isLoggedIn, middleware.isMod], (req, res) => { // RESTful route "Create" for type

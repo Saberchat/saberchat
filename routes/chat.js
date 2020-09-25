@@ -11,7 +11,6 @@ const middleware = require('../middleware');
 const Comment = require('../models/comment');
 const User = require('../models/user');
 const Room = require('../models/room');
-const Announcement = require('../models/announcement');
 const AccessReq = require('../models/accessRequest');
 
 //route for displaying room list
@@ -123,9 +122,9 @@ router.post('/:id/leave', middleware.isLoggedIn, middleware.checkForLeave, funct
       req.flash('error', 'You cannot leave a room you created');
       return res.redirect('back');
     }
-    
+
     const request = await AccessReq.findOne({requester: req.user._id, room: room._id, status: 'accepted'});
-    
+
     if(request) {
       // will delete past request for now
       await request.remove();
@@ -268,7 +267,7 @@ router.delete('/:id/delete', middleware.isLoggedIn, middleware.checkRoomOwnershi
       Comment.deleteMany({room: deletedRoom._id}),
       AccessReq.deleteMany({room: deletedRoom._id})
     ]);
-    
+
     req.flash('success', 'Deleted room');
     res.redirect('/chat');
   })().catch(err => {

@@ -4,7 +4,6 @@ const router = express.Router(); //start express router
 const dateFormat = require('dateformat');
 const User = require('../models/user');
 const Notification = require('../models/notification');
-const Announcement = require('../models/announcement');
 const AccessReq = require('../models/accessRequest');
 const Room = require('../models/room');
 
@@ -22,10 +21,7 @@ router.get('/', middleware.isLoggedIn, (req, res) => {
 				]
 			}).execPopulate();
 
-		foundAnns = await Announcement.find({}).populate({path: 'sender', select: ['username', 'imageUrl']}).populate('message');
-		if(!foundAnns) {req.flash('error', 'Unable to access database'); return res.redirect('back');}
-
-		res.render('inbox/index', {announcements: foundAnns.reverse(), announced: false, inbox: req.user.inbox.reverse(), requests: req.user.requests.reverse(), viewing_sent: false});
+		res.render('inbox/index', {inbox: req.user.inbox.reverse(), requests: req.user.requests.reverse(), viewing_sent: false});
 
 	})().catch(err => {
 		console.log(err);
@@ -43,17 +39,7 @@ router.get('/messages/new', middleware.isLoggedIn, (req, res) => {
 			res.redirect('back');
 
 		} else {
-
-			Announcement.find({}).populate({path: 'sender', select: ['username', 'imageUrl']}).populate('message').exec((err, foundAnns) => {
-				if (err || !foundAnns) {
-					req.flash('error', 'Unable to access database')
-					res.redirect('back')
-
-				} else {
-
-					res.render('inbox/new', {announcements: foundAnns.reverse(), announced: false, users: foundUsers, selected_users: [], currentUser: req.user})
-				}
-			})
+			res.render('inbox/new', {users: foundUsers, selected_users: [], currentUser: req.user})
 		}
 	})
 })
@@ -299,17 +285,7 @@ router.get('/sent', middleware.isLoggedIn, (req, res) => {
 			res.redirect('/inbox')
 
 		} else {
-
-			Announcement.find({}).populate({path: 'sender', select: ['username', 'imageUrl']}).populate('message').exec((err, foundAnns) => {
-				if (err || !foundAnns) {
-					req.flash('error', 'Unable to access database')
-					res.redirect('back')
-
-				} else {
-					res.render('inbox/indexSent', {announcements: foundAnns.reverse(), announced: false, inbox: foundNotifs.reverse()})
-
-				}
-			})
+			res.render('inbox/indexSent', {inbox: foundNotifs.reverse()})
 		}
 	})
 })
@@ -349,17 +325,7 @@ router.get('/:id', middleware.isLoggedIn, (req, res) => {
 					res.redirect('back')
 
 				} else {
-
-					Announcement.find({}).populate({path: 'sender', select: ['username', 'imageUrl']}).populate('message').exec((err, foundAnns) => {
-						if (err || !foundAnns) {
-							req.flash('error', 'Unable to access database')
-							res.redirect('back')
-
-						} else {
-
-							res.render(`inbox/show`, {announcements: foundAnns.reverse(), announced: false, notif: foundNotif, recipient_profiles: foundUsers})
-						}
-					})
+					res.render(`inbox/show`, {notif: foundNotif, recipient_profiles: foundUsers})
 				}
 			})
 		}

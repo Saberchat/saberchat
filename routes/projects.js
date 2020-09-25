@@ -6,7 +6,6 @@ const multer = require('multer')
 const upload = multer({dest: __dirname + '/../public/uploads'});
 
 const User = require('../models/user');
-const Announcement = require('../models/announcement')
 const Project = require('../models/project');
 
 router.get('/', middleware.isLoggedIn, (req, res) => {
@@ -21,18 +20,7 @@ router.get('/', middleware.isLoggedIn, (req, res) => {
       res.redirect('back')
 
     } else {
-
-
-      Announcement.find({}).populate({path: 'sender', select: ['username', 'imageUrl']}).populate('message').exec((err, foundAnns) => {
-        if (err || !foundAnns) {
-          req.flash('error', 'Unable to access database')
-          res.redirect('back')
-
-        } else {
-
-          res.render('projects/index', {announcements: foundAnns.reverse(), projects: foundProjects})
-        }
-      })
+      res.render('projects/index', {projects: foundProjects})
     }
   })
 })
@@ -45,16 +33,7 @@ router.get('/new', [middleware.isLoggedIn, middleware.isFaculty], (req, res) => 
       res.redirect('back')
 
     } else {
-      Announcement.find({}).populate({path: 'sender', select: ['username', 'imageUrl']}).populate('message').exec((err, foundAnns) => {
-        if (err || !foundAnns) {
-          req.flash('error', 'Unable to access database')
-          res.redirect('back')
-
-        } else {
-
-          res.render('projects/new', {announcements: foundAnns.reverse(), students: foundUsers})
-        }
-      })
+      res.render('projects/new', {students: foundUsers})
     }
   })
 })
@@ -124,16 +103,7 @@ router.get('/:id/edit', [middleware.isLoggedIn, middleware.isFaculty], (req, res
           res.redirect('back')
 
         } else {
-          Announcement.find({}).populate({path: 'sender', select: ['username', 'imageUrl']}).populate('message').exec((err, foundAnns) => {
-            if (err || !foundAnns) {
-              req.flash('error', 'Unable to access database')
-              res.redirect('back')
-
-            } else {
-
-              res.render('projects/edit', {announcements: foundAnns.reverse(), project: foundProject, students: foundUsers, creatornames})
-            }
-          })
+          res.render('projects/edit', {project: foundProject, students: foundUsers, creatornames})
         }
       })
     }
@@ -150,16 +120,7 @@ router.get('/:id', middleware.isLoggedIn, (req, res) => {
       res.redirect('back')
 
     } else {
-      Announcement.find({}).populate({path: 'sender', select: ['username', 'imageUrl']}).populate('message').exec((err, foundAnns) => {
-        if (err || !foundAnns) {
-          req.flash('error', 'Unable to access database')
-          res.redirect('back')
-
-        } else {
-
-          res.render('projects/show', {announcements: foundAnns.reverse(), project: foundProject})
-        }
-      })
+      res.render('projects/show', {project: foundProject})
     }
   })
 })

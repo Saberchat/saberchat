@@ -31,6 +31,7 @@
   <div class="container">
     <h1 class="display-4 text-dark"><%= room.name %></h1>
     <p class="text-dark lead mb-3"><%= room.description %></p>
+    <a href="/chat" class="btn btn-primary" class="exit-button"><i class="fas fa-arrow-left"></i> Exit</a>
     <% if (room.creator.id.equals(currentUser._id)) { %>
       <a href="/chat/<%= room._id %>/edit" class="btn btn-secondary"><i class="fas fa-cog"></i> Room Settings</a>
     <% } else if(room.type == 'private') { %>
@@ -68,7 +69,6 @@
     <div class="row rounded-lg overflow-hidden shadow mt-2">
       <!-- Chat Box-->
       <div class="col-12 px-0">
-        <a href="/chat" class="exit-button"><i class="fas fa-long-arrow-alt-left"></i> Exit</a>
         <button class="btn-scrolldown" onclick="scrollBottom()">Scroll To <i class="fas fa-arrow-down"></i></button>
         <div class="px-4 chat-box bg-white" id="message-display">
           <!-- reverse it to get correct order -->

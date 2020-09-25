@@ -4,23 +4,13 @@ const router = express.Router();
 
 const Comment = require('../models/comment');
 const User = require('../models/user');
-const Announcement = require('../models/announcement')
 
 const middlware = require('../middleware');
 
 
 //Function to display user inbox
 router.get('/', middlware.isLoggedIn, middlware.isAdmin, (req, res) => {
-	Announcement.find({}).populate({path: 'sender', select: ['username', 'imageUrl']}).populate('message').exec((err, foundAnns) => {
-    if (err || !foundAnns) {
-      req.flash('error', 'Unable to access database')
-      res.redirect('back')
-
-    } else {
-
-      res.render('admin/index', {announcements: foundAnns.reverse(), announced: false})
-    }
-  })
+	 res.render('admin/index')
 })
 
 // displays moderator page
@@ -33,18 +23,9 @@ router.get('/moderate', middlware.isLoggedIn, middleware.isMod, (req, res) => {
 		if(err) {
 			req.flash('error', 'Cannot access DataBase');
 			res.redirect('/admin');
+
 		} else {
-
-			Announcement.find({}).populate({path: 'sender', select: ['username', 'imageUrl']}).populate('message').exec((err, foundAnns) => {
-		    if (err || !foundAnns) {
-		      req.flash('error', 'Unable to access database')
-		      res.redirect('back')
-
-		    } else {
-
-		      res.render('admin/mod', {comments: foundComments, announcements: foundAnns.reverse(), announced: false})
-		    }
-		  })
+		  res.render('admin/mod', {comments: foundComments})
 		}
 	});
 });
@@ -55,18 +36,9 @@ router.get('/permissions', middlware.isLoggedIn, middlware.isAdmin, (req, res) =
 		if(err || !foundUsers) {
 			req.flash('error', 'Cannot access Database');
 			res.redirect('/admin');
+
 		} else {
-
-			Announcement.find({}).populate({path: 'sender', select: ['username', 'imageUrl']}).populate('message').exec((err, foundAnns) => {
-		    if (err || !foundAnns) {
-		      req.flash('error', 'Unable to access database')
-		      res.redirect('back')
-
-		    } else {
-
-		      res.render('admin/permission', {users: foundUsers, announcements: foundAnns.reverse(), announced: false})
-		    }
-		  })
+		  res.render('admin/permission', {users: foundUsers})
 		}
 	});
 });
@@ -78,17 +50,7 @@ router.get('/status', middlware.isLoggedIn, middlware.isAdmin, (req, res) => {
 			req.flash('error', 'Cannot access Database');
 			res.redirect('/admin');
 		} else {
-
-			Announcement.find({}).populate({path: 'sender', select: ['username', 'imageUrl']}).populate('message').exec((err, foundAnns) => {
-		    if (err || !foundAnns) {
-		      req.flash('error', 'Unable to access database')
-		      res.redirect('back')
-
-		    } else {
-
-		      res.render('admin/status', {users: foundUsers, announcements: foundAnns.reverse(), announced: false})
-		    }
-		  })
+			res.render('admin/status', {users: foundUsers})
 		}
 	});
 });

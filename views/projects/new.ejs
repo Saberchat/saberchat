@@ -10,7 +10,6 @@
     <!-- link css for navbar. Don't need to include public/javascript/userForm.js since user is already logged in and does not need to access login and register forms.  -->
     <link rel="stylesheet" href="/stylesheets/components/navbar.css">
     <link rel="stylesheet" href="/stylesheets/components/header.css">
-    <link rel="stylesheet" href="/stylesheets/components/announcement.css">
     <link rel="stylesheet" href="/stylesheets/projects/projects.css">
 
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
@@ -33,7 +32,7 @@
           <div class="jumbotron text-center">
             <h1><i class="fas fa-paint-brush"></i> Add Project </h1>
             <p>Submit an exceptional or unique student project</p>
-            <a href="/projects">Back to All Projects</a>
+            <a class="btn btn-primary" href="/projects"><i class="fas fa-arrow-left"></i> Back</a>
           </div>
         </div>
       </div>
@@ -63,7 +62,7 @@
 
       <div class="input-group mb-3">
         <!-- <input id="project-file" type="file" accept="image/*" name="img" ><br /> -->
-        <label for='project-file'>Project Image URL</label>
+        <!-- <label for='project-file'>Project Image URL</label> -->
         <input id="new-project-images" type="text" name="img" class="form-control" placeholder="Enter Image Url" aria-label="Username" aria-describedby="basic-addon1" required>
       </div>
 

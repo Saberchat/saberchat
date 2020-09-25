@@ -8,6 +8,7 @@ const Announcement = require('../models/announcement');
 router.get('/', middleware.isLoggedIn, (req, res) => {
   Announcement.find({}).populate('sender').exec((err, foundAnns) => {
     if (err || !foundAnns) {
+      console.log(err)
       req.flash('error', "Unable to access database")
       res.redirect('back')
 
@@ -32,7 +33,7 @@ router.get('/:id', middleware.isLoggedIn, (req, res) => {
       res.redirect('back');
 
     } else {
-      res.render('announcements/show', {announced: true, announcement: foundAnn});
+      res.render('announcements/show', {announcement: foundAnn});
     }
   });
 });
@@ -59,7 +60,8 @@ router.post('/', middleware.isLoggedIn, middleware.isAdmin, (req, res) => {
       req.flash('error', 'Unable to access database');
       return res.redirect('back');
     }
-    if (req.body.images[0]) {
+
+    if (req.body.images) {
       for(const image in req.body.images) {
         announcement.images.push(req.body.images[image]);
       }
@@ -68,7 +70,7 @@ router.post('/', middleware.isLoggedIn, middleware.isAdmin, (req, res) => {
     announcement.save();
 
     req.flash('success', 'Announcement posted to bulletin!');
-    res.redirect('/announcements/new');
+    res.redirect('/announcements/');
   });
 })
 
@@ -85,7 +87,7 @@ router.put('/:id', middleware.isLoggedIn, middleware.isAdmin, (req, res) => {
 
     } else {
       foundAnn.images = [];
-      if(req.body.images["0"]) {
+      if(req.body.images) {
         for(const image in req.body.images) {
           foundAnn.images.push(req.body.images[image]);
         }
@@ -103,16 +105,17 @@ router.put('/:id', middleware.isLoggedIn, middleware.isAdmin, (req, res) => {
 router.delete('/:id', middleware.isLoggedIn, middleware.isAdmin, (req, res) => {
   Announcement.findByIdAndDelete(req.params.id, (err, deletedAnn) => {
     if (err || !deletedAnn) {
+      console.log(err)
       req.flash('error', "Unable to access database");
       res.redirect('back');
 
-    } else if (foundAnn.sender._id != req.user._id) {
+    } else if (deletedAnn.sender._id.toString() != req.user._id.toString()) {
       req.flash('error', "You can only delete announcements that you have sent.")
       res.redirect('back')
 
     } else {
-      req.flash('success', 'Deleted');
-      res.redirect('/announcements/new');
+      req.flash('success', 'Announcement Deleted!');
+      res.redirect('/announcements/');
     }
   })
 })
