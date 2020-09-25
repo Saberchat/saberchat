@@ -150,7 +150,11 @@ router.get('/delete_order/:id', [middleware.isLoggedIn, middleware.cafeOpen], (r
 })
 
 router.post('/:id/ready', middleware.isLoggedIn, (req, res) => {
-  Order.findById(req.params.id).populate('items').exec((err, foundOrder) => {
+
+  Order.findById(req.params.id)
+  .populate('items')
+  .populate('customer')
+  .exec((err, foundOrder) => {
     if (err || !foundOrder) {
       console.log(err);
       req.flash('error', "Could not find order");
@@ -161,65 +165,37 @@ router.post('/:id/ready', middleware.isLoggedIn, (req, res) => {
       foundOrder.present = false;
       foundOrder.save();
 
-      User.findById(foundOrder.customer, (err, foundUser) => {
-        if (err || !foundUser) {
-          req.flash('error', "Could not find user");
+      Notification.create({subject: "Cafe Order Ready", sender: req.user, recipients: [foundOrder.customer], read: [false], toEveryone: false, images: []}, (err, notif) => {
+        if (err) {
+          req.flash('error', "Could not create notif");
           console.log(err);
           res.redirect('/cafe/orders');
 
         } else {
-          Notification.create({toEveryone: false, images: []}, (err, notif) => {
-            if (err) {
-              req.flash('error', "Could not create notif");
-              console.log(err);
-              res.redirect('/cafe/orders');
 
-            } else {
-              notif.subject = "Cafe Order Ready";
-              notif.sender = req.user;
-              notif.date = dateFormat(notif.created_at, "mmm d, h:MMTT");
-              notif.recipients = [foundUser];
-              notif.read = [false];
+          notif.date = dateFormat(notif.created_at, "mmm d, h:MMTT");
 
-              let itemText = [];
-              for (var i = 0; i < foundOrder.items.length; i++) {
-                itemText.push(` - ${foundOrder.items[i].name}: ${foundOrder.quantities[i]} order(s)`);
-              }
+          let itemText = [];
+          for (var i = 0; i < foundOrder.items.length; i++) {
+            itemText.push(` - ${foundOrder.items[i].name}: ${foundOrder.quantities[i]} order(s)`);
+          }
 
-              if (foundOrder.instructions == "") {
+          if (!foundOrder.charge.toString().includes('.')) {
+            notif.text = "Your order is ready:\n" + itemText.join("\n") + "\n\nExtra Instructions: " + foundOrder.instructions + "\nTotal Cost: $" + foundOrder.charge + ".00";
 
-                if (!foundOrder.charge.toString().includes('.')) {
-                  notif.text = "Your order is ready:\n" + itemText.join("\n") + "\n\nExtra Instructions: None\nTotal Cost: $" + foundOrder.charge + ".00";
+          } else if (foundOrder.charge.toString().split('.')[1].length == 1){
+            notif.text = "Your order is ready:\n" + itemText.join("\n") + "\n\nExtra Instructions: " + foundOrder.instructions + "\nTotal Cost: $" + foundOrder.charge + "0";
 
-                } else if (foundOrder.charge.toString().split('.')[1].length == 1){
-                  notif.text = "Your order is ready:\n" + itemText.join("\n") + "\n\nExtra Instructions: None\nTotal Cost: $" + foundOrder.charge + "0";
+          } else {
+            notif.text = "Your order is ready:\n" + itemText.join("\n") + "\n\nExtra Instructions: " + foundOrder.instructions + "\nTotal Cost: $" + foundOrder.charge + "";
+          }
 
-                } else {
-                  notif.text = "Your order is ready:\n" + itemText.join("\n") + "\n\nExtra Instructions: None\nTotal Cost: $" + foundOrder.charge + "";
-                }
+          notif.save();
+          foundOrder.customer.inbox.push(notif);
+          foundOrder.customer.notifCount += 1
+          foundOrder.customer.save();
 
-
-              } else {
-
-                if (!foundOrder.charge.toString().includes('.')) {
-                  notif.text = "Your order is ready:\n" + itemText.join("\n") + "\n\nExtra Instructions: " + foundOrder.instructions + "\nTotal Cost: $" + foundOrder.charge + ".00";
-
-                } else if (foundOrder.charge.toString().split('.')[1].length == 1){
-                  notif.text = "Your order is ready:\n" + itemText.join("\n") + "\n\nExtra Instructions: " + foundOrder.instructions + "\nTotal Cost: $" + foundOrder.charge + "0";
-
-                } else {
-                  notif.text = "Your order is ready:\n" + itemText.join("\n") + "\n\nExtra Instructions: " + foundOrder.instructions + "\nTotal Cost: $" + foundOrder.charge + "";
-                }
-              }
-
-              notif.save();
-              foundUser.inbox.push(notif);
-              foundUser.notifCount += 1
-              foundUser.save();
-
-              res.redirect('/cafe/orders');
-            }
-          });
+          res.redirect('/cafe/orders');
         }
       });
     }

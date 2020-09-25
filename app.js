@@ -300,36 +300,69 @@ io.on('connect', (socket) => {
                       }
 
                       if (!unavailable) {
-                        Order.create({customer: customerId, name: `${user.firstName} ${user.lastName}`, instructions: instructions, present: true, charge: 0}, (err, order) => {
 
-                          if (err) {
-                            console.log(err);
+                        if (instructions == "") {
+                          Order.create({customer: customerId, name: `${user.firstName} ${user.lastName}`, instructions: 'None', present: true, charge: 0}, (err, order) => {
 
-                          } else {
-                            order.date = dateFormat(order.created_at, "mmm d, h:MM TT")
-                            order.items = itemList;
-                            order.quantities = itemCount;
+                            if (err) {
+                              console.log(err);
 
-                            var charge = 0;
+                            } else {
+                              order.date = dateFormat(order.created_at, "mmm d, h:MM TT")
+                              order.items = itemList;
+                              order.quantities = itemCount;
 
-                            for (let i = 0; i < foundItems.length; i++) {
-                              charge += (foundItems[i].price * parseInt(itemCount[i]))
-                            }
+                              var charge = 0;
 
-                            order.charge = charge;
-                            order.save()
-
-                            Item.find({_id: {$in: itemList}}, (err, foundItems) => {
-                              if (err || !foundItems) {
-                                console.log(err);
-                              } else {
-                                io.emit('order', order, foundItems);
+                              for (let i = 0; i < foundItems.length; i++) {
+                                charge += (foundItems[i].price * parseInt(itemCount[i]))
                               }
-                            });
 
-                          }
+                              order.charge = charge;
+                              order.save()
 
-                        })
+                              Item.find({_id: {$in: itemList}}, (err, foundItems) => {
+                                if (err || !foundItems) {
+                                  console.log(err);
+                                } else {
+                                  io.emit('order', order, foundItems);
+                                }
+                              });
+                            }
+                          })
+
+                        } else {
+
+                          Order.create({customer: customerId, name: `${user.firstName} ${user.lastName}`, instructions: instructions, present: true, charge: 0}, (err, order) => {
+
+                            if (err) {
+                              console.log(err);
+
+                            } else {
+                              order.date = dateFormat(order.created_at, "mmm d, h:MM TT")
+                              order.items = itemList;
+                              order.quantities = itemCount;
+
+                              var charge = 0;
+
+                              for (let i = 0; i < foundItems.length; i++) {
+                                charge += (foundItems[i].price * parseInt(itemCount[i]))
+                              }
+
+                              order.charge = charge;
+                              order.save()
+
+                              Item.find({_id: {$in: itemList}}, (err, foundItems) => {
+                                if (err || !foundItems) {
+                                  console.log(err);
+                                } else {
+                                  io.emit('order', order, foundItems);
+                                }
+                              });
+                            }
+                          })
+
+                        }
 
                       } else {
                         console.log("Some items are unavailable in the quantities you requested")
