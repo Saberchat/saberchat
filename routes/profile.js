@@ -47,7 +47,7 @@ router.get('/:id', middleware.isLoggedIn, function(req, res) {
 });
 
 // update user route. Check if current user matches profiles they're trying to edit with middleware.
-router.put('/edit', middleware.isLoggedIn, function(req, res) {
+router.put('/profile', middleware.isLoggedIn, function(req, res) {
   let user = {
     firstName: req.body.firstName,
     lastName: req.body.lastName,

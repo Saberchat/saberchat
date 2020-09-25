@@ -34,7 +34,7 @@ router.get('/:id', function(req, res) {
 });
 
 // create articles
-router.post('/new', function(req, res) {
+router.post('/', function(req, res) {
     const content = JSON.parse(req.body.content);
     const articleObj = {
         title: req.body.title,

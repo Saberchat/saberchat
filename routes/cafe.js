@@ -51,7 +51,7 @@ router.get('/new', [middleware.isLoggedIn, middleware.cafeOpen], (req, res) => {
   })
 });
 
-router.post('/new', [middleware.isLoggedIn, middleware.cafeOpen], (req, res) => {
+router.post('/order', [middleware.isLoggedIn, middleware.cafeOpen], (req, res) => {
 
   Order.find({name: `${req.user.firstName} ${req.user.lastName}`, present: true}, (err, foundOrders) => {
     if (err || !foundOrders) {

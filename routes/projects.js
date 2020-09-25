@@ -61,23 +61,10 @@ router.post('/',[middleware.isLoggedIn, middleware.isFaculty], upload.single('im
           project.date = dateFormat(project.created_at, "mmm d, h:MMTT")
           project.save()
 
-          // if(req.file) {
-          //   project.imgUrl = `uploads/${req.file.filename}`
-          //   project.save()
-          //   req.flash('success', 'Project posted!')
-      		// 	res.redirect(`/projects/${project._id}`)
-          // }
-          //
-          // else {
-          //   throw 'error';
-          // }
-
         }
       })
-
     }
   })
-
 })
 
 router.get('/:id/edit', [middleware.isLoggedIn, middleware.isFaculty], (req, res) => {
