@@ -34,7 +34,7 @@
         <div class="jumbotron text-center">
           <h1 style="text-align: center; width: 100%">New Cafe Order</h1>
           <p>Place an order that will be delivered to you at lunch</p>
-          <a class="btn btn-danger" href='/cafe'><i class="fas fa-arrow-left"></i> Back to Cafe</a>
+          <a class="btn btn-primary" href='/cafe'><i class="fas fa-arrow-left"></i> Back</a>
           <a class="btn btn-info" href='/cafe/menu'><i class="fas fa-bars"></i> Menu </a>
         </div>
       </div>
@@ -82,7 +82,18 @@
                             <% }) %>
                           <% } %>
                         </select>
-                        <label style="margin-left: 1%;" class="form-check-label" for="<%= item._id%>"><strong><%= item.name %></strong> (<%= item.availableItems %> orders available) - $<%= item.price %> </label>
+
+                        <% if (item.price.toString().length < 3) { %>
+                          <label style="margin-left: 1%;" class="form-check-label" for="<%= item._id%>"><strong><%= item.name %></strong> (<%= item.availableItems %> orders available) - $<%= item.price %>.00 </label>
+
+                        <% } else if ((item.price.toString().length == 3) || (item.price.toString().length == 4 && !(item.price.toString().includes('.')))){ %>
+                          <label style="margin-left: 1%;" class="form-check-label" for="<%= item._id%>"><strong><%= item.name %></strong> (<%= item.availableItems %> orders available) - $<%= item.price %>0 </label>
+
+                        <% } else { %>
+                          <label style="margin-left: 1%;" class="form-check-label" for="<%= item._id%>"><strong><%= item.name %></strong> (<%= item.availableItems %> orders available) - $<%= item.price %></label>
+                        <% } %>
+
+
                         <br />
                         <!-- <span class="form-check-label"><%= item.name %>: $<%= item.price %></span> -->
                       </div>
@@ -106,8 +117,9 @@
           </li>
 
           <div>
-            <div style="margin: 0px;" id="order-confirm"></div>
-            <strong style="color: red; margin: 0px;" id="total-cost" class="list-group-item list-group-item-action form-check">Total: $0</strong>
+            <div style="margin: 0px;" id="order-confirm">
+              <strong style="color: green; margin: 0px;" id="total-cost" class="list-group-item list-group-item-action form-check">Total: $0.00</strong>
+            </div>
           </div>
 
           <!-- <strong>Order: </strong> -->

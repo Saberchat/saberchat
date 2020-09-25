@@ -8,6 +8,7 @@ const total = document.getElementById('total-cost')
 const orderConfirm = document.getElementById("order-confirm")
 let orderedItem; //Order that will show up in your 'confirm order' page
 let sum = 0
+let totalNew;
 
 
 container.addEventListener('click', () => {
@@ -36,7 +37,23 @@ container.addEventListener('click', () => {
       }
     }
   }
-  total.innerText = `Total: $${sum}`
+
+  totalNew = document.createElement('strong')
+  totalNew.style = 'color: green;'
+  totalNew.className = "list-group-item list-group-item-action form-check"
+
+  if (sum.toString().length < 3) {
+    totalNew.innerText = `Total: $${sum}.00`
+
+  } else if ((sum.toString().length == 3) || (sum.toString().length == 4 && !(sum.toString().includes('.')))){
+    totalNew.innerText = `Total: $${sum}0`
+
+  } else {
+    totalNew.innerText = `Total: $${sum}`
+  }
+
+  orderConfirm.appendChild(totalNew)
+
 })
 
 for (let dd of dropdown) { //Every quantity dropdown menu
@@ -66,7 +83,23 @@ for (let dd of dropdown) { //Every quantity dropdown menu
         }
       }
     }
-    total.innerText = `Total: $${sum}`
+
+    totalNew = document.createElement('strong')
+    totalNew.style = 'color: green;'
+    totalNew.className = "list-group-item list-group-item-action form-check"
+
+    if (sum.toString().length < 3) {
+      totalNew.innerText = `Total: $${sum}.00`
+
+    } else if ((sum.toString().length == 3) || (sum.toString().length == 4 && !(sum.toString().includes('.')))){
+      totalNew.innerText = `Total: $${sum}0`
+
+    } else {
+      totalNew.innerText = `Total: $${sum}`
+    }
+
+    orderConfirm.appendChild(totalNew)
+
   }
 }
 

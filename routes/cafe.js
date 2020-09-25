@@ -38,7 +38,7 @@ router.get('/menu', middleware.isLoggedIn, (req, res) => {
   })
 })
 
-router.get('/new', [middleware.isLoggedIn, middleware.cafeOpen], (req, res) => {
+router.get('/new', [middleware.isLoggedIn], (req, res) => {
 
   Type.find({}).populate('items').exec((err, foundTypes) => {
     if (err || !foundTypes) {
@@ -51,7 +51,7 @@ router.get('/new', [middleware.isLoggedIn, middleware.cafeOpen], (req, res) => {
   })
 });
 
-router.post('/new', [middleware.isLoggedIn, middleware.cafeOpen], (req, res) => {
+router.post('/new', [middleware.isLoggedIn], (req, res) => {
 
   Order.find({name: `${req.user.firstName} ${req.user.lastName}`, present: true}, (err, foundOrders) => {
     if (err || !foundOrders) {
@@ -297,6 +297,7 @@ router.get('/item/:id', middleware.isLoggedIn, middleware.isMod, (req, res) => {
 router.put('/item/:id/update', middleware.isLoggedIn, middleware.isMod, (req, res) => {
   Item.findByIdAndUpdate(req.params.id, {
     name: req.body.name,
+    price: parseFloat(req.body.price),
     availableItems: parseInt(req.body.available),
     isAvailable: (parseInt(req.body.available) > 0),
     description: req.body.description,
