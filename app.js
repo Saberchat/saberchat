@@ -40,6 +40,7 @@ const Comment = require('./models/comment');
 const User = require("./models/user");
 const Order = require('./models/order');
 const Item = require('./models/orderItem');
+const Cafe = require('./models/cafe');
 
 //require the routes
 const indexRoutes = require('./routes/index');
@@ -257,128 +258,130 @@ io.on('connect', (socket) => {
 
     //Conditionals ensure that sending time is between 9AM and 12:20 PM
 
-    let currentTime = new Date(new Date().getTime()).toString().split(' ')[4]
+    Cafe.find({}, (err, foundCafe) => {
+      if (err || !foundCafe) {
+        console.log(err)
 
-    if ((parseInt(currentTime.split(':')[0]) < 8 || parseInt(currentTime.split(':')[0]) >= 12)) {
-      console.log("Send orders between 8AM and 12PM");
+      } else {
 
-    } else {
+        if (foundCafe[0].open) {
+          if (itemList.length != 0) { //Order form is not empty, something is selected
 
-      if (itemList.length != 0) { //Order form is not empty, something is selected
-
-        User.findById(customerId, (err, user) => {
-          if (err || !user) {
-            console.log(err);
-
-          } else {
-
-            Order.find({name: `${user.firstName} ${user.lastName}`, present: true}, (err, foundOrders) => {
-              if (err || !foundOrders) {
-                console.log(err)
+            User.findById(customerId, (err, user) => {
+              if (err || !user) {
+                console.log(err);
 
               } else {
-                if (foundOrders.length  >= 3) {
-                  console.log("Max orders made")
 
-                } else {
+                Order.find({name: `${user.firstName} ${user.lastName}`, present: true}, (err, foundOrders) => {
+                  if (err || !foundOrders) {
+                    console.log(err)
 
-                  Item.find({_id: {$in: itemList}}, (err, foundItems) => {
-                    if (err || !foundItems) {
-                      console.log(err);
+                  } else {
+                    if (foundOrders.length  >= 3) {
+                      console.log("Max orders made")
 
                     } else {
 
-                      let unavailable = false
-
-                      for (let i = 0; i < foundItems.length; i++) {
-
-                        if (foundItems[i].availableItems < parseInt(itemCount[i])) {
-                          unavailable = true
-                          break
-
-                        }
-                      }
-
-                      if (!unavailable) {
-
-                        if (instructions == "") {
-                          Order.create({customer: customerId, name: `${user.firstName} ${user.lastName}`, instructions: 'None', present: true, charge: 0}, (err, order) => {
-
-                            if (err) {
-                              console.log(err);
-
-                            } else {
-                              order.date = dateFormat(order.created_at, "mmm d, h:MM TT")
-                              order.items = itemList;
-                              order.quantities = itemCount;
-
-                              var charge = 0;
-
-                              for (let i = 0; i < foundItems.length; i++) {
-                                charge += (foundItems[i].price * parseInt(itemCount[i]))
-                              }
-
-                              order.charge = charge;
-                              order.save()
-
-                              Item.find({_id: {$in: itemList}}, (err, foundItems) => {
-                                if (err || !foundItems) {
-                                  console.log(err);
-                                } else {
-                                  io.emit('order', order, foundItems);
-                                }
-                              });
-                            }
-                          })
+                      Item.find({_id: {$in: itemList}}, (err, foundItems) => {
+                        if (err || !foundItems) {
+                          console.log(err);
 
                         } else {
 
-                          Order.create({customer: customerId, name: `${user.firstName} ${user.lastName}`, instructions: instructions, present: true, charge: 0}, (err, order) => {
+                          let unavailable = false
 
-                            if (err) {
-                              console.log(err);
+                          for (let i = 0; i < foundItems.length; i++) {
+
+                            if (foundItems[i].availableItems < parseInt(itemCount[i])) {
+                              unavailable = true
+                              break
+
+                            }
+                          }
+
+                          if (!unavailable) {
+
+                            if (instructions == "") {
+                              Order.create({customer: customerId, name: `${user.firstName} ${user.lastName}`, instructions: 'None', present: true, charge: 0}, (err, order) => {
+
+                                if (err) {
+                                  console.log(err);
+
+                                } else {
+                                  order.date = dateFormat(order.created_at, "mmm d, h:MM TT")
+                                  order.items = itemList;
+                                  order.quantities = itemCount;
+
+                                  var charge = 0;
+
+                                  for (let i = 0; i < foundItems.length; i++) {
+                                    charge += (foundItems[i].price * parseInt(itemCount[i]))
+                                  }
+
+                                  order.charge = charge;
+                                  order.save()
+
+                                  Item.find({_id: {$in: itemList}}, (err, foundItems) => {
+                                    if (err || !foundItems) {
+                                      console.log(err);
+                                    } else {
+                                      io.emit('order', order, foundItems);
+                                    }
+                                  });
+                                }
+                              })
 
                             } else {
-                              order.date = dateFormat(order.created_at, "mmm d, h:MM TT")
-                              order.items = itemList;
-                              order.quantities = itemCount;
 
-                              var charge = 0;
+                              Order.create({customer: customerId, name: `${user.firstName} ${user.lastName}`, instructions: instructions, present: true, charge: 0}, (err, order) => {
 
-                              for (let i = 0; i < foundItems.length; i++) {
-                                charge += (foundItems[i].price * parseInt(itemCount[i]))
-                              }
-
-                              order.charge = charge;
-                              order.save()
-
-                              Item.find({_id: {$in: itemList}}, (err, foundItems) => {
-                                if (err || !foundItems) {
+                                if (err) {
                                   console.log(err);
+
                                 } else {
-                                  io.emit('order', order, foundItems);
+                                  order.date = dateFormat(order.created_at, "mmm d, h:MM TT")
+                                  order.items = itemList;
+                                  order.quantities = itemCount;
+
+                                  var charge = 0;
+
+                                  for (let i = 0; i < foundItems.length; i++) {
+                                    charge += (foundItems[i].price * parseInt(itemCount[i]))
+                                  }
+
+                                  order.charge = charge;
+                                  order.save()
+
+                                  Item.find({_id: {$in: itemList}}, (err, foundItems) => {
+                                    if (err || !foundItems) {
+                                      console.log(err);
+                                    } else {
+                                      io.emit('order', order, foundItems);
+                                    }
+                                  });
                                 }
-                              });
+                              })
+
                             }
-                          })
 
+                          } else {
+                            console.log("Some items are unavailable in the quantities you requested")
+                          }
                         }
-
-                      } else {
-                        console.log("Some items are unavailable in the quantities you requested")
-                      }
+                      })
                     }
-                  })
-                }
+                  }
+                })
               }
             })
-          }
-        })
 
-      } else {
-        console.log('Empty order')
+          } else {
+            console.log('Empty order')
+          }
+        }
       }
-    }
+    })
   })
 });
 

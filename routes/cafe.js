@@ -8,9 +8,9 @@ const Order = require('../models/order');
 const Item = require('../models/orderItem');
 const Notification = require('../models/notification');
 const Type = require('../models/itemType');
+const Cafe = require('../models/cafe')
 
 router.get('/', middleware.isLoggedIn, (req, res) => {
-
   Order.find({customer: req.user._id})
   .populate('items').exec((err, foundOrders) => {
 
@@ -209,10 +209,48 @@ router.get('/manage', middleware.isLoggedIn, middleware.isMod, (req, res) => {
       res.redirect('/cafe');
 
     } else {
-      res.render('cafe/manage', {types: foundTypes})
+      Cafe.find({}, (err, foundCafe) => {
+        if (err || !foundCafe) {
+          req.flash('error', "Unable to access database");
+          res.redirect('back');
+
+        } else {
+          res.render('cafe/manage', {types: foundTypes, open: foundCafe[0].open})
+        }
+      })
     }
   })
 });
+
+router.get('/open', middleware.isLoggedIn, middleware.isMod, (req, res) => {
+  Cafe.find({}, (err, foundCafe) => {
+    if (err || !foundCafe) {
+      req.flash('error', "Unable to access database");
+      res.redirect('back');
+
+    } else {
+      foundCafe[0].open = true;
+      foundCafe[0].save();
+      req.flash('success', "Cafe is now open!")
+      res.redirect('/cafe/manage')
+    }
+  })
+})
+
+router.get('/close', middleware.isLoggedIn, middleware.isMod, (req, res) => {
+  Cafe.find({}, (err, foundCafe) => {
+    if (err || !foundCafe) {
+      req.flash('error', "Unable to access database");
+      res.redirect('back');
+
+    } else {
+      foundCafe[0].open = false;
+      foundCafe[0].save();
+      req.flash('success', "Cafe is now closed!")
+      res.redirect('/cafe/manage')
+    }
+  })
+})
 
 router.get('/item/new', middleware.isLoggedIn, middleware.isMod, (req, res) => {
   Type.find({}, (err, foundTypes) => {

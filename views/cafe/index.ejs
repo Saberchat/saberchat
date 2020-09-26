@@ -73,8 +73,8 @@
                     <% } %>
                   </ul>
                   <p style="margin-top: 10px;"><em><%= order.date %></em></p>
-                  <form action="cafe/order/<%= order._id %>?_method=delete" method="post">
-                    <button type="button" class="btn btn-danger"><a style="text-decoration: none; color: inherit;">Cancel Order</a></button>
+                  <form action="cafe/order/<%=order._id%>?_method=delete" method="post">
+                    <button type="submit" class="btn btn-danger"><a style="text-decoration: none; color: inherit;">Cancel Order</a></button>
                   </form>
                 </li>
               <% } %>

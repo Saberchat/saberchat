@@ -28,6 +28,13 @@
             <h1><i class="fas fa-coffee"></i> Manage EC Cafe</h1><br />
             <!-- Block out until Sidd figures out routing -->
             <!-- <a href="deleteItems" class="btn btn-danger disabled"><i class="fas fa-minus-circle"></i> Delete All Items</a> -->
+            <% if (open == true) { %>
+              <a href="/cafe/close" class="btn btn-danger"><i class="fas fa-lock-open"></i> Close Cafe</a>
+
+            <% } else { %>
+              <a href="/cafe/open" class="btn btn-info"><i class="fas fa-lock"></i> Open Cafe</a>
+
+            <% } %>
             <a href="/cafe/orders" class="btn btn-primary"><i class="fas fa-coffee"></i> Orders</a>
             <a href="/cafe/item/new" class="btn btn-warning"><i class="fas fa-plus-circle"></i> Add New Item</a>
             <a href="/cafe/type/new" class="btn btn-success"><i class="fas fa-plus-circle"></i> Add New Category</a>

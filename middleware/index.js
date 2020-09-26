@@ -1,6 +1,7 @@
 // Executes before the code in HTTP route request
 
 const Room = require("../models/room");
+const Cafe = require('../models/cafe')
 const user = require("../models/user");
 const accessReq = require('../models/accessRequest');
 
@@ -113,15 +114,22 @@ middleware.isStudent = function(req, res, next) {
 }
 
 middleware.cafeOpen = function(req, res, next) { //Cafe time restrictions
-	let currentTime = new Date(new Date().getTime()).toString().split(' ')[4]
 
-  if ((parseInt(currentTime.split(':')[0]) < 8 || parseInt(currentTime.split(':')[0]) >= 12)) {
-    req.flash('error', "Send orders between 8AM and 12PM");
-    res.redirect('back');
+	Cafe.find({}, (err, foundCafe) => {
+		if (err || !foundCafe) {
+			req.flash('error', "Unable to access database")
+			res.redirect('back')
 
-	} else {
-		next();
-	}
+		} else {
+			if (foundCafe[0].open) {
+				next();
+
+			} else {
+				req.flash('error', "The cafe is currently not taking orders");
+				res.redirect('back');
+			}
+		}
+	})
 }
 
 
