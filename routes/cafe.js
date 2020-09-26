@@ -388,7 +388,15 @@ router.delete('/item/:id', middleware.isLoggedIn, middleware.isMod, (req, res) =
 });
 
 router.get('/type/new', [middleware.isLoggedIn, middleware.isMod], (req, res) => { // RESTful route "New" for type
-  res.render('cafe/newItemType')
+  Item.find({}, (err,foundItems) => {
+    if (err || !foundItems) {
+      req.flash('error', "Unable to access database")
+      res.redirect('back')
+
+    } else {
+      res.render('cafe/newItemType', {items: foundItems})
+    }
+  })
 })
 
 router.post('/type', [middleware.isLoggedIn, middleware.isMod], (req, res) => { // RESTful route "Create" for type
@@ -398,13 +406,50 @@ router.post('/type', [middleware.isLoggedIn, middleware.isMod], (req, res) => { 
       res.redirect('back')
 
     } else if (foundTypes.length == 0) {
-      Type.create({name: req.body.name}, (err, type) => {
+
+      Type.create({name: req.body.name, items: []}, (err, type) => {
         if (err) {
           console.log(err)
           req.flash('error', "Item Type could not be created")
           res.redirect('back')
 
         } else {
+
+          Type.find({}, (err, foundTypes) => {
+            if (err || !foundTypes) {
+              req.flash('error', "Unable to access database");
+              res.redirect('back')
+
+            } else {
+              for (let t of foundTypes) {
+                for (let i = 0; i < t.items.length; i += 1) {
+                  if(req.body[t.items[i].toString()]) {
+                    t.items.splice(i, 1)
+                  }
+                }
+                t.save()
+              }
+            }
+          })
+
+          Item.find({}, (err, foundItems) => {
+            if (err || !foundItems) {
+              req.flash('error', "Unable to access database");
+              res.redirect('back')
+
+            } else {
+              for (let item of foundItems) {
+                console.log(req.body[item._id])
+                if(req.body[item._id.toString()]) {
+                  console.log(item)
+                  type.items.push(item)
+                }
+              }
+              type.save()
+            }
+          })
+
+          req.flash('success', "Item Created!")
           res.redirect('/cafe/manage')
         }
       })
@@ -444,24 +489,58 @@ router.put('/type/:id', [middleware.isLoggedIn, middleware.isMod], (req, res) =>
 
     } else {
       Type.find({_id: {$ne: type._id}}, (err, foundTypes) => {
-        for (let type of foundTypes) {
-          for (let i = 0; i < type.items.length; i += 1) {
-            if(req.body[type.items[i].toString()]) {
-              type.items.splice(i, 1)
+
+        if (err || !foundTypes) {
+          req.flash('error', "Unable to access database");
+          res.redirect('back')
+
+        } else {
+          for (let type of foundTypes) {
+            for (let i = 0; i < type.items.length; i += 1) {
+              if(req.body[type.items[i].toString()]) {
+                type.items.splice(i, 1)
+              }
             }
+            type.save()
           }
-          type.save()
         }
       })
 
-      type.items = []
       Item.find({}, (err, foundItems) => {
-        for (let item of foundItems) {
-          if(req.body[item._id.toString()]) {
-            type.items.push(item)
+
+        if (err || !foundItems) {
+          req.flash('error', "Unable to access database")
+          res.redirect('back')
+
+        } else {
+
+          for (let item of type.items) {
+            if (!req.body[item._id.toString()]) { //Item is no longer checked
+
+              Type.findOne({name: 'Other'}, (err, foundType) => {
+
+                if (err || !foundType) {
+                  req.flash('error', "Unable to access database")
+                  res.redirect('back')
+
+                } else {
+                  foundType.items.push(item)
+                  foundType.save()
+                }
+              })
+            }
           }
+
+          type.items = []
+
+          for (let item of foundItems) {
+            if(req.body[item._id.toString()]) {
+              type.items.push(item)
+            }
+          }
+
+          type.save()
         }
-        type.save()
       })
 
       req.flash('success', "Item type updated!")
