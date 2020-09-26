@@ -45,7 +45,7 @@
           <li class="list-group-item list-group-item-info">
             <div class="d-flex w-100 justify-content-between">
               <h2 class="mb-1"><i class="fas fa-hamburger"></i> Current Orders</h2>
-                <a href="cafe/new" class="btn btn-info"><i class="fas fa-plus-circle"></i> Order</a>
+                <a href="cafe/order/new" class="btn btn-info"><i class="fas fa-plus-circle"></i> Order</a>
             </div>
             <p class="mb-1">View your currently active orders, or place a new one.</p>
           </li>
@@ -73,7 +73,9 @@
                     <% } %>
                   </ul>
                   <p style="margin-top: 10px;"><em><%= order.date %></em></p>
-                  <button type="button" class="btn btn-danger"><a style="text-decoration: none; color: inherit;" href="cafe/delete_order/<%= order._id %>">Cancel Order</a></button>
+                  <form action="cafe/order/<%= order._id %>?_method=delete" method="post">
+                    <button type="button" class="btn btn-danger"><a style="text-decoration: none; color: inherit;">Cancel Order</a></button>
+                  </form>
                 </li>
               <% } %>
             <% }); %>

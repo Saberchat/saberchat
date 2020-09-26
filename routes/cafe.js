@@ -38,7 +38,7 @@ router.get('/menu', middleware.isLoggedIn, (req, res) => {
   })
 })
 
-router.get('/new', [middleware.isLoggedIn, middleware.cafeOpen], (req, res) => {
+router.get('/order/new', [middleware.isLoggedIn, middleware.cafeOpen], (req, res) => {
 
   Type.find({}).populate('items').exec((err, foundTypes) => {
     if (err || !foundTypes) {
@@ -129,7 +129,7 @@ router.get('/orders', middleware.isLoggedIn, (req, res) => {
   });
 });
 
-router.get('/delete_order/:id', [middleware.isLoggedIn, middleware.cafeOpen], (req, res) => {
+router.delete('/order/:id', [middleware.isLoggedIn, middleware.cafeOpen], (req, res) => {
 
   Order.findByIdAndDelete(req.params.id).populate('items').exec((err, foundOrder) => {
     if (err || !foundOrder) {
@@ -214,7 +214,7 @@ router.get('/manage', middleware.isLoggedIn, middleware.isMod, (req, res) => {
   })
 });
 
-router.get('/newOrderItem', middleware.isLoggedIn, middleware.isMod, (req, res) => {
+router.get('/item/new', middleware.isLoggedIn, middleware.isMod, (req, res) => {
   Type.find({}, (err, foundTypes) => {
     if (err || !foundTypes) {
       req.flash('error', "Unable to access database")
@@ -225,7 +225,7 @@ router.get('/newOrderItem', middleware.isLoggedIn, middleware.isMod, (req, res) 
   })
 });
 
-router.post('/newOrderItem', middleware.isLoggedIn, middleware.isMod, (req, res) => {
+router.post('/item', middleware.isLoggedIn, middleware.isMod, (req, res) => {
   Item.create({}, (err, item) => {
     if (err) {
       console.log(err);
@@ -263,13 +263,14 @@ router.post('/newOrderItem', middleware.isLoggedIn, middleware.isMod, (req, res)
   });
 });
 
-router.get('/deleteItems', middleware.isLoggedIn, middleware.isMod, (req, res) => {
-  res.render('cafe/deleteitems')
-});
-
-router.delete('/deleteItems', middleware.isLoggedIn, middleware.isMod, (req, res) => {
+// NOT BEING USED
+// router.get('/deleteItems', middleware.isLoggedIn, middleware.isMod, (req, res) => {
+//   res.render('cafe/deleteitems')
+// });
+//
+// router.delete('/deleteItems', middleware.isLoggedIn, middleware.isMod, (req, res) => {
   // Checkboxes
-});
+// });
 
 router.get('/item/:id', middleware.isLoggedIn, middleware.isMod, (req, res) => {
   Item.findOne({_id: req.params.id}, (err, foundItem) => {
@@ -290,7 +291,7 @@ router.get('/item/:id', middleware.isLoggedIn, middleware.isMod, (req, res) => {
   })
 });
 
-router.put('/item/:id/update', middleware.isLoggedIn, middleware.isMod, (req, res) => {
+router.put('/item/:id', middleware.isLoggedIn, middleware.isMod, (req, res) => {
   Item.findByIdAndUpdate(req.params.id, {
     name: req.body.name,
     price: parseFloat(req.body.price),
@@ -356,7 +357,7 @@ router.put('/item/:id/update', middleware.isLoggedIn, middleware.isMod, (req, re
   })
 });
 
-router.delete('/item/:id/delete', middleware.isLoggedIn, middleware.isMod, (req, res) => {
+router.delete('/item/:id', middleware.isLoggedIn, middleware.isMod, (req, res) => {
   Item.findByIdAndDelete(req.params.id, (err, item) => {
     if (err || !item) {
       req.flash('error', 'Could not delete item');
