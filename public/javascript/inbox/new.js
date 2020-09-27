@@ -32,31 +32,25 @@ function updateTo(check) {
 function addRecipient() {
     const id = userSelect.value;
     const username = userSelect.options[userSelect.selectedIndex].text;
-    recipients.push({id: id, username: username});
+    recipients.push(id);
 
-    refreshDisplay();
+    const tag = document.createElement('div');
+    tag.classList.add('user-tag');
+    tag.innerHTML = `<span>${username}</span>
+    <button type="button" id="${id}" onclick="remRecipient(this)">&times;</button>`;
+
+    userDisplay.appendChild(tag);
+    userSelect.value = '';
+    console.log(recipients)
 }
 
 // remove recipients
-function remReicipient(id) {
-    const user = recipients.find(user => user.id === id);
-    const i = recipients.indexOf(user);
+function remRecipient(btn) {
+    const id = btn.id;
+    const i = recipients.indexOf(id);
     recipients.splice(i, 1);
 
-    refreshDisplay();
-}
-
-// refreshes user-list display
-function refreshDisplay() {
-    userDisplay.innerHTML = '';
-    for (let i = 0; i < recipients.length; i++) {
-        const id = recipients[i];
-
-        const tag = document.createElement('div');
-        tag.classList.add('user-tag');
-        tag.innerHTML = `<span>${username}</span>
-        <button type="button" onclick="remRecipient(${id})">&times;</button>`;
-
-        userDisplay.appendChild(tag);
-    }
+    const parent = btn.parentNode;
+    parent.remove();
+    console.log(recipients)
 }

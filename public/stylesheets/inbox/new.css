@@ -37,6 +37,7 @@
     display: inline-block;
     overflow: hidden;
     height: 2.3rem;
+    margin-right: 0.5rem;
 }
 
 .user-tag span {

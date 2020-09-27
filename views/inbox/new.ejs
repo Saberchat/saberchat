@@ -42,12 +42,7 @@
                         <option value="<%= user._id %>"><%= user.username %> (<%= user.firstName.charAt(0) %>.<%= user.lastName.charAt(0) %>.)</option>
                       <% }) %> 
                     </select>
-                    <div id="user-display">
-                      <div class="user-tag">
-                        <span>Username</span>
-                        <button type="button" onclick="remRecipient(555)">&times;</button>
-                      </div>
-                    </div>
+                    <div id="user-display"></div>
                   </div>
                   <div class="form-check">
                     <input onchange="updateTo(this)" type="checkbox" class="form-check-input" name="all" value="true" id="all">
