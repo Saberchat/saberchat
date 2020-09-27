@@ -47,6 +47,18 @@
     padding-bottom: 0.2rem;
     padding-left: 1rem;
     padding-right: 0.5rem;
+    vertical-align: middle;
+
+    max-width: 15rem;
+    overflow-x: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
+@media (max-width: 330px) {
+    .user-tag span {
+        max-width: 7rem;
+    }
 }
 
 .user-tag button {

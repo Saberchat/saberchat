@@ -1,7 +1,11 @@
 const form = document.getElementById('message-form');
 
 const userSelect = document.getElementById('user-select');
+const facultySelect = document.getElementById('faculty-select');
 const userDisplay = document.getElementById('user-display');
+
+const defaultMsg = document.getElementById('default-msg');
+const anonyMsg = document.getElementById('anony-msg');
 
 let recipients = [];
 
@@ -28,28 +32,65 @@ function updateTo(check) {
     }
 }
 
+// toggles anonymous messgaing
+function setAnonymous(check) {
+    if(check.checked) {
+        userSelect.required = false;
+        defaultMsg.style.display = 'none';
+
+        facultySelect.required = true;
+        anonyMsg.style.display = 'static';
+
+        recipients = [];
+        const tags = document.getElementsByClassName('user-tag');
+        console.log(tags);
+        if(tags && tags.length > 0) {
+            for (let i = 0; i < tags.length; i++) {
+                const tag = tags[i];
+                tag.remove();
+            }
+        }
+        facultySelect.value = '';
+    } else {
+        userSelect.required = true;
+        defaultMsg.style.display = 'static';
+
+        facultySelect.required = false;
+        anonyMsg.style.display = 'none';
+
+        recipients = [];
+        const tags = document.getElementsByClassName('user-tag');
+        tags.forEach(tag => {tag.remove()});
+        userSelect.value = '';
+    }
+}
+
 // adds recipients to list
 function addRecipient() {
     const id = userSelect.value;
-    const username = userSelect.options[userSelect.selectedIndex].text;
-    recipients.push(id);
+    if(!recipients.includes(id)) {
+        const username = userSelect.options[userSelect.selectedIndex].text;
+        recipients.push(id);
 
-    const tag = document.createElement('div');
-    tag.classList.add('user-tag');
-    tag.innerHTML = `<span>${username}</span>
-    <button type="button" id="${id}" onclick="remRecipient(this)">&times;</button>`;
+        const tag = document.createElement('div');
+        tag.classList.add('user-tag');
+        tag.innerHTML = `<span>${username}</span>
+        <button type="button" id="${id}" onclick="remRecipient(this)">&times;</button>`;
 
-    userDisplay.appendChild(tag);
+        userDisplay.appendChild(tag);
+        
+        console.log(recipients)
+    }
     userSelect.value = '';
-    console.log(recipients)
 }
 
 // remove recipients
 function remRecipient(btn) {
     const id = btn.id;
     const i = recipients.indexOf(id);
-    recipients.splice(i, 1);
-
+    if(i) {
+        recipients.splice(i, 1);
+    }
     const parent = btn.parentNode;
     parent.remove();
     console.log(recipients)
