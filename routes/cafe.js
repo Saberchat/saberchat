@@ -151,21 +151,17 @@ router.delete('/order/:id', [middleware.isLoggedIn, middleware.cafeOpen], (req, 
 
 router.post('/:id/ready', middleware.isLoggedIn, (req, res) => {
 
-  Order.findById(req.params.id)
-  .populate('items')
-  .populate('customer')
-  .exec((err, foundOrder) => {
-    if (err || !foundOrder) {
-      console.log(err);
-      req.flash('error', "Could not find order");
-      res.redirect('/cafe/orders');
+  (async () => {
+    const order = await Order.findById(req.params.id).populate('items').populate('customer');
+    if (!order) {
+      req.flash('error', 'Could not find order'); return res.redirect('/cafe/orders');
 
     } else {
 
-      foundOrder.present = false;
-      foundOrder.save();
+      order.present = false;
+      order.save()
 
-      Notification.create({subject: "Cafe Order Ready", sender: req.user, recipients: [foundOrder.customer], read: [false], toEveryone: false, images: []}, (err, notif) => {
+      Notification.create({subject: "Cafe Order Ready", sender: req.user, recipients: [order.customer], read: [false], toEveryone: false, images: []}, (err, notif) => {
         if (err) {
           req.flash('error', "Could not create notif");
           console.log(err);
@@ -176,30 +172,35 @@ router.post('/:id/ready', middleware.isLoggedIn, (req, res) => {
           notif.date = dateFormat(notif.created_at, "mmm d, h:MMTT");
 
           let itemText = [];
-          for (var i = 0; i < foundOrder.items.length; i++) {
-            itemText.push(` - ${foundOrder.items[i].name}: ${foundOrder.quantities[i]} order(s)`);
+          for (var i = 0; i < order.items.length; i++) {
+            itemText.push(` - ${order.items[i].name}: ${order.quantities[i]} order(s)`);
           }
 
-          if (!foundOrder.charge.toString().includes('.')) {
-            notif.text = "Your order is ready:\n" + itemText.join("\n") + "\n\nExtra Instructions: " + foundOrder.instructions + "\nTotal Cost: $" + foundOrder.charge + ".00";
+          if (!order.charge.toString().includes('.')) {
+            notif.text = "Your order is ready:\n" + itemText.join("\n") + "\n\nExtra Instructions: " + order.instructions + "\nTotal Cost: $" + order.charge + ".00";
 
-          } else if (foundOrder.charge.toString().split('.')[1].length == 1){
-            notif.text = "Your order is ready:\n" + itemText.join("\n") + "\n\nExtra Instructions: " + foundOrder.instructions + "\nTotal Cost: $" + foundOrder.charge + "0";
+          } else if (order.charge.toString().split('.')[1].length == 1){
+            notif.text = "Your order is ready:\n" + itemText.join("\n") + "\n\nExtra Instructions: " + order.instructions + "\nTotal Cost: $" + order.charge + "0";
 
           } else {
-            notif.text = "Your order is ready:\n" + itemText.join("\n") + "\n\nExtra Instructions: " + foundOrder.instructions + "\nTotal Cost: $" + foundOrder.charge + "";
+            notif.text = "Your order is ready:\n" + itemText.join("\n") + "\n\nExtra Instructions: " + order.instructions + "\nTotal Cost: $" + order.charge + "";
           }
 
           notif.save();
-          foundOrder.customer.inbox.push(notif);
-          foundOrder.customer.notifCount += 1
-          foundOrder.customer.save();
+          order.customer.inbox.push(notif);
+          order.customer.notifCount += 1
+          order.customer.save();
 
           res.redirect('/cafe/orders');
         }
       });
     }
-  });
+
+  })().catch(err => {
+    console.log(err)
+    req.flash('error', "Unable to access database")
+    res.redirect('back')
+  })
 });
 
 router.get('/manage', middleware.isLoggedIn, middleware.isMod, (req, res) => {
@@ -438,13 +439,15 @@ router.get('/type/new', [middleware.isLoggedIn, middleware.isMod], (req, res) =>
 })
 
 router.post('/type', [middleware.isLoggedIn, middleware.isMod], (req, res) => { // RESTful route "Create" for type
-  Type.find({name: req.body.name}, (err, foundTypes) => {
-    if (err || !foundTypes) {
-      req.flash('error', "Unable to access database")
+
+  ( async() => {
+    const foundTypes = await Type.find({name: req.body.name});
+
+    if (!foundTypes) {
+      req.flash('error', "Unable to find item types")
       res.redirect('back')
 
     } else if (foundTypes.length == 0) {
-
       Type.create({name: req.body.name, items: []}, (err, type) => {
         if (err) {
           console.log(err)
@@ -453,13 +456,15 @@ router.post('/type', [middleware.isLoggedIn, middleware.isMod], (req, res) => { 
 
         } else {
 
-          Type.find({}, (err, foundTypes) => {
-            if (err || !foundTypes) {
-              req.flash('error', "Unable to access database");
-              res.redirect('back')
+          (async() => {
+            const ft = await Type.find({}); //Found types, but represents all item types
+            if (!ft) {
+              req.flash('error', "Could not find item types");
+              res.redirect('back');
 
             } else {
-              for (let t of foundTypes) {
+
+              for (let t of ft) {
                 for (let i = 0; i < t.items.length; i += 1) {
                   if(req.body[t.items[i].toString()]) {
                     t.items.splice(i, 1)
@@ -467,28 +472,41 @@ router.post('/type', [middleware.isLoggedIn, middleware.isMod], (req, res) => { 
                 }
                 t.save()
               }
-            }
-          })
 
-          Item.find({}, (err, foundItems) => {
-            if (err || !foundItems) {
-              req.flash('error', "Unable to access database");
-              res.redirect('back')
+              (async() => {
+                const foundItems = await Item.find({});
+                if (!foundItems) {
+                  req.flash('error', 'Could not find items')
+                  res.redirect('back')
 
-            } else {
-              for (let item of foundItems) {
-                console.log(req.body[item._id])
-                if(req.body[item._id.toString()]) {
-                  console.log(item)
-                  type.items.push(item)
+                } else {
+
+                  for (let item of foundItems) {
+                    console.log(req.body[item._id])
+                    if(req.body[item._id.toString()]) {
+                      console.log(item)
+                      type.items.push(item)
+                    }
+                  }
+
+                  type.save()
                 }
-              }
-              type.save()
-            }
-          })
 
-          req.flash('success', "Item Created!")
-          res.redirect('/cafe/manage')
+              })().catch(err => {
+                console.log(err)
+                req.flash('error', "Unable to access database")
+                res.redirect('back')
+              })
+
+              req.flash('success', "Item Category Created!")
+              res.redirect('/cafe/manage')
+            }
+
+          })().catch(err => {
+            console.log(err)
+            req.flash('error', "Unable to access database")
+            res.redirect('back')
+          })
         }
       })
 
@@ -496,6 +514,11 @@ router.post('/type', [middleware.isLoggedIn, middleware.isMod], (req, res) => { 
       req.flash('error', "Item type already in database.")
       res.redirect('back')
     }
+
+  })().catch(err => {
+    console.log(err)
+    req.flash('error', "Unable to access database")
+    res.redirect('back')
   })
 })
 
@@ -520,71 +543,89 @@ router.get('/type/:id', [middleware.isLoggedIn, middleware.isMod], (req, res) =>
 });
 
 router.put('/type/:id', [middleware.isLoggedIn, middleware.isMod], (req, res) => { // RESTful route "Update" for type
-  Type.findByIdAndUpdate(req.params.id, {name: req.body.name}, (err, type) => {
-    if (err || !type) {
+
+  Type.find({_id: {$ne: req.params.id}, name: req.body.name}, (err, foundTypes) => {
+
+    if (err || !foundTypes) {
       req.flash('error', "Unable to access database")
-      res.redirect('back')
 
-    } else {
-      Type.find({_id: {$ne: type._id}}, (err, foundTypes) => {
+    } else if (foundTypes.length == 0) {
 
-        if (err || !foundTypes) {
-          req.flash('error', "Unable to access database");
-          res.redirect('back')
-
-        } else {
-          for (let type of foundTypes) {
-            for (let i = 0; i < type.items.length; i += 1) {
-              if(req.body[type.items[i].toString()]) {
-                type.items.splice(i, 1)
-              }
-            }
-            type.save()
-          }
-        }
-      })
-
-      Item.find({}, (err, foundItems) => {
-
-        if (err || !foundItems) {
+      Type.findByIdAndUpdate(req.params.id, {name: req.body.name}, (err, type) => {
+        if (err || !type) {
           req.flash('error', "Unable to access database")
           res.redirect('back')
 
         } else {
+          Type.find({_id: {$ne: type._id}}, (err, foundTypes) => {
 
-          for (let item of type.items) {
-            if (!req.body[item._id.toString()]) { //Item is no longer checked
+            if (err || !foundTypes) {
+              req.flash('error', "Unable to access database");
+              res.redirect('back')
 
-              Type.findOne({name: 'Other'}, (err, foundType) => {
+            } else {
 
-                if (err || !foundType) {
-                  req.flash('error', "Unable to access database")
-                  res.redirect('back')
+              for (let type of foundTypes) {
 
-                } else {
-                  foundType.items.push(item)
-                  foundType.save()
+                for (let i = 0; i < type.items.length; i += 1) {
+                  if(req.body[type.items[i].toString()]) {
+                    type.items.splice(i, 1)
+                  }
                 }
-              })
+
+                type.save()
+              }
             }
-          }
+          })
 
-          type.items = []
+          Item.find({}, (err, foundItems) => {
 
-          for (let item of foundItems) {
-            if(req.body[item._id.toString()]) {
-              type.items.push(item)
+            if (err || !foundItems) {
+              req.flash('error', "Unable to access database")
+              res.redirect('back')
+
+            } else {
+
+              for (let item of type.items) {
+                if (!req.body[item._id.toString()]) { //Item is no longer checked
+
+                  Type.findOne({name: 'Other'}, (err, foundType) => {
+
+                    if (err || !foundType) {
+                      req.flash('error', "Unable to access database")
+                      res.redirect('back')
+
+                    } else {
+                      foundType.items.push(item)
+                      foundType.save()
+                    }
+                  })
+                }
+              }
+
+              type.items = []
+
+              for (let item of foundItems) {
+                if(req.body[item._id.toString()]) {
+                  type.items.push(item)
+                }
+              }
+
+              type.save()
             }
-          }
+          })
 
-          type.save()
+          req.flash('success', "Item type updated!")
+          res.redirect('/cafe/manage')
         }
       })
 
-      req.flash('success', "Item type updated!")
-      res.redirect('/cafe/manage')
+    } else {
+      req.flash('error', "Item already in database")
+      res.redirect('back')
     }
   })
+
 })
 
 router.delete('/type/:id', [middleware.isLoggedIn, middleware.isMod], (req, res) => { //// RESTful route "Destroy" for type
