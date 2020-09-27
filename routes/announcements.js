@@ -66,7 +66,7 @@ router.post('/', middleware.isLoggedIn, middleware.isAdmin, (req, res) => {
         announcement.images.push(req.body.images[image]);
       }
     }
-    announcement.date = dateFormat(announcement.created_at, "mmm d, h:MMTT");
+    announcement.date = dateFormat(announcement.created_at, "h:MMTT | mmm d");
     announcement.save();
 
     req.flash('success', 'Announcement posted to bulletin!');

@@ -37,7 +37,7 @@
             <div class="ann-head">
               <h1><%= announcement.subject %></h1>
               <p>Posted by <%= announcement.sender.username %></p>
-              <span><%=announcement.date.split(', ')[1]%> | <%=announcement.date.split(', ')[0]%></span>
+              <span><%=announcement.date%></span>
               <% if(announcement.sender._id.equals(currentUser._id)) { %>
                 <form action="/announcements/<%= announcement._id %>?_method=delete" method="post" id="delete-form">
                   <button type="submit" class="btn btn-danger"><i class="far fa-trash-alt"></i> Delete</button>
