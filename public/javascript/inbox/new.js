@@ -16,12 +16,16 @@ let recipients = [];
 
 // processes all the selected recipients into form info
 function process() {
+    if(!recipients.length > 0) {
+        return false;
+    }
     const input = document.createElement('input');
     input.type = 'text';
     input.name = 'recipients';
-    input.value = 'joe';
+    input.value = JSON.stringify(recipients);
     input.style.display = 'none';
     form.appendChild(input);
+    return true;
 }
 
 // toggles recipients selection
@@ -40,7 +44,7 @@ function updateTo(everyoneCheck) {
     }
 }
 
-// toggles anonymous messgaing
+// toggles anonymous messaging
 function setAnonymous(check) {
     if(check.checked) {
         userSelect.required = false;
@@ -80,16 +84,15 @@ function addRecipient(type) {
     if(type == 'user') {
         const id = userSelect.value;
         addTag(userSelect, id);
-        userSelect.value = '';
     } else if(type == 'faculty') {
         const id = facultySelect.value;
         addTag(facultySelect, id);
-        facultySelect.value = '';
     }
 }
 
 // adds the user tag to the display
 function addTag(select, id) {
+    console.log(recipients);
     if(!recipients.includes(id)) {
         const username = select.options[select.selectedIndex].text;
         recipients.push(id);
@@ -107,7 +110,7 @@ function addTag(select, id) {
 function remRecipient(btn) {
     const id = btn.id;
     const i = recipients.indexOf(id);
-    if(i) {
+    if(i > -1) {
         recipients.splice(i, 1);
     }
     const parent = btn.parentNode;

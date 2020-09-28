@@ -32,7 +32,7 @@
           <div class="col-md-8 offset-md-2 col-12">
             <div class="form-container">
               <h1>New Message</h1>
-              <form action="/inbox/messages" method="post" onsubmit="process()" id="message-form">
+              <form action="/inbox/messages" method="post" onsubmit="return process();" id="message-form">
                 <div id="to-block">
                   <div id="default-msg">
                     <div class="form-group">
@@ -51,7 +51,7 @@
                   <div id="anony-msg">
                     <div class="form-group">
                       <label for="faculty-select" class="label-custom">Recipients</label>
-                      <select id="faculty-select" class="form-control" onchange="addRecipient('faculty')" required>
+                      <select id="faculty-select" class="form-control" onchange="addRecipient('faculty')">
                         <option value="" selected disabled>Select Faculty</option>
                         <% users.forEach(user => { %>
                           <% if(!user._id.equals(currentUser._id) && user.status == 'faculty') { %> 
