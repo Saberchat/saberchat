@@ -7,6 +7,11 @@ const userDisplay = document.getElementById('user-display');
 const defaultMsg = document.getElementById('default-msg');
 const anonyMsg = document.getElementById('anony-msg');
 
+const everyoneCheck = document.getElementById('everyone-check');
+
+const anonymousCheck = document.getElementById('anonymous-check');
+const anonymousControl = document.getElementById('anonymous-control');
+
 let recipients = [];
 
 // processes all the selected recipients into form info
@@ -20,15 +25,18 @@ function process() {
 }
 
 // toggles recipients selection
-function updateTo(check) {
-    if(check.checked) {
+function updateTo(everyoneCheck) {
+    if(everyoneCheck.checked) {
         userSelect.required = false;
-        userSelect.style.display = 'none';
+        facultySelect.required = false;
+        defaultMsg.style.display = 'none';
+        anonyMsg.style.display = 'none';
         userDisplay.style.display = 'none';
+        anonymousControl.style.display = 'none';
     } else {
-        userSelect.required = true;
-        userSelect.style.display = '';
-        userDisplay.style.display = '';
+        setAnonymous(anonymousCheck);
+        anonymousControl.style.display = 'block';
+        userDisplay.style.display = 'block';
     }
 }
 
@@ -39,37 +47,51 @@ function setAnonymous(check) {
         defaultMsg.style.display = 'none';
 
         facultySelect.required = true;
-        anonyMsg.style.display = 'static';
+        anonyMsg.style.display = 'block';
 
         recipients = [];
-        const tags = document.getElementsByClassName('user-tag');
-        console.log(tags);
-        if(tags && tags.length > 0) {
-            for (let i = 0; i < tags.length; i++) {
-                const tag = tags[i];
-                tag.remove();
-            }
-        }
+        clearTags();
         facultySelect.value = '';
+
     } else {
         userSelect.required = true;
-        defaultMsg.style.display = 'static';
+        defaultMsg.style.display = 'block';
 
         facultySelect.required = false;
         anonyMsg.style.display = 'none';
 
         recipients = [];
-        const tags = document.getElementsByClassName('user-tag');
-        tags.forEach(tag => {tag.remove()});
+        clearTags();
         userSelect.value = '';
     }
 }
 
+// clears user tags
+function clearTags() {
+    const tags = document.getElementsByClassName('user-tag');
+
+    while (tags[0]) {
+        tags[0].parentNode.removeChild(tags[0]);
+    }
+}
+
 // adds recipients to list
-function addRecipient() {
-    const id = userSelect.value;
+function addRecipient(type) {
+    if(type == 'user') {
+        const id = userSelect.value;
+        addTag(userSelect, id);
+        userSelect.value = '';
+    } else if(type == 'faculty') {
+        const id = facultySelect.value;
+        addTag(facultySelect, id);
+        facultySelect.value = '';
+    }
+}
+
+// adds the user tag to the display
+function addTag(select, id) {
     if(!recipients.includes(id)) {
-        const username = userSelect.options[userSelect.selectedIndex].text;
+        const username = select.options[select.selectedIndex].text;
         recipients.push(id);
 
         const tag = document.createElement('div');
@@ -78,10 +100,7 @@ function addRecipient() {
         <button type="button" id="${id}" onclick="remRecipient(this)">&times;</button>`;
 
         userDisplay.appendChild(tag);
-        
-        console.log(recipients)
     }
-    userSelect.value = '';
 }
 
 // remove recipients
@@ -92,6 +111,5 @@ function remRecipient(btn) {
         recipients.splice(i, 1);
     }
     const parent = btn.parentNode;
-    parent.remove();
-    console.log(recipients)
+    parent.parentNode.removeChild(parent);
 }

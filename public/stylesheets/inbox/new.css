@@ -8,6 +8,7 @@
 .form-container h1 {
     text-align: center;
     font-size: 2rem;
+    margin-bottom: 1.5rem;
 }
 
 .form-container .form-group label {
@@ -25,9 +26,14 @@
     height: 15px;
 }
 
+#anony-msg {
+    display: none;
+}
+
 /* user tags */
 #user-display {
     padding-top: 1rem;
+    padding-bottom: 2rem;
 }
 
 .user-tag {

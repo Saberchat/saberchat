@@ -37,7 +37,7 @@
                   <div id="default-msg">
                     <div class="form-group">
                       <label for="user-select" class="label-custom">Recipients</label>
-                      <select id="user-select" class="form-control" onchange="addRecipient()" required>
+                      <select id="user-select" class="form-control" onchange="addRecipient('user')" required>
                         <option value="" selected disabled>Select User</option>
                         <% users.forEach(user => { %>
                           <% if(!user._id.equals(currentUser._id)) { %> 
@@ -51,7 +51,7 @@
                   <div id="anony-msg">
                     <div class="form-group">
                       <label for="faculty-select" class="label-custom">Recipients</label>
-                      <select id="faculty-select" class="form-control" onchange="addRecipient()" required>
+                      <select id="faculty-select" class="form-control" onchange="addRecipient('faculty')" required>
                         <option value="" selected disabled>Select Faculty</option>
                         <% users.forEach(user => { %>
                           <% if(!user._id.equals(currentUser._id) && user.status == 'faculty') { %> 
@@ -64,13 +64,14 @@
 
                   <div id="user-display"></div>
 
-                  <div class="form-check" id="everyone-check">
-                    <input onchange="updateTo(this)" type="checkbox" class="form-check-input" name="all" value="true" id="all">
-                    <label class="form-check-label" for="all">Send to everyone</label>
+                  <div class="form-check" id="anonymous-control">
+                    <input onchange="setAnonymous(this)" type="checkbox" class="form-check-input" name="anonymous" value="true" id="anonymous-check">
+                    <label class="form-check-label" for="anonymous-check">Send Anonymously</label>
                   </div>
-                  <div class="form-check" id="anonymous-check">
-                    <input onchange="setAnonymous(this)" type="checkbox" class="form-check-input" name="anonymous" value="true" id="anonymous">
-                    <label class="form-check-label" for="anonymous">Send Anonymously</label>
+
+                  <div class="form-check">
+                    <input onchange="updateTo(this)" type="checkbox" class="form-check-input" name="all" value="true" id="all-check">
+                    <label class="form-check-label" for="all-check">Send to everyone</label>
                   </div>
                 </div>
                 
