@@ -2,6 +2,9 @@ const express = require('express');
 const middleware = require('../middleware');
 const router = express.Router(); //start express router
 const dateFormat = require('dateformat');
+const Filter = require('bad-words');
+const filter = new Filter();
+
 const User = require('../models/user');
 const Notification = require('../models/notification');
 const AccessReq = require('../models/accessRequest');
@@ -48,7 +51,31 @@ router.get('/messages/new', middleware.isLoggedIn, (req, res) => {
 router.post('/messages', middleware.isLoggedIn, (req, res) => {
 	console.log('-------Req------');
 	console.log(req.body);
-	res.redirect('back');
+	( async () => {
+		let request = {
+			subject: filter.clean(req.body.subject),
+			message: filter.clean(req.body.message)
+		}
+		
+		if(req.body.images) {
+			request.images = req.body.images;
+		}
+
+		if(req.body.all == 'true') {
+
+		} else if(!req.body.recipients || !req.body.recipients > 0) {
+			req.flash('error', 'Please select recipients');
+			res.redirect('back');
+		} else if(req.body.anonymous == 'true') {
+	
+		}
+		res.redirect('back');
+
+	})().catch(err => {
+		req.flash('error', 'An error occured');
+		res.redirect('back');
+	});
+	
 	// if(!req.body.recipient_list || req.body.recipient_list.length == 0) {
 	// 	req.flash('error', 'Please select recipients');
 	// 	return res.redirect('back');
