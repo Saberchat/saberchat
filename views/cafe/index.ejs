@@ -72,6 +72,18 @@
                       </li>
                     <% } %>
                   </ul>
+
+                  <br /><strong>Extra Instructions: </strong><span>
+
+                  <% if (order.instructions != "") {%>
+                    <%=order.instructions%>
+
+                  <% } else { %>
+                    None
+                  <% } %>
+
+                  </span>
+
                   <p style="margin-top: 10px;"><em><%= order.date %></em></p>
                   <form action="cafe/order/<%=order._id%>?_method=delete" method="post">
                     <button type="submit" class="btn btn-danger"><a style="text-decoration: none; color: inherit;">Cancel Order</a></button>

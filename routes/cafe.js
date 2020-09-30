@@ -156,6 +156,9 @@ router.post('/:id/ready', middleware.isLoggedIn, (req, res) => {
     const order = await Order.findById(req.params.id).populate('items').populate('customer');
     if (!order) {
       req.flash('error', 'Could not find order'); return res.redirect('/cafe/orders');
+
+    } else if (order.customer._id.toString() == req.user._id.toString()) {
+      req.flash('error', 'You cannot confirm your own orders'); return res.redirect('/cafe/orders');
     }
 
     order.present = false;
@@ -174,13 +177,13 @@ router.post('/:id/ready', middleware.isLoggedIn, (req, res) => {
       }
 
       if (!order.charge.toString().includes('.')) {
-        notif.text = "Your order is ready:\n" + itemText.join("\n") + "\n\nExtra Instructions: " + order.instructions + "\nTotal Cost: $" + order.charge + ".00";
+        notif.text = "Your order is ready to pick up:\n" + itemText.join("\n") + "\n\nExtra Instructions: " + order.instructions + "\nTotal Cost: $" + order.charge + ".00";
 
       } else if (order.charge.toString().split('.')[1].length == 1){
-        notif.text = "Your order is ready:\n" + itemText.join("\n") + "\n\nExtra Instructions: " + order.instructions + "\nTotal Cost: $" + order.charge + "0";
+        notif.text = "Your order is ready to pick up:\n" + itemText.join("\n") + "\n\nExtra Instructions: " + order.instructions + "\nTotal Cost: $" + order.charge + "0";
 
       } else {
-        notif.text = "Your order is ready:\n" + itemText.join("\n") + "\n\nExtra Instructions: " + order.instructions + "\nTotal Cost: $" + order.charge + "";
+        notif.text = "Your order is ready to pick up:\n" + itemText.join("\n") + "\n\nExtra Instructions: " + order.instructions + "\nTotal Cost: $" + order.charge + "";
       }
 
       await notif.save();
@@ -189,6 +192,7 @@ router.post('/:id/ready', middleware.isLoggedIn, (req, res) => {
       order.customer.notifCount += 1
       await order.customer.save();
 
+      req.flash('success', 'Notification sent to customer! If they do not arrive within 5 minutes, try contacting them again')
       res.redirect('/cafe/orders');
 
   })().catch(err => {
@@ -308,117 +312,128 @@ router.post('/item', middleware.isLoggedIn, middleware.isMod, (req, res) => {
 // });
 
 router.get('/item/:id', middleware.isLoggedIn, middleware.isMod, (req, res) => {
-  Item.findOne({_id: req.params.id}, (err, foundItem) => {
-    if (err || !foundItem) {
-      req.flash('error', "Unable to access database")
-      res.redirect('back')
 
-    } else {
-      Type.find({}, (err, foundTypes) => {
-        if (err || !foundTypes) {
-          req.flash('error', "Unable to access database")
+  (async() => {
 
-        } else {
-          res.render('cafe/show.ejs', {types: foundTypes, item: foundItem})
-        }
-      });
+    const item = await Item.findById(req.params.id);
+
+    if (!item) {
+      req.flash('error', "Unable to find item"); return res.redirect('back')
     }
+
+    const types = await Type.find({});
+    if (!types) {
+      req.flash('error', "Unable to find item types"); return res.redirect('back')
+    }
+
+    res.render('cafe/show.ejs', {types, item})
+
+  })().catch(err => {
+    console.log(err)
+    req.flash('error', "Unable to access database")
+    res.redirect('back')
   })
 });
 
 router.put('/item/:id', middleware.isLoggedIn, middleware.isMod, (req, res) => {
-  Item.findByIdAndUpdate(req.params.id, {
-    name: req.body.name,
-    price: parseFloat(req.body.price),
-    availableItems: parseInt(req.body.available),
-    isAvailable: (parseInt(req.body.available) > 0),
-    description: req.body.description,
-    imgUrl: req.body.image
-  }, (err, foundItem) => {
 
-    if (err || !foundItem) {
-      req.flash('error', 'item not found');
-      res.redirect('back')
+  (async() => {
 
-    } else {
+    const item = await Item.findByIdAndUpdate(req.params.id, {
+      name: req.body.name,
+      price: parseFloat(req.body.price),
+      availableItems: parseInt(req.body.available),
+      isAvailable: (parseInt(req.body.available) > 0),
+      description: req.body.description,
+      imgUrl: req.body.image
+    });
 
-      Order.find({present:true}).populate('items').exec((err, foundOrders) => {
-        if (err || !foundOrders) {
-          req.flash('error', "Unable to access database")
-          res.redirect('back')
-
-        } else {
-
-          for (let order of foundOrders) {
-            order.charge = 0
-
-            for (let i = 0; i < order.items.length; i += 1) {
-              order.charge += order.items[i].price * order.quantities[i]
-            }
-            order.save()
-          }
-        }
-      })
-
-      Type.find({name: {$ne: req.body.type}}, (err, foundTypes) => {
-        if (err || !foundTypes) {
-          req.flash('error', "Unable to access database")
-          res.redirect('back')
-
-        } else {
-
-          for (let type of foundTypes) {
-            if (type.items.includes(foundItem._id)) {
-              type.items.splice(type.items.indexOf(foundItem._id), 1)
-            }
-
-            type.save()
-          }
-        }
-      })
-
-      Type.findOne({name: req.body.type}, (err, foundType) => {
-        if (foundType.items.includes(foundItem._id)) {
-          foundType.items.splice(foundType.items.indexOf(foundItem._id), 1)
-        }
-
-        foundType.items.push(foundItem)
-        foundType.save()
-      })
-
-      req.flash('success', "Item updated!")
-      res.redirect('/cafe/manage');
+    if (!item) {
+      req.flash('error', 'item not found'); return res.redirect('back');
     }
+
+    const activeOrders = await Order.find({present:true}).populate('items'); //Any orders that are active will need to change, to accomodate the item changes.
+
+    if (!activeOrders) {
+      req.flash('error', "Unable to find active orders"); return res.redirect('back');
+    }
+
+    for (let order of activeOrders) {
+      order.charge = 0
+
+      for (let i = 0; i < order.items.length; i += 1) {
+        order.charge += order.items[i].price * order.quantities[i]
+      }
+      await order.save()
+    }
+
+    const types = await Type.find({name: {$ne: req.body.type}})
+
+    if (!types) {
+      req.flash('error', "Unable to find item types"); return res.redirect('back')
+    }
+
+    for (let t of types) {
+      if (t.items.includes(item._id)) {
+        t.items.splice(t.items.indexOf(item._id), 1)
+      }
+
+      await t.save()
+    }
+
+    const type = await Type.findOne({name: req.body.type});
+
+    if (!type) {
+      req.flash('error', 'Unable to find item type')
+    }
+
+    if (type.items.includes(item._id)) { //If item is already in type, remove it so you can put the updated type back (we don't know whether the type will be there or not, so it's better to just cover all bases)
+      type.items.splice(type.items.indexOf(item._id), 1)
+    }
+
+    type.items.push(item)
+    await type.save()
+
+    req.flash('success', "Item updated!")
+    res.redirect('/cafe/manage');
+
+  })().catch(err => {
+    console.log(err)
+    req.flash('error', "Unable to access database")
+    res.redirect('back')
   })
 });
 
 router.delete('/item/:id', middleware.isLoggedIn, middleware.isMod, (req, res) => {
-  Item.findByIdAndDelete(req.params.id, (err, item) => {
-    if (err || !item) {
-      req.flash('error', 'Could not delete item');
-      res.redirect('back')
 
-    } else {
+  (async() => {
 
-      Type.find({}, (err, foundTypes) => {
-        if (err || !foundTypes) {
-          req.flash('error', "Could not delete item")
-          res.redirect('back')
+    const item = await Item.findByIdAndDelete(req.params.id);
 
-        } else {
-
-          for (let type of foundTypes) {
-            if (type.items.includes(item._id)) {
-              type.items.splice(type.items.indexOf(item._id), 1);
-              type.save();
-            }
-          }
-        }
-      })
-
-      req.flash('success', 'Deleted item');
-      res.redirect('/cafe/manage');
+    if (!item) {
+      req.flash('error', 'Could not delete item'); return res.redirect('back')
     }
+
+    const types = await Type.find({});
+
+    if (!types) {
+      req.flash('error', "Could not remove item from list of item types"); return res.redirect('back')
+    }
+
+    for (let type of types) {
+      if (type.items.includes(item._id)) {
+        type.items.splice(type.items.indexOf(item._id), 1);
+        await type.save();
+      }
+    }
+
+    req.flash('success', 'Deleted Item!');
+    res.redirect('/cafe/manage');
+
+  })().catch(err => {
+    console.log(err)
+    req.flash('error', "Unable to access database")
+    res.redirect('back')
   })
 });
 
@@ -497,23 +512,28 @@ router.post('/type', [middleware.isLoggedIn, middleware.isMod], (req, res) => { 
 })
 
 router.get('/type/:id', [middleware.isLoggedIn, middleware.isMod], (req, res) => { // RESTful route "Show/Edit" for type
-  Type.findById(req.params.id, (err, type) => {
-    if (err || !type) {
-      req.flash('error', "Unable to access database")
-      res.redirect('back')
 
-    } else {
-      Item.find({}, (err, foundItems) => {
-        if (err || !foundItems) {
-          req.flash('error', "Unable to access database")
-          res.redirect('back')
+  (async() => {
 
-        } else {
-          res.render('cafe/editItemType', {type, items: foundItems})
-        }
-      })
+    const type = await Type.findById(req.params.id);
+
+    if (!type) {
+      req.flash('error', "Unable to access database"); return res.redirect('back')
     }
-  })
+
+    const items = await Item.find({});
+
+    if (!items) {
+      req.flash('error', "Unable to access database"); return res.redirect('back');
+    }
+
+    res.render('cafe/editItemType', {type, items})
+
+  })().catch(err => {
+    console.log(err)
+    req.flash('error', "Unable to access database")
+    res.redirect('back')
+  });
 });
 
 router.put('/type/:id', [middleware.isLoggedIn, middleware.isMod], (req, res) => { // RESTful route "Update" for type
@@ -598,28 +618,34 @@ router.put('/type/:id', [middleware.isLoggedIn, middleware.isMod], (req, res) =>
 })
 
 router.delete('/type/:id', [middleware.isLoggedIn, middleware.isMod], (req, res) => { //// RESTful route "Destroy" for type
-  Type.findByIdAndDelete(req.params.id, (err, type) => {
-    if (err || !type) {
-      req.flash('error', "Unable to access database")
-      res.redirect('back')
 
-    } else {
+  (async() => {
 
-      Type.findOne({name: "Other"}, (err, foundType) => {
-        if (err || !foundType) {
-          req.flash('error', "Unable to access database")
+    const type = await Type.findByIdAndDelete(req.params.id);
 
-        } else {
-          for (let item of type.items) {
-            foundType.items.push(item)
-          }
-          foundType.save()
-        }
-      })
-
-      req.flash('success', "Item type deleted!")
-      res.redirect('/cafe/manage')
+    if (!type) {
+      req.flash('error', "Unable to find item type"); return res.redirect('back');
     }
+
+    const other = await Type.findOne({name: "Other"})
+
+      if (!other) {
+        req.flash('error', "Unable to find item type 'Other'"); return res.redirect('back');
+      }
+
+      for (let item of type.items) {
+        other.items.push(item)
+      }
+
+      await other.save()
+
+    req.flash('success', "Item type deleted!")
+    res.redirect('/cafe/manage')
+
+  })().catch(err => {
+    console.log(err)
+    req.flash('error', "Unable to access database")
+    res.redirect('back')
   })
 })
 

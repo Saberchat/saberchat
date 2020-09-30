@@ -21,8 +21,11 @@ function order(form, customer) {
       // this = current accessed element
       // index = int index of current element relative to parent list
     });
-    socket.emit('order', itemList, itemCount, instructions, customer);
-    console.log("_" + instructions + "_");
+
+    if (itemList.length > 0) {
+      socket.emit('order', itemList, itemCount, instructions, customer);
+      console.log("_" + instructions + "_");
+    }
   });
 }
 

@@ -61,20 +61,25 @@ router.get('/:id', middleware.isLoggedIn, middleware.checkIfMember, (req, res) =
 
 // display edit form
 router.get('/:id/edit', middleware.isLoggedIn, middleware.checkRoomOwnership, (req, res) => {
-  Room.findById(req.params.id, function(err, foundRoom) {
-    if (err || !foundRoom) {
-      req.flash('error', 'Cannot find room or unable to access Database');
-      res.redirect('back');
-    } else {
-      User.find({}, function(err, foundUsers) {
-        if (err || !foundUsers) {
-          req.flash('error', 'Unable to access Database');
-          res.redirect('back');
-        } else {
-          res.render('chat/edit', {users: foundUsers, room: foundRoom});
-        }
-      });
+  (async() => {
+    const room = await Room.findById(req.params.id);
+
+    if (!room) {
+      req.flash('error', "Unable to find room"); return res.redirect('back')
     }
+
+    const users = await User.find({});
+
+    if (!users) {
+      req.flash('error', 'Unable to access Database'); return res.redirect('back');
+    }
+
+    res.render('chat/edit', {users, room});
+
+  })().catch(err => {
+    console.log(err)
+    req.flash('error', "Unable to access database")
+    res.redirect('back')
   });
 });
 
@@ -86,6 +91,7 @@ router.post('/', middleware.isLoggedIn, function(req, res) {
     'creator.username': req.user.username,
     members: [req.user._id]
   }
+  
   Room.create(room, function(err, room) {
     if (err) {
       console.log(err);

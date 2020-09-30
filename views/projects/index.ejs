@@ -60,7 +60,7 @@
                   <%}%>
                   <img class="project-img" src="<%=project.imgUrl%>"/>
                   <br />
-                  <% if (currentUser.username == project.poster.username) { %>
+                  <% if (currentUser._id.toString() == project.poster._id.toString()) { %>
                     <button id="edit-button" type="button" class="btn btn-success"><a style="color: white;" href="projects/<%=project._id%>/edit">Edit Project</a></button>
 
                     <form action="projects/<%=project._id%>?_method=delete" method="post" style="display: inline-block;">
