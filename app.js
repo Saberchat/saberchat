@@ -256,94 +256,80 @@ io.on('connect', (socket) => {
 
   socket.on('order', (itemList, itemCount, instructions, customerId) => {
 
-    Cafe.find({}, (err, foundCafe) => {
+    (async() => {
+      const cafe = await Cafe.find({});
 
-      if (err || !foundCafe) {
-        console.log(err)
-
-      } else if (foundCafe[0].open) {
-
-        User.findById(customerId, (err, user) => {
-          if (err || !user) {
-            console.log(err);
-
-          } else {
-
-            Order.find({name: `${user.firstName} ${user.lastName}`, present: true}, (err, foundOrders) => {
-              if (err || !foundOrders) {
-                console.log(err)
-
-              } else if (foundOrders.length  >= 3) {
-                console.log("Max orders made")
-
-              } else {
-
-                Item.find({_id: {$in: itemList}}, (err, foundItems) => {
-                  if (err || !foundItems) {
-                    console.log(err);
-
-                  } else {
-
-                    let unavailable = false
-
-                    for (let i = 0; i < foundItems.length; i++) {
-
-                      if (foundItems[i].availableItems < parseInt(itemCount[i])) {
-                        unavailable = true
-                        break
-
-                      }
-                    }
-
-                    if (!unavailable) {
-
-                      Order.create({customer: customerId, name: `${user.firstName} ${user.lastName}`, present: true, charge: 0}, (err, order) => {
-
-                        if (err) {
-                          console.log(err);
-
-                        } else {
-
-                          if (instructions == "") {
-                            order.instructions = "None";
-                          } else {
-                            order.instructions = instructions;
-                          }
-
-                          order.date = dateFormat(order.created_at, "mmm d, h:MM TT")
-                          order.items = itemList;
-                          order.quantities = itemCount;
-
-                          var charge = 0;
-
-                          for (let i = 0; i < foundItems.length; i++) {
-                            charge += (foundItems[i].price * parseInt(itemCount[i]))
-                          }
-
-                          order.charge = charge;
-                          order.save()
-
-                          Item.find({_id: {$in: itemList}}, (err, foundItems) => {
-                            if (err || !foundItems) {
-                              console.log(err);
-                            } else {
-                              io.emit('order', order, foundItems);
-                            }
-                          });
-                        }
-                      })
-
-                    } else {
-                      console.log("Some items are unavailable in the quantities you requested")
-                    }
-                  }
-                })
-              }
-            })
-          }
-        })
+      if (!cafe) {
+        return console.log('error accessing cafe')
       }
+
+      if (cafe[0].open) {
+        const user = await User.findById(customerId);
+
+        if (!user) {
+          return console.log('error accessing user')
+        }
+
+        const activeOrders = await Order.find({name: `${user.firstName} ${user.lastName}`, present: true});
+
+        if (!activeOrders) {
+          return console.log('error accessing orders')
+
+        } else if (activeOrders.length >= 3) {
+          return console.log("Max orders made")
+        }
+
+        const orderItems = await Item.find({_id: {$in: itemList}});
+
+        if (!orderItems) {
+          return console.log('error accessing order items')
+        }
+
+        let unavailable = false
+
+        for (let i = 0; i < orderItems.length; i++) {
+
+          if (orderItems[i].availableItems < parseInt(itemCount[i])) {
+            unavailable = true
+            break
+          }
+        }
+
+        if (unavailable) {
+          return console.log('some items unavailable')
+        }
+
+
+        const order = await Order.create({customer: customerId, name: `${user.firstName} ${user.lastName}`, present: true, charge: 0, instructions, items: itemList, quantities: itemCount});
+
+        if (!order) {
+          return console.log('error creating order');
+        }
+
+        order.date = dateFormat(order.created_at, "mmm d, h:MM TT")
+
+        var charge = 0;
+        for (let i = 0; i < orderItems.length; i++) {
+          charge += (orderItems[i].price * parseInt(itemCount[i]))
+        }
+
+        order.charge = charge;
+
+        await order.save()
+
+        const displayItems = await Item.find({_id: {$in: itemList}});
+
+        if (!displayItems) {
+          return console.log('Error accessing display items');
+        }
+
+        io.emit('order', order, displayItems);
+      }
+
+    })().catch(err => {
+      return console.log(err);
     })
+
   })
 });
 
