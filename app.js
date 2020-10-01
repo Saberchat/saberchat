@@ -254,53 +254,54 @@ io.on('connect', (socket) => {
     });
   });
 
-  socket.on('order', (itemList, itemCount, instructions, customerId) => {
+  socket.on('order', (itemList, itemCount, instructions, customerId) => { //If an order is sent, handle it here (determined from cafe-socket frontend)
 
-    (async() => {
-      const cafe = await Cafe.find({});
+    (async() => { //Asynchronous function to control processes one at a time
+
+      const cafe = await Cafe.find({}); //Collect data on cafe to figure out whether it's open or not
 
       if (!cafe) {
         return console.log('error accessing cafe')
       }
 
-      if (cafe[0].open) {
+      if (cafe[0].open) { //If the cafe is open, run everything else. Otherwise, nothing matters since orders aren't being accepted
         const user = await User.findById(customerId);
 
         if (!user) {
           return console.log('error accessing user')
         }
 
-        const activeOrders = await Order.find({name: `${user.firstName} ${user.lastName}`, present: true});
+        const activeOrders = await Order.find({name: `${user.firstName} ${user.lastName}`, present: true}); //Access user's current orders (so we can see if they've passed the order limit)
 
         if (!activeOrders) {
           return console.log('error accessing orders')
 
-        } else if (activeOrders.length >= 3) {
+        } else if (activeOrders.length >= 3) { //If you have made three or more orders that are still active (have not been delivered), then you cannot make anymore
           return console.log("Max orders made")
         }
 
-        const orderItems = await Item.find({_id: {$in: itemList}});
+        const orderItems = await Item.find({_id: {$in: itemList}}); //Find all items that are part of the user's order (itemList was generated in cafe-socket FE)
 
         if (!orderItems) {
           return console.log('error accessing order items')
         }
 
-        let unavailable = false
+        let unavailable = false //This variable will track if any items are unavailable in the requested quantities
 
-        for (let i = 0; i < orderItems.length; i++) {
+        for (let i = 0; i < orderItems.length; i++) { //Iterate over each item and check if any are unavailable
 
-          if (orderItems[i].availableItems < parseInt(itemCount[i])) {
+           if (orderItems[i].availableItems < parseInt(itemCount[i])) { //If order asks for more of this item than is available, unavailable is now true, and the checking stops immediately
             unavailable = true
             break
           }
         }
 
-        if (unavailable) {
+        if (unavailable) { //An unlikely scenario. Another user places an order that results in there being less available items than the number that our user has ordered.
           return console.log('some items unavailable')
         }
 
 
-        const order = await Order.create({customer: customerId, name: `${user.firstName} ${user.lastName}`, present: true, charge: 0, instructions, items: itemList, quantities: itemCount});
+        const order = await Order.create({customer: customerId, name: `${user.firstName} ${user.lastName}`, present: true, charge: 0, instructions, items: itemList, quantities: itemCount}); //Assuming no setbacks, create the order
 
         if (!order) {
           return console.log('error creating order');
@@ -308,25 +309,27 @@ io.on('connect', (socket) => {
 
         order.date = dateFormat(order.created_at, "mmm d, h:MM TT")
 
-        var charge = 0;
+        let charge = 0;
         for (let i = 0; i < orderItems.length; i++) {
+          //items[] contains info about individual items (and their prices); itenCounts[] says how much of each item is ordered. Multiplication will calculate how much to charge for an item
+
           charge += (orderItems[i].price * parseInt(itemCount[i]))
         }
 
-        order.charge = charge;
+        order.charge = charge; //Set order cost based on the items ordered
 
         await order.save()
 
-        const displayItems = await Item.find({_id: {$in: itemList}});
+        const displayItems = await Item.find({_id: {$in: itemList}}); //Full versions of the _id signatures sent in order.items
 
         if (!displayItems) {
           return console.log('Error accessing display items');
         }
 
-        io.emit('order', order, displayItems);
+        io.emit('order', order, displayItems); //Send order to cafe admins via socket
       }
 
-    })().catch(err => {
+    })().catch(err => { //Execute and catch any error
       return console.log(err);
     })
 
