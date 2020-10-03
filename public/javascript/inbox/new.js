@@ -18,13 +18,14 @@ let recipients = [];
 function process() {
     if(!recipients.length > 0 && !everyoneCheck.checked) {
         return false;
+    } else if(!everyoneCheck.checked) {
+        const input = document.createElement('input');
+        input.type = 'text';
+        input.name = 'recipients';
+        input.value = JSON.stringify(recipients);
+        input.style.display = 'none';
+        form.appendChild(input);
     }
-    const input = document.createElement('input');
-    input.type = 'text';
-    input.name = 'recipients';
-    input.value = JSON.stringify(recipients);
-    input.style.display = 'none';
-    form.appendChild(input);
     return true;
 }
 
@@ -37,6 +38,11 @@ function updateTo(everyoneCheck) {
         anonyMsg.style.display = 'none';
         userDisplay.style.display = 'none';
         anonymousControl.style.display = 'none';
+
+        recipients = [];
+        clearTags();
+        facultySelect.value = '';
+        userSelect.value = '';
     } else {
         setAnonymous(anonymousCheck);
         anonymousControl.style.display = 'block';

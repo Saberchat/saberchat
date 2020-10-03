@@ -1,9 +1,14 @@
 const mongoose = require('mongoose');
 
-var notificationSchema = new mongoose.Schema({
+var messageSchema = new mongoose.Schema({
     subject: String,
     images: [{type: String}],
-    read: [{type: Boolean}],
+    read: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User'
+      }
+    ],
     sender: {
         type: mongoose.Schema.Types.ObjectId,
         ref: "User"
@@ -21,4 +26,4 @@ var notificationSchema = new mongoose.Schema({
     date: String,
 }, {timestamps: {createdAt: 'created_at'}});
 
-module.exports = mongoose.model("Notification", notificationSchema);
+module.exports = mongoose.model("Message", messageSchema);

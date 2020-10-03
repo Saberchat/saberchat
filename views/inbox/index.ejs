@@ -88,105 +88,25 @@
                       <% inbox.forEach((notif) => { %>
 
                         <li class="list-group-item list-group-item-action">
+                          <div class="message-check">
+                            <input class="del-form-input" type="checkbox" name="<%= notif._id %>" value="" onchange="updateDelete()">
+                          </div>
 
-                          <% if (notif.sender == null) { %>
-
-                            <div class="message-check">
-                              <input class="del-form-input" type="checkbox" name="<%= notif._id %>" value="" onchange="updateDelete()">
-                            </div>
-
-                            <% if (notif.read[notif.recipients.indexOf(currentUser._id)] == true) { %>
-
-                              <a href="/inbox/<%= notif._id %>" class="message-body">
-                                <div class="message-head">
-                                  <div class="message-from">
-                                    <%= notif.subject %>
-                                  </div>
-                                  <div class="message-from">
-                                    Anonymous
-                                  </div>
-                                </div>
-                                <div class="message-text">
-                                  <%= notif.text %>
-                                </div>
-                              </a>
-
-                            <% } else { %>
-
-                              <a href="/inbox/<%= notif._id %>" class="message-body">
-                                <div class="message-head">
-                                  <div class="message-subject">
-                                    <%= notif.subject %>
-                                  </div>
-                                  <div class="message-from">
-                                    Anonymous
-                                  </div>
-                                </div>
-                                <div class="message-text">
-                                  <%= notif.text %>
-                                </div>
-                              </a>
-                            <% } %>
-
-
-                          <% } else if (notif.sender._id.toString() == currentUser._id.toString()) { %>
-
-                            <a href="/inbox/<%= notif._id %>" class="message-body">
-                              <div class="message-head">
-                                <div class="message-from">
-                                  <%= notif.subject %>
-                                </div>
-                                <div class="message-from">
-                                  <%= notif.sender.username %>
-                                </div>
+                          <a href="/inbox/<%= notif._id %>" class="message-body">
+                            <div class="message-head">
+                              <div class="message-subject">
+                                <%= notif.subject %>
                               </div>
-                              <div class="message-text">
-                                <%= notif.text %>
+                              <div class="message-from">
+                                <%= notif.sender.username %> 
                               </div>
-                            </a>
-
-                          <% } else { %>
-                            <div class="message-check">
-                              <input class="del-form-input" type="checkbox" name="<%= notif._id %>" value="" onchange="updateDelete()">
                             </div>
-
-                            <% if (notif.read[notif.recipients.indexOf(currentUser._id.toString())] == true) { %>
-
-                              <a href="/inbox/<%= notif._id %>" class="message-body">
-                                <div class="message-head">
-                                  <div class="message-from">
-                                    <%= notif.subject %>
-                                  </div>
-                                  <div class="message-from">
-                                    <%= notif.sender.username %>
-                                  </div>
-                                </div>
-                                <div class="message-text">
-                                  <%= notif.text %>
-                                </div>
-                              </a>
-
-                            <% } else { %>
-
-                              <a href="/inbox/<%= notif._id %>" class="message-body">
-                                <div class="message-head">
-                                  <div class="message-subject">
-                                    <%= notif.subject %>
-                                  </div>
-                                  <div class="message-from">
-                                    <%= notif.sender.username %>
-                                  </div>
-                                </div>
-                                <div class="message-text">
-                                  <%= notif.text %>
-                                </div>
-                              </a>
-                            <% } %>
-                          <% }%>
-
-
+                            <div class="message-text">
+                              <%= notif.text %>
+                            </div>
+                          </a>
                           <span class="message-date">
-                            <%=notif.date.split(',')[0]%>
+                            <%= notif.date %>
                           </span>
                         </li>
                       <% }); %>

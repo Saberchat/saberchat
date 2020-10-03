@@ -16,7 +16,7 @@ var userSchema = new mongoose.Schema({
 	inbox: [
 		{
 			type: mongoose.Schema.Types.ObjectId,
-			ref: "Notification"
+			ref: "Message"
 		}
 	],
 	requests: [

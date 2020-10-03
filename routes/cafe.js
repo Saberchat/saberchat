@@ -10,7 +10,7 @@ const dateFormat = require('dateformat');
 const User = require('../models/user');
 const Order = require('../models/order');
 const Item = require('../models/orderItem');
-const Notification = require('../models/notification');
+const Notification = require('../models/message');
 const Type = require('../models/itemType');
 const Cafe = require('../models/cafe')
 
