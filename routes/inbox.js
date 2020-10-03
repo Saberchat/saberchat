@@ -49,29 +49,44 @@ router.get('/messages/new', middleware.isLoggedIn, (req, res) => {
 
 //Route to send notification to a group of people
 router.post('/messages', middleware.isLoggedIn, (req, res) => {
-	console.log('-------Req------');
-	console.log(req.body);
 	( async () => {
-		let request = {
+		const recipients = JSON.parse(req.body.recipients);
+
+		let message = {
 			subject: filter.clean(req.body.subject),
-			message: filter.clean(req.body.message)
+			text: filter.clean(req.body.message)
 		}
 		
 		if(req.body.images) {
-			request.images = req.body.images;
+			message.images = req.body.images;
 		}
+		message.sender = req.user._id;
 
 		if(req.body.all == 'true') {
-
-		} else if(!req.body.recipients || !req.body.recipients > 0) {
+			message.toEveryone = true;
+		} else if(!recipients || !recipients.length > 0) {
 			req.flash('error', 'Please select recipients');
 			res.redirect('back');
+		} else if(recipients.includes(req.user._id)) {
+			req.flash('error', 'You cannot send messages to yourself');
+			res.redirect('back');
 		} else if(req.body.anonymous == 'true') {
-	
+			message.anonymous = true;
+			delete message.sender;
 		}
+
+		const newMessage = await Notification.create(message);
+
+		if(message.toEveryone) {
+			await User.updateMany({}, {$push: {inbox: newMessage}});
+		} else {
+			await User.updateMany({ _id: { $in: recipients } }, { $push: { inbox: newMessage } });
+		}
+
 		res.redirect('back');
 
 	})().catch(err => {
+		console.log(err);
 		req.flash('error', 'An error occured');
 		res.redirect('back');
 	});

@@ -16,7 +16,7 @@ let recipients = [];
 
 // processes all the selected recipients into form info
 function process() {
-    if(!recipients.length > 0) {
+    if(!recipients.length > 0 && !everyoneCheck.checked) {
         return false;
     }
     const input = document.createElement('input');

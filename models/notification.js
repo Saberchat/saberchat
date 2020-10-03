@@ -15,9 +15,9 @@ var notificationSchema = new mongoose.Schema({
         ref: 'User'
       }
     ],
-
     text: String,
-    toEveryone: Boolean,
+    toEveryone: { type: Boolean, default: false},
+    anonymous: { type: Boolean, default: false },
     date: String,
 }, {timestamps: {createdAt: 'created_at'}});
 
