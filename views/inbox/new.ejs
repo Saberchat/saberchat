@@ -25,171 +25,73 @@
     <!-- include the backdrop for nav -->
     <%- include('../partials/header') %>
 
-    </head>
-    <body>
-      <div class="container">
-        <div class="row">
-          <div class="col-md-8 offset-md-2 col-12">
-            <div class="form-container">
-              <h1>New Message</h1>
-              <form action="/inbox/messages" method="post" onsubmit="return process();" id="message-form">
-                <div id="to-block">
-                  <div id="default-msg">
-                    <div class="form-group">
-                      <label for="user-select" class="label-custom">Recipients</label>
-                      <select id="user-select" class="form-control" onchange="addRecipient('user')" required>
-                        <option value="" selected disabled>Select User</option>
-                        <% users.forEach(user => { %>
-                          <% if(!user._id.equals(currentUser._id)) { %> 
-                            <option value="<%= user._id %>"><%= user.username %> (<%= user.firstName.charAt(0) %>.<%= user.lastName.charAt(0) %>.)</option>
-                          <% } %> 
-                        <% }) %> 
-                      </select>
-                    </div>
-                  </div>
-
-                  <div id="anony-msg">
-                    <div class="form-group">
-                      <label for="faculty-select" class="label-custom">Recipients</label>
-                      <select id="faculty-select" class="form-control" onchange="addRecipient('faculty')">
-                        <option value="" selected disabled>Select Faculty</option>
-                        <% users.forEach(user => { %>
-                          <% if(!user._id.equals(currentUser._id) && user.status == 'faculty') { %> 
-                            <option value="<%= user._id %>"><%= user.username %> (<%= user.firstName.charAt(0) %>.<%= user.lastName.charAt(0) %>.)</option>
-                          <% } %> 
-                        <% }) %> 
-                      </select>
-                    </div>
-                  </div>
-
-                  <div id="user-display"></div>
-
-                  <div class="form-check" id="anonymous-control">
-                    <input onchange="setAnonymous(this)" type="checkbox" class="form-check-input" name="anonymous" value="true" id="anonymous-check">
-                    <label class="form-check-label" for="anonymous-check">Send Anonymously</label>
-                  </div>
-
-                  <div class="form-check">
-                    <input onchange="updateTo(this)" type="checkbox" class="form-check-input" name="all" value="true" id="all-check">
-                    <label class="form-check-label" for="all-check">Send to everyone</label>
+  </head>
+  <body>
+    <div class="container">
+      <div class="row">
+        <div class="col-md-8 offset-md-2 col-12">
+          <div class="form-container">
+            <h1>New Message</h1>
+            <form action="/inbox/messages" method="post" onsubmit="return process();" id="message-form">
+              <div id="to-block">
+                <div id="default-msg">
+                  <div class="form-group">
+                    <label for="user-select" class="label-custom">Recipients</label>
+                    <select id="user-select" class="form-control" onchange="addRecipient('user')" required>
+                      <option value="" selected disabled>Select User</option>
+                      <% users.forEach(user => { %>
+                        <% if(!user._id.equals(currentUser._id)) { %> 
+                          <option value="<%= user._id %>"><%= user.username %> (<%= user.firstName.charAt(0) %>.<%= user.lastName.charAt(0) %>.)</option>
+                        <% } %> 
+                      <% }) %> 
+                    </select>
                   </div>
                 </div>
-                
-                <div class="form-group">
-                  <label for="subject">Subject</label>
-                  <input id="subject" placeholder="A short title..." class="form-control" type="text" name="subject" required>
-                </div>
-                <div class="form-group">
-                  <label for="message">Message</label>
-                  <textarea name="message" id="message" placeholder="Message text..." rows="5" class="form-control" required></textarea>
-                </div>
-    
-                <div id="image-block">
-                  <h4>Images</h4>
-                  <button type="button" onclick="addImg()" class="btn btn-primary"><i class="fas fa-plus"></i> Image</button>
-                  <hr>
-                </div>
-                <button type="submit" class="btn btn-primary btn-block">Send</button>
-              </form>
-            </div>
-            <!-- <div class="inbox-container">
-              <nav class="inbox-nav">
-                <div class="btn-group" role="group" aria-label="inbox navigation">
-                  <button
-                    class="nav-tab active"
-                    id="view-msg"
-                    >Messages</button>
-                </div>
-              </nav>
 
-                <div class="action-bar" style="padding-bottom: 20px;">
-                  <div class="message-actions display">
-                    <a href="/inbox" class="action-btn">Inbox</a>
-                    <a href="/inbox/sent" class="action-btn">View Sent</a>
+                <div id="anony-msg">
+                  <div class="form-group">
+                    <label for="faculty-select" class="label-custom">Recipients</label>
+                    <select id="faculty-select" class="form-control" onchange="addRecipient('faculty')">
+                      <option value="" selected disabled>Select Faculty</option>
+                      <% users.forEach(user => { %>
+                        <% if(!user._id.equals(currentUser._id) && user.status == 'faculty') { %> 
+                          <option value="<%= user._id %>"><%= user.username %> (<%= user.firstName.charAt(0) %>.<%= user.lastName.charAt(0) %>.)</option>
+                        <% } %> 
+                      <% }) %> 
+                    </select>
                   </div>
                 </div>
-                <div class='send-box'>
-                  <% if (currentUser.status != 'faculty') { %>
-                    <div class="send-notif-type" style="margin-top: 20px; margin-bottom: 50px; text-align: center; display: inline-block;">
 
-                  <% } else { %>
-                    <div class="send-notif-type" style="margin-top: 20px; margin-bottom: 50px; text-align: center; display: inline-block;">
-                  <% } %>
+                <div id="user-display"></div>
 
-                      <strong class="send-notif-header">Regular Notification</strong>
-                      <form action="/inbox/send_group" method="post" style="margin-bottom: 25px;">
+                <div class="form-check" id="anonymous-control">
+                  <input onchange="setAnonymous(this)" type="checkbox" class="form-check-input" name="anonymous" value="true" id="anonymous-check">
+                  <label class="form-check-label" for="anonymous-check">Send Anonymously</label>
+                </div>
 
-                        <div class="input-group mb-3" style="width: 100%;">
-                          <select id="recipients" name="recipients" style="width: 100%;">
-                            <option disabled selected value="none">Select User</option>
-                            <%users.forEach(user => { %>
-                              <% if (user.username != currentUser.username) { %>
-                                <option><%=user.username%></option>
-                                <% } %>
-                              <% }) %>
-                            <option>everyone</option>
-                          </select>
-                        </div>
-                        <div class="input-group mb-3" style="width: 100%;">
-                          <input class="form-control" autocomplete="off" name="recipient_list"id="recipient_list" type="text" aria-describedby="basic-addon2" placeholder="Recipients" style="color: blue; background-color: #fff;" required readonly/>
-                          <div class="input-group-append">
-                            <button id="clear" class="btn btn-outline-secondary" type="button" style="color: white; background-color: rgb(202, 0, 0);">Clear</button>
-                          </div>
-                        </div>
-                        <div class="input-group mb-3" style="width: 100%;">
-                          <input class="form-control" type="text" id="type" name="subject" style="width: 100%;" placeholder="Enter subject" required/>
-                        </div>
-                        <div class="input-group mb-3" style="width: 100%;">
-                          <input class="form-control" type="text" id="images" name="images" style="width: 100%;" placeholder="Enter any image urls, separate by comma (optional)"/>
-                        </div>
-                        <div class="input-group mb-3" style="width: 100%;">
-                          <textarea class="form-control" class="message" name="message" cols="40" rows="5" style="width: 100%" placeholder="Enter notification" required></textarea>
-                        </div>
-                        <button class="btn btn-primary" class='submit-button' action="submit" style="width: 100%;">Send Notification</button>
-                      </form>
-                    </div>
-
-                  <% if (currentUser.status != 'faculty') { %>
-
-                    <div class="send-notif-type" style="margin-top: 20px; margin-bottom: 50px; text-align: center; display: inline-block;">
-                      <strong class="send-notif-header">Anonymous Hotline</strong>
-                      <form action="/inbox/send_anonymous" method="post" style="margin-bottom: 25px;">
-
-                        <div class="input-group mb-3" style="width: 100%;">
-                          <select id="recipients_anonymous" name="recipient" style=" width: 100%;">
-                            <option disabled selected value="none">Select User (Must Be Faculty) </option>
-                            <%users.forEach(user => { %>
-                              <% if (user.username != currentUser.username && (user.status == 'faculty')) { %>
-                                <option><%=user.username%></option>
-                              <% } %>
-                            <% }) %>
-                            <option>All Faculty</option>
-                          </select>
-                        </div>
-                        <div class="input-group mb-3" style="width: 100%">
-                          <input class="form-control" autocomplete="off" name="recipient_list_anonymous" id="recipient_list_anonymous" type="text" aria-describedby="basic-addon2" placeholder="Recipients" style="color: blue;" required/>
-                          <div class="input-group-append">
-                            <button id="clear_anonymous" class="btn btn-outline-secondary" type="button" style="color: white; background-color: rgb(202, 0, 0);">Clear</button>
-                          </div>
-                        </div>
-
-                        <div class="input-group mb-3" style="width: 100%">
-                          <input class="form-control" type="text" id="type" name="subject" style=" width: 100%;" placeholder="Enter subject" required/>
-                        </div>
-
-                        <div class="input-group mb-3" style="width: 100%">
-                          <input class="form-control" type="text" id="images" name="images" style=" width: 100%;" placeholder="Enter any image urls, separate by comma (optional)"/>
-                        </div>
-
-                        <div class="input-group mb-3" style="width: 100%">
-                          <textarea class="form-control" class="message" name="message" cols="40" rows="5" style="width: 100%;" placeholder="Enter notification" required></textarea>
-                        </div>
-
-                        <button style=" margin-bottom: 10px; width: 100%;" class="btn btn-primary" class='submit-button' action="submit">Send Notification</button>
-                      </form>
-                    </div>
-                  <% } %> -->
-
+                <div class="form-check">
+                  <input onchange="updateTo(this)" type="checkbox" class="form-check-input" name="all" value="true" id="all-check">
+                  <label class="form-check-label" for="all-check">Send to everyone</label>
+                </div>
+              </div>
+              
+              <div class="form-group">
+                <label for="subject">Subject</label>
+                <input id="subject" placeholder="A short title..." class="form-control" type="text" name="subject" required>
+              </div>
+              <div class="form-group">
+                <label for="message">Message</label>
+                <textarea name="message" id="message" placeholder="Message text..." rows="5" class="form-control" required></textarea>
+              </div>
+  
+              <div id="image-block">
+                <h4>Images</h4>
+                <button type="button" onclick="addImg()" class="btn btn-primary"><i class="fas fa-plus"></i> Image</button>
+                <hr>
+              </div>
+              <button type="submit" class="btn btn-primary btn-block">Send</button>
+            </form>
+          </div>
         </div>
       </div> 
     </div>

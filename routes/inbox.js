@@ -70,10 +70,10 @@ router.post('/messages', middleware.isLoggedIn, (req, res) => {
 			message.toEveryone = true;
 		} else if(!recipients || !recipients.length > 0) {
 			req.flash('error', 'Please select recipients');
-			res.redirect('back');
+			return res.redirect('back');
 		} else if(recipients.includes(req.user._id)) {
 			req.flash('error', 'You cannot send messages to yourself');
-			res.redirect('back');
+			return res.redirect('back');
 		} else if(req.body.anonymous == 'true') {
 			const faculty = await User.find({status: 'faculty', _id: { $in: recipients } });
 

@@ -7,7 +7,7 @@ const userDisplay = document.getElementById('user-display');
 const defaultMsg = document.getElementById('default-msg');
 const anonyMsg = document.getElementById('anony-msg');
 
-const everyoneCheck = document.getElementById('everyone-check');
+const everyoneCheck = document.getElementById('all-check');
 
 const anonymousCheck = document.getElementById('anonymous-check');
 const anonymousControl = document.getElementById('anonymous-control');
@@ -98,7 +98,6 @@ function addRecipient(type) {
 
 // adds the user tag to the display
 function addTag(select, id) {
-    console.log(recipients);
     if(!recipients.includes(id)) {
         const username = select.options[select.selectedIndex].text;
         recipients.push(id);
