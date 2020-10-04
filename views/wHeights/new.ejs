@@ -7,8 +7,11 @@
 
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css">
     <link rel="stylesheet" href="/stylesheets/main.css">
+    <link rel="stylesheet" href="/stylesheets/wHeights/index.css">
     <link rel="stylesheet" href="/stylesheets/wHeights/simple-image.css">
     <link rel="stylesheet" href="/stylesheets/wHeights/new.css">
+    <link rel="stylesheet" href="/stylesheets/components/navbar.css">
+    <link rel="stylesheet" href="/stylesheets/components/header.css">
 
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
@@ -20,46 +23,51 @@
     <script src="/javascript/wHeights/new_edit.js"></script> -->
 </head>
 <body>
-    <!-- witherly heights navbar -->
-    <nav class="navbar navbar-expand-md navbar-dark bg-dark">
-      <div class="container">
-        <a class="navbar-brand" href="#">Witherly Heights</a>
 
-        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarToggler" aria-controls="navbarToggler" aria-expanded="false" aria-label="Toggle navigation">
-          <span class="navbar-toggler-icon"></span>
-        </button>
-
-        <div class="collapse navbar-collapse" id="navbarToggler">
-          <ul class="navbar-nav mr-auto mt-2 mt-md-0">
-            <li class="nav-item">
-              <a class="nav-link" href="#">Home</a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link" href="#">Contact</a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link" href="#">About</a>
-            </li>
-          </ul>
-        </div>
-      </div>
-    </nav>
+  <%- include('../partials/navbar') %>
+  <%- include('../partials/header') %>
+  <%- include('../partials/wHeightsNav') %>
 
     <!-- editor -->
+    <br />
     <div class="container">
         <div class="row">
             <div class="col-12">
                 <!-- Head. Enter title and author -->
                 <div id="article-head">
-                  <h1>New Post</h1>
+                  <h1>New Article</h1>
+
                   <div class="form-group">
                     <label for="title">Title</label>
                     <input name="title" id="title" class="form-control" type="text">
                   </div>
+
                   <div class="form-group">
-                      <label for="author">Author</label>
-                      <input id="author" class="form-control" type="text" name="author">
+                    <label for="author">Author</label><br />
+                    <select required id="author" name="author" class="form-control">
+                      <option value="">Select A Student</option>
+                      <% for (let student of students) { %>
+                        <option value="<%=student._id%>">
+                          <%=student.username%>
+                        </option>
+                      <% } %>
+                    </select>
+                      <!-- <label for="author">Author</label>
+                      <input id="author" class="form-control" type="text" name="author"> -->
                   </div>
+
+                  <div class="form-group">
+                    <label for="type">Category</label><br />
+                    <select required id="type" name="type" class="form-control">
+                      <option value="">Select A Category</option>
+                      <% for (let type of types) { %>
+                        <option value="<%=type._id%>">
+                          <%=type.name%>
+                        </option>
+                      <% } %>
+                    </select>
+                  </div>
+
                   <button class="btn btn-success" id="save-button">Save</button>
                 </div>
 

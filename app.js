@@ -46,7 +46,7 @@ const Cafe = require('./models/cafe');
 const indexRoutes = require('./routes/index');
 const chatRoutes = require('./routes/chat');
 const profileRoutes = require('./routes/profile');
-const wHeightsRoutes = require('./routes/wHeights');
+// const wHeightsRoutes = require('./routes/wHeights');
 const inboxRoutes = require('./routes/inbox');
 const adminRoutes = require('./routes/admin');
 const cafeRoutes = require('./routes/cafe');
@@ -136,7 +136,7 @@ app.use(function(req, res, next) {
 app.use(indexRoutes);
 app.use('/chat', chatRoutes);
 app.use('/profiles', profileRoutes);
-app.use('/articles', wHeightsRoutes);
+// app.use('/articles', wHeightsRoutes);
 app.use('/inbox', inboxRoutes);
 app.use('/announcements', announcementRoutes);
 app.use('/admin', adminRoutes);
