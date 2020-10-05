@@ -54,18 +54,19 @@ router.post('/messages', middleware.isLoggedIn, (req, res) => {
 			subject: filter.clean(req.body.subject),
 			text: filter.clean(req.body.message)
 		}
-		
+
 		if(req.body.images) {
 			message.images = req.body.images;
 		}
 		message.sender = req.user._id;
 
 		let recipients = [];
+		console.log(req.body.recipients)
 
 		if(req.body.recipients) {
 			recipients = JSON.parse(req.body.recipients);
 		}
-		
+
 		if(req.body.all == 'true') {
 			message.toEveryone = true;
 		} else if(!recipients || !recipients.length > 0) {
