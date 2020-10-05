@@ -99,9 +99,19 @@ router.post('/messages', middleware.isLoggedIn, (req, res) => {
 		await newMessage.save();
 
 		if(message.toEveryone) {
-			await User.updateMany({ _id: { $ne: req.user._id } }, { $push: { inbox: newMessage } });
+			await User.updateMany(
+				{ _id: { $ne: req.user._id } }, 
+				{ 
+					$push: { inbox: newMessage }, 
+					$inc: { notifCount: 1 }
+				});
 		} else {
-			await User.updateMany({ _id: { $in: recipients } }, { $push: { inbox: newMessage } });
+			await User.updateMany(
+				{ _id: { $in: recipients } }, 
+				{ 
+					$push: { inbox: newMessage },
+					$inc: { notifCount: 1 } 
+				});
 		}
 
 		req.flash('success', 'Message sent');
@@ -139,7 +149,9 @@ router.get('/:id', middleware.isLoggedIn, (req, res) => {
 		}
 
 		if(!message.read.includes(req.user._id)) {
+			req.user.notifCount -= 1;
 			message.read.push(req.user._id);
+			await req.user.save();
 			await message.save();
 		}
 
@@ -157,118 +169,71 @@ router.get('/:id', middleware.isLoggedIn, (req, res) => {
 //Clear entire inbox
 router.delete('/clear', middleware.isLoggedIn, (req, res) => {
 	req.user.inbox = []
-	req.user.notifCount = 0
-	req.user.save()
+	req.user.notifCount = 0;
+	req.user.save();
 	req.flash('success', 'Inbox cleared!');
 	res.redirect('/inbox');
 })
 
 //Delete already viewed notifications
 router.delete('/delete', middleware.isLoggedIn, (req, res) => {
-	deletes = [] //List of messages to be deleted
-	for (let item of req.user.inbox) {
-		if (Object.keys(req.body).includes(item._id.toString())) { //If item is selected to be deleted (checkbox)
-			deletes.push(item)
+	( async ()=> {
+		let ids = [];
+		for(const id in req.body) {
+			ids.push(id);
 		}
+		
+		const messages = await Message.find({_id: {$in: ids}});
+		if(!messages) {req.flash('error', 'Could not find messages'); return res.redirect('back');}
+
+		let nUnread = 0;
+		messages.forEach( message => {
+			const i = req.user.inbox.indexOf(message._id);
+			req.user.inbox.splice(i, 1);
+			if(!message.read.includes(req.user._id)) {
+				nUnread ++;
+			}
+		});
+		req.user.notifCount -= nUnread;
+		await req.user.save();
+
+		res.redirect('back');
+	})().catch(err => {
+		console.log(err);
+		req.flash('error', 'An error occured');
+		res.redirect('back');
+	});
+});
+
+router.put('/mark-all', middleware.isLoggedIn, (req, res) => {
+	Message.updateMany({_id: {$in: req.user.inbox}, read: {$ne: req.user._id}}, {$push: {read: req.user._id}}, (err, result) => {
+		if(err) {
+			req.flash('error','Could not mark as read');
+			res.redirect('back');
+		} else {
+			req.user.notifCount -= result.nModified;
+			req.user.save();
+			req.flash('success', 'Marked all as read');
+			res.redirect('back');
+		}
+	});
+});
+
+router.put('/mark-selected', middleware.isLoggedIn, (req, res) => {
+	let ids = [];
+	for(const id in req.body) {
+		ids.push(id);
 	}
-
-	Message.find({_id: {$in: deletes}}, (err, foundNotifs) => {
-		if (err || !foundNotifs) {
-			req.flash('error', "Unable to access database")
-			res.redirect('back')
-
+	Message.updateMany({_id: {$in: ids}, read: {$ne: req.user._id}}, {$push: {read: req.user._id}}, (err, result) => {
+		if(err) {
+			req.flash('error','Could not mark as read');
+			res.redirect('back');
 		} else {
-
-			for (let notif of foundNotifs) {
-
-				for (let i of req.user.inbox) {
-					if (notif._id.toString() == i.toString()) {
-						req.user.inbox.splice(req.user.inbox.indexOf(i), 1)
-					}
-				}
-
-				if (!notif.read[notif.recipients.indexOf(req.user._id)]) { //If you haven't read it yet but want to delete it, it's no longer new.
-					req.user.notifCount -= 1
-				}
-			}
+			req.user.notifCount -= result.nModified;
+			req.user.save();
+			req.flash('success', 'Marked all as read');
+			res.redirect('back');
 		}
-
-		req.user.save()
-		req.flash('success', 'Notification(s) deleted!')
-		res.redirect('/inbox')
-	})
-})
-
-router.put('/mark_all', middleware.isLoggedIn, (req, res) => {
-	Message.find({_id: {$in: req.user.inbox}}, (err, foundNotifs) => {
-		if (err || !foundNotifs) {
-			req.flash('error', "Unable to access database")
-			res.redirect('back')
-
-		} else {
-			for (let notif of foundNotifs) {
-				notif.read[notif.recipients.indexOf(req.user._id)] = true
-				notif.save()
-
-				Message.findByIdAndUpdate(notif._id, {read: notif.read}, (err, fn) => { //For some reason, foundNotif.save() wasn't saving file properly. Had to add this
-					if (err || !fn) {
-						req.flash('error', "Unable to access database")
-						res.redirect('back')
-
-					}
-				})
-			}
-
-			req.user.notifCount = 0
-			req.user.save()
-
-			req.flash("success", "All notifications marked as read")
-			res.redirect('/inbox')
-		}
-
-	})
-})
-
-router.put('/mark_selected', middleware.isLoggedIn, (req, res) => {
-	selected = [] //List of messages that are selected
-	for (let item of req.user.inbox) {
-		if (Object.keys(req.body).includes(item._id.toString())) { //If item is selected (checkbox)
-			selected.push(item)
-		}
-	}
-
-	Message.find({_id: {$in: selected}}, (err, foundNotifs) => {
-		if (err || !foundNotifs) {
-			req.flash('error', "Unable to access database")
-			res.redirect('back')
-
-		} else {
-
-			for (let notif of foundNotifs) {
-				for (let i of req.user.inbox) {
-					if (notif._id.toString() == i.toString()) {
-						if (!notif.read[notif.recipients.indexOf(req.user._id)]) {
-							notif.read[notif.recipients.indexOf(req.user._id)] = true
-							notif.save()
-							req.user.notifCount -= 1
-
-							Message.findByIdAndUpdate(notif._id, {read: notif.read}, (err, fn) => { //For some reason, foundNotif.save() wasn't saving file properly. Had to add this
-								if (err || !fn) {
-									req.flash('error', "Unable to access database")
-									res.redirect('back')
-
-								}
-							})
-						}
-					}
-				}
-			}
-		}
-
-		req.user.save()
-
-		req.flash('success', 'Notification(s) marked as read!')
-		res.redirect('/inbox')
 	});
 });
 
@@ -292,7 +257,7 @@ router.get('/requests/:id', middleware.isLoggedIn, (req, res) => {
 
 // route to accept request
 router.post('/requests/:id/accept', middleware.isLoggedIn, (req, res) => {
-	async function handleAccept() {
+	( async function() {
 		const Req = await AccessReq.findById(req.params.id)
 		.populate({path: 'room', select: ['creator']});
 
@@ -317,55 +282,22 @@ router.post('/requests/:id/accept', middleware.isLoggedIn, (req, res) => {
 			foundRoom.members.push(Req.requester);
 			Req.status = 'accepted';
 
-			req.user.requests.splice(req.user.requests.indexOf(Req._id), 1) //Remove request from list of requests
-			req.user.save()
-
-			User.findById(Req.requester, (err, foundUser) => {
-				if (err || !foundUser) {
-					req.flash("error", 'Unable to access database')
-					res.redirect('back')
-
-				} else {
-
-					Message.create({subject: "Room Join Request Accepted", sender: req.user, text: `Your request to join room '${foundRoom.name}' has been accepted`, recipients: [foundUser], read: [0], toEveryone: false}, (err, notification) => {
-
-						if (err || !foundUser) {
-							req.flash('error', "Unable to access database")
-							res.redirect('back')
-
-						} else {
-							notification.date = dateFormat(notification.created_at, "mmm d, h:MMTT")
-							notification.save() //Create notification
-
-							foundUser.inbox.push(notification)
-
-							if (foundUser.notifCount == undefined) {
-								foundUser.notifCount = 1
-
-							} else {
-								foundUser.notifCount += 1
-							}
-
-							foundUser.save()
-						}
-					})
-				}
-			})
-
 			await foundRoom.save();
 			await Req.save();
 
 			req.flash('success', 'Request accepted');
 			res.redirect('/inbox');
 		}
-	}
-
-	handleAccept().catch(err => {console.log(err); req.flash("error", "Unable to access database");return res.redirect('back');});
+	})().catch(err => {
+		console.log(err); 
+		req.flash("error", "Unable to access database");
+		res.redirect('back');
+	});
 });
 
 // route to reject request
 router.post('/requests/:id/reject', middleware.isLoggedIn, (req, res) => {
-	async function handleReject() {
+	( async function() {
 		const Req = await AccessReq.findById(req.params.id)
 		.populate({path: 'room', select: ['creator']});
 
@@ -385,58 +317,16 @@ router.post('/requests/:id/reject', middleware.isLoggedIn, (req, res) => {
 
 			Req.status = 'rejected';
 
-			req.user.requests.splice(req.user.requests.indexOf(Req._id), 1) //Remove request from list of requests
-			req.user.save()
-
-			User.findById(Req.requester, (err, foundUser) => {
-				if (err || !foundUser) {
-					req.flash("error", 'Unable to access database')
-					res.redirect('back')
-
-				} else {
-
-					Room.findById(Req.room._id, (err, foundRoom) => {
-						if (err || !foundRoom) {
-							req.flash("error", "Unable to access database")
-							res.redirect('back')
-
-						} else {
-							Message.create({subject: "Room Join Request Rejected", sender: req.user, text: `Your request to join room '${foundRoom.name}' has been rejected`, recipients: [foundUser], read: [0], toEveryone: false}, (err, notification) => {
-
-								if (err || !foundUser) {
-									req.flash('error', "Unable to access database")
-									res.redirect('back')
-
-								} else {
-									notification.date = dateFormat(notification.created_at, "mmm d, h:MMTT")
-									notification.save() //Create notification
-
-									foundUser.inbox.push(notification)
-
-									if (foundUser.notifCount == undefined) {
-										foundUser.notifCount = 1
-
-									} else {
-										foundUser.notifCount += 1
-									}
-
-									foundUser.save()
-								}
-							})
-						}
-					})
-				}
-			})
-
-
 			await Req.save();
 
 			req.flash('success', 'Request rejected');
 			res.redirect('/inbox');
 		}
-	}
-
-	handleReject().catch(err => {console.log(err); req.flash("error", "Unable to access database");return res.redirect('back');});
+	})().catch(err => {
+		console.log(err); 
+		req.flash("error", "Unable to access database");
+		res.redirect('back');
+	});
 });
 
 module.exports = router;
