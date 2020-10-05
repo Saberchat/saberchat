@@ -16,7 +16,6 @@
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js"></script>
-    <script src="../javascript/socket.js"></script>
 
     <!-- I'm using my fontawesome kit -->
     <script src="https://kit.fontawesome.com/dccc745c41.js" crossorigin="anonymous"></script>
@@ -35,7 +34,13 @@
                 <h1><%= message.subject %></h1>
                 <p>From: 
                   <a href= "/profiles/<%=message.sender._id%>" class="user-link">
-                    <span class="badge badge-pill badge-primary"><%= message.sender.username %></span>
+                    <span class="badge badge-pill badge-primary">
+                      <% if(message.sender._id.equals(currentUser._id)) { %>
+                        me
+                      <% } else { %> 
+                        <%= message.sender.username %>
+                      <% } %> 
+                    </span>
                   </a>
                 </p>
                 <p>To: 
@@ -44,7 +49,13 @@
                   <% } else { %> 
                     <% message.recipients.forEach(user => { %>
                       <a href="/profiles/<%= user._id %>" class="user-link">
-                        <span class="badge badge-pill badge-secondary"><%= user.username %></span>
+                        <span class="badge badge-pill badge-secondary">
+                          <% if(user._id.equals(currentUser._id)) { %>
+                            me
+                          <% } else { %> 
+                            <%= user.username %>
+                          <% } %> 
+                        </span>
                       </a>
                     <% }); %>
                   <% } %> 
