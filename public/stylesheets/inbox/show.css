@@ -1,38 +1,39 @@
-.btn-setting {
-    width: 8rem;
+.back-btn {
+    width: 10rem;
 }
 
-#delete-form {
-    display: inline-block;
+.user-link:hover .badge.badge-pill{
+    color: #dadada;
 }
 
-.ann-container {
+.msg-container {
     border-radius: 15px;
     box-shadow: 0px 3px 15px rgb(168, 168, 168);
 }
 
-.ann-head {
+.msg-head {
+    position: relative;
     padding: 2rem 5rem;
     text-align: center;
 }
 
-.ann-head span {
+.msg-head > span {
     display: block;
     color: rgb(105, 105, 105);
     font-weight: 300;
-    margin-bottom: 2rem;
+    margin-bottom: 1rem;
 }
 
-.ann-body {
+.msg-body {
     padding:2rem 5rem;
 }
 
-.ann-body hr {
+.msg-body hr {
     border-radius: 5px;
     border: 1px solid #525252;
 }
 
-.ann-images img {
+.msg-images img {
     margin-bottom: 2rem;
     box-shadow: 0px 1px 5px #6d6d6d;
 }
