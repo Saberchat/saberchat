@@ -89,6 +89,8 @@ router.post('/messages', middleware.isLoggedIn, (req, res) => {
 			delete message.sender;
 		}
 
+		message.recipients = recipients;
+
 		const newMessage = await Message.create(message);
 		if(!newMessage) {req.flash('error', 'Message could not be created'); return res.redirect('back');}
 
@@ -113,58 +115,42 @@ router.post('/messages', middleware.isLoggedIn, (req, res) => {
 
 //Accesses every notification that you have sent
 router.get('/sent', middleware.isLoggedIn, (req, res) => {
-	Message.find({'sender': req.user}, (err, foundNotifs) => {
-		if (err || !foundNotifs) {
+	Message.find({sender: req.user._id}, (err, foundMsg) => {
+		if (err || !foundMsg) {
 			req.flash('error', 'Unable to access database')
 			res.redirect('/inbox')
 
 		} else {
-			res.render('inbox/indexSent', {inbox: foundNotifs.reverse()})
+			res.render('inbox/index_sent', {inbox: foundMsg.reverse()})
 		}
 	})
 })
 
-//View message in your inbox in more detail
+// Message show route
 router.get('/:id', middleware.isLoggedIn, (req, res) => {
-	Message.findOne({_id: req.params.id}).populate({path: 'sender', select: ['username', 'imageUrl']})
-	.exec((err, foundNotif) => {
-		if (err || !foundNotif) {
-			req.flash('error', "Unable to access database1")
-			console.log(err)
-			res.redirect('back')
+	( async ()=> {
+		const message = await Message.findById(req.params.id);
+		if(!message) {req.flash('error','Cannot find message'); return res.redirect('back');}
 
-		} else {
-
-				if (foundNotif.sender == null || foundNotif.sender.username != req.user.username) {
-
-				if (!foundNotif.read[foundNotif.recipients.indexOf(req.user._id.toString())]) {
-					req.user.notifCount -= 1
-					req.user.save()
-					foundNotif.read[foundNotif.recipients.indexOf(req.user._id)] = true
-					foundNotif.save()
-
-					Message.findByIdAndUpdate(foundNotif._id, {read: foundNotif.read}, (err, fn) => { //For some reason, foundNotif.save() wasn't saving file properly. Had to add this
-						if (err || !fn) {
-							req.flash('error', "Unable to access database")
-							res.redirect('back')
-
-						}
-					})
-				}
-			}
-
-			User.find({_id: {$in: foundNotif.recipients}}, (err, foundUsers) => {
-				if (err || !foundUsers) {
-					req.flash('error', 'Unable to access database')
-					res.redirect('back')
-
-				} else {
-					res.render(`inbox/show`, {notif: foundNotif, recipient_profiles: foundUsers})
-				}
-			})
+		if(!message.toEveryone && !message.recipients.includes(req.user._id) && !message.sender.equals(req.user._id)) {
+			req.flash('error', 'You do not have permission to view this message');
+			return res.redirect('back');
 		}
-	})
-})
+
+		if(!message.read.includes(req.user._id)) {
+			message.read.push(req.user._id);
+			await message.save();
+		}
+
+		await message.populate({path: 'sender', select: 'username'}).populate({path:'recipients', select: 'username'}).execPopulate();
+
+		res.render('inbox/show', {message: message});
+	})().catch(err => {
+		console.log(err);
+		req.flash('error','There was an error');
+		res.redirect('back');
+	});
+});
 
 
 //Clear entire inbox

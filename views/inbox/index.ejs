@@ -85,28 +85,31 @@
 
                     <ul class="list-group">
 
-                      <% inbox.forEach((notif) => { %>
-
-                        <li class="list-group-item list-group-item-action">
+                      <% inbox.forEach((msg) => { %>
+                        <% if(msg.read.includes(currentUser._id)) { %>
+                          <li class="list-group-item list-group-item-action read">
+                        <% } else { %>
+                          <li class="list-group-item list-group-item-action">
+                        <% } %>
                           <div class="message-check">
-                            <input class="del-form-input" type="checkbox" name="<%= notif._id %>" value="" onchange="updateDelete()">
+                            <input class="del-form-input" type="checkbox" name="<%= msg._id %>" value="" onchange="updateDelete()">
                           </div>
 
-                          <a href="/inbox/<%= notif._id %>" class="message-body">
+                          <a href="/inbox/<%= msg._id %>" class="message-body">
                             <div class="message-head">
                               <div class="message-subject">
-                                <%= notif.subject %>
+                                <%= msg.subject %>
                               </div>
                               <div class="message-from">
-                                <%= notif.sender.username %> 
+                                <%= msg.sender.username %> 
                               </div>
                             </div>
                             <div class="message-text">
-                              <%= notif.text %>
+                              <%= msg.text %>
                             </div>
                           </a>
                           <span class="message-date">
-                            <%= notif.date %>
+                            <%= msg.date %>
                           </span>
                         </li>
                       <% }); %>
