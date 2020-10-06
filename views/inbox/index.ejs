@@ -58,16 +58,14 @@
                   <div class="message-actions display">
                     <a href="/inbox/messages/new" class="action-btn">Send New</a>
                     <a href="/inbox/sent" class="action-btn">View Sent</a>
-                    <% if (viewing_sent == false)  { %>
-                      <hr>
-                      <!-- <a href="/inbox/clear?_method=delete" class="action-btn" id="del-all-btn">Clear All</a> -->
-                      <button class="action-btn" formAction="/inbox/clear?_method=delete" id="del-all-btn">Clear All</button>
-                      <button class="action-btn" formAction="/inbox/delete?_method=delete" id="del-sel-btn">Clear Selected</button>
+                    <hr>
+                    <!-- <a href="/inbox/clear?_method=delete" class="action-btn" id="del-all-btn">Clear All</a> -->
+                    <button class="action-btn" formAction="/inbox/clear?_method=delete" id="del-all-btn">Clear All</button>
+                    <button class="action-btn" formAction="/inbox/delete?_method=delete" id="del-sel-btn">Clear Selected</button>
 
-                      <!-- <a href="/mark_all?_method=put" class="action-btn" id="mark-all-btn">Mark All As Read</a> -->
-                      <button class="action-btn" formAction="/inbox/mark-all?_method=put" id="mark-all-btn">Mark All As Read</button>
-                      <button class="action-btn" formAction="/inbox/mark-selected?_method=put" id="mark-sel-btn" style="display: none;">Mark Selected As Read</button>
-                    <% } %>
+                    <!-- <a href="/mark_all?_method=put" class="action-btn" id="mark-all-btn">Mark All As Read</a> -->
+                    <button class="action-btn" formAction="/inbox/mark-all?_method=put" id="mark-all-btn">Mark All As Read</button>
+                    <button class="action-btn" formAction="/inbox/mark-selected?_method=put" id="mark-sel-btn" style="display: none;">Mark Selected As Read</button>
 
                   </div>
                   <!-- request actions -->

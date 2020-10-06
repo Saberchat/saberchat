@@ -24,7 +24,7 @@ router.get('/', middleware.isLoggedIn, (req, res) => {
 				]
 			}).execPopulate();
 
-		res.render('inbox/index', {inbox: req.user.inbox.reverse(), requests: req.user.requests.reverse(), viewing_sent: false});
+		res.render('inbox/index', {inbox: req.user.inbox.reverse(), requests: req.user.requests.reverse()});
 
 	})().catch(err => {
 		console.log(err);
@@ -42,7 +42,7 @@ router.get('/messages/new', middleware.isLoggedIn, (req, res) => {
 			res.redirect('back');
 
 		} else {
-			res.render('inbox/new', {users: foundUsers, selected_users: [], currentUser: req.user})
+			res.render('inbox/new', {users: foundUsers});
 		}
 	})
 })
@@ -61,7 +61,6 @@ router.post('/messages', middleware.isLoggedIn, (req, res) => {
 		message.sender = req.user._id;
 
 		let recipients = [];
-		console.log(req.body.recipients)
 
 		if(req.body.recipients) {
 			recipients = JSON.parse(req.body.recipients);
@@ -103,14 +102,14 @@ router.post('/messages', middleware.isLoggedIn, (req, res) => {
 				{ _id: { $ne: req.user._id } }, 
 				{ 
 					$push: { inbox: newMessage }, 
-					$inc: { notifCount: 1 }
+					$inc: { msgCount: 1 }
 				});
 		} else {
 			await User.updateMany(
 				{ _id: { $in: recipients } }, 
 				{ 
 					$push: { inbox: newMessage },
-					$inc: { notifCount: 1 } 
+					$inc: { msgCount: 1 } 
 				});
 		}
 
@@ -149,7 +148,7 @@ router.get('/:id', middleware.isLoggedIn, (req, res) => {
 		}
 
 		if(!message.read.includes(req.user._id)) {
-			req.user.notifCount -= 1;
+			req.user.msgCount -= 1;
 			message.read.push(req.user._id);
 			await req.user.save();
 			await message.save();
@@ -169,13 +168,13 @@ router.get('/:id', middleware.isLoggedIn, (req, res) => {
 //Clear entire inbox
 router.delete('/clear', middleware.isLoggedIn, (req, res) => {
 	req.user.inbox = []
-	req.user.notifCount = 0;
+	req.user.msgCount = 0;
 	req.user.save();
 	req.flash('success', 'Inbox cleared!');
 	res.redirect('/inbox');
 })
 
-//Delete already viewed notifications
+//Delete messages
 router.delete('/delete', middleware.isLoggedIn, (req, res) => {
 	( async ()=> {
 		let ids = [];
@@ -189,12 +188,14 @@ router.delete('/delete', middleware.isLoggedIn, (req, res) => {
 		let nUnread = 0;
 		messages.forEach( message => {
 			const i = req.user.inbox.indexOf(message._id);
-			req.user.inbox.splice(i, 1);
-			if(!message.read.includes(req.user._id)) {
-				nUnread ++;
+			if(i > -1) {
+				req.user.inbox.splice(i, 1);
+				if(!message.read.includes(req.user._id)) {
+					nUnread ++;
+				}
 			}
 		});
-		req.user.notifCount -= nUnread;
+		req.user.msgCount -= nUnread;
 		await req.user.save();
 
 		res.redirect('back');
@@ -211,7 +212,7 @@ router.put('/mark-all', middleware.isLoggedIn, (req, res) => {
 			req.flash('error','Could not mark as read');
 			res.redirect('back');
 		} else {
-			req.user.notifCount -= result.nModified;
+			req.user.msgCount -= result.nModified;
 			req.user.save();
 			req.flash('success', 'Marked all as read');
 			res.redirect('back');
@@ -229,9 +230,9 @@ router.put('/mark-selected', middleware.isLoggedIn, (req, res) => {
 			req.flash('error','Could not mark as read');
 			res.redirect('back');
 		} else {
-			req.user.notifCount -= result.nModified;
+			req.user.msgCount -= result.nModified;
 			req.user.save();
-			req.flash('success', 'Marked all as read');
+			req.flash('success', 'Marked as read');
 			res.redirect('back');
 		}
 	});

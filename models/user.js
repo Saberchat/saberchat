@@ -12,7 +12,9 @@ var userSchema = new mongoose.Schema({
 	title: String,
 	bannerUrl: {type: String, default: 'https://i.imgur.com/Wnbn7Ei.gif'},
 	imageUrl: {type: String, default: 'https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_640.png'},
-	notifCount: Number,
+	msgCount: {type:Number, default: 0},
+	reqCount: {type:Number, default: 0},
+	annCount: {type:Number, default: 0},
 	inbox: [
 		{
 			type: mongoose.Schema.Types.ObjectId,
