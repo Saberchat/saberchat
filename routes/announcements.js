@@ -105,7 +105,7 @@ router.put('/:id', middleware.isLoggedIn, middleware.isAdmin, (req, res) => { //
         }
       }
 
-      updatedAnnouncement.save();
+      await updatedAnnouncement.save();
 
       req.flash('success', 'Announcement Updated!');
       res.redirect(`/announcements/${updatedAnnouncement._id}`);
