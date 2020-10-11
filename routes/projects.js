@@ -140,13 +140,21 @@ router.put('/:id', [middleware.isLoggedIn, middleware.isFaculty], (req, res) => 
       req.flash('error', 'Some profiles were changed. Please create project again'); return res.redirect('back');
     }
 
-    const project = await Project.findByIdAndUpdate(req.params.id, {title: req.body.title, imgUrl: req.body.img, creators, text: req.body.text});
+    const project = await Project.findById(req.params.id).populate('poster');
 
     if (!project) {
-      req.flash('error', "Unable to update project"); return res.redirect('back')
+      req.flash('error', "Unable to find project"); return res.redirect('back')
+    }
 
-    } else if (project.poster._id.toString() != req.user._id.toString()) {
-      req.flash('error', "You may only delete projects that you have posted"); return res.redirect('back') //If you didn't post the project, you can't edit it
+    if (project.poster._id.toString() != req.user._id.toString()) {
+      req.flash('error', "You may only update projects that you have posted");
+      return res.redirect('back')
+    }
+
+    const updatedProject = await Project.findByIdAndUpdate(project._id, {title: req.body.title, imgUrl: req.body.img, creators, text: req.body.text});
+
+    if (!updatedProject) {
+      req.flash('error', "Unable to update project"); return res.redirect('back')
     }
 
     req.flash("success", "Project Updated!")
@@ -162,13 +170,19 @@ router.put('/:id', [middleware.isLoggedIn, middleware.isFaculty], (req, res) => 
 router.delete('/:id', [middleware.isLoggedIn, middleware.isFaculty], (req, res) => {
 
   (async() => { //Asynchronous functions dictates that processes occur one at a time, reducing excessive callbacks
-    const project = await Project.findByIdAndDelete(req.params.id);
+    const project = await Project.findById(req.params.id);
 
     if (!project) {
-      req.flash('error', "Unable to delete project"); return res.redirect('back')
+      req.flash('error', "Unable to access project"); return res.redirect('back')
 
     } else if (project.poster._id.toString() != req.user._id.toString()) { //If you didn't post the project, you can't delete it
       req.flash('error', "You may only delete projects that you have posted"); return res.redirect('back')
+    }
+
+    const deletedProject = await Project.findByIdAndDelete(project._id);
+
+    if (!deletedProject) {
+      req.flash('error', "Unable to delete project"); return res.redirect('back')
     }
 
     req.flash("success", "Project Deleted!")

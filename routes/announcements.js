@@ -78,46 +78,74 @@ router.post('/', middleware.isLoggedIn, middleware.isAdmin, (req, res) => { //RE
 })
 
 router.put('/:id', middleware.isLoggedIn, middleware.isAdmin, (req, res) => { //RESTful Routing 'UPDATE' route
-  Announcement.findByIdAndUpdate(req.params.id, {subject: req.body.subject, text: req.body.message}, (err, foundAnn) => { //Update the announcement specified in the form
-    if (err || !foundAnn) {
-      req.flash('error', "Unable to access database");
-      res.redirect('back');
+  (async() => {
 
-    } else if (!foundAnn.sender._id.equals(req.user._id)) { //If you did not create the announcement, you cannot edit it (triple check, because the 'edit' button is not available, and we do a double check when the user tries to access the edit page )
-      req.flash('error', "You can only edit announcements that you have sent.")
-      res.redirect('back')
+    const announcement = await Announcement.findById(req.params.id).populate('sender');
 
-    } else {
-      foundAnn.images = []; //Empty image array so that you can fill it with whatever images are added (all images are there, not just new ones)
+    if (!announcement) {
+      req.flash('error', "Unable to access announcement");
+      return res.redirect('back');
+    }
+
+    if (announcement.sender._id.toString() != req.user._id.toString()) {
+      req.flash('error', "You can only update announcements which you have sent");
+      return res.redirect('back');
+    }
+
+    const updatedAnnouncement = await Announcement.findByIdAndUpdate(req.params.id, {subject: req.body.subject, text: req.body.message});
+      if (!updatedAnnouncement) {
+        req.flash('error', "Unable to update announcement");
+        return res.redirect('back');
+      }
+
+      updatedAnnouncement.images = []; //Empty image array so that you can fill it with whatever images are added (all images are there, not just new ones)
       if(req.body.images) { //Only add images if any are provided
         for(const image in req.body.images) {
-          foundAnn.images.push(req.body.images[image]);
+          updatedAnnouncement.images.push(req.body.images[image]);
         }
       }
 
-      foundAnn.save();
+      updatedAnnouncement.save();
 
       req.flash('success', 'Announcement Updated!');
-      res.redirect(`/announcements/${foundAnn._id}`);
-    }
+      res.redirect(`/announcements/${updatedAnnouncement._id}`);
+
+  })().catch(err => {
+    console.log(err)
+    req.flash('error', "Unable to access database")
+    res.redirect('back')
   })
 })
 
 router.delete('/:id', middleware.isLoggedIn, middleware.isAdmin, (req, res) => { // RESTful Routing 'DESTROY' route
-  Announcement.findByIdAndDelete(req.params.id, (err, deletedAnn) => { //Delete announcement specified in the form
-    if (err || !deletedAnn) {
-      console.log(err)
-      req.flash('error', "Unable to access database");
-      res.redirect('back');
+  (async() => {
 
-    } else if (deletedAnn.sender._id.toString() != req.user._id.toString()) { //Same thing we did with updating announcements. If you didn't post the announcement, you can't delete it.
-      req.flash('error', "You can only delete announcements that you have sent.")
-      res.redirect('back')
+    const announcement = await Announcement.findById(req.params.id).populate('sender');
+    if (!announcement) {
+      req.flash('error', "Unable to access announcement");
+      return res.redirect('back');
+    }
+
+    if (announcement.sender._id.toString() != req.user._id.toString()) {
+      req.flash('error', "You can only delete announcements that you have posted")
+      return res.redirect('back')
 
     } else {
+      const deletedAnn = await Announcement.findByIdAndDelete(announcement._id);
+
+      if (!deletedAnn) {
+        req.flash('error', "Unable to delete announcement");
+        return res.redirect('back')
+      }
+
       req.flash('success', 'Announcement Deleted!');
       res.redirect('/announcements/');
+
     }
+  })().catch(err => {
+    console.log(err)
+    req.flash('error', "Unable to access database")
+    res.redirect('back')
   })
 })
 
