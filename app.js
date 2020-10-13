@@ -1,5 +1,5 @@
-//set up env vars
-require('dotenv').config();
+//set up env vars. commented out for deployment
+// require('dotenv').config();
 // Require NodeJS modules
 //set up and start the express server
 const express = require('express');
