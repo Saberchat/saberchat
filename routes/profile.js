@@ -1,7 +1,5 @@
 const express = require('express')
 const router = express.Router();
-const multer = require('multer');
-const upload = multer({dest: __dirname + '/public/uploads'});
 const Filter = require('bad-words');
 const filter = new Filter();
 

@@ -5,8 +5,6 @@ const express = require('express');
 const middleware = require('../middleware');
 const router = express.Router(); //start express router
 const dateFormat = require('dateformat')
-const multer = require('multer')
-const upload = multer({dest: __dirname + '/../public/uploads'});
 
 //SCHEMA
 const User = require('../models/user');
