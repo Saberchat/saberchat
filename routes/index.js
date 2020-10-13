@@ -6,8 +6,6 @@ const router = express.Router();
 //import passport for authentication
 const passport = require('passport');
 const middleware = require('../middleware');
-const textEncoding = require('text-encoding');
-const TextDecoder = textEncoding.TextDecoder
 
 //import user schema for db actions
 const User = require('../models/user');
