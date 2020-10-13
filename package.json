@@ -32,7 +32,6 @@
     "express": "^4.17.1",
     "express-fileupload": "^1.2.0",
     "express-session": "^1.17.1",
-    "express-sesslodion": "^1.17.1",
     "form-data": "^3.0.0",
     "memorystore": "^1.6.2",
     "method-override": "^3.0.0",
