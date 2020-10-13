@@ -42,7 +42,7 @@ router.get('/new', [middleware.isLoggedIn, middleware.isFaculty], (req, res) => 
   })
 })
 
-router.post('/',[middleware.isLoggedIn, middleware.isFaculty], upload.single('img'), (req, res) => { //RESTful Routing 'CRWATE' route
+router.post('/',[middleware.isLoggedIn, middleware.isFaculty], (req, res) => { //RESTful Routing 'CRWATE' route
 
   (async() => { //Asynchronous functions dictates that processes occur one at a time, reducing excessive callbacks
 
