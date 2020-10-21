@@ -17,7 +17,7 @@ const Cafe = require('../models/cafe')
 //ROUTES
 router.get('/', middleware.isLoggedIn, (req, res) => { //RESTful routing 'order/index' route
   Order.find({customer: req.user._id})
-  .populate('items').exec((err, foundOrders) => { //Find all of the orders that you have ordered, and populate info on their items
+  .populate('items.item').exec((err, foundOrders) => { //Find all of the orders that you have ordered, and populate info on their items
 
     if (err || !foundOrders) {
 
@@ -26,6 +26,7 @@ router.get('/', middleware.isLoggedIn, (req, res) => { //RESTful routing 'order/
       res.redirect('back');
 
     } else {
+      console.log(foundOrders)
       res.render('cafe/index', {orders: foundOrders});
     }
   });
@@ -124,7 +125,7 @@ router.post('/order', [middleware.isLoggedIn, middleware.cafeOpen], (req, res) =
 
 router.get('/orders', middleware.isLoggedIn, (req, res) => { //This is for EC Cafe Workers to check all the available orders
   Order.find({present: true})
-  .populate('items').exec((err, foundOrders) => { //Collect all orders which are currently active, and get all info on their items
+  .populate('items.item').exec((err, foundOrders) => { //Collect all orders which are currently active, and get all info on their items
     if (err) {
       req.flash('error', 'Could not find orders');
       console.log(err)
@@ -138,16 +139,16 @@ router.get('/orders', middleware.isLoggedIn, (req, res) => { //This is for EC Ca
 
 router.delete('/order/:id', [middleware.isLoggedIn, middleware.cafeOpen], (req, res) => { //RESTful routing 'order/destroy' (for users to delete an order they no longer want)
 
-  Order.findByIdAndDelete(req.params.id).populate('items').exec((err, foundOrder) => { //Delete the item selected in teh form (but first, collect info on its items so you can replace them)
+  Order.findByIdAndDelete(req.params.id).populate('items.item').exec((err, foundOrder) => { //Delete the item selected in the form (but first, collect info on its items so you can replace them)
     if (err || !foundOrder) {
       req.flash("error", "Unable to access database")
       res.redirect('back')
 
     } else {
       for (let i = 0; i < foundOrder.items.length; i += 1) { //For each of the order's items, add the number ordered back to that item. (If there are 12 available quesadillas and our user ordered 3, there are now 15)
-        foundOrder.items[i].availableItems += foundOrder.quantities[i]
-        foundOrder.items[i].isAvailable = true;
-        foundOrder.items[i].save()
+        foundOrder.items[i].item.availableItems += foundOrder.items[i].quantity
+        foundOrder.items[i].item.isAvailable = true;
+        foundOrder.items[i].item.save()
       }
 
       req.flash('success', "Order deleted!")
@@ -159,7 +160,7 @@ router.delete('/order/:id', [middleware.isLoggedIn, middleware.cafeOpen], (req, 
 router.post('/:id/ready', middleware.isLoggedIn, (req, res) => {
 
   (async () => {
-    const order = await Order.findById(req.params.id).populate('items').populate('customer'); //Find the order that is currently being handled based on id, and populate info about its items
+    const order = await Order.findById(req.params.id).populate('items.item').populate('customer'); //Find the order that is currently being handled based on id, and populate info about its items
     if (!order) {
       req.flash('error', 'Could not find order'); return res.redirect('/cafe/orders');
 
@@ -170,7 +171,7 @@ router.post('/:id/ready', middleware.isLoggedIn, (req, res) => {
     order.present = false; //Order is not active anymore
     await order.save();
 
-    const notif = await Notification.create({subject: "Cafe Order Ready", sender: req.user, recipients: [order.customer], read: [false], toEveryone: false, images: []}); //Create a notification to alert the user
+    const notif = await Notification.create({subject: "Cafe Order Ready", sender: req.user, recipients: [order.customer], read: [order.customer], toEveryone: false, images: []}); //Create a notification to alert the user
       if (!notif) {
         req.flash('error', 'Unable to send notification'); return res.redirect('/cafe/orders');
       }
@@ -179,7 +180,7 @@ router.post('/:id/ready', middleware.isLoggedIn, (req, res) => {
 
       let itemText = []; //This will have all the decoded info about the order
       for (var i = 0; i < order.items.length; i++) {
-        itemText.push(` - ${order.items[i].name}: ${order.quantities[i]} order(s)`);
+        itemText.push(` - ${order.items[i].item.name}: ${order.items[i].quantity} order(s)`);
       }
 
       //Render the item's charge in '$dd.cc' pattern, based on what the actual charge is
@@ -212,7 +213,7 @@ router.post('/:id/ready', middleware.isLoggedIn, (req, res) => {
 router.get('/manage', middleware.isLoggedIn, middleware.isMod, (req, res) => { //Route to manage cafe
   Type.find({}).populate('items').exec((err, foundTypes) => { //Collect info on all the item types
     if (err || !foundTypes) {
-      req.flash('error', 'Cannot access Database');
+      req.flash('error', 'Unable to access Database');
       res.redirect('/cafe');
 
     } else {
@@ -354,7 +355,7 @@ router.put('/item/:id', middleware.isLoggedIn, middleware.isMod, (req, res) => {
       req.flash('error', 'item not found'); return res.redirect('back');
     }
 
-    const activeOrders = await Order.find({present:true}).populate('items'); //Any orders that are active will need to change, to accomodate the item changes.
+    const activeOrders = await Order.find({present:true}).populate('items.item'); //Any orders that are active will need to change, to accomodate the item changes.
 
     if (!activeOrders) {
       req.flash('error', "Unable to find active orders"); return res.redirect('back');
@@ -364,7 +365,7 @@ router.put('/item/:id', middleware.isLoggedIn, middleware.isMod, (req, res) => {
       order.charge = 0 //Reset the order's charge, we will have to recalculate
 
       for (let i = 0; i < order.items.length; i += 1) { //Iterate over each order, and change its price to match the new item prices
-        order.charge += order.items[i].price * order.quantities[i]
+        order.charge += order.items[i].item.price * order.items[i].quantity
       }
       await order.save()
     }
@@ -427,6 +428,26 @@ router.delete('/item/:id', middleware.isLoggedIn, middleware.isMod, (req, res) =
         type.items.splice(type.items.indexOf(item._id), 1);
         await type.save();
       }
+    }
+
+    const orders = await Order.find({}).populate('items.item');
+
+    if (!orders) {
+      req.flash('error', 'Could not find orders'); return res.redirect('back')
+    }
+
+    for (let order of orders) {//If the order includes this item, remove the item from that order's item list
+      for (let i of order.items) {
+        if (i.item == null) {
+          order.items.splice(i, 1)
+        }
+      }
+
+      order.charge = 0
+      for (let i of order.items) {
+        order.charge += (i.item.price * i.quantity);
+      }
+      order.save()
     }
 
     req.flash('success', 'Deleted Item!');

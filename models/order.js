@@ -6,13 +6,10 @@ const orderSchema = new mongoose.Schema({
     ref: 'User'
   },
   name: String,
-  items: [
-    {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: 'OrderItem'
-    }
-  ],
-  quantities: [{type: Number}],
+  items: [{
+    item: {type: mongoose.Schema.Types.ObjectId, ref: 'OrderItem'},
+    quantity: Number
+  }],
   instructions: String,
   charge: Number,
   date: String,

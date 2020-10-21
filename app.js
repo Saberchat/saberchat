@@ -56,7 +56,7 @@ const io = require('socket.io')(http);
 const port = process.env.PORT || 3000;
 
 //connect to db. We should set the link as environment variable for security purposes in the future.
-mongoose.connect(process.env.DATABASE_URL || 'mongodb+srv://admin_1:alsion2020@cluster0-cpycz.mongodb.net/saberChat?retryWrites=true&w=majority',
+mongoose.connect(process.env.DATABASE_URL,
 {
   useNewUrlParser: true,
   useUnifiedTopology: true,
@@ -296,8 +296,18 @@ io.on('connect', (socket) => {
           return console.log('some items unavailable')
         }
 
+        let orderItemsObjects = []
 
-        const order = await Order.create({customer: customerId, name: `${user.firstName} ${user.lastName}`, present: true, charge: 0, instructions, items: itemList, quantities: itemCount}); //Assuming no setbacks, create the order
+        for (let i = 0; i < itemList.length; i += 1) {
+          orderItemsObjects.push(
+            {
+              item: itemList[i],
+              quantity: parseInt(itemCount[i])
+            }
+          )
+        }
+
+        let order = await Order.create({customer: customerId, name: `${user.firstName} ${user.lastName}`, present: true, charge: 0, instructions, items: orderItemsObjects}); //Assuming no setbacks, create the order
 
         if (!order) {
           return console.log('error creating order');
@@ -306,11 +316,20 @@ io.on('connect', (socket) => {
         order.date = dateFormat(order.created_at, "mmm d, h:MM TT")
 
         let charge = 0;
-        for (let i = 0; i < orderItems.length; i++) {
-          //items[] contains info about individual items (and their prices); itenCounts[] says how much of each item is ordered. Multiplication will calculate how much to charge for an item
+        let itemProfile = null;
 
-          charge += (orderItems[i].price * parseInt(itemCount[i]))
+        for (let i = 0; i < order.items.length; i++) { //items[] contains info about individual items (and their prices); itemCount[] says how much of each item is ordered. Multiplication will calculate how much to charge for an item
+          console.log("HOWDY WORLD")
+
+          itemProfile = await Item.findById(orderItemsObjects[i].item);
+
+          if (!itemProfile) {
+            return console.log('error accessing item')
+          }
+
+          charge += (itemProfile.price * orderItemsObjects[i].quantity)
         }
+        console.log(charge)
 
         order.charge = charge; //Set order cost based on the items ordered
 

@@ -5,10 +5,6 @@ var orderItemSchema = new mongoose.Schema({
   description: String,
   price: Number,
   imgUrl: String,
-  // type: {
-  //   type: mongoose.Schema.Types.ObjectId,
-  //   ref: "ItemType"
-  // },
   availableItems: Number,
   isAvailable: Boolean,
 });

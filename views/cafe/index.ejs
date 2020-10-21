@@ -68,7 +68,7 @@
                   <ul>
                     <% for (var i = 0; i < order.items.length; i++) { %>
                       <li>
-                        <%=order.items[i].name + " (" + order.quantities[i] + " orders)"%>
+                        <%=order.items[i].item.name + " (" + order.items[i].quantity + " orders)"%>
                       </li>
                     <% } %>
                   </ul>
@@ -118,7 +118,7 @@
 
                 <ul>
                   <% for (var i = 0; i < order.items.length; i++) { %>
-                    <li><%=order.items[i].name%> (<%=order.quantities[i]%> Orders)</li>
+                    <li><%=order.items[i].item.name%> (<%=order.items[i].quantity%> Orders)</li>
                   <% } %>
                 </ul>
               </li>

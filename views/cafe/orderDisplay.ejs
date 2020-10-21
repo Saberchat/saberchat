@@ -53,7 +53,7 @@
               <% } %>
               <ul class="list-group">
                 <% for (let i = 0; i < order.items.length; i++) { %>
-                    <li class="list-group-item"><%= order.items[i].name %>: <%=order.quantities[i] %> order(s)</li>
+                    <li class="list-group-item"><%= order.items[i].item.name %>: <%=order.items[i].quantity %> order(s)</li>
                 <% } %>
               </ul>
 
