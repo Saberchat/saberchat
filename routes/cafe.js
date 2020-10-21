@@ -171,7 +171,7 @@ router.post('/:id/ready', middleware.isLoggedIn, (req, res) => {
     order.present = false; //Order is not active anymore
     await order.save();
 
-    const notif = await Notification.create({subject: "Cafe Order Ready", sender: req.user, recipients: [order.customer], read: [order.customer], toEveryone: false, images: []}); //Create a notification to alert the user
+    const notif = await Notification.create({subject: "Cafe Order Ready", sender: req.user, recipients: [order.customer], read: [], toEveryone: false, images: []}); //Create a notification to alert the user
       if (!notif) {
         req.flash('error', 'Unable to send notification'); return res.redirect('/cafe/orders');
       }
