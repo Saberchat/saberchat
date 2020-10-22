@@ -18,6 +18,7 @@ router.get('/', (req, res) => {
 			user.msgCount = 0;
 			user.annCount = 0;
 			user.reqCount = 0;
+			user.save();
 		}
 	})
 	res.render('index')
