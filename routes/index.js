@@ -64,7 +64,7 @@ router.post("/register",  function(req, res) {
 				firstName: req.body.firstName,
 				lastName: req.body.lastName,
 				username: filter.clean(username),
-				notifCount: 0
+				msgCount: 0
 			}
 		);
 

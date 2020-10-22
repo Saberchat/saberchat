@@ -45,7 +45,7 @@ router.get('/menu', middleware.isLoggedIn, (req, res) => { //Renders the cafe me
   })
 })
 
-router.get('/order/new', [middleware.isLoggedIn, middleware.cafeOpen], (req, res) => { //RESTFUL routing 'order/new' route
+router.get('/order/new', middleware.isLoggedIn, middleware.cafeOpen, (req, res) => { //RESTFUL routing 'order/new' route
 
   (async() => {
 
@@ -76,7 +76,7 @@ router.get('/order/new', [middleware.isLoggedIn, middleware.cafeOpen], (req, res
   })
 });
 
-router.post('/order', [middleware.isLoggedIn, middleware.cafeOpen], (req, res) => { //RESTful routing 'order/create' route
+router.post('/order', middleware.isLoggedIn, middleware.cafeOpen, (req, res) => { //RESTful routing 'order/create' route
 
   (async () => { //Asynchronous function controls user ordering
 
@@ -141,7 +141,7 @@ router.post('/order', [middleware.isLoggedIn, middleware.cafeOpen], (req, res) =
 });
 
 
-router.get('/orders', middleware.isLoggedIn, (req, res) => { //This is for EC Cafe Workers to check all the available orders
+router.get('/orders', middleware.isLoggedIn, middleware.isMod, (req, res) => { //This is for EC Cafe Workers to check all the available orders
   Order.find({present: true})
   .populate('items.item').exec((err, foundOrders) => { //Collect all orders which are currently active, and get all info on their items
     if (err) {
@@ -155,7 +155,7 @@ router.get('/orders', middleware.isLoggedIn, (req, res) => { //This is for EC Ca
   });
 });
 
-router.delete('/order/:id', [middleware.isLoggedIn, middleware.cafeOpen], (req, res) => { //RESTful routing 'order/destroy' (for users to delete an order they no longer want)
+router.delete('/order/:id', middleware.isLoggedIn, middleware.cafeOpen, (req, res) => { //RESTful routing 'order/destroy' (for users to delete an order they no longer want)
 
   Order.findByIdAndDelete(req.params.id).populate('items.item').exec((err, foundOrder) => { //Delete the item selected in the form (but first, collect info on its items so you can replace them)
     if (err || !foundOrder) {
@@ -175,7 +175,7 @@ router.delete('/order/:id', [middleware.isLoggedIn, middleware.cafeOpen], (req, 
   })
 })
 
-router.post('/:id/ready', middleware.isLoggedIn, (req, res) => {
+router.post('/:id/ready', middleware.isLoggedIn, middleware.isMod, (req, res) => {
 
   (async () => {
     const order = await Order.findById(req.params.id).populate('items.item').populate('customer'); //Find the order that is currently being handled based on id, and populate info about its items
@@ -215,10 +215,10 @@ router.post('/:id/ready', middleware.isLoggedIn, (req, res) => {
       await notif.save();
 
       order.customer.inbox.push(notif); //Add notif to user's inbox
-      order.customer.notifCount += 1
+      order.customer.msgCount += 1
       await order.customer.save();
 
-      req.flash('success', 'Notification sent to customer! If they do not arrive within 5 minutes, try contacting them again')
+      req.flash('success', 'Order ready! A notification has been sent to the customer. If they do not arrive within 5 minutes, try contacting them again.')
       res.redirect('/cafe/orders');
 
   })().catch(err => {
@@ -227,6 +227,68 @@ router.post('/:id/ready', middleware.isLoggedIn, (req, res) => {
     res.redirect('back')
   })
 });
+
+router.post('/:id/reject', middleware.isLoggedIn, middleware.isMod, (req, res) => {
+  (async() => {
+    const order = await Order.findById(req.params.id).populate('items.item').populate('customer');
+
+    if (!order) {
+      req.flash('error', 'Could not find order'); return res.redirect('back');
+
+    } else if (order.customer._id.toString() == req.user._id.toString()) {
+      req.flash('error', 'You cannot reject your own orders'); return res.redirect('/cafe/orders');
+    }
+
+    const deletedOrder = await Order.findByIdAndDelete(order._id).populate('items.item').populate('customer');
+
+    if (!deletedOrder) {
+      req.flash('error', "Unable to delete order"); return res.redirect('back');
+    }
+
+    for (let i of order.items) { //Iterate over each item/quantity object
+      i.item.availableItems += i.quantity;
+      i.item.isAvailable = true;
+      await i.item.save();
+    }
+
+    const notif = await Notification.create({subject: "Cafe Order Rejected", sender: req.user, recipients: [order.customer], read: [], toEveryone: false, images: []}); //Create a notification to alert the user
+    if (!notif) {
+      req.flash('error', 'Unable to send notification'); return res.redirect('/cafe/orders');
+    }
+
+    notif.date = dateFormat(notif.created_at, "mmm d, h:MMTT");
+
+    let itemText = []; //This will have all the decoded info about the order
+    for (var i = 0; i < order.items.length; i++) {
+      itemText.push(` - ${order.items[i].item.name}: ${order.items[i].quantity} order(s)`);
+    }
+
+    //Render the item's charge in '$dd.cc' pattern, based on what the actual charge is
+    if (!order.charge.toString().includes('.')) {
+      notif.text = "Your order was rejected. This is most likely because we suspect your order is not genuine. Contact us if you think there has been a mistake.\n" + itemText.join("\n") + "\n\nExtra Instructions: " + order.instructions + "\nTotal Cost: $" + order.charge + ".00";
+
+    } else if (order.charge.toString().split('.')[1].length == 1){
+      notif.text = "Your order was rejected. This is most likely because we suspect your order is not genuine. Contact us if you think there has been a mistake.\n" + itemText.join("\n") + "\n\nExtra Instructions: " + order.instructions + "\nTotal Cost: $" + order.charge + "0";
+
+    } else {
+      notif.text = "Your order was rejected. This is most likely because we suspect your order is not genuine. Contact us if you think there has been a mistake.\n" + itemText.join("\n") + "\n\nExtra Instructions: " + order.instructions + "\nTotal Cost: $" + order.charge + "";
+    }
+
+    await notif.save();
+
+    order.customer.inbox.push(notif); //Add notif to user's inbox
+    order.customer.msgCount += 1
+    await order.customer.save();
+
+    req.flash('success', 'Order rejected! A message has been sent to the customer.')
+    res.redirect('/cafe/orders');
+
+  })().catch(err => {
+    console.log(err);
+    req.flash('error', "Unable to access database");
+    res.redirect('back')
+  })
+})
 
 router.get('/manage', middleware.isLoggedIn, middleware.isMod, (req, res) => { //Route to manage cafe
   Type.find({}).populate('items').exec((err, foundTypes) => { //Collect info on all the item types
@@ -487,7 +549,7 @@ router.delete('/item/:id', middleware.isLoggedIn, middleware.isMod, (req, res) =
   // Checkboxes
 // });
 
-router.get('/type/new', [middleware.isLoggedIn, middleware.isMod], (req, res) => { // RESTful route "New" for type
+router.get('/type/new', middleware.isLoggedIn, middleware.isMod, (req, res) => { // RESTful route "New" for type
   Item.find({}, (err,foundItems) => { //Collect info on all the items, so that we can give the user the option to add them to that type
     if (err || !foundItems) {
       req.flash('error', "Unable to access database")
@@ -499,7 +561,7 @@ router.get('/type/new', [middleware.isLoggedIn, middleware.isMod], (req, res) =>
   })
 })
 
-router.post('/type', [middleware.isLoggedIn, middleware.isMod], (req, res) => { // RESTful route "Create" for type
+router.post('/type', middleware.isLoggedIn, middleware.isMod, (req, res) => { // RESTful route "Create" for type
 
   ( async() => {
 
@@ -561,7 +623,7 @@ router.post('/type', [middleware.isLoggedIn, middleware.isMod], (req, res) => { 
   })
 })
 
-router.get('/type/:id', [middleware.isLoggedIn, middleware.isMod], (req, res) => { // RESTful route "Show/Edit" for type
+router.get('/type/:id', middleware.isLoggedIn, middleware.isMod, (req, res) => { // RESTful route "Show/Edit" for type
 
   (async() => {
 
@@ -586,7 +648,7 @@ router.get('/type/:id', [middleware.isLoggedIn, middleware.isMod], (req, res) =>
   });
 });
 
-router.put('/type/:id', [middleware.isLoggedIn, middleware.isMod], (req, res) => { // RESTful route "Update" for type
+router.put('/type/:id', middleware.isLoggedIn, middleware.isMod, (req, res) => { // RESTful route "Update" for type
 
   (async() => {
 
@@ -667,7 +729,7 @@ router.put('/type/:id', [middleware.isLoggedIn, middleware.isMod], (req, res) =>
   })
 })
 
-router.delete('/type/:id', [middleware.isLoggedIn, middleware.isMod], (req, res) => { //// RESTful route "Destroy" for type
+router.delete('/type/:id', middleware.isLoggedIn, middleware.isMod, (req, res) => { //// RESTful route "Destroy" for type
 
   (async() => {
 

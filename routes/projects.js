@@ -29,7 +29,7 @@ router.get('/', middleware.isLoggedIn, (req, res) => { //RESTful Routing 'INDEX'
   })
 })
 
-router.get('/new', [middleware.isLoggedIn, middleware.isFaculty], (req, res) => { ////RESTful Routing 'NEW' route
+router.get('/new', middleware.isLoggedIn, middleware.isFaculty, (req, res) => { ////RESTful Routing 'NEW' route
   User.find({permission: 'student'}, (err, foundUsers) => { //Find all students, so that when teachers post a project, they can select which students created it
     if (err || !foundUsers) {
       console.log(err)
@@ -42,7 +42,7 @@ router.get('/new', [middleware.isLoggedIn, middleware.isFaculty], (req, res) => 
   })
 })
 
-router.post('/',[middleware.isLoggedIn, middleware.isFaculty], (req, res) => { //RESTful Routing 'CRWATE' route
+router.post('/',middleware.isLoggedIn, middleware.isFaculty, (req, res) => { //RESTful Routing 'CRWATE' route
 
   (async() => { //Asynchronous functions dictates that processes occur one at a time, reducing excessive callbacks
 
@@ -74,7 +74,7 @@ router.post('/',[middleware.isLoggedIn, middleware.isFaculty], (req, res) => { /
   });
 })
 
-router.get('/:id/edit', [middleware.isLoggedIn, middleware.isFaculty], (req, res) => { //RESTful Routing 'EDIT' route
+router.get('/:id/edit', middleware.isLoggedIn, middleware.isFaculty, (req, res) => { //RESTful Routing 'EDIT' route
 
   (async() => { //Asynchronous functions dictates that processes occur one at a time, reducing excessive callbacks
 
@@ -126,7 +126,7 @@ router.get('/:id', middleware.isLoggedIn, (req, res) => { //RESTful Routing 'SHO
 })
 
 
-router.put('/:id', [middleware.isLoggedIn, middleware.isFaculty], (req, res) => {
+router.put('/:id', middleware.isLoggedIn, middleware.isFaculty, (req, res) => {
 
   (async() => { //Asynchronous functions dictates that processes occur one at a time, reducing excessive callbacks
     const creators = await User.find({username: {$in: req.body.creators.split(', ')}});
@@ -165,7 +165,7 @@ router.put('/:id', [middleware.isLoggedIn, middleware.isFaculty], (req, res) => 
   })
 })
 
-router.delete('/:id', [middleware.isLoggedIn, middleware.isFaculty], (req, res) => {
+router.delete('/:id', middleware.isLoggedIn, middleware.isFaculty, (req, res) => {
 
   (async() => { //Asynchronous functions dictates that processes occur one at a time, reducing excessive callbacks
     const project = await Project.findById(req.params.id);

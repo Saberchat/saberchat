@@ -32,33 +32,33 @@
             <article class="msg-container">
               <div class="msg-head">
                 <h1><%= message.subject %></h1>
-                <p>From: 
+                <p>From:
                   <a href= "/profiles/<%=message.sender._id%>" class="user-link">
                     <span class="badge badge-pill badge-primary">
                       <% if(message.sender._id.equals(currentUser._id)) { %>
                         me
                       <% } else { %> 
                         <%= message.sender.username %>
-                      <% } %> 
+                      <% } %>
                     </span>
                   </a>
                 </p>
-                <p>To: 
-                  <% if(message.toEveryone) { %> 
+                <p>To:
+                  <% if(message.toEveryone) { %>
                     Everyone
-                  <% } else { %> 
+                  <% } else { %>
                     <% message.recipients.forEach(user => { %>
                       <a href="/profiles/<%= user._id %>" class="user-link">
                         <span class="badge badge-pill badge-secondary">
                           <% if(user._id.equals(currentUser._id)) { %>
                             me
-                          <% } else { %> 
+                          <% } else { %>
                             <%= user.username %>
-                          <% } %> 
+                          <% } %>
                         </span>
                       </a>
                     <% }); %>
-                  <% } %> 
+                  <% } %>
                 </p>
                 <span><%=message.date%></span>
                 <a href="/inbox" class="btn btn-primary back-btn"><i class="fas fa-arrow-left"></i> Back</a>
