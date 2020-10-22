@@ -47,14 +47,32 @@ router.get('/menu', middleware.isLoggedIn, (req, res) => { //Renders the cafe me
 
 router.get('/order/new', [middleware.isLoggedIn, middleware.cafeOpen], (req, res) => { //RESTFUL routing 'order/new' route
 
-  Type.find({}).populate('items').exec((err, foundTypes) => { //Collects info on every item type, to render (in frontend, the ejs checks each item inside type, and only shows it if it's available)
-    if (err || !foundTypes) {
-      req.flash('error', "Unable to access database")
-      res.redirect('back')
+  (async() => {
 
-    } else {
-      res.render('cafe/newOrder', {types: foundTypes});
+    const sent_orders = await Order.find({name: `${req.user.firstName} ${req.user.lastName}`, present: true}) //Find all of this user's orders that are currently active
+
+    if (!sent_orders) {
+      req.flash('error', "Unable to find orders");
+      return res.redirect('back')
+
+    } else if (sent_orders.length > 2) {
+      req.flash('error', "You have made the maximum number of orders for the day");
+      return res.redirect('back')
     }
+
+    const types = await Type.find({}).populate('items');
+
+    if (!types) {
+      req.flash('error', "Unable to find types")
+      return res.redirect('back')
+    }
+
+    res.render('cafe/newOrder', {types});
+
+  })().catch(err => {
+    console.log(err);
+    req.flash('error', "Unable to access database");
+    res.redirect('back');
   })
 });
 
