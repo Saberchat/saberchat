@@ -12,15 +12,6 @@ const User = require('../models/user');
 
 // Home route. gives the landing or home or index page (whatever you want to call it).
 router.get('/', (req, res) => {
-	User.find({}, (err, users) => {
-		for (let user of users) {
-			user.inbox = []
-			user.msgCount = 0;
-			user.annCount = 0;
-			user.reqCount = 0;
-			user.save();
-		}
-	})
 	res.render('index')
 });
 
