@@ -26,11 +26,9 @@
 
     <div class="container mt-5">
       <div class="row">
-        <div class="col-12">
-          <div class="jumbotron text-center">
+        <div class="col-12" style="text-align: center;">
             <h1 style="text-align: center; width: 100%">New Cafe Item Type</h1>
-            <br /><a class="btn btn-primary" href="/cafe/manage"><i class="fas fa-arrow-left"></i> Back</a>
-          </div>
+            <a class="btn btn-primary" href="/cafe/manage"><i class="fas fa-arrow-left"></i> Back</a><br /><br />
         </div>
       </div>
 
@@ -54,8 +52,8 @@
           <div class="col-md-8 offset-md-2 col-12">
             <div class="form-group">
               <% items.forEach(item => { %>
-                <input id="item" type="checkbox" name="<%=item._id%>"/>
-                <label for="item"><%=item.name%></label>
+                <input id="item<%=item._id%>" type="checkbox" name="<%=item._id%>"/>
+                <label for="item<%=item._id%>"><%=item.name%></label>
                 <br />
               <% }) %>
             </div>

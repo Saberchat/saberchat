@@ -631,6 +631,9 @@ router.get('/type/:id', middleware.isLoggedIn, middleware.isMod, (req, res) => {
 
     if (!type) {
       req.flash('error', "Unable to access database"); return res.redirect('back')
+
+    } else if (type.name == "Other") {
+      req.flash('error', "You cannot make any changes to that category"); return res.redirect('/cafe/manage')
     }
 
     const items = await Item.find({}); //Find all items

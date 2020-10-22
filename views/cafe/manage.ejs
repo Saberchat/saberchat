@@ -82,30 +82,14 @@
           </li>
           <% types.forEach(type => { %>
             <% if (type.name != "Other") { %>
-              <div class="list-group-item list-group-item-action"><strong><%=type.name%></strong> (<%=type.items.length%> items)
-                <br />
-                <% if (type.name != "Other") { %>
-                  <a style="margin-top: 5px;" href="type/<%=type._id%>" class="btn btn-success">Edit</a>
-                  <form action="type/<%=type._id%>?_method=delete" method="post" style="display: inline-block;">
-                    <button type="submit" style="margin-top: 5px;" class="btn btn-danger">Delete</button>
-                  </form>
-                <% } %>
-              </div>
+              <a href="type/<%=type._id%>" class="list-group-item list-group-item-action"><strong><%=type.name%></strong> (<%=type.items.length%> items)</a>
             <% } %>
           <% }) %>
 
           <!-- Ensures that 'other' will be last -->
           <% types.forEach(type => { %>
             <% if (type.name == "Other") { %>
-              <div class="list-group-item list-group-item-action"><strong><%=type.name%></strong> (<%=type.items.length%> items)
-                <br />
-                <% if (type.name != "Other") { %>
-                  <a style="margin-top: 5px;" href="type/<%=type._id%>" class="btn btn-success">Edit</a>
-                  <form action="type/<%=type._id%>?_method=delete" method="post" style="display: inline-block;">
-                    <button type="submit" style="margin-top: 5px;" class="btn btn-danger">Delete</button>
-                  </form>
-                <% } %>
-              </div>
+              <div class="list-group-item list-group-item-action"><strong><%=type.name%></strong> (<%=type.items.length%> items) <strong style="color: red;">You cannot edit or delete this category </strong></div>
             <% } %>
           <% }) %>
 

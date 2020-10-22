@@ -27,15 +27,19 @@
     <div class="container mt-5">
       <div class="row">
         <div class="col-12">
-          <h1 style="text-align: center; width: 100%">Edit Cafe Item<h1>
+          <div style="text-align: center;"  class="col-12">
+            <h1 style="text-align: center; width: 100%">Edit Cafe Item - "<%=item.name%>"<h1>
+            <a class="btn btn-primary" href="/cafe/manage"><i class="fas fa-arrow-left"></i> Back</a><br />
+          </div>
         </div>
       </div>
+      
       <div class="row">
         <div class="col-md-8 offset-md-2 col-12">
           <form action="/cafe/item/<%= item._id %>?_method=put" method="post">
             <div class="form-group">
               <div class="row mb-3">
-                <div class="col">
+                <div class="col" style="text-align: center;">
                   <label for="usernameInput">Name</label>
                   <input id="usernameInput" class="form-control" type="text" name="name" placeholder="name" value="<%= item.name %>" maxlength="45" required>
                 </div>
@@ -100,7 +104,7 @@
       <div class="row mt-2">
         <div class="col-md-8 offset-md-2 col-12">
           <form action="/cafe/item/<%= item._id %>?_method=delete" method="post" id="delete-form">
-            <button type="button" class="btn btn-danger btn-lg btn-block" data-toggle="modal" data-target="#modal" id="delete-button">Delete this item</button>
+            <button type="button" class="btn btn-danger btn-lg btn-block" data-toggle="modal" data-target="#modal" id="delete-button">Delete Item</button>
             <div class="modal fade" id="modal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
               <div class="modal-dialog">
                 <div class="modal-content">

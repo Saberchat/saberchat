@@ -27,12 +27,13 @@
     <div class="container mt-5">
       <div class="row">
         <div class="col-12">
-          <div class="jumbotron text-center">
-            <h1 style="text-align: center; width: 100%">Edit Cafe Item Type - "<%=type.name%>"</h1>
-            <br /><a class="btn btn-primary" href="/cafe/manage"><i class="fas fa-arrow-left"></i> Back</a>
+          <div style="text-align: center;"  class="col-12">
+            <h1 style="text-align: center; width: 100%">Edit Cafe Category - "<%=type.name%>"</h1>
+            <a class="btn btn-primary" href="/cafe/manage"><i class="fas fa-arrow-left"></i> Back</a><br /><br />
           </div>
         </div>
       </div>
+
       <form action="/cafe/type/<%=type._id%>?_method=put" method="post">
 
         <h2 style="text-align: center;">Name</h2>
@@ -54,13 +55,13 @@
             <div class="form-group">
               <% items.forEach(item => { %>
                 <% if (type.items.includes(item._id)) { %>
-                  <input id="item" type="checkbox" name="<%=item._id%>" checked/>
-                  <label for="item"><%=item.name%></label>
+                  <input id="item<%=item._id%>" type="checkbox" name="<%=item._id%>" checked/>
+                  <label for="item<%=item._id%>"><%=item.name%></label>
                   <br />
 
                 <% } else { %>
-                  <input id="item" type="checkbox" name="<%=item._id%>"/>
-                  <label for="item"><%=item.name%></label>
+                  <input id="item<%=item._id%>" type="checkbox" name="<%=item._id%>"/>
+                  <label for="item<%=item._id%>"><%=item.name%></label>
                   <br />
 
                 <% }%>
@@ -74,8 +75,31 @@
             <button type="submit" class="btn btn-lg btn-primary btn-block">Submit Changes</button>
           </div>
         </div>
-        <br />
 
+        <div class="row mt-2">
+          <div class="col-md-8 offset-md-2 col-12">
+              <button type="button" class="btn btn-danger btn-lg btn-block" data-toggle="modal" data-target="#modal" id="delete-button">Delete Category</button>
+              <div class="modal fade" id="modal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+                <div class="modal-dialog">
+                  <div class="modal-content">
+                    <div class="modal-header">
+                      <h5 class="modal-title" id="exampleModalLabel">Delete this category?</h5>
+                      <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                      </button>
+                    </div>
+                    <div class="modal-body">
+                      You will have to manually add this category back
+                    </div>
+                    <div class="modal-footer">
+                      <button type="button" class="btn btn-secondary" data-dismiss="modal">Back</button>
+                      <button type="submit" formaction="<%=type._id%>?_method=delete" class="btn btn-danger">Delete</button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+          </div>
+        </div>
       </form>
     </div>
   </body>
