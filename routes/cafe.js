@@ -125,12 +125,12 @@ router.post('/order', [middleware.isLoggedIn, middleware.cafeOpen], (req, res) =
 
       } else {
         req.flash("error", "Some items are unavailable in the quantities you requested")
-        res.redirect('/cafe/new');
+        res.redirect('/cafe/order/new');
       }
 
     } else { //If no items were checked
       req.flash('error', "Cannot send empty order")
-      res.redirect('/cafe/new');
+      res.redirect('/cafe/order/new');
     }
 
   })().catch(err => {
