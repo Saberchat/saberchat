@@ -53,7 +53,17 @@
               <% } %>
               <ul class="list-group">
                 <% for (let i = 0; i < order.items.length; i++) { %>
-                    <li class="list-group-item"><%= order.items[i].item.name %>: <%=order.items[i].quantity %> order(s)</li>
+
+                  <% if (!(order.items[i].quantity * order.items[i].item.price).toString().includes('.')) { %>
+                    <li class="list-group-item"><%= order.items[i].item.name %> (<%=order.items[i].quantity %> orders) - $<%=order.items[i].quantity * order.items[i].item.price%>.00</li>
+
+                  <% } else if ((order.items[i].quantity * order.items[i].item.price).toString().split('.')[1].length == 1){ %>
+                    <li class="list-group-item"><%= order.items[i].item.name %> (<%=order.items[i].quantity %> orders) - $<%=order.items[i].quantity * order.items[i].item.price%>0</li>
+
+                  <% } else { %>
+                    <li class="list-group-item"><%= order.items[i].item.name %> (<%=order.items[i].quantity %> orders) - $<%=order.items[i].quantity * order.items[i].item.price%></li>
+                  <% } %>
+
                 <% } %>
               </ul>
 

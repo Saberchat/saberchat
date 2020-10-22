@@ -64,11 +64,20 @@
                     <h4><strong>Order - $<%= order.charge %></strong></h4>
                   <% } %>
 
-                  <% let itemText = []; %>
                   <ul>
                     <% for (var i = 0; i < order.items.length; i++) { %>
                       <li>
-                        <%=order.items[i].item.name + " (" + order.items[i].quantity + " orders)"%>
+
+                        <% if (!(order.items[i].quantity * order.items[i].item.price).toString().includes('.')) { %>
+                          <%= order.items[i].item.name + " (" + order.items[i].quantity + " orders) - $" + order.items[i].quantity * order.items[i].item.price + ".00"%>
+
+                        <% } else if ((order.items[i].quantity * order.items[i].item.price).toString().split('.')[1].length == 1){ %>
+                          <%= order.items[i].item.name + " (" + order.items[i].quantity + " orders) - $" + order.items[i].quantity * order.items[i].item.price + "0" %>
+
+                        <% } else { %>
+                          <%= order.items[i].item.name + " (" + order.items[i].quantity + " orders) - $" + order.items[i].quantity * order.items[i].item.price %>
+                        <% } %>
+
                       </li>
                     <% } %>
                   </ul>
@@ -118,7 +127,19 @@
 
                 <ul>
                   <% for (var i = 0; i < order.items.length; i++) { %>
-                    <li><%=order.items[i].item.name%> (<%=order.items[i].quantity%> Orders)</li>
+                    <li>
+
+                      <% if (!(order.items[i].quantity * order.items[i].item.price).toString().includes('.')) { %>
+                        <%= order.items[i].item.name + " (" + order.items[i].quantity + " orders) - $" + order.items[i].quantity * order.items[i].item.price + ".00"%>
+
+                      <% } else if ((order.items[i].quantity * order.items[i].item.price).toString().split('.')[1].length == 1){ %>
+                        <%= order.items[i].item.name + " (" + order.items[i].quantity + " orders) - $" + order.items[i].quantity * order.items[i].item.price + "0" %>
+
+                      <% } else { %>
+                        <%= order.items[i].item.name + " (" + order.items[i].quantity + " orders) - $" + order.items[i].quantity * order.items[i].item.price %>
+                      <% } %>
+
+                    </li>
                   <% } %>
                 </ul>
               </li>
