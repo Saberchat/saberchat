@@ -89,7 +89,7 @@
           <!-- Ensures that 'other' will be last -->
           <% types.forEach(type => { %>
             <% if (type.name == "Other") { %>
-              <div class="list-group-item list-group-item-action"><strong><%=type.name%></strong> (<%=type.items.length%> items) <strong style="color: red;">You cannot edit or delete this category </strong></div>
+              <div class="list-group-item list-group-item-action"><strong><%=type.name%></strong> (<%=type.items.length%> items) <strong style="color: red;">You cannot modify this category </strong></div>
             <% } %>
           <% }) %>
 
