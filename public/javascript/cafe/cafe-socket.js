@@ -1,7 +1,6 @@
 function order(form, customer) {
   var socket = io();
   let items = document.getElementById('item-list')
-  console.log(items)
 
   $(form).submit(function (e) {
     // e.preventDefault();
@@ -24,7 +23,6 @@ function order(form, customer) {
 
     if (itemList.length > 0) {
       socket.emit('order', itemList, itemCount, instructions, customer);
-      console.log("_" + instructions + "_");
     }
   });
 }

@@ -55,10 +55,12 @@
                         <% if (user.status.toLowerCase() == status[0]) { %>
                             <a href="/profiles/<%= user._id %>" class="list-group-item list-group-item-action">
                               <img class="profile-image" src="<%= user.imageUrl %>" alt="profile picture">
-                              <span class="username <%=status[0]%>"><%= user.username %></span>
+                              <span class="username <%=status[0]%>"><strong><%=user.firstName%> <%=user.lastName%></strong> <span style="font-size: 80%;"><%=`${user.username}`%></span></span>
                               <% if (user.permission == 'admin') { %>
                                 <span class="badge badge-info">Admin</span>
-                              <% } %>
+                              <% } else if (user.permission == "mod") { %>
+                                <span class="badge badge-success">Moderator</span>
+                              <% }%>
                             </a>
                         <% } %>
                       <% } %>
@@ -94,6 +96,7 @@
           for (let status of statuses) {
             statusIncluded = false;
             for (let member of document.getElementsByClassName(status[0])) {
+              console.log(member.innerText.toUpperCase())
               if (member.innerText.toUpperCase().indexOf(filter) > -1) {
                 statusIncluded = true;
                 break;

@@ -43,3 +43,7 @@ input#search-input {
     height:40px;
     object-fit: cover;
 }
+
+strong {
+  font-weight: bold;
+}

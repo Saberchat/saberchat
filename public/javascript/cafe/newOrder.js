@@ -1,7 +1,6 @@
 //Collect DOM Elements
 
 const container = document.getElementById('container')
-console.log(container)
 const dropdown = document.getElementsByTagName('select')
 const fci = document.getElementsByClassName('form-check-input')
 const fcl = document.getElementsByClassName('form-check-label')

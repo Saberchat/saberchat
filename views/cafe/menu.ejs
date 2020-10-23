@@ -31,14 +31,18 @@
             <a class="btn btn-primary" href='/cafe'><i class="fas fa-arrow-left"></i> Back to Cafe</a>
             <a class="btn btn-info" href='/cafe/order/new'><i class="fas fa-plus-circle"></i> Order</a>
           </div>
+          <div class="search-filter">
+              <i class="fas fa-search"></i>
+              <input id="search-input" onkeyup="searchFunction()" class="form-control" type="text" placeholder="Search..." title="Type in Username">
+          </div>
         </div>
       </div>
       <div class="row">
         <div class="col-12">
           <% types.forEach(type => { %>
             <% if (type.items.length > 0) { %>
-              <br />
-              <li class="list-group-item list-group-item-success">
+              <br class="category-break" id="<%=type._id%>-break"/>
+              <li class="list-group-item list-group-item-success category-header" id="<%=type._id%>-header">
                 <div class="d-flex w-100 justify-content-between">
                   <h2 class="mb-1"><%=type.name%></h2>
                 </div>
@@ -48,13 +52,13 @@
                 <% if (item.isAvailable == true) { %>
 
                   <% if (!item.price.toString().includes('.')) { %>
-                    <span class="list-group-item list-group-item-action"><strong><%= item.name %> (<%= item.availableItems%> orders available)</strong> - $<%=item.price%>.00<br /> <em><%= item.description %></em><br /><br /><img  src=<%=item.imgUrl%> style="width: 20%; height: 20%; border-radius: 20px;"/></span>
+                    <span class="list-group-item list-group-item-action menu-item <%=type.name%>" id="item-<%=item.id%>"><strong><%= item.name %> (<%= item.availableItems%> orders available)</strong> - $<%=item.price%>.00<br /> <em><%= item.description %></em><br /><br /><img  src=<%=item.imgUrl%> style="width: 20%; height: 20%; border-radius: 20px;"/></span>
 
                   <% } else if (item.price.toString().split('.')[1].length == 1){ %>
-                    <span class="list-group-item list-group-item-action"><strong><%= item.name %> (<%= item.availableItems%> orders available)</strong> - $<%=item.price%>0<br /> <em><%= item.description %></em><br /><br /><img  src=<%=item.imgUrl%> style="width: 20%; height: 20%; border-radius: 20px;"/></span>
+                    <span class="list-group-item list-group-item-action menu-item <%=type.name%>" id="item-<%=item.id%>"><strong><%= item.name %> (<%= item.availableItems%> orders available)</strong> - $<%=item.price%>0<br /> <em><%= item.description %></em><br /><br /><img  src=<%=item.imgUrl%> style="width: 20%; height: 20%; border-radius: 20px;"/></span>
 
                   <% } else { %>
-                    <span class="list-group-item list-group-item-action"><strong><%= item.name %> (<%= item.availableItems%> orders available)</strong> - $<%=item.price%><br /> <em><%= item.description %></em><br /><br /><img  src=<%=item.imgUrl%> style="width: 20%; height: 20%; border-radius: 20px;"/></span>
+                    <span class="list-group-item list-group-item-action menu-item <%=type.name%>" id="item-<%=item.id%>"><strong><%= item.name %> (<%= item.availableItems%> orders available)</strong> - $<%=item.price%><br /> <em><%= item.description %></em><br /><br /><img  src=<%=item.imgUrl%> style="width: 20%; height: 20%; border-radius: 20px;"/></span>
                   <% } %>
 
                 <% }%>
@@ -66,5 +70,50 @@
         </div>
       </div>
     </div>
+
+    <script>
+
+    function searchFunction() {
+      const catHeaders = document.getElementsByClassName('category-header') //Category header
+      const catBreaks = document.getElementsByClassName('category-break') //Category page break
+      const menuItems = document.getElementsByClassName('menu-item')
+      const input = document.getElementById("search-input");
+      let filter = input.value.toLowerCase();
+
+      for (let item of menuItems) {
+        if(!item.innerText.toLowerCase().includes(filter)) {
+          $(`#${item.id}`).hide()
+
+        } else {
+          $(`#${item.id}`).show()
+        }
+      }
+
+      let catIncluded; //"Category Included"
+
+      for (let h = 0; h < catHeaders.length; h+= 1) {
+        catIncluded = false;
+
+        for (let item of document.getElementsByClassName(catHeaders[h].innerText)) {
+          if(item.innerText.toLowerCase().includes(filter)) {
+            catIncluded = true;
+            break
+          }
+        }
+
+        if (catIncluded) {
+          $(`#${catHeaders[h].id}`).show()
+          $(`#${catBreaks[h].id}`).show()
+
+        } else {
+          $(`#${catHeaders[h].id}`).hide()
+          $(`#${catBreaks[h].id}`).hide()
+        }
+      }
+
+    }
+
+
+    </script>
   </body>
 </html>
