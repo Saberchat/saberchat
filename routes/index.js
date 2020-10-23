@@ -43,26 +43,40 @@ router.post("/register",  function(req, res) {
 		req.flash('error', 'Fill in username');
 		res.redirect('/');
 	} else if(req.body.password == '') {
-		req.flash('error', 'Fill in password name');
+		req.flash('error', 'Fill in password');
 		res.redirect('/');
-	} else if(req.body.password.length <= 8) {
+	} else if(req.body.password.length < 8) {
 		req.flash('error', 'Password too short');
 		res.redirect('/');
 
 	} else {
 
 		let username = req.body.username;
-
-		if (username[username.length - 1] == ' ') { //Space at the end of usrname causes errors that are hard to fix, and unnecessary if we nip it in the bud here
+		if (username[username.length - 1] == ' ') { //Space at the end of username causes errors that are hard to fix, and unnecessary if we nip it in the bud here
 			username = username.slice(0, username.length - 1);
+		}
+
+		let firstName = req.body.firstName;
+		if (firstName[firstName.length - 1] == ' ') { //Space at the end of username causes errors that are hard to fix, and unnecessary if we nip it in the bud here
+			firstName = firstName.slice(0, firstName.length - 1);
+		}
+
+		let lastName = req.body.lastName;
+		if (lastName[lastName.length - 1] == ' ') { //Space at the end of username causes errors that are hard to fix, and unnecessary if we nip it in the bud here
+			lastName = lastName.slice(0, lastName.length - 1);
+		}
+
+		let email = req.body.email;
+		if (email[email.length - 1] == ' ') { //Space at the end of username causes errors that are hard to fix, and unnecessary if we nip it in the bud here
+			email = email.slice(0, email.length - 1);
 		}
 
 		//creates new user from form info
 		newUser = new User(
 			{
-				email: req.body.email,
-				firstName: req.body.firstName,
-				lastName: req.body.lastName,
+				email: email,
+				firstName: firstName,
+				lastName: lastName,
 				username: filter.clean(username),
 				msgCount: 0,
 				annCount: 0,
