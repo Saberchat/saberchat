@@ -96,7 +96,6 @@
           for (let status of statuses) {
             statusIncluded = false;
             for (let member of document.getElementsByClassName(status[0])) {
-              console.log(member.innerText.toUpperCase())
               if (member.innerText.toUpperCase().indexOf(filter) > -1) {
                 statusIncluded = true;
                 break;
