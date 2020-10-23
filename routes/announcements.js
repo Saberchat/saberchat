@@ -38,6 +38,13 @@ router.get('/:id', middleware.isLoggedIn, (req, res) => { //RESTful Routing 'SHO
       res.redirect('back');
 
     } else {
+      for (let ann of req.user.annCount) {
+        if (foundAnn._id.toString() == ann._id.toString()) {
+          req.user.annCount.splice(req.user.annCount.indexOf(ann), 1)
+        }
+      }
+
+      req.user.save()
       res.render('announcements/show', {announcement: foundAnn});
     }
   });
@@ -58,9 +65,11 @@ router.get('/:id/edit', middleware.isLoggedIn, middleware.isAdmin, (req, res) =>
 })
 
 router.post('/', middleware.isLoggedIn, middleware.isAdmin, (req, res) => { //RESTful Routing 'CREATE' route
-  Announcement.create({sender: req.user, subject: req.body.subject, text: req.body.message}, (err, announcement) => { //Create announcement with form data
-    if(err || !announcement) {
-      req.flash('error', 'Unable to access database');
+  (async() => {
+    const announcement = await Announcement.create({sender: req.user, subject: req.body.subject, text: req.body.message});
+
+    if(!announcement) {
+      req.flash('error', 'Unable to create announcement');
       return res.redirect('back');
     }
 
@@ -70,11 +79,28 @@ router.post('/', middleware.isLoggedIn, middleware.isAdmin, (req, res) => { //RE
       }
     }
     announcement.date = dateFormat(announcement.created_at, "h:MMTT | mmm d");
-    announcement.save();
+    await announcement.save();
+
+    const users = await User.find({_id: {$nin: [req.user._id]}});
+
+    if (!users) {
+      req.flash('error', "Unable to access database");
+      res.rediect('back');
+    }
+
+    for (let user of users) {
+      user.annCount.push(announcement);
+      await user.save()
+    }
 
     req.flash('success', 'Announcement posted to bulletin!');
     res.redirect('/announcements/');
-  });
+
+  })().catch(err => {
+    console.log(err);
+    req.flash('error', "Unable to access database");
+    return res.redirect('back');
+  })
 })
 
 router.put('/:id', middleware.isLoggedIn, middleware.isAdmin, (req, res) => { //RESTful Routing 'UPDATE' route

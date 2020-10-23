@@ -79,7 +79,7 @@ router.post("/register",  function(req, res) {
 				lastName: lastName,
 				username: filter.clean(username),
 				msgCount: 0,
-				annCount: 0,
+				annCount: [],
 				reqCount: 0
 			}
 		);

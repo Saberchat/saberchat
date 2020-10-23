@@ -41,12 +41,21 @@
         <div class="row" style="margin-bottom: 2rem;">
             <div class="col-lg-12">
                 <article class="text-block">
-                    <div class="block-header grey">
-                        <h5><a href="/announcements/<%=announcement._id%>" style="color:white;"><%=announcement.subject%></a>
+                    <div class="block-header grey" style="padding-bottom: 20px;">
+                      <h5>
+                        <% if (currentUser.annCount.includes(announcement._id)) { %>
+                          <a href="/announcements/<%=announcement._id%>" style="color:white;"><%=announcement.subject%>  <span class="badge badge-pill badge-danger">New!</span></a>
+                        <% } else { %>
+                          <a href="/announcements/<%=announcement._id%>" style="color:white;"><%=announcement.subject%></a>
+                          
+                        <% }%>
+                        <a class= "float-right" style="color:white; font-size: 80%;"><%=announcement.date%></a>
+                      </h5>
 
-                        <a class="col-12" style="color:white; padding_left: 50;"><%=announcement.date%></a>
-                        <a class= "float-right" href= "../profiles/<%=announcement.sender._id%>" style="color:white; padding-right: 50;"><%=announcement.sender.username%></a></h5>
-
+                      <a style="color:white;" href= "../profiles/<%=announcement.sender._id%>" >
+                        <img src="<%= announcement.sender.imageUrl %>" alt="profile pic" style="width: 30px; height: 30px; object-fit: cover; border-radius: 50%;">
+                        <%=announcement.sender.username%>
+                      </a>
 
 
                     </div>
@@ -58,7 +67,7 @@
                       <% } %>
 
                     </div>
-                </article>
+                </a>
             </div>
 
         </div>
