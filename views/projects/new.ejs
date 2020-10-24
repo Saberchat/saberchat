@@ -11,6 +11,7 @@
     <link rel="stylesheet" href="/stylesheets/components/navbar.css">
     <link rel="stylesheet" href="/stylesheets/components/header.css">
     <link rel="stylesheet" href="/stylesheets/projects/projects.css">
+    <link rel="stylesheet" href="/stylesheets/announcements/form.css">
 
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
@@ -37,67 +38,111 @@
       </div>
     </div>
 
-    <form action="/projects" method="post" style="text-align: center;" enctype="multipart/form-data">
-      <div class="input-group mb-3">
-        <input id="new-project-message" name="title" maxlength="30" type="text" class="form-control" placeholder="Enter Project Name" aria-label="Username" aria-describedby="basic-addon1" required>
-      </div>
+    <div class="row">
+      <div class="col-md-8 offset-md-2 col-12">
+        <form action="/projects" method="post" style="text-align: center;">
+          <div class="form-group">
+            <label style="float: left;" for="new-project-message"><strong>Title</strong></label>
+            <input id="new-project-message" name="title" maxlength="30" type="text" class="form-control" placeholder="Project Title" aria-label="Username" aria-describedby="basic-addon1" required>
+          </div><br />
 
-      <div class="input-group mb-3">
-        <div id="dropdown-button" class="input-group-prepend">
-          <button type="button" class="btn btn-outline-secondary dropdown-toggle dropdown-toggle-split" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-            <span class="sr-only">Toggle Dropdown</span>
-          </button>
-          <div class="dropdown-menu">
-            <% students.forEach(student => { %>
-              <a class="dropdown-item"><%=student.username%></a>
-            <% }) %>
+          <div class="form-group" id="creator-div">
+            <label style="float: left;" for="creator-select"><strong>Creators</strong></label>
+            <select id="creator-select" class="form-control" onchange="addCreator('user')" required>
+              <option value="" selected disabled>Select Students</option>
+              <% students.forEach(student => { %>
+                <option value="<%=student._id%>"><%=student.username%></a>
+              <% }) %>
+            </select>
+            <input type="text" id="creator-input" name="creatorInput" hidden />
+            <br />
           </div>
-        </div>
-        <input id="creators" class="form-control" autocomplete="off" name="creators" type="text" aria-describedby="basic-addon2" placeholder="Creators" required/>
-        <div class="input-group-append">
-          <button id="clear" class="btn btn-outline-secondary" type="button" style="background-color: rgb(202, 0, 0); color: white;">Clear Field</button>
-        </div>
-      </div>
 
-      <div class="input-group mb-3">
-        <!-- <input id="project-file" type="file" accept="image/*" name="img" ><br /> -->
-        <!-- <label for='project-file'>Project Image URL</label> -->
-        <input id="new-project-images" type="text" name="img" class="form-control" placeholder="Enter Image Url" aria-label="Username" aria-describedby="basic-addon1" required>
-      </div>
+          <div class="form-group">
+            <label style="float: left;" for="image-input"><strong>Image</strong></label>
+            <input id="image-input" type="text" name="img" class="form-control" placeholder="Enter Image Url" aria-label="Username" aria-describedby="basic-addon1" required>
+            <br />
+            <img id="project-image" style="width: 30%; height: 30%;" src="" alt="Image Does Not Exist"/>
+          </div><br />
 
-      <div class="input-group">
-        <textarea id="new-project-text" maxlength="500" name="text" placeholder="Write a little about the project" class="form-control" aria-label="With textarea" required></textarea>
+          <div class="form-group">
+            <label style="float: left;" for="new-project-text"><strong>Description</strong></label>
+            <textarea id="new-project-text" minlength="200" maxlength="800" name="text" rows="5" placeholder="Write a little about the project" class="form-control" aria-label="With textarea" required></textarea>
+          </div><br />
+
+          <button class="btn btn-primary btn-block" type="submit">Post</button><br />
+        </form>
       </div>
-      <br />
-      <button class="btn btn-primary" type="submit">Submit Project</button>
-    </form>
+    </div>
   </body>
 
   <script>
 
-  $("#creators").on('keydown paste', function(e){
-      e.preventDefault();
-  });
+    const creatorSelect = document.getElementById('creator-select');
+    const creatorDiv = document.getElementById('creator-div');
+    const creatorInput = document.getElementById('creator-input');
+    const imageInput = document.getElementById('image-input');
+    const projectImage = document.getElementById('project-image');
 
-  let creator_options = document.getElementsByClassName('dropdown-item')
-  let creators_list = document.getElementById('creators')
-  let clear = document.getElementById('clear')
+    $("#project-image").hide()
 
-  for (let option of creator_options) {
-    option.addEventListener('click', () => {
-      if (!creators_list.value.split(', ').includes(option.innerText)) {
-        if (creators_list.value == '') {
-          creators_list.value += `${option.innerText}`
-        } else {
-          creators_list.value += `, ${option.innerText}`
+    let creatorList = [];
+
+    const addCreator = (user => {
+      if (!creatorList.includes(creatorSelect.value)) {
+
+        let newCreator = document.createElement('div');
+        newCreator.classList.add('user-tag');
+        newCreator.id = `${creatorSelect.value}`;
+        creatorList.push(creatorSelect.value);
+        creatorInput.value = creatorList.toString();
+
+        newCreator.innerHTML = `<span name="creators" value="${creatorSelect.value}">${creatorSelect.options[creatorSelect.selectedIndex].text}</span>
+        <button type="button" id="${creatorSelect.value}" onclick="remCreator(this)">&times;</button>`;
+        creatorDiv.appendChild(newCreator);
+      }
+    })
+
+    const remCreator = (btn => {
+      const id = btn.id;
+
+      const userTags = document.getElementsByClassName('user-tag');
+      for (let tag of userTags) {
+
+        if(tag.id == id) {
+          creatorDiv.removeChild(tag);
+          creatorList.splice(creatorList.indexOf(id), 1);
+          creatorInput.value = creatorList.toString();
         }
       }
     })
-  }
 
-  clear.addEventListener('click', () => {
-    creators_list.value = ""
-  })
+    imageInput.addEventListener('keydown', () => {
+      setTimeout(() => {
+
+        if (imageInput.value == "") {
+          projectImage.src = imageInput.value;
+          $("#project-image").hide();
+
+        } else {
+          projectImage.src = imageInput.value;
+          $("#project-image").show();
+        }
+      }, 3)
+    })
+
+    imageInput.addEventListener('paste', () => {
+      setTimeout(() => {
+        projectImage.src = imageInput.value;
+
+        if (imageInput.value == "") {
+          $("#project-image").hide();
+
+        } else {
+          $("#project-image").show();
+        }
+      }, 3)
+    })
 
   </script>
 </html>

@@ -12,6 +12,7 @@
     <link rel="stylesheet" href="/stylesheets/components/announcement.css">
     <link rel="stylesheet" href="/stylesheets/announcements/index.css">
     <link rel="stylesheet" href="/stylesheets/home/index.css">
+
     <script src="https://code.jquery.com/jquery-3.5.1.min.js" integrity="sha256-9/aliU8dGd2tb6OSsuzixeV4y/faTqgFtohetphbbj0=" crossorigin="anonymous"></script>
     <script src="https://unpkg.com/@popperjs/core@2" crossorigin="anonymous"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js" integrity="sha384-OgVRvuATP1z7JjHLkuOU7Xw704+h835Lr+6QL9UvYjZE3Ipu6Tp75j7Bh/kR0JKI" crossorigin="anonymous"></script>
@@ -28,82 +29,62 @@
           <div class="jumbotron text-center">
             <h1><i class="fas fa-bullhorn"></i> Announcements</h1>
             <p>The latest news from staff</p>
-            <% if (currentUser.permission == "admin") { %>
+            <% if (currentUser.permission == "admin" || currentUser.status == "faculty") { %>
               <a href="/announcements/new" class="btn btn-primary" style="color: white;"><i class="fas fa-bullhorn"></i> Send Announcement</a>
             <% } %>
           </div>
         </div>
       </div>
-      <% if (announcements.length <= 5) { %>
+
         <% announcements.forEach(announcement => { %>
 
-
-        <div class="row" style="margin-bottom: 2rem;">
+          <div class="row" style="margin-bottom: 2rem;">
             <div class="col-lg-12">
-                <article class="text-block">
-                    <div class="block-header grey" style="padding-bottom: 20px;">
-                      <h5>
-                        <% if (currentUser.annCount.includes(announcement._id)) { %>
-                          <a href="/announcements/<%=announcement._id%>" style="color:white;"><%=announcement.subject%>  <span class="badge badge-pill badge-danger">New!</span></a>
-                        <% } else { %>
-                          <a href="/announcements/<%=announcement._id%>" style="color:white;"><%=announcement.subject%></a>
-                          
-                        <% }%>
-                        <a class= "float-right" style="color:white; font-size: 80%;"><%=announcement.date%></a>
-                      </h5>
+              <article class="text-block">
+                <div class="block-header grey" style="padding-bottom: 20px;">
+                  <h5>
+                    <% let index = -1 %>
+                    <% for (let i = 0; i < currentUser.annCount.length; i += 1) { %>
+                      <% if (currentUser.annCount[i].announcement.toString() == announcement._id.toString()) { %>
+                        <% index = i; %>
+                      <% } %>
+                    <% } %>
 
-                      <a style="color:white;" href= "../profiles/<%=announcement.sender._id%>" >
-                        <img src="<%= announcement.sender.imageUrl %>" alt="profile pic" style="width: 30px; height: 30px; object-fit: cover; border-radius: 50%;">
-                        <%=announcement.sender.username%>
-                      </a>
+                    <% if (index != -1) { %>
+                      <% if (currentUser.annCount[index].version == "new") { %>
+                        <a href="/announcements/<%=announcement._id%>" style="color:white;"><%=announcement.subject%>  <span class="badge badge-pill badge-danger">New!</span></a>
 
-
-                    </div>
-                    <div class="block-content">
-                      <% if (announcement.text.split(" ").length > 30) { %>
-                        <p><%=announcement.text.split(" ").slice(0,31).join(" ")%> <a href="/announcements/<%=announcement._id%>">(Read More)</a></p>
-                      <% } else { %>
-                        <p><%=announcement.text%></p>
+                      <% } else if (currentUser.annCount[index].version == "updated") { %>
+                        <a href="/announcements/<%=announcement._id%>" style="color:white;"><%=announcement.subject%>  <span class="badge badge-pill badge-info">Updated!</span></a>
                       <% } %>
 
-                    </div>
-                </a>
-            </div>
+                    <% } else { %>
+                      <a href="/announcements/<%=announcement._id%>" style="color:white;"><%=announcement.subject%></a>
 
-        </div>
+                    <% }%>
+                    <a class= "float-right" style="color:white; font-size: 80%;"><%=announcement.date%></a>
+                  </h5>
+
+                  <a style="color:white;" href= "../profiles/<%=announcement.sender._id%>" >
+                    <img src="<%= announcement.sender.imageUrl %>" alt="profile pic" style="width: 30px; height: 30px; object-fit: cover; border-radius: 50%;">
+                    <%=announcement.sender.username%>
+                  </a>
+
+
+                </div>
+                <div class="block-content">
+                  <% if (announcement.text.split(" ").length > 30) { %>
+                    <p><%=announcement.text.split(" ").slice(0,31).join(" ")%> <a href="/announcements/<%=announcement._id%>">(Read More)</a></p>
+                  <% } else { %>
+                    <p><%=announcement.text%></p>
+                  <% } %>
+
+                </div>
+              </article>
+            </div>
+          </div>
+
         <% }) %>
-
-      <% } else { %>
-        <% announcements.slice(0,5).forEach(announcement => { %>
-
-
-        <div class="row" style="margin-bottom: 5rem;">
-            <div class="col-lg-12">
-                <article class="text-block">
-                    <div class="block-header grey">
-                        <h1><a href="/announcements/<%=announcement._id%>" style="color:white;"><%=announcement.subject%></a></h1>
-
-                          <h5>Posted by <a href= "../profiles/<%=announcement.sender._id%>" style="color:white;"><%=announcement.sender.username%></a></h5>
-
-                    </div>
-                    <div class="block-content">
-                      <% if (announcement.text.split(" ").length > 30) { %>
-                        <p><%=announcement.text.split(" ").slice(0,31).join(" ")%> <a href="/announcements/<%=announcement._id%>">(Read More)</a></p>
-                      <% } else { %>
-                        <p><%=announcement.text%></p>
-                      <% } %>
-
-
-                    </div>
-                </article>
-            </div>
-            <div class="col-lg-6 block">
-
-            </div>
-        </div>
-        <% }) %>
-      <% } %>
-
-
-  </div>
+      </div>
+    </body>
 </html>

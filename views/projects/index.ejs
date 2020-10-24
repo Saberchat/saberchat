@@ -11,6 +11,8 @@
     <link rel="stylesheet" href="/stylesheets/components/header.css">
     <link rel="stylesheet" href="/stylesheets/components/navbar.css">
     <link rel="stylesheet" href="/stylesheets/projects/projects.css">
+    <link rel="stylesheet" href="/stylesheets/announcements/index.css">
+    <link rel="stylesheet" href="/stylesheets/home/index.css">
 
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
@@ -19,12 +21,13 @@
 
     <!-- I'm using my fontawesome kit -->
     <script src="https://kit.fontawesome.com/dccc745c41.js" crossorigin="anonymous"></script>
-
-  </head>
-  <body>
     <!-- include the navbar via ejs -->
     <%- include('../partials/navbar') %>
     <%- include('../partials/header') %>
+
+  </head>
+  <body>
+
     <div class="container mt-5">
       <div class="row">
         <div class="col-12">
@@ -32,46 +35,70 @@
             <h1><i class="fas fa-paint-brush"></i> Student Projects </h1>
             <p>Our Students' Artwork, Gardening Projects, Science Projects and More</p>
             <% if (currentUser.status == 'faculty') { %>
-              <a class="btn btn-info" href="projects/new"><i class="fas fa-plus-circle"></i> Add Project</a>
+              <a class="btn btn-info" href="projects/new"><i class="fas fa-paint-brush"></i> Add Project</a>
             <%}%>
           </div>
         </div>
       </div>
-    </div>
 
     <div class="projects">
+
       <%projects.reverse().forEach(project => { %>
-        <div class="container mt-5" id="project-container">
-          <div class="row">
-            <div class="col-12">
-              <div class="jumbotron text-center">
-                <div class="project-info">
-                  <a href="projects/<%=project._id%>"><h2 class="project-title"><%=project.title%></h2></a>
-                  <p><em>Posted by <a style="color: black;" href="profiles/<%=project.poster._id%>"><strong><%=project.poster.username%></a></strong></em> on <%=project.date%></p>
-                  <% if (project.creators.length > 2) {%>
-                    <p><strong>Creators:</strong> <em><a style="color: black" href="profiles/<%=project.creators[0]._id%>"><%=project.creators[0].username%></a> and <%=project.creators.length - 1%> others</em></p>
+        <div class="row" style="margin-bottom: 2rem;">
+          <div class="col-lg-12">
+            <article class="text-block">
+              <div class="block-header grey" style="padding-bottom: 20px;">
+                <h5>
+                  <a style="color: white;" href="projects/<%=project._id%>"><%=project.title%></a>
+                  <a class= "float-right" style="color:white; font-size: 80%;"><%=project.date%></a>
+                </h5>
 
-                  <%} else if (project.creators.length == 2){%>
-                    <p><strong>Creators:</strong> <em><a style="color: black" href="profiles/<%=project.creators[0]._id%>"><%=project.creators[0].username%></a> and <a style="color: black" href="profiles/<%=project.creators[1]._id%>"><%=project.creators[1].username%></a></em></p>
+                <a style="color:white;" href= "../profiles/<%=project.poster._id%>" >
+                  <img src="<%= project.poster.imageUrl %>" alt="profile pic" style="width: 30px; height: 30px; object-fit: cover; border-radius: 50%;">
+                  <%=project.poster.firstName%> <%=project.poster.lastName%>
 
-                  <%} else {%>
-                    <p><strong>Creator:</strong> <a style="color: black" href="profiles/<%=project.creators[0]._id%>"><em><%=project.creators[0].username%></em></a></p>
-                  <%}%>
-                  <img class="project-img" src="<%=project.imgUrl%>"/>
-                  <br />
                   <% if (currentUser._id.toString() == project.poster._id.toString()) { %>
-                    <button id="edit-button" type="button" class="btn btn-success"><a style="color: white;" href="projects/<%=project._id%>/edit">Edit Project</a></button>
+                    <button style="margin-left: 10px;" id="edit-button"type="button" class="btn btn-info"><a style="color: white;" href="projects/<%=project._id%>/edit"><i class="fas fa-cog"></i> Edit</a></button>
 
                     <form action="projects/<%=project._id%>?_method=delete" method="post" style="display: inline-block;">
-                      <button style="margin-top: 20px; color: white;" class="btn btn-danger" type="submit">Delete Project</button>
+                      <button style="color: white;" class="btn btn-danger" type="submit"><i class="far fa-trash-alt"></i> Delete</button>
                     </form>
                   <% } %>
-                </div>
+
+                </a>
+
               </div>
-            </div>
+
+              <div class="block-content" style="text-align: center;">
+                  <img style="width: 25%; height: 25%; float: left; border-radius: 15px; margin-bottom: 20px; margin-right: 20px;" src="<%=project.imgUrl%>"/>
+
+                  <% if (project.creators.length == 0) { %>
+                    <p style="float: left;"><strong>Creators:</strong> <em>None</em></p>
+
+                    <%} else if (project.creators.length == 1){%>
+                      <p style="float: left;"><strong>Creator:</strong> <a style="color: black" href="profiles/<%=project.creators[0]._id%>"><img src="<%= project.creators[0].imageUrl %>" alt="profile pic" style="width: 30px; height: 30px; object-fit: cover; border-radius: 50%;"> <em><%=project.creators[0].firstName%> <%=project.creators[0].lastName%></em></a></p>
+
+                  <%} else if (project.creators.length == 2){%>
+                    <p style="float: left;"><strong>Creators:</strong> <em><a style="color: black" href="profiles/<%=project.creators[0]._id%>"><img src="<%= project.creators[0].imageUrl %>" alt="profile pic" style="width: 30px; height: 30px; object-fit: cover; border-radius: 50%;"> <%=project.creators[0].firstName%> <%=project.creators[0].lastName%></a>, <a style="color: black" href="profiles/<%=project.creators[1]._id%>"><img src="<%= project.creators[1].imageUrl %>" alt="profile pic" style="width: 30px; height: 30px; object-fit: cover; border-radius: 50%;"> <%=project.creators[1].firstName%> <%=project.creators[1].lastName%></a></em></p>
+
+                  <% } else if (project.creators.length > 2) {%>
+                    <p style="float: left;"><strong>Creators:</strong> <em><a style="color: black" href="profiles/<%=project.creators[0]._id%>"><img src="<%= project.creators[0].imageUrl %>" alt="profile pic" style="width: 30px; height: 30px; object-fit: cover; border-radius: 50%;"><%=project.creators[0].firstName%> <%=project.creators[0].lastName%></a> and <%=project.creators.length - 1%> others</em></p>
+
+                  <%}%>
+                  <br /><br />
+
+                <% if (project.text.split(" ").length > 70) { %>
+                  <p><%=project.text.split(" ").slice(0,71).join(" ")%> <a href="/projects/<%=project._id%>">(Read More)</a></p>
+                <% } else { %>
+                  <p><%=project.text%></p>
+                <% } %>
+
+              </div>
+            </article>
           </div>
         </div>
       <% }) %>
     </div>
-  </body>
+  </div>
+</body>
 </html>

@@ -8,9 +8,9 @@
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css">
     <link rel="stylesheet" href="/stylesheets/main.css">
     <!-- link css for navbar. Don't need to include public/javascript/userForm.js since user is already logged in and does not need to access login and register forms.  -->
-
     <link rel="stylesheet" href="/stylesheets/components/header.css">
     <link rel="stylesheet" href="/stylesheets/components/navbar.css">
+    <link rel="stylesheet" href="/stylesheets/announcements/index.css">
 
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
@@ -22,10 +22,10 @@
 
   </head>
   <body>
+    <%- include('../partials/navbar') %>
+    <%- include('../partials/header') %>
+
     <div class="container mt-5">
-      <!-- include the navbar via ejs -->
-      <%- include('../partials/navbar') %>
-      <%- include('../partials/header') %>
       <div class="row">
         <div class="col-12">
           <div class="jumbotron text-center">
@@ -35,48 +35,54 @@
           </div>
         </div>
       </div>
-    </div>
-    <div class="container mt-5" style="display: flex; justify-content: center;">
+
       <div class="row">
         <div class="col-12">
-          <div class="jumbotron text-center" style="padding: 50px;">
-            <h1><%=project.title%></h1>
+          <article class="ann-container" style="text-align: center; padding-left: 50px; padding-right: 50px; padding-bottom: 50px;">
+            <div class="ann-head">
+              <h1><%=project.title%></h1>
 
-            <% if (currentUser.username == project.poster.username) { %>
-              <button id="edit-button" type="button" class="btn btn-success"><a style="color: white;" href="<%=project._id%>/edit">Edit Project</a></button>
+              <a style="color: black;" href="../profiles/<%=project.poster._id%>">
+                <img src="<%= project.poster.imageUrl %>" alt="profile pic" style="width: 30px; height: 30px; object-fit: cover; border-radius: 50%;">
+                <%=project.poster.firstName%> <%=project.poster.lastName%>
+              </a>
+              <br /><br />
+              <span style="color: #6e6e6e;"><%=project.date%></span>
 
-              <form action="<%=project._id%>?_method=delete" method="post" style="display: inline-block;">
-                <button class="btn btn-danger" type="submit" style="color: white;">Delete Project</button>
-              </form>
-            <% } %>
-            <br /><br />
+              <% if (currentUser.username == project.poster.username) { %>
+                <button id="edit-button" type="button" class="btn btn-info"><a style="color: white;" href="<%=project._id%>/edit"><i class="fas fa-cog"></i> Edit</a></button>
 
-            <p><em>Posted by <strong><a style="color: black;" href="../profiles/<%=project.poster._id%>"><%=project.poster.username%></a></strong></em> on <%=project.date%></p>
+                <form action="<%=project._id%>?_method=delete" method="post" style="display: inline-block;">
+                  <button class="btn btn-danger" type="submit" style="color: white;"><i class="far fa-trash-alt"></i> Delete</button>
+                </form>
+              <% } %>
+            </div>
 
-            <% if (project.creators.length > 2) {%>
+
+            <% if (project.creators.length > 2) { %>
               <span><strong>Creators:</strong>
 
                 <% let tempcreators = project.creators.slice(0, project.creators.length - 2)%>
 
                 <%tempcreators.forEach(creator => { %>
-                   <em><a style="color: black" href="../profiles/<%=creator._id%>"><%=creator.username%></a>,</em>
+                   <em><a style="color: black" href="../profiles/<%=creator._id%>"><img src="<%= creator.imageUrl %>" alt="profile pic" style="width: 30px; height: 30px; object-fit: cover; border-radius: 50%;"> <%=creator.firstName%> <%=creator.lastName%></a>,</em>
                 <%})%>
 
-                <em><a style="color: black" href="../profiles/<%=project.creators[project.creators.length - 2]._id%>"><%=project.creators[project.creators.length - 2].username%></a></em>
-                and <em><a style="color: black" href="../profiles/<%=project.creators[project.creators.length - 1]._id%>"><%=project.creators[project.creators.length - 1].username%></a></em>
+                <em><a style="color: black" href="../profiles/<%=project.creators[project.creators.length - 2]._id%>"><img src="<%= project.creators[project.creators.length - 2].imageUrl %>" alt="profile pic" style="width: 30px; height: 30px; object-fit: cover; border-radius: 50%;"> <%=project.creators[project.creators.length - 2].firstName%> <%=project.creators[project.creators.length - 2].lastName%></a>,</em>
+                <em><a style="color: black" href="../profiles/<%=project.creators[project.creators.length - 1]._id%>"><img src="<%= project.creators[project.creators.length - 1].imageUrl %>" alt="profile pic" style="width: 30px; height: 30px; object-fit: cover; border-radius: 50%;"> <%=project.creators[project.creators.length - 1].firstName%> <%=project.creators[project.creators.length - 1].lastName%></a></em>
 
               </span>
 
             <%} else if (project.creators.length == 2){%>
-              <p><strong>Creators:</strong> <a style="color: black" href="../profiles/<%=project.creators[0]._id%>"><em><%=project.creators[0].username%></a> and <a style="color: black" href="profiles/<%=project.creators[0]._id%>"><%=project.creators[1].username%></a></em></p>
+              <p><strong>Creators:</strong> <a style="color: black" href="../profiles/<%=project.creators[0]._id%>"><em><img src="<%= project.creators[0].imageUrl %>" alt="profile pic" style="width: 30px; height: 30px; object-fit: cover; border-radius: 50%;"> <%=project.creators[0].firstName%> <%=project.creators[0].lastName%></a>, <a style="color: black" href="profiles/<%=project.creators[0]._id%>"><img src="<%= project.creators[1].imageUrl %>" alt="profile pic" style="width: 30px; height: 30px; object-fit: cover; border-radius: 50%;"> <%=project.creators[1].firstName%> <%=project.creators[1].lastName%></a></em></p>
 
             <%} else {%>
-              <p><strong>Creator:</strong> <a style="color: black" href="../profiles/<%=project.creators[0]._id%>"><em><%=project.creators[0].username%></em></a></p>
+              <p><strong>Creator:</strong> <a style="color: black" href="../profiles/<%=project.creators[0]._id%>"><em><img src="<%= project.creators[0].imageUrl %>" alt="profile pic" style="width: 30px; height: 30px; object-fit: cover; border-radius: 50%;"> <%=project.creators[0].firstName%> <%=project.creators[0].lastName%></em></a></p>
             <%}%>
 
             <p style="margin-top: 10px; white-space: pre-wrap;"><%=project.text%></p>
-            <img style="width: 100%; height: 100%; object-fit: contain;" src="<%=project.imgUrl%>"/>
-          </div>
+            <img style="width: 40%; height: 40%; object-fit: contain; border-radius: 15px;" src="<%=project.imgUrl%>"/>
+          </article>
         </div>
       </div>
     </div>

@@ -37,62 +37,123 @@
       </div>
     </div>
 
-    <form action="/projects/<%=project._id%>?_method=put" method="post" style="text-align: center;">
-      <div class="input-group mb-3">
-        <input id="new-project-message" name="title" maxlength="30" type="text" class="form-control" value = "<%=project.title%>" placeholder="Enter Project Name" aria-label="Username" aria-describedby="basic-addon1" required>
-      </div>
+    <div class="row">
+      <div class="col-md-8 offset-md-2 col-12">
+        <form action="/projects/<%=project._id%>?_method=put" method="post" style="text-align: center;">
 
-      <div class="input-group mb-3">
-        <div id="dropdown-button" class="input-group-prepend">
-          <button type="button" class="btn btn-outline-secondary dropdown-toggle dropdown-toggle-split" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-            <span class="sr-only">Toggle Dropdown</span>
-          </button>
-          <div class="dropdown-menu">
-            <% students.forEach(student => { %>
-              <a class="dropdown-item"><%=student.username%></a>
-            <% }) %>
+          <div class="form-group">
+            <label style="float: left;" for="new-project-message"><strong>Title</strong></label>
+            <input id="new-project-title" name="title" maxlength="30" type="text" class="form-control" value = "<%=project.title%>" placeholder="Enter Project Name" aria-label="Username" aria-describedby="basic-addon1" required>
           </div>
-        </div>
-        <input id="creators" class="form-control" autocomplete="off" name="creators" type="text" aria-describedby="basic-addon2" value = "<%=creatornames.join(', ')%>" placeholder="Creators" required/>
-        <div class="input-group-append">
-          <button id="clear" class="btn btn-outline-secondary" style="background-color: rgb(202, 0, 0); color: white;" type="button">Clear Field</button>
-        </div>
-      </div>
 
-      <div class="input-group mb-3">
-        <input id="new-project-images" type="text" name="img" class="form-control" value = "<%=project.imgUrl%>" placeholder="Enter Image Url" aria-label="Username" aria-describedby="basic-addon1" required>
-      </div>
+          <div class="form-group" id="creator-div">
+            <label style="float: left;" for="creator-select"><strong>Creators</strong></label>
+            <select id="creator-select" class="form-control" onchange="addCreator('user')">
+              <option value="" selected disabled>Select Students</option>
+              <% students.forEach(student => { %>
+                <option value="<%=student._id%>"><%=student.username%></a>
+              <% }) %>
+            </select>
+            <input type="text" id="creator-input" name="creatorInput" hidden />
+            <br />
+            <%for (let creator of project.creators) { %>
+              <div class="user-tag" id="<%=creator._id%>">
+                <span name="creators" value="<%=creator._id%>"><%=creator.username%></span>
+                <button type="button" id="<%=creator._id%>" onclick="remCreator(this)">&times;</button>
+              </div>
+            <% } %>
+          </div>
 
-      <div class="input-group">
-        <textarea id="new-project-text" maxlength="500" name="text" placeholder="Write a little about the project" class="form-control" aria-label="With textarea" required><%=project.text%></textarea>
+          <!-- <input id="creators" class="form-control" autocomplete="off" name="creators" type="text" aria-describedby="basic-addon2" value = "<%=creatornames.join(', ')%>" placeholder="Creators" required/> -->
+
+          <div class="form-group">
+            <label style="float: left;" for="image-input"><strong>Image</strong></label>
+            <input id="image-input" type="text" name="img" class="form-control" value = "<%=project.imgUrl%>" placeholder="Enter Image Url" aria-label="Username" aria-describedby="basic-addon1" required>
+            <br />
+            <img id="project-image" style="width: 25%; height: 25%;" src="<%=project.imgUrl%>" alt="Image Does Not Exist"/>
+          </div>
+
+          <div class="form-group">
+            <label style="float: left;" for="new-project-description"><strong>Description</strong></label>
+            <textarea id="new-project-description" minlength="200" maxlength="800" name="text" placeholder="Write a little about the project" class="form-control" aria-label="With textarea" required><%=project.text%></textarea>
+          </div>
+          <br />
+          <button class="btn btn-primary btn-block" type="submit">Submit Changes</button><br />
+        </form>
       </div>
-      <br />
-      <button class="btn btn-primary" type="submit">Submit Changes</button>
-    </form>
+    </dov>
   </body>
 
   <script>
 
-  $("#creators").on('keydown paste', function(e){
-      e.preventDefault();
-  });
+  const creatorSelect = document.getElementById('creator-select');
+  const creatorDiv = document.getElementById('creator-div');
+  const creatorInput = document.getElementById('creator-input');
+  const imageInput = document.getElementById('image-input');
+  const projectImage = document.getElementById('project-image');
 
-  let creator_options = document.getElementsByClassName('dropdown-item')
-  let creators_list = document.getElementById('creators')
-  let clear = document.getElementById('clear')
+  let creatorList = [];
 
-  for (let option of creator_options) {
-    option.addEventListener('click', () => {
-      if (creators_list.value == '') {
-        creators_list.value += `${option.innerText}`
-      } else {
-        creators_list.value += `, ${option.innerText}`
-      }
-    })
+  for (let creator of document.getElementsByClassName('user-tag')) {
+    creatorList.push(creator.id)
+    creatorInput.value = creatorList.toString()
   }
 
-  clear.addEventListener('click', () => {
-    creators_list.value = ""
+  const addCreator = (user => {
+    if (!creatorList.includes(creatorSelect.value)) {
+
+      let newCreator = document.createElement('div');
+      newCreator.classList.add('user-tag');
+      newCreator.id = `${creatorSelect.value}`;
+      creatorList.push(creatorSelect.value);
+      creatorInput.value = creatorList.toString()
+
+      newCreator.innerHTML = `<span name="creators" value="${creatorSelect.value}">${creatorSelect.options[creatorSelect.selectedIndex].text}</span>
+      <button type="button" id="${creatorSelect.value}" onclick="remCreator(this)">&times;</button>`;
+      creatorDiv.appendChild(newCreator);
+    }
+  })
+
+  const remCreator = (btn => {
+    const id = btn.id;
+
+    const userTags = document.getElementsByClassName('user-tag');
+    for (let tag of userTags) {
+
+      if(tag.id == id) {
+        creatorDiv.removeChild(tag);
+        creatorList.splice(creatorList.indexOf(id), 1);
+        creatorInput.value = creatorList.toString()
+      }
+    }
+  })
+
+  imageInput.addEventListener('keydown', () => {
+    setTimeout(() => {
+      projectImage.src = imageInput.value
+
+      if (imageInput.value == "") {
+        $("#project-image").hide();
+
+      } else {
+        $("#project-image").show();
+
+      }
+    }, 3)
+  })
+
+  imageInput.addEventListener('paste', () => {
+    setTimeout(() => {
+      projectImage.src = imageInput.value
+
+      if (imageInput.value == "") {
+        $("#project-image").hide();
+
+      } else {
+        $("#project-image").show();
+
+      }
+    }, 3)
   })
 
   </script>

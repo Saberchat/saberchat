@@ -15,8 +15,8 @@ var userSchema = new mongoose.Schema({
 	msgCount: {type:Number, default: 0},
 	annCount: [
 		{
-			type: mongoose.Schema.Types.ObjectId,
-			ref: "Announcement"
+			announcement: {type: mongoose.Schema.Types.ObjectId,ref: "Announcement"},
+			version: String
 		}
 	],
 

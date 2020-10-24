@@ -19,13 +19,19 @@ router.get('/', middleware.isLoggedIn, (req, res) => { //RESTful Routing 'INDEX'
       res.redirect('back')
 
     } else {
-      res.render('announcements/index', {announcements: foundAnns.reverse()}) //Render announcement page with data on all announcements
+
+      if (foundAnns.length > 5) {
+        res.render('announcements/index', {announcements: foundAnns.reverse().slice(0, 5) }) //Render announcement page with data on all announcements
+
+      } else {
+        res.render('announcements/index', {announcements: foundAnns.reverse()}) //Render announcement page with data on all announcements
+      }
     }
   })
 })
 
 
-router.get('/new', middleware.isLoggedIn, middleware.isAdmin, (req, res) => { //RESTful Routing 'NEW' route
+router.get('/new', middleware.isLoggedIn, middleware.isMod, (req, res) => { //RESTful Routing 'NEW' route
   res.render('announcements/new');
 });
 
@@ -38,10 +44,17 @@ router.get('/:id', middleware.isLoggedIn, (req, res) => { //RESTful Routing 'SHO
       res.redirect('back');
 
     } else {
-      for (let ann of req.user.annCount) {
-        if (foundAnn._id.toString() == ann._id.toString()) {
-          req.user.annCount.splice(req.user.annCount.indexOf(ann), 1)
+
+      let index = -1;
+      for (let i = 0; i < req.user.annCount.length; i += 1) {
+
+        if (foundAnn._id.toString() == req.user.annCount[i].announcement._id.toString()) {
+          index = i;
         }
+      }
+
+      if (index != -1) {
+        req.user.annCount.splice(index, 1)
       }
 
       req.user.save()
@@ -64,7 +77,7 @@ router.get('/:id/edit', middleware.isLoggedIn, middleware.isAdmin, (req, res) =>
   })
 })
 
-router.post('/', middleware.isLoggedIn, middleware.isAdmin, (req, res) => { //RESTful Routing 'CREATE' route
+router.post('/', middleware.isLoggedIn, middleware.isMod, (req, res) => { //RESTful Routing 'CREATE' route
   (async() => {
     const announcement = await Announcement.create({sender: req.user, subject: req.body.subject, text: req.body.message});
 
@@ -88,8 +101,13 @@ router.post('/', middleware.isLoggedIn, middleware.isAdmin, (req, res) => { //RE
       res.rediect('back');
     }
 
+    let announcementObject = {
+      announcement: announcement,
+      version: "new"
+    }
+
     for (let user of users) {
-      user.annCount.push(announcement);
+      user.annCount.push(announcementObject);
       await user.save()
     }
 
@@ -103,7 +121,7 @@ router.post('/', middleware.isLoggedIn, middleware.isAdmin, (req, res) => { //RE
   })
 })
 
-router.put('/:id', middleware.isLoggedIn, middleware.isAdmin, (req, res) => { //RESTful Routing 'UPDATE' route
+router.put('/:id', middleware.isLoggedIn, middleware.isMod, (req, res) => { //RESTful Routing 'UPDATE' route
   (async() => {
 
     const announcement = await Announcement.findById(req.params.id).populate('sender');
@@ -133,6 +151,36 @@ router.put('/:id', middleware.isLoggedIn, middleware.isAdmin, (req, res) => { //
 
       await updatedAnnouncement.save();
 
+      const users = await User.find({_id: {$nin: [req.user._id]}});
+
+      if (!users) {
+        req.flash('error', "Unable to access database");
+        res.rediect('back');
+      }
+
+      let announcementObject = {
+        announcement: updatedAnnouncement,
+        version: "updated"
+      }
+
+      let overlap;
+
+      for (let user of users) {
+        overlap = false;
+
+        for (let a of user.annCount) {
+          if (a.announcement.toString() == updatedAnnouncement._id.toString()) {
+            overlap = true;
+            break;
+          }
+        }
+
+        if (!overlap) {
+          user.annCount.push(announcementObject);
+          await user.save()
+        }
+      }
+
       req.flash('success', 'Announcement Updated!');
       res.redirect(`/announcements/${updatedAnnouncement._id}`);
 
@@ -143,7 +191,7 @@ router.put('/:id', middleware.isLoggedIn, middleware.isAdmin, (req, res) => { //
   })
 })
 
-router.delete('/:id', middleware.isLoggedIn, middleware.isAdmin, (req, res) => { // RESTful Routing 'DESTROY' route
+router.delete('/:id', middleware.isLoggedIn, middleware.isMod, (req, res) => { // RESTful Routing 'DESTROY' route
   (async() => {
 
     const announcement = await Announcement.findById(req.params.id).populate('sender');
@@ -163,6 +211,20 @@ router.delete('/:id', middleware.isLoggedIn, middleware.isAdmin, (req, res) => {
         req.flash('error', "Unable to delete announcement");
         return res.redirect('back')
       }
+
+      const users = await User.find({}, (err, users) => {
+        if (!users) {
+          req.flash('error', "Unable to find users");
+          return res.redirect('back')
+        }
+
+        for (let user of users) {
+          if (user.annCount.includes(deletedAnn._id)) {
+            user.annCount.splice(user.annCount.indexOf(deletedAnn._id), 1)
+            user.save()
+          }
+        }
+      })
 
       req.flash('success', 'Announcement Deleted!');
       res.redirect('/announcements/');

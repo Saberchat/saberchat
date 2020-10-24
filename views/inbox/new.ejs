@@ -38,10 +38,10 @@
                     <select id="user-select" class="form-control" onchange="addRecipient('user')" required>
                       <option value="" selected disabled>Select User</option>
                       <% users.forEach(user => { %>
-                        <% if(!user._id.equals(currentUser._id)) { %> 
+                        <% if(!user._id.equals(currentUser._id)) { %>
                           <option value="<%= user._id %>"><%= user.username %> (<%= user.firstName.charAt(0) %>.<%= user.lastName.charAt(0) %>.)</option>
-                        <% } %> 
-                      <% }) %> 
+                        <% } %>
+                      <% }) %>
                     </select>
                   </div>
                 </div>
@@ -52,10 +52,10 @@
                     <select id="faculty-select" class="form-control" onchange="addRecipient('faculty')">
                       <option value="" selected disabled>Select Faculty</option>
                       <% users.forEach(user => { %>
-                        <% if(!user._id.equals(currentUser._id) && user.status == 'faculty') { %> 
+                        <% if(!user._id.equals(currentUser._id) && user.status == 'faculty') { %>
                           <option value="<%= user._id %>"><%= user.username %> (<%= user.firstName.charAt(0) %>.<%= user.lastName.charAt(0) %>.)</option>
-                        <% } %> 
-                      <% }) %> 
+                        <% } %>
+                      <% }) %>
                     </select>
                   </div>
                 </div>
@@ -72,7 +72,7 @@
                   <label class="form-check-label" for="all-check">Send to everyone</label>
                 </div>
               </div>
-              
+
               <div class="form-group">
                 <label for="subject">Subject</label>
                 <input id="subject" placeholder="A short title..." class="form-control" type="text" name="subject" required>
@@ -81,7 +81,7 @@
                 <label for="message">Message</label>
                 <textarea name="message" id="message" placeholder="Message text..." rows="5" class="form-control" required></textarea>
               </div>
-  
+
               <div id="image-block">
                 <h4>Images</h4>
                 <button type="button" onclick="addImg()" class="btn btn-primary"><i class="fas fa-plus"></i> Image</button>
@@ -91,7 +91,7 @@
             </form>
           </div>
         </div>
-      </div> 
+      </div>
     </div>
     <script src="/javascript/inbox/form.js"></script>
     <script src="/javascript/inbox/new.js"></script>

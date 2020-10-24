@@ -99,17 +99,17 @@ router.post('/messages', middleware.isLoggedIn, (req, res) => {
 
 		if(message.toEveryone) {
 			await User.updateMany(
-				{ _id: { $ne: req.user._id } }, 
-				{ 
-					$push: { inbox: newMessage }, 
+				{ _id: { $ne: req.user._id } },
+				{
+					$push: { inbox: newMessage },
 					$inc: { msgCount: 1 }
 				});
 		} else {
 			await User.updateMany(
-				{ _id: { $in: recipients } }, 
-				{ 
+				{ _id: { $in: recipients } },
+				{
 					$push: { inbox: newMessage },
-					$inc: { msgCount: 1 } 
+					$inc: { msgCount: 1 }
 				});
 		}
 
@@ -181,7 +181,7 @@ router.delete('/delete', middleware.isLoggedIn, (req, res) => {
 		for(const id in req.body) {
 			ids.push(id);
 		}
-		
+
 		const messages = await Message.find({_id: {$in: ids}});
 		if(!messages) {req.flash('error', 'Could not find messages'); return res.redirect('back');}
 
@@ -290,7 +290,7 @@ router.post('/requests/:id/accept', middleware.isLoggedIn, (req, res) => {
 			res.redirect('/inbox');
 		}
 	})().catch(err => {
-		console.log(err); 
+		console.log(err);
 		req.flash("error", "Unable to access database");
 		res.redirect('back');
 	});
@@ -324,7 +324,7 @@ router.post('/requests/:id/reject', middleware.isLoggedIn, (req, res) => {
 			res.redirect('/inbox');
 		}
 	})().catch(err => {
-		console.log(err); 
+		console.log(err);
 		req.flash("error", "Unable to access database");
 		res.redirect('back');
 	});

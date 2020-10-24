@@ -42,17 +42,14 @@ router.get('/new', middleware.isLoggedIn, middleware.isFaculty, (req, res) => { 
   })
 })
 
-router.post('/',middleware.isLoggedIn, middleware.isFaculty, (req, res) => { //RESTful Routing 'CRWATE' route
+router.post('/',middleware.isLoggedIn, middleware.isFaculty, (req, res) => { //RESTful Routing 'CREATE' route
 
   (async() => { //Asynchronous functions dictates that processes occur one at a time, reducing excessive callbacks
 
-    const creators = await User.find({username: {$in: req.body.creators.split(', ')}}); //Figure out all the students who created the project, based on the usernames the teacher entered
+    const creators = await User.find({_id: {$in: req.body.creatorInput.split(',')}}); //Figure out all the students who created the project, based on the usernames the teacher entered
 
     if (!creators) {
       req.flash('error', "Unable to find the users you listed"); return res.redirect('back')
-
-    } else if(creators.length != req.body.creators.split(', ').length) { //Counters an unlikely scenario. If a student changes their profile while a teacher is posting a project, this page will realize that one of the creator usernames is now invalid
-      req.flash('error', 'Some profiles were changed. Please create project again'); return res.redirect('back');
     }
 
     const project = await Project.create({title: req.body.title, imgUrl: req.body.img, text: req.body.text, poster: req.user, creators}); //Create a new project with all the provided data
@@ -61,7 +58,7 @@ router.post('/',middleware.isLoggedIn, middleware.isFaculty, (req, res) => { //R
       req.flash('error', "Unable to create project"); return res.redirect('back');
     }
 
-    project.date = dateFormat(project.created_at, "mmm d, h:MMTT")
+    project.date = dateFormat(project.created_at, "h:MMTT | mmm d")
     await project.save()
 
     req.flash('success', "Project Posted!")
@@ -129,13 +126,11 @@ router.get('/:id', middleware.isLoggedIn, (req, res) => { //RESTful Routing 'SHO
 router.put('/:id', middleware.isLoggedIn, middleware.isFaculty, (req, res) => {
 
   (async() => { //Asynchronous functions dictates that processes occur one at a time, reducing excessive callbacks
-    const creators = await User.find({username: {$in: req.body.creators.split(', ')}});
+
+    const creators = await User.find({_id: {$in: req.body.creatorInput.split(',')}});
 
     if (!creators) {
       req.flash('error', 'Unable to find project creators'); return res.redirect('back')
-
-    } else if (creators.length != req.body.creators.split(', ').length) {
-      req.flash('error', 'Some profiles were changed. Please create project again'); return res.redirect('back');
     }
 
     const project = await Project.findById(req.params.id).populate('poster');

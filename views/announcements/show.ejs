@@ -21,8 +21,8 @@
 
     <%- include('../partials/navbar') %>
     <%- include('../partials/header') %>
-    
-    <div class="container my-5">
+
+    <div class="container mt-5">
       <div class="row">
         <div class="col-12">
           <div class="jumbotron text-center">
@@ -37,13 +37,19 @@
           <article class="ann-container">
             <div class="ann-head">
               <h1><%= announcement.subject %></h1>
-              <p>Posted by <a href= "../profiles/<%=announcement.sender._id%>"><%= announcement.sender.username %></a></p>
+
+              <a style="color: black;" href="../profiles/<%=announcement.sender._id%>">
+                <img src="<%= announcement.sender.imageUrl %>" alt="profile pic" style="width: 30px; height: 30px; object-fit: cover; border-radius: 50%;">
+                <%=announcement.sender.firstName%> <%=announcement.sender.lastName%>
+              </a>
+              <br /><br />
+
               <span><%=announcement.date%></span>
               <% if(announcement.sender._id.equals(currentUser._id)) { %>
+                <a href="/announcements/<%= announcement._id %>/edit" class="btn btn-info"><i class="fas fa-cog"></i> Edit</a>
                 <form action="/announcements/<%= announcement._id %>?_method=delete" method="post" id="delete-form">
                   <button type="submit" class="btn btn-danger"><i class="far fa-trash-alt"></i> Delete</button>
                 </form>
-                <a href="/announcements/<%= announcement._id %>/edit" class="btn btn-info"><i class="fas fa-cog"></i> Edit</a>
               <% } %>
             </div>
             <div class="ann-body">
