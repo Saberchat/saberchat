@@ -89,7 +89,7 @@
         let filter = searchInput.value.toLowerCase();
 
         for (let i = 0; i < users.length; i += 1) {
-          if (!users[i].innerText.toLowerCase().includes(filter)) {
+          if (!users[i].innerText.split('\n')[0].toLowerCase().includes(filter)) {
             $(`#${users[i].id}`).hide();
 
           } else {

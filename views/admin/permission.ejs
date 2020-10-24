@@ -44,22 +44,22 @@
                 <% users.forEach(function(user) { %>
                     <% if(!user._id.equals(currentUser._id)) { %>
                     <li class="list-group-item user" id="<%=user._id%>">
-                        <%= user.username %> (<%= user.firstName %> <%= user.lastName %>)
-                        <select name="permission" class="role-select" onchange="updateRole(this)" id="<%= user._id %>">
-                            <option value="admin"
-                            <% if(user.permission == 'admin'){ %> selected <% } %>
-                            >Administrator</option>
-                            <option value="mod"
-                            <% if(user.permission == 'mod'){ %> selected <% } %>
-                            >Moderator</option>
-                            <option value="student"
-                            <% if(user.permission == 'student'){ %> selected <% } %>
-                            >Student</option>
+                      <%= user.username %> (<%= user.firstName %> <%= user.lastName %>)
+                      <select name="permission" class="role-select" onchange="updateRole(this)" id="<%= user._id %>">
+                        <option value="admin"
+                        <% if(user.permission == 'admin'){ %> selected <% } %>
+                        >Administrator</option>
+                        <option value="mod"
+                        <% if(user.permission == 'mod'){ %> selected <% } %>
+                        >Moderator</option>
+                        <option value="student"
+                        <% if(user.permission == 'student'){ %> selected <% } %>
+                        >Student</option>
                         </select>
                     </li>
                     <% } %>
                 <% }); %>
-              </ul>
+              </ul><br />
             </div>
           </div>
         </div>
@@ -72,7 +72,7 @@
         let filter = searchInput.value.toLowerCase();
 
         for (let i = 0; i < users.length; i += 1) {
-          if (!users[i].innerText.toLowerCase().includes(filter)) {
+          if (!users[i].innerText.split('\n')[0].toLowerCase().includes(filter)) {
             $(`#${users[i].id}`).hide();
 
           } else {
