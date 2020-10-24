@@ -19,13 +19,7 @@ router.get('/', middleware.isLoggedIn, (req, res) => { //RESTful Routing 'INDEX'
       res.redirect('back')
 
     } else {
-
-      if (foundAnns.length > 5) {
-        res.render('announcements/index', {announcements: foundAnns.reverse().slice(0, 5) }) //Render announcement page with data on all announcements
-
-      } else {
-        res.render('announcements/index', {announcements: foundAnns.reverse()}) //Render announcement page with data on all announcements
-      }
+      res.render('announcements/index', {announcements: foundAnns.reverse()}) //Render announcement page with data on all announcements
     }
   })
 })

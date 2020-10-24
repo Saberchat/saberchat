@@ -138,21 +138,6 @@
 <script>
   order(orderForm, '<%=currentUser._id%>');
 
-  // function searchFunction() {
-  //   let input = document.getElementById("search-input");
-  //   let filter = input.value.toUpperCase();
-  //   let list = document.getElementById("item-list");
-  //   let items = list.getElementsByClassName('form-check');
-  //   for (i = 0; i < items.length; i++) {
-  //     let item = items[i].getElementsByTagName('label')[0];
-  //     let txtValue = item.textContent || item.innerText;
-  //     if (txtValue.toUpperCase().indexOf(filter) > -1) {
-  //       items[i].style.display = "";
-  //     } else {
-  //       items[i].style.display = "none";
-  //     }
-  //   }
-  // }
 
   function searchFunction() {
     const catHeaders = document.getElementsByClassName('category-header') //Category header
