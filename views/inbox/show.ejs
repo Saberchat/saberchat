@@ -37,7 +37,7 @@
                     <span class="badge badge-pill badge-primary">
                       <% if(message.sender._id.equals(currentUser._id)) { %>
                         me
-                      <% } else { %> 
+                      <% } else { %>
                         <%= message.sender.username %>
                       <% } %>
                     </span>
@@ -64,7 +64,7 @@
                 <a href="/inbox" class="btn btn-primary back-btn"><i class="fas fa-arrow-left"></i> Back</a>
               </div>
               <div class="msg-body">
-                <p><%= message.text %></p>
+                <p style="white-space: pre-wrap;"><%= message.text %></p>
                 <hr>
                 <div class="msg-images">
                   <% message.images.forEach(image => { %>

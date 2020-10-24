@@ -57,7 +57,7 @@ router.get('/:id', middleware.isLoggedIn, (req, res) => { //RESTful Routing 'SHO
   });
 });
 
-router.get('/:id/edit', middleware.isLoggedIn, middleware.isAdmin, (req, res) => { //RESTful Routing 'EDIT' route
+router.get('/:id/edit', middleware.isLoggedIn, middleware.isMod, (req, res) => { //RESTful Routing 'EDIT' route
   Announcement.findById(req.params.id, (err, foundAnn) => { //Find only the announcement specified from form
     if (err || !foundAnn) {
       req.flash('error', "Unable to access database");

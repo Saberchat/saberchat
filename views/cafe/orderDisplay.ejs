@@ -55,11 +55,7 @@
           <div class="card mt-3" id="<%=order._id%>">
             <div class="card-body">
               <h5 class="card-title">Order for <%= order.name %></h5>
-              <% if (!order.instructions || order.instructions == "") { %>
-                <p class="card-text">No extra instructions</p>
-              <% } else { %>
-                <p class="card-text"><strong>Extra Instructions:</strong> <%= order.instructions %></p>
-              <% } %>
+              <p class="card-text"><strong>Extra Instructions:</strong> <%= order.instructions %></p>
               <ul class="list-group">
                 <% for (let i = 0; i < order.items.length; i++) { %>
 
@@ -122,18 +118,15 @@
 
       const searchFunction = (() => {
         const orders = document.getElementsByClassName('card');
-        // const breaks = document.getElementsByClassName('text-break');
         const searchInput = document.getElementById('search-input');
         let filter = searchInput.value.toLowerCase();
 
         for (let i = 0; i < orders.length; i += 1) {
           if (!orders[i].innerText.toLowerCase().includes(filter)) {
             $(`#${orders[i].id}`).hide();
-            // $(`#${breaks[i].id}`).hide();
 
           } else {
             $(`#${orders[i].id}`).show();
-            // $(`#${breaks[i].id}`).show();
           }
         }
       })

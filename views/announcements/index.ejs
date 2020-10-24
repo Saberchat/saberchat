@@ -80,9 +80,9 @@
                 </div>
                 <div class="block-content">
                   <% if (announcement.text.split(" ").length > 30) { %>
-                    <p><%=announcement.text.split(" ").slice(0,31).join(" ")%> <a href="/announcements/<%=announcement._id%>">(Read More)</a></p>
+                    <p style="white-space: pre-wrap;"><%=announcement.text.split(" ").slice(0,31).join(" ")%> <a href="/announcements/<%=announcement._id%>">(Read More)</a></p>
                   <% } else { %>
-                    <p><%=announcement.text%></p>
+                    <p style="white-space: pre-wrap;"><%=announcement.text%></p>
                   <% } %>
 
                 </div>

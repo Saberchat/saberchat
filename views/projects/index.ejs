@@ -94,9 +94,9 @@
                   <br /><br />
 
                 <% if (project.text.split(" ").length > 70) { %>
-                  <p><%=project.text.split(" ").slice(0,71).join(" ")%> <a href="/projects/<%=project._id%>">(Read More)</a></p>
+                  <p style="white-space: pre-wrap;"><%=project.text.split(" ").slice(0,71).join(" ")%> <a href="/projects/<%=project._id%>">(Read More)</a></p>
                 <% } else { %>
-                  <p><%=project.text%></p>
+                  <p style="white-space: pre-wrap;"><%=project.text%></p>
                 <% } %>
 
               </div>

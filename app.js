@@ -307,7 +307,16 @@ io.on('connect', (socket) => {
           )
         }
 
-        let order = await Order.create({customer: customerId, name: `${user.firstName} ${user.lastName}`, present: true, charge: 0, instructions, items: orderItemsObjects}); //Assuming no setbacks, create the order
+        let orderInstructions = ""
+
+        if (instructions == "") {
+          orderInstructions = "None"
+
+        } else {
+          orderInstructions = instructions
+        }
+
+        let order = await Order.create({customer: customerId, name: `${user.firstName} ${user.lastName}`, present: true, charge: 0, instructions: orderInstructions, items: orderItemsObjects}); //Assuming no setbacks, create the order
 
         if (!order) {
           return console.log('error creating order');
