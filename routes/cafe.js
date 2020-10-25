@@ -356,13 +356,23 @@ router.get('/item/new', middleware.isLoggedIn, middleware.isMod, (req, res) => {
 router.post('/item', middleware.isLoggedIn, middleware.isMod, (req, res) => { //RESTFUL routing 'item/create'
 
   (async() => {
+
+    const overlap = await Item.find({name: req.body.name});
+
+    if (!overlap) {
+      req.flash('error', "Unable to find items");return res.redirect('back')
+
+    } else if (overlap.length > 0) {
+      req.flash('error', "Item already in database");return res.redirect('back')
+    }
+
     const item = await Item.create({name: req.body.name, availableItems: parseInt(req.body.available), description: req.body.description, imgUrl: req.body.image}) //Create the item
 
     if (!item) {
       req.flash('error', "Unable to create item");return res.redirect('back')
     }
 
-    //Algorithm to create charge; once created, add to item's ifno
+    //Algorithm to create charge; once created, add to item's info
 
     if (parseFloat(req.body.price)) {
       item.price = parseFloat(req.body.price);
