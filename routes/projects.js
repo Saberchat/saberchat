@@ -30,7 +30,7 @@ router.get('/', middleware.isLoggedIn, (req, res) => { //RESTful Routing 'INDEX'
 })
 
 router.get('/new', middleware.isLoggedIn, middleware.isFaculty, (req, res) => { ////RESTful Routing 'NEW' route
-  User.find({permission: 'student'}, (err, foundUsers) => { //Find all students, so that when teachers post a project, they can select which students created it
+  User.find({status: {$nin: ['guest', 'parent', 'faculty']}}, (err, foundUsers) => { //Find all students, so that when teachers post a project, they can select which students created it
     if (err || !foundUsers) {
       console.log(err)
       req.flash('error', 'Unable to access database')
@@ -91,7 +91,7 @@ router.get('/:id/edit', middleware.isLoggedIn, middleware.isFaculty, (req, res) 
       creatornames.push(creator.username)
     }
 
-    const students = await User.find({permission: 'student'}); //Find all students - all of whom are possible project creators
+    const students = await User.find({status: {$nin: ['guest', 'parent', 'faculty']}}); //Find all students - all of whom are possible project creators
 
     if (!students) {
       req.flash('error', 'Unable to find student list'); return res.redirect('back')

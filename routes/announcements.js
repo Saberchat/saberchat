@@ -213,8 +213,17 @@ router.delete('/:id', middleware.isLoggedIn, middleware.isMod, (req, res) => { /
         }
 
         for (let user of users) {
-          if (user.annCount.includes(deletedAnn._id)) {
-            user.annCount.splice(user.annCount.indexOf(deletedAnn._id), 1)
+
+          let index;
+
+          for (let i = 0; i < user.annCount.length; i += 1) {
+            if (user.annCount[i].announcement.toString() == deletedAnn._id.toString()) {
+              index = i;
+            }
+          }
+
+          if (index > -1) {
+            user.annCount.splice(index, 1)
             user.save()
           }
         }
