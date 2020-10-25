@@ -89,7 +89,11 @@
               <div class="row">
                 <div class="col">
                   <label for="usernameInput">Image</label>
-                  <input id="usernameInput" class="form-control" type="text" name="image" value="<%=item.imgUrl%>" placeholder="Enter URL for Item Image" required>
+                  <div style="text-align: center;">
+                    <input id="image-input" class="form-control" type="text" name="image" value="<%=item.imgUrl%>" placeholder="Enter URL for Item Image">
+                    <br />
+                    <img id="item-image" style="width: 30%; border-radius: 15px;" src="<%=item.imgUrl%>" alt="Image Does Not Exist"/>
+                  </div>
                 </div>
               </div>
             </div>
@@ -129,4 +133,35 @@
       </div>
     </div>
   </body>
+  <script>
+
+  const imageInput = document.getElementById("image-input");
+  const itemImage = document.getElementById("item-image");
+
+  imageInput.addEventListener('keydown', () => {
+
+    setTimeout(() => {
+      if (imageInput.value != '') {
+        itemImage.src = imageInput.value;
+        $('#item-image').show();
+
+      } else {
+        $('#item-image').hide();
+      }
+    }, 3)
+  })
+
+  imageInput.addEventListener('paste', () => {
+    setTimeout(() => {
+      if (imageInput.value != '') {
+        itemImage.src = imageInput.value;
+        $('#item-image').show();
+
+      } else {
+        $('#item-image').hide();
+      }
+    }, 3)
+  })
+
+  </script>
 </html>
