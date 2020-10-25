@@ -48,7 +48,26 @@
               <% if(announcement.sender._id.equals(currentUser._id)) { %>
                 <a href="/announcements/<%= announcement._id %>/edit" class="btn btn-info"><i class="fas fa-cog"></i> Edit</a>
                 <form action="/announcements/<%= announcement._id %>?_method=delete" method="post" id="delete-form">
-                  <button type="submit" class="btn btn-danger"><i class="far fa-trash-alt"></i> Delete</button>
+                  <button style="color: white;" class="btn btn-danger" type="button" data-toggle="modal" data-target="#modal-<%=announcement._id%>"><i class="far fa-trash-alt"></i> Delete</button>
+                  <div class="modal fade" id="modal-<%=announcement._id%>" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+                    <div class="modal-dialog">
+                      <div class="modal-content">
+                        <div class="modal-header">
+                          <h5 class="modal-title" id="exampleModalLabel" style="color: black;">Delete Announcement?</h5>
+                          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                          </button>
+                        </div>
+                        <div class="modal-body" style="color: black; text-align: left;">
+                          This action is irreversible. You will have to manually recreate this announcement.
+                        </div>
+                        <div class="modal-footer">
+                          <button type="button" class="btn btn-secondary" data-dismiss="modal">No, Go Back</button>
+                          <button type="submit" class="btn btn-danger">Yes, Delete Announcement</button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
                 </form>
               <% } %>
             </div>

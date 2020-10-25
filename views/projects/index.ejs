@@ -67,7 +67,26 @@
                     <button style="margin-left: 10px;" id="edit-button"type="button" class="btn btn-info"><a style="color: white;" href="projects/<%=project._id%>/edit"><i class="fas fa-cog"></i> Edit</a></button>
 
                     <form action="projects/<%=project._id%>?_method=delete" method="post" style="display: inline-block;">
-                      <button style="color: white;" class="btn btn-danger" type="submit"><i class="far fa-trash-alt"></i> Delete</button>
+                      <button style="color: white;" class="btn btn-danger" type="button" data-toggle="modal" data-target="#modal-<%=project._id%>"><i class="far fa-trash-alt"></i> Delete</button>
+                      <div class="modal fade" id="modal-<%=project._id%>" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+                        <div class="modal-dialog">
+                          <div class="modal-content">
+                            <div class="modal-header">
+                              <h5 class="modal-title" id="exampleModalLabel" style="color: black;">Delete Post?</h5>
+                              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                              </button>
+                            </div>
+                            <div class="modal-body" style="color: black;">
+                              This action is irreversible. You will have to manually recreate this post.
+                            </div>
+                            <div class="modal-footer">
+                              <button type="button" class="btn btn-secondary" data-dismiss="modal">No, Go Back</button>
+                              <button type="submit" class="btn btn-danger">Yes, Delete Post</button>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
                     </form>
                   <% } %>
 
