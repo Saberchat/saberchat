@@ -106,7 +106,7 @@ router.post('/', middleware.isLoggedIn, middleware.isMod, (req, res) => { //REST
     }
 
     req.flash('success', 'Announcement posted to bulletin!');
-    res.redirect('/announcements/');
+    res.redirect(`/announcements/${announcement._id}`);
 
   })().catch(err => {
     console.log(err);

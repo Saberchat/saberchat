@@ -73,8 +73,16 @@
 
                   <a style="color:white;" href= "../profiles/<%=announcement.sender._id%>" >
                     <img src="<%= announcement.sender.imageUrl %>" alt="profile pic" style="width: 30px; height: 30px; object-fit: cover; border-radius: 50%;">
-                    <%=announcement.sender.username%>
+                    <%=announcement.sender.firstName%> <%=announcement.sender.lastName%>
                   </a>
+
+                  <% if (currentUser._id.toString() == announcement.sender._id.toString()) { %>
+                    <button style="margin-left: 10px;" id="edit-button"type="button" class="btn btn-info"><a style="color: white;" href="announcements/<%=announcement._id%>/edit"><i class="fas fa-cog"></i> Edit</a></button>
+
+                    <form action="announcements/<%=announcement._id%>?_method=delete" method="post" style="display: inline-block;">
+                      <button style="color: white;" class="btn btn-danger" type="submit"><i class="far fa-trash-alt"></i> Delete</button>
+                    </form>
+                  <% } %>
 
 
                 </div>
