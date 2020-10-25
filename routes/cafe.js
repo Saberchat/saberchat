@@ -560,13 +560,13 @@ router.delete('/item/:id', middleware.isLoggedIn, middleware.isMod, (req, res) =
 // });
 
 router.get('/type/new', middleware.isLoggedIn, middleware.isMod, (req, res) => { // RESTful route "New" for type
-  Item.find({}, (err,foundItems) => { //Collect info on all the items, so that we can give the user the option to add them to that type
-    if (err || !foundItems) {
-      req.flash('error', "Unable to access database")
+  Type.find({}).populate('items').exec((err, types) => { //Collect info on all the items, so that we can give the user the option to add them to that type
+    if (err || !types) {
+      req.flash('error', "Unable to find types")
       res.redirect('back')
 
     } else {
-      res.render('cafe/newItemType', {items: foundItems})
+      res.render('cafe/newItemType', {types})
     }
   })
 })
@@ -637,7 +637,7 @@ router.get('/type/:id', middleware.isLoggedIn, middleware.isMod, (req, res) => {
 
   (async() => {
 
-    const type = await Type.findById(req.params.id); //Find the specified type
+    const type = await Type.findById(req.params.id).populate('items'); //Find the specified type
 
     if (!type) {
       req.flash('error', "Unable to access database"); return res.redirect('back')
@@ -646,13 +646,13 @@ router.get('/type/:id', middleware.isLoggedIn, middleware.isMod, (req, res) => {
       req.flash('error', "You cannot modify that category"); return res.redirect('/cafe/manage')
     }
 
-    const items = await Item.find({}); //Find all items
+    const types = await Type.find({_id: {$nin: type._id}}).populate('items'); //Find all items
 
-    if (!items) {
+    if (!types) {
       req.flash('error', "Unable to access database"); return res.redirect('back');
     }
 
-    res.render('cafe/editItemType', {type, items})
+    res.render('cafe/editItemType', {type, types})
 
   })().catch(err => {
     console.log(err)

@@ -53,18 +53,25 @@
         <div class="row">
           <div class="col-md-8 offset-md-2 col-12">
             <div class="form-group">
-              <% items.forEach(item => { %>
-                <% if (type.items.includes(item._id)) { %>
-                  <input id="item<%=item._id%>" type="checkbox" name="<%=item._id%>" checked/>
-                  <label for="item<%=item._id%>"><%=item.name%></label>
-                  <br />
+              <h5><strong><%=type.name%></strong></h5>
+              <% type.items.forEach(item => { %>
+                <input id="item<%=item._id%>" type="checkbox" name="<%=item._id%>" checked/>
+                <label for="item<%=item._id%>"><%=item.name%></label>
+                <br />
+              <% }) %>
+              <br />
 
-                <% } else { %>
-                  <input id="item<%=item._id%>" type="checkbox" name="<%=item._id%>"/>
-                  <label for="item<%=item._id%>"><%=item.name%></label>
-                  <br />
+              <% types.forEach(t => { %>
 
-                <% }%>
+                <% if (t.items.length > 0) { %>
+                  <h5><strong><%=t.name%></strong></h5>
+                  <% t.items.forEach(item => { %>
+                    <input id="item<%=item._id%>" type="checkbox" name="<%=item._id%>"/>
+                    <label for="item<%=item._id%>"><%=item.name%></label>
+                    <br />
+                  <% }) %>
+                  <br />
+                <% } %>
               <% }) %>
             </div>
           </div>

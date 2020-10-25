@@ -67,8 +67,7 @@
 
           <% types.forEach(type => { %>
             <% if (type.items.length > 0) { %>
-              <br class="category-break" id="<%=type._id%>-break"/>
-              <li class="list-group-item list-group-item-success category-header" id="<%=type._id%>-header">
+              <li class="list-group-item list-group-item-success category-header" id="<%=type._id%>-header" style="margin-top: 40px;">
                 <div class="d-flex w-100 justify-content-between">
                   <h2 class="mb-1"><%=type.name%></h2>
                 </div>
@@ -80,6 +79,7 @@
                   <a href="item/<%= item._id %>" id="item-<%=item.id%>" class="list-group-item list-group-item-action menu-item <%=type.name.split(' ').join('')%>"><strong><%= item.name %></strong> (Unavailable)</a>
                 <% } %>
               <% }) %>
+              <br class="category-break" id="<%=type._id%>-break"/>
             <% } %>
           <% }) %>
 

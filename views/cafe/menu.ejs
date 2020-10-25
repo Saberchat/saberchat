@@ -41,8 +41,8 @@
         <div class="col-12">
           <% types.forEach(type => { %>
             <% if (type.items.length > 0) { %>
-              <br class="category-break" id="<%=type._id%>-break"/>
-              <li class="list-group-item list-group-item-success category-header" id="<%=type._id%>-header">
+
+              <li class="list-group-item list-group-item-success category-header" id="<%=type._id%>-header" style="margin-top: 40px;">
                 <div class="d-flex w-100 justify-content-between">
                   <h2 class="mb-1"><%=type.name%></h2>
                 </div>
@@ -63,6 +63,7 @@
 
                 <% }%>
               <% }) %>
+              <br class="category-break" id="<%=type._id%>-break"/>
             <% } %>
 
           <% }) %>
