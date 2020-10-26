@@ -60,7 +60,9 @@
                                 <span class="badge badge-info">Admin</span>
                               <% } else if (user.permission == "mod") { %>
                                 <span class="badge badge-success">Moderator</span>
-                              <% }%>
+                              <% } else if (user.permission == "principal") { %>
+                                <span class="badge badge-danger">Principal</span>
+                              <% } %>
                             </a>
                         <% } %>
                       <% } %>

@@ -77,6 +77,16 @@ middleware.checkRoomOwnership = function(req, res, next) {
 	});
 }
 
+middleware.isPrincipal = function(req, res, next) {
+	if(req.user.permission == 'principal') {
+		next();
+	} else {
+		req.flash('error', 'You do not have permission to do that');
+		res.redirect('/');
+	}
+}
+
+
 middleware.isAdmin = function(req, res, next) {
 	if(req.user.permission == 'admin' || req.user.permission == 'principal') {
 		next();

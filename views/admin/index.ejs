@@ -25,11 +25,21 @@
 
       <div class="container">
         <ul>
-          <h1 class="list-group-item">Admin Dashboard Page</h1>
+          <% if (currentUser.permission == "principal") { %>
+            <h1 class="list-group-item">Principal Dashboard Page</h1>
+
+          <% } else { %>
+            <h1 class="list-group-item">Admin Dashboard Page</h1>
+          <% } %>
+
           <a href="/admin/permissions" class="list-group-item">Change Permissions</a>
           <a href="/admin/moderate" class="list-group-item">Moderate</a>
           <a href="/admin/manageCafe" class="list-group-item">Manage Cafe</a>
           <a href="/admin/status" class="list-group-item">Change Status</a>
+
+          <% if (currentUser.permission == "principal") { %>
+            <a href="/admin/whitelist" class="list-group-item">Email Whitelist</a>
+          <% } %>
         </ul>
       </div>
   </body>

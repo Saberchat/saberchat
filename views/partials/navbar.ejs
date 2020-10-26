@@ -61,8 +61,10 @@
                           </a>
                           <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
                             <a class="dropdown-item" href="/profiles/<%= currentUser._id %>">View Profile</a>
-                            <% if (currentUser.permission == 'admin' || currentUser.permission == 'principal') { %>
-                                    <a class="dropdown-item" href="/admin">Admin Controls</a>
+                            <% if (currentUser.permission == 'admin') { %>
+                              <a class="dropdown-item" href="/admin">Admin Controls</a>
+                            <% } else if (currentUser.permission == 'principal') {%>
+                              <a class="dropdown-item" href="/admin">Principal Controls</a>
                             <% } %>
                             <a class="dropdown-item" href="/logout">Logout</a>
                           </div>

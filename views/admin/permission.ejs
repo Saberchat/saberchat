@@ -32,7 +32,7 @@
 
               <div class="search-filter mb-3">
                 <i class="fas fa-search"></i>
-                <input id="search-input" onkeyup="searchFunction()" class="form-control" type="text" placeholder="Search..." title="Type in announcement segment"/>
+                <input id="search-input" onkeyup="searchFunction()" class="form-control" type="text" placeholder="Search..." title="Type in name"/>
               </div><br />
 
               <ul class="list-group">
@@ -46,6 +46,9 @@
                     <li class="list-group-item user" id="<%=user._id%>">
                       <%= user.username %> (<%= user.firstName %> <%= user.lastName %>)
                       <select name="permission" class="role-select" onchange="updateRole(this)" id="<%= user._id %>">
+                        <option value="principal"
+                        <% if(user.permission == 'principal'){ %> selected <% } %>
+                        >Principal</option>
                         <option value="admin"
                         <% if(user.permission == 'admin'){ %> selected <% } %>
                         >Administrator</option>

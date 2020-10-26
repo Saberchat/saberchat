@@ -4,6 +4,7 @@ const Filter = require('bad-words');
 const filter = new Filter();
 
 const User = require('../models/user');
+const Email = require('../models/email');
 
 const middleware = require('../middleware');
 
@@ -77,14 +78,34 @@ router.put('/profile', middleware.isLoggedIn, function(req, res) {
 
 //route for changing email. Similar to edit profiles route. But changing email logs out user for some reason.
 router.put('/change-email', middleware.isLoggedIn, function(req, res) {
-  User.findByIdAndUpdate(req.user._id, {email: req.body.email}, function(err, updatedUser) {
-    if(err || !updatedUser) {
+  (async() => {
+
+    const emails = await Email.find({address: req.body.email});
+
+    if (!emails) {
+      req.flash('error', "Unable to find emails");
+      return res.redirect('back');
+
+    } else if (emails.length < 1) {
+      req.flash('error', "Email not in whitelist");
+      return res.redirect('back');
+    }
+
+    const updatedUser = await  User.findByIdAndUpdate(req.user._id, {email: req.body.email});
+
+    if(!updatedUser) {
       req.flash('error', 'There was an error changing your email');
       res.redirect('/');
+
     } else {
       req.flash('success', 'Updated your profile. Please Login Again.');
       res.redirect('/');
     }
+
+  })().catch(err => {
+    console.log(err);
+    req.flash('error', "Unable to access database");
+    res.redirect('back');
   });
 });
 

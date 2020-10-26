@@ -9,6 +9,7 @@ const middleware = require('../middleware');
 
 //import user schema for db actions
 const User = require('../models/user');
+const Email = require('../models/email');
 
 // Home route. gives the landing or home or index page (whatever you want to call it).
 router.get('/', (req, res) => {
@@ -29,10 +30,6 @@ router.post("/register",  function(req, res) {
 		req.flash('error', 'Fill in valid email');
 		res.redirect('/');
 
-	} else if (req.body.email.split('@')[1] != 'alsionschool.org') { //THIS IS A PLACEHOLDER FOR UNTIL WE HAVE MR. JOEY SET UP A PROPER WHITELIST
-		req.flash('error', 'Only members of the Alsion community may sign up');
-		res.redirect('/');
-
 	} else if(req.body.firstName == '') {
 		req.flash('error', 'Fill in first name');
 		res.redirect('/');
@@ -51,61 +48,75 @@ router.post("/register",  function(req, res) {
 
 	} else {
 
-		let username = req.body.username;
-		if (username[username.length - 1] == ' ') { //Space at the end of username causes errors that are hard to fix, and unnecessary if we nip it in the bud here
-			username = username.slice(0, username.length - 1);
-		}
-
-		let firstName = req.body.firstName;
-		if (firstName[firstName.length - 1] == ' ') { //Space at the end of username causes errors that are hard to fix, and unnecessary if we nip it in the bud here
-			firstName = firstName.slice(0, firstName.length - 1);
-		}
-
-		let lastName = req.body.lastName;
-		if (lastName[lastName.length - 1] == ' ') { //Space at the end of username causes errors that are hard to fix, and unnecessary if we nip it in the bud here
-			lastName = lastName.slice(0, lastName.length - 1);
-		}
-
-		let email = req.body.email;
-		if (email[email.length - 1] == ' ') { //Space at the end of username causes errors that are hard to fix, and unnecessary if we nip it in the bud here
-			email = email.slice(0, email.length - 1);
-		}
-
-		//creates new user from form info
-		newUser = new User(
-			{
-				email: email,
-				firstName: firstName,
-				lastName: lastName,
-				username: filter.clean(username),
-				msgCount: 0,
-				annCount: [],
-				reqCount: 0
-			}
-		);
-
-		//registers the user
-		User.register(newUser, req.body.password, function(err, user) {
-			if(err) {
-				//flash message the error if there is an error registering user
-				if(err.name == 'UserExistsError') {
-					req.flash('error', 'Email is already taken');
-				} else {
-					req.flash("error", err.message);
-				}
+		Email.find({address: req.body.email}, (err, emails) => {
+			if (err || !emails) {
 				console.log(err);
-				//redirect to root
-				return res.redirect("/");
-			}
+				req.flash('error', "Unable to find emails");
+				req.flash('error', 'Only members of the Alsion community may sign up');
+				res.redirect('/');
 
-			//if registration is successful, login user.
-			passport.authenticate("local")(req, res, function() {
-				//flash message for succesful login
-				req.flash("success", "Welcome to Saberchat " + user.firstName);
-				res.redirect("/");
-				console.log('succesfully registered and logged in user')
-			});
-		});
+			} else if (emails.length < 1) {
+				req.flash('error', 'Only members of the Alsion community may sign up');
+				res.redirect('/');
+
+			} else {
+				let username = req.body.username;
+				if (username[username.length - 1] == ' ') { //Space at the end of username causes errors that are hard to fix, and unnecessary if we nip it in the bud here
+					username = username.slice(0, username.length - 1);
+				}
+
+				let firstName = req.body.firstName;
+				if (firstName[firstName.length - 1] == ' ') { //Space at the end of username causes errors that are hard to fix, and unnecessary if we nip it in the bud here
+					firstName = firstName.slice(0, firstName.length - 1);
+				}
+
+				let lastName = req.body.lastName;
+				if (lastName[lastName.length - 1] == ' ') { //Space at the end of username causes errors that are hard to fix, and unnecessary if we nip it in the bud here
+					lastName = lastName.slice(0, lastName.length - 1);
+				}
+
+				let email = req.body.email;
+				if (email[email.length - 1] == ' ') { //Space at the end of username causes errors that are hard to fix, and unnecessary if we nip it in the bud here
+					email = email.slice(0, email.length - 1);
+				}
+
+				//creates new user from form info
+				newUser = new User(
+					{
+						email: email,
+						firstName: firstName,
+						lastName: lastName,
+						username: filter.clean(username),
+						msgCount: 0,
+						annCount: [],
+						reqCount: 0
+					}
+				);
+
+				//registers the user
+				User.register(newUser, req.body.password, function(err, user) {
+					if(err) {
+						//flash message the error if there is an error registering user
+						if(err.name == 'UserExistsError') {
+							req.flash('error', 'Email is already taken');
+						} else {
+							req.flash("error", err.message);
+						}
+						console.log(err);
+						//redirect to root
+						return res.redirect("/");
+					}
+
+					//if registration is successful, login user.
+					passport.authenticate("local")(req, res, function() {
+						//flash message for succesful login
+						req.flash("success", "Welcome to Saberchat " + user.firstName);
+						res.redirect("/");
+						console.log('succesfully registered and logged in user')
+					});
+				});
+			}
+		})
 	}
 });
 
