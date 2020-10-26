@@ -62,6 +62,7 @@
                     </form>
 
                     <% for (let email of emails) { %>
+
                       <li class="list-group-item email" id="<%=email._id%>">
                         <%=email.address%>
                         <% let exists = null %>
@@ -77,29 +78,32 @@
                           <a class="badge badge-info" style="color: white;" href="../profiles/<%=exists._id%>">User Exists</a>
                         <% } %>
 
-                        <form action="/admin/whitelist/<%=email._id%>?_method=delete" method="post" style="float: right;">
-                          <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#modal-<%=email._id%>" id="delete-button"><i class="fas fa-trash-alt"></i> Remove</button>
-                          <div class="modal fade" id="modal-<%=email._id%>" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
-                            <div class="modal-dialog">
-                              <div class="modal-content">
-                                <div class="modal-header">
-                                  <h5 class="modal-title" id="exampleModalLabel">Remove Email From Whitelist?</h5>
-                                  <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                    <span aria-hidden="true">&times;</span>
-                                  </button>
-                                </div>
-                                <div class="modal-body">
-                                  Removing <%=email.address%> will delete any accounts which use this email.
-                                </div>
-                                <div class="modal-footer">
-                                  <button type="button" class="btn btn-secondary" data-dismiss="modal">No, Go Back</button>
-                                  <button type="submit" class="btn btn-danger">Yes, Remove Email</button>
+                        <% if (currentUser.email != email.address) { %>
+                          <form action="/admin/whitelist/<%=email._id%>?_method=delete" method="post" style="float: right;">
+                            <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#modal-<%=email._id%>" id="delete-button"><i class="fas fa-trash-alt"></i> Remove</button>
+                            <div class="modal fade" id="modal-<%=email._id%>" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+                              <div class="modal-dialog">
+                                <div class="modal-content">
+                                  <div class="modal-header">
+                                    <h5 class="modal-title" id="exampleModalLabel">Remove Email From Whitelist?</h5>
+                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                      <span aria-hidden="true">&times;</span>
+                                    </button>
+                                  </div>
+                                  <div class="modal-body">
+                                    Removing <%=email.address%> will delete any accounts which use this email.
+                                  </div>
+                                  <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-dismiss="modal">No, Go Back</button>
+                                    <button type="submit" class="btn btn-danger">Yes, Remove Email</button>
+                                  </div>
                                 </div>
                               </div>
                             </div>
-                          </div>
-                        </form>
-                      </li>
+                          </form>
+                        </li>
+
+                      <% } %>
                     <% } %>
                   </li>
                 </ul>
