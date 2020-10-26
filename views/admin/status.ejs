@@ -40,43 +40,30 @@
                     <strong>Modify Statuses</strong>
                   </li>
 
-                    <% users.forEach(function(user) { %>
-                        <% if(!user._id.equals(currentUser._id)) { %>
+                  <% let statuses = ["Faculty", "12th", "11th", "10th", "9th", "8th", "7th", "Parent", "Guest"]; %>
+
+                  <% for (let status of statuses) { %>
+                    <% for (let user of users) { %>
+                      <% if(!user._id.equals(currentUser._id) && user.status.toLowerCase() == status.toLowerCase()){ %>
                         <li class="list-group-item user" id="<%=user._id%>">
-                            <%= user.username %> (<%= user.firstName %> <%= user.lastName %>)
-                            <select name="status" class="role-select" onchange="updateStatus(this)" id="<%= user._id %>">
-                                <option value="guest"
-                                <% if(!user.status){ %> selected <% } %>
-                                >Guest</option>
-                                <option value="7th"
-                                <% if(user.status == '7th'){ %> selected <% } %>
-                                >7th</option>
-                                <option value="8th"
-                                <% if(user.status == '8th'){ %> selected <% } %>
-                                >8th</option>
-                                <option value="9th"
-                                <% if(user.status == '9th'){ %> selected <% } %>
-                                >9th</option>
-                                <option value="10th"
-                                <% if(user.status == '10th'){ %> selected <% } %>
-                                >10th</option>
-                                <option value="11th"
-                                <% if(user.status == '11th'){ %> selected <% } %>
-                                >11th</option>
-                                <option value="12th"
-                                <% if(user.status == '12th'){ %> selected <% } %>
-                                >12th</option>
-                                <option value="parent"
-                                <% if(user.status == 'parent'){ %> selected <% } %>
-                                >Parent</option>
-                                <option value="faculty"
-                                <% if(user.status == 'faculty'){ %> selected <% } %>
-                                >Faculty</option>
-                            </select>
+                          <%= user.username %> (<%= user.firstName %> <%= user.lastName %>) <span hidden><%=status%></span>
+                          <select name="status" class="role-select" onchange="updateStatus(this)" id="<%= user._id %>">
+
+                            <% for (let status of statuses) { %>
+                              <% if (user.status.toLowerCase() == status.toLowerCase()) { %>
+                                <option value="<%=status.toLowerCase()%>" selected><%=status%></option>
+
+                              <% } else { %>
+                                <option value="<%=status.toLowerCase()%>"><%=status%></option>
+                              <% }%>
+                            <% } %>
+                          </select>
                         </li>
-                        <% } %>
-                    <% }); %>
-                  </ul><br />
+                      <% } %>
+                  <% }; %>
+                <% } %>
+
+                </ul><br />
             </div>
         </div>
     </div>
@@ -89,7 +76,7 @@
         let filter = searchInput.value.toLowerCase();
 
         for (let i = 0; i < users.length; i += 1) {
-          if (!users[i].innerText.split('\n')[0].toLowerCase().includes(filter)) {
+          if (!users[i].textContent.split('\n')[1].toLowerCase().includes(filter)) {
             $(`#${users[i].id}`).hide();
 
           } else {

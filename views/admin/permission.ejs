@@ -41,27 +41,31 @@
                   <strong>Modify Permissions</strong>
                 </li>
 
-                <% users.forEach(function(user) { %>
-                    <% if(!user._id.equals(currentUser._id)) { %>
-                    <li class="list-group-item user" id="<%=user._id%>">
-                      <%= user.username %> (<%= user.firstName %> <%= user.lastName %>)
-                      <select name="permission" class="role-select" onchange="updateRole(this)" id="<%= user._id %>">
-                        <option value="principal"
-                        <% if(user.permission == 'principal'){ %> selected <% } %>
-                        >Principal</option>
-                        <option value="admin"
-                        <% if(user.permission == 'admin'){ %> selected <% } %>
-                        >Administrator</option>
-                        <option value="mod"
-                        <% if(user.permission == 'mod'){ %> selected <% } %>
-                        >Moderator</option>
-                        <option value="student"
-                        <% if(user.permission == 'student'){ %> selected <% } %>
-                        >Student</option>
-                        </select>
-                    </li>
-                    <% } %>
-                <% }); %>
+                <% let permMatrix = [["principal", "Principal"], ["admin", "Administrator"], ["mod", "Moderator"], ["student", "Student"]]; %>
+
+                <% for (let perm of permMatrix) { %>
+
+                  <% for (let user of users) { %>
+                      <% if(!user._id.equals(currentUser._id) && user.permission == perm[0]){ %>
+                        <li class="list-group-item user" id="<%=user._id%>">
+                          <%= user.username %> (<%= user.firstName %> <%= user.lastName %>) <span hidden><%=perm[1]%></span>
+                          <select name="permission" class="role-select" onchange="updateRole(this)" id="<%= user._id %>">
+
+                            <% for (let perm of permMatrix) { %>
+                              <% if (user.permission == perm[0]) { %>
+                                <option value="<%=perm[0]%>" selected><%=perm[1]%></option>
+
+                              <% } else { %>
+                                <option value="<%=perm[0]%>"><%=perm[1]%></option>
+                              <% }%>
+                            <% } %>
+                          </select>
+                        </li>
+                      <% } %>
+                  <% } %>
+
+                <% } %>
+
               </ul><br />
             </div>
           </div>
@@ -75,7 +79,7 @@
         let filter = searchInput.value.toLowerCase();
 
         for (let i = 0; i < users.length; i += 1) {
-          if (!users[i].innerText.split('\n')[0].toLowerCase().includes(filter)) {
+          if (!users[i].textContent.split('\n')[1].toLowerCase().includes(filter)) {
             $(`#${users[i].id}`).hide();
 
           } else {
