@@ -84,13 +84,13 @@
                         </select>
 
                         <% if (!item.price.toString().includes('.')) { %>
-                          <label style="margin-left: 1%;" class="form-check-label" for="<%= item._id%>"><strong><%= item.name %></strong> (<%= item.availableItems %> orders available) - $<%= item.price %>.00 </label>
+                          <label style="margin-left: 1%;" class="form-check-label" for="<%= item._id%>"><strong><%= item.name %></strong> (<%= item.availableItems %> orders available) - $<%= item.price %>.00 <span hidden><%=type.name%></span></label>
 
                         <% } else if (item.price.toString().split('.')[1].length == 1){ %>
-                          <label style="margin-left: 1%;" class="form-check-label" for="<%= item._id%>"><strong><%= item.name %></strong> (<%= item.availableItems %> orders available) - $<%= item.price %>0 </label>
+                          <label style="margin-left: 1%;" class="form-check-label" for="<%= item._id%>"><strong><%= item.name %></strong> (<%= item.availableItems %> orders available) - $<%= item.price %>0 <span hidden><%=type.name%></span></label>
 
                         <% } else { %>
-                          <label style="margin-left: 1%;" class="form-check-label" for="<%= item._id%>"><strong><%= item.name %></strong> (<%= item.availableItems %> orders available) - $<%= item.price %></label>
+                          <label style="margin-left: 1%;" class="form-check-label" for="<%= item._id%>"><strong><%= item.name %></strong> (<%= item.availableItems %> orders available) - $<%= item.price %><span hidden><%=type.name%></span></label>
                         <% } %>
 
                         <br />
@@ -148,7 +148,7 @@
     let filter = input.value.toLowerCase();
 
     for (let item of menuItems) {
-      if(!item.innerText.toLowerCase().includes(filter)) {
+      if(!item.textContent.toLowerCase().includes(filter)) {
         $(`#${item.id}`).hide()
 
       } else {
@@ -161,8 +161,8 @@
     for (let h = 0; h < catHeaders.length; h+= 1) {
       catIncluded = false;
 
-      for (let item of document.getElementsByClassName(catHeaders[h].innerText)) {
-        if(item.innerText.toLowerCase().includes(filter)) {
+      for (let item of document.getElementsByClassName(catHeaders[h].textContent)) {
+        if(item.textContent.toLowerCase().includes(filter)) {
           catIncluded = true;
           break
         }

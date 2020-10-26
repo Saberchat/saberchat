@@ -74,9 +74,9 @@
               </li>
               <% type.items.forEach(item => { %>
                 <% if (item.isAvailable == true) { %>
-                  <a href="item/<%= item._id %>" id="item-<%=item.id%>" class="list-group-item list-group-item-action menu-item <%=type.name.split(' ').join('')%>"><strong><%= item.name %></strong> (<%= item.availableItems%> orders available)</a>
+                  <a href="item/<%= item._id %>" id="item-<%=item.id%>" class="list-group-item list-group-item-action menu-item <%=type.name.split(' ').join('')%>"><strong><%= item.name %></strong> (<%= item.availableItems%> orders available) <span hidden><%=type.name%></span></a>
                 <% } else {%>
-                  <a href="item/<%= item._id %>" id="item-<%=item.id%>" class="list-group-item list-group-item-action menu-item <%=type.name.split(' ').join('')%>"><strong><%= item.name %></strong> (Unavailable)</a>
+                  <a href="item/<%= item._id %>" id="item-<%=item.id%>" class="list-group-item list-group-item-action menu-item <%=type.name.split(' ').join('')%>"><strong><%= item.name %></strong> (Unavailable) <span hidden><%=type.name%></span></a>
                 <% } %>
               <% }) %>
               <br class="category-break" id="<%=type._id%>-break"/>
@@ -91,7 +91,7 @@
           </li>
           <% types.forEach(type => { %>
             <% if (type.name != "Other") { %>
-              <a href="type/<%=type._id%>" id="type-<%=type.id%>" class="list-group-item list-group-item-action menu-item ItemOrderCategories"><strong><%=type.name%></strong> (<%=type.items.length%> items)</a>
+              <a href="type/<%=type._id%>" id="type-<%=type.id%>" class="list-group-item list-group-item-action menu-item ItemOrderCategories"><strong><%=type.name%></strong> (<%=type.items.length%> items) </a>
             <% } %>
           <% }) %>
 
@@ -121,7 +121,7 @@
     let filter = input.value.toLowerCase();
 
     for (let item of menuItems) {
-      if(!item.innerText.toLowerCase().includes(filter)) {
+      if(!item.textContent.toLowerCase().includes(filter)) {
         $(`#${item.id}`).hide()
 
       } else {
@@ -134,8 +134,8 @@
     for (let h = 0; h < catHeaders.length; h+= 1) {
       catIncluded = false;
 
-      for (let item of document.getElementsByClassName(catHeaders[h].innerText.split(' ').join(''))) {
-        if(item.innerText.toLowerCase().includes(filter)) {
+      for (let item of document.getElementsByClassName(catHeaders[h].textContent.split(' ').join(''))) {
+        if(item.textContent.toLowerCase().includes(filter)) {
           catIncluded = true;
           break
         }

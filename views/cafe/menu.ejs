@@ -52,13 +52,13 @@
                 <% if (item.isAvailable == true) { %>
 
                   <% if (!item.price.toString().includes('.')) { %>
-                    <span class="list-group-item list-group-item-action menu-item <%=type.name%>" id="item-<%=item.id%>"><strong><%= item.name %> (<%= item.availableItems%> orders available)</strong> - $<%=item.price%>.00<br /> <em><%= item.description %></em><br /><br /><img  src=<%=item.imgUrl%> style="width: 20%; height: 20%; border-radius: 20px;"/></span>
+                    <span class="list-group-item list-group-item-action menu-item <%=type.name%>" id="item-<%=item.id%>"><strong><%= item.name %> (<%= item.availableItems%> orders available)</strong> - $<%=item.price%>.00<br /> <em><%= item.description %></em><br /><br /><img  src=<%=item.imgUrl%> style="width: 20%; height: 20%; border-radius: 20px;"/><span hidden><%=type.name%></span></span>
 
                   <% } else if (item.price.toString().split('.')[1].length == 1){ %>
-                    <span class="list-group-item list-group-item-action menu-item <%=type.name%>" id="item-<%=item.id%>"><strong><%= item.name %> (<%= item.availableItems%> orders available)</strong> - $<%=item.price%>0<br /> <em><%= item.description %></em><br /><br /><img  src=<%=item.imgUrl%> style="width: 20%; height: 20%; border-radius: 20px;"/></span>
+                    <span class="list-group-item list-group-item-action menu-item <%=type.name%>" id="item-<%=item.id%>"><strong><%= item.name %> (<%= item.availableItems%> orders available)</strong> - $<%=item.price%>0<br /> <em><%= item.description %></em><br /><br /><img  src=<%=item.imgUrl%> style="width: 20%; height: 20%; border-radius: 20px;"/><span hidden><%=type.name%></span></span>
 
                   <% } else { %>
-                    <span class="list-group-item list-group-item-action menu-item <%=type.name%>" id="item-<%=item.id%>"><strong><%= item.name %> (<%= item.availableItems%> orders available)</strong> - $<%=item.price%><br /> <em><%= item.description %></em><br /><br /><img  src=<%=item.imgUrl%> style="width: 20%; height: 20%; border-radius: 20px;"/></span>
+                    <span class="list-group-item list-group-item-action menu-item <%=type.name%>" id="item-<%=item.id%>"><strong><%= item.name %> (<%= item.availableItems%> orders available)</strong> - $<%=item.price%><br /> <em><%= item.description %></em><br /><br /><img  src=<%=item.imgUrl%> style="width: 20%; height: 20%; border-radius: 20px;"/><span hidden><%=type.name%></span></span>
                   <% } %>
 
                 <% }%>
@@ -82,7 +82,7 @@
       let filter = input.value.toLowerCase();
 
       for (let item of menuItems) {
-        if(!item.innerText.toLowerCase().includes(filter)) {
+        if(!item.textContent.toLowerCase().includes(filter)) {
           $(`#${item.id}`).hide()
 
         } else {
@@ -95,8 +95,8 @@
       for (let h = 0; h < catHeaders.length; h+= 1) {
         catIncluded = false;
 
-        for (let item of document.getElementsByClassName(catHeaders[h].innerText)) {
-          if(item.innerText.toLowerCase().includes(filter)) {
+        for (let item of document.getElementsByClassName(catHeaders[h].textContent)) {
+          if(item.textContent.toLowerCase().includes(filter)) {
             catIncluded = true;
             break
           }
