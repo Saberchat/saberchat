@@ -94,11 +94,25 @@
 
                           <a href="/inbox/<%= msg._id %>" class="message-body">
                             <div class="message-head">
-                              <div class="message-subject">
-                                <%= msg.subject %>
-                              </div>
-                              <div class="message-from">
-                                <%= msg.sender.username %> 
+
+                              <% if (msg.read.includes(currentUser._id)) { %>
+                                <div class="message-subject">
+                                  <%= msg.subject %>
+                                </div>
+
+                              <% } else { %>
+                                <div class="message-subject" style="font-weight: 700">
+                                  <%= msg.subject %>
+                                </div>
+                              <% } %>
+
+                              <% if (msg.read.includes(currentUser._id)) { %>
+                                <div class="message-from">
+
+                                <% } else { %>
+                                  <div class="message-from" style="font-weight: 700">
+                                <% } %>
+                                <%= msg.sender.username %>
                               </div>
                             </div>
                             <div class="message-text">
