@@ -27,7 +27,7 @@
     <div class="container mt-5">
         <div class="row">
             <div class="col-12" style="text-align: center;">
-                <h1 style="width: 100%">Change Email Or Password</h1>
+                <h1 style="width: 100%">Edit Account Settings</h1>
                 <a class="btn btn-primary" href="/profiles/<%= currentUser._id %>"><i class="fas fa-arrow-left"></i> Back</a>
             </div>
         </div>
@@ -40,7 +40,7 @@
                         <input id="usernameInput" class="form-control" type="text" name="email" value="<%= currentUser.email %>" placeholder="Enter New Email" required>
                     </div>
 
-                    <button class="btn btn-lg btn-primary btn-block">Submit</button>
+                    <button class="btn btn-lg btn-primary btn-block">Change Email</button>
                 </form>
                 <h4 class="mt-5 mb-3">Change Password</h4>
                 <form action="/profiles/change-password?_method=put" method="post">
@@ -53,8 +53,33 @@
                         <input id="usernameInput" class="form-control" type="password" name="newPassword" placeholder="Enter New Password" required>
                     </div>
 
-                    <button class="btn btn-lg btn-primary btn-block">Submit</button>
+                    <button class="btn btn-lg btn-primary btn-block">Change Password</button>
                 </form>
+
+                <br />
+                <!-- <form action="/profiles/delete-account?_method=delete" method="post" style="margin-top: 30px;">
+                  <button type="button" class="btn btn-lg btn-danger btn-block" data-toggle="modal" data-target="#modal" id="delete-button">Delete Account</button>
+                  <div class="modal fade" id="modal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+                    <div class="modal-dialog">
+                      <div class="modal-content">
+                        <div class="modal-header">
+                          <h5 class="modal-title" id="exampleModalLabel">Delete Account?</h5>
+                          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                          </button>
+                        </div>
+                        <div class="modal-body">
+                          All of your account data will be deleted.
+                        </div>
+                        <div class="modal-footer">
+                          <button type="button" class="btn btn-secondary" data-dismiss="modal">No, Go Back</button>
+                          <button type="submit" class="btn btn-danger">Yes, Delete My Account</button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </form> -->
+                <br />
             </div>
         </div>
     </div>

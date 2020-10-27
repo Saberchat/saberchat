@@ -116,23 +116,103 @@ router.delete('/whitelist/:id', middleware.isLoggedIn, middleware.isPrincipal, (
 			return res.redirect('back');
 		}
 
-		const users = await User.find({email: email.address});
+		const deletedUsers = await User.deleteMany({email: email.address});
 
-		if (!users) {
-			req.flash('error', "Unable to find users with this email");
+		if (!deletedUsers) {
+			req.flash('error', "Unable to delete users with this email");
 			return res.redirect('back');
 		}
 
-		let deletedUser;
-
-		for (let user of users) {
-			deletedUser = await User.findByIdAndDelete(user._id);
-
-			if (!deletedUser) {
-				req.flash('error', "Unable to delete users with this email");
-				return res.redirect('back');
-			}
-		}
+		// let deletedComments = null;
+		// let deletedMessages = null;
+		// let deletedAnns = null;
+		// let deletedRooms = null;
+		// let deletedArticles = null;
+		// let deletedRequests = null;
+		// let deletedOrders = null;
+		// let deletedProjectsPosted = null;
+		// let projectsPosted = null;
+		// let deletedProjectsCreated = null;
+		//
+		// for (let user of deletedUsers) {
+		// 	deletedComments = await Comment.deleteMany({author: user._id});
+		//
+		//  if (!deletedComments) {
+		// 	 req.flash('error', "Unable to delete your comments");
+		// 	 return res.redirect('back');
+		//  }
+		//
+		// 	deletedMessages = await Message.deleteMany({sender: user._id});
+		//
+		//  if (!deletedMessages) {
+		// 	 req.flash('error', "Unable to delete your messages");
+		// 	 return res.redirect('back');
+		//  }
+		//
+		// 	deletedAnns = await Announcement.deleteMany({sender: user._id});
+		//
+		//  if (!deletedAnns) {
+		// 	 req.flash('error', "Unable to delete your announcements");
+		// 	 return res.redirect('back');
+		//  }
+		//
+		// 	deletedRooms = await Room.deleteMany({creator: user._id});
+		//
+		//  if (!deletedRooms) {
+		// 	 req.flash('error', "Unable to delete your rooms");
+		// 	 return res.redirect('back');
+		//  }
+		//
+		// 	deletedArticles = await Article.deleteMany({author: user._id});
+		//
+		//  if (!deletedArticles) {
+		// 	 req.flash('error', "Unable to delete your articles");
+		// 	 return res.redirect('back');
+		//  }
+		//
+		// 	deletedRequests = await Request.deleteMany({requester: user._id});
+		//
+		//  if (!deletedRequests) {
+		// 	 req.flash('error', "Unable to delete your requests");
+		// 	 return res.redirect('back');
+		//  }
+		//
+		// 	deletedOrders = await Order.deleteMany({customer: user._id});
+		//
+		//  if (!deletedOrders) {
+		// 	 req.flash('error', "Unable to delete your orders");
+		// 	 return res.redirect('back');
+		//  }
+		//
+		// 	deletedProjectsPosted = await Project.deleteMany({poster: user._id});
+		//
+		//  if (!deletedProjectsPosted) {
+		// 	 req.flash('error', "Unable to delete your projects");
+		// 	 return res.redirect('back');
+		//  }
+		//
+		// 	projectsCreated = await Project.find({});
+		//
+		//  if (!projectsCreated) {
+		// 	 req.flash('error', "Unable to find your projects");
+		// 	 return res.redirect('back');
+		//  }
+		//
+		//  deletes = []
+		//
+		//  for (let project of projects) {
+		// 	 if (project.creators.includes(user._id)) {
+		// 		 deletes.push(user._id);
+		// 	 }
+		//  }
+		//
+		// 	deletedProjectsCreated = await Project.deleteMany({_id: {$in: deletes}})
+		//
+		//  if (!deletedProjectsCreated) {
+		// 	 req.flash('error', "Unable to delete your projects");
+		// 	 return res.redirect('back');
+		//  }
+		// }
 
 		req.flash('success', "Email Removed From Whitelist! Any users with this email have been removed.");
 		res.redirect('/admin/whitelist');

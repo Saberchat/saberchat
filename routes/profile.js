@@ -6,6 +6,17 @@ const filter = new Filter();
 const User = require('../models/user');
 const Email = require('../models/email');
 
+const Comment = require('../models/comment');
+const Room = require('../models/room');
+const Request = require('../models/accessRequest');
+
+const Message = require('../models/message');
+const Announcement = require('../models/announcement');
+const Project = require('../models/project');
+
+const Order = require('../models/order');
+const Article = require('../models/article');
+
 const middleware = require('../middleware');
 
 // renders the list of users page
@@ -159,5 +170,98 @@ router.put('/change-password', middleware.isLoggedIn, function(req, res) {
     }
   });
 });
+
+// router.delete('/delete-account', middleware.isLoggedIn, (req, res) => {
+//   (async() => {
+//
+//     const deletedComments = await Comment.deleteMany({author: req.user._id});
+//
+//     if (!deletedComments) {
+//       req.flash('error', "Unable to delete your comments");
+//       return res.redirect('back');
+//     }
+//
+//     const deletedMessages = await Message.deleteMany({sender: req.user._id});
+//
+//     if (!deletedMessages) {
+//       req.flash('error', "Unable to delete your messages");
+//       return res.redirect('back');
+//     }
+//
+//     const deletedAnns = await Announcement.deleteMany({sender: req.user._id});
+//
+//     if (!deletedAnns) {
+//       req.flash('error', "Unable to delete your announcements");
+//       return res.redirect('back');
+//     }
+//
+//     const deletedRooms = await Room.deleteMany({creator: req.user._id});
+//
+//     if (!deletedRooms) {
+//       req.flash('error', "Unable to delete your rooms");
+//       return res.redirect('back');
+//     }
+//
+//     const deletedArticles = await Article.deleteMany({author: req.user._id});
+//
+//     if (!deletedArticles) {
+//       req.flash('error', "Unable to delete your articles");
+//       return res.redirect('back');
+//     }
+//
+//     const deletedRequests = await Request.deleteMany({requester: req.user._id});
+//
+//     if (!deletedRequests) {
+//       req.flash('error', "Unable to delete your requests");
+//       return res.redirect('back');
+//     }
+//
+//     const deletedOrders = await Order.deleteMany({customer: req.user._id});
+//
+//     if (!deletedOrders) {
+//       req.flash('error', "Unable to delete your orders");
+//       return res.redirect('back');
+//     }
+//
+//     const deletedProjectsPosted = await Project.deleteMany({poster: req.user._id});
+//
+//     if (!deletedProjectsPosted) {
+//       req.flash('error', "Unable to delete your projects");
+//       return res.redirect('back');
+//     }
+//
+//     const projectsCreated = await Project.find({});
+//
+//     if (!projectsCreated) {
+//       req.flash('error', "Unable to find your projects");
+//       return res.redirect('back');
+//     }
+//
+//     let deletes = []
+//
+//     for (let project of projects) {
+//       if (project.creators.includes(req.user._id)) {
+//         deletes.push(req.user._id);
+//       }
+//     }
+//
+//     const deletedProjectsCreated = await Project.deleteMany({_id: {$in: deletes}})
+//
+//     if (!deletedProjectsCreated) {
+//       req.flash('error', "Unable to delete your projects");
+//       return res.redirect('back');
+//     }
+//
+//     const deletedUser = await User.findByIdAndDelete(req.user._id);
+//
+//     if (!deletedUser) {
+//       req.flash('error', "There was an error deleting your account");
+//       return res.redirect('back');
+//     }
+//
+//     req.flash('success', "Account deleted!");
+//     res.redirect('/')
+//   })
+// })
 
 module.exports = router;
