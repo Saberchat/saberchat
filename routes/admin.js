@@ -2,12 +2,21 @@ const express = require('express');
 //start express router
 const router = express.Router();
 
-const Comment = require('../models/comment');
 const User = require('../models/user');
 const Email = require('../models/email');
 
-const middleware = require('../middleware');
+const Comment = require('../models/comment');
+const Room = require('../models/room');
+const Request = require('../models/accessRequest');
 
+const Message = require('../models/message');
+const Announcement = require('../models/announcement');
+const Project = require('../models/project');
+
+const Order = require('../models/order');
+const Article = require('../models/article');
+
+const middleware = require('../middleware');
 
 //Function to display user inbox
 router.get('/', middleware.isLoggedIn, middleware.isAdmin, (req, res) => {
@@ -116,106 +125,192 @@ router.delete('/whitelist/:id', middleware.isLoggedIn, middleware.isPrincipal, (
 			return res.redirect('back');
 		}
 
-		const deletedUsers = await User.deleteMany({email: email.address});
+		const users = await User.find({email: email.address});
 
-		if (!deletedUsers) {
+		if (!users) {
 			req.flash('error', "Unable to delete users with this email");
 			return res.redirect('back');
 		}
 
-		// let deletedComments = null;
-		// let deletedMessages = null;
-		// let deletedAnns = null;
-		// let deletedRooms = null;
-		// let deletedArticles = null;
-		// let deletedRequests = null;
-		// let deletedOrders = null;
-		// let deletedProjectsPosted = null;
-		// let projectsPosted = null;
-		// let deletedProjectsCreated = null;
-		//
-		// for (let user of deletedUsers) {
-		// 	deletedComments = await Comment.deleteMany({author: user._id});
-		//
-		//  if (!deletedComments) {
-		// 	 req.flash('error', "Unable to delete your comments");
-		// 	 return res.redirect('back');
-		//  }
-		//
-		// 	deletedMessages = await Message.deleteMany({sender: user._id});
-		//
-		//  if (!deletedMessages) {
-		// 	 req.flash('error', "Unable to delete your messages");
-		// 	 return res.redirect('back');
-		//  }
-		//
-		// 	deletedAnns = await Announcement.deleteMany({sender: user._id});
-		//
-		//  if (!deletedAnns) {
-		// 	 req.flash('error', "Unable to delete your announcements");
-		// 	 return res.redirect('back');
-		//  }
-		//
-		// 	deletedRooms = await Room.deleteMany({creator: user._id});
-		//
-		//  if (!deletedRooms) {
-		// 	 req.flash('error', "Unable to delete your rooms");
-		// 	 return res.redirect('back');
-		//  }
-		//
-		// 	deletedArticles = await Article.deleteMany({author: user._id});
-		//
-		//  if (!deletedArticles) {
-		// 	 req.flash('error', "Unable to delete your articles");
-		// 	 return res.redirect('back');
-		//  }
-		//
-		// 	deletedRequests = await Request.deleteMany({requester: user._id});
-		//
-		//  if (!deletedRequests) {
-		// 	 req.flash('error', "Unable to delete your requests");
-		// 	 return res.redirect('back');
-		//  }
-		//
-		// 	deletedOrders = await Order.deleteMany({customer: user._id});
-		//
-		//  if (!deletedOrders) {
-		// 	 req.flash('error', "Unable to delete your orders");
-		// 	 return res.redirect('back');
-		//  }
-		//
-		// 	deletedProjectsPosted = await Project.deleteMany({poster: user._id});
-		//
-		//  if (!deletedProjectsPosted) {
-		// 	 req.flash('error', "Unable to delete your projects");
-		// 	 return res.redirect('back');
-		//  }
-		//
-		// 	projectsCreated = await Project.find({});
-		//
-		//  if (!projectsCreated) {
-		// 	 req.flash('error', "Unable to find your projects");
-		// 	 return res.redirect('back');
-		//  }
-		//
-		//  deletes = []
-		//
-		//  for (let project of projects) {
-		// 	 if (project.creators.includes(user._id)) {
-		// 		 deletes.push(user._id);
-		// 	 }
-		//  }
-		//
-		// 	deletedProjectsCreated = await Project.deleteMany({_id: {$in: deletes}})
-		//
-		//  if (!deletedProjectsCreated) {
-		// 	 req.flash('error', "Unable to delete your projects");
-		// 	 return res.redirect('back');
-		//  }
-		// }
+		let deletedComments = null;
 
-		req.flash('success', "Email Removed From Whitelist! Any users with this email have been removed.");
-		res.redirect('/admin/whitelist');
+		let deletedMessages = null;
+		let messagesReceived = null;
+		let messageUpdate;
+
+		let deletedAnns = null;
+		let deletedArticles = null;
+		let deletedRequests = null;
+
+		let orders = null;
+		let deletedOrder = null;
+
+		let roomsCreated = null;
+
+		let roomsPartOf = null;
+		let roomUpdates = null;
+		let updatedRoom = null;
+
+		let deletedProjectsPosted = null;
+
+		let projectsCreated = null;
+		let projectUpdates = null;
+		let updatedProjects = null;
+
+		for (let user of users) {
+			deletedComments = await Comment.deleteMany({author: user._id});
+
+		if (!deletedComments) {
+			req.flash('error', "Unable to delete your comments");
+			return res.redirect('back');
+		}
+
+		deletedMessages = await Message.deleteMany({sender: user._id});
+
+		if (!deletedMessages) {
+		 req.flash('error', "Unable to delete your messages");
+		 return res.redirect('back');
+		}
+
+		messagesReceived = await Message.find({});
+
+		if (!messagesReceived) {
+			req.flash('error', "Unable to find your messages");
+			return res.redirect('back');
+		}
+
+		for (let message of messagesReceived) {
+			if (message.recipients.includes(req.user._id)) {
+				messageUpdate = await Message.findByIdAndUpdate(message._id, {$pull: {recipients: req.user._id}})
+
+				if (!messageUpdate) {
+					req.flash('error', "Unable to update your messages");
+					return res.redirect('back');
+				}
+			}
+		}
+
+		deletedAnns = await Announcement.deleteMany({sender: user._id});
+
+		if (!deletedAnns) {
+			req.flash('error', "Unable to delete your announcements");
+			return res.redirect('back');
+		}
+
+		deletedArticles = await Article.deleteMany({author: user._id});
+
+		if (!deletedArticles) {
+			req.flash('error', "Unable to delete your articles");
+			return res.redirect('back');
+		}
+
+		deletedRequests = await Request.deleteMany({requester: user._id});
+
+		if (!deletedRequests) {
+			req.flash('error', "Unable to delete your requests");
+			return res.redirect('back');
+		}
+
+		orders = await Order.find({customer: req.user._id});
+
+    if (!orders) {
+      req.flash('error', "Unable to find your orders");
+      return res.redirect('back')
+    }
+
+    for (let order of orders) {
+      deletedOrder = await Order.findByIdAndDelete(req.params.id).populate('items.item');
+      if (!deletedOrder) {
+        req.flash("error", "Unable to delete orders")
+        return res.redirect('back')
+      }
+
+      for (let i = 0; i < deletedOrder.items.length; i += 1) { //For each of the order's items, add the number ordered back to that item. (If there are 12 available quesadillas and our user ordered 3, there are now 15)
+
+        if (deletedOrder.present) {
+          deletedOrder.items[i].item.availableItems += deletedOrder.items[i].quantity
+          deletedOrder.items[i].item.isAvailable = true;
+          await deletedOrder.items[i].item.save()
+        }
+      }
+    }
+
+		deletedRoomsCreated = await Room.deleteMany({creator: user._id});
+
+		if (!deletedRoomsCreated) {
+			req.flash('error', "Unable to delete your rooms");
+			return res.redirect('back');
+		}
+
+		roomsPartOf = await Room.find({});
+
+		if (!roomsPartOf) {
+			req.flash('error', "Unable to find your rooms");
+			return res.redirect('back');
+		}
+
+		roomUpdates = []
+
+		for (let room of roomsPartOf) {
+			if (room.members.includes(user._id)) {
+				roomUpdates.push(room._id);
+			}
+		}
+
+		for (let room of roomUpdates) {
+			updatedRoom = await Room.findByIdAndUpdate(room, {$pull: {members: user._id}});
+
+			if (!updatedRoom) {
+				req.flash('error', "Unable to access your rooms");
+				return res.redirect('back');
+			}
+		}
+
+		deletedProjectsPosted = await Project.deleteMany({poster: user._id});
+
+		if (!deletedProjectsPosted) {
+			req.flash('error', "Unable to remove you from your projects");
+			return res.redirect('back');
+		}
+
+		projectsCreated = await Project.find({});
+
+		if (!projectsCreated) {
+			req.flash('error', "Unable to find your projects");
+			return res.redirect('back');
+		}
+
+		projectUpdates = []
+
+		for (let project of projectsCreated) {
+			if (project.creators.includes(user._id)) {
+				projectUpdates.push(project._id);
+			}
+		}
+
+		for (let project of projectUpdates) {
+			updatedProject = await Project.findByIdAndUpdate(project, {$pull: {creators: user._id}});
+
+			if (!updatedProject) {
+				req.flash('error', "Unable to access your projects");
+				return res.redirect('back');
+			}
+		}
+	}
+
+	let deletedUser;
+
+	for (let user of users) {
+		deletedUser = await User.findByIdAndDelete(user._id);
+
+		if (!deletedUser) {
+			req.flash('error', 'Unable to delete account');
+			return res.redirect('back');
+		}
+	}
+
+	req.flash('success', "Email Removed From Whitelist! Any users with this email have been removed.");
+	res.redirect('/admin/whitelist');
 
 	})().catch(err => {
 		console.log(err);
