@@ -58,7 +58,7 @@ router.post('/',middleware.isLoggedIn, middleware.isFaculty, (req, res) => { //R
       req.flash('error', "Unable to create project"); return res.redirect('back');
     }
 
-    project.date = dateFormat(project.created_at, "h:MMTT | mmm d")
+    project.date = dateFormat(project.created_at, "h:MM TT | mmm d")
     await project.save()
 
     req.flash('success', "Project Posted!")
