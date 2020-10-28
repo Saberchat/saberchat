@@ -181,6 +181,20 @@ router.delete('/delete-account', middleware.isLoggedIn, (req, res) => {
       return res.redirect('back');
     }
 
+    const messagesSent = await Message.find({sender: req.user._id}).populate('read');
+
+    if (!messagesSent) {
+      req.flash('error', "Unable to delete your messages");
+      return res.redirect('back');
+    }
+
+    for (let message of messagesSent) {
+      for (let user of message.read) {
+        user.msgCount -= 1;
+        await user.save();
+      }
+    }
+
     const deletedMessagesSent = await Message.deleteMany({sender: req.user._id});
 
     if (!deletedMessagesSent) {
@@ -205,6 +219,33 @@ router.delete('/delete-account', middleware.isLoggedIn, (req, res) => {
           req.flash('error', "Unable to update your messages");
           return res.redirect('back');
         }
+      }
+    }
+
+    const emptyMessages = await Message.deleteMany({recipients: []});
+
+    if (!emptyMessages) {
+      req.flash('error', "Unable to delete your messages");
+      return res.redirect('back');
+    }
+
+    const anns = await Announcement.find({sender: req.user._id});
+
+    if (!anns) {
+      req.flash('error', "Unable to delete your announcements");
+      return res.redirect('back');
+    }
+
+    const users = await User.find({});
+
+    for (let ann of anns) {
+      for (let user of users) {
+        for (let i = 0; i < user.annCount.length; i +=1) {
+          if (user.annCount[i].announcement.toString() == ann._id.toString()) {
+            user.annCount.splice(i, 1);
+          }
+        }
+        await user.save();
       }
     }
 
@@ -239,7 +280,7 @@ router.delete('/delete-account', middleware.isLoggedIn, (req, res) => {
     let deletedOrder;
 
     for (let order of orders) {
-      deletedOrder = await Order.findByIdAndDelete(req.params.id).populate('items.item');
+      deletedOrder = await Order.findByIdAndDelete(order._id).populate('items.item');
       if (!deletedOrder) {
         req.flash("error", "Unable to delete orders")
         return res.redirect('back')
@@ -255,11 +296,24 @@ router.delete('/delete-account', middleware.isLoggedIn, (req, res) => {
       }
     }
 
-    const deletedRoomsCreated = await Room.deleteMany({creator: req.user._id});
+    const roomsCreated = await Room.find({});
 
-    if (!deletedRoomsCreated) {
+    if (!roomsCreated) {
       req.flash('error', "Unable to delete your rooms");
-      return res.redirect('back');
+      return res.redirect('back')
+    }
+
+    let deletedRoomCreated = null;
+
+    for (let room of roomsCreated) {
+      if (room.creator.id.toString() == req.user._id.toString()) {
+        deletedRoomCreated = await Room.findByIdAndDelete(room._id);
+
+        if (!deletedRoomCreated) {
+          req.flash('error', "Unable to delete your rooms");
+          return res.redirect('back');
+        }
+      }
     }
 
     const roomsPartOf = await Room.find({});
@@ -317,6 +371,13 @@ router.delete('/delete-account', middleware.isLoggedIn, (req, res) => {
         req.flash('error', "Unable to remove you from your projects");
         return res.redirect('back');
       }
+    }
+
+    const emptyProjects = await Project.deleteMany({creators: []});
+
+    if (!emptyProjects) {
+      req.flash('error', "Unable to delete your projects");
+      return res.redirect('back');
     }
 
     const deletedUser = await User.findByIdAndDelete(req.user._id);

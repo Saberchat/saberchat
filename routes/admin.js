@@ -132,13 +132,20 @@ router.delete('/whitelist/:id', middleware.isLoggedIn, middleware.isPrincipal, (
 			return res.redirect('back');
 		}
 
+		const allUsers = await User.find({});
+
 		let deletedComments = null;
 
+		let messageSent = null;
 		let deletedMessages = null;
+
 		let messagesReceived = null;
 		let messageUpdate;
+		let emptyMessages = null;
 
+		let anns = null;
 		let deletedAnns = null;
+
 		let deletedArticles = null;
 		let deletedRequests = null;
 
@@ -146,6 +153,7 @@ router.delete('/whitelist/:id', middleware.isLoggedIn, middleware.isPrincipal, (
 		let deletedOrder = null;
 
 		let roomsCreated = null;
+		let deletedRoomCreated = null;
 
 		let roomsPartOf = null;
 		let roomUpdates = null;
@@ -156,6 +164,7 @@ router.delete('/whitelist/:id', middleware.isLoggedIn, middleware.isPrincipal, (
 		let projectsCreated = null;
 		let projectUpdates = null;
 		let updatedProjects = null;
+		let emptyProjects = null
 
 		for (let user of users) {
 			deletedComments = await Comment.deleteMany({author: user._id});
@@ -163,6 +172,20 @@ router.delete('/whitelist/:id', middleware.isLoggedIn, middleware.isPrincipal, (
 		if (!deletedComments) {
 			req.flash('error', "Unable to delete your comments");
 			return res.redirect('back');
+		}
+
+		messagesSent = await Message.find({sender: req.user._id}).populate('read');
+
+		if (!messagesSent) {
+			req.flash('error', "Unable to delete your messages");
+			return res.redirect('back');
+		}
+
+		for (let message of messagesSent) {
+			for (let user of message.read) {
+				user.msgCount -= 1;
+				await user.save();
+			}
 		}
 
 		deletedMessages = await Message.deleteMany({sender: user._id});
@@ -189,6 +212,31 @@ router.delete('/whitelist/:id', middleware.isLoggedIn, middleware.isPrincipal, (
 				}
 			}
 		}
+
+		emptyMessages = await Message.deleteMany({recipients: []});
+
+		if (!emptyMessages) {
+			req.flash('error', "Unable to delete your messages");
+			return res.redirect('back');
+		}
+
+		anns = await Announcement.find({sender: user._id});
+
+		if (!anns) {
+      req.flash('error', "Unable to delete your announcements");
+      return res.redirect('back');
+    }
+
+    for (let ann of anns) {
+      for (let user of allUsers) {
+        for (let i = 0; i < user.annCount.length; i +=1) {
+          if (user.annCount[i].announcement.toString() == ann._id.toString()) {
+            user.annCount.splice(i, 1);
+          }
+        }
+        await user.save();
+      }
+    }
 
 		deletedAnns = await Announcement.deleteMany({sender: user._id});
 
@@ -219,7 +267,7 @@ router.delete('/whitelist/:id', middleware.isLoggedIn, middleware.isPrincipal, (
     }
 
     for (let order of orders) {
-      deletedOrder = await Order.findByIdAndDelete(req.params.id).populate('items.item');
+      deletedOrder = await Order.findByIdAndDelete(order._id).populate('items.item');
       if (!deletedOrder) {
         req.flash("error", "Unable to delete orders")
         return res.redirect('back')
@@ -235,12 +283,23 @@ router.delete('/whitelist/:id', middleware.isLoggedIn, middleware.isPrincipal, (
       }
     }
 
-		deletedRoomsCreated = await Room.deleteMany({creator: user._id});
+		roomsCreated = await Room.find({});
 
-		if (!deletedRoomsCreated) {
-			req.flash('error', "Unable to delete your rooms");
-			return res.redirect('back');
-		}
+    if (!roomsCreated) {
+      req.flash('error', "Unable to delete your rooms");
+      return res.redirect('back')
+    }
+
+    for (let room of roomsCreated) {
+			if (room.creator.id.toString() == user._id.toString()) {
+      	deletedRoomCreated = await Room.findByIdAndDelete(room._id);
+
+				if (!deletedRoomCreated) {
+	        req.flash('error', "Unable to delete your rooms");
+	        return res.redirect('back');
+	      }
+			}
+    }
 
 		roomsPartOf = await Room.find({});
 
