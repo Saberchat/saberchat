@@ -38,11 +38,18 @@
                     </div>
                     <div class="profile-body">
                         <span><%= user.title %></span>
+
                         <h4>Role</h4>
-                        <p><%= user.permission %></p>
+                        <% permMatrix = [["principal", "Principal"], ["admin", "Administrator"], ["mod", "Moderator"], ["student", "Student"]] %>
+
+                        <% for (let perm of permMatrix) { %>
+                          <% if (user.permission.toLowerCase() == perm[0].toLowerCase()) { %>
+                            <p><%= perm[1] %></p>
+                          <% } %>
+                        <% } %>
 
                         <h4>Status</h4>
-                        <p><%= user.status %></p>
+                        <p><%= user.status.charAt(0).toUpperCase() + user.status.slice(1) %></p>
 
                         <h4>Email</h4>
                         <p><%= user.email %></p>

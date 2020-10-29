@@ -44,6 +44,8 @@
                     <% } %>
                   <% } %>
 
+                  <% let sortedUsers = [];%>
+
                   <% for (let status of statuses) { %>
                     <% if (status[2].length > 0) { %>
                       <li class="list-group-item list-group-item-success status-header" id="<%=status[0]%>-header">
@@ -51,13 +53,24 @@
                           <h2 class="mb-1"><%=status[1]%></h2>
                         </div>
                       </li>
-                      <% for (let user of users) { %>
+
+                      <% sortedUsers = [];%>
+
+                      <% for (let perm of ["Principal", "Admin", "Mod", "Student"]) { %>
+                        <% for (let user of users) { %>
+                          <% if (user.permission.toLowerCase() == perm.toLowerCase()) { %>
+                            <% sortedUsers.push(user) %>
+                          <% } %>
+                        <% } %>
+                      <% } %>
+
+                      <% for (let user of sortedUsers) { %>
                         <% if (user.status.toLowerCase() == status[0]) { %>
                             <a href="/profiles/<%= user._id %>" class="list-group-item list-group-item-action">
                               <img class="profile-image" src="<%= user.imageUrl %>" alt="profile picture">
                               <span class="username <%=status[0]%>"><strong><%=user.firstName%> <%=user.lastName%></strong> <span style="font-size: 80%;"><%=`${user.username}`%></span></span>
                               <% if (user.permission == 'admin') { %>
-                                <span class="badge badge-info">Admin</span>
+                                <span class="badge badge-info">Administrator</span>
                               <% } else if (user.permission == "mod") { %>
                                 <span class="badge badge-success">Moderator</span>
                               <% } else if (user.permission == "principal") { %>
