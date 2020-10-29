@@ -78,7 +78,7 @@ router.put('/profile', middleware.isLoggedIn, function(req, res) {
       username: filter.clean(req.body.username),
       description: filter.clean(req.body.description),
       title: filter.clean(req.body.title),
-      status: req.body.status
+      status: req.body.status.toLowerCase()
     }
 
     if(req.body.imageUrl) {
