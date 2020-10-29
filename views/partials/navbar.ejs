@@ -99,7 +99,7 @@
 
     <!-- onsubmit="disableBtn()" -->
     <!-- Sign Up Form -->
-    <form name="signup" class="user-form signup" action="/register" method="post" onsubmit="return submitActions()">
+    <form name="signup" id="signup" action="/register"  method="post" class="user-form signup">
         <span class="form-close signup"><i class="far fa-window-close"></i></span>
         <div class="user-info display">
             <div class="form-group mt-3">
@@ -124,11 +124,11 @@
             </div>
             <div class="form-group">
                 <label for="password-signup">Password</label>
-                <input name="password" type="password" class="form-control" id="password-signup" placeholder="(min 8 char)">
+                <input name="password" type="password" class="form-control" id="password-signup" minlength="8" placeholder="(min 8 char)">
             </div>
             <div style="position: relative;">
-                <button type="button" class="btn btn-secondary btn-h btn-l" onclick="back()"><i class="fas fa-arrow-left"></i> Back</button>
-                <button type="submit" id="register-button" class="btn btn-success btn-h btn-r"><i class="far fa-plus-square"></i> Sign Up</button>
+                <button type="button" class="btn btn-secondary btn-h btn-l" onclick="back()" style="float: left;"><i class="fas fa-arrow-left"></i> Back</button>
+                <button type="button" id="register-button" data-toggle="modal" data-target="#modal-terms" class="btn btn-success btn-h btn-r"><i class="far fa-plus-square"></i> Sign Up</button>
             </div>
         </div>
     </form>
@@ -147,3 +147,18 @@
         <% } %>
     </div>
 </div>
+<%- include('agreement') %>
+
+<script>
+
+  const checkIfAgree = e => {
+    if(!document.getElementById('agree').checked) {
+      e.preventDefault();
+    }
+  }
+
+  document.getElementById('confirm-agreement').addEventListener('click', e => {
+    checkIfAgree(e)
+  })
+
+</script>
