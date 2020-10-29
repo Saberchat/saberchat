@@ -53,7 +53,7 @@ router.get('/:id', middleware.isLoggedIn, function(req, res) {
             req.flash('error', 'Cannot find article');
             res.redirect('/articles');
         } else {
-            res.render('wHeights/show', {article: foundArticle, date: dateFormat(foundArticle.created_at, "mmm d, yyyy - h:MMTT")})
+            res.render('wHeights/show', {article: foundArticle, date: dateFormat(foundArticle.created_at, "mmm d, yyyy - h:MM TT")})
         }
     });
 });

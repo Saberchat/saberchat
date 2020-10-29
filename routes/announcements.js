@@ -85,7 +85,7 @@ router.post('/', middleware.isLoggedIn, middleware.isMod, (req, res) => { //REST
         announcement.images.push(req.body.images[image]);
       }
     }
-    announcement.date = dateFormat(announcement.created_at, "h:MMTT | mmm d");
+    announcement.date = dateFormat(announcement.created_at, "h:MM TT | mmm d");
     await announcement.save();
 
     const users = await User.find({_id: {$nin: [req.user._id]}});

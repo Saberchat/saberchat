@@ -94,7 +94,7 @@ router.post('/messages', middleware.isLoggedIn, (req, res) => {
 		const newMessage = await Message.create(message);
 		if(!newMessage) {req.flash('error', 'Message could not be created'); return res.redirect('back');}
 
-		newMessage.date = dateFormat(newMessage.created_at, "h:MMTT | mmm d");
+		newMessage.date = dateFormat(newMessage.created_at, "h:MM TT | mmm d");
 		await newMessage.save();
 
 		if(message.toEveryone) {

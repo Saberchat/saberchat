@@ -194,7 +194,7 @@ router.post('/:id/ready', middleware.isLoggedIn, middleware.isMod, (req, res) =>
         req.flash('error', 'Unable to send notification'); return res.redirect('/cafe/orders');
       }
 
-      notif.date = dateFormat(notif.created_at, "mmm d, h:MMTT");
+      notif.date = dateFormat(notif.created_at, "mmm d, h:MM TT");
 
       let itemText = []; //This will have all the decoded info about the order
       for (var i = 0; i < order.items.length; i++) {
@@ -256,7 +256,7 @@ router.post('/:id/reject', middleware.isLoggedIn, middleware.isMod, (req, res) =
       req.flash('error', 'Unable to send notification'); return res.redirect('/cafe/orders');
     }
 
-    notif.date = dateFormat(notif.created_at, "mmm d, h:MMTT");
+    notif.date = dateFormat(notif.created_at, "mmm d, h:MM TT");
 
     let itemText = []; //This will have all the decoded info about the order
     for (var i = 0; i < order.items.length; i++) {
