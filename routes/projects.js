@@ -52,10 +52,16 @@ router.post('/',middleware.isLoggedIn, middleware.isFaculty, (req, res) => { //R
       req.flash('error', "Unable to find the users you listed"); return res.redirect('back')
     }
 
-    const project = await Project.create({title: req.body.title, imgUrl: req.body.img, text: req.body.text, poster: req.user, creators}); //Create a new project with all the provided data
+    const project = await Project.create({title: req.body.title, text: req.body.text, poster: req.user, creators}); //Create a new project with all the provided data
 
     if (!project) {
       req.flash('error', "Unable to create project"); return res.redirect('back');
+    }
+
+    if (req.body.images) { //If any images were added (if not, the 'images' property is null)
+      for(const image in req.body.images) {
+        project.images.push(req.body.images[image]);
+      }
     }
 
     project.date = dateFormat(project.created_at, "h:MMTT | mmm d")
@@ -144,11 +150,20 @@ router.put('/:id', middleware.isLoggedIn, middleware.isFaculty, (req, res) => {
       return res.redirect('back')
     }
 
-    const updatedProject = await Project.findByIdAndUpdate(project._id, {title: req.body.title, imgUrl: req.body.img, creators, text: req.body.text});
+    const updatedProject = await Project.findByIdAndUpdate(project._id, {title: req.body.title, creators, text: req.body.text});
 
     if (!updatedProject) {
       req.flash('error', "Unable to update project"); return res.redirect('back')
     }
+
+    updatedProject.images = []; //Empty image array so that you can fill it with whatever images are added (all images are there, not just new ones)
+    if(req.body.images) { //Only add images if any are provided
+      for(const image in req.body.images) {
+        updatedProject.images.push(req.body.images[image]);
+      }
+    }
+
+    updatedProject.save();
 
     req.flash("success", "Project Updated!")
     res.redirect(`/projects/${project._id}`)

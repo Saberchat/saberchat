@@ -63,6 +63,10 @@
                               <% } else if (user.permission == "principal") { %>
                                 <span class="badge badge-danger">Principal</span>
                               <% } %>
+
+                              <% if (user._id.toString() == currentUser._id.toString())  { %>
+                                <span class="badge badge-primary">Me</span>
+                              <% } %>
                             </a>
                         <% } %>
                       <% } %>

@@ -2,7 +2,7 @@ const mongoose = require("mongoose");
 
 var projectSchema = new mongoose.Schema({
     title: String,
-    imgUrl: String,
+    images: [{type: String}],
     text: String,
     date: String,
     poster: {

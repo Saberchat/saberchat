@@ -11,6 +11,7 @@
     <link rel="stylesheet" href="/stylesheets/components/header.css">
     <link rel="stylesheet" href="/stylesheets/components/navbar.css">
     <link rel="stylesheet" href="/stylesheets/projects/projects.css">
+    <link rel="stylesheet" href="/stylesheets/announcements/form.css">
 
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
@@ -51,14 +52,14 @@
             <select id="creator-select" class="form-control" onchange="addCreator('user')">
               <option value="" selected disabled>Select Students</option>
               <% students.forEach(student => { %>
-                <option value="<%=student._id%>"><%=student.username%></a>
+                <option value="<%=student._id%>"><%=student.username%> (<%=student.firstName%> <%=student.lastName%>)</a>
               <% }) %>
             </select>
             <input type="text" id="creator-input" name="creatorInput" hidden />
             <br />
             <%for (let creator of project.creators) { %>
               <div class="user-tag" id="<%=creator._id%>">
-                <span name="creators" value="<%=creator._id%>"><%=creator.username%></span>
+                <span name="creators" value="<%=creator._id%>"><%=creator.username%> (<%=creator.firstName%> <%=creator.lastName%>)</span>
                 <button type="button" id="<%=creator._id%>" onclick="remCreator(this)">&times;</button>
               </div>
             <% } %>
@@ -67,23 +68,39 @@
           <!-- <input id="creators" class="form-control" autocomplete="off" name="creators" type="text" aria-describedby="basic-addon2" value = "<%=creatornames.join(', ')%>" placeholder="Creators" required/> -->
 
           <div class="form-group">
-            <label style="float: left;" for="image-input"><strong>Image</strong></label>
-            <input id="image-input" type="text" name="img" class="form-control" value = "<%=project.imgUrl%>" placeholder="Enter Image Url" aria-label="Username" aria-describedby="basic-addon1" required>
-            <br />
-            <img id="project-image" style="width: 25%; height: 25%;" src="<%=project.imgUrl%>" alt="Image Does Not Exist"/>
+            <label style="float: left;" for="new-project-description"><strong>Description</strong></label>
+            <textarea id="new-project-description" minlength="200" maxlength="800" rows="6" name="text" placeholder="Write a little about the project" class="form-control" aria-label="With textarea" required><%=project.text%></textarea>
           </div>
 
-          <div class="form-group">
-            <label style="float: left;" for="new-project-description"><strong>Description</strong></label>
-            <textarea id="new-project-description" minlength="200" maxlength="800" name="text" placeholder="Write a little about the project" class="form-control" aria-label="With textarea" required><%=project.text%></textarea>
+          <div id="image-header">
+            <h4 style="float: left;">Images</h4>
+            <button type="button" onclick="addImg()" class="btn btn-primary"><i class="fas fa-plus"></i> Image</button>
+            <br /><br />
+            <hr>
           </div>
-          <br />
+
+          <div id="image-block">
+            <% let reversedImages = project.images.reverse() %>
+            <% for (let i = 0; i< reversedImages.length; i += 1) { %>
+              <div class="image-group" style="text-align: left;">
+                <div class="input-container" id="block-<%=i%>">
+                  <input type="text" id="<%=reversedImages.length - (i+1)%>" class="form-control" onkeyup="createImg(this)" placeholder="Url..." name="images[<%= reversedImages.length - (i+1) %>]" required value="<%= reversedImages[i] %>">
+                  <img id="image-<%=reversedImages.length - (i+1)%>" style = "width: 50%; height: 50%; margin-top: 10px; border-radius: 15px;" src="<%= reversedImages[i] %>" alt="Image Does Not Exist"/>
+                </div>
+                <button type="button" onclick="deleteImg(this)" class="btn btn-danger"><i class="fas fa-minus"></i></button>
+              </div>
+            <% } %>
+          </div>
+
+          <br /><br />
+
           <button class="btn btn-primary btn-block" type="submit">Submit Changes</button><br />
         </form>
       </div>
     </dov>
   </body>
 
+  <script src="/javascript/projects/form.js"></script>
   <script>
 
   const creatorSelect = document.getElementById('creator-select');
@@ -127,34 +144,5 @@
       }
     }
   })
-
-  imageInput.addEventListener('keydown', () => {
-    setTimeout(() => {
-      projectImage.src = imageInput.value
-
-      if (imageInput.value == "") {
-        $("#project-image").hide();
-
-      } else {
-        $("#project-image").show();
-
-      }
-    }, 3)
-  })
-
-  imageInput.addEventListener('paste', () => {
-    setTimeout(() => {
-      projectImage.src = imageInput.value
-
-      if (imageInput.value == "") {
-        $("#project-image").hide();
-
-      } else {
-        $("#project-image").show();
-
-      }
-    }, 3)
-  })
-
   </script>
 </html>

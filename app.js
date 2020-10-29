@@ -328,7 +328,6 @@ io.on('connect', (socket) => {
         let itemProfile = null;
 
         for (let i = 0; i < order.items.length; i++) { //items[] contains info about individual items (and their prices); itemCount[] says how much of each item is ordered. Multiplication will calculate how much to charge for an item
-          console.log("HOWDY WORLD")
 
           itemProfile = await Item.findById(orderItemsObjects[i].item);
 

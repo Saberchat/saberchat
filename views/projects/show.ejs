@@ -94,12 +94,19 @@
             <%} else if (project.creators.length == 2){%>
               <p><strong>Creators:</strong> <a style="color: black" href="../profiles/<%=project.creators[0]._id%>"><em><img src="<%= project.creators[0].imageUrl %>" alt="profile pic" style="width: 30px; height: 30px; object-fit: cover; border-radius: 50%;"> <%=project.creators[0].firstName%> <%=project.creators[0].lastName%></a>, <a style="color: black" href="profiles/<%=project.creators[0]._id%>"><img src="<%= project.creators[1].imageUrl %>" alt="profile pic" style="width: 30px; height: 30px; object-fit: cover; border-radius: 50%;"> <%=project.creators[1].firstName%> <%=project.creators[1].lastName%></a></em></p>
 
-            <%} else {%>
+            <%} else if (project.creators.length == 1){%>
               <p><strong>Creator:</strong> <a style="color: black" href="../profiles/<%=project.creators[0]._id%>"><em><img src="<%= project.creators[0].imageUrl %>" alt="profile pic" style="width: 30px; height: 30px; object-fit: cover; border-radius: 50%;"> <%=project.creators[0].firstName%> <%=project.creators[0].lastName%></em></a></p>
-            <%}%>
+
+            <% } else { %>
+              <p><strong>Creators:</strong> <em>None</em></p>
+            <% }%>
 
             <p style="margin-top: 10px; white-space: pre-wrap;"><%=project.text%></p>
-            <img style="width: 40%; height: 40%; object-fit: contain; border-radius: 15px;" src="<%=project.imgUrl%>"/>
+
+            <% for (let img of project.images) { %>
+              <img style="width: 40%; height: 40%; object-fit: contain; border-radius: 15px;" src="<%=img%>"/>
+              <br /><br />
+            <%}%>
           </article>
         </div>
       </div>

@@ -4,7 +4,7 @@
     position: relative;
 }
 
-#image-block h4 {
+#image-header h4 {
     font-weight: 500;
     font-size: 1.3rem;
 
@@ -12,7 +12,7 @@
     width: 5rem;
 }
 
-#image-block button {
+#image-header button {
     float: right;
 }
 

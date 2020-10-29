@@ -39,7 +39,7 @@
                       <option value="" selected disabled>Select User</option>
                       <% users.forEach(user => { %>
                         <% if(!user._id.equals(currentUser._id)) { %>
-                          <option value="<%= user._id %>"><%= user.username %> (<%= user.firstName.charAt(0) %>.<%= user.lastName.charAt(0) %>.)</option>
+                          <option value="<%= user._id %>"><%= user.username %> (<%= user.firstName%> <%= user.lastName%>)</option>
                         <% } %>
                       <% }) %>
                     </select>
@@ -53,7 +53,7 @@
                       <option value="" selected disabled>Select Faculty</option>
                       <% users.forEach(user => { %>
                         <% if(!user._id.equals(currentUser._id) && user.status == 'faculty') { %>
-                          <option value="<%= user._id %>"><%= user.username %> (<%= user.firstName.charAt(0) %>.<%= user.lastName.charAt(0) %>.)</option>
+                          <option value="<%= user._id %>"><%= user.username %> (<%= user.firstName%> <%= user.lastName%>)</option>
                         <% } %>
                       <% }) %>
                     </select>
@@ -82,10 +82,13 @@
                 <textarea name="message" id="message" placeholder="Message text..." rows="5" class="form-control" required></textarea>
               </div>
 
-              <div id="image-block">
+              <div id="image-header">
                 <h4>Images</h4>
                 <button type="button" onclick="addImg()" class="btn btn-primary"><i class="fas fa-plus"></i> Image</button>
                 <hr>
+              </div>
+
+              <div id="image-block">
               </div>
               <button type="submit" class="btn btn-primary btn-block">Send</button>
             </form>
