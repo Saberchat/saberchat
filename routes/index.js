@@ -167,6 +167,60 @@ router.post('/login', function(req, res, next) {
     })(req, res, next);
 });
 
+router.post('/forgot-password', (req, res) => {
+
+  User.find({'email': req.body.newPwdEmail}, (err,  users) => {
+    if (!users) {
+      req.flash('error', "Unable to find users");
+      res.redirect('/');
+
+    } else if (users.length == 0) {
+      req.flash('error', "We couldn't find any users with that email address");
+      res.redirect('/');
+
+    } else {
+
+      let charSetMatrix = []
+      charSetMatrix.push('qwertyuiopasdfghjklzxcvbnm'.split(''));
+      charSetMatrix.push('QWERTYUIOPASDFGHJKLZXCVBNM'.split(''));
+      charSetMatrix.push('1234567890'.split(''));
+      charSetMatrix.push('`}~!@#$*(-=_+[)\\{]|\'",./<>?');
+      let pwd_length = Math.round((Math.random() * 15)) + 15;
+      let pwd = "";
+
+      let charSet; //Which character set to choose from
+      for (let i = 0; i < pwd_length; i += 1) {
+        charSet = charSetMatrix[Math.floor(Math.random() * 4)]
+        pwd += charSet[Math.floor((Math.random() * charSet.length))];
+      }
+
+      for (let user of users) {
+        user.setPassword(pwd, () => {
+          user.save();
+        })
+      }
+
+      let newPwdMessage = {
+        from: 'noreply.saberchat@gmail.com',
+        to: users[0].email,
+        subject: 'Saberchat Password Reset',
+        text: `Hello ${users[0].firstName},\n\nYou are receiving this email because you recently requested a password reset.\n\Your new password is the following: ${pwd}\n\nLog in to https://alsion-saberchat.herokuapp.com with your email (${users[0].email}) and this password. You can reset it after logging in.`
+      };
+
+      transporter.sendMail(newPwdMessage, function(error, info) {
+        if (error) {
+          console.log(error);
+        } else {
+          console.log('Email sent: ' + info.response);
+        }
+      })
+
+      req.flash('success', "Your password has been reset! The new password has been sent to your email address.");
+      res.redirect('/');
+    }
+  })
+})
+
 // >>>>>>> c413c2fa840ea70b4f1a6207ded0a60067579863
 //logout route
 router.get("/logout", function(req, res) {
