@@ -68,17 +68,13 @@
                     <div class="form-group">
                         <label for="status">Select Status</label>
                         <select class="form-control" id="status" name="status">
+                          <option selected value=""><%=currentUser.status%></option>
                           <% if (currentUser.permission == 'admin') { %>
-                            <% ['7th', '8th', '9th', '10th', '11th', '12th', 'Guest', 'Parent', 'Faculty'].forEach( status => { %>
-                              <% if (currentUser.status.toLowerCase() == status.toLowerCase()) { %>
-                                <option value="<%=status%>" selected><%=status%></option>
-                              <% } else { %>
+                            <% ['7th', '8th', '9th', '10th', '11th', '12th', 'guest', 'parent', 'faculty'].forEach( status => { %>
+                              <% if (currentUser.status.toLowerCase() != status.toLowerCase()) { %>
                                 <option value="<%=status%>"><%=status%></option>
                               <% }%>
                             <% }) %>
-
-                          <% } else { %>
-                            <option value="<%=currentUser.status%>" selected><%=currentUser.status%></option>
                           <% }%>
                         </select>
                     </div>

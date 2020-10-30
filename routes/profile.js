@@ -81,13 +81,24 @@ router.put('/profile', middleware.isLoggedIn, function(req, res) {
       return res.redirect('back');
     }
 
+    let status;
+
+    if (req.body.status == '') {
+      status = req.user.status;
+
+    } else {
+      status = req.body.status;
+    }
+
+    console.log(status)
+
     let user = {
       firstName: req.body.firstName,
       lastName: req.body.lastName,
       username: filter.clean(req.body.username),
       description: filter.clean(req.body.description),
       title: filter.clean(req.body.title),
-      status: req.body.status.toLowerCase()
+      status: status.toLowerCase()
     }
 
     if(req.body.imageUrl) {
