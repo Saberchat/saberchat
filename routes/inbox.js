@@ -126,13 +126,19 @@ router.post('/messages', middleware.isLoggedIn, (req, res) => {
 
 		const recipientList = await User.find({ _id: { $in: recipients}});
 
+    imageString = ""
+
+    for (let image of newMessage.images) {
+      imageString += `<img src="${image}">`
+    }
+    
 		for (let r of recipientList) {
 
 			inboxEmail = {
 				from: 'noreply.saberchat@gmail.com',
 				to: r.email,
 				subject: `New Inbox Notification - ${newMessage.subject}`,
-				text: `Hello ${r.firstName},\n\nYou have a new Saberchat inbox notification from ${req.user.username}!\n\n${newMessage.text}\n\nYou can access the full message at https://alsion-saberchat.herokuapp.com`
+				html: `<p>Hello ${r.firstName},</p><p>You have a new Saberchat inbox notification from <strong>${req.user.username}</strong>!</p><p>${newMessage.text}</p><p>You can access the full message at https://alsion-saberchat.herokuapp.com</p> ${imageString}`
 			};
 
 			transporter.sendMail(inboxEmail, function(error, info){
@@ -332,8 +338,8 @@ router.post('/requests/:id/accept', middleware.isLoggedIn, (req, res) => {
       let requestEmail = {
 				from: 'noreply.saberchat@gmail.com',
 				to: Req.requester.email,
-				subject: `Room Request Accepted`,
-				text: `Hello ${Req.requester.firstName},\n\nYour request to join chat room ${foundRoom.name} has been accepted!\n\nYou can access the room at https://alsion-saberchat.herokuapp.com`
+				subject: `Room Request Accepted - ${foundRoom.name}`,
+				html: `<p>Hello ${Req.requester.firstName},</p><p>Your request to join chat room <strong>${foundRoom.name}</strong> has been accepted!<p><p>You can access the room at https://alsion-saberchat.herokuapp.com</p>`
 			};
 
 			transporter.sendMail(requestEmail, function(error, info){
@@ -393,8 +399,8 @@ router.post('/requests/:id/reject', middleware.isLoggedIn, (req, res) => {
       let requestEmail = {
 				from: 'noreply.saberchat@gmail.com',
 				to: Req.requester.email,
-				subject: `Room Request Rejected`,
-				text: `Hello ${Req.requester.firstName},\n\nYour request to join chat room ${Req.room.name} has been rejected. Contact the room creator, ${Req.room.creator.username}, if  you think there has been a mistake.`
+				subject: `Room Request Rejected - ${Req.room.name}`,
+				html: `<p>Hello ${Req.requester.firstName},</p><p>Your request to join chat room <strong>${Req.room.name}</strong> has been rejected. Contact the room creator, <strong>${Req.room.creator.username}</strong>, if  you think there has been a mistake.</p>`
 			};
 
 			transporter.sendMail(requestEmail, function(error, info){

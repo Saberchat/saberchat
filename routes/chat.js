@@ -208,7 +208,7 @@ router.post('/:id/request-access', middleware.isLoggedIn, function(req, res) {
 				from: 'noreply.saberchat@gmail.com',
 				to: roomCreator.email,
 				subject: `New Room Access Request`,
-				text: `Hello ${roomCreator.firstName},\n\n${req.user.username} is request to join your room, ${foundRoom.name}.\n\nYou can access the full request at https://alsion-saberchat.herokuapp.com`
+				html: `<p>Hello ${roomCreator.firstName},</p><p><strong>${req.user.username}</strong> is requesting to join your room, <strong>${foundRoom.name}.</strong></p><p>You can access the full request at https://alsion-saberchat.herokuapp.com</p>`
 			};
 
 			transporter.sendMail(requestEmail, function(error, info){
