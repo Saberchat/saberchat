@@ -5,11 +5,21 @@ const filter = new Filter();
 const router = express.Router();
 //import passport for authentication
 const passport = require('passport');
+const nodemailer = require('nodemailer');
+
 const middleware = require('../middleware');
 
 //import user schema for db actions
 const User = require('../models/user');
 const Email = require('../models/email');
+
+let transporter = nodemailer.createTransport({
+  service: 'gmail',
+  auth: {
+    user: 'noreply.saberchat@gmail.com',
+    pass: 'Tgy8erwIYtxRZrJHvKwkWbrkbUhv1Zr9'
+  }
+});
 
 // Home route. gives the landing or home or index page (whatever you want to call it).
 router.get('/', (req, res) => {
@@ -114,6 +124,23 @@ router.post("/register",  function(req, res) {
 						res.redirect("/");
 						console.log('succesfully registered and logged in user')
 					});
+
+
+      		let emailMessage = {
+      		  from: 'noreply.saberchat@gmail.com',
+      		  to: newUser.email,
+      		  subject: 'Welcome To Saberchat!',
+      			text: `Hello ${newUser.firstName},\n\nWelcome to Saberchat! A confirmation of your account:\n\nYour username is ${newUser.username}.\nYour full name is ${newUser.firstName} ${newUser.lastName}.\nYour linked email is ${newUser.email}\n\nYou will be assigned a role and status soon based on your grade or position.`
+      		};
+
+      		transporter.sendMail(emailMessage, function(error, info){
+      		  if (error) {
+      		    console.log(error);
+      		  } else {
+      		    console.log('Email sent: ' + info.response);
+      		  }
+      		})
+
 				});
 			}
 		})

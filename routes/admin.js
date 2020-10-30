@@ -1,6 +1,7 @@
 const express = require('express');
 //start express router
 const router = express.Router();
+const nodemailer = require('nodemailer');
 
 const User = require('../models/user');
 const Email = require('../models/email');
@@ -17,6 +18,14 @@ const Order = require('../models/order');
 const Article = require('../models/article');
 
 const middleware = require('../middleware');
+
+let transporter = nodemailer.createTransport({
+  service: 'gmail',
+  auth: {
+    user: 'noreply.saberchat@gmail.com',
+    pass: 'Tgy8erwIYtxRZrJHvKwkWbrkbUhv1Zr9'
+  }
+});
 
 //Function to display user inbox
 router.get('/', middleware.isLoggedIn, middleware.isAdmin, (req, res) => {
@@ -366,6 +375,21 @@ router.delete('/whitelist/:id', middleware.isLoggedIn, middleware.isPrincipal, (
 			req.flash('error', 'Unable to delete account');
 			return res.redirect('back');
 		}
+
+		let deleteEmail = {
+			from: 'noreply.saberchat@gmail.com',
+			to: deletedUser.email,
+			subject: 'Profile Deletion Notice',
+			text: `Hello ${deletedUser.firstName},\n\nYou are receiving this email because your email has been removed from Saberchat's email whitelist. Your account and all of its data has been deleted. Please contact a faculty member if  you think there has been a mistake.`
+		};
+
+		transporter.sendMail(deleteEmail, function(error, info){
+			if (error) {
+				console.log(error);
+			} else {
+				console.log('Email sent: ' + info.response);
+			}
+		})
 	}
 
 	req.flash('success', "Email Removed From Whitelist! Any users with this email have been removed.");

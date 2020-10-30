@@ -2,6 +2,7 @@ const express = require('express')
 const router = express.Router();
 const Filter = require('bad-words');
 const filter = new Filter();
+const nodemailer = require('nodemailer');
 
 const User = require('../models/user');
 const Email = require('../models/email');
@@ -18,6 +19,14 @@ const Order = require('../models/order');
 const Article = require('../models/article');
 
 const middleware = require('../middleware');
+
+let transporter = nodemailer.createTransport({
+  service: 'gmail',
+  auth: {
+    user: 'noreply.saberchat@gmail.com',
+    pass: 'Tgy8erwIYtxRZrJHvKwkWbrkbUhv1Zr9'
+  }
+});
 
 // renders the list of users page
 router.get('/', middleware.isLoggedIn, function(req, res) {
@@ -97,6 +106,21 @@ router.put('/profile', middleware.isLoggedIn, function(req, res) {
       return res.redirect('back');
     }
 
+    let updateEmail = {
+		  from: 'noreply.saberchat@gmail.com',
+		  to: updatedUser.email,
+		  subject: 'Profile Update Confirmation',
+			text: `Hello ${user.firstName},\n\nYou are receiving this email because you recently made changes to your Saberchat profile. This is a confirmation of your profile.\n\nYour username is ${user.username}.\nYour full name is ${user.firstName} ${user.lastName}.`
+		};
+
+		transporter.sendMail(updateEmail, function(error, info){
+		  if (error) {
+		    console.log(error);
+		  } else {
+		    console.log('Email sent: ' + info.response);
+		  }
+		})
+
     req.flash('success', 'Updated your profile');
     res.redirect('/profiles/' + req.user._id);
 
@@ -140,6 +164,22 @@ router.put('/change-email', middleware.isLoggedIn, function(req, res) {
       res.redirect('/');
 
     } else {
+
+      let updateEmail = {
+        from: 'noreply.saberchat@gmail.com',
+        to: req.body.email,
+        subject: 'Profile Update Confirmation',
+        text: `Hello ${updatedUser.firstName},\n\nYou are receiving this email because you recently made changes to your Saberchat email. This is a confirmation of your profile.\n\nYour username is ${updatedUser.username}.\nYour full name is ${updatedUser.firstName} ${updatedUser.lastName}.\nYour email is ${req.body.email}`
+      };
+
+      transporter.sendMail(updateEmail, function(error, info){
+        if (error) {
+          console.log(error);
+        } else {
+          console.log('Email sent: ' + info.response);
+        }
+      })
+
       req.flash('success', 'Updated your profile. Please Login Again.');
       res.redirect('/');
     }
@@ -386,6 +426,21 @@ router.delete('/delete-account', middleware.isLoggedIn, (req, res) => {
       req.flash('error', "There was an error deleting your account");
       return res.redirect('back');
     }
+
+    let deleteEmail = {
+      from: 'noreply.saberchat@gmail.com',
+      to: deletedUser.email,
+      subject: 'Profile Deletion Confirmation',
+      text: `Hello ${deletedUser.firstName},\n\nYou are receiving this email because you recently deleted your Saberchat account. If you did not delete your account, contact a staff member immediately.`
+    };
+
+    transporter.sendMail(deleteEmail, function(error, info){
+      if (error) {
+        console.log(error);
+      } else {
+        console.log('Email sent: ' + info.response);
+      }
+    })
 
     req.flash('success', "Account deleted!");
     res.redirect('/')

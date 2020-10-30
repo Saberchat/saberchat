@@ -19,6 +19,8 @@ const cookieParser = require('cookie-parser');
 const methodOverride = require('method-override');
 // package for formating dates on the serverside
 const dateFormat = require('dateformat');
+//Allows Node.js to send emails
+const nodemailer = require("nodemailer");
 
 //pretty up the console
 // const colors = require('colors');

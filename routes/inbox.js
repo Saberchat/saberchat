@@ -4,11 +4,20 @@ const router = express.Router(); //start express router
 const dateFormat = require('dateformat');
 const Filter = require('bad-words');
 const filter = new Filter();
+const nodemailer = require('nodemailer');
 
 const User = require('../models/user');
 const Message = require('../models/message');
 const AccessReq = require('../models/accessRequest');
 const Room = require('../models/room');
+
+let transporter = nodemailer.createTransport({
+  service: 'gmail',
+  auth: {
+    user: 'noreply.saberchat@gmail.com',
+    pass: 'Tgy8erwIYtxRZrJHvKwkWbrkbUhv1Zr9'
+  }
+});
 
 //Route to display user inbox
 router.get('/', middleware.isLoggedIn, (req, res) => {
@@ -111,6 +120,28 @@ router.post('/messages', middleware.isLoggedIn, (req, res) => {
 					$push: { inbox: newMessage },
 					$inc: { msgCount: 1 }
 				});
+		}
+
+		let inboxEmail;
+
+		const recipientList = await User.find({ _id: { $in: recipients}});
+
+		for (let r of recipientList) {
+
+			inboxEmail = {
+				from: 'noreply.saberchat@gmail.com',
+				to: r.email,
+				subject: 'New Inbox Notification',
+				text: `Hello ${r.firstName},\n\nYou have a new Saberchat inbox notification from ${req.user.username}! You can access it at https://alsion-saberchat.herokuapp.com`
+			};
+
+			transporter.sendMail(inboxEmail, function(error, info){
+				if (error) {
+					console.log(error);
+				} else {
+					console.log('Email sent: ' + info.response);
+				}
+			})
 		}
 
 		req.flash('success', 'Message sent');

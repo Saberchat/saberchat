@@ -5,6 +5,7 @@ const express = require('express');
 const middleware = require('../middleware');
 const router = express.Router();
 const dateFormat = require('dateformat');
+const nodemailer = require('nodemailer');
 
 //SCHEMA
 const User = require('../models/user');
@@ -13,6 +14,14 @@ const Item = require('../models/orderItem');
 const Notification = require('../models/message');
 const Type = require('../models/itemType');
 const Cafe = require('../models/cafe')
+
+let transporter = nodemailer.createTransport({
+  service: 'gmail',
+  auth: {
+    user: 'noreply.saberchat@gmail.com',
+    pass: 'Tgy8erwIYtxRZrJHvKwkWbrkbUhv1Zr9'
+  }
+});
 
 //ROUTES
 router.get('/', middleware.isLoggedIn, (req, res) => { //RESTful routing 'order/index' route
@@ -214,6 +223,21 @@ router.post('/:id/ready', middleware.isLoggedIn, middleware.isMod, (req, res) =>
 
       await notif.save();
 
+      let orderEmail = {
+  		  from: 'noreply.saberchat@gmail.com',
+  		  to: order.customer.email,
+  		  subject: 'Cafe Order Ready',
+  			text: `Hello ${order.customer.firstName},\n\n${notif.text}\n\n`
+  		};
+
+  		transporter.sendMail(orderEmail, function(error, info){
+  		  if (error) {
+  		    console.log(error);
+  		  } else {
+  		    console.log('Email sent: ' + info.response);
+  		  }
+  		})
+
       order.customer.inbox.push(notif); //Add notif to user's inbox
       order.customer.msgCount += 1
       await order.customer.save();
@@ -275,6 +299,22 @@ router.post('/:id/reject', middleware.isLoggedIn, middleware.isMod, (req, res) =
     }
 
     await notif.save();
+
+    let orderEmail = {
+      from: 'noreply.saberchat@gmail.com',
+      to: order.customer.email,
+      subject: 'Cafe Order Rejected',
+      text: `Hello ${order.customer.firstName},\n\n${notif.text}\n\n`
+    };
+
+    transporter.sendMail(orderEmail, function(error, info){
+      if (error) {
+        console.log(error);
+      } else {
+        console.log('Email sent: ' + info.response);
+      }
+    })
+
 
     order.customer.inbox.push(notif); //Add notif to user's inbox
     order.customer.msgCount += 1
