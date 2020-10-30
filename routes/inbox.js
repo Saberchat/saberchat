@@ -131,8 +131,8 @@ router.post('/messages', middleware.isLoggedIn, (req, res) => {
 			inboxEmail = {
 				from: 'noreply.saberchat@gmail.com',
 				to: r.email,
-				subject: 'New Inbox Notification',
-				text: `Hello ${r.firstName},\n\nYou have a new Saberchat inbox notification from ${req.user.username}! You can access it at https://alsion-saberchat.herokuapp.com`
+				subject: `New Inbox Notification - ${newMessage.subject}`,
+				text: `Hello ${r.firstName},\n\nYou have a new Saberchat inbox notification from ${req.user.username}!\n\n${newMessage.text}\n\nYou can access the full message at https://alsion-saberchat.herokuapp.com`
 			};
 
 			transporter.sendMail(inboxEmail, function(error, info){
@@ -291,7 +291,7 @@ router.get('/requests/:id', middleware.isLoggedIn, (req, res) => {
 router.post('/requests/:id/accept', middleware.isLoggedIn, (req, res) => {
 	( async function() {
 		const Req = await AccessReq.findById(req.params.id)
-		.populate({path: 'room', select: ['creator']});
+		.populate({path: 'room', select: ['creator']}).populate('requester');
 
 		if(!Req) {
 			req.flash("error", "Unable to access database");
@@ -317,6 +317,33 @@ router.post('/requests/:id/accept', middleware.isLoggedIn, (req, res) => {
 			await foundRoom.save();
 			await Req.save();
 
+      let index = -1;
+      for (let i = 0; i < req.user.requests.length; i ++) {
+        if (req.user.requests[i].equals(Req._id)) {
+          index = i;
+        }
+      }
+
+      if (index != -1) {
+        req.user.requests.splice(index, 1);
+        req.user.save();
+      }
+
+      let requestEmail = {
+				from: 'noreply.saberchat@gmail.com',
+				to: Req.requester.email,
+				subject: `Room Request Accepted`,
+				text: `Hello ${Req.requester.firstName},\n\nYour request to join chat room ${foundRoom.name} has been accepted!\n\nYou can access the room at https://alsion-saberchat.herokuapp.com`
+			};
+
+			transporter.sendMail(requestEmail, function(error, info){
+				if (error) {
+					console.log(error);
+				} else {
+					console.log('Email sent: ' + info.response);
+				}
+			})
+
 			req.flash('success', 'Request accepted');
 			res.redirect('/inbox');
 		}
@@ -331,7 +358,7 @@ router.post('/requests/:id/accept', middleware.isLoggedIn, (req, res) => {
 router.post('/requests/:id/reject', middleware.isLoggedIn, (req, res) => {
 	( async function() {
 		const Req = await AccessReq.findById(req.params.id)
-		.populate({path: 'room', select: ['creator']});
+		.populate('room').populate('requester');
 
 		if(!Req) {
 			req.flash("error", "Unable to access database");
@@ -350,6 +377,33 @@ router.post('/requests/:id/reject', middleware.isLoggedIn, (req, res) => {
 			Req.status = 'rejected';
 
 			await Req.save();
+
+      let index = -1;
+      for (let i = 0; i < req.user.requests.length; i ++) {
+        if (req.user.requests[i].equals(Req._id)) {
+          index = i;
+        }
+      }
+
+      if (index != -1) {
+        req.user.requests.splice(index, 1);
+        req.user.save();
+      }
+
+      let requestEmail = {
+				from: 'noreply.saberchat@gmail.com',
+				to: Req.requester.email,
+				subject: `Room Request Rejected`,
+				text: `Hello ${Req.requester.firstName},\n\nYour request to join chat room ${Req.room.name} has been rejected. Contact the room creator, ${Req.room.creator.username}, if  you think there has been a mistake.`
+			};
+
+			transporter.sendMail(requestEmail, function(error, info){
+				if (error) {
+					console.log(error);
+				} else {
+					console.log('Email sent: ' + info.response);
+				}
+			})
 
 			req.flash('success', 'Request rejected');
 			res.redirect('/inbox');

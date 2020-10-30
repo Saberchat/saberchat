@@ -3,6 +3,7 @@ const Filter = require('bad-words');
 const filter = new Filter();
 //create express router
 const router = express.Router();
+const nodemailer = require('nodemailer');
 
 //import middleware
 const middleware = require('../middleware');
@@ -12,6 +13,15 @@ const Comment = require('../models/comment');
 const User = require('../models/user');
 const Room = require('../models/room');
 const AccessReq = require('../models/accessRequest');
+
+
+let transporter = nodemailer.createTransport({
+  service: 'gmail',
+  auth: {
+    user: 'noreply.saberchat@gmail.com',
+    pass: 'Tgy8erwIYtxRZrJHvKwkWbrkbUhv1Zr9'
+  }
+});
 
 //route for displaying room list
 router.get('/', middleware.isLoggedIn, (req, res) => {
@@ -25,7 +35,7 @@ router.get('/', middleware.isLoggedIn, (req, res) => {
   });
 });
 
-//route for desplaying new room form
+//route for displaying new room form
 router.get('/new', middleware.isLoggedIn, (req, res) => {
   User.find({}, function(err, foundUsers) {
     if (err || !foundUsers) {
@@ -91,7 +101,7 @@ router.post('/', middleware.isLoggedIn, function(req, res) {
     'creator.username': req.user.username,
     members: [req.user._id]
   }
-  
+
   Room.create(room, function(err, room) {
     if (err) {
       console.log(err);
@@ -194,11 +204,27 @@ router.post('/:id/request-access', middleware.isLoggedIn, function(req, res) {
       roomCreator.requests.push(createdReq._id);
       roomCreator.save();
 
+      let requestEmail = {
+				from: 'noreply.saberchat@gmail.com',
+				to: roomCreator.email,
+				subject: `New Room Access Request`,
+				text: `Hello ${roomCreator.firstName},\n\n${req.user.username} is request to join your room, ${foundRoom.name}.\n\nYou can access the full request at https://alsion-saberchat.herokuapp.com`
+			};
+
+			transporter.sendMail(requestEmail, function(error, info){
+				if (error) {
+					console.log(error);
+				} else {
+					console.log('Email sent: ' + info.response);
+				}
+			})
+
       req.flash('success', 'Request for access sent');
       res.redirect('back');
     }
 
   })().catch(err => {
+    console.log(err)
     req.flash('error', 'Cannot access Database');
     res.redirect('back');
   });

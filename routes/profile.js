@@ -203,6 +203,22 @@ router.put('/change-password', middleware.isLoggedIn, function(req, res) {
           req.flash('error', 'Error changing your password. Check if old password is correct.');
           res.redirect('/');
         } else {
+
+          let updateEmail = {
+            from: 'noreply.saberchat@gmail.com',
+            to: req.user.email,
+            subject: 'Password Update Confirmation',
+            text: `Hello ${req.user.firstName},\n\nYou are receiving this email because you recently made changes to your Saberchat password. This is a confirmation of your profile.\n\nYour username is ${req.user.username}.\nYour full name is ${req.user.firstName} ${req.user.lastName}.\nYour email is ${req.user.email}\n\nIf you did not recently change your password, reset it immediately and contact a faculty member.`
+          };
+
+          transporter.sendMail(updateEmail, function(error, info){
+            if (error) {
+              console.log(error);
+            } else {
+              console.log('Email sent: ' + info.response);
+            }
+          })
+
           req.flash('success', 'Successfully changed your password');
           res.redirect('/profiles/' + req.user._id);
         }

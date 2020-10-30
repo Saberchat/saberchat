@@ -10,6 +10,7 @@
         <!-- link css for navbar. Don't need to include public/javascript/userForm.js since user is already logged in and does not need to access login and register forms.  -->
         <link rel="stylesheet" href="/stylesheets/components/navbar.css">
         <link rel="stylesheet" href="/stylesheets/components/header.css">
+        <link rel="stylesheet" href="/stylesheets/inbox/show.css">
 
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
@@ -25,27 +26,46 @@
         <%- include('../../partials/navbar') %>
         <!-- include the backdrop for nav -->
         <%- include('../../partials/header') %>
-        
+
         <div class="container mt-5" style="text-align: center;">
             <div class="row">
-                <div class="col-md-8 col-12 offset-md-2">
-                    <div class="jumbotron">
+                <div class="col-12">
+                    <article class="msg-container" style="padding-top: 20px; padding-bottom: 30px;">
                         <h1>Access Request</h1>
-                        <hr>
                         <h4><%= request.room.name %></h4>
-                        <p>From: <%= request.requester.username %>, To: <%= request.room.creator.username %></p>
+                        <p>From:
+                          <a href= "/profiles/<%=request.requester._id%>" class="user-link">
+                            <span class="badge badge-pill badge-primary">
+                              <%= request.requester.username %>
+                            </span>
+                          </a>
+                        </p>
+                        <p>To:
+                          <a href= "/profiles/<%=request.room.creator.id%>" class="user-link">
+                            <span class="badge badge-pill badge-secondary">
+                              <% if(request.room.creator.id.equals(currentUser._id)) { %>
+                                me
+                              <% } else { %>
+                                <%= request.room.creator.username %>
+                              <% } %>
+                            </span>
+                          </a>
+                        </p>
 
-                        <% if(request.receiver.equals(currentUser._id) && request.status == 'pending') {%> 
+                        <span><%=request.date%></span>
+                        <a style="margin-bottom: 50px;" href="/inbox" class="btn btn-primary back-btn"><i class="fas fa-arrow-left"></i> Back</a><br />
+
+                        <% if(request.receiver.equals(currentUser._id) && request.status == 'pending') {%>
                             <form action="/inbox/requests/<%= request._id %>/reject" method="post" style="display: inline-block;">
-                                <button type="submit" class="btn btn-danger">Reject</button>
+                                <button type="submit" class="btn btn-danger"><i class="fas fa-thumbs-down"></i> Reject</button>
                             </form>
                             <form action="/inbox/requests/<%= request._id %>/accept" method="post" style="display: inline-block;">
-                                <button type="submit" class="btn btn-success">Accept</button>
+                                <button type="submit" class="btn btn-success"><i class="fas fa-thumbs-up"></i> Accept</button>
                             </form>
                         <% } else { %>
                             <p><em><%= request.status %></em></p>
                         <% } %>
-                    </div>
+                    </article>
                 </div>
             </div>
         </div>
