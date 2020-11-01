@@ -204,38 +204,46 @@ router.put('/change-email', middleware.isLoggedIn, function(req, res) {
 
 //route for changing password. Not too much different from previous routes.
 router.put('/change-password', middleware.isLoggedIn, function(req, res) {
-    User.findById(req.user._id, function(err, foundUser) {
-      if(err || !foundUser) {
-        req.flash('error', 'Error, cannot find user');
-        res.redirect('/');
-    } else {
-      foundUser.changePassword(req.body.oldPassword, req.body.newPassword, function(err) {
-        if(err) {
-          req.flash('error', 'Error changing your password. Check if old password is correct.');
+
+    if (req.body.newPassword == req.body.newPasswordConfirm)  {
+      User.findById(req.user._id, function(err, foundUser) {
+        if(err || !foundUser) {
+          req.flash('error', 'Error, cannot find user');
           res.redirect('/');
-        } else {
+      } else {
+        foundUser.changePassword(req.body.oldPassword, req.body.newPassword, function(err) {
+          if(err) {
+            req.flash('error', 'Error changing your password. Check if old password is correct.');
+            res.redirect('/');
+          } else {
 
-          let updateEmail = {
-            from: 'noreply.saberchat@gmail.com',
-            to: req.user.email,
-            subject: 'Password Update Confirmation',
-            text: `Hello ${req.user.firstName},\n\nYou are receiving this email because you recently made changes to your Saberchat password. This is a confirmation of your profile.\n\nYour username is ${req.user.username}.\nYour full name is ${req.user.firstName} ${req.user.lastName}.\nYour email is ${req.user.email}\n\nIf you did not recently change your password, reset it immediately and contact a faculty member.`
-          };
+            let updateEmail = {
+              from: 'noreply.saberchat@gmail.com',
+              to: req.user.email,
+              subject: 'Password Update Confirmation',
+              text: `Hello ${req.user.firstName},\n\nYou are receiving this email because you recently made changes to your Saberchat password. This is a confirmation of your profile.\n\nYour username is ${req.user.username}.\nYour full name is ${req.user.firstName} ${req.user.lastName}.\nYour email is ${req.user.email}\n\nIf you did not recently change your password, reset it immediately and contact a faculty member.`
+            };
 
-          transporter.sendMail(updateEmail, function(error, info){
-            if (error) {
-              console.log(error);
-            } else {
-              console.log('Email sent: ' + info.response);
-            }
-          })
+            transporter.sendMail(updateEmail, function(error, info){
+              if (error) {
+                console.log(error);
+              } else {
+                console.log('Email sent: ' + info.response);
+              }
+            })
 
-          req.flash('success', 'Successfully changed your password');
-          res.redirect('/profiles/' + req.user._id);
-        }
-      });
-    }
-  });
+            req.flash('success', 'Successfully changed your password');
+            res.redirect('/profiles/' + req.user._id);
+          }
+        });
+      }
+    });
+
+  } else {
+    req.flash('error', "Passwords do not match");
+    res.redirect('back');
+  }
+
 });
 
 router.delete('/delete-account', middleware.isLoggedIn, (req, res) => {

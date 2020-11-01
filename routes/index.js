@@ -180,31 +180,11 @@ router.post('/forgot-password', (req, res) => {
 
     } else {
 
-      let charSetMatrix = []
-      charSetMatrix.push('qwertyuiopasdfghjklzxcvbnm'.split(''));
-      charSetMatrix.push('QWERTYUIOPASDFGHJKLZXCVBNM'.split(''));
-      charSetMatrix.push('1234567890'.split(''));
-      charSetMatrix.push('`}~!@#$*(-=_+[)\\{]|\'",./<>?');
-      let pwd_length = Math.round((Math.random() * 15)) + 15;
-      let pwd = "";
-
-      let charSet; //Which character set to choose from
-      for (let i = 0; i < pwd_length; i += 1) {
-        charSet = charSetMatrix[Math.floor(Math.random() * 4)]
-        pwd += charSet[Math.floor((Math.random() * charSet.length))];
-      }
-
-      for (let user of users) {
-        user.setPassword(pwd, () => {
-          user.save();
-        })
-      }
-
       let newPwdMessage = {
         from: 'noreply.saberchat@gmail.com',
         to: users[0].email,
         subject: 'Saberchat Password Reset',
-        text: `Hello ${users[0].firstName},\n\nYou are receiving this email because you recently requested a password reset.\n\Your new password is the following: ${pwd}\n\nLog in to https://alsion-saberchat.herokuapp.com with your email (${users[0].email}) and this password. You can reset it after logging in.`
+        html: `<p>Hello ${users[0].firstName},</p><p>You are receiving this email because you recently requested a password reset.</p><p>Click <a href="https://alsion-saberchat.herokuapp.com/reset-password?user=${users[0]._id}">here</a> to reset your password.</p>`
       };
 
       transporter.sendMail(newPwdMessage, function(error, info) {
@@ -215,10 +195,53 @@ router.post('/forgot-password', (req, res) => {
         }
       })
 
-      req.flash('success', "Your password has been reset! The new password has been sent to your email address.");
+      req.flash('success', "Check your email for instructions on  how to reset your password");
       res.redirect('/');
     }
   })
+})
+
+router.get('/reset-password', (req, res) => {
+  res.render('profile/reset-password', {user: req.query.user})
+})
+
+router.put('/reset-password', (req, res) => {
+
+  if (req.body.newPwd == req.body.newPwdConfirm) {
+    User.findById(req.query.user, (err,  user) => {
+      if (!user) {
+        req.flash('error', "Unable to find your profile");
+        res.redirect('/');
+
+      } else {
+        user.setPassword(req.body.newPwd, () => {
+          user.save();
+        })
+
+        let newPwdMessage = {
+          from: 'noreply.saberchat@gmail.com',
+          to: user.email,
+          subject: 'Password Reset Confirmation',
+          html: `<p>Hello ${user.firstName},</p><p>You are receiving this email because you recently reset your Saberchat password.</p><p>If you did not recently reset your password, contact a faculty member immediately</p><p>If you did, you can ignore this message.</p>`
+        };
+
+        transporter.sendMail(newPwdMessage, function(error, info) {
+          if (error) {
+            console.log(error);
+          } else {
+            console.log('Email sent: ' + info.response);
+          }
+        })
+
+        req.flash('success', "Password reset!");
+        res.redirect('/');
+      }
+    })
+
+  } else {
+    req.flash('error', "Passwords do not match");
+    res.redirect('back');
+  }
 })
 
 // >>>>>>> c413c2fa840ea70b4f1a6207ded0a60067579863

@@ -12,6 +12,7 @@
     <link rel="stylesheet" href="/stylesheets/components/header.css">
     <link rel="stylesheet" href="/stylesheets/inbox/form.css">
     <link rel="stylesheet" href="/stylesheets/inbox/new.css">
+    <link rel="stylesheet" href="/stylesheets/inbox/show.css">
 
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
@@ -30,6 +31,10 @@
         <div class="col-md-8 offset-md-2 col-12">
           <div class="form-container">
             <h1>New Message</h1>
+            <div style="text-align: center">
+              <a href="/inbox" class="btn btn-primary back-btn"><i class="fas fa-arrow-left"></i> Back</a>
+              <br /><br />
+            </div>
             <form action="/inbox/messages" method="post" onsubmit="return process();" id="message-form">
               <div id="to-block">
                 <div id="default-msg">
