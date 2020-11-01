@@ -131,15 +131,37 @@ router.post('/messages', middleware.isLoggedIn, (req, res) => {
     for (let image of newMessage.images) {
       imageString += `<img src="${image}">`
     }
-    
-		for (let r of recipientList) {
 
-			inboxEmail = {
-				from: 'noreply.saberchat@gmail.com',
-				to: r.email,
-				subject: `New Inbox Notification - ${newMessage.subject}`,
-				html: `<p>Hello ${r.firstName},</p><p>You have a new Saberchat inbox notification from <strong>${req.user.username}</strong>!</p><p>${newMessage.text}</p><p>You can access the full message at https://alsion-saberchat.herokuapp.com</p> ${imageString}`
-			};
+    let recipientArr = [];
+
+		for (let r of recipientList) {
+      recipientArr = [];
+
+      for (let rec of recipientList) {
+        if (rec._id.equals(r._id)) {
+          recipientArr.push('me');
+
+        } else {
+          recipientArr.push(rec.username);
+        }
+      }
+
+      if (message.toEveryone) {
+        inboxEmail = {
+  				from: 'noreply.saberchat@gmail.com',
+  				to: r.email,
+  				subject: `New Inbox Notification - ${newMessage.subject}`,
+  				html: `<p>Hello ${r.firstName},</p><p>You have a new Saberchat inbox notification from <strong>${req.user.username}</strong>!</p><p><strong>To</strong>: Everyone</p><p>${newMessage.text}</p><p>You can access the full message at https://alsion-saberchat.herokuapp.com</p> ${imageString}`
+  			};
+
+      } else {
+  			inboxEmail = {
+  				from: 'noreply.saberchat@gmail.com',
+  				to: r.email,
+  				subject: `New Inbox Notification - ${newMessage.subject}`,
+  				html: `<p>Hello ${r.firstName},</p><p>You have a new Saberchat inbox notification from <strong>${req.user.username}</strong>!</p><p><strong>To</strong>: ${recipientArr.join(', ')}</p><p>${newMessage.text}</p><p>You can access the full message at https://alsion-saberchat.herokuapp.com</p> ${imageString}`
+  			};
+      }
 
 			transporter.sendMail(inboxEmail, function(error, info){
 				if (error) {
@@ -191,7 +213,7 @@ router.get('/:id', middleware.isLoggedIn, (req, res) => {
 			await message.save();
 		}
 
-		await message.populate({path: 'sender', select: 'username'}).populate({path:'recipients', select: 'username'}).execPopulate();
+		await message.populate({path: 'sender', select: 'username'}).populate({path:'recipients', select: 'username'}).populate({path: 'read', select: 'username'}).execPopulate();
 
 		res.render('inbox/show', {message: message});
 	})().catch(err => {

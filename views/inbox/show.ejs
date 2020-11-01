@@ -60,6 +60,20 @@
                     <% }); %>
                   <% } %>
                 </p>
+                <p>
+                  Seen By:
+                  <% message.read.forEach(user => { %>
+                    <a href="/profiles/<%= user._id %>" class="user-link">
+                      <span class="badge badge-pill badge-info">
+                        <% if(user._id.equals(currentUser._id)) { %>
+                          me
+                        <% } else { %>
+                          <%= user.username %>
+                        <% } %>
+                      </span>
+                    </a>
+                  <% }) %>
+                </p>
                 <span><%=message.date%></span>
                 <a href="/inbox" class="btn btn-primary back-btn"><i class="fas fa-arrow-left"></i> Back</a>
               </div>
