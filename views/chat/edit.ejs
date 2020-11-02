@@ -28,8 +28,9 @@
 
     <div class="container mt-5">
       <div class="row">
-          <div class="col-12">
-              <h1 style="text-align: center; width: 100%" class="title">Edit <span><%= room.name %></span></h1>
+          <div class="col-12" style="text-align: center;">
+              <h1 style="text-align: center; width: 100%" class="title"><span>Edit <%= room.name %></span></h1>
+              <a class="btn btn-primary" href="/chat/<%= room._id %>"><i class="fas fa-arrow-left"></i> Back</a>
           </div>
       </div>
       <div class="row">
@@ -117,17 +118,16 @@
                     You will not be able to change your mind.
                   </div>
                   <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">No thanks</button>
-                    <button type="submit" class="btn btn-danger">Delete it!</button>
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">No, Go Back</button>
+                    <button type="submit" class="btn btn-danger">Yes, Delete Room</button>
                   </div>
                 </div>
               </div>
             </div>
           </form>
-
-          <a style="display: block; margin-top: 1rem; margin-bottom: 5rem;" href="/chat/<%= room._id %>">Go Back</a>
         </div>
       </div>
+      <br />
     </div>
   </body>
 </html>

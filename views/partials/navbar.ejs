@@ -31,12 +31,12 @@
 
                           <a class="dropdown-item" target="_blank" href="https://witherlyheights.org/"><i class="far fa-newspaper"></i> Witherly Heights</a>
                           <!-- <a class="dropdown-item" href="/articles"><i class="far fa-newspaper"></i> Witherly Heights</a> -->
+                          <a class="dropdown-item" href="/chat"><i class="fas fa-comment-dots"></i> Chat</a>
                           <% if (currentUser.annCount.length > 0) { %>
                             <a class="dropdown-item" href="/announcements"><i class="fas fa-bullhorn"></i> Announcements <span class="badge badge-pill badge-danger"><%=currentUser.annCount.length%></span></a>
                           <% } else { %>
                             <a class="dropdown-item" href="/announcements"><i class="fas fa-bullhorn"></i> Announcements</a>
                           <% }%>
-                          <a class="dropdown-item" href="/chat"><i class="fas fa-comment-dots"></i> Chat</a>
                           <a class="dropdown-item" href="/profiles"><i class="fas fa-user"></i> Users</a>
                         </div>
 

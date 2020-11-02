@@ -24,7 +24,7 @@
 
 </head>
 
-<body>
+<body onclick="changeOrderConfirmation()">
   <!-- include the navbar via ejs -->
   <%- include('../partials/navbar') %>
   <%- include('../partials/header') %>
@@ -69,7 +69,7 @@
                       <div style="margin-left: 2%;" class="style-div">
 
                         <input name="check[<%= item._id %>]" id="<%= item._id%>" class="form-check-input" type="checkbox" value="">
-                        <select class="num-orders" id="dd_<%=item._id%>" name="<%=item.name%>">
+                        <select class="num-orders" id="dd_<%=item._id%>" name="<%=item.name%>" onchange="changeOrderConfirmation()">
                           <% if (item.availableItems > 3) { %>
                             <% [1, 2, 3].forEach(function(num) { %>
                               <option><%=num%></option>
@@ -106,7 +106,7 @@
 
           <br />
           <div class="form-group mt-3">
-            <textarea id="descInput" class="form-control" name="instructions" placeholder="Add special instructions for your order" maxlength="100" rows="5"></textarea>
+            <textarea id="descInput" class="form-control" name="instructions" placeholder="Add special instructions for your order" maxlength="100" rows="5" onkeyup="changeOrderConfirmation()" onpaste="changeOrderConfirmation()"></textarea>
           </div>
 
           <br />
@@ -118,12 +118,10 @@
 
           <div>
             <div style="margin: 0px;" id="order-confirm">
+              <span  style="color: blue; margin: 0px;" id="extra-instructions" class="list-group-item list-group-item-action form-check"><strong>Extra Instructions:</strong> None</span>
               <strong style="color: green; margin: 0px;" id="total-cost" class="list-group-item list-group-item-action form-check">Total: $0.00</strong>
             </div>
           </div>
-
-          <!-- <strong>Order: </strong> -->
-          <!-- <ul id="order-confirm"></ul> -->
 
           <br />
           <button type="submit" class="btn btn-lg btn-primary btn-block">Complete your Order</button>
