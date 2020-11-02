@@ -190,9 +190,6 @@ router.post('/:id/ready', middleware.isLoggedIn, middleware.isMod, (req, res) =>
     const order = await Order.findById(req.params.id).populate('items.item').populate('customer'); //Find the order that is currently being handled based on id, and populate info about its items
     if (!order) {
       req.flash('error', 'Could not find order'); return res.redirect('/cafe/orders');
-
-    // } else if (order.customer._id.toString() == req.user._id.toString()) { //If you made this order, you cannot confirm it (this counters an inbox error that arises from sending notifs to yourself)
-    //   req.flash('error', 'You cannot confirm your own orders'); return res.redirect('/cafe/orders');
     }
 
     order.present = false; //Order is not active anymore
@@ -258,9 +255,6 @@ router.post('/:id/reject', middleware.isLoggedIn, middleware.isMod, (req, res) =
 
     if (!order) {
       req.flash('error', 'Could not find order'); return res.redirect('back');
-
-    // } else if (order.customer._id.toString() == req.user._id.toString()) {
-    //   req.flash('error', 'You cannot reject your own orders'); return res.redirect('/cafe/orders');
     }
 
     const deletedOrder = await Order.findByIdAndDelete(order._id).populate('items.item').populate('customer');
