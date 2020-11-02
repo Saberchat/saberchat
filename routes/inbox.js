@@ -206,7 +206,7 @@ router.get('/:id', middleware.isLoggedIn, (req, res) => {
 			return res.redirect('back');
 		}
 
-		if((!message.read.includes(req.user._id)) && (!message.sender.equals(req.user._id))) {
+		if((!message.read.includes(req.user._id)) && (message.recipients.includes(req.user._id))) {
 			req.user.msgCount -= 1;
 			message.read.push(req.user._id);
 			await req.user.save();

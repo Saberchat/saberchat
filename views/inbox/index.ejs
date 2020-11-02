@@ -116,11 +116,11 @@
                               </div>
                             </div>
                             <div class="message-text">
-                              <%= msg.text %>
+                              <%= msg.text%>
                             </div>
                           </a>
                           <span class="message-date">
-                            <%= msg.date %>
+                            <%= msg.date.split(',')[0].split('|')[1] %>
                           </span>
                         </li>
                       <% }); %>
