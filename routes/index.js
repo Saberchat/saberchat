@@ -180,11 +180,32 @@ router.post('/forgot-password', (req, res) => {
 
     } else {
 
+      let charSetMatrix = []
+
+      charSetMatrix.push('qwertyuiopasdfghjklzxcvbnm'.split(''));
+      charSetMatrix.push('QWERTYUIOPASDFGHJKLZXCVBNM'.split(''));
+      charSetMatrix.push('1234567890'.split(''));
+      charSetMatrix.push('`}~!@#$*(-=_+[)\\{]|\'",./<>?');
+
+      let pwd_length = Math.round((Math.random() * 15)) + 15;
+      let pwd = "";
+
+      let charSet; //Which character set to choose from
+      for (let i = 0; i < pwd_length; i += 1) {
+        charSet = charSetMatrix[Math.floor(Math.random() * 4)]
+        pwd += charSet[Math.floor((Math.random() * charSet.length))];
+      }
+
+      for (let user of users) {
+        user.tempPwd = pwd;
+        user.save()
+      }
+
       let newPwdMessage = {
         from: 'noreply.saberchat@gmail.com',
         to: users[0].email,
         subject: 'Saberchat Password Reset',
-        html: `<p>Hello ${users[0].firstName},</p><p>You are receiving this email because you recently requested a password reset.</p><p>Click <a href="https://alsion-saberchat.herokuapp.com/reset-password?user=${users[0]._id}">here</a> to reset your password.</p>`
+        html: `<p>Hello ${users[0].firstName},</p><p>You are receiving this email because you recently requested a password reset.</p><p>Click <a href="https://alsion-saberchat.herokuapp.com/reset-password?user=${users[0]._id}">here</a> to reset your password. Use the following character sequence as your temporary password:</p><p>${pwd}</p>`
       };
 
       transporter.sendMail(newPwdMessage, function(error, info) {
@@ -214,27 +235,35 @@ router.put('/reset-password', (req, res) => {
         res.redirect('/');
 
       } else {
-        user.setPassword(req.body.newPwd, () => {
-          user.save();
-        })
 
-        let newPwdMessage = {
-          from: 'noreply.saberchat@gmail.com',
-          to: user.email,
-          subject: 'Password Reset Confirmation',
-          html: `<p>Hello ${user.firstName},</p><p>You are receiving this email because you recently reset your Saberchat password.</p><p>If you did not recently reset your password, contact a faculty member immediately</p><p>If you did, you can ignore this message.</p>`
-        };
+        if (req.body.tempPwd == user.tempPwd) {
+          user.setPassword(req.body.newPwd, () => {
+            user.tempPwd = null;
+            user.save();
+          })
 
-        transporter.sendMail(newPwdMessage, function(error, info) {
-          if (error) {
-            console.log(error);
-          } else {
-            console.log('Email sent: ' + info.response);
-          }
-        })
+          let newPwdMessage = {
+            from: 'noreply.saberchat@gmail.com',
+            to: user.email,
+            subject: 'Password Reset Confirmation',
+            html: `<p>Hello ${user.firstName},</p><p>You are receiving this email because you recently reset your Saberchat password.</p><p>If you did not recently reset your password, contact a faculty member immediately.</p><p>If you did, you can ignore this message.</p>`
+          };
 
-        req.flash('success', "Password reset!");
-        res.redirect('/');
+          transporter.sendMail(newPwdMessage, function(error, info) {
+            if (error) {
+              console.log(error);
+            } else {
+              console.log('Email sent: ' + info.response);
+            }
+          })
+
+          req.flash('success', "Password reset!");
+          res.redirect('/');
+
+        } else {
+          req.flash('error', "Your temporary password is incorrect. Make sure you are using the password that was sent to your email.");
+          res.redirect('back');
+        }
       }
     })
 
