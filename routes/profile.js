@@ -37,19 +37,19 @@ router.get('/', middleware.isLoggedIn, function(req, res) {
         res.redirect('back');
 
     } else {
-      res.render('profile/index', {users: foundUsers})
+      res.render('profile/index', {users: foundUsers});
     }
   });
 });
 
 //renders profiles edit page
 router.get('/edit', middleware.isLoggedIn, function(req, res) {
-  res.render('profile/edit')
+  res.render('profile/edit');
 });
 
 //renders the email/password edit page
 router.get('/change-login-info', middleware.isLoggedIn, function(req, res) {
-  res.render('profile/edit_pwd_email')
+  res.render('profile/edit_pwd_email');
 });
 
 //renders views/profiles/show.ejs at /profiles route.
@@ -60,7 +60,7 @@ router.get('/:id', middleware.isLoggedIn, function(req, res) {
         res.redirect('back');
 
     } else {
-      res.render('profile/show', {user: foundUser})
+      res.render('profile/show', {user: foundUser});
     }
   });
 });
@@ -90,7 +90,7 @@ router.put('/profile', middleware.isLoggedIn, function(req, res) {
       status = req.body.status;
     }
 
-    console.log(status)
+    console.log(status);
 
     let user = {
       firstName: req.body.firstName,
@@ -99,7 +99,7 @@ router.put('/profile', middleware.isLoggedIn, function(req, res) {
       description: filter.clean(req.body.description),
       title: filter.clean(req.body.title),
       status: status.toLowerCase()
-    }
+    };
 
     if(req.body.imageUrl) {
         user.imageUrl = req.body.imageUrl;
@@ -121,7 +121,7 @@ router.put('/profile', middleware.isLoggedIn, function(req, res) {
 		  from: 'noreply.saberchat@gmail.com',
 		  to: updatedUser.email,
 		  subject: 'Profile Update Confirmation',
-			text: `Hello ${user.firstName},\n\nYou are receiving this email because you recently made changes to your Saberchat profile. This is a confirmation of your profile.\n\nYour username is ${user.username}.\nYour full name is ${user.firstName} ${user.lastName}.`
+			text: `Hello ${user.firstName},\n\nYou are receiving this email because you recently made changes to your Saberchat profile.\n\nIf you did not recently make any changes, contact a faculty member immediately.`
 		};
 
 		transporter.sendMail(updateEmail, function(error, info){
@@ -130,7 +130,7 @@ router.put('/profile', middleware.isLoggedIn, function(req, res) {
 		  } else {
 		    console.log('Email sent: ' + info.response);
 		  }
-		})
+		});
 
     req.flash('success', 'Updated your profile');
     res.redirect('/profiles/' + req.user._id);
@@ -139,7 +139,7 @@ router.put('/profile', middleware.isLoggedIn, function(req, res) {
     console.log(err);
     req.flash('error', "Unable to access database");
     res.redirect('back');
-  })
+  });
 });
 
 //route for changing email. Similar to edit profiles route. But changing email logs out user for some reason.
@@ -189,7 +189,7 @@ router.put('/change-email', middleware.isLoggedIn, function(req, res) {
         } else {
           console.log('Email sent: ' + info.response);
         }
-      })
+      });
 
       req.flash('success', 'Updated your profile. Please Login Again.');
       res.redirect('/');
@@ -210,11 +210,13 @@ router.put('/change-password', middleware.isLoggedIn, function(req, res) {
         if(err || !foundUser) {
           req.flash('error', 'Error, cannot find user');
           res.redirect('/');
+
       } else {
         foundUser.changePassword(req.body.oldPassword, req.body.newPassword, function(err) {
           if(err) {
             req.flash('error', 'Error changing your password. Check if old password is correct.');
             res.redirect('/');
+
           } else {
 
             let updateEmail = {
@@ -230,7 +232,7 @@ router.put('/change-password', middleware.isLoggedIn, function(req, res) {
               } else {
                 console.log('Email sent: ' + info.response);
               }
-            })
+            });
 
             req.flash('success', 'Successfully changed your password');
             res.redirect('/profiles/' + req.user._id);
@@ -288,7 +290,7 @@ router.delete('/delete-account', middleware.isLoggedIn, (req, res) => {
 
     for (let message of messagesReceived) {
       if (message.recipients.includes(req.user._id)) {
-        messageUpdate = await Message.findByIdAndUpdate(message._id, {$pull: {recipients: req.user._id}})
+        messageUpdate = await Message.findByIdAndUpdate(message._id, {$pull: {recipients: req.user._id}});
 
         if (!messageUpdate) {
           req.flash('error', "Unable to update your messages");
@@ -349,7 +351,7 @@ router.delete('/delete-account', middleware.isLoggedIn, (req, res) => {
 
     if (!orders) {
       req.flash('error', "Unable to find your orders");
-      return res.redirect('back')
+      return res.redirect('back');
     }
 
     let deletedOrder;
@@ -357,16 +359,16 @@ router.delete('/delete-account', middleware.isLoggedIn, (req, res) => {
     for (let order of orders) {
       deletedOrder = await Order.findByIdAndDelete(order._id).populate('items.item');
       if (!deletedOrder) {
-        req.flash("error", "Unable to delete orders")
-        return res.redirect('back')
+        req.flash("error", "Unable to delete orders");
+        return res.redirect('back');
       }
 
       for (let i = 0; i < deletedOrder.items.length; i += 1) { //For each of the order's items, add the number ordered back to that item. (If there are 12 available quesadillas and our user ordered 3, there are now 15)
 
         if (deletedOrder.present) {
-          deletedOrder.items[i].item.availableItems += deletedOrder.items[i].quantity
+          deletedOrder.items[i].item.availableItems += deletedOrder.items[i].quantity;
           deletedOrder.items[i].item.isAvailable = true;
-          await deletedOrder.items[i].item.save()
+          await deletedOrder.items[i].item.save();
         }
       }
     }
@@ -375,7 +377,7 @@ router.delete('/delete-account', middleware.isLoggedIn, (req, res) => {
 
     if (!roomsCreated) {
       req.flash('error', "Unable to delete your rooms");
-      return res.redirect('back')
+      return res.redirect('back');
     }
 
     let deletedRoomCreated = null;
@@ -398,7 +400,7 @@ router.delete('/delete-account', middleware.isLoggedIn, (req, res) => {
 			return res.redirect('back');
 		}
 
-		let roomUpdates = []
+		let roomUpdates = [];
 
 		for (let room of roomsPartOf) {
 			if (room.members.includes(req.user._id)) {
@@ -429,7 +431,7 @@ router.delete('/delete-account', middleware.isLoggedIn, (req, res) => {
       return res.redirect('back');
     }
 
-    let projectUpdates = []
+    let projectUpdates = [];
 
     for (let project of projectsCreated) {
       if (project.creators.includes(req.user._id)) {
@@ -440,7 +442,7 @@ router.delete('/delete-account', middleware.isLoggedIn, (req, res) => {
     let updatedProjectCreated;
 
     for (let project of projectUpdates) {
-      updatedProjectCreated = await Project.findByIdAndUpdate(project, {$pull: {creators: user._id}})
+      updatedProjectCreated = await Project.findByIdAndUpdate(project, {$pull: {creators: user._id}});
 
       if (!updatedProjectCreated) {
         req.flash('error', "Unable to remove you from your projects");
@@ -478,13 +480,13 @@ router.delete('/delete-account', middleware.isLoggedIn, (req, res) => {
     })
 
     req.flash('success', "Account deleted!");
-    res.redirect('/')
+    res.redirect('/');
 
   })().catch(err => {
     console.log(err);
     req.flash('error', "Unable to access database");
     res.redirect('back');
-  })
-})
+  });
+});
 
 module.exports = router;

@@ -1,10 +1,8 @@
 const creatorSelect = document.getElementById('creator-select');
 const creatorDiv = document.getElementById('creator-div');
 const creatorInput = document.getElementById('creator-input');
-// const imageInput = document.getElementById('image-input');
-// const projectImage = document.getElementById('project-image');
 
-$("#project-image").hide()
+$("#project-image").hide();
 
 let creatorList = [];
 
@@ -35,31 +33,4 @@ const remCreator = (btn => {
       creatorInput.value = creatorList.toString();
     }
   }
-})
-
-// imageInput.addEventListener('keydown', () => {
-//   setTimeout(() => {
-//
-//     if (imageInput.value == "") {
-//       projectImage.src = imageInput.value;
-//       $("#project-image").hide();
-//
-//     } else {
-//       projectImage.src = imageInput.value;
-//       $("#project-image").show();
-//     }
-//   }, 3)
-// })
-//
-// imageInput.addEventListener('paste', () => {
-//   setTimeout(() => {
-//     projectImage.src = imageInput.value;
-//
-//     if (imageInput.value == "") {
-//       $("#project-image").hide();
-//
-//     } else {
-//       $("#project-image").show();
-//     }
-//   }, 3)
-// })
+});

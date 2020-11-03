@@ -29,7 +29,7 @@ let transporter = nodemailer.createTransport({
 
 //Function to display user inbox
 router.get('/', middleware.isLoggedIn, middleware.isAdmin, (req, res) => {
-	 res.render('admin/index')
+	 res.render('admin/index');
 })
 
 // displays moderator page
@@ -44,7 +44,7 @@ router.get('/moderate', middleware.isLoggedIn, middleware.isMod, (req, res) => {
 			res.redirect('/admin');
 
 		} else {
-		  res.render('admin/mod', {comments: foundComments})
+		  res.render('admin/mod', {comments: foundComments});
 		}
 	});
 });
@@ -57,7 +57,7 @@ router.get('/permissions', middleware.isLoggedIn, middleware.isAdmin, (req, res)
 			res.redirect('/admin');
 
 		} else {
-		  res.render('admin/permission', {users: foundUsers})
+		  res.render('admin/permission', {users: foundUsers});
 		}
 	});
 });
@@ -69,7 +69,7 @@ router.get('/status', middleware.isLoggedIn, middleware.isMod, (req, res) => {
 			req.flash('error', 'Cannot access Database');
 			res.redirect('/admin');
 		} else {
-			res.render('admin/status', {users: foundUsers})
+			res.render('admin/status', {users: foundUsers});
 		}
 	});
 });
@@ -96,8 +96,8 @@ router.get('/whitelist', middleware.isLoggedIn, middleware.isPrincipal, (req, re
 		console.log(err);
 		req.flash('error', "Unable to access database");
 		res.redirect('back');
-	})
-})
+	});
+});
 
 router.post('/whitelist', middleware.isLoggedIn, middleware.isPrincipal, (req, res) => {
 
@@ -114,16 +114,16 @@ router.post('/whitelist', middleware.isLoggedIn, middleware.isPrincipal, (req, r
 		}
 
 		const email = await Email.create({address: req.body.address});
-		req.flash('success', "Email added!")
-		res.redirect('/admin/whitelist')
+		req.flash('success', "Email added!");
+		res.redirect('/admin/whitelist');
 
 
 	})().catch(err => {
 		console.log(err);
 		req.flash('error', "Unable to access database");
 		res.redirect('back');
-	})
-})
+	});
+});
 
 router.delete('/whitelist/:id', middleware.isLoggedIn, middleware.isPrincipal, (req, res) => {
 	(async() => {
@@ -213,7 +213,7 @@ router.delete('/whitelist/:id', middleware.isLoggedIn, middleware.isPrincipal, (
 
 		for (let message of messagesReceived) {
 			if (message.recipients.includes(req.user._id)) {
-				messageUpdate = await Message.findByIdAndUpdate(message._id, {$pull: {recipients: req.user._id}})
+				messageUpdate = await Message.findByIdAndUpdate(message._id, {$pull: {recipients: req.user._id}});
 
 				if (!messageUpdate) {
 					req.flash('error', "Unable to update your messages");
@@ -272,22 +272,22 @@ router.delete('/whitelist/:id', middleware.isLoggedIn, middleware.isPrincipal, (
 
     if (!orders) {
       req.flash('error', "Unable to find your orders");
-      return res.redirect('back')
+      return res.redirect('back');
     }
 
     for (let order of orders) {
       deletedOrder = await Order.findByIdAndDelete(order._id).populate('items.item');
       if (!deletedOrder) {
-        req.flash("error", "Unable to delete orders")
-        return res.redirect('back')
+        req.flash("error", "Unable to delete orders");
+        return res.redirect('back');
       }
 
       for (let i = 0; i < deletedOrder.items.length; i += 1) { //For each of the order's items, add the number ordered back to that item. (If there are 12 available quesadillas and our user ordered 3, there are now 15)
 
         if (deletedOrder.present) {
-          deletedOrder.items[i].item.availableItems += deletedOrder.items[i].quantity
+          deletedOrder.items[i].item.availableItems += deletedOrder.items[i].quantity;
           deletedOrder.items[i].item.isAvailable = true;
-          await deletedOrder.items[i].item.save()
+          await deletedOrder.items[i].item.save();
         }
       }
     }
@@ -296,7 +296,7 @@ router.delete('/whitelist/:id', middleware.isLoggedIn, middleware.isPrincipal, (
 
     if (!roomsCreated) {
       req.flash('error', "Unable to delete your rooms");
-      return res.redirect('back')
+      return res.redirect('back');
     }
 
     for (let room of roomsCreated) {
@@ -317,7 +317,7 @@ router.delete('/whitelist/:id', middleware.isLoggedIn, middleware.isPrincipal, (
 			return res.redirect('back');
 		}
 
-		roomUpdates = []
+		roomUpdates = [];
 
 		for (let room of roomsPartOf) {
 			if (room.members.includes(user._id)) {
@@ -348,7 +348,7 @@ router.delete('/whitelist/:id', middleware.isLoggedIn, middleware.isPrincipal, (
 			return res.redirect('back');
 		}
 
-		projectUpdates = []
+		projectUpdates = [];
 
 		for (let project of projectsCreated) {
 			if (project.creators.includes(user._id)) {
@@ -389,7 +389,7 @@ router.delete('/whitelist/:id', middleware.isLoggedIn, middleware.isPrincipal, (
 			} else {
 				console.log('Email sent: ' + info.response);
 			}
-		})
+		});
 	}
 
 	req.flash('success', "Email Removed From Whitelist! Any users with this email have been removed.");
@@ -399,8 +399,8 @@ router.delete('/whitelist/:id', middleware.isLoggedIn, middleware.isPrincipal, (
 		console.log(err);
 		req.flash('error', "Unable to access database");
 		res.redirect('back');
-	})
-})
+	});
+});
 
 // changes permissions
 router.put('/permissions', middleware.isLoggedIn, middleware.isAdmin, (req, res) => {

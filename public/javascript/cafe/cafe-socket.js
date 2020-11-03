@@ -1,6 +1,6 @@
 function order(form, customer) {
   var socket = io();
-  let items = document.getElementById('item-list')
+  let items = document.getElementById('item-list');
 
   $(form).submit(function (e) {
     // e.preventDefault();
@@ -41,7 +41,7 @@ function getOrders(outputStream) {
       if (!order.instructions || order.instructions == "") {
         return `<p class="card-text">No extra instructions</p>`;
       } else {
-        return `<p class="card-text"><strong>Extra Instructions:</strong> ${order.instructions}</p>`
+        return `<p class="card-text"><strong>Extra Instructions:</strong> ${order.instructions}</p>`;
       }
     }
 

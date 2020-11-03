@@ -23,7 +23,7 @@ let transporter = nodemailer.createTransport({
 
 // Home route. gives the landing or home or index page (whatever you want to call it).
 router.get('/', (req, res) => {
-	res.render('index')
+	res.render('index');
 });
 
 // ===========================
@@ -122,7 +122,7 @@ router.post("/register",  function(req, res) {
 						//flash message for succesful login
 						req.flash("success", "Welcome to Saberchat " + user.firstName);
 						res.redirect("/");
-						console.log('succesfully registered and logged in user')
+						console.log('succesfully registered and logged in user');
 					});
 
 
@@ -139,11 +139,11 @@ router.post("/register",  function(req, res) {
       		  } else {
       		    console.log('Email sent: ' + info.response);
       		  }
-      		})
+      		});
 
 				});
 			}
-		})
+		});
 	}
 });
 
@@ -180,7 +180,7 @@ router.post('/forgot-password', (req, res) => {
 
     } else {
 
-      let charSetMatrix = []
+      let charSetMatrix = [];
 
       charSetMatrix.push('qwertyuiopasdfghjklzxcvbnm'.split(''));
       charSetMatrix.push('QWERTYUIOPASDFGHJKLZXCVBNM'.split(''));
@@ -192,13 +192,13 @@ router.post('/forgot-password', (req, res) => {
 
       let charSet; //Which character set to choose from
       for (let i = 0; i < pwd_length; i += 1) {
-        charSet = charSetMatrix[Math.floor(Math.random() * 4)]
+        charSet = charSetMatrix[Math.floor(Math.random() * 4)];
         pwd += charSet[Math.floor((Math.random() * charSet.length))];
       }
 
       for (let user of users) {
         user.tempPwd = pwd;
-        user.save()
+        user.save();
       }
 
       let newPwdMessage = {
@@ -219,11 +219,11 @@ router.post('/forgot-password', (req, res) => {
       req.flash('success', "Check your email for instructions on  how to reset your password");
       res.redirect('/');
     }
-  })
-})
+  });
+});
 
 router.get('/reset-password', (req, res) => {
-  res.render('profile/reset-password', {user: req.query.user})
+  res.render('profile/reset-password', {user: req.query.user});
 })
 
 router.put('/reset-password', (req, res) => {
@@ -255,7 +255,7 @@ router.put('/reset-password', (req, res) => {
             } else {
               console.log('Email sent: ' + info.response);
             }
-          })
+          });
 
           req.flash('success', "Password reset!");
           res.redirect('/');
@@ -265,13 +265,13 @@ router.put('/reset-password', (req, res) => {
           res.redirect('back');
         }
       }
-    })
+    });
 
   } else {
     req.flash('error', "Passwords do not match");
     res.redirect('back');
   }
-})
+});
 
 // >>>>>>> c413c2fa840ea70b4f1a6207ded0a60067579863
 //logout route
@@ -286,32 +286,32 @@ router.get("/logout", function(req, res) {
 router.get('/contact', middleware.isLoggedIn, (req, res) => {
 	User.find({status: 'faculty'}, (err, faculty) => {
 		if (err || !faculty) {
-			req.flash('error', "Unable to access database")
-			res.redirect('back')
+			req.flash('error', "Unable to access database");
+			res.redirect('back');
 
 		} else {
-			res.render('other/contact', {faculty})
+			res.render('other/contact', {faculty});
 		}
-	})
-})
+	});
+});
 
 router.get('/alsion', (req, res) => {
 	User.find({status: 'faculty'}, (err, faculty) => {
 		if (err || !faculty) {
-			req.flash('error', "Unable to access database")
-			res.redirect('back')
+			req.flash('error', "Unable to access database");
+			res.redirect('back');
 
 		} else {
-			let teacherNames = []
+			let teacherNames = [];
 
 			for (let fac of faculty) {
-				teacherNames.push(`${fac.firstName} ${fac.lastName}`)
+				teacherNames.push(`${fac.firstName} ${fac.lastName}`);
 			}
 
-			res.render('other/alsion_info', {faculty: teacherNames.join(', ')})
+			res.render('other/alsion_info', {faculty: teacherNames.join(', ')});
 		}
-	})
-})
+	});
+});
 
 // NOTE: Remove this line when enabling cafe
 // router.get('/cafe', middleware.isLoggedIn, (req, res) => {

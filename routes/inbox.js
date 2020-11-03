@@ -53,8 +53,8 @@ router.get('/messages/new', middleware.isLoggedIn, (req, res) => {
 		} else {
 			res.render('inbox/new', {users: foundUsers});
 		}
-	})
-})
+	});
+});
 
 //Route to send notification to a group of people
 router.post('/messages', middleware.isLoggedIn, (req, res) => {
@@ -62,7 +62,7 @@ router.post('/messages', middleware.isLoggedIn, (req, res) => {
 		let message = {
 			subject: filter.clean(req.body.subject),
 			text: filter.clean(req.body.message)
-		}
+		};
 
 		if(req.body.images) {
 			message.images = req.body.images;
@@ -101,7 +101,9 @@ router.post('/messages', middleware.isLoggedIn, (req, res) => {
 		message.recipients = recipients;
 
 		const newMessage = await Message.create(message);
-		if(!newMessage) {req.flash('error', 'Message could not be created'); return res.redirect('back');}
+		if(!newMessage) {
+      req.flash('error', 'Message could not be created'); return res.redirect('back');
+    }
 
 		newMessage.date = dateFormat(newMessage.created_at, "h:MM TT | mmm d");
 		await newMessage.save();
@@ -113,6 +115,7 @@ router.post('/messages', middleware.isLoggedIn, (req, res) => {
 					$push: { inbox: newMessage },
 					$inc: { msgCount: 1 }
 				});
+
 		} else {
 			await User.updateMany(
 				{ _id: { $in: recipients } },
@@ -126,10 +129,10 @@ router.post('/messages', middleware.isLoggedIn, (req, res) => {
 
 		const recipientList = await User.find({ _id: { $in: recipients}});
 
-    imageString = ""
+    imageString = "";
 
     for (let image of newMessage.images) {
-      imageString += `<img src="${image}">`
+      imageString += `<img src="${image}">`;
     }
 
     let recipientArr = [];
@@ -169,7 +172,7 @@ router.post('/messages', middleware.isLoggedIn, (req, res) => {
 				} else {
 					console.log('Email sent: ' + info.response);
 				}
-			})
+			});
 		}
 
 		req.flash('success', 'Message sent');
@@ -186,20 +189,22 @@ router.post('/messages', middleware.isLoggedIn, (req, res) => {
 router.get('/sent', middleware.isLoggedIn, (req, res) => {
 	Message.find({sender: req.user._id}, (err, foundMsg) => {
 		if (err || !foundMsg) {
-			req.flash('error', 'Unable to access database')
-			res.redirect('/inbox')
+			req.flash('error', 'Unable to access database');
+			res.redirect('/inbox');
 
 		} else {
-			res.render('inbox/index_sent', {inbox: foundMsg.reverse()})
+			res.render('inbox/index_sent', {inbox: foundMsg.reverse()});
 		}
-	})
-})
+	});
+});
 
 // Message show route
 router.get('/:id', middleware.isLoggedIn, (req, res) => {
-	( async ()=> {
+	( async () => {
 		const message = await Message.findById(req.params.id);
-		if(!message) {req.flash('error','Cannot find message'); return res.redirect('back');}
+		if(!message) {
+      req.flash('error','Cannot find message'); return res.redirect('back');
+    }
 
 		if(!message.toEveryone && !message.recipients.includes(req.user._id) && !message.sender.equals(req.user._id)) {
 			req.flash('error', 'You do not have permission to view this message');
@@ -216,7 +221,8 @@ router.get('/:id', middleware.isLoggedIn, (req, res) => {
 		await message.populate({path: 'sender', select: 'username'}).populate({path:'recipients', select: 'username'}).populate({path: 'read', select: 'username'}).execPopulate();
 
 		res.render('inbox/show', {message: message});
-	})().catch(err => {
+
+  })().catch(err => {
 		console.log(err);
 		req.flash('error','There was an error');
 		res.redirect('back');
@@ -226,12 +232,12 @@ router.get('/:id', middleware.isLoggedIn, (req, res) => {
 
 //Clear entire inbox
 router.delete('/clear', middleware.isLoggedIn, (req, res) => {
-	req.user.inbox = []
+	req.user.inbox = [];
 	req.user.msgCount = 0;
 	req.user.save();
 	req.flash('success', 'Inbox cleared!');
 	res.redirect('/inbox');
-})
+});
 
 //Delete messages
 router.delete('/delete', middleware.isLoggedIn, (req, res) => {
@@ -288,6 +294,7 @@ router.put('/mark-selected', middleware.isLoggedIn, (req, res) => {
 		if(err) {
 			req.flash('error','Could not mark as read');
 			res.redirect('back');
+
 		} else {
 			req.user.msgCount -= result.nModified;
 			req.user.save();
@@ -317,7 +324,7 @@ router.get('/requests/:id', middleware.isLoggedIn, (req, res) => {
 
 // route to accept request
 router.post('/requests/:id/accept', middleware.isLoggedIn, (req, res) => {
-	( async function() {
+	(async () =>  {
 		const Req = await AccessReq.findById(req.params.id)
 		.populate({path: 'room', select: ['creator']}).populate('requester');
 
@@ -337,7 +344,9 @@ router.post('/requests/:id/accept', middleware.isLoggedIn, (req, res) => {
 
 			const foundRoom = await Room.findById(Req.room._id);
 
-			if(!foundRoom) {req.flash("error", "Unable to access database");return res.redirect('back');}
+			if(!foundRoom) {
+        req.flash("error", "Unable to access database");return res.redirect('back');
+      }
 
 			foundRoom.members.push(Req.requester);
 			Req.status = 'accepted';
@@ -370,10 +379,11 @@ router.post('/requests/:id/accept', middleware.isLoggedIn, (req, res) => {
 				} else {
 					console.log('Email sent: ' + info.response);
 				}
-			})
+			});
 
 			req.flash('success', 'Request accepted');
 			res.redirect('/inbox');
+
 		}
 	})().catch(err => {
 		console.log(err);
@@ -384,9 +394,9 @@ router.post('/requests/:id/accept', middleware.isLoggedIn, (req, res) => {
 
 // route to reject request
 router.post('/requests/:id/reject', middleware.isLoggedIn, (req, res) => {
-	( async function() {
+	( async () => {
 		const Req = await AccessReq.findById(req.params.id)
-		.populate('room').populate('requester');
+		.populate('room').populate('requester')
 
 		if(!Req) {
 			req.flash("error", "Unable to access database");
@@ -431,11 +441,12 @@ router.post('/requests/:id/reject', middleware.isLoggedIn, (req, res) => {
 				} else {
 					console.log('Email sent: ' + info.response);
 				}
-			})
+			});
 
 			req.flash('success', 'Request rejected');
 			res.redirect('/inbox');
 		}
+
 	})().catch(err => {
 		console.log(err);
 		req.flash("error", "Unable to access database");

@@ -29,23 +29,23 @@ const changeOrderConfirmation = (() => {
 
           for (let no of numOrders) {
             if (no.id.split('_')[1] == i.id) { //Id's are constructed in format 'dd_<id>'. This extracts that ID
-              sum += parseInt(no.value) * parseFloat(l.innerText.split('$')[1])
+              sum += parseInt(no.value) * parseFloat(l.innerText.split('$')[1]);
 
-              orderedItem = document.createElement('strong') //Create the item confirmation
-              orderedItem.className = "list-group-item list-group-item-action form-check" //Give it the boostrap class that will style it
+              orderedItem = document.createElement('strong'); //Create the item confirmation
+              orderedItem.className = "list-group-item list-group-item-action form-check"; //Give it the boostrap class that will style it
 
               //Decide its text based on what the total cost is
               if (! (parseInt(no.value) * parseFloat(l.innerText.split('$')[1])).toString().includes('.') ) {
-                orderedItem.innerText = `${no.name} (${no.value} orders) - \$${parseInt(no.value) * parseFloat(l.innerText.split('$')[1])}.00`
+                orderedItem.innerText = `${no.name} (${no.value} orders) - \$${parseInt(no.value) * parseFloat(l.innerText.split('$')[1])}.00`;
 
               } else if ((parseInt(no.value) * parseFloat(l.innerText.split('$')[1])).toString().split('.')[1].length == 1){
-                orderedItem.innerText = `${no.name} (${no.value} orders) - \$${parseInt(no.value) * parseFloat(l.innerText.split('$')[1])}0`
+                orderedItem.innerText = `${no.name} (${no.value} orders) - \$${parseInt(no.value) * parseFloat(l.innerText.split('$')[1])}0`;
 
               } else {
-                orderedItem.innerText = `${no.name} (${no.value} orders) - \$${parseInt(no.value) * parseFloat(l.innerText.split('$')[1])}`
+                orderedItem.innerText = `${no.name} (${no.value} orders) - \$${parseInt(no.value) * parseFloat(l.innerText.split('$')[1])}`;
               }
 
-              orderConfirm.appendChild(orderedItem) //Add the order to the list of orders
+              orderConfirm.appendChild(orderedItem); //Add the order to the list of orders
             }
           }
         }
@@ -55,9 +55,9 @@ const changeOrderConfirmation = (() => {
 
   //Once this process is finished, create an element to render the extra instructions and total cost
 
-  instructionsNew = document.createElement('span')
+  instructionsNew = document.createElement('span');
   instructionsNew.style = 'color: blue;';
-  instructionsNew.className = "list-group-item list-group-item-action form-check"
+  instructionsNew.className = "list-group-item list-group-item-action form-check";
 
   if (extraInstructionsInput.value == '') {
     instructionsNew.innerHTML = `<strong>Extra Instructions:</strong> None`;
@@ -66,24 +66,24 @@ const changeOrderConfirmation = (() => {
     instructionsNew.innerHTML = `<strong>Extra Instructions:</strong> ${extraInstructionsInput.value}`;
   }
 
-  totalNew = document.createElement('strong')
-  totalNew.style = 'color: green;'
-  totalNew.className = "list-group-item list-group-item-action form-check"
+  totalNew = document.createElement('strong');
+  totalNew.style = 'color: green;';
+  totalNew.className = "list-group-item list-group-item-action form-check";
 
 
   //Create cost in full '$dd.cc' format based on what the total is
   if (!sum.toString().includes('.')) {
-    totalNew.innerText = `Total: $${sum}.00`
+    totalNew.innerText = `Total: $${sum}.00`;
 
   } else if (sum.toString().split('.')[1].length == 1){
-    totalNew.innerText = `Total: $${sum}0`
+    totalNew.innerText = `Total: $${sum}0`;
 
   } else {
-    totalNew.innerText = `Total: $${sum}`
+    totalNew.innerText = `Total: $${sum}`;
   }
 
   //Add the total to the div
-  orderConfirm.appendChild(instructionsNew)
-  orderConfirm.appendChild(totalNew)
+  orderConfirm.appendChild(instructionsNew);
+  orderConfirm.appendChild(totalNew);
 
-})
+});

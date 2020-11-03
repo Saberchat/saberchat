@@ -14,12 +14,12 @@ const Announcement = require('../models/announcement');
 router.get('/', middleware.isLoggedIn, (req, res) => { //RESTful Routing 'INDEX' route
   Announcement.find({}).populate('sender').exec((err, foundAnns) => { //Collects data about all announcements
     if (err || !foundAnns) {
-      console.log(err)
-      req.flash('error', "Unable to access database")
-      res.redirect('back')
+      console.log(err);
+      req.flash('error', "Unable to access database");
+      res.redirect('back');
 
     } else {
-      res.render('announcements/index', {announcements: foundAnns.reverse()}) //Render announcement page with data on all announcements
+      res.render('announcements/index', {announcements: foundAnns.reverse()}); //Render announcement page with data on all announcements
     }
   })
 })
@@ -48,10 +48,10 @@ router.get('/:id', middleware.isLoggedIn, (req, res) => { //RESTful Routing 'SHO
       }
 
       if (index != -1) {
-        req.user.annCount.splice(index, 1)
+        req.user.annCount.splice(index, 1);
       }
 
-      req.user.save()
+      req.user.save();
       res.render('announcements/show', {announcement: foundAnn});
     }
   });
@@ -98,11 +98,11 @@ router.post('/', middleware.isLoggedIn, middleware.isMod, (req, res) => { //REST
     let announcementObject = {
       announcement: announcement,
       version: "new"
-    }
+    };
 
     for (let user of users) {
       user.annCount.push(announcementObject);
-      await user.save()
+      await user.save();
     }
 
     req.flash('success', 'Announcement posted to bulletin!');
@@ -112,8 +112,8 @@ router.post('/', middleware.isLoggedIn, middleware.isMod, (req, res) => { //REST
     console.log(err);
     req.flash('error', "Unable to access database");
     return res.redirect('back');
-  })
-})
+  });
+});
 
 router.put('/:id', middleware.isLoggedIn, middleware.isMod, (req, res) => { //RESTful Routing 'UPDATE' route
   (async() => {
@@ -155,7 +155,7 @@ router.put('/:id', middleware.isLoggedIn, middleware.isMod, (req, res) => { //RE
       let announcementObject = {
         announcement: updatedAnnouncement,
         version: "updated"
-      }
+      };
 
       let overlap;
 
@@ -171,7 +171,7 @@ router.put('/:id', middleware.isLoggedIn, middleware.isMod, (req, res) => { //RE
 
         if (!overlap) {
           user.annCount.push(announcementObject);
-          await user.save()
+          await user.save();
         }
       }
 
@@ -182,8 +182,8 @@ router.put('/:id', middleware.isLoggedIn, middleware.isMod, (req, res) => { //RE
     console.log(err)
     req.flash('error', "Unable to access database")
     res.redirect('back')
-  })
-})
+  });
+});
 
 router.delete('/:id', middleware.isLoggedIn, middleware.isMod, (req, res) => { // RESTful Routing 'DESTROY' route
   (async() => {
@@ -195,21 +195,21 @@ router.delete('/:id', middleware.isLoggedIn, middleware.isMod, (req, res) => { /
     }
 
     if (announcement.sender._id.toString() != req.user._id.toString()) {
-      req.flash('error', "You can only delete announcements that you have posted")
-      return res.redirect('back')
+      req.flash('error', "You can only delete announcements that you have posted");
+      return res.redirect('back');
 
     } else {
       const deletedAnn = await Announcement.findByIdAndDelete(announcement._id);
 
       if (!deletedAnn) {
         req.flash('error', "Unable to delete announcement");
-        return res.redirect('back')
+        return res.redirect('back');
       }
 
       const users = await User.find({}, (err, users) => {
         if (!users) {
           req.flash('error', "Unable to find users");
-          return res.redirect('back')
+          return res.redirect('back');
         }
 
         for (let user of users) {
@@ -223,8 +223,8 @@ router.delete('/:id', middleware.isLoggedIn, middleware.isMod, (req, res) => { /
           }
 
           if (index > -1) {
-            user.annCount.splice(index, 1)
-            user.save()
+            user.annCount.splice(index, 1);
+            user.save();
           }
         }
       })
@@ -237,7 +237,7 @@ router.delete('/:id', middleware.isLoggedIn, middleware.isMod, (req, res) => { /
     console.log(err)
     req.flash('error', "Unable to access database")
     res.redirect('back')
-  })
-})
+  });
+});
 
 module.exports = router; //Export these routes to app.js

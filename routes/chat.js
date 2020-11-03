@@ -51,7 +51,9 @@ router.get('/new', middleware.isLoggedIn, (req, res) => {
 router.get('/:id', middleware.isLoggedIn, middleware.checkIfMember, (req, res) => {
   (async () => {
     const room = await Room.findById(req.params.id);
-    if(!room) {req.flash('error', 'Could not find room'); return res.redirect('/chat');}
+    if(!room) {
+      req.flash('error', 'Could not find room'); return res.redirect('/chat');
+    }
 
     if(!(room.confirmed.includes(req.user._id))) {
       room.confirmed.push(req.user._id);
@@ -75,7 +77,7 @@ router.get('/:id/edit', middleware.isLoggedIn, middleware.checkRoomOwnership, (r
     const room = await Room.findById(req.params.id);
 
     if (!room) {
-      req.flash('error', "Unable to find room"); return res.redirect('back')
+      req.flash('error', "Unable to find room"); return res.redirect('back');
     }
 
     const users = await User.find({});
@@ -87,9 +89,9 @@ router.get('/:id/edit', middleware.isLoggedIn, middleware.checkRoomOwnership, (r
     res.render('chat/edit', {users, room});
 
   })().catch(err => {
-    console.log(err)
-    req.flash('error', "Unable to access database")
-    res.redirect('back')
+    console.log(err);
+    req.flash('error', "Unable to access database");
+    res.redirect('back');
   });
 });
 
@@ -100,7 +102,7 @@ router.post('/', middleware.isLoggedIn, function(req, res) {
     'creator.id': req.user._id,
     'creator.username': req.user.username,
     members: [req.user._id]
-  }
+  };
 
   Room.create(room, function(err, room) {
     if (err) {
@@ -132,7 +134,9 @@ router.post('/', middleware.isLoggedIn, function(req, res) {
 router.post('/:id/leave', middleware.isLoggedIn, middleware.checkForLeave, function(req, res) {
   (async () => {
     const room = await Room.findById(req.params.id);
-    if(!room) {req.flash('error', 'Room does not exist'); return res.redirect('back');}
+    if(!room) {
+      req.flash('error', 'Room does not exist'); return res.redirect('back');
+    }
 
     if(room.creator.id.equals(req.user._id)) {
       req.flash('error', 'You cannot leave a room you created');
@@ -169,7 +173,10 @@ router.post('/:id/request-access', middleware.isLoggedIn, function(req, res) {
     // find the room
     const foundRoom = await Room.findById(req.params.id);
     // if no found room, exit
-    if(!foundRoom) {req.flash('error', 'Room does not Exist'); return res.redirect('back');}
+    if(!foundRoom) {
+      req.flash('error', 'Room does not Exist'); return res.redirect('back');
+    }
+
     if(foundRoom.type == 'public') {
       req.flash('error', 'Room is public');
       return res.redirect('back');
@@ -192,14 +199,17 @@ router.post('/:id/request-access', middleware.isLoggedIn, function(req, res) {
         requester: req.user._id,
         room: foundRoom._id,
         receiver: foundRoom.creator.id
-      }
+      };
+
       // create the request and find the room creator
       const [createdReq, roomCreator] = await Promise.all([
         AccessReq.create(request),
         User.findById(foundRoom.creator.id)
       ]);
 
-      if(!createdReq || !roomCreator) {req.flash('error', 'An error occured'); return res.redirect('back');}
+      if(!createdReq || !roomCreator) {
+        req.flash('error', 'An error occured'); return res.redirect('back');
+      }
 
       roomCreator.requests.push(createdReq._id);
       roomCreator.save();
@@ -217,7 +227,7 @@ router.post('/:id/request-access', middleware.isLoggedIn, function(req, res) {
 				} else {
 					console.log('Email sent: ' + info.response);
 				}
-			})
+			});
 
       req.flash('success', 'Request for access sent');
       res.redirect('back');
@@ -282,7 +292,7 @@ router.put('/:id', middleware.isLoggedIn, middleware.checkRoomOwnership, (req, r
         room.moderate = true;
       }
 
-      room.save()
+      room.save();
       req.flash('success', 'Updated your group');
       res.redirect('/chat/' + room._id);
     }

@@ -17,7 +17,7 @@ router.get('/', middleware.isLoggedIn, function(req, res) {
           req.flash('error', 'Cannot access Database');
           res.redirect('/articles');
       } else {
-        res.render('wHeights/index', {articles: foundArticles})
+        res.render('wHeights/index', {articles: foundArticles});
       }
   });
 });
@@ -29,20 +29,20 @@ router.get('/new', middleware.isLoggedIn, function(req, res) {
 
     const students = await User.find({permission: 'student'});
     if (!students) {
-      req.flash('error', "Unable to find students"); return res.redirect('back')
+      req.flash('error', "Unable to find students"); return res.redirect('back');
     }
 
     const types = await Type.find({});
     if (!types) {
-      req.flash('error', "Unable to find article types"); return res.redirect('back')
+      req.flash('error', "Unable to find article types"); return res.redirect('back');
     }
 
-    res.render('wHeights/new', {students, types})
+    res.render('wHeights/new', {students, types});
 
   })().catch(err => {
-    console.log(err)
-    req.flash('error', "Unable to access database")
-    res.redirect('back')
+    console.log(err);
+    req.flash('error', "Unable to access database");
+    res.redirect('back');
   })
 });
 
@@ -53,7 +53,7 @@ router.get('/:id', middleware.isLoggedIn, function(req, res) {
             req.flash('error', 'Cannot find article');
             res.redirect('/articles');
         } else {
-            res.render('wHeights/show', {article: foundArticle, date: dateFormat(foundArticle.created_at, "mmm d, yyyy - h:MM TT")})
+            res.render('wHeights/show', {article: foundArticle, date: dateFormat(foundArticle.created_at, "mmm d, yyyy - h:MM TT")});
         }
     });
 });
@@ -64,7 +64,7 @@ router.post('/new', middleware.isLoggedIn, function(req, res) {
   (async () => {
 
     const content = JSON.parse(req.body.content);
-    console.log(req.body)
+    console.log(req.body);
 
     const articleObj = {
         title: req.body.title,
@@ -86,7 +86,7 @@ router.post('/new', middleware.isLoggedIn, function(req, res) {
 
     const type = await Type.findById(req.body.type);
     if (!type) {
-      req.flash('error', "Unable to find specified type"); return res.redirect('back')
+      req.flash('error', "Unable to find specified type"); return res.redirect('back');
     }
 
     type.articles.push(article);
@@ -98,7 +98,7 @@ router.post('/new', middleware.isLoggedIn, function(req, res) {
     console.log(err);
     req.flash('error', "Unable to access database");
     res.redirect('back');
-  })
+  });
 });
 
 module.exports = router;
