@@ -54,6 +54,38 @@
                             <a class="nav-link" href="/inbox/"><i class="fas fa-inbox"></i> Inbox</a>
                           <% } %>
                         </li>
+
+                        <% if (currentUser.permission == 'mod') { %>
+                          <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="" id="navbarDropdownMenuLink" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="fas fa-align-justify"></i> Moderator Controls</a>
+                            <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
+                              <a href="/admin/status" class="dropdown-item"><i class="fas fa-user"></i> Change Statuses</a>
+                              <a href="/admin/moderate" class="dropdown-item"><i class="fas fa-exclamation-triangle"></i> Moderate Comments</a>
+                          </li>
+
+                        <% } else if (currentUser.permission == 'admin') { %>
+                          <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="" id="navbarDropdownMenuLink" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="fas fa-align-justify"></i> Admin Controls</a>
+                            <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
+                              <a href="/admin/permissions" class="dropdown-item"><i class="fas fa-user"></i> Change Permissions</a>
+                              <a href="/admin/status" class="dropdown-item"><i class="fas fa-user"></i> Change Statuses</a>
+                              <a href="/admin/moderate" class="dropdown-item"><i class="fas fa-exclamation-triangle"></i> Moderate Comments</a>
+                              <a href="/admin/manageCafe" class="dropdown-item"><i class="fas fa-coffee"></i> Manage EC Cafe</a>
+                          </li>
+
+                        <% } else if (currentUser.permission == 'principal') {%>
+                          <li class="nav-item dropdown">
+                          <a class="nav-link dropdown-toggle" href="" id="navbarDropdownMenuLink" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="fas fa-align-justify"></i> Principal Controls</a>
+                          <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
+                            <a href="/admin/permissions" class="dropdown-item"><i class="fas fa-user"></i> Change Permissions</a>
+                            <a href="/admin/status" class="dropdown-item"><i class="fas fa-user"></i> Change Statuses</a>
+                            <a href="/admin/moderate" class="dropdown-item"><i class="fas fa-exclamation-triangle"></i> Moderate Comments</a>
+                            <a href="/admin/manageCafe" class="dropdown-item"><i class="fas fa-coffee"></i> Manage EC Cafe</a>
+                            <a href="/admin/whitelist" class="dropdown-item"><i class="fas fa-inbox"></i> Email Whitelist</a>
+                          </li>
+                        <% } %>
+
+
                         <li class="nav-item dropdown">
                           <a class="nav-link dropdown-toggle" href="" id="navbarDropdownMenuLink" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                               <img src="<%= currentUser.imageUrl %>" alt="profile pic" style="width: 20px; height: 20px; object-fit: cover; border-radius: 50%; display: inline-block;">
@@ -61,11 +93,8 @@
                           </a>
                           <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
                             <a class="dropdown-item" href="/profiles/<%= currentUser._id %>">View Profile</a>
-                            <% if (currentUser.permission == 'admin') { %>
-                              <a class="dropdown-item" href="/admin">Admin Controls</a>
-                            <% } else if (currentUser.permission == 'principal') {%>
-                              <a class="dropdown-item" href="/admin">Principal Controls</a>
-                            <% } %>
+                              <!-- <a class="dropdown-item" href="/admin">Admin Controls</a>
+                              <a class="dropdown-item" href="/admin">Principal Controls</a> -->
                             <a class="dropdown-item" href="/logout">Logout</a>
                           </div>
                       </li>

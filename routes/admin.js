@@ -51,7 +51,7 @@ router.get('/moderate', middleware.isLoggedIn, middleware.isMod, (req, res) => {
 
 // displays permissions page
 router.get('/permissions', middleware.isLoggedIn, middleware.isAdmin, (req, res) => {
-	User.find({permission: { $ne: 'principle'}}, (err, foundUsers) => {
+	User.find({permission: { $ne: 'principal'}}, (err, foundUsers) => {
 		if(err || !foundUsers) {
 			req.flash('error', 'Cannot access Database');
 			res.redirect('/admin');
@@ -63,8 +63,8 @@ router.get('/permissions', middleware.isLoggedIn, middleware.isAdmin, (req, res)
 });
 
 // displays status page
-router.get('/status', middleware.isLoggedIn, middleware.isAdmin, (req, res) => {
-	User.find({permission: { $ne: 'principle'}}, (err, foundUsers) => {
+router.get('/status', middleware.isLoggedIn, middleware.isMod, (req, res) => {
+	User.find({permission: { $ne: 'principal'}}, (err, foundUsers) => {
 		if(err || !foundUsers) {
 			req.flash('error', 'Cannot access Database');
 			res.redirect('/admin');
@@ -440,7 +440,7 @@ router.put('/permissions', middleware.isLoggedIn, middleware.isAdmin, (req, res)
 });
 
 // changes status
-router.put('/status', middleware.isLoggedIn, middleware.isAdmin, (req, res) => {
+router.put('/status', middleware.isLoggedIn, middleware.isMod, (req, res) => {
 	User.findByIdAndUpdate(req.body.user, {status: req.body.status}, (err, updatedUser) => {
 		if(err || !updatedUser) {
 			res.json({error: 'Error. Could not change'});
