@@ -16,6 +16,9 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js"></script>
     <script src="../javascript/socket.js"></script>
+    <script src="/javascript/nav/userForm.js"></script>
+    <script src="/javascript/nav/navbar.js"></script>
+    <script src="/javascript/home/index.js"></script>
 
     <!-- I'm using my fontawesome kit -->
     <script src="https://kit.fontawesome.com/dccc745c41.js" crossorigin="anonymous"></script>
@@ -42,64 +45,106 @@
             <div class="ann-head">
               <h1><%=project.title%></h1>
 
-              <a style="color: black;" href="../profiles/<%=project.poster._id%>">
-                <img src="<%= project.poster.imageUrl %>" alt="profile pic" style="width: 30px; height: 30px; object-fit: cover; border-radius: 50%;">
-                <%=project.poster.firstName%> <%=project.poster.lastName%>
-              </a>
-              <br /><br />
+              <% if (currentUser) { %>
+                <a style="color: black;" href="../profiles/<%=project.poster._id%>">
+                  <img src="<%= project.poster.imageUrl %>" alt="profile pic" style="width: 30px; height: 30px; object-fit: cover; border-radius: 50%;">
+                  <%=project.poster.firstName%> <%=project.poster.lastName%>
+                </a>
+                <br /><br />
+
+              <% } else { %>
+                <span style="color: black;">
+                  <img src="<%= project.poster.imageUrl %>" alt="profile pic" style="width: 30px; height: 30px; object-fit: cover; border-radius: 50%;">
+                  <%=project.poster.firstName%> <%=project.poster.lastName%>
+                </span>
+              <% } %>
+
               <span style="color: #6e6e6e;"><%=project.date%></span>
 
-              <% if (currentUser.username == project.poster.username) { %>
-                <button id="edit-button" type="button" class="btn btn-info"><a style="color: white;" href="<%=project._id%>/edit"><i class="fas fa-cog"></i> Edit</a></button>
+              <% if (currentUser) { %>
+                <% if (currentUser.username == project.poster.username) { %>
+                  <button id="edit-button" type="button" class="btn btn-info"><a style="color: white;" href="<%=project._id%>/edit"><i class="fas fa-cog"></i> Edit</a></button>
 
-                <form action="<%=project._id%>?_method=delete" method="post" style="display: inline-block;">
-                  <button style="color: white;" class="btn btn-danger" type="button" data-toggle="modal" data-target="#modal-<%=project._id%>"><i class="far fa-trash-alt"></i> Delete</button>
-                  <div class="modal fade" id="modal-<%=project._id%>" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
-                    <div class="modal-dialog">
-                      <div class="modal-content">
-                        <div class="modal-header">
-                          <h5 class="modal-title" id="exampleModalLabel" style="color: black;">Delete Post?</h5>
-                          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                            <span aria-hidden="true">&times;</span>
-                          </button>
-                        </div>
-                        <div class="modal-body" style="color: black; text-align: left;">
-                          This action is irreversible. You will have to manually recreate this post.
-                        </div>
-                        <div class="modal-footer">
-                          <button type="button" class="btn btn-secondary" data-dismiss="modal">No, Go Back</button>
-                          <button type="submit" class="btn btn-danger">Yes, Delete Post</button>
+                  <form action="<%=project._id%>?_method=delete" method="post" style="display: inline-block;">
+                    <button style="color: white;" class="btn btn-danger" type="button" data-toggle="modal" data-target="#modal-<%=project._id%>"><i class="far fa-trash-alt"></i> Delete</button>
+                    <div class="modal fade" id="modal-<%=project._id%>" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+                      <div class="modal-dialog">
+                        <div class="modal-content">
+                          <div class="modal-header">
+                            <h5 class="modal-title" id="exampleModalLabel" style="color: black;">Delete Post?</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                              <span aria-hidden="true">&times;</span>
+                            </button>
+                          </div>
+                          <div class="modal-body" style="color: black; text-align: left;">
+                            This action is irreversible. You will have to manually recreate this post.
+                          </div>
+                          <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">No, Go Back</button>
+                            <button type="submit" class="btn btn-danger">Yes, Delete Post</button>
+                          </div>
                         </div>
                       </div>
                     </div>
+                  </form>
                   </div>
-                </form>
-                </div>
-              <% }%>
+                <% } %>
+              <% } %>
 
-            <% if (project.creators.length > 2) { %>
-              <span><strong>Creators:</strong>
+            <% if (currentUser) { %>
 
-                <% let tempcreators = project.creators.slice(0, project.creators.length - 2)%>
+              <% if (project.creators.length > 2) { %>
+                <span><strong>Creators:</strong>
 
-                <%tempcreators.forEach(creator => { %>
-                   <em><a style="color: black" href="../profiles/<%=creator._id%>"><img src="<%= creator.imageUrl %>" alt="profile pic" style="width: 30px; height: 30px; object-fit: cover; border-radius: 50%;"> <%=creator.firstName%> <%=creator.lastName%></a>,</em>
-                <%})%>
+                  <% let tempcreators = project.creators.slice(0, project.creators.length - 2)%>
 
-                <em><a style="color: black" href="../profiles/<%=project.creators[project.creators.length - 2]._id%>"><img src="<%= project.creators[project.creators.length - 2].imageUrl %>" alt="profile pic" style="width: 30px; height: 30px; object-fit: cover; border-radius: 50%;"> <%=project.creators[project.creators.length - 2].firstName%> <%=project.creators[project.creators.length - 2].lastName%></a>,</em>
-                <em><a style="color: black" href="../profiles/<%=project.creators[project.creators.length - 1]._id%>"><img src="<%= project.creators[project.creators.length - 1].imageUrl %>" alt="profile pic" style="width: 30px; height: 30px; object-fit: cover; border-radius: 50%;"> <%=project.creators[project.creators.length - 1].firstName%> <%=project.creators[project.creators.length - 1].lastName%></a></em>
+                  <%tempcreators.forEach(creator => { %>
+                     <em><a style="color: black" href="../profiles/<%=creator._id%>"><img src="<%= creator.imageUrl %>" alt="profile pic" style="width: 30px; height: 30px; object-fit: cover; border-radius: 50%;"> <%=creator.firstName%> <%=creator.lastName%></a>,</em>
+                  <%})%>
 
-              </span>
+                  <em><a style="color: black" href="../profiles/<%=project.creators[project.creators.length - 2]._id%>"><img src="<%= project.creators[project.creators.length - 2].imageUrl %>" alt="profile pic" style="width: 30px; height: 30px; object-fit: cover; border-radius: 50%;"> <%=project.creators[project.creators.length - 2].firstName%> <%=project.creators[project.creators.length - 2].lastName%></a>,</em>
+                  <em><a style="color: black" href="../profiles/<%=project.creators[project.creators.length - 1]._id%>"><img src="<%= project.creators[project.creators.length - 1].imageUrl %>" alt="profile pic" style="width: 30px; height: 30px; object-fit: cover; border-radius: 50%;"> <%=project.creators[project.creators.length - 1].firstName%> <%=project.creators[project.creators.length - 1].lastName%></a></em>
 
-            <%} else if (project.creators.length == 2){%>
-              <p><strong>Creators:</strong> <a style="color: black" href="../profiles/<%=project.creators[0]._id%>"><em><img src="<%= project.creators[0].imageUrl %>" alt="profile pic" style="width: 30px; height: 30px; object-fit: cover; border-radius: 50%;"> <%=project.creators[0].firstName%> <%=project.creators[0].lastName%></a>, <a style="color: black" href="profiles/<%=project.creators[0]._id%>"><img src="<%= project.creators[1].imageUrl %>" alt="profile pic" style="width: 30px; height: 30px; object-fit: cover; border-radius: 50%;"> <%=project.creators[1].firstName%> <%=project.creators[1].lastName%></a></em></p>
+                </span>
 
-            <%} else if (project.creators.length == 1){%>
-              <p><strong>Creator:</strong> <a style="color: black" href="../profiles/<%=project.creators[0]._id%>"><em><img src="<%= project.creators[0].imageUrl %>" alt="profile pic" style="width: 30px; height: 30px; object-fit: cover; border-radius: 50%;"> <%=project.creators[0].firstName%> <%=project.creators[0].lastName%></em></a></p>
+              <%} else if (project.creators.length == 2){ %>
+                <p><strong>Creators:</strong> <a style="color: black" href="../profiles/<%=project.creators[0]._id%>"><em><img src="<%= project.creators[0].imageUrl %>" alt="profile pic" style="width: 30px; height: 30px; object-fit: cover; border-radius: 50%;"> <%=project.creators[0].firstName%> <%=project.creators[0].lastName%></a>, <a style="color: black" href="profiles/<%=project.creators[0]._id%>"><img src="<%= project.creators[1].imageUrl %>" alt="profile pic" style="width: 30px; height: 30px; object-fit: cover; border-radius: 50%;"> <%=project.creators[1].firstName%> <%=project.creators[1].lastName%></a></em></p>
+
+              <%} else if (project.creators.length == 1){ %>
+                <p><strong>Creator:</strong> <a style="color: black" href="../profiles/<%=project.creators[0]._id%>"><em><img src="<%= project.creators[0].imageUrl %>" alt="profile pic" style="width: 30px; height: 30px; object-fit: cover; border-radius: 50%;"> <%=project.creators[0].firstName%> <%=project.creators[0].lastName%></em></a></p>
+
+              <% } else { %>
+                <p><strong>Creators:</strong> <em>None</em></p>
+              <% } %>
 
             <% } else { %>
-              <p><strong>Creators:</strong> <em>None</em></p>
-            <% }%>
+
+              <% if (project.creators.length > 2) { %>
+                <strong>Creators:</strong>
+
+                  <% let tempcreators = project.creators.slice(0, project.creators.length - 2)%>
+
+                  <span style="color: black; display: inline;"><em>
+                    <%tempcreators.forEach(creator => { %>
+                       <img src="<%= creator.imageUrl %>" alt="profile pic" style="width: 30px; height: 30px; object-fit: cover; border-radius: 50%;"> <%=creator.firstName%> <%=creator.lastName%>,
+                    <%})%>
+
+                  <img src="<%= project.creators[project.creators.length - 2].imageUrl %>" alt="profile pic" style="width: 30px; height: 30px; object-fit: cover; border-radius: 50%;"> <%=project.creators[project.creators.length - 2].firstName%> <%=project.creators[project.creators.length - 2].lastName%>,
+                  <img src="<%= project.creators[project.creators.length - 1].imageUrl %>" alt="profile pic" style="width: 30px; height: 30px; object-fit: cover; border-radius: 50%;"> <%=project.creators[project.creators.length - 1].firstName%> <%=project.creators[project.creators.length - 1].lastName%>
+
+                  </em></span>
+
+              <%} else if (project.creators.length == 2){ %>
+                <p><strong>Creators:</strong> <span style="color: black; display: inline;"><em><img src="<%= project.creators[0].imageUrl %>" alt="profile pic" style="width: 30px; height: 30px; object-fit: cover; border-radius: 50%;"> <%=project.creators[0].firstName%> <%=project.creators[0].lastName%>, <img src="<%= project.creators[1].imageUrl %>" alt="profile pic" style="width: 30px; height: 30px; object-fit: cover; border-radius: 50%;"> <%=project.creators[1].firstName%> <%=project.creators[1].lastName%></span></em></p>
+
+              <%} else if (project.creators.length == 1){ %>
+                <p><strong>Creator:</strong> <span style="color: black; display: inline;"><em><img src="<%= project.creators[0].imageUrl %>" alt="profile pic" style="width: 30px; height: 30px; object-fit: cover; border-radius: 50%;"> <%=project.creators[0].firstName%> <%=project.creators[0].lastName%></em></span></p>
+
+              <% } else { %>
+                <p><strong>Creators:</strong> <em>None</em></p>
+              <% } %>
+
+            <% } %>
 
             <p style="margin-top: 10px; white-space: pre-wrap;"><%=project.text%></p>
 

@@ -12,7 +12,7 @@ const Project = require('../models/project');
 
 
 //ROUTES
-router.get('/', middleware.isLoggedIn, (req, res) => { //RESTful Routing 'INDEX' route
+router.get('/', (req, res) => { //RESTful Routing 'INDEX' route
 
   Project.find({})
   .populate('creators')
@@ -46,10 +46,17 @@ router.post('/',middleware.isLoggedIn, middleware.isFaculty, (req, res) => { //R
 
   (async() => { //Asynchronous functions dictates that processes occur one at a time, reducing excessive callbacks
 
-    const creators = await User.find({_id: {$in: req.body.creatorInput.split(',')}}); //Figure out all the students who created the project, based on the usernames the teacher entered
+    let creators;
 
-    if (!creators) {
-      req.flash('error', "Unable to find the users you listed"); return res.redirect('back');
+    if (req.body.creatorInput == '') {
+      creators = [];
+
+    } else {
+      creators = await User.find({_id: {$in: req.body.creatorInput.split(',')}}); //Figure out all the students who created the project, based on the usernames the teacher entered
+
+      if (!creators) {
+        req.flash('error', "Unable to find the users you listed"); return res.redirect('back');
+      }
     }
 
     const project = await Project.create({title: req.body.title, text: req.body.text, poster: req.user, creators}); //Create a new project with all the provided data
@@ -112,7 +119,7 @@ router.get('/:id/edit', middleware.isLoggedIn, middleware.isFaculty, (req, res) 
   })
 })
 
-router.get('/:id', middleware.isLoggedIn, (req, res) => { //RESTful Routing 'SHOW' route
+router.get('/:id', (req, res) => { //RESTful Routing 'SHOW' route
 
   Project.findById(req.params.id)
   .populate('poster')
@@ -133,7 +140,18 @@ router.put('/:id', middleware.isLoggedIn, middleware.isFaculty, (req, res) => {
 
   (async() => { //Asynchronous functions dictates that processes occur one at a time, reducing excessive callbacks
 
-    const creators = await User.find({_id: {$in: req.body.creatorInput.split(',')}});
+    let creators;
+
+    if (req.body.creatorInput == '') {
+      creators = [];
+
+    } else {
+      creators = await User.find({_id: {$in: req.body.creatorInput.split(',')}}); //Figure out all the students who created the project, based on the usernames the teacher entered
+
+      if (!creators) {
+        req.flash('error', "Unable to find the users you listed"); return res.redirect('back');
+      }
+    }
 
     if (!creators) {
       req.flash('error', 'Unable to find project creators'); return res.redirect('back');

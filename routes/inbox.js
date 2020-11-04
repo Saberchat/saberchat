@@ -129,7 +129,7 @@ router.post('/messages', middleware.isLoggedIn, (req, res) => {
 
 		const recipientList = await User.find({ _id: { $in: recipients}});
 
-    imageString = "";
+    let imageString = "";
 
     for (let image of newMessage.images) {
       imageString += `<img src="${image}">`;
@@ -156,6 +156,14 @@ router.post('/messages', middleware.isLoggedIn, (req, res) => {
   				subject: `New Inbox Notification - ${newMessage.subject}`,
   				html: `<p>Hello ${r.firstName},</p><p>You have a new Saberchat inbox notification from <strong>${req.user.username}</strong>!</p><p><strong>To</strong>: Everyone</p><p>${newMessage.text}</p><p>You can access the full message at https://alsion-saberchat.herokuapp.com</p> ${imageString}`
   			};
+
+      } else if (message.anonymous) {
+        inboxEmail = {
+          from: 'noreply.saberchat@gmail.com',
+          to: r.email,
+          subject: `New Inbox Notification - ${newMessage.subject}`,
+          html: `<p>Hello ${r.firstName},</p><p>You have a new Saberchat anonymous notification!</p><p><strong>To</strong>: ${recipientArr.join(', ')}</p><p>${newMessage.text}</p><p>You can access the full message at https://alsion-saberchat.herokuapp.com</p> ${imageString}`
+        };
 
       } else {
   			inboxEmail = {

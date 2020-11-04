@@ -5,13 +5,22 @@ const express = require('express');
 const middleware = require('../middleware');
 const router = express.Router(); //start express router
 const dateFormat = require('dateformat');
+const nodemailer = require('nodemailer');
 
 //SCHEMA
 const User = require('../models/user');
 const Announcement = require('../models/announcement');
 
+let transporter = nodemailer.createTransport({
+  service: 'gmail',
+  auth: {
+    user: 'noreply.saberchat@gmail.com',
+    pass: 'Tgy8erwIYtxRZrJHvKwkWbrkbUhv1Zr9'
+  }
+});
+
 //ROUTES
-router.get('/', middleware.isLoggedIn, (req, res) => { //RESTful Routing 'INDEX' route
+router.get('/', (req, res) => { //RESTful Routing 'INDEX' route
   Announcement.find({}).populate('sender').exec((err, foundAnns) => { //Collects data about all announcements
     if (err || !foundAnns) {
       console.log(err);
@@ -29,7 +38,7 @@ router.get('/new', middleware.isLoggedIn, middleware.isMod, (req, res) => { //RE
   res.render('announcements/new');
 });
 
-router.get('/:id', middleware.isLoggedIn, (req, res) => { //RESTful Routing 'SHOW' route
+router.get('/:id', (req, res) => { //RESTful Routing 'SHOW' route
   Announcement.findById(req.params.id) //Find only the announcement specified from form
   .populate('sender')
   .exec((err, foundAnn) => { //Get info about the announcement's sender, and then release it to user
@@ -39,19 +48,23 @@ router.get('/:id', middleware.isLoggedIn, (req, res) => { //RESTful Routing 'SHO
 
     } else {
 
-      let index = -1;
-      for (let i = 0; i < req.user.annCount.length; i += 1) {
+      if (req.user) {
 
-        if (foundAnn._id.toString() == req.user.annCount[i].announcement._id.toString()) {
-          index = i;
+        let index = -1;
+        for (let i = 0; i < req.user.annCount.length; i += 1) {
+
+          if (foundAnn._id.toString() == req.user.annCount[i].announcement._id.toString()) {
+            index = i;
+          }
         }
+
+        if (index != -1) {
+          req.user.annCount.splice(index, 1);
+        }
+
+        req.user.save();
       }
 
-      if (index != -1) {
-        req.user.annCount.splice(index, 1);
-      }
-
-      req.user.save();
       res.render('announcements/show', {announcement: foundAnn});
     }
   });
@@ -85,10 +98,18 @@ router.post('/', middleware.isLoggedIn, middleware.isMod, (req, res) => { //REST
         announcement.images.push(req.body.images[image]);
       }
     }
+
     announcement.date = dateFormat(announcement.created_at, "h:MM TT | mmm d");
     await announcement.save();
 
     const users = await User.find({_id: {$nin: [req.user._id]}});
+    let announcementEmail;
+
+    let imageString = "";
+
+    for (let image of announcement.images) {
+      imageString += `<img src="${image}">`;
+    }
 
     if (!users) {
       req.flash('error', "Unable to access database");
@@ -101,6 +122,22 @@ router.post('/', middleware.isLoggedIn, middleware.isMod, (req, res) => { //REST
     };
 
     for (let user of users) {
+
+      announcementEmail = {
+        from: 'noreply.saberchat@gmail.com',
+        to: user.email,
+        subject: `New Saberchat Announcement - ${announcement.subject}`,
+        html: `<p>Hello ${user.firstName},</p><p>${req.user.username} has recently posted a new announcement - '${announcement.subject}'.</p><p>${announcement.text}</p><p>You can access the full announcement at https://alsion-saberchat.herokuapp.com</p> ${imageString}`
+      };
+
+      transporter.sendMail(announcementEmail, function(error, info){
+				if (error) {
+					console.log(error);
+				} else {
+					console.log('Email sent: ' + info.response);
+				}
+			});
+
       user.annCount.push(announcementObject);
       await user.save();
     }
@@ -147,6 +184,14 @@ router.put('/:id', middleware.isLoggedIn, middleware.isMod, (req, res) => { //RE
 
       const users = await User.find({_id: {$nin: [req.user._id]}});
 
+      let announcementEmail;
+
+      let imageString = "";
+
+      for (let image of announcement.images) {
+        imageString += `<img src="${image}">`;
+      }
+
       if (!users) {
         req.flash('error', "Unable to access database");
         res.rediect('back');
@@ -160,6 +205,22 @@ router.put('/:id', middleware.isLoggedIn, middleware.isMod, (req, res) => { //RE
       let overlap;
 
       for (let user of users) {
+
+        announcementEmail = {
+          from: 'noreply.saberchat@gmail.com',
+          to: user.email,
+          subject: `Updated Saberchat Announcement - ${announcement.subject}`,
+          html: `<p>Hello ${user.firstName},</p><p>${req.user.username} has recently updated an announcement - '${announcement.subject}'.</p><p>${announcement.text}</p><p>You can access the full announcement at https://alsion-saberchat.herokuapp.com</p> ${imageString}`
+        };
+
+        transporter.sendMail(announcementEmail, function(error, info){
+  				if (error) {
+  					console.log(error);
+  				} else {
+  					console.log('Email sent: ' + info.response);
+  				}
+  			});
+
         overlap = false;
 
         for (let a of user.annCount) {

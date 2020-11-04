@@ -19,6 +19,9 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js"></script>
     <script src="../javascript/socket.js"></script>
+    <script src="/javascript/nav/userForm.js"></script>
+    <script src="/javascript/nav/navbar.js"></script>
+    <script src="/javascript/home/index.js"></script>
 
     <!-- I'm using my fontawesome kit -->
     <script src="https://kit.fontawesome.com/dccc745c41.js" crossorigin="anonymous"></script>
@@ -35,9 +38,11 @@
           <div class="jumbotron text-center">
             <h1><i class="fas fa-paint-brush"></i> Student Projects </h1>
             <p>Our Students' Artwork, Gardening Projects, Science Projects and More</p>
-            <% if (currentUser.status == 'faculty') { %>
-              <a class="btn btn-info" href="projects/new"><i class="fas fa-paint-brush"></i> Add Project</a>
-            <%}%>
+            <% if (currentUser) { %>
+              <% if (currentUser.status == 'faculty') { %>
+                <a class="btn btn-info" href="projects/new"><i class="fas fa-paint-brush"></i> Add Project</a>
+              <%}%>
+            <% } %>
           </div>
         </div>
       </div>
@@ -59,62 +64,90 @@
                   <a class= "float-right" style="color:white; font-size: 80%;"><%=project.date%></a>
                 </h5>
 
-                <a style="color:white;" href= "../profiles/<%=project.poster._id%>" >
-                  <img src="<%= project.poster.imageUrl %>" alt="profile pic" style="width: 30px; height: 30px; object-fit: cover; border-radius: 50%;">
-                  <%=project.poster.firstName%> <%=project.poster.lastName%>
+                <% if (currentUser) { %>
+                  <a style="color:white;" href= "../profiles/<%=project.poster._id%>" >
+                    <img src="<%= project.poster.imageUrl %>" alt="profile pic" style="width: 30px; height: 30px; object-fit: cover; border-radius: 50%;">
+                    <%=project.poster.firstName%> <%=project.poster.lastName%>
+                  </a>
 
-                  <% if (currentUser._id.toString() == project.poster._id.toString()) { %>
-                    <button style="margin-left: 10px;" id="edit-button"type="button" class="btn btn-info"><a style="color: white;" href="projects/<%=project._id%>/edit"><i class="fas fa-cog"></i> Edit</a></button>
+                <% } else { %>
+                  <span style="color:white;">
+                    <img src="<%= project.poster.imageUrl %>" alt="profile pic" style="width: 30px; height: 30px; object-fit: cover; border-radius: 50%;">
+                    <%=project.poster.firstName%> <%=project.poster.lastName%>
+                  </span>
+                <% } %>
 
-                    <form action="projects/<%=project._id%>?_method=delete" method="post" style="display: inline-block;">
-                      <button style="color: white;" class="btn btn-danger" type="button" data-toggle="modal" data-target="#modal-<%=project._id%>"><i class="far fa-trash-alt"></i> Delete</button>
-                      <div class="modal fade" id="modal-<%=project._id%>" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
-                        <div class="modal-dialog">
-                          <div class="modal-content">
-                            <div class="modal-header">
-                              <h5 class="modal-title" id="exampleModalLabel" style="color: black;">Delete Post?</h5>
-                              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                <span aria-hidden="true">&times;</span>
-                              </button>
-                            </div>
-                            <div class="modal-body" style="color: black;">
-                              This action is irreversible. You will have to manually recreate this post.
-                            </div>
-                            <div class="modal-footer">
-                              <button type="button" class="btn btn-secondary" data-dismiss="modal">No, Go Back</button>
-                              <button type="submit" class="btn btn-danger">Yes, Delete Post</button>
+                  <% if (currentUser) { %>
+                    <% if (currentUser._id.toString() == project.poster._id.toString()) { %>
+                      <button style="margin-left: 10px;" id="edit-button"type="button" class="btn btn-info"><a style="color: white;" href="projects/<%=project._id%>/edit"><i class="fas fa-cog"></i> Edit</a></button>
+
+                      <form action="projects/<%=project._id%>?_method=delete" method="post" style="display: inline-block;">
+                        <button style="color: white;" class="btn btn-danger" type="button" data-toggle="modal" data-target="#modal-<%=project._id%>"><i class="far fa-trash-alt"></i> Delete</button>
+                        <div class="modal fade" id="modal-<%=project._id%>" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+                          <div class="modal-dialog">
+                            <div class="modal-content">
+                              <div class="modal-header">
+                                <h5 class="modal-title" id="exampleModalLabel" style="color: black;">Delete Post?</h5>
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                  <span aria-hidden="true">&times;</span>
+                                </button>
+                              </div>
+                              <div class="modal-body" style="color: black;">
+                                This action is irreversible. You will have to manually recreate this post.
+                              </div>
+                              <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-dismiss="modal">No, Go Back</button>
+                                <button type="submit" class="btn btn-danger">Yes, Delete Post</button>
+                              </div>
                             </div>
                           </div>
                         </div>
-                      </div>
-                    </form>
+                      </form>
+                    <% } %>
                   <% } %>
-
-                </a>
 
               </div>
 
               <div class="block-content" style="text-align: center;">
-                  <img style="width: 25%; height: 25%; float: left; border-radius: 15px; margin-bottom: 20px; margin-right: 20px;" src="<%=project.images[0]%>"/>
+                  <% if (project.images.length > 0) { %>
+                    <img style="width: 25%; height: 25%; float: left; border-radius: 15px; margin-bottom: 20px; margin-right: 20px;" src="<%=project.images[0]%>"/>
+                  <% } %>
 
                   <span hidden>
                     <% for (let c of project.creators) {%>
                       <%=c.firstName %> <%=c.lastName %> <%=c.username%>
                     <% } %></span>
 
-                  <% if (project.creators.length == 0) { %>
-                    <p style="float: left;"><strong>Creators:</strong> <em>None</em></p>
+                  <% if (currentUser) { %>
 
-                    <%} else if (project.creators.length == 1){%>
-                      <p style="float: left;"><strong>Creator:</strong> <a style="color: black" href="profiles/<%=project.creators[0]._id%>"><img src="<%= project.creators[0].imageUrl %>" alt="profile pic" style="width: 30px; height: 30px; object-fit: cover; border-radius: 50%;"> <em><%=project.creators[0].firstName%> <%=project.creators[0].lastName%></em></a></p>
+                    <% if (project.creators.length == 0) { %>
+                      <p style="float: left;"><strong>Creators:</strong> <em>None</em></p>
 
-                  <%} else if (project.creators.length == 2){%>
-                    <p style="float: left;"><strong>Creators:</strong> <em><a style="color: black" href="profiles/<%=project.creators[0]._id%>"><img src="<%= project.creators[0].imageUrl %>" alt="profile pic" style="width: 30px; height: 30px; object-fit: cover; border-radius: 50%;"> <%=project.creators[0].firstName%> <%=project.creators[0].lastName%></a>, <a style="color: black" href="profiles/<%=project.creators[1]._id%>"><img src="<%= project.creators[1].imageUrl %>" alt="profile pic" style="width: 30px; height: 30px; object-fit: cover; border-radius: 50%;"> <%=project.creators[1].firstName%> <%=project.creators[1].lastName%></a></em></p>
+                      <%} else if (project.creators.length == 1){%>
+                        <p style="float: left;"><strong>Creator:</strong> <a style="color: black" href="profiles/<%=project.creators[0]._id%>"><img src="<%= project.creators[0].imageUrl %>" alt="profile pic" style="width: 30px; height: 30px; object-fit: cover; border-radius: 50%;"> <em><%=project.creators[0].firstName%> <%=project.creators[0].lastName%></em></a></p>
 
-                  <% } else if (project.creators.length > 2) {%>
-                    <p style="float: left;"><strong>Creators:</strong> <em><a style="color: black" href="profiles/<%=project.creators[0]._id%>"><img src="<%= project.creators[0].imageUrl %>" alt="profile pic" style="width: 30px; height: 30px; object-fit: cover; border-radius: 50%;"> <%=project.creators[0].firstName%> <%=project.creators[0].lastName%></a> and <%=project.creators.length - 1%> others</em></p>
+                    <%} else if (project.creators.length == 2){%>
+                      <p style="float: left;"><strong>Creators:</strong> <em><a style="color: black" href="profiles/<%=project.creators[0]._id%>"><img src="<%= project.creators[0].imageUrl %>" alt="profile pic" style="width: 30px; height: 30px; object-fit: cover; border-radius: 50%;"> <%=project.creators[0].firstName%> <%=project.creators[0].lastName%></a>, <a style="color: black" href="profiles/<%=project.creators[1]._id%>"><img src="<%= project.creators[1].imageUrl %>" alt="profile pic" style="width: 30px; height: 30px; object-fit: cover; border-radius: 50%;"> <%=project.creators[1].firstName%> <%=project.creators[1].lastName%></a></em></p>
 
-                  <%}%>
+                    <% } else if (project.creators.length > 2) {%>
+                      <p style="float: left;"><strong>Creators:</strong> <em><a style="color: black" href="profiles/<%=project.creators[0]._id%>"><img src="<%= project.creators[0].imageUrl %>" alt="profile pic" style="width: 30px; height: 30px; object-fit: cover; border-radius: 50%;"> <%=project.creators[0].firstName%> <%=project.creators[0].lastName%></a> and <%=project.creators.length - 1%> others</em></p>
+                    <% } %>
+
+                  <% } else { %>
+                    <% if (project.creators.length == 0) { %>
+                      <p style="float: left;"><strong>Creators:</strong> <em>None</em></p>
+
+                      <%} else if (project.creators.length == 1){%>
+                        <p style="float: left;"><strong>Creator:</strong> <span style="color: black"><img src="<%= project.creators[0].imageUrl %>" alt="profile pic" style="width: 30px; height: 30px; object-fit: cover; border-radius: 50%;"> <em><%=project.creators[0].firstName%> <%=project.creators[0].lastName%></em></span></p>
+
+                    <%} else if (project.creators.length == 2){%>
+                      <p style="float: left;"><strong>Creators:</strong> <em><span style="color: black" ><img src="<%= project.creators[0].imageUrl %>" alt="profile pic" style="width: 30px; height: 30px; object-fit: cover; border-radius: 50%;"> <%=project.creators[0].firstName%> <%=project.creators[0].lastName%></span>, <span style="color: black"><img src="<%= project.creators[1].imageUrl %>" alt="profile pic" style="width: 30px; height: 30px; object-fit: cover; border-radius: 50%;"> <%=project.creators[1].firstName%> <%=project.creators[1].lastName%></span></em></p>
+
+                    <% } else if (project.creators.length > 2) {%>
+                      <p style="float: left;"><strong>Creators:</strong> <em><span style="color: black"><img src="<%= project.creators[0].imageUrl %>" alt="profile pic" style="width: 30px; height: 30px; object-fit: cover; border-radius: 50%;"> <%=project.creators[0].firstName%> <%=project.creators[0].lastName%></span> and <%=project.creators.length - 1%> others</em></p>
+                    <% } %>
+                  <% } %>
+
                   <br /><br />
 
                 <% if (project.text.split(" ").length > 70) { %>

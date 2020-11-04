@@ -30,8 +30,10 @@
           <div class="jumbotron text-center">
             <h1><i class="fas fa-bullhorn"></i> Announcements</h1>
             <p>The latest news from staff</p>
-            <% if (currentUser.permission == "admin" || currentUser.status == "faculty") { %>
-              <a href="/announcements/new" class="btn btn-primary" style="color: white;"><i class="fas fa-bullhorn"></i> Send Announcement</a>
+            <% if (currentUser) { %>
+              <% if (currentUser.permission == "admin" || currentUser.status == "faculty") { %>
+                <a href="/announcements/new" class="btn btn-primary" style="color: white;"><i class="fas fa-bullhorn"></i> Send Announcement</a>
+              <% } %>
             <% } %>
           </div>
         </div>
@@ -49,58 +51,74 @@
               <article class="text-block" id="<%=announcement._id%>">
                 <div class="block-header grey" style="padding-bottom: 20px;">
                   <h5>
-                    <% let index = -1 %>
-                    <% for (let i = 0; i < currentUser.annCount.length; i += 1) { %>
-                      <% if (currentUser.annCount[i].announcement.toString() == announcement._id.toString()) { %>
-                        <% index = i; %>
+                    <% if (currentUser) { %>
+                      <% let index = -1 %>
+                      <% for (let i = 0; i < currentUser.annCount.length; i += 1) { %>
+                        <% if (currentUser.annCount[i].announcement.toString() == announcement._id.toString()) { %>
+                          <% index = i; %>
+                        <% } %>
                       <% } %>
+
+                      <% if (index != -1) { %>
+                        <% if (currentUser.annCount[index].version == "new") { %>
+                          <a href="/announcements/<%=announcement._id%>" style="color:white;"><%=announcement.subject%>  <span class="badge badge-pill badge-danger">New!</span></a>
+
+                        <% } else if (currentUser.annCount[index].version == "updated") { %>
+                          <a href="/announcements/<%=announcement._id%>" style="color:white;"><%=announcement.subject%>  <span class="badge badge-pill badge-info">Updated!</span></a>
+                        <% } %>
+
+                      <% } else { %>
+                        <a href="/announcements/<%=announcement._id%>" style="color:white;"><%=announcement.subject%></a>
+
+                      <% }%>
+
+                    <% } else {%>
+                      <a href="/announcements/<%=announcement._id%>" style="color:white;"><%=announcement.subject%></a>
                     <% } %>
 
-                    <% if (index != -1) { %>
-                      <% if (currentUser.annCount[index].version == "new") { %>
-                        <a href="/announcements/<%=announcement._id%>" style="color:white;"><%=announcement.subject%>  <span class="badge badge-pill badge-danger">New!</span></a>
-
-                      <% } else if (currentUser.annCount[index].version == "updated") { %>
-                        <a href="/announcements/<%=announcement._id%>" style="color:white;"><%=announcement.subject%>  <span class="badge badge-pill badge-info">Updated!</span></a>
-                      <% } %>
-
-                    <% } else { %>
-                      <a href="/announcements/<%=announcement._id%>" style="color:white;"><%=announcement.subject%></a>
-
-                    <% }%>
                     <a class= "float-right" style="color:white; font-size: 80%;"><%=announcement.date%></a>
                   </h5>
 
-                  <a style="color:white;" href= "../profiles/<%=announcement.sender._id%>" >
-                    <img src="<%= announcement.sender.imageUrl %>" alt="profile pic" style="width: 30px; height: 30px; object-fit: cover; border-radius: 50%;">
-                    <%=announcement.sender.firstName%> <%=announcement.sender.lastName%>
-                  </a>
+                  <% if (currentUser) { %>
+                    <a style="color:white;" href= "../profiles/<%=announcement.sender._id%>" >
+                      <img src="<%= announcement.sender.imageUrl %>" alt="profile pic" style="width: 30px; height: 30px; object-fit: cover; border-radius: 50%;">
+                      <%=announcement.sender.firstName%> <%=announcement.sender.lastName%>
+                    </a>
 
-                  <% if (currentUser._id.toString() == announcement.sender._id.toString()) { %>
-                    <button style="margin-left: 10px;" id="edit-button"type="button" class="btn btn-info"><a style="color: white;" href="announcements/<%=announcement._id%>/edit"><i class="fas fa-cog"></i> Edit</a></button>
+                  <% } else {%>
+                    <span style="color:white;">
+                      <img src="<%= announcement.sender.imageUrl %>" alt="profile pic" style="width: 30px; height: 30px; object-fit: cover; border-radius: 50%;">
+                      <%=announcement.sender.firstName%> <%=announcement.sender.lastName%>
+                    </span>
+                  <% } %>
 
-                    <form action="announcements/<%=announcement._id%>?_method=delete" method="post" style="display: inline-block;">
-                      <button style="color: white;" class="btn btn-danger" type="button" data-toggle="modal" data-target="#modal-<%=announcement._id%>"><i class="far fa-trash-alt"></i> Delete</button>
-                      <div class="modal fade" id="modal-<%=announcement._id%>" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
-                        <div class="modal-dialog">
-                          <div class="modal-content">
-                            <div class="modal-header">
-                              <h5 class="modal-title" id="exampleModalLabel" style="color: black;">Delete Announcement?</h5>
-                              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                <span aria-hidden="true">&times;</span>
-                              </button>
-                            </div>
-                            <div class="modal-body" style="color: black;">
-                              This action is irreversible. You will have to manually recreate this announcement.
-                            </div>
-                            <div class="modal-footer">
-                              <button type="button" class="btn btn-secondary" data-dismiss="modal">No, Go Back</button>
-                              <button type="submit" class="btn btn-danger">Yes, Delete Announcement</button>
+                  <% if (currentUser) { %>
+                    <% if (currentUser._id.toString() == announcement.sender._id.toString()) { %>
+                      <button style="margin-left: 10px;" id="edit-button"type="button" class="btn btn-info"><a style="color: white;" href="announcements/<%=announcement._id%>/edit"><i class="fas fa-cog"></i> Edit</a></button>
+
+                      <form action="announcements/<%=announcement._id%>?_method=delete" method="post" style="display: inline-block;">
+                        <button style="color: white;" class="btn btn-danger" type="button" data-toggle="modal" data-target="#modal-<%=announcement._id%>"><i class="far fa-trash-alt"></i> Delete</button>
+                        <div class="modal fade" id="modal-<%=announcement._id%>" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+                          <div class="modal-dialog">
+                            <div class="modal-content">
+                              <div class="modal-header">
+                                <h5 class="modal-title" id="exampleModalLabel" style="color: black;">Delete Announcement?</h5>
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                  <span aria-hidden="true">&times;</span>
+                                </button>
+                              </div>
+                              <div class="modal-body" style="color: black;">
+                                This action is irreversible. You will have to manually recreate this announcement.
+                              </div>
+                              <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-dismiss="modal">No, Go Back</button>
+                                <button type="submit" class="btn btn-danger">Yes, Delete Announcement</button>
+                              </div>
                             </div>
                           </div>
                         </div>
-                      </div>
-                    </form>
+                      </form>
+                    <% } %>
                   <% } %>
 
 
