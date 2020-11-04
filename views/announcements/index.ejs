@@ -19,6 +19,10 @@
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js" integrity="sha384-OgVRvuATP1z7JjHLkuOU7Xw704+h835Lr+6QL9UvYjZE3Ipu6Tp75j7Bh/kR0JKI" crossorigin="anonymous"></script>
 
     <script src="https://kit.fontawesome.com/dccc745c41.js" crossorigin="anonymous"></script>
+    <script src="/javascript/nav/userForm.js"></script>
+    <script src="/javascript/nav/navbar.js"></script>
+    <script src="/javascript/home/index.js"></script>
+
     <%- include('../partials/navbar') %>
     <%- include('../partials/header') %>
 
@@ -34,6 +38,7 @@
               <% if (currentUser.permission == "admin" || currentUser.status == "faculty") { %>
                 <a href="/announcements/new" class="btn btn-primary" style="color: white;"><i class="fas fa-bullhorn"></i> Send Announcement</a>
               <% } %>
+              <a href="/announcements/mark-all" class="btn btn-success" style="color: white;"><i class="fas fa-check-square"></i> Mark All As Read</a>
             <% } %>
           </div>
         </div>
@@ -62,9 +67,11 @@
                       <% if (index != -1) { %>
                         <% if (currentUser.annCount[index].version == "new") { %>
                           <a href="/announcements/<%=announcement._id%>" style="color:white;"><%=announcement.subject%>  <span class="badge badge-pill badge-danger">New!</span></a>
+                          <a href="/announcements/mark/<%=announcement._id%>" style="color: white;"><span class="badge badge-pill badge-success">Mark As Read</span></a>
 
                         <% } else if (currentUser.annCount[index].version == "updated") { %>
                           <a href="/announcements/<%=announcement._id%>" style="color:white;"><%=announcement.subject%>  <span class="badge badge-pill badge-info">Updated!</span></a>
+                          <a href="/announcements/mark/<%=announcement._id%>" style="color: white;"><span class="badge badge-pill badge-success">Mark As Read</span></a>
                         <% } %>
 
                       <% } else { %>

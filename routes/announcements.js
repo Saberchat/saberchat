@@ -24,7 +24,7 @@ router.get('/', (req, res) => { //RESTful Routing 'INDEX' route
   Announcement.find({}).populate('sender').exec((err, foundAnns) => { //Collects data about all announcements
     if (err || !foundAnns) {
       console.log(err);
-      req.flash('error', "Unable to access database");
+      req.flash('error', "Unable To Access Database");
       res.redirect('back');
 
     } else {
@@ -38,12 +38,39 @@ router.get('/new', middleware.isLoggedIn, middleware.isMod, (req, res) => { //RE
   res.render('announcements/new');
 });
 
+router.get('/mark-all', middleware.isLoggedIn, (req, res) => {
+  req.user.annCount = [];
+  req.user.save();
+  req.flash('success', 'All Announcements Marked As Read!');
+  res.redirect(`/announcements`);
+});
+
+router.get('/mark/:id', middleware.isLoggedIn, (req, res) => {
+  let index = -1;
+
+  for (let i = 0; i < req.user.annCount.length; i ++) {
+    if (req.user.annCount[i].announcement.toString() == req.params.id.toString()) {
+      index = i;
+    }
+  }
+
+  console.log(index);
+  if (index > -1) {
+    req.user.annCount.splice(index, 1);
+    req.user.save()
+  }
+
+  req.flash('success', 'Announcement Marked As Read!');
+  res.redirect(`/announcements`);
+})
+
+
 router.get('/:id', (req, res) => { //RESTful Routing 'SHOW' route
   Announcement.findById(req.params.id) //Find only the announcement specified from form
   .populate('sender')
   .exec((err, foundAnn) => { //Get info about the announcement's sender, and then release it to user
     if (err || !foundAnn) {
-      req.flash('error', 'Unable to access database');
+      req.flash('error', 'Unable To Access Database');
       res.redirect('back');
 
     } else {
@@ -73,7 +100,7 @@ router.get('/:id', (req, res) => { //RESTful Routing 'SHOW' route
 router.get('/:id/edit', middleware.isLoggedIn, middleware.isMod, (req, res) => { //RESTful Routing 'EDIT' route
   Announcement.findById(req.params.id, (err, foundAnn) => { //Find only the announcement specified from form
     if (err || !foundAnn) {
-      req.flash('error', "Unable to access database");
+      req.flash('error', "Unable To Access Database");
       res.redirect('back');
     } else if(!foundAnn.sender._id.equals(req.user._id)) { //If you did not send the announcement, you cannot edit it (the 'edit' button does not show up if you did not create the announcement, but this is a double-check)
       req.flash('error', 'You do not have permission to do that');
@@ -81,8 +108,8 @@ router.get('/:id/edit', middleware.isLoggedIn, middleware.isMod, (req, res) => {
     } else {
       res.render('announcements/edit', {announcement: foundAnn}); //If no problems, allow the user to edit announcement
     }
-  })
-})
+  });
+});
 
 router.post('/', middleware.isLoggedIn, middleware.isMod, (req, res) => { //RESTful Routing 'CREATE' route
   (async() => {
@@ -112,7 +139,7 @@ router.post('/', middleware.isLoggedIn, middleware.isMod, (req, res) => { //REST
     }
 
     if (!users) {
-      req.flash('error', "Unable to access database");
+      req.flash('error', "Unable To Access Database");
       res.rediect('back');
     }
 
@@ -147,7 +174,7 @@ router.post('/', middleware.isLoggedIn, middleware.isMod, (req, res) => { //REST
 
   })().catch(err => {
     console.log(err);
-    req.flash('error', "Unable to access database");
+    req.flash('error', "Unable To Access Database2");
     return res.redirect('back');
   });
 });
@@ -193,7 +220,7 @@ router.put('/:id', middleware.isLoggedIn, middleware.isMod, (req, res) => { //RE
       }
 
       if (!users) {
-        req.flash('error', "Unable to access database");
+        req.flash('error', "Unable To Access Database");
         res.rediect('back');
       }
 
@@ -241,7 +268,7 @@ router.put('/:id', middleware.isLoggedIn, middleware.isMod, (req, res) => { //RE
 
   })().catch(err => {
     console.log(err)
-    req.flash('error', "Unable to access database")
+    req.flash('error', "Unable To Access Database")
     res.redirect('back')
   });
 });
@@ -296,7 +323,7 @@ router.delete('/:id', middleware.isLoggedIn, middleware.isMod, (req, res) => { /
     }
   })().catch(err => {
     console.log(err)
-    req.flash('error', "Unable to access database")
+    req.flash('error', "Unable To Access Database")
     res.redirect('back')
   });
 });
