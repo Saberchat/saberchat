@@ -29,8 +29,6 @@
         <div class="col-12">
           <div class="jumbotron text-center">
             <h1><i class="fas fa-coffee"></i> Manage EC Cafe</h1><br />
-            <!-- Block out until Sidd figures out routing -->
-            <!-- <a href="deleteItems" class="btn btn-danger disabled"><i class="fas fa-minus-circle"></i> Delete All Items</a> -->
             <% if (open == true) { %>
               <a href="/cafe/close" class="btn btn-danger"><i class="fas fa-lock-open"></i> Close Cafe</a>
 
@@ -41,25 +39,13 @@
             <a href="/cafe/orders" class="btn btn-primary"><i class="fas fa-coffee"></i> Orders</a>
             <a href="/cafe/item/new" class="btn btn-warning"><i class="fas fa-plus-circle"></i> Add New Item</a>
             <a href="/cafe/type/new" class="btn btn-info"><i class="fas fa-plus-circle"></i> Add New Category</a>
+            <a href="/cafe/data" class="btn btn-secondary"><i class="fas fa-chart-bar"></i> Cafe Data Analytics</a>
           </div>
         </div>
       </div>
 
       <div class="row">
         <div class="col-md-8 offset-md-2 col-12">
-          <!-- <li class="list-group-item list-group-item-info">
-            <div class="d-flex w-100 justify-content-between">
-              <h2 class="mb-1">Cafe Items</h2>
-              <span>
-                <a href="deleteItems" class="btn btn-danger disabled"><i class="fas fa-minus-circle"></i> Delete All Items</a>
-                <a href="/cafe/orders" class="btn btn-primary"><i class="fas fa-coffee"></i> Student Orders</a>
-                <a href="newOrderItem" class="btn btn-warning"><i class="fas fa-plus-circle"></i> Add New Item</a>
-                <a href="/cafe/type/new" class="btn btn-success"><i class="fas fa-plus-circle"></i> Add New Item Type</a>
-              </span>
-            </div>
-            <p class="mb-1">View cafe products</p>
-          </li> -->
-
           <div class="search-filter mb-3">
             <i class="fas fa-search"></i>
             <input id="search-input" onkeyup="searchFunction()" class="form-control" type="text" placeholder="Search..." title="Type in itemname" />
@@ -103,9 +89,6 @@
           <% }) %>
 
           <br />
-
-
-          <!-- <a style="display: block; margin-top: 1rem;" href="/cafe/orders">Student Orders</a> -->
         </div>
       </div>
     </div>
@@ -114,18 +97,18 @@
   <script>
 
   function searchFunction() {
-    const catHeaders = document.getElementsByClassName('category-header') //Category header
-    const catBreaks = document.getElementsByClassName('category-break') //Category page break
-    const menuItems = document.getElementsByClassName('menu-item')
+    const catHeaders = document.getElementsByClassName('category-header'); //Category header
+    const catBreaks = document.getElementsByClassName('category-break'); //Category page break
+    const menuItems = document.getElementsByClassName('menu-item');
     const input = document.getElementById("search-input");
     let filter = input.value.toLowerCase();
 
     for (let item of menuItems) {
       if(!item.textContent.toLowerCase().includes(filter)) {
-        $(`#${item.id}`).hide()
+        $(`#${item.id}`).hide();
 
       } else {
-        $(`#${item.id}`).show()
+        $(`#${item.id}`).show();
       }
     }
 
@@ -137,17 +120,17 @@
       for (let item of document.getElementsByClassName(catHeaders[h].textContent.split(' ').join(''))) {
         if(item.textContent.toLowerCase().includes(filter)) {
           catIncluded = true;
-          break
+          break;
         }
       }
 
       if (catIncluded) {
-        $(`#${catHeaders[h].id}`).show()
-        $(`#${catBreaks[h].id}`).show()
+        $(`#${catHeaders[h].id}`).show();
+        $(`#${catBreaks[h].id}`).show();
 
       } else {
-        $(`#${catHeaders[h].id}`).hide()
-        $(`#${catBreaks[h].id}`).hide()
+        $(`#${catHeaders[h].id}`).hide();
+        $(`#${catBreaks[h].id}`).hide();
       }
     }
   }

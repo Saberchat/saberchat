@@ -54,6 +54,128 @@ router.get('/menu', middleware.isLoggedIn, (req, res) => { //Renders the cafe me
   })
 })
 
+router.get('/data', middleware.isLoggedIn, middleware.isAdmin, (req, res) => {
+  (async() => {
+
+    //Evaluate our most common customers
+
+    const customers = await User.find({});
+    if (!customers) {
+      req.flash('error', "Unable to find customers");
+      return res.redirect('back');
+    }
+
+    let popularCustomers = [];
+    let customerObject;
+    let customerOrders;
+
+    for (let customer of customers) {
+      customerOrders = await Order.find({'customer': customer._id});
+      if (!customerOrders) {
+        req.flash('error', "Unable to find orders");
+        return res.redirect('back');
+      }
+
+      customerObject = {
+        customer: customer,
+        orderCount: customerOrders.length
+      };
+
+      if (customerObject.orderCount > 0) {
+        popularCustomers.push(customerObject);
+      }
+    }
+
+    //Sort customers
+    let tempCustomer;
+    for (let h = 0; h < popularCustomers.length; h++) {
+      for (let i = 0; i < popularCustomers.length - 1; i ++) {
+        if (popularCustomers[i].orderCount < popularCustomers[i+1].orderCount) {
+          tempCustomer = popularCustomers[i];
+          popularCustomers[i] = popularCustomers[i+1];
+          popularCustomers[i+1] = tempCustomer;
+        }
+      }
+    }
+
+    //Evaluate the most purchased items
+
+    const items = await Item.find({});
+    if (!items) {
+      req.flash('error', "Unable to find items");
+      return res.redirect('back');
+    }
+
+    let popularItems = [];
+    let itemObject;
+    let itemTotal;
+
+    let orderedQuantities = []; //Typically how much of an item is ordered in one go
+    let itemQuantityArray = [0, 0, 0];
+
+    let itemOrders = await Order.find({});
+    if (!itemOrders) {
+      req.flash('error', "Unable to find orders");
+      return res.redirect('back');
+    }
+
+    for (let item of items) {
+      itemTotal = 0;
+      itemQuantityArray = [0, 0, 0];
+
+      for (let order of itemOrders) {
+        for (let it of order.items) {
+          if (it.item.toString() == item._id.toString()) {
+            itemTotal += it.quantity;
+            itemQuantityArray[it.quantity-1] += 1;
+          }
+        }
+      }
+
+      itemObject = {
+        item: item,
+        orderCount: itemTotal
+      };
+
+      if (itemObject.orderCount > 0) {
+        popularItems.push(itemObject);
+      }
+
+      orderedQuantities.push({item: item, quantities: itemQuantityArray})
+    }
+
+    //Sort items
+    let tempItem;
+    for (let h = 0; h < popularItems.length; h++) {
+      for (let i = 0; i < popularItems.length - 1; i ++) {
+        if (popularItems[i].orderCount < popularItems[i+1].orderCount) {
+          tempItem = popularItems[i];
+          popularItems[i] = popularItems[i+1];
+          popularItems[i+1] = tempItem;
+        }
+      }
+    }
+
+    //Output stuff
+
+    console.log(orderedQuantities);
+    console.log(orderedQuantities[0].quantities);
+
+    res.render('cafe/data', {popularItems, popularCustomers, orderedQuantities});
+
+    //DATA VISUALIZATIONS TO CREATE:
+    //Most common timeframe for orders
+    //Common item combinations
+    //Common orders for various people
+
+
+  })().catch(err => {
+    console.log(err);
+    req.flash('error', "Unable to access database");
+    res.redirect('back');
+  })
+})
+
 router.get('/order/new', middleware.isLoggedIn, middleware.cafeOpen, (req, res) => { //RESTFUL routing 'order/new' route
 
   (async() => {

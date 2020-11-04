@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html>
+  <head>
+      <title>Saberchat</title>
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1">
+
+      <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css">
+      <link rel="stylesheet" href="/stylesheets/main.css">
+      <!-- link css for navbar. Don't need to include public/javascript/userForm.js since user is already logged in and does not need to access login and register forms.  -->
+      <link rel="stylesheet" href="/stylesheets/components/header.css">
+      <link rel="stylesheet" href="/stylesheets/components/navbar.css">
+      <link rel="stylesheet" href="/stylesheets/chat/new.css">
+
+      <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+      <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js"></script>
+
+      <!-- I'm using my fontawesome kit -->
+      <script src="https://kit.fontawesome.com/dccc745c41.js" crossorigin="anonymous"></script>
+  </head>
+  <body>
+    <!-- include the navbar via ejs -->
+    <%- include('../partials/navbar') %>
+    <%- include('../partials/header') %>
+
+    <div class="container mt-5">
+      <div class="row">
+        <div class="col-12" style="text-align: center;">
+          <h1 style="text-align: center; width: 100%">Cafe Data Analytics</h1>
+          <a class="btn btn-primary" href="/cafe/manage"><i class="fas fa-arrow-left"></i> Back</a><br /><br />
+        </div>
+      </div>
+
+        <h3>Most Frequent Customers</h3>
+
+        <ol>
+
+        <% for (let customer of popularCustomers) { %>
+          <li>
+            <%=customer.customer.firstName%> <%=customer.customer.lastName%> (<%=customer.orderCount%> orders)
+          </li>
+        <% } %>
+
+        </ol>
+
+        <h3>Most Popular Items</h3>
+
+        <ol>
+
+        <% for (let item of popularItems) { %>
+          <li>
+            <%=item.item.name%> (<%=item.orderCount%> orders)
+          </li>
+        <% } %>
+
+        </ol>
+
+        <h3>Average Amount Ordered Per Item</h3>
+
+        <ol>
+        <% let numOrders;%>
+        <% let sumOrders;%>
+
+        <% for (let obj of orderedQuantities) { %>
+          <li>
+            <%numOrders = 0;%>
+            <%sumOrders = 0;%>
+
+            <% for (let i = 0; i < obj.quantities.length; i ++) { %>
+              <% numOrders += obj.quantities[i]; %>
+              <% sumOrders += ((i+1) * obj.quantities[i]); %>
+            <% } %>
+
+            <%=obj.item.name%>: <%=sumOrders/numOrders%>
+          </li>
+        <% } %>
+
+      </ol>
+    </div>
+  </body>
+
+</html>
