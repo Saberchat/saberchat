@@ -12,6 +12,7 @@ const middleware = require('../middleware');
 //import user schema for db actions
 const User = require('../models/user');
 const Email = require('../models/email');
+const Announcement = require('../models/announcement');
 
 let transporter = nodemailer.createTransport({
   service: 'gmail',
@@ -102,6 +103,18 @@ router.post("/register",  function(req, res) {
 						reqCount: 0
 					}
 				);
+
+        Announcement.find({}, (err, anns) => {
+          if (err || !anns) {
+            req.flash('error', "Unable to find announcements");
+            res.redirect('back');
+
+          } else {
+            for (let ann of anns) {
+              newUser.annCount.push({announcement: ann,version : "new"});
+            }
+          }
+        });
 
 				//registers the user
 				User.register(newUser, req.body.password, function(err, user) {
@@ -312,12 +325,6 @@ router.get('/alsion', (req, res) => {
 		}
 	});
 });
-
-// NOTE: Remove this line when enabling cafe
-// router.get('/cafe', middleware.isLoggedIn, (req, res) => {
-//   req.flash('error', "The cafe is currently closed");
-//   res.redirect('back');
-// });
 
 //export router with all the routes connected
 module.exports = router;
