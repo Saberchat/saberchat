@@ -50,7 +50,7 @@
 
         <% for (let customer of lucrativeCustomers) { %>
           <li>
-            <%=customer.customer.firstName%> <%=customer.customer.lastName%>: $<%=customer.spent%> spent (Avg. $<%=customer.avgCharge%> per order)
+            <%=customer.customer.firstName%> <%=customer.customer.lastName%>: $<%=customer.spent%> spent (Avg. $<%=Math.round(customer.avgCharge * 100) / 100%> per order)
           </li>
         <% } %>
 
@@ -62,7 +62,7 @@
 
         <% for (let customer of longestOrderCustomers) { %>
           <li>
-            <%=customer.customer.firstName%> <%=customer.customer.lastName%> (Avg. <%=customer.orderLength%> items per order)
+            <%=customer.customer.firstName%> <%=customer.customer.lastName%> (Avg. <%=Math.round(customer.orderLength * 100) / 100%> items per order)
           </li>
         <% } %>
 
@@ -88,7 +88,7 @@
 
         <% for (let obj of orderedQuantities) { %>
           <li>
-            <%=obj.item.name%>: <%=obj.avgQuantity%>
+            <%=obj.item.name%>: <%=Math.round(obj.avgQuantity * 100) / 100%>
           </li>
         <% } %>
 
@@ -127,6 +127,18 @@
       <% averageHours /= times.length %>
       <% averageMinutes /= times.length %>
 
+      <%let stdDevTime = 0;%>
+      <% let timeInMinutes;%>
+      <% let avgTimeInMinutes = (averageHours*60) + (averageMinutes); %>
+
+      <% for (let time of times) { %>
+        <% timeInMinutes = (parseInt(time.split(':')[0])*60) + (parseInt(time.split(':')[1])); %>
+        <% stdDevTime += Math.pow((timeInMinutes - avgTimeInMinutes), 2); %>
+      <% } %>
+
+      <% stdDevTime /= times.length %>
+      <% stdDevTime = Math.sqrt(stdDevTime) %>
+
       <% let medianTime; %>
 
       <% if (times.length%2 == 1) { %>
@@ -143,6 +155,10 @@
 
       <p>
         Median Ordering Time - <%=medianTime%>
+      </p>
+
+      <p>
+        Most orders will take place between <%=Math.floor((Math.round(avgTimeInMinutes - stdDevTime))/60)%>:<%=Math.floor((Math.round(avgTimeInMinutes - stdDevTime))%60)%> and <%=Math.floor((Math.round(avgTimeInMinutes + stdDevTime))/60)%>:<%=Math.floor((Math.round(avgTimeInMinutes + stdDevTime))%60)%>
       </p>
 
     </div>
