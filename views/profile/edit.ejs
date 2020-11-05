@@ -69,8 +69,8 @@
                         <label for="status">Select Status</label>
                         <select class="form-control" id="status" name="status">
                           <option selected value=""><%=currentUser.status%></option>
-                          <% if (currentUser.permission == 'admin') { %>
-                            <% ['7th', '8th', '9th', '10th', '11th', '12th', 'guest', 'parent', 'faculty'].forEach( status => { %>
+                          <% if (currentUser.permission == 'admin' || currentUser.permission == 'principal') { %>
+                            <% ['7th', '8th', '9th', '10th', '11th', '12th', 'alumnus', 'guest', 'parent', 'faculty'].forEach( status => { %>
                               <% if (currentUser.status.toLowerCase() != status.toLowerCase()) { %>
                                 <option value="<%=status%>"><%=status%></option>
                               <% }%>

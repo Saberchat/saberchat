@@ -1,5 +1,5 @@
 //set up env vars. commented out for deployment
-//require('dotenv').config();
+// require('dotenv').config();
 // Require NodeJS modules
 //set up and start the express server
 const express = require('express');
@@ -304,7 +304,8 @@ io.on('connect', (socket) => {
           orderItemsObjects.push(
             {
               item: itemList[i],
-              quantity: parseInt(itemCount[i])
+              quantity: parseInt(itemCount[i]),
+              price: 0
             }
           );
         }
@@ -318,7 +319,7 @@ io.on('connect', (socket) => {
           orderInstructions = instructions;
         }
 
-        let order = await Order.create({customer: customerId, name: `${user.firstName} ${user.lastName}`, present: true, charge: 0, instructions: orderInstructions, items: orderItemsObjects}); //Assuming no setbacks, create the order
+        let order = await Order.create({customer: customerId, name: `${user.firstName} ${user.lastName}`, present: true, charge: 0, instructions: orderInstructions}); //Assuming no setbacks, create the order
 
         if (!order) {
           return console.log('error creating order');
@@ -338,10 +339,11 @@ io.on('connect', (socket) => {
           }
 
           charge += (itemProfile.price * orderItemsObjects[i].quantity);
+          orderItemObjects[i].price = itemProfile.price;
         }
-        console.log(charge);
 
         order.charge = charge; //Set order cost based on the items ordered
+        order.items = orderItemsObjects;
 
         await order.save();
 

@@ -34,7 +34,7 @@
                     <input id="search-input" onkeyup="searchFunction()" class="form-control" type="text" placeholder="Search..." title="Type in Username">
                 </div>
                 <div class="list-group" id="user-list">
-                  <% let statuses = [ ["faculty", "Faculty", []], ["12th", "Seniors", []], ["11th", "Juniors", []], ["10th", "Sophomores", []], ["9th", "Freshmen", []], ["8th", "8th Graders", []], ["7th", "7th Graders", []], ["parent", "Parents", []], ["guest", "Guests", []] ] %>
+                  <% let statuses = [ ["faculty", "Faculty", []], ["12th", "Seniors", []], ["11th", "Juniors", []], ["10th", "Sophomores", []], ["9th", "Freshmen", []], ["8th", "8th Graders", []], ["7th", "7th Graders", []], ["alumnus", "Alumni", []], ["parent", "Parents", []], ["guest", "Guests", []] ] %>
 
                   <% for (let status of statuses) { %>
                     <% for (let user of users) { %>
@@ -94,7 +94,7 @@
         function searchFunction() {
           let statusHeaders = document.getElementsByClassName('status-header')
           let statusBreaks =  document.getElementsByClassName('status-page-break')
-          let statuses = [ ["faculty", "Faculty", []], ["12th", "Seniors", []], ["11th", "Juniors", []], ["10th", "Sophomores", []], ["9th", "Freshmen", []], ["8th", "8th Graders", []], ["7th", "7th Graders", []], ["parent", "Parents", []], ["guest", "Guests", []] ]
+          let statuses = [ ["faculty", "Faculty", []], ["12th", "Seniors", []], ["11th", "Juniors", []], ["10th", "Sophomores", []], ["9th", "Freshmen", []], ["8th", "8th Graders", []], ["7th", "7th Graders", []], ["alumnus", "Alumni", []], ["parent", "Parents", []], ["guest", "Guests", []] ]
 
           let input = document.getElementById("search-input");
           let filter = input.value.toUpperCase();

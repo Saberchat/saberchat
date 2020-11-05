@@ -51,7 +51,7 @@ router.get('/moderate', middleware.isLoggedIn, middleware.isMod, (req, res) => {
 
 // displays permissions page
 router.get('/permissions', middleware.isLoggedIn, middleware.isAdmin, (req, res) => {
-	User.find({permission: { $ne: 'principal'}}, (err, foundUsers) => {
+	User.find({}, (err, foundUsers) => {
 		if(err || !foundUsers) {
 			req.flash('error', 'Cannot access Database');
 			res.redirect('/admin');
@@ -64,7 +64,7 @@ router.get('/permissions', middleware.isLoggedIn, middleware.isAdmin, (req, res)
 
 // displays status page
 router.get('/status', middleware.isLoggedIn, middleware.isMod, (req, res) => {
-	User.find({permission: { $ne: 'principal'}}, (err, foundUsers) => {
+	User.find({}, (err, foundUsers) => {
 		if(err || !foundUsers) {
 			req.flash('error', 'Cannot access Database');
 			res.redirect('/admin');

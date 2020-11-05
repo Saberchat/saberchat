@@ -17,7 +17,7 @@
                 <ul class="navbar-nav">
                   <% if (currentUser) { %>
                     <li class="nav-item">
-                        <a class="nav-link" href="/projects"><i class="fas fa-paint-brush"></i> Student Projects</a>
+                        <a class="nav-link" href="/projects"><i class="fas fa-paint-brush"></i> Projects</a>
                     </li>
                     <li class="nav-item"></li>
                       <a class="nav-link" href="/cafe"><i class="fas fa-coffee"></i> EC Cafe</a>
@@ -44,7 +44,7 @@
 
                   <% } else { %>
                     <li class="nav-item">
-                        <a class="nav-link" href="/projects"><i class="fas fa-paint-brush"></i> Student Projects</a>
+                        <a class="nav-link" href="/projects"><i class="fas fa-paint-brush"></i> Projects</a>
                     </li>
 
                     <li class="nav-item">
@@ -66,7 +66,7 @@
 
                         <% if (currentUser.permission == 'mod') { %>
                           <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle" href="" id="navbarDropdownMenuLink" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="fas fa-align-justify"></i> Moderator Controls</a>
+                            <a class="nav-link dropdown-toggle" href="" id="navbarDropdownMenuLink" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="fas fa-align-justify"></i> Moderator</a>
                             <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
                               <a href="/admin/status" class="dropdown-item"><i class="fas fa-user"></i> Change Statuses</a>
                               <a href="/admin/moderate" class="dropdown-item"><i class="fas fa-flag"></i> Moderate Comments</a>
@@ -74,7 +74,7 @@
 
                         <% } else if (currentUser.permission == 'admin') { %>
                           <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle" href="" id="navbarDropdownMenuLink" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="fas fa-align-justify"></i> Admin Controls</a>
+                            <a class="nav-link dropdown-toggle" href="" id="navbarDropdownMenuLink" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="fas fa-align-justify"></i> Administrator</a>
                             <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
                               <a href="/admin/permissions" class="dropdown-item"><i class="fas fa-user"></i> Change Permissions</a>
                               <a href="/admin/status" class="dropdown-item"><i class="fas fa-user"></i> Change Statuses</a>
@@ -84,7 +84,7 @@
 
                         <% } else if (currentUser.permission == 'principal') {%>
                           <li class="nav-item dropdown">
-                          <a class="nav-link dropdown-toggle" href="" id="navbarDropdownMenuLink" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="fas fa-align-justify"></i> Principal Controls</a>
+                          <a class="nav-link dropdown-toggle" href="" id="navbarDropdownMenuLink" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="fas fa-align-justify"></i> Principal</a>
                           <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
                             <a href="/admin/permissions" class="dropdown-item"><i class="fas fa-user"></i> Change Permissions</a>
                             <a href="/admin/status" class="dropdown-item"><i class="fas fa-user"></i> Change Statuses</a>
