@@ -65,28 +65,49 @@ router.get('/data', middleware.isLoggedIn, middleware.isAdmin, (req, res) => {
       return res.redirect('back');
     }
 
-    let popularCustomers = [];
-    let customerObject;
+    let popularCustomers = []; //Most orders
+    let longestOrderCustomers = []; //Longest orders by item
+    let lucrativeCustomers = []; //Most money spent at the cafe
+
+    let customerOrdersObject;
+
     let customerOrders;
+    let orderTotal;
 
     for (let customer of customers) {
+      orderTotal = 0;
+
       customerOrders = await Order.find({'customer': customer._id});
+
       if (!customerOrders) {
         req.flash('error', "Unable to find orders");
         return res.redirect('back');
       }
 
-      customerObject = {
+      customerOrdersObject = {
         customer: customer,
-        orderCount: customerOrders.length
+        orderLength: 0
       };
 
-      if (customerObject.orderCount > 0) {
-        popularCustomers.push(customerObject);
+      for (let order of customerOrders) {
+        orderTotal += order.charge;
+
+        for (let item of order.items) {
+          customerOrdersObject.orderLength += item.quantity;
+        }
       }
+
+      customerOrdersObject.orderLength/= customerOrders.length;
+
+      if (customerOrders.length > 0) {
+        popularCustomers.push({customer: customer, orderCount: customerOrders.length});
+        lucrativeCustomers.push({customer: customer, spent: orderTotal, avgCharge: (orderTotal/customerOrders.length)});
+        longestOrderCustomers.push(customerOrdersObject);
+      }
+
     }
 
-    //Sort customers
+    //Sort customers in all three arrays - popularity by number of orders, longest orders, and most charge
     let tempCustomer;
     for (let h = 0; h < popularCustomers.length; h++) {
       for (let i = 0; i < popularCustomers.length - 1; i ++) {
@@ -95,6 +116,19 @@ router.get('/data', middleware.isLoggedIn, middleware.isAdmin, (req, res) => {
           popularCustomers[i] = popularCustomers[i+1];
           popularCustomers[i+1] = tempCustomer;
         }
+
+        if (longestOrderCustomers[i].orderLength < longestOrderCustomers[i+1].orderLength) {
+          tempCustomer = longestOrderCustomers[i];
+          longestOrderCustomers[i] = longestOrderCustomers[i+1];
+          longestOrderCustomers[i+1] = tempCustomer;
+        }
+
+        if (lucrativeCustomers[i].spent < lucrativeCustomers[i+1].spent) {
+          tempCustomer = lucrativeCustomers[i];
+          lucrativeCustomers[i] = lucrativeCustomers[i+1];
+          lucrativeCustomers[i+1] = tempCustomer;
+        }
+
       }
     }
 
@@ -141,7 +175,24 @@ router.get('/data', middleware.isLoggedIn, middleware.isAdmin, (req, res) => {
         popularItems.push(itemObject);
       }
 
-      orderedQuantities.push({item: item, quantities: itemQuantityArray})
+      let orderedQuantityObject = {
+        item: item,
+        numOrders: 0,
+        sumOrders: 0,
+        avgQuantity: 0
+      };
+
+      for (let i = 0; i < itemQuantityArray.length; i ++) {
+        orderedQuantityObject.numOrders += itemQuantityArray[i];
+        orderedQuantityObject.sumOrders += ((i+1) * itemQuantityArray[i]);
+      }
+
+      orderedQuantityObject.avgQuantity  = orderedQuantityObject.sumOrders/orderedQuantityObject.numOrders;
+
+      if (!isNaN(orderedQuantityObject.avgQuantity)) {
+        orderedQuantities.push(orderedQuantityObject);
+      }
+
     }
 
     //Sort items
@@ -156,18 +207,127 @@ router.get('/data', middleware.isLoggedIn, middleware.isAdmin, (req, res) => {
       }
     }
 
-    //Output stuff
+    //Calculate most common item combinations
 
-    console.log(orderedQuantities);
-    console.log(orderedQuantities[0].quantities);
+    const orders = await Order.find({});
+    if (!orders) {
+      req.flash('error', "Unable to find orders");
+      return res.redirect('back');
+    }
 
-    res.render('cafe/data', {popularItems, popularCustomers, orderedQuantities});
+    let combinations = []; //Matrix of common order combinations
+    let combo = [];
+    let overlap;
+
+    //Initialize combinations matrix with first order
+
+    for (let item of orders[0].items) {
+      combo.push(item.item.toString());
+    }
+
+    combo.sort(); //Sort the combination so it can be easily compared with all other combinations
+
+    combinations.push({combination: combo, instances: 1});
+
+    for (let order of orders.slice(1)) {
+      combo = []
+      overlap = false;
+
+      for (let item of order.items) {
+        combo.push(item.item.toString());
+      }
+
+      combo.sort();
+
+      for (let c of combinations) {
+        if (combo.toString() == c.combination.toString()) { //Compare the sorted arrays by making them strings
+          c.instances ++;
+          overlap = true;
+          break;
+        }
+      }
+
+      if (!overlap) {
+        combinations.push({combination: combo, instances: 1});
+      }
+    }
+
+    //Sort combinations
+    let tempCombo;
+    for (let h = 0; h < combinations.length; h++) {
+      for (let i = 0; i < combinations.length - 1; i ++) {
+        if (combinations[i].instances < combinations[i+1].instances) {
+          tempCombo = combinations[i];
+          combinations[i] = combinations[i+1];
+          combinations[i+1] = tempCombo;
+        }
+      }
+    }
+
+    let populatedCombinations = [];
+    let populatedCombination;
+    let populatedItem;
+
+    for (let combo of combinations) {
+      populatedCombination = [];
+
+      for (let item of combo.combination) {
+        populatedItem = await Item.findById(item);
+        if (!populatedItem) {
+          req.flash('error', "Umable to find item");
+          return res.redirect('back');
+        }
+        populatedCombination.push(populatedItem);
+      }
+      populatedCombinations.push({combination: populatedCombination, instances: combo.instances});
+    }
+
+    //Calculate most common timeframes
+    let times = [];
+    let time;
+
+    for (let order of orders) { //Orders already declared from earlier
+      time = order.date.split(', ')[1];
+
+      if (time.split(' ')[1] == "AM") {
+
+        if (time.split(':')[0] == '12') {
+          time = `00:${time.split(':')[1].split(' ')[0]}`;
+
+        } else {
+          time = `${time.split(' ')[0]}`;
+        }
+
+      } else {
+        if (time.split(':')[0] == '12') {
+          time = `12:${time.split(':')[1].split(' ')[0]}`;
+
+        } else {
+          time = `${(parseInt(time.split(':')[0])+12).toString()}:${time.split(':')[1].split(' ')[0]}`;
+        }
+      }
+
+      times.push(time);
+    }
+
+    //Sort times
+
+    let tempTime;
+    for (let h = 0; h < times.length; h++) {
+      for (let i = 0; i < times.length - 1; i ++) {
+        if (parseInt(`${times[i].split(':')[0]}${times[i].split(':')[1]}`) > parseInt(`${times[i+1].split(':')[0]}${times[i+1].split(':')[1]}`)) {
+          tempTime = times[i];
+          times[i] = times[i+1];
+          times[i+1] = tempTime;
+        }
+      }
+    }
+
+    res.render('cafe/data', {popularCustomers, longestOrderCustomers, lucrativeCustomers, popularItems, orderedQuantities, combinations: populatedCombinations, times});
 
     //DATA VISUALIZATIONS TO CREATE:
-    //Most common timeframe for orders
-    //Common item combinations
-    //Common orders for various people
 
+    //Which flavors are the most popular in an item - NEEDS WORK, WE NEED TO SET UP A WAY TO TRACK SPECIFIC FLAVORS
 
   })().catch(err => {
     console.log(err);
@@ -316,6 +476,15 @@ router.post('/:id/ready', middleware.isLoggedIn, middleware.isMod, (req, res) =>
 
     order.present = false; //Order is not active anymore
     await order.save();
+
+    const cafe = await Cafe.find({});
+    if (!cafe) {
+      req.flash('error', "Unable to find cafe info");
+      return res.redirect('back');
+    }
+
+    cafe.revenue += order.charge;
+    cafe.save();
 
     const notif = await Notification.create({subject: "Cafe Order Ready", sender: req.user, recipients: [order.customer], read: [], toEveryone: false, images: []}); //Create a notification to alert the user
       if (!notif) {
@@ -612,6 +781,7 @@ router.put('/item/:id', middleware.isLoggedIn, middleware.isMod, (req, res) => {
 
       for (let i = 0; i < order.items.length; i += 1) { //Iterate over each order, and change its price to match the new item prices
         order.charge += order.items[i].item.price * order.items[i].quantity;
+        order.items[i].price = item.price;
       }
 
       await order.save();

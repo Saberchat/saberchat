@@ -38,7 +38,31 @@
 
         <% for (let customer of popularCustomers) { %>
           <li>
-            <%=customer.customer.firstName%> <%=customer.customer.lastName%> (<%=customer.orderCount%> orders)
+            <%=customer.customer.firstName%> <%=customer.customer.lastName%>: <%=customer.orderCount%> orders
+          </li>
+        <% } %>
+
+        </ol>
+
+        <h3>Most Lucrative Customers</h3>
+
+        <ol>
+
+        <% for (let customer of lucrativeCustomers) { %>
+          <li>
+            <%=customer.customer.firstName%> <%=customer.customer.lastName%>: $<%=customer.spent%> spent (Avg. $<%=customer.avgCharge%> per order)
+          </li>
+        <% } %>
+
+        </ol>
+
+        <h3>Customers With Largest Orders</h3>
+
+        <ol>
+
+        <% for (let customer of longestOrderCustomers) { %>
+          <li>
+            <%=customer.customer.firstName%> <%=customer.customer.lastName%> (Avg. <%=customer.orderLength%> items per order)
           </li>
         <% } %>
 
@@ -50,7 +74,7 @@
 
         <% for (let item of popularItems) { %>
           <li>
-            <%=item.item.name%> (<%=item.orderCount%> orders)
+            <%=item.item.name%>: <%=item.orderCount%> orders
           </li>
         <% } %>
 
@@ -64,19 +88,63 @@
 
         <% for (let obj of orderedQuantities) { %>
           <li>
-            <%numOrders = 0;%>
-            <%sumOrders = 0;%>
-
-            <% for (let i = 0; i < obj.quantities.length; i ++) { %>
-              <% numOrders += obj.quantities[i]; %>
-              <% sumOrders += ((i+1) * obj.quantities[i]); %>
-            <% } %>
-
-            <%=obj.item.name%>: <%=sumOrders/numOrders%>
+            <%=obj.item.name%>: <%=obj.avgQuantity%>
           </li>
         <% } %>
 
       </ol>
+
+      <h3>Common Order Combinations</h3>
+
+      <ol>
+        <% let nameArr; %>
+        <%for (let combo of combinations) { %>
+
+          <% nameArr = []%>
+          <% for (let item of combo.combination) { %>
+            <% nameArr.push(item.name)%>
+          <%}%>
+
+          <li>The combination of <strong>{<span><%=nameArr.join(', ')%></span>}</strong> has been ordered <%=combo.instances%> times.</li>
+        <% } %>
+      </ol>
+
+      <h3>Common Ordering Timeframes</h3>
+
+      <%let averageHours = 0;%>
+      <%let averageMinutes = 0;%>
+
+      <ul>
+        <% for (let time of times) { %>
+          <% averageHours += parseInt(time.split(':')[0]) %>
+          <% averageMinutes += parseInt(time.split(':')[1]) %>
+          <li>
+            <%=time%>
+          </li>
+        <% } %>
+      </ul>
+
+      <% averageHours /= times.length %>
+      <% averageMinutes /= times.length %>
+
+      <% let medianTime; %>
+
+      <% if (times.length%2 == 1) { %>
+        <% medianTime = times[((times.length+1)/2) - 1] %>
+
+      <% } else { %>
+        <% medianTime = `${Math.round((parseInt(times[((times.length)/2) - 1].split(':')[0]) + parseInt(times[((times.length)/2)].split(':')[0]))/2)}:${Math.round((parseInt(times[((times.length)/2) - 1].split(':')[1]) + parseInt(times[((times.length)/2)].split(':')[1]))/2)}`%>
+
+      <% }%>
+
+      <p>
+        Mean Ordering Time - <%=Math.round(averageHours)%>:<%=Math.round(averageMinutes)%>
+      </p>
+
+      <p>
+        Median Ordering Time - <%=medianTime%>
+      </p>
+
     </div>
   </body>
 
