@@ -473,14 +473,14 @@ router.post('/:id/ready', middleware.isLoggedIn, middleware.isMod, (req, res) =>
     order.present = false; //Order is not active anymore
     await order.save();
 
-    const cafe = await Cafe.find({});
-    if (!cafe) {
+    const cafes = await Cafe.find({});
+    if (!cafes) {
       req.flash('error', "Unable to find cafe info");
       return res.redirect('back');
     }
 
-    cafe.revenue += order.charge;
-    cafe.save();
+    cafes[0].revenue += order.charge;
+    cafes[0].save();
 
     const notif = await Notification.create({subject: "Cafe Order Ready", sender: req.user, recipients: [order.customer], read: [], toEveryone: false, images: []}); //Create a notification to alert the user
       if (!notif) {

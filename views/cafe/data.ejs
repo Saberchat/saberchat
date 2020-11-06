@@ -149,16 +149,46 @@
 
       <% }%>
 
-      <p>
-        Mean Ordering Time - <%=Math.round(averageHours)%>:<%=Math.round(averageMinutes)%>
-      </p>
+      <% if (Math.round(averageMinutes).toString().length < 2) { %>
+        <p>
+          Mean Ordering Time - <%=Math.round(averageHours)%>:<%=Math.round(averageMinutes)%>0
+        </p>
+      <% } else { %>
+        <p>
+          Mean Ordering Time - <%=Math.round(averageHours)%>:<%=Math.round(averageMinutes)%>
+        </p>
+      <% } %>
+
+      <% if (medianTime.split(':')[1].length < 2) { %>
+        <p>
+          Median Ordering Time - <%=medianTime%>0
+        </p>
+
+      <% } else { %>
+        <p>
+          Median Ordering Time - <%=medianTime%>
+        </p>
+      <% } %>
+
+      <% let lowerMinuteLimit = Math.floor((Math.round(avgTimeInMinutes - stdDevTime))%60) %>
+      <% let upperMinuteLimit = Math.floor((Math.round(avgTimeInMinutes + stdDevTime))%60) %>
+
+      <% if (lowerMinuteLimit.toString().length < 2) { %>
+        <% lowerMinuteLimit = `${lowerMinuteLimit}0` %>
+
+      <% } else { %>
+        <% lowerMinuteLimit = `${lowerMinuteLimit}` %>
+      <% } %>
+
+      <% if (upperMinuteLimit.toString().length < 2) { %>
+        <% upperMinuteLimit = `${upperMinuteLimit}0` %>
+
+      <% } else { %>
+        <% upperMinuteLimit = `${upperMinuteLimit}` %>
+      <% } %>
 
       <p>
-        Median Ordering Time - <%=medianTime%>
-      </p>
-
-      <p>
-        Most orders will take place between <%=Math.floor((Math.round(avgTimeInMinutes - stdDevTime))/60)%>:<%=Math.floor((Math.round(avgTimeInMinutes - stdDevTime))%60)%> and <%=Math.floor((Math.round(avgTimeInMinutes + stdDevTime))/60)%>:<%=Math.floor((Math.round(avgTimeInMinutes + stdDevTime))%60)%>
+        Most orders will take place between <%=Math.floor((Math.round(avgTimeInMinutes - stdDevTime))/60)%>:<%=lowerMinuteLimit%> and <%=Math.floor((Math.round(avgTimeInMinutes + stdDevTime))/60)%>:<%=upperMinuteLimit%>
       </p>
 
     </div>
