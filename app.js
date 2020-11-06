@@ -328,9 +328,9 @@ io.on('connect', (socket) => {
         order.date = dateFormat(order.created_at, "mmm d, h:MM TT");
 
         let charge = 0;
-        let itemProfile = null;
+        let itemProfile;
 
-        for (let i = 0; i < order.items.length; i++) { //items[] contains info about individual items (and their prices); itemCount[] says how much of each item is ordered. Multiplication will calculate how much to charge for an item
+        for (let i = 0; i < orderItemsObjects.length; i++) { //items[] contains info about individual items (and their prices); itemCount[] says how much of each item is ordered. Multiplication will calculate how much to charge for an item
 
           itemProfile = await Item.findById(orderItemsObjects[i].item);
 
@@ -339,7 +339,7 @@ io.on('connect', (socket) => {
           }
 
           charge += (itemProfile.price * orderItemsObjects[i].quantity);
-          orderItemObjects[i].price = itemProfile.price;
+          orderItemsObjects[i].price = itemProfile.price;
         }
 
         order.charge = charge; //Set order cost based on the items ordered
