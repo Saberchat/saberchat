@@ -111,87 +111,98 @@
 
       <h3>Common Ordering Timeframes</h3>
 
-      <%let averageHours = 0;%>
-      <%let averageMinutes = 0;%>
-
       <ul>
-        <% for (let time of times) { %>
-          <% averageHours += parseInt(time.split(':')[0]) %>
-          <% averageMinutes += parseInt(time.split(':')[1]) %>
+
+        <% for (let time of times.times) { %>
           <li>
-            <%=time%>
+            <% if (parseInt(time.split(':')[0]) > 12) { %>
+              <%=parseInt(time.split(':')[0])-12%>:<%=time.split(':')[1]%> PM
+
+            <% } else if (parseInt(time.split(':')[0]) == 12) { %>
+              12:<%=time.split(':')[1]%> PM
+
+            <% } else if (parseInt(time.split(':')[0]) == 0) { %>
+              12:<%=time.split(':')[1]%> AM
+
+            <% } else { %>
+              <%=time%> AM
+            <% }%>
           </li>
         <% } %>
+
       </ul>
 
-      <% averageHours /= times.length %>
-      <% averageMinutes /= times.length %>
-
-      <%let stdDevTime = 0;%>
-      <% let timeInMinutes;%>
-      <% let avgTimeInMinutes = (averageHours*60) + (averageMinutes); %>
-
-      <% for (let time of times) { %>
-        <% timeInMinutes = (parseInt(time.split(':')[0])*60) + (parseInt(time.split(':')[1])); %>
-        <% stdDevTime += Math.pow((timeInMinutes - avgTimeInMinutes), 2); %>
-      <% } %>
-
-      <% stdDevTime /= times.length %>
-      <% stdDevTime = Math.sqrt(stdDevTime) %>
-
-      <% let medianTime; %>
-
-      <% if (times.length%2 == 1) { %>
-        <% medianTime = times[((times.length+1)/2) - 1] %>
-
-      <% } else { %>
-        <% medianTime = `${Math.round((parseInt(times[((times.length)/2) - 1].split(':')[0]) + parseInt(times[((times.length)/2)].split(':')[0]))/2)}:${Math.round((parseInt(times[((times.length)/2) - 1].split(':')[1]) + parseInt(times[((times.length)/2)].split(':')[1]))/2)}`%>
-
-      <% }%>
-
-      <% if (Math.round(averageMinutes).toString().length < 2) { %>
         <p>
-          Mean Ordering Time - <%=Math.round(averageHours)%>:<%=Math.round(averageMinutes)%>0
-        </p>
-      <% } else { %>
-        <p>
-          Mean Ordering Time - <%=Math.round(averageHours)%>:<%=Math.round(averageMinutes)%>
-        </p>
-      <% } %>
 
-      <% if (medianTime.split(':')[1].length < 2) { %>
-        <p>
-          Median Ordering Time - <%=medianTime%>0
+          The average ordering time is
+
+          <% if (parseInt(times.meanTime.split(':')[0]) > 12) { %>
+            <%=parseInt(times.meanTime.split(':')[0])-12%>:<%=times.meanTime.split(':')[1]%> PM
+
+          <% } else if (parseInt(times.meanTime.split(':')[0]) == 12) { %>
+            12:<%=times.meanTime.split(':')[1]%> PM
+
+          <% } else if (parseInt(times.meanTime.split(':')[0]) == 0) { %>
+            12:<%=times.meanTime.split(':')[1]%> AM
+
+          <% } else { %>
+            <%=times.meanTime%> AM
+          <% }%>
+
         </p>
 
-      <% } else { %>
         <p>
-          Median Ordering Time - <%=medianTime%>
+          The median ordering time is
+
+          <% if (parseInt(times.medianTime.split(':')[0]) > 12) { %>
+            <%=parseInt(times.medianTime.split(':')[0])-12%>:<%=times.medianTime.split(':')[1]%> PM
+
+          <% } else if (parseInt(times.medianTime.split(':')[0]) == 12) { %>
+            12:<%=times.medianTime.split(':')[1]%> PM
+
+          <% } else if (parseInt(times.medianTime.split(':')[0]) == 0) { %>
+            12:<%=times.medianTime.split(':')[1]%> AM
+
+          <% } else { %>
+            <%=times.medianTime%> AM
+          <% }%>
+
         </p>
-      <% } %>
 
-      <% let lowerMinuteLimit = Math.floor((Math.round(avgTimeInMinutes - stdDevTime))%60) %>
-      <% let upperMinuteLimit = Math.floor((Math.round(avgTimeInMinutes + stdDevTime))%60) %>
+        <p>
+          Most orders will fall between
 
-      <% if (lowerMinuteLimit.toString().length < 2) { %>
-        <% lowerMinuteLimit = `${lowerMinuteLimit}0` %>
+          <% if (parseInt(times.minTime.split(':')[0]) > 12) { %>
+            <%=parseInt(times.minTime.split(':')[0])-12%>:<%=times.minTime.split(':')[1]%> PM
 
-      <% } else { %>
-        <% lowerMinuteLimit = `${lowerMinuteLimit}` %>
-      <% } %>
+          <% } else if (parseInt(times.minTime.split(':')[0]) == 12) { %>
+            12:<%=times.minTime.split(':')[1]%> PM
 
-      <% if (upperMinuteLimit.toString().length < 2) { %>
-        <% upperMinuteLimit = `${upperMinuteLimit}0` %>
+          <% } else if (parseInt(times.minTime.split(':')[0]) == 0) { %>
+            12:<%=times.minTime.split(':')[1]%> AM
 
-      <% } else { %>
-        <% upperMinuteLimit = `${upperMinuteLimit}` %>
-      <% } %>
+          <% } else { %>
+            <%=times.minTime%> AM
+          <% }%>
 
-      <p>
-        Most orders will take place between <%=Math.floor((Math.round(avgTimeInMinutes - stdDevTime))/60)%>:<%=lowerMinuteLimit%> and <%=Math.floor((Math.round(avgTimeInMinutes + stdDevTime))/60)%>:<%=upperMinuteLimit%>
-      </p>
+          and
 
+          <% if (parseInt(times.maxTime.split(':')[0]) > 12) { %>
+            <%=parseInt(times.maxTime.split(':')[0])-12%>:<%=times.maxTime.split(':')[1]%> PM
+
+          <% } else if (parseInt(times.maxTime.split(':')[0]) == 12) { %>
+            12:<%=times.maxTime.split(':')[1]%> PM
+
+          <% } else if (parseInt(times.maxTime.split(':')[0]) == 0) { %>
+            12:<%=times.maxTime.split(':')[1]%> AM
+
+          <% } else { %>
+            <%=times.maxTime%> AM
+          <% }%>
+
+        </p>
     </div>
+    <br />
   </body>
 
 </html>
