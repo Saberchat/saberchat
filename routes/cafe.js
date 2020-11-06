@@ -350,7 +350,7 @@ router.get('/order/new', middleware.isLoggedIn, middleware.cafeOpen, (req, res) 
     const types = await Type.find({}).populate('items');
 
     if (!types) {
-      req.flash('error', "Unable to find types");
+      req.flash('error', "Unable to find categories");
       return res.redirect('back');
     }
 
@@ -736,7 +736,7 @@ router.get('/item/:id', middleware.isLoggedIn, middleware.isMod, (req, res) => {
 
     const types = await Type.find({}); //Find all types
     if (!types) {
-      req.flash('error', "Unable to find item types"); return res.redirect('back');
+      req.flash('error', "Unable to find item categories"); return res.redirect('back');
     }
 
     res.render('cafe/show.ejs', {types, item});
@@ -786,7 +786,7 @@ router.put('/item/:id', middleware.isLoggedIn, middleware.isMod, (req, res) => {
     const types = await Type.find({name: {$ne: req.body.type}}); //Collect all item types
 
     if (!types) {
-      req.flash('error', "Unable to find item types"); return res.redirect('back');
+      req.flash('error', "Unable to find item categories"); return res.redirect('back');
     }
 
     for (let t of types) { //Remove this item from its old item type (if the type has not changed, it's fine because we' add it back in a moment anyway)
@@ -800,7 +800,7 @@ router.put('/item/:id', middleware.isLoggedIn, middleware.isMod, (req, res) => {
     const type = await Type.findOne({name: req.body.type});  //Add the item to the type which is now specified
 
     if (!type) {
-      req.flash('error', 'Unable to find item type');
+      req.flash('error', 'Unable to find item category');
     }
 
     if (type.items.includes(item._id)) { //If item is already in type, remove it so you can put the updated type back (we don't know whether the type will be there or not, so it's better to just cover all bases)
@@ -833,7 +833,7 @@ router.delete('/item/:id', middleware.isLoggedIn, middleware.isMod, (req, res) =
     const types = await Type.find({}); //Find all possible types
 
     if (!types) {
-      req.flash('error', "Could not remove item from list of item types"); return res.redirect('back');
+      req.flash('error', "Could not remove item from list of item categories"); return res.redirect('back');
     }
 
     for (let type of types) { //If the type includes this item, remove the item from that type's item list
@@ -874,19 +874,10 @@ router.delete('/item/:id', middleware.isLoggedIn, middleware.isMod, (req, res) =
   });
 });
 
-// NOT BEING USED
-// router.get('/deleteItems', middleware.isLoggedIn, middleware.isMod, (req, res) => {
-//   res.render('cafe/deleteitems')
-// });
-//
-// router.delete('/deleteItems', middleware.isLoggedIn, middleware.isMod, (req, res) => {
-  // Checkboxes
-// });
-
 router.get('/type/new', middleware.isLoggedIn, middleware.isMod, (req, res) => { // RESTful route "New" for type
   Type.find({}).populate('items').exec((err, types) => { //Collect info on all the items, so that we can give the user the option to add them to that type
     if (err || !types) {
-      req.flash('error', "Unable to find types");
+      req.flash('error', "Unable to find categories");
       res.redirect('back');
 
     } else {
@@ -902,19 +893,19 @@ router.post('/type', middleware.isLoggedIn, middleware.isMod, (req, res) => { //
     const overlappingTypes = await Type.find({name: req.body.name}); //Find all item types with this name that already exist
 
     if (!overlappingTypes) {
-      req.flash('error', "Unable to find item types"); return res.redirect('back');
+      req.flash('error', "Unable to find item categories"); return res.redirect('back');
     }
 
     if (overlappingTypes.length == 0) { //If there are none, go ahead
       const type = await Type.create({name: req.body.name, items: []});
 
       if (!type) {
-        req.flash('error', "Item Type could not be created"); return res.redirect('back');
+        req.flash('error', "Item Category could not be created"); return res.redirect('back');
       }
 
       const types = await Type.find({}); //Found types, but represents all item types
       if (!types) {
-        req.flash('error', "Could not find item types"); return res.redirect('back');
+        req.flash('error', "Could not find item categories"); return res.redirect('back');
       }
 
       for (let t of types) { //Now that we've created the type, we have to remove the newly selected items from all other types
@@ -945,7 +936,7 @@ router.post('/type', middleware.isLoggedIn, middleware.isMod, (req, res) => { //
       res.redirect('/cafe/manage');
 
     } else { //If an overlap is found
-      req.flash('error', "Item type already in database.");
+      req.flash('error', "Item category already in database.");
       res.redirect('back');
     }
 
@@ -999,25 +990,36 @@ router.put('/type/:id', middleware.isLoggedIn, middleware.isMod, (req, res) => {
       const type = await Type.findByIdAndUpdate(req.params.id, {name: req.body.name}); //Update this item type based on the id
 
       if (!type) {
-        req.flash('error', "Unable to update item type"); return res.redirect('back');
+        req.flash('error', "Unable to update item category"); return res.redirect('back');
       }
 
+      //Problem here
       const ft = await Type.find({_id: {$ne: type._id}}); //Find all other types
 
       if (!ft) {
-        req.flash('error', "Unable to find item types"); return res.redirect('back');
+        req.flash('error', "Unable to find item categories"); return res.redirect('back');
       }
+
+      let deletes = []; //Which items to remove from type
 
       for (let t of ft) { //Iterate over other types
 
+        deletes = [];
+
         for (let i = 0; i < t.items.length; i += 1) { //Update them to remove the newly selected items from their 'items' array
           if(req.body[t.items[i].toString()]) {
-            t.items.splice(i, 1);
+            deletes.push(i);
           }
+        }
+
+        for (let index of deletes.reverse()) { //Reverse so that indices remain same
+          t.items.splice(index, 1);
         }
 
         await t.save();
       }
+
+      //Ends here
 
       const foundItems = await Item.find({}); //Find all items
 
@@ -1031,7 +1033,7 @@ router.put('/type/:id', middleware.isLoggedIn, middleware.isMod, (req, res) => {
           const other = await Type.findOne({name: 'Other'}); //Find type 'other'
 
           if (!other) {
-            req.flash('error', "Unable to find item type 'Other', please add it'"); res.redirect('back');
+            req.flash('error', "Unable to find item category 'Other', please add it'"); res.redirect('back'); //There's nowhere for the type-less items to go unless 'Other' exists
           }
 
           other.items.push(item); //Move that item to 'Other'
@@ -1050,11 +1052,11 @@ router.put('/type/:id', middleware.isLoggedIn, middleware.isMod, (req, res) => {
 
       await type.save();
 
-      req.flash('success', "Item type updated!");
+      req.flash('success', "Item category updated!");
       res.redirect('/cafe/manage');
 
     } else {
-      req.flash('error', "Item already in database");
+      req.flash('error', "Item category already in database");
       res.redirect('back');
     }
 
@@ -1072,13 +1074,13 @@ router.delete('/type/:id', middleware.isLoggedIn, middleware.isMod, (req, res) =
     const type = await Type.findByIdAndDelete(req.params.id); //Delete type based on specified ID
 
     if (!type) {
-      req.flash('error', "Unable to find item type"); return res.redirect('back');
+      req.flash('error', "Unable to find item category"); return res.redirect('back');
     }
 
     const other = await Type.findOne({name: "Other"}); //Find the type with name 'Other' - we've created this type so that any unselected items go here
 
       if (!other) {
-        req.flash('error', "Unable to find item type 'Other'"); return res.redirect('back');
+        req.flash('error', "Unable to find item category 'Other', please add it"); return res.redirect('back');
       }
 
       for (let item of type.items) {
@@ -1087,7 +1089,7 @@ router.delete('/type/:id', middleware.isLoggedIn, middleware.isMod, (req, res) =
 
       await other.save();
 
-    req.flash('success', "Item type deleted!");
+    req.flash('success', "Item category deleted!");
     res.redirect('/cafe/manage');
 
   })().catch(err => {
