@@ -325,16 +325,12 @@ router.get('/data', middleware.isLoggedIn, middleware.isAdmin, (req, res) => {
 
     res.render('cafe/data', {popularCustomers, longestOrderCustomers, lucrativeCustomers, popularItems, orderedQuantities, combinations: populatedCombinations, times});
 
-    //DATA VISUALIZATIONS TO CREATE:
-
-    //Which flavors are the most popular in an item - NEEDS WORK, WE NEED TO SET UP A WAY TO TRACK SPECIFIC FLAVORS
-
   })().catch(err => {
     console.log(err);
     req.flash('error', "Unable to access database");
     res.redirect('back');
-  })
-})
+  });
+});
 
 router.get('/order/new', middleware.isLoggedIn, middleware.cafeOpen, (req, res) => { //RESTFUL routing 'order/new' route
 
@@ -460,7 +456,7 @@ router.delete('/order/:id', middleware.isLoggedIn, middleware.cafeOpen, (req, re
         foundOrder.items[i].item.save();
       }
 
-      req.flash('success', "Order deleted!");
+      req.flash('success', "Order canceled!");
       res.redirect('/cafe');
     }
   });
