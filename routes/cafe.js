@@ -323,7 +323,73 @@ router.get('/data', middleware.isLoggedIn, middleware.isAdmin, (req, res) => {
       }
     }
 
-    res.render('cafe/data', {popularCustomers, longestOrderCustomers, lucrativeCustomers, popularItems, orderedQuantities, combinations: populatedCombinations, times});
+    let timesObject = {
+      times: times,
+      averageMinutes: 0, //Average time in minutes
+      meanTime: '',
+      medianTime: '',
+      stdDevMinutes: 0,
+      stdDevTime: '',
+      minTimeMinutes: 0,
+      minTime: '',
+      maxTimeMinutes: 0,
+      maxTime: ''
+    };
+
+    for (let time of times) {
+      timesObject.averageMinutes += parseInt(time.split(':')[0]) * 60;
+      timesObject.averageMinutes += parseInt(time.split(':')[1]);
+    }
+
+    timesObject.averageMinutes /= times.length;
+
+    timesObject.meanTime = `${Math.floor(timesObject.averageMinutes / 60)}:${Math.round(timesObject.averageMinutes % 60)}`;
+
+    if (timesObject.meanTime.split(':')[1].length < 2) {
+      timesObject.meanTime = `${timesObject.meanTime}0`;
+    }
+
+    if (times.length%2 == 1) {
+      timesObject.medianTime = times[(times.length - 1) / 2];
+
+    } else {
+      timesObject.medianTime = `${Math.floor((parseInt(times[((times.length)/2) - 1].split(':')[0]) + parseInt(times[((times.length)/2)].split(':')[0]))/2)}:${Math.round((parseInt(times[((times.length)/2) - 1].split(':')[1]) + parseInt(times[((times.length)/2)].split(':')[1]))/2)}`
+    }
+
+    if (timesObject.medianTime.split(':')[1].length < 2) {
+      timesObject.medianTime = `${timesObject.medianTime}0`;
+    }
+
+    let timeInMinutes;
+
+    for (let time of times) {
+      timeInMinutes = parseInt((time.split(':')[0]) * 60) + parseInt(time.split(':')[1]);
+      timesObject.stdDevMinutes += (Math.pow((timeInMinutes - timesObject.averageMinutes), 2));
+    }
+
+    timesObject.stdDevMinutes = Math.sqrt(timesObject.stdDevMinutes / times.length);
+    timesObject.stdDevTime = `${Math.floor(timesObject.stdDevMinutes / 60)}:${Math.round(timesObject.stdDevMinutes % 60)}`;
+
+    if (timesObject.stdDevTime.split(':')[1].length < 2) {
+      timesObject.stdDevTime = `${timesObject.stdDevTime}0`;
+    }
+
+    timesObject.minTimeMinutes = timesObject.averageMinutes - timesObject.stdDevMinutes;
+    timesObject.maxTimeMinutes = timesObject.averageMinutes + timesObject.stdDevMinutes;
+
+    timesObject.minTime = `${Math.floor(timesObject.minTimeMinutes/60)}:${Math.round(timesObject.minTimeMinutes%60)}`;
+    timesObject.maxTime = `${Math.floor(timesObject.maxTimeMinutes/60)}:${Math.round(timesObject.maxTimeMinutes%60)}`;
+
+    if (timesObject.minTime.split(':')[1].length < 2) {
+      timesObject.minTime = `${timesObject.minTime}0`;
+    }
+
+    if (timesObject.maxTime.split(':')[1].length < 2) {
+      timesObject.maxTime = `${timesObject.maxTime}0`;
+    }
+
+
+    res.render('cafe/data', {popularCustomers, longestOrderCustomers, lucrativeCustomers, popularItems, orderedQuantities, combinations: populatedCombinations, times: timesObject});
 
   })().catch(err => {
     console.log(err);
