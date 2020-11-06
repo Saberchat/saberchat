@@ -422,7 +422,7 @@ router.put('/permissions', middleware.isLoggedIn, middleware.isAdmin, (req, res)
 	} else {
 		// else continue
 		User.findById(req.body.user, (err, user) => {
-			if (user.permission == 'principal' && req.user.permission != "principal") {
+			if ((user.permission == 'principal' || user.permission == 'admin') && req.user.permission != "principal") {
 				res.json({error: 'You do not have permissions to do that'});
 
 			} else {
