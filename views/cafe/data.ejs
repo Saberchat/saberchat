@@ -105,7 +105,15 @@
             <% nameArr.push(item.name)%>
           <%}%>
 
-          <li>The combination of <strong>{<span><%=nameArr.join(', ')%></span>}</strong> has been ordered <%=combo.instances%> times.</li>
+          <li>The combination of the following has been ordered <%=combo.instances%> times:</li>
+          <ul>
+            <% for (let name of nameArr) { %>
+              <li>
+                <strong><%=name%></strong>
+              </li>
+            <% } %>
+          </ul>
+          <br />
         <% } %>
       </ol>
 
@@ -122,7 +130,7 @@
 
           <ul>
           <% for (let point of pricepoints.get(item).keys()) {%>
-            <li>At price $<%=point%>, this item was ordered <%=pricepoints.get(item).get(point)%> times</li>
+            <li>At price $<%=point%>, this item was ordered <%=pricepoints.get(item).get(point)%> times <em>(Total Revenue At This Price: $<%=point * pricepoints.get(item).get(point)%>)</em></li>
           <% } %>
           </ul>
         <% } %>
@@ -132,21 +140,24 @@
       <h3>Common Ordering Timeframes</h3>
 
       <ul>
-
-        <% for (let time of times.times) { %>
+        <% for (let time of times.timeCount) { %>
           <li>
-            <% if (parseInt(time.split(':')[0]) > 12) { %>
-              <%=parseInt(time.split(':')[0])-12%>:<%=time.split(':')[1]%> PM
+            <strong>
+            <% if (parseInt(time[0].split(':')[0]) > 12) { %>
+              <%=parseInt(time[0].split(':')[0])-12%>:<%=time[0].split(':')[1]%> PM
 
-            <% } else if (parseInt(time.split(':')[0]) == 12) { %>
-              12:<%=time.split(':')[1]%> PM
+            <% } else if (parseInt(time[0].split(':')[0]) == 12) { %>
+              12:<%=time[0].split(':')[1]%> PM
 
-            <% } else if (parseInt(time.split(':')[0]) == 0) { %>
-              12:<%=time.split(':')[1]%> AM
+            <% } else if (parseInt(time[0].split(':')[0]) == 0) { %>
+              12:<%=time[0].split(':')[1]%> AM
 
             <% } else { %>
-              <%=time%> AM
+              <%=time[0]%> AM
             <% }%>
+            </strong>
+
+            (<%=time[1]%> times)
           </li>
         <% } %>
 
@@ -156,6 +167,7 @@
 
           The average ordering time is
 
+          <strong>
           <% if (parseInt(times.meanTime.split(':')[0]) > 12) { %>
             <%=parseInt(times.meanTime.split(':')[0])-12%>:<%=times.meanTime.split(':')[1]%> PM
 
@@ -168,12 +180,15 @@
           <% } else { %>
             <%=times.meanTime%> AM
           <% }%>
+          </strong>
 
         </p>
 
         <p>
+
           The median ordering time is
 
+          <strong>
           <% if (parseInt(times.medianTime.split(':')[0]) > 12) { %>
             <%=parseInt(times.medianTime.split(':')[0])-12%>:<%=times.medianTime.split(':')[1]%> PM
 
@@ -186,12 +201,14 @@
           <% } else { %>
             <%=times.medianTime%> AM
           <% }%>
+          </strong>
 
         </p>
 
         <p>
           Most orders will be placed between
 
+          <strong>
           <% if (parseInt(times.minTime.split(':')[0]) > 12) { %>
             <%=parseInt(times.minTime.split(':')[0])-12%>:<%=times.minTime.split(':')[1]%> PM
 
@@ -204,9 +221,11 @@
           <% } else { %>
             <%=times.minTime%> AM
           <% }%>
+          </strong>
 
           and
 
+          <strong>
           <% if (parseInt(times.maxTime.split(':')[0]) > 12) { %>
             <%=parseInt(times.maxTime.split(':')[0])-12%>:<%=times.maxTime.split(':')[1]%> PM
 
@@ -219,6 +238,7 @@
           <% } else { %>
             <%=times.maxTime%> AM
           <% }%>
+          </strong>
 
         </p>
     </div>

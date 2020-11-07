@@ -302,10 +302,14 @@ router.get('/data', middleware.isLoggedIn, middleware.isAdmin, (req, res) => {
     }
 
     //Calculate most common timeframes
+
     let times = [];
+    let timeCount = []; //Using matrix instead of map to count number of repetitions of a time so it can be sortable
     let time;
+    let index; //Index of overlapping time in the matrix of times
 
     for (let order of orders) { //Orders already declared from earlier
+      index = -1;
       time = order.date.split(', ')[1];
 
       if (time.split(' ')[1] == "AM") {
@@ -326,7 +330,22 @@ router.get('/data', middleware.isLoggedIn, middleware.isAdmin, (req, res) => {
         }
       }
 
-      times.push(time);
+      times.push(time)
+
+      //Populate matrix of time counts accordingly
+      for (let i = 0; i < timeCount.length; i ++) {
+        if (timeCount[i][0] == time)  {
+          index = i;
+          break;
+        }
+      }
+
+      if (index != -1) {
+        timeCount[index][1] += 1;
+
+      } else {
+        timeCount.push([time, 1]);
+      }
     }
 
     //Sort times
@@ -342,8 +361,19 @@ router.get('/data', middleware.isLoggedIn, middleware.isAdmin, (req, res) => {
       }
     }
 
+    for (let h = 0; h < timeCount.length; h++) {
+      for (let i = 0; i < timeCount.length - 1; i ++) {
+        if (parseInt(`${timeCount[i][0].split(':')[0]}${timeCount[i][0].split(':')[1]}`) > parseInt(`${timeCount[i+1][0].split(':')[0]}${timeCount[i+1][0].split(':')[1]}`)) {
+          tempTime = timeCount[i];
+          timeCount[i] = timeCount[i+1];
+          timeCount[i+1] = tempTime;
+        }
+      }
+    }
+
     let timesObject = { //This object stores the formatted time as well as the numerical time, meaning we can display it and do mathematical operations on it
       times: times,
+      timeCount: timeCount,
       averageMinutes: 0,
       meanTime: '',
       medianTime: '',
