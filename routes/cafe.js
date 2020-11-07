@@ -282,6 +282,25 @@ router.get('/data', middleware.isLoggedIn, middleware.isAdmin, (req, res) => {
       populatedCombinations.push({combination: populatedCombination, instances: combo.instances});
     }
 
+    //Calculate popularity at various price points
+
+    let pricepoints = new Map();
+
+    for (let item of items) {
+      pricepoints.set(item._id.toString(), new Map());
+    }
+
+    for (let order of orders) {
+      for (let it of order.items) {
+        if (pricepoints.get(it.item._id.toString()).has(it.price)) {
+          pricepoints.get(it.item._id.toString()).set(it.price, pricepoints.get(it.item._id.toString()).get(it.price)+1);
+
+        } else {
+          pricepoints.get(it.item._id.toString()).set(it.price, 1);
+        }
+      }
+    }
+
     //Calculate most common timeframes
     let times = [];
     let time;
@@ -323,9 +342,9 @@ router.get('/data', middleware.isLoggedIn, middleware.isAdmin, (req, res) => {
       }
     }
 
-    let timesObject = {
+    let timesObject = { //This object stores the formatted time as well as the numerical time, meaning we can display it and do mathematical operations on it
       times: times,
-      averageMinutes: 0, //Average time in minutes
+      averageMinutes: 0,
       meanTime: '',
       medianTime: '',
       stdDevMinutes: 0,
@@ -389,7 +408,7 @@ router.get('/data', middleware.isLoggedIn, middleware.isAdmin, (req, res) => {
     }
 
 
-    res.render('cafe/data', {popularCustomers, longestOrderCustomers, lucrativeCustomers, popularItems, orderedQuantities, combinations: populatedCombinations, times: timesObject});
+    res.render('cafe/data', {items, popularCustomers, longestOrderCustomers, lucrativeCustomers, popularItems, orderedQuantities, pricepoints, combinations: populatedCombinations, times: timesObject});
 
   })().catch(err => {
     console.log(err);

@@ -109,6 +109,26 @@
         <% } %>
       </ol>
 
+      <h3>Popularity of Items At Different Price Points</h3>
+      <%for (let item of pricepoints.keys()) { %>
+
+        <% if (pricepoints.get(item).size > 0) { %>
+
+          <% for (let i of items) { %>
+            <% if (i._id.toString() == item) { %>
+              <em><strong><%=i.name%>:</strong></em>
+            <% } %>
+          <% } %>
+
+          <ul>
+          <% for (let point of pricepoints.get(item).keys()) {%>
+            <li>At price $<%=point%>, this item was ordered <%=pricepoints.get(item).get(point)%> times</li>
+          <% } %>
+          </ul>
+        <% } %>
+
+      <% } %>
+
       <h3>Common Ordering Timeframes</h3>
 
       <ul>
@@ -170,7 +190,7 @@
         </p>
 
         <p>
-          Most orders will fall between
+          Most orders will be placed between
 
           <% if (parseInt(times.minTime.split(':')[0]) > 12) { %>
             <%=parseInt(times.minTime.split(':')[0])-12%>:<%=times.minTime.split(':')[1]%> PM
