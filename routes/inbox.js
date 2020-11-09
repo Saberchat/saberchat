@@ -98,12 +98,40 @@ router.post('/messages', middleware.isLoggedIn, (req, res) => {
 			delete message.sender;
 		}
 
+		const statuses = ['7th', '8th', '9th', '10th', '11th', '12th', 'faculty'];
+
+		if(req.body.anonymous != 'true' && !message.toEveryone) {
+			let selStatuses = [];
+			for (let i = 0; i < statuses.length; i++) {
+				const status = statuses[i];
+				if(recipients.includes(status)) {
+					selStatuses.push(status);
+					const index = recipients.indexOf(status);
+					recipients.splice(index, 1);
+				}
+			}
+
+			if(selStatuses.length > 0) {
+				const selUsers = await User.find({status: {$in: selStatuses}});
+
+				if(!selUsers) {
+					req.flash('error', 'Error connecting to database'); return res.redirect('back');
+				}
+
+				for (let i = 0; i < selUsers.length; i++) {
+					const user = selUsers[i];
+					if(!recipients.includes(user._id) && !user._id.equals(req.user._id)) {
+						recipients.push(user._id);
+					}
+				}
+			}
+		}
 		message.recipients = recipients;
 
 		const newMessage = await Message.create(message);
 		if(!newMessage) {
-      req.flash('error', 'Message could not be created'); return res.redirect('back');
-    }
+			req.flash('error', 'Message could not be created'); return res.redirect('back');
+		}
 
 		newMessage.date = dateFormat(newMessage.created_at, "h:MM TT | mmm d");
 		await newMessage.save();

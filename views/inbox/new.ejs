@@ -41,7 +41,14 @@
                   <div class="form-group">
                     <label for="user-select" class="label-custom">Recipients</label>
                     <select id="user-select" class="form-control" onchange="addRecipient('user')" required>
-                      <option value="" selected disabled>Select User</option>
+                      <option value="" selected disabled>Select User/Group</option>
+                      <option value="7th">7th Graders</option>
+                      <option value="8th">8th Graders</option>
+                      <option value="9th">9th Graders</option>
+                      <option value="10th">EC Sophomores</option>
+                      <option value="11th">EC Juniors</option>
+                      <option value="12th">EC Seniors</option>
+                      <option value="faculty">Faculty</option>
                       <% users.forEach(user => { %>
                         <% if(!user._id.equals(currentUser._id)) { %>
                           <option value="<%= user._id %>"><%= user.username %> (<%= user.firstName%> <%= user.lastName%>)</option>
