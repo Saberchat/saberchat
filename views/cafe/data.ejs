@@ -32,7 +32,7 @@
         </div>
       </div>
 
-        <h3>Most Frequent Customers</h3>
+        <h3>Most Frequent Customers (Bar Graph)</h3>
 
         <ol>
 
@@ -44,7 +44,7 @@
 
         </ol>
 
-        <h3>Most Lucrative Customers</h3>
+        <h3>Most Lucrative Customers (Bar Graph)</h3>
 
         <ol>
 
@@ -56,7 +56,7 @@
 
         </ol>
 
-        <h3>Customers With Largest Orders</h3>
+        <h3>Customers With Largest Orders (Bar Graph)</h3>
 
         <ol>
 
@@ -68,7 +68,7 @@
 
         </ol>
 
-        <h3>Most Popular Items</h3>
+        <h3>Most Popular Items (Pie Chart/Bar Graph)</h3>
 
         <ol>
 
@@ -80,7 +80,7 @@
 
         </ol>
 
-        <h3>Average Amount Ordered Per Item</h3>
+        <h3>Average Amount Ordered Per Item (Bar Graph)</h3>
 
         <ol>
         <% let numOrders;%>
@@ -94,7 +94,7 @@
 
       </ol>
 
-      <h3>Common Order Combinations</h3>
+      <h3>Common Order Combinations (Bar Graph)</h3>
 
       <ol>
         <% let nameArr; %>
@@ -117,7 +117,7 @@
         <% } %>
       </ol>
 
-      <h3>Popularity of Items At Different Price Points</h3>
+      <h3>Popularity of Items At Different Price Points (Line Graph)</h3>
       <%for (let item of pricepoints.keys()) { %>
 
         <% if (pricepoints.get(item).size > 0) { %>
@@ -137,7 +137,7 @@
 
       <% } %>
 
-      <h3>Common Ordering Timeframes</h3>
+      <h3>Common Ordering Timeframes (Boxplot)</h3>
 
       <ul>
         <% for (let time of times.timeCount) { %>

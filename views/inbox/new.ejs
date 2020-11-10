@@ -49,6 +49,9 @@
                       <option value="11th">EC Juniors</option>
                       <option value="12th">EC Seniors</option>
                       <option value="faculty">Faculty</option>
+                      <option value="parent">Parents</option>
+                      <option value="alumnus">Alumni</option>
+                      <option value="guest">Guests</option>
                       <% users.forEach(user => { %>
                         <% if(!user._id.equals(currentUser._id)) { %>
                           <option value="<%= user._id %>"><%= user.username %> (<%= user.firstName%> <%= user.lastName%>)</option>

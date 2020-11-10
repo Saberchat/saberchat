@@ -98,7 +98,7 @@ router.post('/messages', middleware.isLoggedIn, (req, res) => {
 			delete message.sender;
 		}
 
-		const statuses = ['7th', '8th', '9th', '10th', '11th', '12th', 'faculty'];
+		const statuses = ['7th', '8th', '9th', '10th', '11th', '12th', 'faculty', 'parent', 'alumnus', 'guest'];
 
 		if(req.body.anonymous != 'true' && !message.toEveryone) {
 			let selStatuses = [];

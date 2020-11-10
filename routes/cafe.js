@@ -35,7 +35,6 @@ router.get('/', middleware.isLoggedIn, (req, res) => { //RESTful routing 'order/
       res.redirect('back');
 
     } else {
-      console.log(foundOrders);
       res.render('cafe/index', {orders: foundOrders});
     }
   });
@@ -494,6 +493,7 @@ router.post('/order', middleware.isLoggedIn, middleware.cafeOpen, (req, res) => 
     if (req.body.check) { //If any items are selected
 
       const foundItems = await Item.find({}); //Find all items
+      let orderCharge = 0; //Track to compare w/ balance
 
       if (!foundItems) {
         req.flash('error', 'No items found'); return res.redirect('back');
@@ -510,6 +510,7 @@ router.post('/order', middleware.isLoggedIn, middleware.cafeOpen, (req, res) => 
 
           } else { //If all items are available, perform these operations
             foundItems[i].availableItems -= parseInt(req.body[foundItems[i].name]);
+            orderCharge += (foundItems[i].price * parseInt(req.body[foundItems[i].name])); //Increment charge
 
             if (foundItems[i].availableItems == 0) {
               foundItems[i].isAvailable = false;
@@ -521,7 +522,11 @@ router.post('/order', middleware.isLoggedIn, middleware.cafeOpen, (req, res) => 
         }
       }
 
-      if (!unavailable) { //This should not be necessary for the most part, since if an item is unavailable, it doesn't show up in the menu. But if the user starts ordering before someone else submits their order, this is a possibility
+    if (orderCharge > req.user.balance) { //Check to see if you are ordering more than you can
+      req.flash("error", "You do not have enough money in your account to pay for this order. Contact the principal to update your balance.");
+      res.redirect('/cafe');
+
+    } else if (!unavailable) { //This should not be necessary for the most part, since if an item is unavailable, it doesn't show up in the menu. But if the user starts ordering before someone else submits their order, this is a possibility
         req.flash("success", "Order Sent!");
         res.redirect('/cafe');
 
@@ -596,6 +601,10 @@ router.post('/:id/ready', middleware.isLoggedIn, middleware.isMod, (req, res) =>
 
     cafes[0].revenue += order.charge;
     cafes[0].save();
+
+    order.customer.debt += order.charge; //Update customer money info
+    order.customer.balance -= order.charge;
+    order.customer.save();
 
     const notif = await Notification.create({subject: "Cafe Order Ready", sender: req.user, recipients: [order.customer], read: [], toEveryone: false, images: []}); //Create a notification to alert the user
       if (!notif) {

@@ -347,6 +347,14 @@ io.on('connect', (socket) => {
 
         await order.save();
 
+        if (order.charge > user.balance) {
+          const deletedOrder = await Order.findByIdAndDelete(order._id);
+
+          if (!deletedOrder) {
+            console.log('Error deleting order');
+          }
+        }
+
         const displayItems = await Item.find({_id: {$in: itemList}}); //Full versions of the _id signatures sent in order.items
 
         if (!displayItems) {
