@@ -66,7 +66,7 @@
 
                         <% if (currentUser.permission == 'mod') { %>
                           <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle" href="" id="navbarDropdownMenuLink" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="fas fa-align-justify"></i> Moderator</a>
+                            <a class="nav-link dropdown-toggle" href="" id="navbarDropdownMenuLink" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="fas fa-align-justify"></i> Mod</a>
                             <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
                               <a href="/admin/status" class="dropdown-item"><i class="fas fa-user"></i> Change Statuses</a>
                               <a href="/admin/moderate" class="dropdown-item"><i class="fas fa-flag"></i> Moderate Comments</a>
@@ -74,7 +74,7 @@
 
                         <% } else if (currentUser.permission == 'admin') { %>
                           <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle" href="" id="navbarDropdownMenuLink" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="fas fa-align-justify"></i> Administrator</a>
+                            <a class="nav-link dropdown-toggle" href="" id="navbarDropdownMenuLink" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="fas fa-align-justify"></i> Admin</a>
                             <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
                               <a href="/admin/permissions" class="dropdown-item"><i class="fas fa-user"></i> Change Permissions</a>
                               <a href="/admin/status" class="dropdown-item"><i class="fas fa-user"></i> Change Statuses</a>
