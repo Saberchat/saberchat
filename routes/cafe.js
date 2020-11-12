@@ -477,7 +477,7 @@ router.get('/order/new', middleware.isLoggedIn, middleware.cafeOpen, (req, res) 
   });
 });
 
-router.post('/order', middleware.isLoggedIn, middleware.cafeOpen, (req, res) => { //RESTful routing 'order/create' route
+router.post('/order', middleware.isLoggedIn, middleware.cafeOpen, (req, res) => { //RESTful routing 'order/create'
 
   (async () => { //Asynchronous function controls user ordering
 
@@ -506,7 +506,7 @@ router.post('/order', middleware.isLoggedIn, middleware.cafeOpen, (req, res) => 
 
           if (foundItems[i].availableItems < parseInt(req.body[foundItems[i].name])) { //First test to see if all items are available
             unavailable = true;
-            break; //Immediately quit
+            break;
 
           } else { //If all items are available, perform these operations
             foundItems[i].availableItems -= parseInt(req.body[foundItems[i].name]);
@@ -522,17 +522,17 @@ router.post('/order', middleware.isLoggedIn, middleware.cafeOpen, (req, res) => 
         }
       }
 
-    if (orderCharge > req.user.balance) { //Check to see if you are ordering more than you can
-      req.flash("error", "You do not have enough money in your account to pay for this order. Contact the principal to update your balance.");
-      res.redirect('/cafe');
-
-    } else if (!unavailable) { //This should not be necessary for the most part, since if an item is unavailable, it doesn't show up in the menu. But if the user starts ordering before someone else submits their order, this is a possibility
-        req.flash("success", "Order Sent!");
+      if (orderCharge > req.user.balance) { //Check to see if you are ordering more than you can
+        req.flash("error", "You do not have enough money in your account to pay for this order. Contact the principal to update your balance.");
         res.redirect('/cafe');
 
-      } else {
-        req.flash("error", "Some items are unavailable in the quantities you requested");
+      } else if (unavailable) { //This should not be necessary for the most part, since if an item is unavailable, it doesn't show up in the menu. But if the user starts ordering before someone else submits their order, this is a possibility
+        req.flash("error", "Some items are unavailable in the quantities you requested. Please order again.");
         res.redirect('/cafe/order/new');
+
+      } else {
+        req.flash("success", "Order Sent!");
+        res.redirect('/cafe');
       }
 
     } else { //If no items were checked
@@ -570,7 +570,7 @@ router.delete('/order/:id', middleware.isLoggedIn, middleware.cafeOpen, (req, re
       res.redirect('back');
 
     } else {
-      for (let i = 0; i < foundOrder.items.length; i += 1) { //For each of the order's items, add the number ordered back to that item. (If there are 12 available quesadillas and our user ordered 3, there are now 15)
+      for (let i = 0; i < foundOrder.items.length; i += 1) { //For each of the order's items, add the number ordered back to that item. (If there are 12 available quesadillas and the  user ordered 3, there are now 15)
         foundOrder.items[i].item.availableItems += foundOrder.items[i].quantity;
         foundOrder.items[i].item.isAvailable = true;
         foundOrder.items[i].item.save();
@@ -1166,7 +1166,7 @@ router.put('/type/:id', middleware.isLoggedIn, middleware.isMod, (req, res) => {
         }
       }
 
-      type.items = []; //Our type is now empty
+      type.items = []; //type is now empty
 
       for (let item of foundItems) { //Push new items to type's items[] array, based on the latest changes
         if(req.body[item._id.toString()]) {
