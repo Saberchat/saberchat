@@ -170,7 +170,7 @@ router.post('/login', function(req, res, next) {
             req.flash('error', 'Invalid Email or Password');
             return res.redirect('/');
 		}
-		//login user again? I'm not sure why this is here.
+		//If authentication succeeds, log in user again
         req.logIn(user, function(err) {
 			if (err) { return next(err); }
 			//flash message success
