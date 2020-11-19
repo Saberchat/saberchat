@@ -60,7 +60,7 @@
                         </div>
 
                         <div id="user-list">
-                            <% users.forEach(function(user) { %>
+                            <% users.forEach(user => { %>
                                 <% if (!(user._id.equals(currentUser._id))) { %>
                                     <div class="form-check">
                                         <input name="check[<%= user._id %>]" id="<%= user._id %>" class="form-check-input" type="checkbox" value="">
@@ -76,7 +76,7 @@
           </div>
       </div>
     <script>
-        function updateDisplay() {
+        const updateDisplay = (() => {
             let userSelect = document.getElementById('roomType');
             let display = document.getElementById('user-selection');
             if(userSelect.checked == true) {
@@ -84,9 +84,9 @@
             } else {
                 display.style.display = "none";
             }
-        }
+        });
 
-        function searchFunction() {
+        const searchFunction = (() => {
             let input = document.getElementById("search-input");
             let filter = input.value.toUpperCase();
             let list = document.getElementById("user-list");
@@ -100,7 +100,8 @@
                     users[i].style.display = "none";
                 }
             }
-        }
+        });
+        
     </script>
   </body>
 </html>

@@ -1,47 +1,47 @@
 //toggles the classes for animating the login and register forms
-$(function() {
+$(() => {
     //login form
-    $(".user-form-btn.login").on('click', function(){
+    $(".user-form-btn.login").on('click', () => {
         $(".user-form.login").addClass("display");
         $(".user-form.signup").removeClass("display");
     });
-    $(".form-close.login").on('click', function(){
+    $(".form-close.login").on('click', () => {
         $(".user-form.login").removeClass("display");
     });
 
     //register form
-    $(".user-form-btn.signup").on('click', function(){
+    $(".user-form-btn.signup").on('click', () => {
         $(".user-form.signup").addClass("display");
         $(".user-form.login").removeClass("display");
     });
-    $(".form-close.signup").on('click', function(){
+    $(".form-close.signup").on('click', () => {
         $(".user-form.signup").removeClass("display");
     });
 });
 
 // class animations for the signup form
-function next() {
+const next = (() => {
     $('.user-info').removeClass('display');
     $('.login-info').addClass('display');
-}
+});
 
-function back() {
+const back = (() => {
     $('.user-info').addClass('display');
     $('.login-info').removeClass('display');
-}
+});
 
 // prevents double clicking the form submit
-function disableBtn() {
+const disableBtn = (() => {
     document.getElementById('register-button').disabled = true;
-}
+});
 
 // reactivates button on invalid form submit
-function enableBtn() {
+const enableBtn = (() => {
     document.getElementById('register-button').disabled = false;
-}
+});
 
 // validates signup form
-function validateForm() {
+const validateForm = (() => {
     let form = document.forms.signup;
     if(form.firstName.value == '') {
         enableBtn();
@@ -80,9 +80,9 @@ function validateForm() {
         form.email.style.border = '2px solid red';
         return false;
     }
-}
+});
 
-function submitActions() {
+const submitActions = (() => {
     disableBtn();
     return validateForm();
-}
+});

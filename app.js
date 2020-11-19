@@ -45,12 +45,12 @@ const Cafe = require('./models/cafe');
 const indexRoutes = require('./routes/index');
 const chatRoutes = require('./routes/chat');
 const profileRoutes = require('./routes/profile');
-const wHeightsRoutes = require('./routes/wHeights');
 const inboxRoutes = require('./routes/inbox');
 const adminRoutes = require('./routes/admin');
 const cafeRoutes = require('./routes/cafe');
 const announcementRoutes = require('./routes/announcements');
 const projectRoutes = require('./routes/projects');
+// const wHeightsRoutes = require('./routes/wHeights');
 
 //set up ports and socket.io
 const http = require('http').createServer(app);
@@ -118,7 +118,7 @@ passport.serializeUser(User.serializeUser());
 passport.deserializeUser(User.deserializeUser());
 
 // setting app locals, which can be accessed in all ejs views
-app.use(function(req, res, next) {
+app.use((req, res, next) => {
   // puts user info into 'currentUser' variable
   res.locals.currentUser = req.user;
   // flash message stuff
@@ -134,15 +134,15 @@ app.use(function(req, res, next) {
 app.use(indexRoutes);
 app.use('/chat', chatRoutes);
 app.use('/profiles', profileRoutes);
-app.use('/articles', wHeightsRoutes);
 app.use('/inbox', inboxRoutes);
 app.use('/announcements', announcementRoutes);
 app.use('/admin', adminRoutes);
 app.use('/cafe', cafeRoutes);
 app.use('/projects', projectRoutes);
+// app.use('/articles', wHeightsRoutes);
 
 // Catch-all route
-app.get('*', function(req, res) {
+app.get('*', (req, res) => {
 	res.redirect('/');
 });
 
@@ -155,14 +155,14 @@ const curseResponse = [
 ];
 
 // gets random item in array
-function getRandMessage(list) {
+const getRandMessage = (list => {
   return list[Math.floor(Math.random() * list.length)];
-}
+})
 
 // deletes all comments at midnight
 
-// var manageComments = schedule.scheduleJob('0 0 0 * * *', function() {
-// 	Comment.find({}, function(err, foundComments) {
+// var manageComments = schedule.scheduleJob('0 0 0 * * *', () => {
+// 	Comment.find({}, (err, foundComments) => {
 // 		if(err) {
 // 			console.log(err);
 // 		} else {
@@ -230,7 +230,7 @@ io.on('connect', (socket) => {
       text: msg.text,
       room: socket.room,
       author: msg.authorId
-    }, function(err, comment) {
+    }, (err, comment) => {
       if (err) {
         // sends error msg if comment could not be created
         console.log(err);
@@ -258,7 +258,7 @@ io.on('connect', (socket) => {
             text: notif,
             room: socket.room,
             status: notif.status
-          }, function(err, comment) {
+          }, (err, comment) => {
             if (err) {
               // sends error msg if comment could not be created
               console.log(err);

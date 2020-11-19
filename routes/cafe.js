@@ -638,9 +638,9 @@ router.post('/:id/ready', middleware.isLoggedIn, middleware.isMod, (req, res) =>
   			text: `Hello ${order.customer.firstName},\n\n${notif.text}\n\n`
   		};
 
-  		transporter.sendMail(orderEmail, function(error, info){
-  		  if (error) {
-  		    console.log(error);
+  		transporter.sendMail(orderEmail, (err, info) => {
+  		  if (err) {
+  		    console.log(err);
   		  } else {
   		    console.log('Email sent: ' + info.response);
   		  }
@@ -712,9 +712,9 @@ router.post('/:id/reject', middleware.isLoggedIn, middleware.isMod, (req, res) =
       text: `Hello ${order.customer.firstName},\n\n${notif.text}\n\n`
     };
 
-    transporter.sendMail(orderEmail, function(error, info){
-      if (error) {
-        console.log(error);
+    transporter.sendMail(orderEmail, (err, info) => {
+      if (err) {
+        console.log(err);
       } else {
         console.log('Email sent: ' + info.response);
       }

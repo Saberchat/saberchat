@@ -50,7 +50,7 @@
             <p class="mb-1">View your currently active orders, or place a new one.</p>
           </li>
           <ul class="list-group">
-            <% orders.reverse().forEach(function(order) { %>
+            <% orders.reverse().forEach(order => { %>
               <% if (order.present == true) { %>
                 <li class="list-group-item">
 
@@ -132,7 +132,7 @@
             </div>
             <p class="mb-1">View your past orders.</p>
           </li>
-          <% orders.forEach(function(order) { %>
+          <% orders.forEach(order => { %>
             <% if (order.present == false) { %>
               <li class="list-group-item">
 

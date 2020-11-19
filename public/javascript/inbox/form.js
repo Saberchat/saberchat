@@ -2,7 +2,7 @@ const imgContainer = document.getElementById('image-block');
 
 let i = 0;
 
-function addImg() {
+const addImg = (() => {
     const img = document.createElement('div');
     img.classList.add('image-group');
     img.id = `block-${i}`;
@@ -12,9 +12,9 @@ function addImg() {
   <button type="button" onclick="deleteImg(this)" class="btn btn-danger"><i class="fas fa-minus"></i></button>`;
     imgContainer.prepend(img);
     i++;
-}
+});
 
-function createImg(val) { //Creates an image based on value of image input
+const createImg = (val => { //Creates an image based on value of image input
 
   if ($(`#block-${val.id}`).find('img').length == 0) {
     const imageDisplay = document.createElement('img');
@@ -40,9 +40,9 @@ function createImg(val) { //Creates an image based on value of image input
 
     }, 3);
   }
-}
+});
 
-function deleteImg(btn) {
+const deleteImg = (btn => {
     const parent = btn.parentNode;
     parent.remove();
-}
+});

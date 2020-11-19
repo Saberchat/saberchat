@@ -61,7 +61,7 @@
                   </div>
                 </li>
 
-                <% type.items.forEach(function(item) { %>
+                <% type.items.forEach(item => { %>
                   <% if (item.isAvailable == true) { %>
                     <div class="list-group-item list-group-item-action form-check menu-item <%=type.name%>" id="item-<%=item.id%>">
 
@@ -71,15 +71,15 @@
                         <input name="check[<%= item._id %>]" id="<%= item._id%>" class="form-check-input" type="checkbox" value="">
                         <select class="num-orders" id="dd_<%=item._id%>" name="<%=item.name%>" onchange="changeOrderConfirmation()">
                           <% if (item.availableItems > 3) { %>
-                            <% [1, 2, 3].forEach(function(num) { %>
+                            <% [1, 2, 3].forEach(num => { %>
                               <option><%=num%></option>
-                            <% }) %>
+                            <% }); %>
                           <% } else { %>
                             <% let val = 0 %>
-                            <% [...Array(item.availableItems).keys()].forEach(function(num) { %>
+                            <% [...Array(item.availableItems).keys()].forEach(num => { %>
                               <% val = num + 1 %>
                               <option><%=val%></option>
-                            <% }) %>
+                            <% }); %>
                           <% } %>
                         </select>
 
@@ -138,7 +138,7 @@
   order(orderForm, '<%=currentUser._id%>');
 
 
-  function searchFunction() {
+  const searchFunction = (() => {
     const catHeaders = document.getElementsByClassName('category-header') //Category header
     const catBreaks = document.getElementsByClassName('category-break') //Category page break
     const menuItems = document.getElementsByClassName('menu-item')
@@ -176,7 +176,7 @@
       }
     }
 
-  }
+  });
 
 </script>
 </html>

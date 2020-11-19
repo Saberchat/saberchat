@@ -29,9 +29,9 @@ let transporter = nodemailer.createTransport({
 });
 
 // renders the list of users page
-router.get('/', middleware.isLoggedIn, function(req, res) {
+router.get('/', middleware.isLoggedIn, (req, res) => {
 
-  User.find({}, function(err, foundUsers) {
+  User.find({}, (err, foundUsers) => {
     if(err || !foundUsers) {
         req.flash('error', 'Unable to access Database');
         res.redirect('back');
@@ -43,18 +43,18 @@ router.get('/', middleware.isLoggedIn, function(req, res) {
 });
 
 //renders profiles edit page
-router.get('/edit', middleware.isLoggedIn, function(req, res) {
+router.get('/edit', middleware.isLoggedIn, (req, res) => {
   res.render('profile/edit');
 });
 
 //renders the email/password edit page
-router.get('/change-login-info', middleware.isLoggedIn, function(req, res) {
+router.get('/change-login-info', middleware.isLoggedIn, (req, res) => {
   res.render('profile/edit_pwd_email');
 });
 
 //renders views/profiles/show.ejs at /profiles route.
-router.get('/:id', middleware.isLoggedIn, function(req, res) {
-  User.findById(req.params.id, function(err, foundUser) {
+router.get('/:id', middleware.isLoggedIn, (req, res) => {
+  User.findById(req.params.id, (err, foundUser) => {
     if(err || !foundUser) {
         req.flash('error', 'Error. Cannot find user.');
         res.redirect('back');
@@ -66,7 +66,7 @@ router.get('/:id', middleware.isLoggedIn, function(req, res) {
 });
 
 // update user route. Check if current user matches profiles they're trying to edit with middleware.
-router.put('/profile', middleware.isLoggedIn, function(req, res) {
+router.put('/profile', middleware.isLoggedIn, (req, res) => {
 
   (async() => {
 
@@ -124,9 +124,9 @@ router.put('/profile', middleware.isLoggedIn, function(req, res) {
 			text: `Hello ${user.firstName},\n\nYou are receiving this email because you recently made changes to your Saberchat profile.\n\nIf you did not recently make any changes, contact a faculty member immediately.`
 		};
 
-		transporter.sendMail(updateEmail, function(error, info){
-		  if (error) {
-		    console.log(error);
+		transporter.sendMail(updateEmail, (err, info) =>{
+		  if (err) {
+		    console.log(err);
 		  } else {
 		    console.log('Email sent: ' + info.response);
 		  }
@@ -143,7 +143,7 @@ router.put('/profile', middleware.isLoggedIn, function(req, res) {
 });
 
 //route for changing email. Similar to edit profiles route. But changing email logs out user for some reason.
-router.put('/change-email', middleware.isLoggedIn, function(req, res) {
+router.put('/change-email', middleware.isLoggedIn, (req, res) => {
   (async() => {
 
     const emails = await Email.find({address: req.body.email});
@@ -183,9 +183,9 @@ router.put('/change-email', middleware.isLoggedIn, function(req, res) {
         text: `Hello ${updatedUser.firstName},\n\nYou are receiving this email because you recently made changes to your Saberchat email. This is a confirmation of your profile.\n\nYour username is ${updatedUser.username}.\nYour full name is ${updatedUser.firstName} ${updatedUser.lastName}.\nYour email is ${req.body.email}`
       };
 
-      transporter.sendMail(updateEmail, function(error, info){
-        if (error) {
-          console.log(error);
+      transporter.sendMail(updateEmail, (err, info) =>{
+        if (err) {
+          console.log(err);
         } else {
           console.log('Email sent: ' + info.response);
         }
@@ -203,16 +203,16 @@ router.put('/change-email', middleware.isLoggedIn, function(req, res) {
 });
 
 //route for changing password. Not too much different from previous routes.
-router.put('/change-password', middleware.isLoggedIn, function(req, res) {
+router.put('/change-password', middleware.isLoggedIn, (req, res) => {
 
     if (req.body.newPassword == req.body.newPasswordConfirm)  {
-      User.findById(req.user._id, function(err, foundUser) {
+      User.findById(req.user._id, (err, foundUser) => {
         if(err || !foundUser) {
           req.flash('error', 'Error, cannot find user');
           res.redirect('/');
 
       } else {
-        foundUser.changePassword(req.body.oldPassword, req.body.newPassword, function(err) {
+        foundUser.changePassword(req.body.oldPassword, req.body.newPassword, (err) => {
           if(err) {
             req.flash('error', 'Error changing your password. Check if old password is correct.');
             res.redirect('/');
@@ -226,9 +226,9 @@ router.put('/change-password', middleware.isLoggedIn, function(req, res) {
               text: `Hello ${req.user.firstName},\n\nYou are receiving this email because you recently made changes to your Saberchat password. This is a confirmation of your profile.\n\nYour username is ${req.user.username}.\nYour full name is ${req.user.firstName} ${req.user.lastName}.\nYour email is ${req.user.email}\n\nIf you did not recently change your password, reset it immediately and contact a faculty member.`
             };
 
-            transporter.sendMail(updateEmail, function(error, info){
-              if (error) {
-                console.log(error);
+            transporter.sendMail(updateEmail, (err, info) =>{
+              if (err) {
+                console.log(err);
               } else {
                 console.log('Email sent: ' + info.response);
               }
@@ -471,9 +471,9 @@ router.delete('/delete-account', middleware.isLoggedIn, (req, res) => {
       text: `Hello ${deletedUser.firstName},\n\nYou are receiving this email because you recently deleted your Saberchat account. If you did not delete your account, contact a staff member immediately.`
     };
 
-    transporter.sendMail(deleteEmail, function(error, info){
-      if (error) {
-        console.log(error);
+    transporter.sendMail(deleteEmail, (err, info) =>{
+      if (err) {
+        console.log(err);
       } else {
         console.log('Email sent: ' + info.response);
       }

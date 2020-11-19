@@ -9,7 +9,7 @@ const accessReq = require('../models/accessRequest');
 middleware = {};
 
 //create isLoggedIn function to check if user is logged in
-middleware.isLoggedIn = function(req, res, next) {
+middleware.isLoggedIn = ((req, res, next) => {
 	//authenticate user
 	if(req.isAuthenticated()) {
 		//stop the function by returning and proceed to next step
@@ -18,10 +18,10 @@ middleware.isLoggedIn = function(req, res, next) {
 	//user is not logged in. Give flash message and redirect to root
 	req.flash('error', 'Please Login');
 	res.redirect('/');
-}
+});
 
 //checks if user is allowed into room
-middleware.checkIfMember = function(req, res, next) {
+middleware.checkIfMember = ((req, res, next) => {
 	Room.findById(req.params.id, function(err, foundRoom) {
 		if(err || !foundRoom) {
 			console.log(err);
@@ -37,10 +37,10 @@ middleware.checkIfMember = function(req, res, next) {
 			res.redirect('/chat');
 		}
 	});
-}
+});
 
 // checks for if the user can leave from a room
-middleware.checkForLeave = function(req, res, next) {
+middleware.checkForLeave = ((req, res, next) => {
 	Room.findById(req.params.id, function(err, foundRoom) {
 		if(err || !foundRoom) {
 			console.log(err);
@@ -59,9 +59,10 @@ middleware.checkForLeave = function(req, res, next) {
 			}
 		}
 	});
-}
+});
+
 // check if room owner
-middleware.checkRoomOwnership = function(req, res, next) {
+middleware.checkRoomOwnership = ((req, res, next) => {
 	Room.findById(req.params.id, function(err, foundRoom) {
 		if(err || !foundRoom) {
 			console.log(err);
@@ -75,55 +76,54 @@ middleware.checkRoomOwnership = function(req, res, next) {
 			res.redirect('/chat/' + foundRoom._id);
 		}
 	});
-}
+});
 
-middleware.isPrincipal = function(req, res, next) {
+middleware.isPrincipal = ((req, res, next) => {
 	if(req.user.permission == 'principal') {
 		next();
 	} else {
 		req.flash('error', 'You do not have permission to do that');
 		res.redirect('/');
 	}
-}
+});
 
-
-middleware.isAdmin = function(req, res, next) {
+middleware.isAdmin = ((req, res, next) => {
 	if(req.user.permission == 'admin' || req.user.permission == 'principal') {
 		next();
 	} else {
 		req.flash('error', 'You do not have permission to do that');
 		res.redirect('/');
 	}
-}
+});
 
-middleware.isMod = function(req, res, next) {
+middleware.isMod = ((req, res, next) => {
 	if(req.user.permission == 'mod' || req.user.permission == 'admin' || req.user.permission == 'principal') {
 		next();
 	} else {
 		req.flash('error', 'You do not have permission to do that');
 		res.redirect('/');
 	}
-}
+});
 
-middleware.isFaculty = function(req, res, next) {
+middleware.isFaculty = ((req, res, next) => {
 	if(req.user.status == 'faculty') {
 		next();
 	} else {
 		req.flash('error', 'You do not have permission to do that');
 		res.redirect('back');
 	}
-}
+});
 
-middleware.isStudent = function(req, res, next) {
+middleware.isStudent = ((req, res, next) => {
 	if(req.user.status != 'faculty' && req.user.status != "parent") {
 		next();
 	} else {
 		req.flash('error', 'You do not have permission to do that');
 		res.redirect('back');
 	}
-}
+});
 
-middleware.cafeOpen = function(req, res, next) { //Cafe time restrictions
+middleware.cafeOpen = ((req, res, next) => { //Cafe time restrictions
 
 	Cafe.find({}, (err, foundCafe) => {
 		if (err || !foundCafe) {
@@ -140,7 +140,7 @@ middleware.cafeOpen = function(req, res, next) { //Cafe time restrictions
 			}
 		}
 	})
-}
+});
 
 
 //export the object with all the functions

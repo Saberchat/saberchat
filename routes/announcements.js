@@ -157,9 +157,9 @@ router.post('/', middleware.isLoggedIn, middleware.isMod, (req, res) => { //REST
         html: `<p>Hello ${user.firstName},</p><p>${req.user.username} has recently posted a new announcement - '${announcement.subject}'.</p><p>${announcement.text}</p><p>You can access the full announcement at https://alsion-saberchat.herokuapp.com</p> ${imageString}`
       };
 
-      transporter.sendMail(announcementEmail, function(error, info){
-				if (error) {
-					console.log(error);
+      transporter.sendMail(announcementEmail, (err, info) => {
+				if (err) {
+					console.log(err);
 				} else {
 					console.log('Email sent: ' + info.response);
 				}
@@ -240,9 +240,9 @@ router.put('/:id', middleware.isLoggedIn, middleware.isMod, (req, res) => { //RE
           html: `<p>Hello ${user.firstName},</p><p>${req.user.username} has recently updated an announcement - '${announcement.subject}'.</p><p>${announcement.text}</p><p>You can access the full announcement at https://alsion-saberchat.herokuapp.com</p> ${imageString}`
         };
 
-        transporter.sendMail(announcementEmail, function(error, info){
+        transporter.sendMail(announcementEmail, (err, info) => {
   				if (error) {
-  					console.log(error);
+  					console.log(err);
   				} else {
   					console.log('Email sent: ' + info.response);
   				}

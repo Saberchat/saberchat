@@ -33,7 +33,7 @@ router.get('/', (req, res) => {
 // ===========================
 
 //new registered user
-router.post("/register",  function(req, res) {
+router.post("/register",  (req, res) => {
 	if(req.body.email == '') {
 		req.flash('error', 'Fill in email');
 		res.redirect('/');
@@ -117,7 +117,7 @@ router.post("/register",  function(req, res) {
         });
 
 				//registers the user
-				User.register(newUser, req.body.password, function(err, user) {
+				User.register(newUser, req.body.password, (err, user) => {
 					if(err) {
 						//flash message the error if there is an error registering user
 						if(err.name == 'UserExistsError') {
@@ -146,9 +146,9 @@ router.post("/register",  function(req, res) {
       			text: `Hello ${newUser.firstName},\n\nWelcome to Saberchat! A confirmation of your account:\n\nYour username is ${newUser.username}.\nYour full name is ${newUser.firstName} ${newUser.lastName}.\nYour linked email is ${newUser.email}\n\nYou will be assigned a role and status soon based on your grade or position.`
       		};
 
-      		transporter.sendMail(emailMessage, function(error, info){
-      		  if (error) {
-      		    console.log(error);
+      		transporter.sendMail(emailMessage, (err, info) =>{
+      		  if (err) {
+      		    console.log(err);
       		  } else {
       		    console.log('Email sent: ' + info.response);
       		  }
@@ -163,7 +163,7 @@ router.post("/register",  function(req, res) {
 // Custom login handling so that flash messages can be sent. I'm not entirely sure how it works. Copy pasted from official doc
 router.post('/login', function(req, res, next) {
 	//authenticate user
-    passport.authenticate('local', function(err, user, info) {
+    passport.authenticate('local', (err, user, info) => {
         if (err) { return next(err); }
         if (!user) {
 			//flash message error
@@ -171,7 +171,7 @@ router.post('/login', function(req, res, next) {
             return res.redirect('/');
 		}
 		//If authentication succeeds, log in user again
-        req.logIn(user, function(err) {
+        req.logIn(user, (err) => {
 			if (err) { return next(err); }
 			//flash message success
             req.flash('success', 'Welcome ' + user.firstName);
@@ -221,9 +221,9 @@ router.post('/forgot-password', (req, res) => {
         html: `<p>Hello ${users[0].firstName},</p><p>You are receiving this email because you recently requested a password reset.</p><p>Click <a href="https://alsion-saberchat.herokuapp.com/reset-password?user=${users[0]._id}">here</a> to reset your password. Use the following character sequence as your temporary password:</p><p>${pwd}</p>`
       };
 
-      transporter.sendMail(newPwdMessage, function(error, info) {
-        if (error) {
-          console.log(error);
+      transporter.sendMail(newPwdMessage, (err, info) => {
+        if (err) {
+          console.log(err);
         } else {
           console.log('Email sent: ' + info.response);
         }
@@ -262,9 +262,9 @@ router.put('/reset-password', (req, res) => {
             html: `<p>Hello ${user.firstName},</p><p>You are receiving this email because you recently reset your Saberchat password.</p><p>If you did not recently reset your password, contact a faculty member immediately.</p><p>If you did, you can ignore this message.</p>`
           };
 
-          transporter.sendMail(newPwdMessage, function(error, info) {
-            if (error) {
-              console.log(error);
+          transporter.sendMail(newPwdMessage, (err, info) => {
+            if (err) {
+              console.log(err);
             } else {
               console.log('Email sent: ' + info.response);
             }
@@ -288,7 +288,7 @@ router.put('/reset-password', (req, res) => {
 
 // >>>>>>> c413c2fa840ea70b4f1a6207ded0a60067579863
 //logout route
-router.get("/logout", function(req, res) {
+router.get("/logout", (req, res) => {
 	//logout with passport
 	req.logout();
 	//flash message success and redirect

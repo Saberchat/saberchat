@@ -13,7 +13,7 @@ let articleAuthor;
 let articleContent = [];
 
 // changes from head to editor
-function next() {
+const next = (() => {
   const title = document.getElementById('title').value;
   const author = document.getElementById('author').value;
   head.style.display = 'none';
@@ -22,9 +22,10 @@ function next() {
   articleTitle = title;
   document.getElementById('author-display').innerText = author;
   articleAuthor = author;
-}
+});
+
 // adds textarea
-function addText() {
+const addText = (() => {
   textCount += 1;
   $('#article-content').append(
     `<div class="text-block">
@@ -32,18 +33,18 @@ function addText() {
     <button class="delete-btn btn btn-danger" onclick="remove(this)"><i class="far fa-trash-alt"></i></button>
   </div>`
   );
-  document.getElementById('t-' + textCount).onkeydown = function(e){
+  document.getElementById('t-' + textCount).onkeydown = e => {
         if(e.keyCode==9 || e.which==9){
             e.preventDefault();
             let s = this.selectionStart;
             this.value = this.value.substring(0,this.selectionStart) + "\t" + this.value.substring(this.selectionEnd);
-            this.selectionEnd = s+1; 
+            this.selectionEnd = s+1;
         }
     }
-}
+});
 
 // adds image
-function addImage() {
+const addImage = (() => {
   $('#article-content').append(
     `<div class="img-block">
     <img src="${imageInput.value}" alt="article image" class="rounded article-img">
@@ -51,7 +52,8 @@ function addImage() {
     </div>`
   );
   imageInput.value = "";
-}
+});
+
 // enable tabs in textareas
 const textareas = document.getElementsByTagName('textarea');
 const count = textareas.length;
@@ -62,12 +64,12 @@ for(let i=0;i<count;i++){
             e.preventDefault();
             let s = this.selectionStart;
             this.value = this.value.substring(0,this.selectionStart) + "\t" + this.value.substring(this.selectionEnd);
-            this.selectionEnd = s+1; 
+            this.selectionEnd = s+1;
         }
     }
 }
 // function to post data
-function postIt(url, data){
+const postIt = ((url, data => {
 
   $('body').append($('<form/>', {
     id: 'jQueryPostItForm',
@@ -83,22 +85,22 @@ function postIt(url, data){
     }));
   }
   $('#jQueryPostItForm').submit();
-}
+});
 
 // removes text/image block
-function remove(element) {
+const remove = (element => {
   let parent = element.parentElement;
   parent.remove();
-}
+});
 
 // auto grows textareas
-function autoGrow(element) {
+const autoGrow = (element => {
   element.style.height = "5px";
   element.style.height = (element.scrollHeight)+"px";
-}
+});
 
 // submit article
-// $('#create-btn').on('click', function() {
+// $('#create-btn').on('click', (() => {
 //   let preContent = $('#article-content').children();
 //   for(let i=0;i < preContent.length; i++) {
 //     if(preContent[i].tagName == 'TEXTAREA') {
@@ -118,11 +120,11 @@ function autoGrow(element) {
 //     author: articleAuthor,
 //     content: JSON.stringify(articleContent)
 //   }
-
+//
 //   postIt('/witherlyheights/articles/new', article);
 // });
 
-$('#create-btn').on('click', function() {
+$('#create-btn').on('click', (() => {
   let preContent = $('#article-content').children();
   console.log(preContent);
   for(let i=0;i < preContent.length; i++) {

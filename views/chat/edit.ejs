@@ -70,7 +70,7 @@
                   <input id="remove-search-input" onkeyup="searchFunction('remove')" class="form-control  search-input" type="text" placeholder="Search..." title="Type in Username">
               </div>
               <div id="remove-user-list" class="user-list">
-                  <% users.forEach(function(user) { %>
+                  <% users.forEach(user => { %>
                       <% if (!(user._id.equals(currentUser._id)) && room.members.includes(user._id)) { %>
                           <div class="form-check">
                               <input name="checkRemove[<%= user._id %>]" id="<%= user._id %>" class="form-check-input" type="checkbox" value="">
@@ -88,7 +88,7 @@
                   <input id="add-search-input" onkeyup="searchFunction('add')" class="form-control  search-input" type="text" placeholder="Search..." title="Type in Username">
               </div>
               <div id="add-user-list" class="user-list">
-                  <% users.forEach(function(user) { %>
+                  <% users.forEach(user => { %>
                       <% if (!(user._id.equals(currentUser._id)) && !(room.members.includes(user._id))) { %>
                           <div class="form-check">
                               <input name="checkAdd[<%= user._id %>]" id="<%= user._id %>" class="form-check-input" type="checkbox" value="">

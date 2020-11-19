@@ -91,7 +91,7 @@
         </div>
     </div>
     <script>
-        function searchFunction() {
+        const searchFunction = (() => {
           let statusHeaders = document.getElementsByClassName('status-header')
           let statusBreaks =  document.getElementsByClassName('status-page-break')
           let statuses = [ ["faculty", "Faculty", []], ["12th", "Seniors", []], ["11th", "Juniors", []], ["10th", "Sophomores", []], ["9th", "Freshmen", []], ["8th", "8th Graders", []], ["7th", "7th Graders", []], ["alumnus", "Alumni", []], ["parent", "Parents", []], ["guest", "Guests", []] ]
@@ -139,7 +139,7 @@
             }
 
           }
-        }
+        });
     </script>
 </body>
 </html>

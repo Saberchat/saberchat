@@ -105,12 +105,13 @@
 </main>
 <%- include('../partials/footer') %>
 <script>
-    window.onload = function() {
-        window.onscroll = function() {
+    window.onload = (() => {
+        window.onscroll = (() => {
             updateNav();
             animateDisplay();
-        }
-    }
+        });
+    });
+    
 </script>
 </body>
 </html>

@@ -25,7 +25,7 @@ let transporter = nodemailer.createTransport({
 
 //route for displaying room list
 router.get('/', middleware.isLoggedIn, (req, res) => {
-  Room.find({}, function(err, foundRooms) {
+  Room.find({}, (err, foundRooms) => {
     if (err || !foundRooms) {
       req.flash('error', 'Unable to access Database');
       res.redirect('back');
@@ -37,7 +37,7 @@ router.get('/', middleware.isLoggedIn, (req, res) => {
 
 //route for displaying new room form
 router.get('/new', middleware.isLoggedIn, (req, res) => {
-  User.find({}, function(err, foundUsers) {
+  User.find({}, (err, foundUsers) => {
     if (err || !foundUsers) {
       req.flash('error', 'Unable to access Database');
       res.redirect('back');
@@ -96,7 +96,7 @@ router.get('/:id/edit', middleware.isLoggedIn, middleware.checkRoomOwnership, (r
 });
 
 // create new rooms
-router.post('/', middleware.isLoggedIn, function(req, res) {
+router.post('/', middleware.isLoggedIn, (req, res) => {
   const room = {
     name: filter.clean(req.body.name),
     'creator.id': req.user._id,
@@ -104,7 +104,7 @@ router.post('/', middleware.isLoggedIn, function(req, res) {
     members: [req.user._id]
   };
 
-  Room.create(room, function(err, room) {
+  Room.create(room, (err, room) => {
     if (err) {
       console.log(err);
       req.flash('error', 'group could not be created');
@@ -131,7 +131,7 @@ router.post('/', middleware.isLoggedIn, function(req, res) {
 });
 
 // leave a room
-router.post('/:id/leave', middleware.isLoggedIn, middleware.checkForLeave, function(req, res) {
+router.post('/:id/leave', middleware.isLoggedIn, middleware.checkForLeave, (req, res) => {
   (async () => {
     const room = await Room.findById(req.params.id);
     if(!room) {
@@ -168,7 +168,7 @@ router.post('/:id/leave', middleware.isLoggedIn, middleware.checkForLeave, funct
 });
 
 // handles access requests
-router.post('/:id/request-access', middleware.isLoggedIn, function(req, res) {
+router.post('/:id/request-access', middleware.isLoggedIn, (req, res) => {
   (async () => {
     // find the room
     const foundRoom = await Room.findById(req.params.id);
@@ -221,9 +221,9 @@ router.post('/:id/request-access', middleware.isLoggedIn, function(req, res) {
 				html: `<p>Hello ${roomCreator.firstName},</p><p><strong>${req.user.username}</strong> is requesting to join your room, <strong>${foundRoom.name}.</strong></p><p>You can access the full request at https://alsion-saberchat.herokuapp.com</p>`
 			};
 
-			transporter.sendMail(requestEmail, function(error, info){
-				if (error) {
-					console.log(error);
+			transporter.sendMail(requestEmail, (err, info) => {
+				if (err) {
+					console.log(err);
 				} else {
 					console.log('Email sent: ' + info.response);
 				}
@@ -241,10 +241,10 @@ router.post('/:id/request-access', middleware.isLoggedIn, function(req, res) {
 });
 
 // handles reports on comments from users
-router.put('/comments/:id/report', middleware.isLoggedIn, function(req, res) {
+router.put('/comments/:id/report', middleware.isLoggedIn, (req, res) => {
   Comment.findById(req.params.id)
   .populate({path: 'room', select: 'moderate'})
-  .exec(function(err, comment) {
+  .exec((err, comment) => {
     if(err || !comment) {
       res.json('Error');
     } else if(!comment.room.moderate) {
@@ -266,7 +266,7 @@ router.put('/comments/:id/report', middleware.isLoggedIn, function(req, res) {
 
 // edit room
 router.put('/:id', middleware.isLoggedIn, middleware.checkRoomOwnership, (req, res) => {
-  Room.findByIdAndUpdate(req.params.id, {name: filter.clean(req.body.name), description: filter.clean(req.body.description)}, function(err, room) {
+  Room.findByIdAndUpdate(req.params.id, {name: filter.clean(req.body.name), description: filter.clean(req.body.description)}, (err, room) => {
     if (err || !room) {
       req.flash('error', 'Unable to access Database');
       res.redirect('back');

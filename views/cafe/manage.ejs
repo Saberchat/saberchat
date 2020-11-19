@@ -96,7 +96,7 @@
 
   <script>
 
-  function searchFunction() {
+  const searchFunction = (() => {
     const catHeaders = document.getElementsByClassName('category-header'); //Category header
     const catBreaks = document.getElementsByClassName('category-break'); //Category page break
     const menuItems = document.getElementsByClassName('menu-item');
@@ -133,7 +133,7 @@
         $(`#${catBreaks[h].id}`).hide();
       }
     }
-  }
+  });
 
   </script>
 </html>

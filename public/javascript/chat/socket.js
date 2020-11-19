@@ -5,13 +5,13 @@ const messageDisplay = document.getElementById('message-display');
 const scrollBtn = document.getElementsByClassName('btn-scrolldown')[0];
 
 // function for auto scrolling to new messages
-function scrollToElement(innerElement) {
+const scrollToElement = (innerElement => {
   var topPos = innerElement.offsetTop;
   messageDisplay.scrollTop = topPos-10;
-}
+})
 
 // function for reporting messages
-function report(element) {
+const report = (element => {
   let id = element.id;
   let url = '/chat/comments/' + id + '/report?_method=put'
   let data = {
@@ -24,10 +24,10 @@ function report(element) {
     parent.getElementsByClassName('flag')[0].remove();
     $(parent).append(`<p class="flag">[${data}]</p>`);
   });
-}
+})
 
 // function for scrolling to very bottom
-function scrollBottom() {
+const scrollBottom = (() => {
   let messages = document.getElementsByClassName('media');
   let message = messages[messages.length - 1];
   if(message) {
@@ -35,10 +35,10 @@ function scrollBottom() {
   }
   autoScroll = true;
   scrollBtn.classList.remove('display');
-}
+})
 
 // turn off auto scroll if user is checking previous messages
-messageDisplay.addEventListener('scroll', function() {
+messageDisplay.addEventListener('scroll', () => {
   if(messageDisplay.scrollTop < lastScrollTop) {
     autoScroll = false;
     if(!scrollBtn.classList.contains('display')) {
@@ -49,11 +49,11 @@ messageDisplay.addEventListener('scroll', function() {
 }, false);
 
 //create function that sets up the socket chat
-function chatInit(username, userId, messageForm, input, chatDisplay, room, userImage) {
+const chatInit = ((username, userId, messageForm, input, chatDisplay, room, userImage) {
 
   var socket = io();
 
-  $(messageForm).submit(function(e) {
+  $(messageForm).submit(e => {
     e.preventDefault(); // prevents page reloading
     let text = $('#m').val()
     //emits message object containing the info
@@ -86,7 +86,7 @@ function chatInit(username, userId, messageForm, input, chatDisplay, room, userI
     socket.emit('switch room', room);
   });
 
-  socket.on('announcement', function(notif) {
+  socket.on('announcement', notif => {
     $(chatDisplay).append(`
     <div class="announcement mb-1">
     <h4>${notif.text}</h4>
@@ -100,11 +100,11 @@ function chatInit(username, userId, messageForm, input, chatDisplay, room, userI
     }
   });
 
-  socket.on('chat message', function(msg) {
+  socket.on('chat message', msg => {
     // appends the message to the ul element displaying the messages
     let element;
     if(moderate == 'true') {
-      element = 
+      element =
       `<div class="media mb-2">
         <img src="${msg.userImage}" alt="user" class="user-image">
         <div class="media-body ml-3">
@@ -116,7 +116,7 @@ function chatInit(username, userId, messageForm, input, chatDisplay, room, userI
         </div>
       </div>`;
     } else {
-      element = 
+      element =
       `<div class="media mb-2">
         <img src="${msg.userImage}" alt="user" class="user-image">
         <div class="media-body ml-3">
@@ -137,4 +137,4 @@ function chatInit(username, userId, messageForm, input, chatDisplay, room, userI
       }
     }
   });
-}
+})

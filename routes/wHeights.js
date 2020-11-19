@@ -10,9 +10,9 @@ const User = require('../models/user');
 const Type = require('../models/articleType');
 
 // index page
-router.get('/', middleware.isLoggedIn, function(req, res) {
+router.get('/', middleware.isLoggedIn, (req, res) => {
 
-  Article.find({}).populate('author').exec(function(err, foundArticles) {
+  Article.find({}).populate('author').exec((err, foundArticles) => {
       if(err) {
           req.flash('error', 'Cannot access Database');
           res.redirect('/articles');
@@ -23,7 +23,7 @@ router.get('/', middleware.isLoggedIn, function(req, res) {
 });
 
 // display form for creating articles
-router.get('/new', middleware.isLoggedIn, function(req, res) {
+router.get('/new', middleware.isLoggedIn, (req, res) => {
 
   (async() => {
 
@@ -47,8 +47,8 @@ router.get('/new', middleware.isLoggedIn, function(req, res) {
 });
 
 // display specific article
-router.get('/:id', middleware.isLoggedIn, function(req, res) {
-    Article.findById(req.params.id).populate('author').exec(function(err, foundArticle) {
+router.get('/:id', middleware.isLoggedIn, (req, res) => {
+    Article.findById(req.params.id).populate('author').exec((err, foundArticle) => {
         if(err) {
             req.flash('error', 'Cannot find article');
             res.redirect('/articles');
@@ -59,7 +59,7 @@ router.get('/:id', middleware.isLoggedIn, function(req, res) {
 });
 
 // create articles
-router.post('/new', middleware.isLoggedIn, function(req, res) {
+router.post('/new', middleware.isLoggedIn, (req, res) => {
 
   (async () => {
 

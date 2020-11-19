@@ -38,7 +38,7 @@ router.get('/moderate', middleware.isLoggedIn, middleware.isMod, (req, res) => {
 	.populate({path: 'author', select:['username','imageUrl']})
 	.populate({path: 'statusBy', select:['username', 'imageUrl']})
 	.populate({path: 'room', select: ['name']})
-	.exec(function(err, foundComments) {
+	.exec((err, foundComments) => {
 		if(err) {
 			req.flash('error', 'Cannot access DataBase');
 			res.redirect('/admin');
@@ -383,9 +383,9 @@ router.delete('/whitelist/:id', middleware.isLoggedIn, middleware.isPrincipal, (
 			text: `Hello ${deletedUser.firstName},\n\nYou are receiving this email because your email has been removed from Saberchat's email whitelist. Your account and all of its data has been deleted. Please contact a faculty member if  you think there has been a mistake.`
 		};
 
-		transporter.sendMail(deleteEmail, function(error, info){
-			if (error) {
-				console.log(error);
+		transporter.sendMail(deleteEmail, (err, info) => {
+			if (err) {
+				console.log(err);
 			} else {
 				console.log('Email sent: ' + info.response);
 			}
@@ -475,6 +475,6 @@ router.delete('/moderate', middleware.isLoggedIn, middleware.isMod, (req, res) =
 
 router.get('/manageCafe', middleware.isLoggedIn, middleware.isMod, (req, res) => {
 	res.redirect('/cafe/manage');
-})
+});
 
 module.exports = router;

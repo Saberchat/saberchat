@@ -202,9 +202,9 @@ router.post('/messages', middleware.isLoggedIn, (req, res) => {
   			};
       }
 
-			transporter.sendMail(inboxEmail, function(error, info){
+			transporter.sendMail(inboxEmail, (err, info) => {
 				if (error) {
-					console.log(error);
+					console.log(err);
 				} else {
 					console.log('Email sent: ' + info.response);
 				}
@@ -409,9 +409,9 @@ router.post('/requests/:id/accept', middleware.isLoggedIn, (req, res) => {
 				html: `<p>Hello ${Req.requester.firstName},</p><p>Your request to join chat room <strong>${foundRoom.name}</strong> has been accepted!<p><p>You can access the room at https://alsion-saberchat.herokuapp.com</p>`
 			};
 
-			transporter.sendMail(requestEmail, function(error, info){
+			transporter.sendMail(requestEmail, (err, info) => {
 				if (error) {
-					console.log(error);
+					console.log(err);
 				} else {
 					console.log('Email sent: ' + info.response);
 				}
@@ -471,9 +471,9 @@ router.post('/requests/:id/reject', middleware.isLoggedIn, (req, res) => {
 				html: `<p>Hello ${Req.requester.firstName},</p><p>Your request to join chat room <strong>${Req.room.name}</strong> has been rejected. Contact the room creator, <strong>${Req.room.creator.username}</strong>, if  you think there has been a mistake.</p>`
 			};
 
-			transporter.sendMail(requestEmail, function(error, info){
+			transporter.sendMail(requestEmail, (err, info) => {
 				if (error) {
-					console.log(error);
+					console.log(err);
 				} else {
 					console.log('Email sent: ' + info.response);
 				}

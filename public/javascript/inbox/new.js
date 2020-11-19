@@ -15,7 +15,7 @@ const anonymousControl = document.getElementById('anonymous-control');
 let recipients = [];
 
 // processes all the selected recipients into form info
-function process() {
+const process = (() => {
     if(!recipients.length > 0 && !everyoneCheck.checked) {
         return false;
     } else if(!everyoneCheck.checked) {
@@ -27,10 +27,10 @@ function process() {
         form.appendChild(input);
     }
     return true;
-}
+});
 
 // toggles recipients selection
-function updateTo(everyoneCheck) {
+const updateTo = (everyoneCheck => {
     if(everyoneCheck.checked) {
         userSelect.required = false;
         facultySelect.required = false;
@@ -48,10 +48,10 @@ function updateTo(everyoneCheck) {
         anonymousControl.style.display = 'block';
         userDisplay.style.display = 'block';
     }
-}
+});
 
 // toggles anonymous messaging
-function setAnonymous(check) {
+const setAnonymous = (check => {
     if(check.checked) {
         userSelect.required = false;
         defaultMsg.style.display = 'none';
@@ -74,19 +74,19 @@ function setAnonymous(check) {
         clearTags();
         userSelect.value = '';
     }
-}
+});
 
 // clears user tags
-function clearTags() {
+const clearTags = (() => {
     const tags = document.getElementsByClassName('user-tag');
 
     while (tags[0]) {
         tags[0].parentNode.removeChild(tags[0]);
     }
-}
+});
 
 // adds recipients to list
-function addRecipient(type) {
+const addRecipient = (type => {
     if(type == 'user') {
         const id = userSelect.value;
         addTag(userSelect, id);
@@ -94,10 +94,10 @@ function addRecipient(type) {
         const id = facultySelect.value;
         addTag(facultySelect, id);
     }
-}
+});
 
 // adds the user tag to the display
-function addTag(select, id) {
+const addTag = ((select, id => {
     if(!recipients.includes(id)) {
         const username = select.options[select.selectedIndex].text;
         recipients.push(id);
@@ -109,10 +109,10 @@ function addTag(select, id) {
 
         userDisplay.appendChild(tag);
     }
-}
+});
 
 // remove recipients
-function remRecipient(btn) {
+const remRecipient = (btn => {
     const id = btn.id;
     const i = recipients.indexOf(id);
     if(i > -1) {
@@ -120,4 +120,4 @@ function remRecipient(btn) {
     }
     const parent = btn.parentNode;
     parent.parentNode.removeChild(parent);
-}
+});

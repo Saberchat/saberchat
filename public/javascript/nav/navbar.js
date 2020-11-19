@@ -1,4 +1,4 @@
-function updateNav() {
+const updateNav = (() => {
     const nav = document.getElementById('nav-component');
     let scrollTop = window.pageYOffset || (document.documentElement || document.body.parentNode || document.body).scrollTop;
     if(scrollTop >= 300) {
@@ -10,4 +10,4 @@ function updateNav() {
             nav.classList.remove('nav-fixed');
         }
     }
-}
+})
