@@ -45,7 +45,7 @@ const Cafe = require('./models/cafe');
 const indexRoutes = require('./routes/index');
 const chatRoutes = require('./routes/chat');
 const profileRoutes = require('./routes/profile');
-// const wHeightsRoutes = require('./routes/wHeights');
+const wHeightsRoutes = require('./routes/wHeights');
 const inboxRoutes = require('./routes/inbox');
 const adminRoutes = require('./routes/admin');
 const cafeRoutes = require('./routes/cafe');
@@ -134,7 +134,7 @@ app.use(function(req, res, next) {
 app.use(indexRoutes);
 app.use('/chat', chatRoutes);
 app.use('/profiles', profileRoutes);
-// app.use('/articles', wHeightsRoutes);
+app.use('/articles', wHeightsRoutes);
 app.use('/inbox', inboxRoutes);
 app.use('/announcements', announcementRoutes);
 app.use('/admin', adminRoutes);
@@ -161,7 +161,7 @@ function getRandMessage(list) {
 
 // deletes all comments at midnight
 
-// var manageComments = schedule.scheduleJob('0 0 * * *', function() {
+// var manageComments = schedule.scheduleJob('0 0 0 * * *', function() {
 // 	Comment.find({}, function(err, foundComments) {
 // 		if(err) {
 // 			console.log(err);
@@ -175,6 +175,34 @@ function getRandMessage(list) {
 // 		}
 // 	});
 // });
+
+//Update all students' statuses on July 1st at midnight
+
+var updateUsers = schedule.scheduleJob('0 0 0 1 7 *', () => {
+
+  User.find({}, (err, users) => {
+    if (err || !users) {
+      console.log(err);
+
+    } else {
+      let statuses = ['7th', '8th', '9th', '10th', '11th', '12th', 'Alumnus'];
+
+      loop1:
+      for (let user of users) {
+
+        loop2:
+        for (i = 0; i < statuses.length - 1; i ++) { //Alumni will not be updated, but students can be updated to 'alumnus', so the loop stops one short of the end
+          if (user.status.toLowerCase() == statuses[i].toLowerCase()) {
+            user.status = statuses[i+1]; //Update user to one status above them
+            user.save();
+            break loop2; //Stop the program from updating user multiple times as it iterates through the array of statuses
+          }
+        }
+      }
+    }
+  })
+
+})
 
 // Socket.io server-side code
 io.on('connect', (socket) => {
