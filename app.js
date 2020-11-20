@@ -87,9 +87,9 @@ app.use(methodOverride('_method'));
 app.use(flash());
 
 // express session stuff for authorization that I know nothing about
-var session = require('express-session');
+const session = require('express-session');
 // using memorystore package because express-session leads to memory leaks and isnt optimized for production.
-var MemoryStore = require('memorystore')(session);
+const MemoryStore = require('memorystore')(session);
 // app.use(require("express-session")({
 // 	// I think secret is what's used to encrypt the information
 // 	secret: "Programming For Alsion Is Cool",
@@ -161,7 +161,7 @@ const getRandMessage = (list => {
 
 // deletes all comments at midnight
 
-// var manageComments = schedule.scheduleJob('0 0 0 * * *', () => {
+// const manageComments = schedule.scheduleJob('0 0 0 * * *', () => {
 // 	Comment.find({}, (err, foundComments) => {
 // 		if(err) {
 // 			console.log(err);
@@ -178,31 +178,22 @@ const getRandMessage = (list => {
 
 //Update all students' statuses on July 1st at midnight
 
-var updateUsers = schedule.scheduleJob('0 0 0 1 7 *', () => {
+const updateUsers = schedule.scheduleJob('0 0 0 1 7 *', () => {
 
-  User.find({}, (err, users) => {
+  let statuses = ['7th', '8th', '9th', '10th', '11th', '12th', 'alumnus'];
+
+  User.find({status: {$in: statuses.slice(0, statuses.length-1)}}, (err, users) => { //Do not include CURRENT alumni in the people who will be updated, only 7th-12th graders
     if (err || !users) {
       console.log(err);
 
     } else {
-      let statuses = ['7th', '8th', '9th', '10th', '11th', '12th', 'Alumnus'];
-
-      loop1:
       for (let user of users) {
-
-        loop2:
-        for (i = 0; i < statuses.length - 1; i ++) { //Alumni will not be updated, but students can be updated to 'alumnus', so the loop stops one short of the end
-          if (user.status.toLowerCase() == statuses[i].toLowerCase()) {
-            user.status = statuses[i+1]; //Update user to one status above them
-            user.save();
-            break loop2; //Stop the program from updating user multiple times as it iterates through the array of statuses
-          }
-        }
+        user.status = statuses[statuses.indexOf(user.status)+1];
+        user.save();
       }
     }
-  })
-
-})
+  });
+});
 
 // Socket.io server-side code
 io.on('connect', (socket) => {
