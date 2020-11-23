@@ -7,7 +7,7 @@ const addImg = (() => { //Adds the image input field
     img.classList.add('image-group');
     img.id = `block-${i}`;
     img.innerHTML = `<div class="input-container">
-    <input type="text" id="${i}" class="form-control" onkeyup="createImg(this)" placeholder="Url..." name="images[${i}]" required>
+    <input type="text" id="${i}" class="form-control" oninput="createImg(this)" placeholder="Url..." name="images[${i}]" required>
   </div>
   <button type="button" onclick="deleteImg(this)" class="btn btn-danger"><i class="fas fa-minus"></i></button>`;
     imgContainer.prepend(img);

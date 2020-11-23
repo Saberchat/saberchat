@@ -47,12 +47,12 @@
 
             <div class="search-filter mb-3">
               <i class="fas fa-search"></i>
-              <input id="search-input" onkeyup="searchFunction()" class="form-control" type="text" placeholder="Search..." title="Type in product" />
+              <input id="search-input" oninput="searchFunction()" class="form-control" type="text" placeholder="Search..." title="Type in product" />
             </div>
           </div>
 
           <div id="item-list">
-            <% types.forEach(type => { %>
+            <% for (let type of types) { %>
               <% if (type.items.length > 0) { %>
 
                 <li class="list-group-item list-group-item-success category-header" id="<%=type._id%>-header" style="margin-top: 40px;">
@@ -60,10 +60,56 @@
                     <h2 class="mb-1"><%=type.name%></h2>
                   </div>
                 </li>
+              <% } %>
 
-                <% type.items.forEach(item => { %>
+              <% let newItems = []; %>
+              <% let frequent = false;%>
+
+              <% for (let item of type.items) { %>
+                <% frequent = false;%>
+                <% for (let frequentItem of frequentItems) { %>
+                  <% if (frequentItem.item.equals(item._id) && frequentItem.quantity >= frequentItemsMean) { %>
+                    <% frequent = true;%>
+                  <% } %>
+                <% } %>
+
+                <% if (frequent) { %>
+                  <%newItems.push(item);%>
+                <% } %>
+
+              <% } %>
+
+              <% for (let item of type.items) { %>
+                <% frequent = false;%>
+                <% for (let frequentItem of frequentItems) { %>
+                  <% if (frequentItem.item.equals(item._id) && frequentItem.quantity >= frequentItemsMean) { %>
+                    <% frequent = true;%>
+                  <% } %>
+                <% } %>
+
+                <% if (!frequent) { %>
+                  <%newItems.push(item);%>
+                <% } %>
+
+              <% } %>
+
+                <% for (let item of newItems) { %>
+                  <% popular = false; %>
                   <% if (item.isAvailable == true) { %>
-                    <div class="list-group-item list-group-item-action form-check menu-item <%=type.name%>" id="item-<%=item.id%>">
+
+                    <% for (let itemObj of frequentItems) { %>
+                      <% if (itemObj.item.equals(item._id) && itemObj.quantity >= frequentItemsMean) { %>
+                        <% popular = true;%>
+                        <% break;%>
+                      <% } %>
+                    <% } %>
+
+                    <% if (popular) { %>
+                      <div class="list-group-item list-group-item-info form-check menu-item <%=type.name%>" id="item-<%=item.id%>" title="You have frequently ordered this item">
+
+                    <% } else { %>
+                      <div class="list-group-item list-group-item-action form-check menu-item <%=type.name%>" id="item-<%=item.id%>">
+                    <% } %>
 
                       <!-- Div to put margins on text inside outer div -->
                       <div style="margin-left: 2%;" class="style-div">
@@ -83,30 +129,38 @@
                           <% } %>
                         </select>
 
-                        <% if (!item.price.toString().includes('.')) { %>
-                          <label style="margin-left: 1%;" class="form-check-label" for="<%= item._id%>"><strong><%= item.name %></strong> (<%= item.availableItems %> orders available) - $<%= item.price %>.00 <span hidden><%=type.name%></span></label>
+                        <label style="margin-left: 1%; font-size: 15px;" class="form-check-label" for="<%= item._id%>"><strong><%= item.name %></strong> (<%= item.availableItems %> orders available) -
 
-                        <% } else if (item.price.toString().split('.')[1].length == 1){ %>
-                          <label style="margin-left: 1%;" class="form-check-label" for="<%= item._id%>"><strong><%= item.name %></strong> (<%= item.availableItems %> orders available) - $<%= item.price %>0 <span hidden><%=type.name%></span></label>
+                        <% if (!item.price.toString().includes('.')) { %>
+                          $<%= item.price %>.00
+
+                        <% } else if (item.price.toString().split('.')[1].length == 1) { %>
+                          $<%= item.price %>0
 
                         <% } else { %>
-                          <label style="margin-left: 1%;" class="form-check-label" for="<%= item._id%>"><strong><%= item.name %></strong> (<%= item.availableItems %> orders available) - $<%= item.price %><span hidden><%=type.name%></span></label>
+                          $<%= item.price %>
                         <% } %>
 
+                        <% if (popular) { %>
+                          <span style="font-weight: bold; color: green;  margin-left: 5px;">Frequently Ordered. Order Item?</span>
+                        <% } %>
+
+                        <span hidden><%=type.name%></span>
+                        </label>
+
                         <br />
-                        <!-- <span class="form-check-label"><%= item.name %>: $<%= item.price %></span> -->
                       </div>
                     </div>
-                  <% }%>
-                <% }); %>
+
+                  <% } %>
+                <% } %>
                 <br class="category-break" id="<%=type._id%>-break"/>
-              <% } %>
-            <% }) %>
+            <% } %>
           </div>
 
           <br />
           <div class="form-group mt-3">
-            <textarea id="descInput" class="form-control" name="instructions" placeholder="Add special instructions for your order" maxlength="100" rows="5" onkeyup="changeOrderConfirmation()" onpaste="changeOrderConfirmation()"></textarea>
+            <textarea id="descInput" class="form-control" name="instructions" placeholder="Add special instructions for your order" maxlength="100" rows="5" oninput="changeOrderConfirmation()"></textarea>
           </div>
 
           <br />

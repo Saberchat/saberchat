@@ -468,7 +468,64 @@ router.get('/order/new', middleware.isLoggedIn, middleware.cafeOpen, (req, res) 
       return res.redirect('back');
     }
 
-    res.render('cafe/newOrder', {types});
+    const all_orders = await Order.find({customer: req.user._id}).populate('items.item'); //Find all of the orders that you have ordered, and populate info on their items
+
+    if (!all_orders) {
+      req.flash('error', "Unable to find orders");
+      return res.redirect('back');
+    }
+
+    let frequentItems = [];
+    let itemObject;
+    let overlap = false;
+    let temp;
+    let frequentItemsMean = 0;
+
+    loop1:
+    for (let order of all_orders) {
+
+      loop2:
+      for (let item of order.items) {
+        overlap = false;
+
+        loop3:
+        for (let i of frequentItems) {
+          if (i.item.equals(item.item._id)) {
+            i.quantity += item.quantity;
+            overlap = true;
+            break loop3;
+          }
+        }
+
+        if (!overlap) {
+
+          itemObject = {
+            item: item.item._id,
+            quantity: item.quantity
+          };
+
+          frequentItems.push(itemObject);
+        }
+      }
+    }
+
+    //My adaptation of the Mergesort Algorithm sorts array/object matrix from greatest-least frequency
+
+    for (let i = 0; i < frequentItems.length-1; i ++) {
+      for (let j = 0; j < frequentItems.length-1; j ++) {
+        if (frequentItems[j].quantity < frequentItems[j+1].quantity) {
+          temp = frequentItems[j];
+          frequentItems[j] = frequentItems[j+1];
+          frequentItems[j+1] = temp;
+        }
+      }
+    }
+
+    for (let itemObj of frequentItems) {
+      frequentItemsMean += itemObj.quantity / frequentItems.length;
+    }
+
+    res.render('cafe/newOrder', {types, frequentItems, frequentItemsMean});
 
   })().catch(err => {
     console.log(err);

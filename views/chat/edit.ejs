@@ -67,7 +67,7 @@
               <h4>Remove Members</h4>
               <div class="search-filter mb-3">
                   <i class="fas fa-search"></i>
-                  <input id="remove-search-input" onkeyup="searchFunction('remove')" class="form-control  search-input" type="text" placeholder="Search..." title="Type in Username">
+                  <input id="remove-search-input" oninput="searchFunction('remove')" class="form-control  search-input" type="text" placeholder="Search..." title="Type in Username">
               </div>
               <div id="remove-user-list" class="user-list">
                   <% users.forEach(user => { %>
@@ -85,7 +85,7 @@
               <h4>Add Members</h4>
               <div class="search-filter mb-3">
                   <i class="fas fa-search"></i>
-                  <input id="add-search-input" onkeyup="searchFunction('add')" class="form-control  search-input" type="text" placeholder="Search..." title="Type in Username">
+                  <input id="add-search-input" oninput="searchFunction('add')" class="form-control  search-input" type="text" placeholder="Search..." title="Type in Username">
               </div>
               <div id="add-user-list" class="user-list">
                   <% users.forEach(user => { %>

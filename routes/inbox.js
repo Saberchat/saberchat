@@ -22,6 +22,7 @@ let transporter = nodemailer.createTransport({
 //Route to display user inbox
 router.get('/', middleware.isLoggedIn, (req, res) => {
 	(async () => {
+
 		await req.user.populate({path: 'inbox', populate: { path: 'sender', select: ['username', 'imageUrl']}}).execPopulate();
 
 		await req.user.populate(

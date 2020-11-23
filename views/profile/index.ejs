@@ -31,7 +31,7 @@
                 <h1 class="title">Users</h1>
                 <div class="search-filter">
                     <i class="fas fa-search"></i>
-                    <input id="search-input" onkeyup="searchFunction()" class="form-control" type="text" placeholder="Search..." title="Type in Username">
+                    <input id="search-input" oninput="searchFunction()" class="form-control" type="text" placeholder="Search..." title="Type in Username">
                 </div>
                 <div class="list-group" id="user-list">
                   <% let statuses = [ ["faculty", "Faculty", []], ["12th", "Seniors", []], ["11th", "Juniors", []], ["10th", "Sophomores", []], ["9th", "Freshmen", []], ["8th", "8th Graders", []], ["7th", "7th Graders", []], ["alumnus", "Alumni", []], ["parent", "Parents", []], ["guest", "Guests", []] ] %>
