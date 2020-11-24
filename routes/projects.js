@@ -46,16 +46,37 @@ router.post('/',middleware.isLoggedIn, middleware.isFaculty, (req, res) => { //R
 
   (async() => { //Asynchronous functions dictates that processes occur one at a time, reducing excessive callbacks
 
-    let creators;
+    let creators = [];
+    let statusGroup; //Group of creators by status
+    let individual; //Individual Creator ID
 
     if (req.body.creatorInput == '') {
       creators = [];
 
     } else {
-      creators = await User.find({_id: {$in: req.body.creatorInput.split(',')}}); //Figure out all the students who created the project, based on the usernames the teacher entered
+      let statuses = ['7th', '8th', '9th', '11th', '12th'];
 
-      if (!creators) {
-        req.flash('error', "Unable to find the users you listed"); return res.redirect('back');
+      for (let creator of req.body.creatorInput.split(',')) {
+
+        if (statuses.indexOf(creator) > -1) {
+          statusGroup = await User.find({status: creator});
+
+          if (!statusGroup) {
+            req.flash('error', "Unable to find the users you listed"); return res.redirect('back');
+          }
+
+          for (let user of statusGroup) {
+            creators.push(user);
+          }
+
+        } else {
+          individual = await User.findById(creator);
+          if (!individual) {
+            req.flash('error', "Unable to find the users you listed"); return res.redirect('back');
+          }
+
+          creators.push(individual);
+        }
       }
     }
 
@@ -140,21 +161,42 @@ router.put('/:id', middleware.isLoggedIn, middleware.isFaculty, (req, res) => {
 
   (async() => { //Asynchronous functions dictates that processes occur one at a time, reducing excessive callbacks
 
-    let creators;
+    let creators = [];
+    let statusGroup; //Group of creators by status
+    let individual; //Individual Creator ID
 
     if (req.body.creatorInput == '') {
       creators = [];
 
     } else {
-      creators = await User.find({_id: {$in: req.body.creatorInput.split(',')}}); //Figure out all the students who created the project, based on the usernames the teacher entered
+      let statuses = ['7th', '8th', '9th', '11th', '12th'];
 
-      if (!creators) {
-        req.flash('error', "Unable to find the users you listed"); return res.redirect('back');
+      let creatorInputArray = req.body.creatorInput.split(',');
+
+      console.log(creatorInputArray);
+
+      for (let creator of creatorInputArray) {
+
+        if (statuses.indexOf(creator) > -1) {
+          statusGroup = await User.find({status: creator});
+
+          if (!statusGroup) {
+            req.flash('error', "Unable to find the users you listed"); return res.redirect('back');
+          }
+
+          for (let user of statusGroup) {
+            creators.push(user);
+          }
+
+        } else {
+          individual = await User.findById(creator);
+          if (!individual) {
+            req.flash('error', "Unable to find the users you listed"); return res.redirect('back');
+          }
+
+          creators.push(individual);
+        }
       }
-    }
-
-    if (!creators) {
-      req.flash('error', 'Unable to find project creators'); return res.redirect('back');
     }
 
     const project = await Project.findById(req.params.id).populate('poster');

@@ -41,20 +41,20 @@
                   <div class="form-group">
                     <label for="user-select" class="label-custom">Recipients</label>
                     <select id="user-select" class="form-control" onchange="addRecipient('user')" required>
-                      <option value="" selected disabled>Select User/Group</option>
-                      <option value="7th">7th Graders</option>
-                      <option value="8th">8th Graders</option>
-                      <option value="9th">9th Graders</option>
-                      <option value="10th">EC Sophomores</option>
-                      <option value="11th">EC Juniors</option>
-                      <option value="12th">EC Seniors</option>
-                      <option value="faculty">Faculty</option>
-                      <option value="parent">Parents</option>
-                      <option value="alumnus">Alumni</option>
-                      <option value="guest">Guests</option>
+                      <option class="recipient-group" value="" selected disabled>Select User/Group</option>
+                      <option class="recipient-group" value="7th">7th Graders</option>
+                      <option class="recipient-group" value="8th">8th Graders</option>
+                      <option class="recipient-group" value="9th">9th Graders</option>
+                      <option class="recipient-group" value="10th">EC Sophomores</option>
+                      <option class="recipient-group" value="11th">EC Juniors</option>
+                      <option class="recipient-group" value="12th">EC Seniors</option>
+                      <option class="recipient-group" value="faculty">Faculty</option>
+                      <option class="recipient-group" value="parent">Parents</option>
+                      <option class="recipient-group" value="alumnus">Alumni</option>
+                      <option class="recipient-group" value="guest">Guests</option>
                       <% users.forEach(user => { %>
                         <% if(!user._id.equals(currentUser._id)) { %>
-                          <option value="<%= user._id %>"><%= user.username %> (<%= user.firstName%> <%= user.lastName%>)</option>
+                          <option class="<%=user.status%>" value="<%= user._id %>"><%= user.username %> (<%= user.firstName%> <%= user.lastName%>)</option>
                         <% } %>
                       <% }) %>
                     </select>

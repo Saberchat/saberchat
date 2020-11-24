@@ -97,18 +97,33 @@ const addRecipient = (type => {
 });
 
 // adds the user tag to the display
-const addTag = ((select, id => {
-    if(!recipients.includes(id)) {
-        const username = select.options[select.selectedIndex].text;
-        recipients.push(id);
+const addTag = ((select, id) => {
 
-        const tag = document.createElement('div');
-        tag.classList.add('user-tag');
-        tag.innerHTML = `<span>${username}</span>
-        <button type="button" id="${id}" onclick="remRecipient(this)">&times;</button>`;
+  if(!(recipients.includes(id)) && !(recipients.includes(select.options[select.selectedIndex].className)) ) { //Check whether this user is already in the list, or whether their group (status) is already in the list
+    const username = select.options[select.selectedIndex].text;
+    recipients.push(id);
 
-        userDisplay.appendChild(tag);
+    const tag = document.createElement('div');
+    tag.classList.add('user-tag');
+    tag.classList.add(`${select.options[select.selectedIndex].className}`); //Put the user status in the tag
+    tag.innerHTML = `<span>${username}</span>
+    <button type="button" id="${id}" onclick="remRecipient(this)">&times;</button>`;
+
+    userDisplay.appendChild(tag);
+
+    let deletes = []; //List of usernames to be removed
+
+    for (let t = 0; t < document.getElementsByClassName('user-tag').length; t ++) { //Go through list of creators, remove any users who have this className (if the added 'username' is a status e.g. '12th', it removes any excess 12th graders)
+      if (document.getElementsByClassName('user-tag')[t].classList.contains(select.options[select.selectedIndex].value)) {
+        deletes.push(t);
+      }
     }
+
+    for (let del of deletes.reverse()) { //Iterate through list of usernames to remove
+      remRecipient(document.getElementsByClassName('user-tag')[del].getElementsByTagName('button')[0]);
+    }
+  }
+
 });
 
 // remove recipients

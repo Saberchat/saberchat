@@ -49,10 +49,22 @@
           <div class="form-group" id="creator-div" style="text-align: left;">
             <label style="float: left;" for="creator-select"><strong>Creators</strong></label>
             <select id="creator-select" class="form-control" onchange="addCreator('user')" required>
-              <option value="" selected disabled>Select Students</option>
-              <% students.forEach(student => { %>
-                <option value="<%=student._id%>"><%=student.username%> (<%=student.firstName%> <%=student.lastName%>)</a>
+              <option class="creator-group" value="" selected disabled>Select Students</option>
+              <option class="creator-group" value="7th">7th Graders</option>
+              <option class="creator-group" value="8th">8th Graders</option>
+              <option class="creator-group" value="9th">9th Graders</option>
+              <option class="creator-group" value="10th">EC Sophomores</option>
+              <option class="creator-group" value="11th">EC Juniors</option>
+              <option class="creator-group" value="12th">EC Seniors</option>
+
+              <% ['7th', '8th', '9th', '10th', '11th', '12th'].forEach(status => { %>
+                <% students.forEach(student => { %>
+                  <% if (student.status == status) { %>
+                    <option class="<%=student.status%>" value="<%=student._id%>"><%=student.username%> (<%=student.firstName%> <%=student.lastName%>)</option>
+                  <% } %>
+                <% }) %>
               <% }) %>
+
             </select>
             <input type="text" id="creator-input" name="creatorInput" hidden />
             <br />
