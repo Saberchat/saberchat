@@ -2,7 +2,7 @@
 
 /* .profile-head{
     text-align: center;
-  
+
 }
 
 .profile-head h1{
@@ -33,7 +33,7 @@
     background-color: #ffffff;
 } */
 
-/* 
+/*
 ====================
 Body Background
  */
@@ -42,9 +42,9 @@ body {
     background-color: #a5dbff;
 }
 
-/* 
+/*
 ====================
-User banner 
+User banner
 */
 #banner{
     background-position: center;
@@ -53,9 +53,9 @@ User banner
     filter: brightness(70%);
 }
 
-/* 
+/*
 ====================
-Profile card info 
+Profile card info
 */
 .profile-card {
     /* background-color: #0a91ab; */
@@ -109,9 +109,9 @@ Profile card info
     font-weight: 300;
 }
 
-/* 
+/*
 ====================
-Description 
+Description
 */
 .profile-desc {
     /* background-color: #0a91ab; */
@@ -148,7 +148,7 @@ Description
     margin-bottom: 0;
 }
 
-/* 
+/*
 ====================
 Profile Image
  */
@@ -165,7 +165,7 @@ Profile Image
     z-index: 1;
 }
 
-/* 
+/*
 ====================
 Username
  */
@@ -183,8 +183,20 @@ Username
     box-shadow: 0 10px 10px #95b4db;
 }
 
+.follower-image{
+    display: inline-block;
+    border-radius:50%;
+    width:40px;
+    height:40px;
+    object-fit: cover;
+}
+
 @media only screen and (max-width: 768px) {
     .profile-desc {
         margin: 1.7rem 0;
+    }
+
+    .profile-box {
+      margin-bottom: 50px;
     }
 }

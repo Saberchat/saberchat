@@ -29,8 +29,7 @@
     <div class="container mb-5">
         <img src="<%= user.imageUrl %>" alt="profile image" class="profile-image">
         <h1 class="username"><%= user.username %></h1>
-        <div class="row">
-            <div class="col-md-4 col-12 order-md-2">
+            <div class="col-md-4 col-12 order-md-2 profile-box" style="float: right;">
                 <section class="profile-card">
                     <div class="profile-head">
                         <h1><%= user.firstName %> <%= user.lastName %></h1>
@@ -58,7 +57,7 @@
                           <button class="btn btn-primary" style="margin-right: 10px; margin-bottom: 10px; width: 100%;"><a style="color: white" href="/profiles/edit">Edit Profile Settings</a></button>
                           <button class="btn btn-info" style="margin-right: 10px; margin-bottom: 10px; width: 100%;"><a style="color: white" href="/profiles/change-login-info">Edit Account Settings</a></button>
 
-                        <% } else if (!(user._id.toString() == currentUser._id.toString()) && (user.status == "faculty")) { %>
+                        <% } else if (!(user._id.toString() == currentUser._id.toString())) { %>
 
                           <% if (user.followers.includes(currentUser._id)) { %>
                             <button type="button" class="btn btn-danger" style="margin-right: 10px; margin-bottom: 10px; width: 100%;"><a style="color: white" data-toggle="modal" data-target="#modal" id="delete-button" href="/profiles/unfollow/<%=user._id%>">Unfollow</a></button>
@@ -111,6 +110,7 @@
                     </div>
                 </section>
             </div>
+
             <div class="col-md-8 col-12">
                 <section class="profile-desc">
                     <div class="desc-head">
@@ -122,7 +122,131 @@
                     </div>
                 </section>
             </div>
-        </div>
+
+          <% if (currentUser._id.equals(user._id)) { %>
+
+            <div class="col-md-8 col-12" style="margin-top: 50px;">
+
+                <section class="profile-desc">
+                    <div class="desc-head">
+
+                      <div style="text-align: center; padding-top: 15px; padding-bottom: 15px;">
+                        <button id="followers-button" class="btn btn-dark" style="width: 47.5%;"><%=user.followers.length%> Followers</button>
+                        <button id="following-button" class="btn btn-secondary" style="width: 47.5%;;"><%=following.length%> Following</button>
+                      </div>
+                    </div>
+                    <div class="desc-body">
+
+                        <div id="followers-list">
+                          <% for (let follower of user.followers) { %>
+                            <p style="margin-bottom: -20px;">
+
+                              <a href="../profiles/<%=follower._id%>" style="color: black; text-decoration: none;">
+                                <img class="follower-image" src="<%= follower.imageUrl %>" alt="profile picture">
+                                <strong><%=follower.firstName%> <%=follower.lastName%></strong> <%=follower.username%>
+                              </a>
+
+                              <button type="button" class="btn btn-warning" style="float: right;"><a style="color: black" data-toggle="modal" data-target="#modal-<%=follower._id%>" id="delete-button" href="/profiles/remove/<%=follower._id%>">Remove</a></button>
+
+                              <div class="modal fade" id="modal-<%=follower._id%>" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+                                <div class="modal-dialog">
+                                  <div class="modal-content">
+                                    <div class="modal-header">
+                                      <h5 class="modal-title" id="exampleModalLabel">Remove <%=follower.firstName%> <%=follower.lastName%>?</h5>
+                                      <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                        <span aria-hidden="true">&times;</span>
+                                      </button>
+                                    </div>
+                                    <div class="modal-body">
+                                      <%=follower.firstName%> <%=follower.lastName%> will no longer be notified when you post anything new.%>
+                                    </div>
+                                    <div class="modal-footer">
+                                      <button type="button" class="btn btn-secondary" data-dismiss="modal">No, Go Back</button>
+                                      <a type="button" href="/profiles/remove/<%=follower._id%>" class="btn btn-warning">Yes, Remove</a>
+                                    </div>
+                                  </div>
+                                </div>
+                              </div>
+                            </p>
+                          <% } %>
+                        </div>
+
+                        <div id="following-list">
+                          <% for (let user of following) { %>
+                            <p style="margin-bottom: -20px;">
+
+                              <a href="../profiles/<%=user._id%>" style="color: black; text-decoration: none;">
+                                <img class="follower-image" src="<%= user.imageUrl %>" alt="profile picture">
+                                <strong><%=user.firstName%> <%=user.lastName%></strong> <%=user.username%>
+                              </a>
+
+                              <button type="button" class="btn btn-danger" style="float: right;"><a style="color: white" data-toggle="modal" data-target="#modal-<%=user._id%>" id="delete-button" href="/profiles/unfollow/<%=user._id%>">Unfollow</a></button>
+
+                              <div class="modal fade" id="modal-<%=user._id%>" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+                                <div class="modal-dialog">
+                                  <div class="modal-content">
+                                    <div class="modal-header">
+                                      <h5 class="modal-title" id="exampleModalLabel">Unfollow <%=user.firstName%> <%=user.lastName%>?</h5>
+                                      <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                        <span aria-hidden="true">&times;</span>
+                                      </button>
+                                    </div>
+                                    <div class="modal-body">
+                                      You will no longer be notified when <%=user.firstName%> <%=user.lastName%> posts anything new.%>
+                                    </div>
+                                    <div class="modal-footer">
+                                      <button type="button" class="btn btn-secondary" data-dismiss="modal">No, Go Back</button>
+                                      <a type="button" href="/profiles/unfollow/<%=user._id%>" class="btn btn-danger">Yes, Unfollow</a>
+                                    </div>
+                                  </div>
+                                </div>
+                              </div>
+                            </p>
+                          <% } %>
+
+                        </div>
+                    </div>
+                </section>
+            </div>
+
+          <% } %>
     </div>
+
+    <script>
+
+    const followerList = document.getElementById('followers-list');
+    const followingList = document.getElementById('following-list');
+
+    const followerButton = document.getElementById('followers-button');
+    const followingButton= document.getElementById('following-button');
+
+    followingList.style.display = 'none';
+
+    followerButton.addEventListener('click', () => {
+
+      followerButton.classList.add('btn-dark');
+      followerButton.classList.remove('btn-secondary');
+
+      followingButton.classList.add('btn-secondary');
+      followingButton.classList.remove('btn-dark');
+
+      followingList.style.display = 'none';
+      followerList.style.display = 'inline';
+    });
+
+    followingButton.addEventListener('click', () => {
+
+      followingButton.classList.add('btn-dark');
+      followingButton.classList.remove('btn-secondary');
+
+      followerButton.classList.add('btn-secondary');
+      followerButton.classList.remove('btn-dark');
+
+      followerList.style.display = 'none';
+      followingList.style.display = 'inline';
+    });
+
+    </script>
+
 </body>
 </html>

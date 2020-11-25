@@ -1,4 +1,4 @@
-//set up env vars. commented out for deployment
+// set up env vars. commented out for deployment
 // require('dotenv').config();
 // Require NodeJS modules
 //set up and start the express server

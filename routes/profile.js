@@ -54,15 +54,33 @@ router.get('/change-login-info', middleware.isLoggedIn, (req, res) => {
 
 //renders views/profiles/show.ejs at /profiles route.
 router.get('/:id', middleware.isLoggedIn, (req, res) => {
-  User.findById(req.params.id, (err, foundUser) => {
-    if(err || !foundUser) {
-        req.flash('error', 'Error. Cannot find user.');
-        res.redirect('back');
 
-    } else {
-      res.render('profile/show', {user: foundUser});
+  (async() => {
+
+    const user = await User.findById(req.params.id).populate('followers');
+
+    if(!user) {
+        req.flash('error', 'Error. Cannot find user.');
+        return res.redirect('back');
     }
-  });
+
+    let following = [];
+
+    const users = await User.find({});
+
+    for (let u of users) {
+      if (u.followers.includes(req.user._id)) {
+        following.push(u);
+      }
+    }
+
+    res.render('profile/show', {user, following});
+
+  })().catch(err => {
+    console.log(err);
+    req.flash('error', "Unable to access database");
+    res.redirect('back');
+  })
 });
 
 // update user route. Check if current user matches profiles they're trying to edit with middleware.
@@ -89,8 +107,6 @@ router.put('/profile', middleware.isLoggedIn, (req, res) => {
     } else {
       status = req.body.status;
     }
-
-    console.log(status);
 
     let user = {
       firstName: req.body.firstName,
@@ -494,12 +510,12 @@ router.get('/follow/:id', (req, res) => {
       req.flash('error', "Unable to find user");
       res.redirect('back');
 
-    } else if (user.status != "faculty") {
-      req.flash('error', "You may only follow faculty members");
-      res.redirect('/profiles');
-
     } else if (user.followers.includes(req.user._id)) {
       req.flash('error', `You are already following ${user.firstName} ${user.lastName}`);
+      res.redirect('/profiles');
+
+    } else if (user._id.equals(req.user._id)) {
+      req.flash('error', `You may not follow yourself`);
       res.redirect('/profiles');
 
     } else {
@@ -517,10 +533,6 @@ router.get('/unfollow/:id', (req, res) => {
     if (err || !user) {
       req.flash('error', "Unable to find user");
       res.redirect('back');
-
-    } else if (user.status != "faculty") {
-      req.flash('error', "You may only follow and unfollow faculty members");
-      res.redirect('/profiles');
 
     } else {
       let index = -1;
@@ -545,4 +557,25 @@ router.get('/unfollow/:id', (req, res) => {
   });
 });
 
+router.get('/remove/:id', (req, res) => {
+
+  User.findById(req.params.id, (err, user) => {
+    if (err || !user) {
+      req.flash('error', "Unable to find user");
+      res.redirect('back');
+
+    } else {
+      if (req.user.followers.includes(user._id)) {
+        req.user.followers.splice(req.user.followers.indexOf(user._id), 1);
+        req.user.save();
+        req.flash('success', `${user.firstName} ${user.lastName} was removed from your list of followers`);
+        res.redirect(`/profiles/${req.user._id}`);
+
+      } else {
+        req.flash('error', `${user.firstName} ${user.lastName} does not appear to be following you.`);
+        res.redirect('back');
+      }
+    }
+  });
+});
 module.exports = router;
