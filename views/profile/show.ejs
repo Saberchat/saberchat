@@ -57,6 +57,56 @@
                         <% if (currentUser._id.toString() == user._id.toString()) { %>
                           <button class="btn btn-primary" style="margin-right: 10px; margin-bottom: 10px; width: 100%;"><a style="color: white" href="/profiles/edit">Edit Profile Settings</a></button>
                           <button class="btn btn-info" style="margin-right: 10px; margin-bottom: 10px; width: 100%;"><a style="color: white" href="/profiles/change-login-info">Edit Account Settings</a></button>
+
+                        <% } else if (!(user._id.toString() == currentUser._id.toString()) && (user.status == "faculty")) { %>
+
+                          <% if (user.followers.includes(currentUser._id)) { %>
+                            <button type="button" class="btn btn-danger" style="margin-right: 10px; margin-bottom: 10px; width: 100%;"><a style="color: white" data-toggle="modal" data-target="#modal" id="delete-button" href="/profiles/unfollow/<%=user._id%>">Unfollow</a></button>
+
+                            <div class="modal fade" id="modal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+                              <div class="modal-dialog">
+                                <div class="modal-content">
+                                  <div class="modal-header">
+                                    <h5 class="modal-title" id="exampleModalLabel">Unfollow <%=user.firstName%> <%=user.lastName%>?</h5>
+                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                      <span aria-hidden="true">&times;</span>
+                                    </button>
+                                  </div>
+                                  <div class="modal-body">
+                                    You will no longer be notified when <%=user.firstName%> <%=user.lastName%> posts anything new.%>
+                                  </div>
+                                  <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-dismiss="modal">No, Go Back</button>
+                                    <a type="button" href="/profiles/unfollow/<%=user._id%>" class="btn btn-danger">Yes, Unfollow</a>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+
+                          <% } else { %>
+                            <button type="button" class="btn btn-primary" style="margin-right: 10px; margin-bottom: 10px; width: 100%;"><a style="color: white" data-toggle="modal" data-target="#modal" id="delete-button" href="/profiles/follow/<%=user._id%>">Follow</a></button>
+
+                            <div class="modal fade" id="modal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+                              <div class="modal-dialog">
+                                <div class="modal-content">
+                                  <div class="modal-header">
+                                    <h5 class="modal-title" id="exampleModalLabel">Follow <%=user.firstName%> <%=user.lastName%>?</h5>
+                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                      <span aria-hidden="true">&times;</span>
+                                    </button>
+                                  </div>
+                                  <div class="modal-body">
+                                    You will be notified when <%=user.firstName%> <%=user.lastName%> posts anything new.%>
+                                  </div>
+                                  <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-dismiss="modal">No, Go Back</button>
+                                    <a type="button" href="/profiles/follow/<%=user._id%>" class="btn btn-primary">Yes, Follow</a>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+
+                          <% } %>
                         <% } %>
                     </div>
                 </section>

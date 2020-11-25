@@ -245,7 +245,6 @@ router.put('/change-password', middleware.isLoggedIn, (req, res) => {
     req.flash('error', "Passwords do not match");
     res.redirect('back');
   }
-
 });
 
 router.delete('/delete-account', middleware.isLoggedIn, (req, res) => {
@@ -486,6 +485,63 @@ router.delete('/delete-account', middleware.isLoggedIn, (req, res) => {
     console.log(err);
     req.flash('error', "Unable to access database");
     res.redirect('back');
+  });
+});
+
+router.get('/follow/:id', (req, res) => {
+  User.findById(req.params.id, (err, user) => {
+    if (err || !user) {
+      req.flash('error', "Unable to find user");
+      res.redirect('back');
+
+    } else if (user.status != "faculty") {
+      req.flash('error', "You may only follow faculty members");
+      res.redirect('/profiles');
+
+    } else if (user.followers.includes(req.user._id)) {
+      req.flash('error', `You are already following ${user.firstName} ${user.lastName}`);
+      res.redirect('/profiles');
+
+    } else {
+      user.followers.push(req.user);
+      user.save();
+      req.flash('success', `You are now following ${user.firstName} ${user.lastName}!`);
+      res.redirect('/profiles');
+
+    }
+  });
+});
+
+router.get('/unfollow/:id', (req, res) => {
+  User.findById(req.params.id, (err, user) => {
+    if (err || !user) {
+      req.flash('error', "Unable to find user");
+      res.redirect('back');
+
+    } else if (user.status != "faculty") {
+      req.flash('error', "You may only follow and unfollow faculty members");
+      res.redirect('/profiles');
+
+    } else {
+      let index = -1;
+      for (let i = 0; i < user.followers.length; i ++) {
+        if (user.followers[i].equals(req.user._id)) {
+          index = i;
+        }
+      }
+
+      if (index > -1) {
+        user.followers.splice(index, 1);
+        user.save();
+        req.flash('success', `You are no longer following ${user.firstName} ${user.lastName}.`);
+        res.redirect('/profiles');
+
+      } else {
+        req.flash('error', `You do not appear to be following ${user.firstName} ${user.lastName}`);
+        res.redirect('/profiles');
+      }
+
+    }
   });
 });
 

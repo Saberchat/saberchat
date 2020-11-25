@@ -5,11 +5,20 @@ const express = require('express');
 const middleware = require('../middleware');
 const router = express.Router(); //start express router
 const dateFormat = require('dateformat')
+const nodemailer = require('nodemailer');
 
 //SCHEMA
 const User = require('../models/user');
 const Project = require('../models/project');
+const Notification = require('../models/message');
 
+let transporter = nodemailer.createTransport({
+  service: 'gmail',
+  auth: {
+    user: 'noreply.saberchat@gmail.com',
+    pass: 'Tgy8erwIYtxRZrJHvKwkWbrkbUhv1Zr9'
+  }
+});
 
 //ROUTES
 router.get('/', (req, res) => { //RESTful Routing 'INDEX' route
@@ -94,6 +103,55 @@ router.post('/',middleware.isLoggedIn, middleware.isFaculty, (req, res) => { //R
 
     project.date = dateFormat(project.created_at, "h:MM TT | mmm d");
     await project.save();
+
+    const followers = await User.find({_id: {$in: req.user.followers}});
+
+    if (!followers) {
+      req.flash('error', "Umable to access your followers");
+      return res.redirect('back');
+    }
+
+    let notif;
+    let postEmail;
+    let imageString = ``;
+
+    for (let image of project.images) {
+      imageString += `<img style="width: 50%; height: 50%;" src="${image}"/>`;
+    }
+
+    for (let follower of followers) {
+
+      notif = await Notification.create({subject: "New Project Post", sender: req.user, recipients: [follower], read: [], toEveryone: false, images: project.images}); //Create a notification to alert the user
+
+      if (!notif) {
+        req.flash('error', 'Unable to send notification'); return res.redirect('/cafe/orders');
+      }
+
+      notif.date = dateFormat(notif.created_at, "h:MM TT | mmm d");
+      notif.text = `Hello ${follower.firstName},\n\n${req.user.firstName} ${req.user.lastName} recently posted a new project: "${project.title}". Check it out!`;
+
+      await notif.save();
+
+      postEmail = {
+        from: 'noreply.saberchat@gmail.com',
+        to: follower.email,
+        subject: `New Project Post - ${project.title}`,
+        html: `<p>Hello ${follower.firstName},</p><p>${req.user.firstName} ${req.user.lastName} recently posted a new project: <strong>${project.title}</strong>. Check it out!</p>${imageString}`
+      };
+
+      transporter.sendMail(postEmail, (err, info) => {
+        if (err) {
+          console.log(err);
+        } else {
+          console.log('Email sent: ' + info.response);
+        }
+      });
+
+      follower.inbox.push(notif); //Add notif to user's inbox
+      follower.msgCount += 1;
+      await follower.save();
+
+    }
 
     req.flash('success', "Project Posted!");
     res.redirect(`/projects/${project._id}`);
@@ -224,6 +282,56 @@ router.put('/:id', middleware.isLoggedIn, middleware.isFaculty, (req, res) => {
     }
 
     updatedProject.save();
+
+    const followers = await User.find({_id: {$in: req.user.followers}});
+
+    if (!followers) {
+      req.flash('error', "Umable to access your followers");
+      return res.redirect('back');
+    }
+
+    let notif;
+    let postEmail;
+
+    let imageString = ``;
+
+    for (let image of updatedProject.images) {
+      imageString += `<img style="width: 50%; height: 50%;" src="${image}"/>`;
+    }
+
+    for (let follower of followers) {
+
+      notif = await Notification.create({subject: "New Project Post", sender: req.user, recipients: [follower], read: [], toEveryone: false, images: updatedProject.images}); //Create a notification to alert the user
+
+      if (!notif) {
+        req.flash('error', 'Unable to send notification'); return res.redirect('/cafe/orders');
+      }
+
+      notif.date = dateFormat(notif.created_at, "h:MM TT | mmm d");
+      notif.text = `Hello ${follower.firstName},\n\n${req.user.firstName} ${req.user.lastName} recently updated one of their projects: "${updatedProject.title}". Check it out!`;
+
+      await notif.save();
+
+      postEmail = {
+        from: 'noreply.saberchat@gmail.com',
+        to: follower.email,
+        subject: `New Project Post - ${updatedProject.title}`,
+        html: `<p>Hello ${follower.firstName},</p><p>${req.user.firstName} ${req.user.lastName} recently updated one of their projects: <strong>${updatedProject.title}</strong>. Check it out!</p>${imageString}`
+      };
+
+      transporter.sendMail(postEmail, (err, info) => {
+        if (err) {
+          console.log(err);
+        } else {
+          console.log('Email sent: ' + info.response);
+        }
+      });
+
+      follower.inbox.push(notif); //Add notif to user's inbox
+      follower.msgCount += 1;
+      await follower.save();
+
+    }
 
     req.flash("success", "Project Updated!");
     res.redirect(`/projects/${project._id}`);

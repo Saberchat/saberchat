@@ -66,21 +66,36 @@
 
                       <% for (let user of sortedUsers) { %>
                         <% if (user.status.toLowerCase() == status[0]) { %>
-                            <a href="/profiles/<%= user._id %>" class="list-group-item list-group-item-action">
-                              <img class="profile-image" src="<%= user.imageUrl %>" alt="profile picture">
-                              <span class="username <%=status[0]%>"><strong><%=user.firstName%> <%=user.lastName%></strong> <span style="font-size: 80%;"><%=`${user.username}`%></span></span>
+                            <li href="/profiles/<%= user._id %>" class="list-group-item list-group-item-action">
+
+                              <a href="../profiles/<%=user._id%>" style="color: black; text-decoration: none;">
+                                <img class="profile-image" src="<%= user.imageUrl %>" alt="profile picture">
+                                <span class="username <%=status[0]%>"><strong><%=user.firstName%> <%=user.lastName%></strong> <span style="font-size: 80%;"><%=`${user.username}`%></span></span>
                               <% if (user.permission == 'admin') { %>
-                                <span class="badge badge-info">Administrator</span>
+                                <span class="badge badge-success">Administrator</span>
                               <% } else if (user.permission == "mod") { %>
-                                <span class="badge badge-success">Moderator</span>
+                                <span class="badge badge-secondary">Moderator</span>
                               <% } else if (user.permission == "principal") { %>
-                                <span class="badge badge-danger">Principal</span>
+                                <span class="badge badge-info">Principal</span>
                               <% } %>
+                              </a>
 
                               <% if (user._id.toString() == currentUser._id.toString())  { %>
-                                <span class="badge badge-primary">Me</span>
+                                <span class="badge badge-dark">Me</span>
+
+                              <% } else if (!(user._id.toString() == currentUser._id.toString()) && (user.status == "faculty")) { %>
+
+                                <% if (user.followers.includes(currentUser._id)) { %>
+                                  <button type="button" data-toggle="modal" data-target="#modal-<%=user._id%>-follow" id="delete-button-<%=user._id%>" style="float: right; color: white;" class="btn btn-danger">Unfollow</button>
+
+                                <% } else { %>
+
+                                  <button type="button" data-toggle="modal" data-target="#modal-<%=user._id%>-unfollow" id="delete-button-<%=user._id%>" style="float: right; color: white;"class="btn btn-primary">Follow</button>
+
+                                <% } %>
+                                </span>
                               <% } %>
-                            </a>
+                            </li>
                         <% } %>
                       <% } %>
                       <span class="status-page-break" id="<%=status[0]%>-break"><br /><br /></span>
@@ -90,6 +105,50 @@
             </div>
         </div>
     </div>
+
+    <% for (let user of users) { %>
+      <div class="modal fade" id="modal-<%=user._id%>-follow" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="exampleModalLabel">Unfollow <%=user.firstName%> <%=user.lastName%>?</h5>
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </div>
+            <div class="modal-body">
+              You will no longer be notified when <%=user.firstName%> <%=user.lastName%> posts anything new.%>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-dismiss="modal">No, Go Back</button>
+              <a type="button" href="/profiles/unfollow/<%=user._id%>" class="btn btn-danger">Yes, Unfollow</a>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal fade" id="modal-<%=user._id%>-unfollow" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="exampleModalLabel">Follow <%=user.firstName%> <%=user.lastName%>?</h5>
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </div>
+            <div class="modal-body">
+              You will be notified when <%=user.firstName%> <%=user.lastName%> posts anything new.%>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-dismiss="modal">No, Go Back</button>
+              <a type="button" href="/profiles/follow/<%=user._id%>" class="btn btn-primary">Yes, Follow</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    <% } %>
+
+
     <script>
         const searchFunction = (() => {
           let statusHeaders = document.getElementsByClassName('status-header')

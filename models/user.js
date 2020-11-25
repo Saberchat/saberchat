@@ -34,6 +34,15 @@ var userSchema = new mongoose.Schema({
 			ref: "AccessRequest"
 		}
 	],
+	followers: [
+		{
+
+		type:mongoose.Schema.Types.ObjectId,
+		ref: "User",
+		default: []
+
+		}
+	],
 	permission: {type: String, default: "student"}, // for permissions
 	status: {type: String, default: 'guest'}, // 7th, 8th, 9th, 10th, 11th, 12th, alumni, parents, faculty
 	balance: {type: Number, default: 0},

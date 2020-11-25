@@ -81,6 +81,7 @@
                         <% if (currentUser.email != email.address) { %>
                           <form action="/admin/whitelist/<%=email._id%>?_method=delete" method="post" style="float: right;">
                             <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#modal-<%=email._id%>" id="delete-button"><i class="fas fa-trash-alt"></i> Remove</button>
+
                             <div class="modal fade" id="modal-<%=email._id%>" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
                               <div class="modal-dialog">
                                 <div class="modal-content">
@@ -100,6 +101,7 @@
                                 </div>
                               </div>
                             </div>
+
                           </form>
                         </li>
 
