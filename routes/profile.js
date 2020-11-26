@@ -65,6 +65,11 @@ router.get('/:id', middleware.isLoggedIn, (req, res) => {
     }
 
     let following = [];
+    let followerIds = [];
+
+    for (let follower of user.followers) {
+      followerIds.push(follower._id);
+    }
 
     const users = await User.find({});
 
@@ -74,7 +79,7 @@ router.get('/:id', middleware.isLoggedIn, (req, res) => {
       }
     }
 
-    res.render('profile/show', {user, following});
+    res.render('profile/show', {user, following, followerIds});
 
   })().catch(err => {
     console.log(err);

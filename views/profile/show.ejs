@@ -59,7 +59,7 @@
 
                         <% } else if (!(user._id.toString() == currentUser._id.toString())) { %>
 
-                          <% if (user.followers.includes(currentUser._id)) { %>
+                          <% if (followerIds.toString().includes(currentUser._id.toString())) { %>
                             <button type="button" class="btn btn-danger" style="margin-right: 10px; margin-bottom: 10px; width: 100%;"><a style="color: white" data-toggle="modal" data-target="#modal" id="delete-button" href="/profiles/unfollow/<%=user._id%>">Unfollow</a></button>
 
                             <div class="modal fade" id="modal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
@@ -137,18 +137,21 @@
                     </div>
                     <div class="desc-body">
 
-                        <div id="followers-list">
+                        <div id="followers-list" style="overflow: hidden;">
+                          <div style="text-align: center;">
+                            <input id="search-bar-followers" type="text" placeholder="&#x1F50D; Search followers" style="width: 95%; margin: 15px; border-radius: 5px; padding-left: 10px; padding-top: 5px; padding-bottom: 5px;" oninput="searchFunctionFollowers()"/>
+                          </div>
                           <% for (let follower of user.followers) { %>
-                            <p style="margin-bottom: -20px;">
+                            <span style="margin-left: 20px;" id="follower-<%=follower._id%>" class="follower-block">
 
                               <a href="../profiles/<%=follower._id%>" style="color: black; text-decoration: none;">
                                 <img class="follower-image" src="<%= follower.imageUrl %>" alt="profile picture">
                                 <strong><%=follower.firstName%> <%=follower.lastName%></strong> <%=follower.username%>
                               </a>
 
-                              <button type="button" class="btn btn-warning" style="float: right;"><a style="color: black" data-toggle="modal" data-target="#modal-<%=follower._id%>" id="delete-button" href="/profiles/remove/<%=follower._id%>">Remove</a></button>
+                              <button type="button" class="btn btn-warning" style="float: right; margin-right: 20px;"><a style="color: black" data-toggle="modal" data-target="#modal-<%=follower._id%>-remove" id="delete-button" href="/profiles/remove/<%=follower._id%>">Remove</a></button>
 
-                              <div class="modal fade" id="modal-<%=follower._id%>" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+                              <div class="modal fade" id="modal-<%=follower._id%>-remove" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
                                 <div class="modal-dialog">
                                   <div class="modal-content">
                                     <div class="modal-header">
@@ -167,22 +170,27 @@
                                   </div>
                                 </div>
                               </div>
-                            </p>
+                              <br /><br />
+                            </span>
                           <% } %>
                         </div>
 
-                        <div id="following-list">
-                          <% for (let user of following) { %>
-                            <p style="margin-bottom: -20px;">
+                        <div id="following-list" style="overflow: hidden;">
+                          <div style="text-align: center;">
+                            <input id="search-bar-following" type="text" placeholder="&#x1F50D; Search following" style="width: 95%; margin: 15px; border-radius: 5px; padding-left: 10px; padding-top: 5px; padding-bottom: 5px;" oninput="searchFunctionFollowing()"/>
+                          </div>
 
-                              <a href="../profiles/<%=user._id%>" style="color: black; text-decoration: none;">
+                          <% for (let user of following) { %>
+                            <span style="margin-left: 20px;" id="following-<%=user._id%>" class="following-block">
+
+                              <a href="../profiles/<%=user._id%>" style="color: black; text-decoration: none;" >
                                 <img class="follower-image" src="<%= user.imageUrl %>" alt="profile picture">
                                 <strong><%=user.firstName%> <%=user.lastName%></strong> <%=user.username%>
                               </a>
 
-                              <button type="button" class="btn btn-danger" style="float: right;"><a style="color: white" data-toggle="modal" data-target="#modal-<%=user._id%>" id="delete-button" href="/profiles/unfollow/<%=user._id%>">Unfollow</a></button>
+                              <button type="button" class="btn btn-danger" style="float: right; margin-right: 20px;"><a style="color: white" data-toggle="modal" data-target="#modal-<%=user._id%>-unfollow" id="delete-button" href="/profiles/unfollow/<%=user._id%>">Unfollow</a></button>
 
-                              <div class="modal fade" id="modal-<%=user._id%>" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+                              <div class="modal fade" id="modal-<%=user._id%>-unfollow" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
                                 <div class="modal-dialog">
                                   <div class="modal-content">
                                     <div class="modal-header">
@@ -201,7 +209,8 @@
                                   </div>
                                 </div>
                               </div>
-                            </p>
+                              <br /><br />
+                            </span>
                           <% } %>
 
                         </div>
@@ -219,6 +228,12 @@
 
     const followerButton = document.getElementById('followers-button');
     const followingButton= document.getElementById('following-button');
+
+    const searchBarFollowers = document.getElementById('search-bar-followers');
+    const searchBarFollowing = document.getElementById('search-bar-following');
+
+    const followerBlocks = document.getElementsByClassName('follower-block');
+    const followingBlocks = document.getElementsByClassName('following-block');
 
     followingList.style.display = 'none';
 
@@ -244,6 +259,31 @@
 
       followerList.style.display = 'none';
       followingList.style.display = 'inline';
+    });
+
+    const searchFunctionFollowers = (() => {
+      for (let b = 0; b < followerBlocks.length; b ++) {
+
+        if (!followerBlocks[b].textContent.split('Remove')[0].toLowerCase().includes(searchBarFollowers.value.toLowerCase())) {
+          $(`#${followerBlocks[b].id}`).hide();
+
+        } else {
+          $(`#${followerBlocks[b].id}`).show();
+        }
+      }
+    });
+
+    const searchFunctionFollowing = (() => {
+      for (let b = 0; b < followingBlocks.length; b ++) {
+
+        if (!followingBlocks[b].textContent.split('Unfollow')[0].toLowerCase().includes(searchBarFollowing.value.toLowerCase())) {
+          $(`#${followingBlocks[b].id}`).hide();
+
+        } else {
+          $(`#${followingBlocks[b].id}`).show();
+        }
+
+      }
     });
 
     </script>
