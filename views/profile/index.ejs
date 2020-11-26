@@ -66,9 +66,9 @@
 
                       <% for (let user of sortedUsers) { %>
                         <% if (user.status.toLowerCase() == status[0]) { %>
-                            <li href="/profiles/<%= user._id %>" class="list-group-item list-group-item-action">
+                            <li class="list-group-item list-group-item-action user-element">
 
-                              <a href="../profiles/<%=user._id%>" style="color: black; text-decoration: none;">
+                              <a href="../profiles/<%=user._id%>" style="color: black; text-decoration: none;" class="user-element-text">
                                 <img class="profile-image" src="<%= user.imageUrl %>" alt="profile picture">
                                 <span class="username <%=status[0]%>"><strong><%=user.firstName%> <%=user.lastName%></strong> <span style="font-size: 80%;"><%=`${user.username}`%></span></span>
                               <% if (user.permission == 'admin') { %>
@@ -158,14 +158,16 @@
           let input = document.getElementById("search-input");
           let filter = input.value.toUpperCase();
           let list = document.getElementById("user-list");
-          let a = list.getElementsByTagName("a");
+          let listItems = list.getElementsByClassName("user-element");
+          let a = list.getElementsByClassName("user-element-text");
+
           for (i = 0; i < a.length; i++) {
               user = a[i].getElementsByClassName('username')[0];
               txtValue = user.textContent || user.innerText;
-              if (txtValue.toUpperCase().indexOf(filter) > -1) {
-                  a[i].style.display = "";
+              if (txtValue.toUpperCase().includes(filter)) {
+                listItems[i].style.display = "block";
               } else {
-                  a[i].style.display = "none";
+                listItems[i].style.display = "none";
               }
           }
 
@@ -183,16 +185,16 @@
             if (!statusIncluded) {
               for (let i = 0; i < statusHeaders.length; i += 1) {
                 if (statusHeaders[i].innerText.includes(status[1])) {
-                  $(`#${statusHeaders[i].id}`).hide()
-                  $(`#${statusBreaks[i].id}`).hide()
+                  statusHeaders[i].style.display = "none";
+                  statusBreaks[i].style.display = "none";
                 }
               }
 
             } else if (statusIncluded) {
               for (let i = 0; i < statusHeaders.length; i += 1) {
                 if (statusHeaders[i].innerText.includes(status[1])) {
-                  $(`#${statusHeaders[i].id}`).show()
-                  $(`#${statusBreaks[i].id}`).show()
+                  statusHeaders[i].style.display = "block";
+                  statusBreaks[i].style.display = "block";
                 }
               }
             }
