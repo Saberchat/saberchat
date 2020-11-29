@@ -58,7 +58,7 @@ router.get('/data', middleware.isLoggedIn, middleware.isAdmin, (req, res) => {
 
     //Evaluate our most common customers
 
-    const customers = await User.find({});
+    const customers = await User.find({authenticated: true});
     if (!customers) {
       req.flash('error', "Unable to find customers");
       return res.redirect('back');

@@ -70,7 +70,12 @@
 
                               <a href="../profiles/<%=user._id%>" style="color: black; text-decoration: none;" class="user-element-text">
                                 <img class="profile-image" src="<%= user.imageUrl %>" alt="profile picture">
-                                <span class="username <%=status[0]%>"><strong><%=user.firstName%> <%=user.lastName%></strong> <span style="font-size: 80%;"><%=`${user.username}`%></span></span>
+                                <span class="username <%=status[0]%>"><strong><%=user.firstName%> <%=user.lastName%></strong> <span style="font-size: 80%;"><%=`${user.username}`%></span><span hidden><%=user.permission%>
+                                  <% for (let status of statuses) { %>
+                                    <% if (status[0].toLowerCase() == user.status.toLowerCase()) { %>
+                                        <%=status[0]%><%=status[1]%></span></span>
+                                    <% } %>
+                                  <% } %>
                               <% if (user.permission == 'admin') { %>
                                 <span class="badge badge-success">Administrator</span>
                               <% } else if (user.permission == "mod") { %>
@@ -163,7 +168,8 @@
 
           for (i = 0; i < a.length; i++) {
               user = a[i].getElementsByClassName('username')[0];
-              txtValue = user.textContent || user.innerText;
+              txtValue = user.textContent;
+              console.log(txtValue)
               if (txtValue.toUpperCase().includes(filter)) {
                 listItems[i].style.display = "block";
               } else {
@@ -176,7 +182,7 @@
           for (let status of statuses) {
             statusIncluded = false;
             for (let member of document.getElementsByClassName(status[0])) {
-              if (member.innerText.toUpperCase().indexOf(filter) > -1) {
+              if (member.textContent.toUpperCase().indexOf(filter) > -1) {
                 statusIncluded = true;
                 break;
               }
@@ -184,7 +190,7 @@
 
             if (!statusIncluded) {
               for (let i = 0; i < statusHeaders.length; i += 1) {
-                if (statusHeaders[i].innerText.includes(status[1])) {
+                if (statusHeaders[i].textContent.includes(status[1])) {
                   statusHeaders[i].style.display = "none";
                   statusBreaks[i].style.display = "none";
                 }
@@ -192,7 +198,7 @@
 
             } else if (statusIncluded) {
               for (let i = 0; i < statusHeaders.length; i += 1) {
-                if (statusHeaders[i].innerText.includes(status[1])) {
+                if (statusHeaders[i].textContent.includes(status[1])) {
                   statusHeaders[i].style.display = "block";
                   statusBreaks[i].style.display = "block";
                 }

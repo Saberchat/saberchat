@@ -27,7 +27,7 @@ router.get('/new', middleware.isLoggedIn, (req, res) => {
 
   (async() => {
 
-    const students = await User.find({permission: 'student'});
+    const students = await User.find({authenticated: true, permission: 'student'});
     if (!students) {
       req.flash('error', "Unable to find students"); return res.redirect('back');
     }

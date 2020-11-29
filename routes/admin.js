@@ -51,7 +51,7 @@ router.get('/moderate', middleware.isLoggedIn, middleware.isMod, (req, res) => {
 
 // displays permissions page
 router.get('/permissions', middleware.isLoggedIn, middleware.isAdmin, (req, res) => {
-	User.find({}, (err, foundUsers) => {
+	User.find({authenticated: true}, (err, foundUsers) => {
 		if(err || !foundUsers) {
 			req.flash('error', 'Cannot access Database');
 			res.redirect('/admin');
@@ -64,7 +64,7 @@ router.get('/permissions', middleware.isLoggedIn, middleware.isAdmin, (req, res)
 
 // displays status page
 router.get('/status', middleware.isLoggedIn, middleware.isMod, (req, res) => {
-	User.find({}, (err, foundUsers) => {
+	User.find({authenticated: true}, (err, foundUsers) => {
 		if(err || !foundUsers) {
 			req.flash('error', 'Cannot access Database');
 			res.redirect('/admin');
@@ -83,7 +83,7 @@ router.get('/whitelist', middleware.isLoggedIn, middleware.isPrincipal, (req, re
 			return res.redirect('back');
 		}
 
-		const users = await User.find({});
+		const users = await User.find({authenticated: true});
 
 		if (!users) {
 			req.flash('error', "Unable to find users");
@@ -134,14 +134,14 @@ router.delete('/whitelist/:id', middleware.isLoggedIn, middleware.isPrincipal, (
 			return res.redirect('back');
 		}
 
-		const users = await User.find({email: email.address});
+		const users = await User.find({authenticated: true, email: email.address});
 
 		if (!users) {
 			req.flash('error', "Unable to delete users with this email");
 			return res.redirect('back');
 		}
 
-		const allUsers = await User.find({});
+		const allUsers = await User.find({authenticated: true});
 
 		let deletedComments = null;
 

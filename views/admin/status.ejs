@@ -40,21 +40,28 @@
                     <strong>Modify Statuses</strong>
                   </li>
 
-                  <% let statuses = ["Faculty", "12th", "11th", "10th", "9th", "8th", "7th", "Alumnus", "Parent", "Guest"]; %>
+                  <% let statusMatrix = [ ["Faculty", "Faculty", []], ["12th", "Seniors", []], ["11th", "Juniors", []], ["10th", "Sophomores", []], ["9th", "Freshmen", []], ["8th", "8th Graders", []], ["7th", "7th Graders", []], ["Alumnus", "Alumni", []], ["Parent", "Parents", []], ["Guest", "Guests", []] ] %>
+                  <% let permMatrix = [["principal", "Principal"], ["admin", "Administrator"], ["mod", "Moderator"], ["student", "Student"]]; %>
 
-                  <% for (let status of statuses) { %>
+                  <% for (let status of statusMatrix) { %>
                     <% for (let user of users) { %>
-                      <% if(!user._id.equals(currentUser._id) && user.status.toLowerCase() == status.toLowerCase()){ %>
+                      <% if(!user._id.equals(currentUser._id) && user.status.toLowerCase() == status[0].toLowerCase()){ %>
                         <li class="list-group-item user" id="<%=user._id%>">
-                          <%= user.username %> (<%= user.firstName %> <%= user.lastName %>) <span hidden><%=status%></span>
+                          <%= user.username %> (<%= user.firstName %> <%= user.lastName %>) <span hidden><%=status[0]%> <%=status[1]%>
+                            <% for (let perm of permMatrix) { %>
+                              <% if (perm[0].toLowerCase() == user.permission.toLowerCase())  { %>
+                                <%=perm[0]%> <%=perm[1]%> data_end
+                              <% } %>
+                            <% } %>
+                          </span>
                           <select name="status" class="role-select" onchange="updateStatus(this)" id="<%= user._id %>">
 
-                            <% for (let status of statuses) { %>
-                              <% if (user.status.toLowerCase() == status.toLowerCase()) { %>
-                                <option value="<%=status.toLowerCase()%>" selected><%=status%></option>
+                            <% for (let status of statusMatrix) { %>
+                              <% if (user.status.toLowerCase() == status[0].toLowerCase()) { %>
+                                <option value="<%=status[0].toLowerCase()%>" selected><%=status[0]%></option>
 
                               <% } else { %>
-                                <option value="<%=status.toLowerCase()%>"><%=status%></option>
+                                <option value="<%=status[0].toLowerCase()%>"><%=status[0]%></option>
                               <% }%>
                             <% } %>
                           </select>
@@ -76,7 +83,7 @@
         let filter = searchInput.value.toLowerCase();
 
         for (let i = 0; i < users.length; i += 1) {
-          if (!users[i].textContent.split('\n')[1].toLowerCase().includes(filter)) {
+          if (!users[i].textContent.split('data_end')[0].toLowerCase().includes(filter)) {
             $(`#${users[i].id}`).hide();
 
           } else {

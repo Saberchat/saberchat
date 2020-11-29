@@ -182,7 +182,7 @@ const updateUsers = schedule.scheduleJob('0 0 0 1 7 *', () => {
 
   let statuses = ['7th', '8th', '9th', '10th', '11th', '12th', 'alumnus'];
 
-  User.find({status: {$in: statuses.slice(0, statuses.length-1)}}, (err, users) => { //Do not include CURRENT alumni in the people who will be updated, only 7th-12th graders
+  User.find({authenticated: true, status: {$in: statuses.slice(0, statuses.length-1)}}, (err, users) => { //Do not include CURRENT alumni in the people who will be updated, only 7th-12th graders
     if (err || !users) {
       console.log(err);
 

@@ -37,7 +37,7 @@ router.get('/', middleware.isLoggedIn, (req, res) => {
 
 //route for displaying new room form
 router.get('/new', middleware.isLoggedIn, (req, res) => {
-  User.find({}, (err, foundUsers) => {
+  User.find({authenticated: true}, (err, foundUsers) => {
     if (err || !foundUsers) {
       req.flash('error', 'Unable to access Database');
       res.redirect('back');
@@ -80,7 +80,7 @@ router.get('/:id/edit', middleware.isLoggedIn, middleware.checkRoomOwnership, (r
       req.flash('error', "Unable to find room"); return res.redirect('back');
     }
 
-    const users = await User.find({});
+    const users = await User.find({authenticated: true});
 
     if (!users) {
       req.flash('error', 'Unable to access Database'); return res.redirect('back');

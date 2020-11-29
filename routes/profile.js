@@ -31,7 +31,7 @@ let transporter = nodemailer.createTransport({
 // renders the list of users page
 router.get('/', middleware.isLoggedIn, (req, res) => {
 
-  User.find({}, (err, foundUsers) => {
+  User.find({authenticated: true}, (err, foundUsers) => {
     if(err || !foundUsers) {
         req.flash('error', 'Unable to access Database');
         res.redirect('back');
@@ -71,7 +71,7 @@ router.get('/:id', middleware.isLoggedIn, (req, res) => {
       followerIds.push(follower._id);
     }
 
-    const users = await User.find({});
+    const users = await User.find({authenticated: true});
 
     for (let u of users) {
       if (u.followers.includes(req.user._id)) {
@@ -93,7 +93,7 @@ router.put('/profile', middleware.isLoggedIn, (req, res) => {
 
   (async() => {
 
-    const overlap = await User.find({username: filter.clean(req.body.username), _id: {$nin: [req.user._id]}});
+    const overlap = await User.find({authenticated: true, username: filter.clean(req.body.username), _id: {$nin: [req.user._id]}});
 
     if (!overlap) {
       req.flash('error', "Unable to find users");
@@ -173,12 +173,12 @@ router.put('/change-email', middleware.isLoggedIn, (req, res) => {
       req.flash('error', "Unable to find emails");
       return res.redirect('back');
 
-    } else if (emails.length < 1) {
-      req.flash('error', "That email is not in our whitelist");
+    } else if (emails.length < 1 && req.body.email.split("@")[1] != "alsionschool.org") {
+      req.flash('error', "New email must be an Alsion-verified email");
       return res.redirect('back');
     }
 
-    const overlap = await User.find({email: req.body.email, _id: {$nin: [req.user._id]}});
+    const overlap = await User.find({authenticated: true, email: req.body.email, _id: {$nin: [req.user._id]}});
 
     if (!overlap) {
       req.flash('error', "Unable to find users");
@@ -189,37 +189,87 @@ router.put('/change-email', middleware.isLoggedIn, (req, res) => {
       return res.redirect('back');
     }
 
-    const updatedUser = await  User.findByIdAndUpdate(req.user._id, {email: req.body.email});
+    let updateEmail = {
+      from: 'noreply.saberchat@gmail.com',
+      to: req.body.email,
+      subject: 'Profile Update Confirmation',
+      html: `<p>Hello ${req.user.firstName},</p><p>You are receiving this email because you recently requested to change your Saberchat email to ${req.body.email}.</p><p>Click <a href="https://alsion-saberchat.herokuapp.com/profiles/confirm-email/${req.user._id}?token=${req.user.authenticationToken}&email=${req.body.email}">this link</a> to confirm your new email address.`
+    };
 
-    if(!updatedUser) {
-      req.flash('error', 'There was an error changing your email');
-      res.redirect('/');
+    transporter.sendMail(updateEmail, (err, info) =>{
+      if (err) {
+        console.log(err);
+      } else {
+        console.log('Email sent: ' + info.response);
+      }
+    });
 
-    } else {
-
-      let updateEmail = {
-        from: 'noreply.saberchat@gmail.com',
-        to: req.body.email,
-        subject: 'Profile Update Confirmation',
-        text: `Hello ${updatedUser.firstName},\n\nYou are receiving this email because you recently made changes to your Saberchat email. This is a confirmation of your profile.\n\nYour username is ${updatedUser.username}.\nYour full name is ${updatedUser.firstName} ${updatedUser.lastName}.\nYour email is ${req.body.email}`
-      };
-
-      transporter.sendMail(updateEmail, (err, info) =>{
-        if (err) {
-          console.log(err);
-        } else {
-          console.log('Email sent: ' + info.response);
-        }
-      });
-
-      req.flash('success', 'Updated your profile. Please Login Again.');
-      res.redirect('/');
-    }
+    req.flash('success', 'Go to your new email to confirm new address');
+    res.redirect('/profiles/change-login-info');
 
   })().catch(err => {
     console.log(err);
     req.flash('error', "Unable to access database");
     res.redirect('back');
+  });
+});
+
+router.get('/confirm-email/:id', (req, res) => {
+  User.findById(req.params.id, (err, user) => {
+    if (err || !user) {
+      req.flash('error', "Unable to find user");
+      res.redirect('back');
+
+    } else {
+
+      //Update authentication token
+      let charSetMatrix = [];
+
+      charSetMatrix.push('qwertyuiopasdfghjklzxcvbnm'.split(''));
+      charSetMatrix.push('QWERTYUIOPASDFGHJKLZXCVBNM'.split(''));
+      charSetMatrix.push('1234567890'.split(''));
+      charSetMatrix.push('()%!~$#*[){]|,.<>');
+
+      let tokenLength = Math.round((Math.random() * 15)) + 15;
+      let token = "";
+
+      let charSet; //Which character set to choose from
+
+      for (let i = 0; i < tokenLength; i += 1) {
+        charSet = charSetMatrix[Math.floor(Math.random() * 4)];
+        token += charSet[Math.floor((Math.random() * charSet.length))];
+      }
+
+      console.log(user.authenticationToken);
+      console.log(req.query.token);
+      if (req.query.token.toString() == user.authenticationToken) {
+        user.email = req.query.email;
+        user.authenticationToken = token;
+        user.save();
+
+        let updateEmail = {
+          from: 'noreply.saberchat@gmail.com',
+          to: req.body.email,
+          subject: 'Email Update Confirmation',
+          text: `Hello ${user.firstName},\n\nYou are receiving this email because you recently made changes to your Saberchat email. This is a confirmation of your profile.\n\nYour username is ${user.username}.\nYour full name is ${user.firstName} ${user.lastName}.\nYour email is ${user.email}`
+        };
+
+        transporter.sendMail(updateEmail, (err, info) =>{
+          if (err) {
+            console.log(err);
+          } else {
+            console.log('Email sent: ' + info.response);
+          }
+        });
+
+        req.flash('success', "Email updated!")
+        res.redirect('/');
+
+      } else {
+        req.flash('error', "Invalid authentication token");
+        res.redirect('/');
+      }
+    }
   });
 });
 
@@ -333,7 +383,7 @@ router.delete('/delete-account', middleware.isLoggedIn, (req, res) => {
       return res.redirect('back');
     }
 
-    const users = await User.find({});
+    const users = await User.find({authenticated: true});
 
     for (let ann of anns) {
       for (let user of users) {

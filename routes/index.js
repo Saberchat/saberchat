@@ -66,7 +66,7 @@ router.post("/register",  (req, res) => {
 				req.flash('error', 'Only members of the Alsion community may sign up');
 				res.redirect('/');
 
-			} else if (emails.length < 1) {
+			} else if (emails.length < 1 && req.body.email.split("@")[1] != "alsionschool.org" ) {
 				req.flash('error', 'Only members of the Alsion community may sign up');
 				res.redirect('/');
 
@@ -91,6 +91,24 @@ router.post("/register",  (req, res) => {
 					email = email.slice(0, email.length - 1);
 				}
 
+        //Create authentication token
+        let charSetMatrix = [];
+
+        charSetMatrix.push('qwertyuiopasdfghjklzxcvbnm'.split(''));
+        charSetMatrix.push('QWERTYUIOPASDFGHJKLZXCVBNM'.split(''));
+        charSetMatrix.push('1234567890'.split(''));
+        charSetMatrix.push('()%!~$#*[){]|,.<>');
+
+        let tokenLength = Math.round((Math.random() * 15)) + 15;
+        let token = "";
+
+        let charSet; //Which character set to choose from
+
+        for (let i = 0; i < tokenLength; i += 1) {
+          charSet = charSetMatrix[Math.floor(Math.random() * 4)];
+          token += charSet[Math.floor((Math.random() * charSet.length))];
+        }
+
 				//creates new user from form info
 				newUser = new User(
 					{
@@ -100,9 +118,13 @@ router.post("/register",  (req, res) => {
 						username: filter.clean(username),
 						msgCount: 0,
 						annCount: [],
-						reqCount: 0
+						reqCount: 0,
+            authenticated: false,
+            authenticationToken: token
 					}
 				);
+
+        //Update annCount with all announcements
 
         Announcement.find({}, (err, anns) => {
           if (err || !anns) {
@@ -116,48 +138,108 @@ router.post("/register",  (req, res) => {
           }
         });
 
-				//registers the user
-				User.register(newUser, req.body.password, (err, user) => {
-					if(err) {
-						//flash message the error if there is an error registering user
-						if(err.name == 'UserExistsError') {
-							req.flash('error', 'Email is already taken');
-						} else {
-							req.flash("error", err.message);
-						}
-						console.log(err);
-						//redirect to root
-						return res.redirect("/");
-					}
 
-					//if registration is successful, login user.
-					passport.authenticate("local")(req, res, function() {
-						//flash message for succesful login
-						req.flash("success", "Welcome to Saberchat " + user.firstName);
-						res.redirect("/");
-						console.log('succesfully registered and logged in user');
-					});
+    		//registers the user
+    		User.register(newUser, req.body.password, (err, user) => {
+    			if(err) {
+    				//flash message the error if there is an error registering user
+    				if(err.name == 'UserExistsError') {
+    					req.flash('error', 'Email is already taken');
+    				} else {
+    					req.flash("error", err.message);
+    				}
+    				console.log(err);
+    				//redirect to root
+    				return res.redirect("/");
+    			}
+
+    			// if registration is successful, login user.
+    			req.flash("success", "Welcome to Saberchat " + user.firstName + "! Go to your email to verify your account");
+    			res.redirect("/");
+
+        });
 
 
-      		let emailMessage = {
-      		  from: 'noreply.saberchat@gmail.com',
-      		  to: newUser.email,
-      		  subject: 'Welcome To Saberchat!',
-      			text: `Hello ${newUser.firstName},\n\nWelcome to Saberchat! A confirmation of your account:\n\nYour username is ${newUser.username}.\nYour full name is ${newUser.firstName} ${newUser.lastName}.\nYour linked email is ${newUser.email}\n\nYou will be assigned a role and status soon based on your grade or position.`
-      		};
+    		let verifyMessage = {
+    		  from: 'noreply.saberchat@gmail.com',
+    		  to: newUser.email,
+    		  subject: 'Verify Saberchat Account',
+    			html: `<p>Hello ${newUser.firstName},</p><p>Welcome to Saberchat! A confirmation of your account:</p><ul><li>Your username is ${newUser.username}.</li><li>Your full name is ${newUser.firstName} ${newUser.lastName}.</li><li>Your linked email is ${newUser.email}</li></ul><p>Click <a href="https://alsion-saberchat.herokuapp.com/authenticate/${newUser._id}?token=${token}">this link</a> to verify your account.</p>`
+    		};
 
-      		transporter.sendMail(emailMessage, (err, info) =>{
-      		  if (err) {
-      		    console.log(err);
-      		  } else {
-      		    console.log('Email sent: ' + info.response);
-      		  }
-      		});
+    		transporter.sendMail(verifyMessage, (err, info) =>{
+    		  if (err) {
+    		    console.log(err);
+    		  } else {
+    		    console.log('Email sent: ' + info.response);
+    		  }
+    		});
+      }
+  	});
+  }
+});
 
-				});
-			}
-		});
-	}
+router.get('/authenticate/:id', (req, res) => {
+  User.findById(req.params.id, (err, user) => {
+    if (err || !user) {
+      req.flash('error', "Unable to find user");
+      res.redirect('/');
+
+    } else {
+
+      //Update authentication token
+      let charSetMatrix = [];
+
+      charSetMatrix.push('qwertyuiopasdfghjklzxcvbnm'.split(''));
+      charSetMatrix.push('QWERTYUIOPASDFGHJKLZXCVBNM'.split(''));
+      charSetMatrix.push('1234567890'.split(''));
+      charSetMatrix.push('()%!~$#*[){]|,.<>');
+
+      let tokenLength = Math.round((Math.random() * 15)) + 15;
+      let token = "";
+
+      let charSet; //Which character set to choose from
+
+      for (let i = 0; i < tokenLength; i += 1) {
+        charSet = charSetMatrix[Math.floor(Math.random() * 4)];
+        token += charSet[Math.floor((Math.random() * charSet.length))];
+      }
+
+      if (req.query.token.toString() == user.authenticationToken) {
+        user.authenticated = true;
+        user.authenticationToken = token;
+        user.save();
+
+        req.logIn(user, (err) => {
+          if (err) {
+            return next(err);
+          }
+
+          let welcomeMessage = {
+            from: 'noreply.saberchat@gmail.com',
+            to: newUser.email,
+            subject: 'Welcome To Saberchat!',
+            html: `<p>Hello ${newUser.firstName},</p><p>Welcome to Saberchat! A confirmation of your account:</p><ul><li>Your username is ${newUser.username}.</li><li>Your full name is ${newUser.firstName} ${newUser.lastName}.</li><li>Your linked email is ${newUser.email}</li></ul><p>You will be assigned a role and status soon.</p>`
+          };
+
+          transporter.sendMail(welcomeMessage, (err, info) =>{
+            if (err) {
+              console.log(err);
+            } else {
+              console.log('Email sent: ' + info.response);
+            }
+          });
+
+          req.flash('success', 'Welcome ' + user.firstName);
+          return res.redirect('/');
+        });
+
+      } else {
+        req.flash('error', "Invalid authentication token");
+        res.redirect('/');
+      }
+    }
+  });
 });
 
 // Custom login handling so that flash messages can be sent. I'm not entirely sure how it works. Copy pasted from official doc
@@ -169,7 +251,10 @@ router.post('/login', function(req, res, next) {
 			//flash message error
             req.flash('error', 'Invalid Email or Password');
             return res.redirect('/');
-		}
+        } else if (!user.authenticated) {
+          req.flash('error', 'Go to your email to verify your account');
+          return res.redirect('/');
+        }
 		//If authentication succeeds, log in user again
         req.logIn(user, (err) => {
 			if (err) { return next(err); }
@@ -182,7 +267,7 @@ router.post('/login', function(req, res, next) {
 
 router.post('/forgot-password', (req, res) => {
 
-  User.find({'email': req.body.newPwdEmail}, (err,  users) => {
+  User.find({authenticated: true, 'email': req.body.newPwdEmail}, (err,  users) => {
     if (!users) {
       req.flash('error', "Unable to find users");
       res.redirect('/');
@@ -198,7 +283,7 @@ router.post('/forgot-password', (req, res) => {
       charSetMatrix.push('qwertyuiopasdfghjklzxcvbnm'.split(''));
       charSetMatrix.push('QWERTYUIOPASDFGHJKLZXCVBNM'.split(''));
       charSetMatrix.push('1234567890'.split(''));
-      charSetMatrix.push('`}~!@#$*(-=_+[)\\{]|\'",./<>?');
+      charSetMatrix.push('()%!~$#*-=+[)\\{]|\'",.<>');
 
       let pwd_length = Math.round((Math.random() * 15)) + 15;
       let pwd = "";
@@ -297,7 +382,7 @@ router.get("/logout", (req, res) => {
 });
 
 router.get('/contact', middleware.isLoggedIn, (req, res) => {
-	User.find({status: 'faculty'}, (err, faculty) => {
+	User.find({authenticated: true, authenticated: true, status: 'faculty'}, (err, faculty) => {
 		if (err || !faculty) {
 			req.flash('error', "Unable to access database");
 			res.redirect('back');
@@ -309,7 +394,7 @@ router.get('/contact', middleware.isLoggedIn, (req, res) => {
 });
 
 router.get('/alsion', (req, res) => {
-	User.find({status: 'faculty'}, (err, faculty) => {
+	User.find({authenticated: true, status: 'faculty'}, (err, faculty) => {
 		if (err || !faculty) {
 			req.flash('error', "Unable to access database");
 			res.redirect('back');

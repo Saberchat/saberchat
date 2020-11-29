@@ -39,7 +39,7 @@ router.get('/', (req, res) => { //RESTful Routing 'INDEX' route
 })
 
 router.get('/new', middleware.isLoggedIn, middleware.isFaculty, (req, res) => { ////RESTful Routing 'NEW' route
-  User.find({status: {$nin: ['alumnus', 'guest', 'parent', 'faculty']}}, (err, foundUsers) => { //Find all students, so that when teachers post a project, they can select which students created it
+  User.find({authenticated: true, status: {$nin: ['alumnus', 'guest', 'parent', 'faculty']}}, (err, foundUsers) => { //Find all students, so that when teachers post a project, they can select which students created it
     if (err || !foundUsers) {
       console.log(err);
       req.flash('error', 'Unable to access database');
@@ -68,7 +68,7 @@ router.post('/',middleware.isLoggedIn, middleware.isFaculty, (req, res) => { //R
       for (let creator of req.body.creatorInput.split(',')) {
 
         if (statuses.indexOf(creator) > -1) {
-          statusGroup = await User.find({status: creator});
+          statusGroup = await User.find({authenticated: true, status: creator});
 
           if (!statusGroup) {
             req.flash('error', "Unable to find the users you listed"); return res.redirect('back');
@@ -104,7 +104,7 @@ router.post('/',middleware.isLoggedIn, middleware.isFaculty, (req, res) => { //R
     project.date = dateFormat(project.created_at, "h:MM TT | mmm d");
     await project.save();
 
-    const followers = await User.find({_id: {$in: req.user.followers}});
+    const followers = await User.find({authenticated: true, _id: {$in: req.user.followers}});
 
     if (!followers) {
       req.flash('error', "Umable to access your followers");
@@ -183,7 +183,7 @@ router.get('/:id/edit', middleware.isLoggedIn, middleware.isFaculty, (req, res) 
       creatornames.push(creator.username);
     }
 
-    const students = await User.find({status: {$nin: ['alumnus', 'guest', 'parent', 'faculty']}}); //Find all students - all of whom are possible project creators
+    const students = await User.find({authenticated: true, status: {$nin: ['alumnus', 'guest', 'parent', 'faculty']}}); //Find all students - all of whom are possible project creators
 
     if (!students) {
       req.flash('error', 'Unable to find student list'); return res.redirect('back');
@@ -236,7 +236,7 @@ router.put('/:id', middleware.isLoggedIn, middleware.isFaculty, (req, res) => {
       for (let creator of creatorInputArray) {
 
         if (statuses.indexOf(creator) > -1) {
-          statusGroup = await User.find({status: creator});
+          statusGroup = await User.find({authenticated: true, status: creator});
 
           if (!statusGroup) {
             req.flash('error', "Unable to find the users you listed"); return res.redirect('back');
@@ -283,7 +283,7 @@ router.put('/:id', middleware.isLoggedIn, middleware.isFaculty, (req, res) => {
 
     updatedProject.save();
 
-    const followers = await User.find({_id: {$in: req.user.followers}});
+    const followers = await User.find({authenticated: true, _id: {$in: req.user.followers}});
 
     if (!followers) {
       req.flash('error', "Umable to access your followers");

@@ -129,7 +129,7 @@ router.post('/', middleware.isLoggedIn, middleware.isMod, (req, res) => { //REST
     announcement.date = dateFormat(announcement.created_at, "h:MM TT | mmm d");
     await announcement.save();
 
-    const users = await User.find({_id: {$nin: [req.user._id]}});
+    const users = await User.find({authenticated: true, _id: {$nin: [req.user._id]}});
     let announcementEmail;
 
     let imageString = "";
@@ -209,7 +209,7 @@ router.put('/:id', middleware.isLoggedIn, middleware.isMod, (req, res) => { //RE
 
       await updatedAnnouncement.save();
 
-      const users = await User.find({_id: {$nin: [req.user._id]}});
+      const users = await User.find({authenticated: true, _id: {$nin: [req.user._id]}});
 
       let announcementEmail;
 
@@ -294,7 +294,7 @@ router.delete('/:id', middleware.isLoggedIn, middleware.isMod, (req, res) => { /
         return res.redirect('back');
       }
 
-      const users = await User.find({}, (err, users) => {
+      const users = await User.find({authenticated: true}, (err, users) => {
         if (!users) {
           req.flash('error', "Unable to find users");
           return res.redirect('back');

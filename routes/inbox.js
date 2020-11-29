@@ -46,7 +46,7 @@ router.get('/', middleware.isLoggedIn, (req, res) => {
 
 //Access sendNotification file
 router.get('/messages/new', middleware.isLoggedIn, (req, res) => {
-	User.find({}, (err, foundUsers) => {
+	User.find({authenticated: true}, (err, foundUsers) => {
 		if(err || !foundUsers) {
 			req.flash('error', 'Unable to access Database');
 			res.redirect('back');
@@ -85,7 +85,7 @@ router.post('/messages', middleware.isLoggedIn, (req, res) => {
 			req.flash('error', 'You cannot send messages to yourself');
 			return res.redirect('back');
 		} else if(req.body.anonymous == 'true') {
-			const faculty = await User.find({status: 'faculty', _id: { $in: recipients } });
+			const faculty = await User.find({authenticated: true, status: 'faculty', _id: { $in: recipients } });
 
 			if(!faculty) {req.flash('error', 'An error occured'); return res.redirect('back');}
 			if(!faculty.length > 0) {req.flash('error', 'You can only select faculty'); return res.redirect('back');}
@@ -113,7 +113,7 @@ router.post('/messages', middleware.isLoggedIn, (req, res) => {
 			}
 
 			if(selStatuses.length > 0) {
-				const selUsers = await User.find({status: {$in: selStatuses}});
+				const selUsers = await User.find({authenticated: true, status:{$in: selStatuses}});
 
 				if(!selUsers) {
 					req.flash('error', 'Error connecting to database'); return res.redirect('back');
