@@ -91,6 +91,15 @@
                     None
                   <% } %>
 
+                  <p style="margin-top: 20px;"><strong>
+
+                  <% if (order.payingInPerson) { %>
+                    Paying In-Person
+                  <% } else { %>
+                    Paying Online
+                  <% } %>
+                </strong></p>
+
                   </span>
 
                   <p style="margin-top: 10px;"><em><%= order.date %></em></p>

@@ -3,9 +3,9 @@ const order = ((form, customer) => {
   let items = document.getElementById('item-list');
 
   $(form).submit(function (e) {
-    // e.preventDefault();
 
     var instructions = $('#descInput').val();
+    var payingInPerson = document.getElementById('payingInPerson').checked;
     var itemList = [];
     var itemCount = [];
 
@@ -22,7 +22,7 @@ const order = ((form, customer) => {
     });
 
     if (itemList.length > 0) {
-      socket.emit('order', itemList, itemCount, instructions, customer);
+      socket.emit('order', itemList, itemCount, instructions, payingInPerson, customer);
     }
   });
 })

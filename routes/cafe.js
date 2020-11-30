@@ -579,7 +579,7 @@ router.post('/order', middleware.isLoggedIn, middleware.cafeOpen, (req, res) => 
         }
       }
 
-      if (orderCharge > req.user.balance) { //Check to see if you are ordering more than you can
+      if (orderCharge > req.user.balance && req.body.payingInPerson == undefined) { //Check to see if you are ordering more than you can
         req.flash("error", "You do not have enough money in your account to pay for this order. Contact the principal to update your balance.");
         res.redirect('/cafe');
 
@@ -588,6 +588,11 @@ router.post('/order', middleware.isLoggedIn, middleware.cafeOpen, (req, res) => 
         res.redirect('/cafe/order/new');
 
       } else {
+        //Update here because if done in socket framework, this will process after balance has changed
+        req.user.balance -= orderCharge;
+        req.user.debt += orderCharge;
+        req.user.save();
+
         req.flash("success", "Order Sent!");
         res.redirect('/cafe');
       }

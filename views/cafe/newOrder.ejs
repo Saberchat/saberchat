@@ -158,9 +158,12 @@
             <% } %>
           </div>
 
-          <br />
           <div class="form-group mt-3">
+            <input type="checkbox" name="payingInPerson" id="payingInPerson" onchange="changeOrderConfirmation()"/>
+            <label for="payingInPerson" title="Paying in person will not subtract money from your online balance">Pay In Person</label>
+            <br /><br />
             <textarea id="descInput" class="form-control" name="instructions" placeholder="Add special instructions for your order" maxlength="100" rows="5" oninput="changeOrderConfirmation()"></textarea>
+            <br />
           </div>
 
           <br />
@@ -174,6 +177,7 @@
             <div style="margin: 0px;" id="order-confirm">
               <span  style="color: blue; margin: 0px;" id="extra-instructions" class="list-group-item list-group-item-action form-check"><strong>Extra Instructions:</strong> None</span>
               <strong style="color: green; margin: 0px;" id="total-cost" class="list-group-item list-group-item-action form-check">Total: $0.00</strong>
+              <strong style="color: red; margin: 0px;" id="paying-style" class="list-group-item list-group-item-action form-check">Paying Online</strong>
             </div>
           </div>
 

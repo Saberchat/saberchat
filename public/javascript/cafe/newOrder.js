@@ -9,10 +9,12 @@ const extraInstructionsInput = document.getElementById('descInput');
 const extraInstructions = document.getElementById('extra-instructions');
 const total = document.getElementById('total-cost');
 const orderConfirm = document.getElementById("order-confirm");
+const payingInPerson = document.getElementById("payingInPerson");
 let orderedItem; //Order that will show up in your 'confirm order' page
 let sum = 0;
 let instructionsNew;
 let totalNew;
+let payingStyleNew;
 
 //Changes the order confirmation on the form
 const changeOrderConfirmation = (() => {
@@ -66,6 +68,17 @@ const changeOrderConfirmation = (() => {
     instructionsNew.innerHTML = `<strong>Extra Instructions:</strong> ${extraInstructionsInput.value}`;
   }
 
+  payingStyleNew = document.createElement('strong');
+  payingStyleNew.style = 'color: red;';
+  payingStyleNew.className = "list-group-item list-group-item-action form-check";
+
+  if (payingInPerson.checked) {
+    payingStyleNew.innerText = "Paying In Person";
+
+  } else {
+    payingStyleNew.innerText = "Paying Online";
+  }
+
   totalNew = document.createElement('strong');
   totalNew.style = 'color: green;';
   totalNew.className = "list-group-item list-group-item-action form-check";
@@ -85,5 +98,6 @@ const changeOrderConfirmation = (() => {
   //Add the total to the div
   orderConfirm.appendChild(instructionsNew);
   orderConfirm.appendChild(totalNew);
+  orderConfirm.appendChild(payingStyleNew);
 
 });

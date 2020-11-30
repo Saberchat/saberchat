@@ -271,7 +271,7 @@ io.on('connect', (socket) => {
     });
   });
 
-  socket.on('order', (itemList, itemCount, instructions, customerId) => { //If an order is sent, handle it here (determined from cafe-socket frontend)
+  socket.on('order', (itemList, itemCount, instructions, payingInPerson, customerId) => { //If an order is sent, handle it here (determined from cafe-socket frontend)
 
     (async() => { //Asynchronous function to control processes one at a time
 
@@ -338,7 +338,7 @@ io.on('connect', (socket) => {
           orderInstructions = instructions;
         }
 
-        let order = await Order.create({customer: customerId, name: `${user.firstName} ${user.lastName}`, present: true, charge: 0, instructions: orderInstructions}); //Assuming no setbacks, create the order
+        let order = await Order.create({customer: customerId, name: `${user.firstName} ${user.lastName}`, present: true, charge: 0, instructions: orderInstructions, payingInPerson}); //Assuming no setbacks, create the order
 
         if (!order) {
           return console.log('error creating order');
@@ -366,12 +366,13 @@ io.on('connect', (socket) => {
 
         await order.save();
 
-        if (order.charge > user.balance) {
+        if (order.charge > user.balance && !payingInPerson) {
           const deletedOrder = await Order.findByIdAndDelete(order._id);
 
           if (!deletedOrder) {
             console.log('Error deleting order');
           }
+
         }
 
         const displayItems = await Item.find({_id: {$in: itemList}}); //Full versions of the _id signatures sent in order.items

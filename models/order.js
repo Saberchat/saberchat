@@ -14,7 +14,8 @@ const orderSchema = new mongoose.Schema({
   instructions: String,
   charge: Number,
   date: String,
-  present: Boolean
+  present: Boolean,
+  payingInPerson: Boolean
 }, {timestamps: {createdAt: 'created_at'}});
 
 module.exports = mongoose.model('Order', orderSchema);
