@@ -7,6 +7,13 @@ var orderItemSchema = new mongoose.Schema({
   imgUrl: String,
   availableItems: Number,
   isAvailable: Boolean,
+  upvotes: [
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'User',
+      default: []
+    }
+  ]
 });
 
 module.exports = mongoose.model('OrderItem', orderItemSchema);

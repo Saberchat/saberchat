@@ -50,27 +50,58 @@
             <% } %>
           <% } %>
 
+          <% let temp;%>
+
+          <% for (let type of tempTypes) { %>
+            <% for (let i = 0; i < type.items.length-1; i ++) { %>
+              <% for (let j = 0; j < type.items.length-1; j ++) { %>
+                <% if (type.items[j].upvotes.length < type.items[j+1].upvotes.length) { %>
+                  <%temp = type.items[j];%>
+                  <%type.items[j] = type.items[j+1];%>
+                  <%type.items[j+1] = temp;%>
+                <% } %>
+              <% } %>
+            <% } %>
+          <% } %>
+
+
           <% tempTypes.forEach(type => { %>
             <% if (type.items.length > 0) { %>
 
               <li class="list-group-item list-group-item-success category-header" id="<%=type._id%>-header" style="margin-top: 40px;">
                 <div class="d-flex w-100 justify-content-between">
                   <h2 class="mb-1"><%=type.name%></h2>
+                  <span><%=type.items.length%> item(s)</span>
                 </div>
               </li>
 
               <% type.items.forEach(item => { %>
                 <% if (item.isAvailable == true) { %>
+                  <span class="list-group-item list-group-item-action menu-item <%=type.name%>" id="item-<%=item.id%>"><strong><%= item.name %> (<%= item.availableItems%> orders available)</strong>
 
                   <% if (!item.price.toString().includes('.')) { %>
-                    <span class="list-group-item list-group-item-action menu-item <%=type.name%>" id="item-<%=item.id%>"><strong><%= item.name %> (<%= item.availableItems%> orders available)</strong> - $<%=item.price%>.00<br /> <em><%= item.description %></em><br /><br /><img  src=<%=item.imgUrl%> style="width: 20%; height: 20%; border-radius: 20px;"/><span hidden><%=type.name%></span></span>
+                    - $<%=item.price%>.00
 
                   <% } else if (item.price.toString().split('.')[1].length == 1){ %>
-                    <span class="list-group-item list-group-item-action menu-item <%=type.name%>" id="item-<%=item.id%>"><strong><%= item.name %> (<%= item.availableItems%> orders available)</strong> - $<%=item.price%>0<br /> <em><%= item.description %></em><br /><br /><img  src=<%=item.imgUrl%> style="width: 20%; height: 20%; border-radius: 20px;"/><span hidden><%=type.name%></span></span>
+                     - $<%=item.price%>0
 
                   <% } else { %>
-                    <span class="list-group-item list-group-item-action menu-item <%=type.name%>" id="item-<%=item.id%>"><strong><%= item.name %> (<%= item.availableItems%> orders available)</strong> - $<%=item.price%><br /> <em><%= item.description %></em><br /><br /><img  src=<%=item.imgUrl%> style="width: 20%; height: 20%; border-radius: 20px;"/><span hidden><%=type.name%></span></span>
+                     - $<%=item.price%>
                   <% } %>
+
+                  <div title="Upvotes" style="margin-left: 10px; display: inline;">
+
+                    <% if (item.upvotes.includes(currentUser._id)) { %>
+                      <a style="color: red; text-decoration: none;" id="upvote-<%=item._id%>" onclick="upvote(this)"><i class="fas fa-arrow-circle-up"></i></a>
+
+                    <% } else { %>
+                      <a style="color: grey; text-decoration: none;" id="upvote-<%=item._id%>" onclick="upvote(this)"><i class="fas fa-arrow-circle-up"></i></a>
+                    <% }%>
+
+                    <span id="upvoteCount-<%=item._id%>"> <%=item.upvotes.length%></span>
+                  </div>
+
+                  <br /> <em><%= item.description %></em><br /><br /><img  src=<%=item.imgUrl%> style="width: 20%; height: 20%; border-radius: 20px;"/><span hidden><%=type.name%></span></span>
 
                 <% }%>
               <% }) %>
@@ -82,6 +113,7 @@
         </div>
       </div>
     </div>
+    <script src="/javascript/cafe/upvote.js"></script>
 
     <script>
 
@@ -106,7 +138,7 @@
       for (let h = 0; h < catHeaders.length; h+= 1) {
         catIncluded = false;
 
-        for (let item of document.getElementsByClassName(catHeaders[h].textContent)) {
+        for (let item of document.getElementsByClassName(catHeaders[h].getElementsByTagName("h2")[0].textContent)) {
           if(item.textContent.toLowerCase().includes(filter)) {
             catIncluded = true;
             break

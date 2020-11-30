@@ -53,6 +53,27 @@ router.get('/menu', middleware.isLoggedIn, (req, res) => { //Renders the cafe me
   })
 })
 
+router.put('/upvote', middleware.isLoggedIn, (req, res) => {
+  Item.findById(req.body.item, (err, item) => {
+    if (err || !item) {
+      res.json({error: "Error upvoting item"});
+
+    } else {
+      if (item.upvotes.includes(req.user._id)) {
+        item.upvotes.splice(item.upvotes.indexOf(req.user._id), 1);
+        item.save();
+        res.json({success: `Downvoted ${item.name}`, upvoteCount: item.upvotes.length})
+
+      } else {
+        item.upvotes.push(req.user._id);
+        item.save();
+        res.json({success: `Upvoted ${item.name}`, upvoteCount: item.upvotes.length})
+      }
+
+    }
+  })
+})
+
 router.get('/data', middleware.isLoggedIn, middleware.isAdmin, (req, res) => {
   (async() => {
 
@@ -538,8 +559,6 @@ router.post('/order', middleware.isLoggedIn, middleware.cafeOpen, (req, res) => 
 
   (async () => { //Asynchronous function controls user ordering
 
-    console.log(req.body.check);
-
     const sent_orders = await Order.find({name: `${req.user.firstName} ${req.user.lastName}`, present: true}); //Find all of this user's orders that are currently active
 
     if (!sent_orders) {
@@ -762,16 +781,29 @@ router.post('/:id/reject', middleware.isLoggedIn, middleware.isMod, (req, res) =
       itemText.push(` - ${order.items[i].item.name}: ${order.items[i].quantity} order(s)`);
     }
 
-    //Render the item's charge in '$dd.cc' pattern, based on what the actual charge is
-    if (!order.charge.toString().includes('.')) {
-      notif.text = "Your order was rejected. This is most likely because we suspect your order is not genuine. Contact us if you think there has been a mistake.\n" + itemText.join("\n") + "\n\nExtra Instructions: " + order.instructions + "\nTotal Cost: $" + order.charge + ".00";
+    if (req.body.rejectionReason == "") {
+      if (!order.charge.toString().includes('.')) {
+        notif.text = "Your order was rejected. This is most likely because we suspect your order is not genuine. Contact us if you think there has been a mistake. No reason was provided for rejection.\n" + itemText.join("\n") + "\n\nExtra Instructions: " + order.instructions + "\nTotal Cost: $" + order.charge + ".00";
 
-    } else if (order.charge.toString().split('.')[1].length == 1){
-      notif.text = "Your order was rejected. This is most likely because we suspect your order is not genuine. Contact us if you think there has been a mistake.\n" + itemText.join("\n") + "\n\nExtra Instructions: " + order.instructions + "\nTotal Cost: $" + order.charge + "0";
+      } else if (order.charge.toString().split('.')[1].length == 1){
+        notif.text = "Your order was rejected. This is most likely because we suspect your order is not genuine. Contact us if you think there has been a mistake. No reason was provided for rejection.\n" + itemText.join("\n") + "\n\nExtra Instructions: " + order.instructions + "\nTotal Cost: $" + order.charge + "0";
+
+      } else {
+        notif.text = "Your order was rejected. This is most likely because we suspect your order is not genuine. Contact us if you think there has been a mistake. No reason was provided for rejection.\n" + itemText.join("\n") + "\n\nExtra Instructions: " + order.instructions + "\nTotal Cost: $" + order.charge + "";
+      }
 
     } else {
-      notif.text = "Your order was rejected. This is most likely because we suspect your order is not genuine. Contact us if you think there has been a mistake.\n" + itemText.join("\n") + "\n\nExtra Instructions: " + order.instructions + "\nTotal Cost: $" + order.charge + "";
+      if (!order.charge.toString().includes('.')) {
+        notif.text = "Your order was rejected. This is most likely because we suspect your order is not genuine. Contact us if you think there has been a mistake. The reason was provided for rejection was the following: \"" + req.body.rejectionReason + "\"\n" + itemText.join("\n") + "\n\nExtra Instructions: " + order.instructions + "\nTotal Cost: $" + order.charge + ".00";
+
+      } else if (order.charge.toString().split('.')[1].length == 1){
+        notif.text = "Your order was rejected. This is most likely because we suspect your order is not genuine. Contact us if you think there has been a mistake. The reason was provided for rejection was the following: \"" + req.body.rejectionReason + "\"\n" + itemText.join("\n") + "\n\nExtra Instructions: " + order.instructions + "\nTotal Cost: $" + order.charge + "0";
+
+      } else {
+        notif.text = "Your order was rejected. This is most likely because we suspect your order is not genuine. Contact us if you think there has been a mistake. The reason was provided for rejection was the following: \"" + req.body.rejectionReason + "\"\n" + itemText.join("\n") + "\n\nExtra Instructions: " + order.instructions + "\nTotal Cost: $" + order.charge + "";
+      }
     }
+
 
     await notif.save();
 

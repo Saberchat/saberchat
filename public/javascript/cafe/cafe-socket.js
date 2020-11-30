@@ -6,7 +6,7 @@ const order = ((form, customer) => {
 
     var instructions = $('#descInput').val();
     var payingInPerson = document.getElementById('payingInPerson').checked;
-    var balance = parseFloat(document.getElementById('balance').innerText);
+    var balance = parseFloat(document.getElementById('balance-box').innerText.split("$")[1]);
     var charge = parseFloat(document.getElementById('total-cost').innerText.split("$")[1]);
     var itemList = [];
     var itemCount = [];

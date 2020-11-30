@@ -1,3 +1,5 @@
+//Implement JSON likes
+
 //Project routes dictate the posting, viewing, and editing of the Saberchat Student Projects Board
 
 //LIBRARIES
@@ -214,25 +216,22 @@ router.get('/:id', (req, res) => { //RESTful Routing 'SHOW' route
   });
 });
 
-router.get('/:id/like', middleware.isLoggedIn, (req, res) => {
-  Project.findById(req.params.id, (err, project) => {
+router.put('/like', middleware.isLoggedIn, (req, res) => {
+  Project.findById(req.body.project, (err, project) => {
     if (err || !project) {
-      req.flash('error', "Unable to find project");
-      res.redirect('back');
+      res.json({error: 'Error updating project'});
 
     } else {
       if (project.likes.includes(req.user._id)) { //Remove like
         project.likes.splice(project.likes.indexOf(req.user._id), 1);
         project.save();
-        req.flash('success', `Removed like from '${project.title}'`);
+        res.json({success: `Removed a like from ${project.title}`, likeCount: project.likes.length});
 
       } else { //Add like
         project.likes.push(req.user._id);
         project.save();
-        req.flash('success', `Liked '${project.title}'!`);
+        res.json({success: `Liked ${project.title}`, likeCount: project.likes.length});
       }
-
-      res.redirect(`back`);
     }
   });
 });

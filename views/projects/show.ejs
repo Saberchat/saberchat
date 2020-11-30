@@ -87,17 +87,20 @@
                       </div>
                     </div>
                   </form>
-                  </div>
+
                   <% } else { %>
 
-                    <% if (project.likes.includes(currentUser._id)) { %>
-                      <a style="color: #03a5fc; text-decoration: none;" href="../projects/<%=project._id%>/like"><i class="fas fa-thumbs-up"></i></a>
+                    <div style="margin-bottom: 15px; margin-top: -15px;">
+                      <% if (project.likes.includes(currentUser._id)) { %>
+                        <a style="color: #03a5fc; text-decoration: none; font-size: 140%;" id="like-<%=project._id%>-show" onclick="like(this)"><i class="fas fa-thumbs-up"></i></a> <span style="display: inline; font-size: 140%;" id="likeCount-<%=project._id%>"><%=project.likes.length%></span>
 
-                    <% } else { %>
-                      <a style="color: white; text-decoration: none;" href="../projects/<%=project._id%>/like"><i class="fas fa-thumbs-up"></i></a>
+                      <% } else { %>
+                        <a style="color: grey; text-decoration: none; font-size: 140%;" id="like-<%=project._id%>-show" onclick="like(this)"><i class="fas fa-thumbs-up"></i></a> <span style="display: inline; font-size: 140%;" id="likeCount-<%=project._id%>"><%=project.likes.length%></span>
 
-                    <% }%>
-                    <a style="color: white; text-decoration: none;" href="#"><i class="fas fa-comment-dots"></i></a>
+                      <% }%>
+                      <!-- <a style="color: white; text-decoration: none;" href="#"><i class="fas fa-comment-dots"></i></a> -->
+                    </div>
+
                   <% }%>
               <% } %>
 
@@ -167,4 +170,5 @@
       </div>
     </div>
   </body>
+  <script src="/javascript/projects/like.js"></script>
 </html>

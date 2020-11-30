@@ -10,11 +10,13 @@ const extraInstructions = document.getElementById('extra-instructions');
 const total = document.getElementById('total-cost');
 const orderConfirm = document.getElementById("order-confirm");
 const payingInPerson = document.getElementById("payingInPerson");
+const balanceString = document.getElementById("balance-box").innerText;
 let orderedItem; //Order that will show up in your 'confirm order' page
 let sum = 0;
 let instructionsNew;
 let totalNew;
 let payingStyleNew;
+let balanceBox;
 
 //Changes the order confirmation on the form
 const changeOrderConfirmation = (() => {
@@ -69,6 +71,33 @@ const changeOrderConfirmation = (() => {
     instructionsNew.innerHTML = `<strong>Extra Instructions:</strong> ${extraInstructionsInput.value}`;
   }
 
+  balanceBox = document.createElement('strong');
+  balanceBox.style = 'color: purple;';
+  balanceBox.className = "list-group-item list-group-item-action form-check";
+  balanceBox.id = "balance-box";
+
+  balanceBox.innerText = balanceString;
+
+  totalNew = document.createElement('span');
+  totalNew.style = 'color: green;';
+  totalNew.className = "list-group-item list-group-item-action form-check";
+  totalNew.id = "total-cost";
+
+  //Create cost in full '$dd.cc' format based on what the total is
+  if (!sum.toString().includes('.')) {
+    totalNew.innerHTML = `<strong>Total: $${sum}.00</strong>`;
+
+  } else if (sum.toString().split('.')[1].length == 1){
+    totalNew.innerHTML = `<strong>Total: $${sum}0</strong>`;
+
+  } else {
+    totalNew.innerHTML = `<strong>Total: $${sum}</strong>`;
+  }
+
+  if (sum > parseFloat(balanceString.split("$")[1]) && !payingInPerson.checked) {
+    totalNew.innerHTML += `<em style="color: red; margin-left: 20px;">Charge is over your account balance</em>`
+  }
+
   payingStyleNew = document.createElement('strong');
   payingStyleNew.style = 'color: red;';
   payingStyleNew.className = "list-group-item list-group-item-action form-check";
@@ -81,25 +110,13 @@ const changeOrderConfirmation = (() => {
     payingStyleNew.innerText = "Paying Online";
   }
 
-  totalNew = document.createElement('strong');
-  totalNew.style = 'color: green;';
-  totalNew.className = "list-group-item list-group-item-action form-check";
-  totalNew.id = "total-cost";
-
-
-  //Create cost in full '$dd.cc' format based on what the total is
-  if (!sum.toString().includes('.')) {
-    totalNew.innerText = `Total: $${sum}.00`;
-
-  } else if (sum.toString().split('.')[1].length == 1){
-    totalNew.innerText = `Total: $${sum}0`;
-
-  } else {
-    totalNew.innerText = `Total: $${sum}`;
-  }
-
   //Add the total to the div
   orderConfirm.appendChild(instructionsNew);
+
+  if (!payingInPerson.checked) {
+    orderConfirm.appendChild(balanceBox);
+  }
+  
   orderConfirm.appendChild(totalNew);
   orderConfirm.appendChild(payingStyleNew);
 

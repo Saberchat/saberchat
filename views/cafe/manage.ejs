@@ -51,18 +51,33 @@
             <input id="search-input" oninput="searchFunction()" class="form-control" type="text" placeholder="Search..." title="Type in itemname" />
           </div>
 
+          <% let temp;%>
+
+          <% for (let type of types) { %>
+            <% for (let i = 0; i < type.items.length-1; i ++) { %>
+              <% for (let j = 0; j < type.items.length-1; j ++) { %>
+                <% if (type.items[j].upvotes.length < type.items[j+1].upvotes.length) { %>
+                  <%temp = type.items[j];%>
+                  <%type.items[j] = type.items[j+1];%>
+                  <%type.items[j+1] = temp;%>
+                <% } %>
+              <% } %>
+            <% } %>
+          <% } %>
+
           <% types.forEach(type => { %>
             <% if (type.items.length > 0) { %>
               <li class="list-group-item list-group-item-success category-header" id="<%=type._id%>-header" style="margin-top: 40px;">
                 <div class="d-flex w-100 justify-content-between">
                   <h2 class="mb-1"><%=type.name%></h2>
+                  <span><%=type.items.length%> item(s)</span>
                 </div>
               </li>
               <% type.items.forEach(item => { %>
                 <% if (item.isAvailable == true) { %>
-                  <a href="item/<%= item._id %>" id="item-<%=item.id%>" class="list-group-item list-group-item-action menu-item <%=type.name.split(' ').join('')%>"><strong><%= item.name %></strong> (<%= item.availableItems%> orders available) <span hidden><%=type.name%></span></a>
+                  <a href="item/<%= item._id %>" id="item-<%=item.id%>" class="list-group-item list-group-item-action menu-item <%=type.name.split(' ').join('')%>"><strong><%= item.name %></strong> (<%= item.availableItems%> orders available) <span hidden><%=type.name%></span> <span title="Upvotes (Cafe admins cannot upvote items from here)" style="color: grey; text-decoration: none; display: inline;"><i class="fas fa-arrow-circle-up"></i></span><span id="upvoteCount-<%=item._id%>"> <%=item.upvotes.length%></span></a>
                 <% } else {%>
-                  <a href="item/<%= item._id %>" id="item-<%=item.id%>" class="list-group-item list-group-item-action menu-item <%=type.name.split(' ').join('')%>"><strong><%= item.name %></strong> (Unavailable) <span hidden><%=type.name%></span></a>
+                  <a href="item/<%= item._id %>" id="item-<%=item.id%>" class="list-group-item list-group-item-action menu-item <%=type.name.split(' ').join('')%>"><strong><%= item.name %></strong> (Unavailable) <span hidden><%=type.name%></span> <span title="Upvotes (Cafe admins cannot upvote items from here)" style="color: grey; text-decoration: none; display: inline;"><i class="fas fa-arrow-circle-up"></i></span><span id="upvoteCount-<%=item._id%>"> <%=item.upvotes.length%></span></a>
                 <% } %>
               <% }) %>
               <br class="category-break" id="<%=type._id%>-break"/>
@@ -73,18 +88,30 @@
           <li class="list-group-item list-group-item-primary category-header" id="types-header">
             <div class="d-flex w-100 justify-content-between">
               <h2 class="mb-1">Item Order Categories</h2>
+              <span><%=types.length%> type(s)</span>
             </div>
           </li>
+
+          <% let upvoteCount = 0;%>
+
           <% types.forEach(type => { %>
+            <% upvoteCount = 0;%>
             <% if (type.name != "Other") { %>
-              <a href="type/<%=type._id%>" id="type-<%=type.id%>" class="list-group-item list-group-item-action menu-item ItemOrderCategories"><strong><%=type.name%></strong> (<%=type.items.length%> items) </a>
+              <% for (let item of type.items) { %>
+                <% upvoteCount += item.upvotes.length%>
+              <% } %>
+              <a href="type/<%=type._id%>" id="type-<%=type.id%>" class="list-group-item list-group-item-action menu-item ItemOrderCategories"><strong><%=type.name%></strong> (<%=type.items.length%> items) <span title="Sum of all upvotes for this category (Cafe admins cannot upvote items from here)" style="color: grey; text-decoration: none; display: inline;"><i class="fas fa-arrow-circle-up"></i></span><span> <%=upvoteCount%></span> </a>
             <% } %>
           <% }) %>
 
           <!-- Ensures that 'other' will be last -->
           <% types.forEach(type => { %>
+            <% upvoteCount = 0;%>
             <% if (type.name == "Other") { %>
-              <div class="list-group-item list-group-item-action menu-item ItemOrderCategories" id="type-<%=type.id%>"><strong><%=type.name%></strong> (<%=type.items.length%> items) <strong style="color: red;">You cannot modify this category </strong></div>
+              <% for (let item of type.items) { %>
+                <% upvoteCount += item.upvotes.length%>
+              <% } %>
+              <div class="list-group-item list-group-item-action menu-item ItemOrderCategories" id="type-<%=type.id%>"><strong><%=type.name%></strong> (<%=type.items.length%> items) <strong style="color: red;">You cannot modify this category </strong> <span title="Sum of all upvotes for this category (Cafe admins cannot upvote items from here)" style="color: grey; text-decoration: none; display: inline;"><i class="fas fa-arrow-circle-up"></i></span><span> <%=upvoteCount%></span>
             <% } %>
           <% }) %>
 
@@ -117,7 +144,7 @@
     for (let h = 0; h < catHeaders.length; h+= 1) {
       catIncluded = false;
 
-      for (let item of document.getElementsByClassName(catHeaders[h].textContent.split(' ').join(''))) {
+      for (let item of document.getElementsByClassName(catHeaders[h].getElementsByTagName("h2")[0].textContent.split(' ').join(''))) {
         if(item.textContent.toLowerCase().includes(filter)) {
           catIncluded = true;
           break;

@@ -77,12 +77,27 @@
               <% } %>
             <% } %>
 
+            <% let temp;%>
+
+            <% for (let type of tempTypes) { %>
+              <% for (let i = 0; i < type.items.length-1; i ++) { %>
+                <% for (let j = 0; j < type.items.length-1; j ++) { %>
+                  <% if (type.items[j].upvotes.length < type.items[j+1].upvotes.length) { %>
+                    <%temp = type.items[j];%>
+                    <%type.items[j] = type.items[j+1];%>
+                    <%type.items[j+1] = temp;%>
+                  <% } %>
+                <% } %>
+              <% } %>
+            <% } %>
+
             <% for (let type of tempTypes) { %>
               <% if (type.items.length > 0) { %>
 
                 <li class="list-group-item list-group-item-success category-header" id="<%=type._id%>-header" style="margin-top: 40px;">
                   <div class="d-flex w-100 justify-content-between">
                     <h2 class="mb-1"><%=type.name%></h2>
+                    <span><%=type.items.length%> item(s)</span>
                   </div>
                 </li>
               <% } %>
@@ -167,11 +182,23 @@
                         <% } %>
 
                         <% if (popular) { %>
-                          <span style="font-weight: bold; color: green;  margin-left: 5px;">Frequently Ordered. Order Item?</span>
+                          <span style="font-weight: bold; color: green;  margin-left: 5px;">Frequently Ordered</span>
                         <% } %>
 
                         <span hidden><%=type.name%></span>
                         </label>
+
+                        <div title="Upvotes" style="margin-left: 10px; display: inline;">
+
+                          <% if (item.upvotes.includes(currentUser._id)) { %>
+                            <a style="color: red; text-decoration: none;" id="upvote-<%=item._id%>" onclick="upvote(this)"><i class="fas fa-arrow-circle-up"></i></a>
+
+                          <% } else { %>
+                            <a style="color: grey; text-decoration: none;" id="upvote-<%=item._id%>" onclick="upvote(this)"><i class="fas fa-arrow-circle-up"></i></a>
+                          <% }%>
+
+                          <span id="upvoteCount-<%=item._id%>"> <%=item.upvotes.length%></span>
+                        </div>
 
                         <br />
                       </div>
@@ -204,6 +231,17 @@
           <div>
             <div style="margin: 0px;" id="order-confirm">
               <span  style="color: blue; margin: 0px;" id="extra-instructions" class="list-group-item list-group-item-action form-check"><strong>Extra Instructions:</strong> None</span>
+              <strong style="color: purple; margin: 0px;" id="balance-box" class="list-group-item list-group-item-action form-check">Current Balance:
+                <% if (!currentUser.balance.toString().includes('.')) { %>
+                  $<%= currentUser.balance %>.00
+
+                <% } else if (currentUser.balance.toString().split('.')[1].length == 1){ %>
+                  $<%= currentUser.balance %>0
+
+                <% } else { %>
+                  $<%= currentUser.balance %>
+                <% } %>
+              </strong>
               <strong style="color: green; margin: 0px;" id="total-cost" class="list-group-item list-group-item-action form-check">Total: $0.00</strong>
               <strong style="color: red; margin: 0px;" id="paying-style" class="list-group-item list-group-item-action form-check">Paying Online</strong>
             </div>
@@ -219,6 +257,7 @@
 </body>
 <!-- Stylistic file. Changes your order summary based on what you are clicking -->
 <script src="/javascript/cafe/newOrder.js"></script>
+<script src="/javascript/cafe/upvote.js"></script>
 
 <script>
   order(orderForm, '<%=currentUser._id%>');
@@ -245,7 +284,7 @@
     for (let h = 0; h < catHeaders.length; h+= 1) {
       catIncluded = false;
 
-      for (let item of document.getElementsByClassName(catHeaders[h].textContent)) {
+      for (let item of document.getElementsByClassName(catHeaders[h].getElementsByTagName("h2")[0].textContent)) {
         if(item.textContent.toLowerCase().includes(filter)) {
           catIncluded = true;
           break
