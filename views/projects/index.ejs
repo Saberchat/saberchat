@@ -103,10 +103,17 @@
                           </div>
                         </div>
                       </form>
-<!-- 
+
                     <% } else { %>
-                      <a href="#"><i class="fas fa-thumbs-up"></i></a>
-                      <a href="#"><i class="fas fa-comment-dots"></i></a> -->
+
+                      <% if (project.likes.includes(currentUser._id)) { %>
+                        <a style="color: #03a5fc; text-decoration: none;" href="projects/<%=project._id%>/like"><i class="fas fa-thumbs-up"></i></a>
+
+                      <% } else { %>
+                        <a style="color: white; text-decoration: none;" href="projects/<%=project._id%>/like"><i class="fas fa-thumbs-up"></i></a>
+
+                      <% }%>
+                      <a style="color: white; text-decoration: none;" href="#"><i class="fas fa-comment-dots"></i></a>
                     <% }%>
                   <% } %>
 

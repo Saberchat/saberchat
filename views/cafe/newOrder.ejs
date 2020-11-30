@@ -37,6 +37,20 @@
           <p>Place an order that will be delivered to you at lunch</p>
           <a class="btn btn-primary" href='/cafe'><i class="fas fa-arrow-left"></i> Back</a>
           <a class="btn btn-info" href='/cafe/menu'><i class="fas fa-bars"></i> Menu </a>
+          <br /><br />
+          <strong style="font-size: 120%;">Current Balance:
+
+            <% if (!currentUser.balance.toString().includes('.')) { %>
+              $<span id="balance"><%= currentUser.balance %>.00
+
+            <% } else if (currentUser.balance.toString().split('.')[1].length == 1){ %>
+              $<span id="balance"><%= currentUser.balance %>0
+
+            <% } else { %>
+              $<span id="balance"><%= currentUser.balance %>
+            <% } %>
+
+          </span></strong>
         </div>
       </div>
     </div>
@@ -52,7 +66,18 @@
           </div>
 
           <div id="item-list">
-            <% for (let type of types) { %>
+
+            <% let tempTypes = types; %>
+
+            <% for (let type of tempTypes) { %>
+              <% for (let i = type.items.length-1; i >= 0; i -=1) { %>
+                <% if (!type.items[i].isAvailable) { %>
+                  <% type.items.splice(i, 1); %>
+                <% } %>
+              <% } %>
+            <% } %>
+
+            <% for (let type of tempTypes) { %>
               <% if (type.items.length > 0) { %>
 
                 <li class="list-group-item list-group-item-success category-header" id="<%=type._id%>-header" style="margin-top: 40px;">
@@ -154,13 +179,16 @@
 
                   <% } %>
                 <% } %>
-                <br class="category-break" id="<%=type._id%>-break"/>
+
+                <% if (type.items.length > 0) { %>
+                  <br class="category-break" id="<%=type._id%>-break"/>
+                <% } %>
             <% } %>
           </div>
 
           <div class="form-group mt-3">
             <input type="checkbox" name="payingInPerson" id="payingInPerson" onchange="changeOrderConfirmation()"/>
-            <label for="payingInPerson" title="Paying in person will not subtract money from your online balance">Pay In Person</label>
+            <label for="payingInPerson" title="Paying in person will not subtract money from your online balance">In-Person Payment</label>
             <br /><br />
             <textarea id="descInput" class="form-control" name="instructions" placeholder="Add special instructions for your order" maxlength="100" rows="5" oninput="changeOrderConfirmation()"></textarea>
             <br />

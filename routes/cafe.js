@@ -538,6 +538,8 @@ router.post('/order', middleware.isLoggedIn, middleware.cafeOpen, (req, res) => 
 
   (async () => { //Asynchronous function controls user ordering
 
+    console.log(req.body.check);
+
     const sent_orders = await Order.find({name: `${req.user.firstName} ${req.user.lastName}`, present: true}); //Find all of this user's orders that are currently active
 
     if (!sent_orders) {
@@ -588,10 +590,13 @@ router.post('/order', middleware.isLoggedIn, middleware.cafeOpen, (req, res) => 
         res.redirect('/cafe/order/new');
 
       } else {
-        //Update here because if done in socket framework, this will process after balance has changed
-        req.user.balance -= orderCharge;
-        req.user.debt += orderCharge;
-        req.user.save();
+        //Update balance here because if done in socket framework, this will process after balance has changed
+
+        if (!req.body.payingInPerson) {
+          req.user.balance -= orderCharge;
+          req.user.debt += orderCharge;
+          req.user.save();
+        }
 
         req.flash("success", "Order Sent!");
         res.redirect('/cafe');
@@ -632,6 +637,13 @@ router.delete('/order/:id', middleware.isLoggedIn, middleware.cafeOpen, (req, re
       res.redirect('back');
 
     } else {
+
+      if (!foundOrder.payingInPerson) {
+        req.user.balance += foundOrder.charge; //Refund
+        req.user.debt -= foundOrder.charge;
+        req.user.save();
+      }
+
       for (let i = 0; i < foundOrder.items.length; i += 1) { //For each of the order's items, add the number ordered back to that item. (If there are 12 available quesadillas and the  user ordered 3, there are now 15)
         foundOrder.items[i].item.availableItems += foundOrder.items[i].quantity;
         foundOrder.items[i].item.isAvailable = true;
@@ -663,10 +675,6 @@ router.post('/:id/ready', middleware.isLoggedIn, middleware.isMod, (req, res) =>
 
     cafes[0].revenue += order.charge;
     cafes[0].save();
-
-    order.customer.debt += order.charge; //Update customer money info
-    order.customer.balance -= order.charge;
-    order.customer.save();
 
     const notif = await Notification.create({subject: "Cafe Order Ready", sender: req.user, recipients: [order.customer], read: [], toEveryone: false, images: []}); //Create a notification to alert the user
       if (!notif) {
@@ -781,6 +789,11 @@ router.post('/:id/reject', middleware.isLoggedIn, middleware.isMod, (req, res) =
         console.log('Email sent: ' + info.response);
       }
     });
+
+    if (!order.payingInPerson) {
+      order.customer.balance += order.charge; //Refund
+      order.customer.debt -= order.charge;
+    }
 
     order.customer.inbox.push(notif); //Add notif to user's inbox
     order.customer.msgCount += 1;

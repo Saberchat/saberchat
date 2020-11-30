@@ -6,6 +6,8 @@ const order = ((form, customer) => {
 
     var instructions = $('#descInput').val();
     var payingInPerson = document.getElementById('payingInPerson').checked;
+    var balance = parseFloat(document.getElementById('balance').innerText);
+    var charge = parseFloat(document.getElementById('total-cost').innerText.split("$")[1]);
     var itemList = [];
     var itemCount = [];
 
@@ -22,7 +24,9 @@ const order = ((form, customer) => {
     });
 
     if (itemList.length > 0) {
-      socket.emit('order', itemList, itemCount, instructions, payingInPerson, customer);
+      if (!payingInPerson && charge > balance) {} else {
+        socket.emit('order', itemList, itemCount, instructions, payingInPerson, customer);
+      }
     }
   });
 })

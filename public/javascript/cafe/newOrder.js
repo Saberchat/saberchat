@@ -60,6 +60,7 @@ const changeOrderConfirmation = (() => {
   instructionsNew = document.createElement('span');
   instructionsNew.style = 'color: blue;';
   instructionsNew.className = "list-group-item list-group-item-action form-check";
+  instructionsNew.id = "extra-instructions";
 
   if (extraInstructionsInput.value == '') {
     instructionsNew.innerHTML = `<strong>Extra Instructions:</strong> None`;
@@ -71,9 +72,10 @@ const changeOrderConfirmation = (() => {
   payingStyleNew = document.createElement('strong');
   payingStyleNew.style = 'color: red;';
   payingStyleNew.className = "list-group-item list-group-item-action form-check";
+  payingStyleNew.id = "paying-style";
 
   if (payingInPerson.checked) {
-    payingStyleNew.innerText = "Paying In Person";
+    payingStyleNew.innerText = "Paying In-Person";
 
   } else {
     payingStyleNew.innerText = "Paying Online";
@@ -82,6 +84,7 @@ const changeOrderConfirmation = (() => {
   totalNew = document.createElement('strong');
   totalNew.style = 'color: green;';
   totalNew.className = "list-group-item list-group-item-action form-check";
+  totalNew.id = "total-cost";
 
 
   //Create cost in full '$dd.cc' format based on what the total is

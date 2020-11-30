@@ -35,8 +35,8 @@ router.get('/', (req, res) => { //RESTful Routing 'INDEX' route
     } else {
       res.render('projects/index', {projects: foundProjects}); //Post the project data to HTML page, which formats the data
     }
-  })
-})
+  });
+});
 
 router.get('/new', middleware.isLoggedIn, middleware.isFaculty, (req, res) => { ////RESTful Routing 'NEW' route
   User.find({authenticated: true, status: {$nin: ['alumnus', 'guest', 'parent', 'faculty']}}, (err, foundUsers) => { //Find all students, so that when teachers post a project, they can select which students created it
@@ -48,8 +48,8 @@ router.get('/new', middleware.isLoggedIn, middleware.isFaculty, (req, res) => { 
     } else {
       res.render('projects/new', {students: foundUsers});
     }
-  })
-})
+  });
+});
 
 router.post('/',middleware.isLoggedIn, middleware.isFaculty, (req, res) => { //RESTful Routing 'CREATE' route
 
@@ -161,7 +161,7 @@ router.post('/',middleware.isLoggedIn, middleware.isFaculty, (req, res) => { //R
     req.flash('error', "Unable to access database");
     res.redirect('back');
   });
-})
+});
 
 router.get('/:id/edit', middleware.isLoggedIn, middleware.isFaculty, (req, res) => { //RESTful Routing 'EDIT' route
 
@@ -195,8 +195,8 @@ router.get('/:id/edit', middleware.isLoggedIn, middleware.isFaculty, (req, res) 
     console.log(err);
     req.flash('error', "Unable to access database");
     res.redirect('back');
-  })
-})
+  });
+});
 
 router.get('/:id', (req, res) => { //RESTful Routing 'SHOW' route
 
@@ -211,8 +211,31 @@ router.get('/:id', (req, res) => { //RESTful Routing 'SHOW' route
     } else {
       res.render('projects/show', {project: foundProject});
     }
-  })
-})
+  });
+});
+
+router.get('/:id/like', middleware.isLoggedIn, (req, res) => {
+  Project.findById(req.params.id, (err, project) => {
+    if (err || !project) {
+      req.flash('error', "Unable to find project");
+      res.redirect('back');
+
+    } else {
+      if (project.likes.includes(req.user._id)) { //Remove like
+        project.likes.splice(project.likes.indexOf(req.user._id), 1);
+        project.save();
+        req.flash('success', `Removed like from '${project.title}'`);
+
+      } else { //Add like
+        project.likes.push(req.user._id);
+        project.save();
+        req.flash('success', `Liked '${project.title}'!`);
+      }
+
+      res.redirect(`back`);
+    }
+  });
+});
 
 
 router.put('/:id', middleware.isLoggedIn, middleware.isFaculty, (req, res) => {
