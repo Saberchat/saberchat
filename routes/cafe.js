@@ -161,6 +161,7 @@ router.get('/data', middleware.isLoggedIn, middleware.isAdmin, (req, res) => {
     }
 
     let popularItems = [];
+    let upvotedItems = [];
     let itemObject;
     let itemTotal;
 
@@ -213,9 +214,11 @@ router.get('/data', middleware.isLoggedIn, middleware.isAdmin, (req, res) => {
         orderedQuantities.push(orderedQuantityObject);
       }
 
+      upvotedItems.push(item);
+
     }
 
-    //Sort items
+    //Sort popular items
     let tempItem;
     for (let h = 0; h < popularItems.length; h++) {
       for (let i = 0; i < popularItems.length - 1; i ++) {
@@ -224,6 +227,33 @@ router.get('/data', middleware.isLoggedIn, middleware.isAdmin, (req, res) => {
           popularItems[i] = popularItems[i+1];
           popularItems[i+1] = tempItem;
         }
+      }
+    }
+
+    //Sort upvoted items
+
+    let tempUpvotedItem;
+    let avgUpvotes = 0;
+
+    for (let j = 0; j < upvotedItems.length - 1; j++) {
+      for (let k = 0; k < upvotedItems.length - 1; k++) {
+        if (upvotedItems[k].upvotes.length < upvotedItems[k+1].upvotes.length) {
+          tempUpvotedItem = upvotedItems[k];
+          upvotedItems[k] = upvotedItems[k+1];
+          upvotedItems[k+1] = tempUpvotedItem;
+        }
+      }
+    }
+
+    for (let i = 0; i < upvotedItems.length; i++) {
+      avgUpvotes += upvotedItems[i].upvotes.length;
+    }
+
+    avgUpvotes /= upvotedItems.length;
+
+    for (let j = upvotedItems.length - 1; j >= 0 ; j--) {
+      if(upvotedItems[j].upvotes.length < avgUpvotes) {
+        upvotedItems.splice(j, 1);
       }
     }
 
@@ -458,7 +488,7 @@ router.get('/data', middleware.isLoggedIn, middleware.isAdmin, (req, res) => {
     }
 
 
-    res.render('cafe/data', {items, popularCustomers, longestOrderCustomers, lucrativeCustomers, popularItems, orderedQuantities, pricepoints, combinations: populatedCombinations, times: timesObject});
+    res.render('cafe/data', {items, popularCustomers, longestOrderCustomers, lucrativeCustomers, popularItems, upvotedItems, orderedQuantities, pricepoints, combinations: populatedCombinations, times: timesObject});
 
   })().catch(err => {
     console.log(err);

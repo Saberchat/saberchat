@@ -10,19 +10,23 @@ var projectSchema = new mongoose.Schema({
       ref: 'User'
     },
 
-    creators: [
-      {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'User'
-      }
-    ],
+    creators: [{
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'User'
+    }],
 
-    likes: [
-      {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'User'
-      }
-    ]
+    likes: [{
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'User',
+      default: []
+    }],
+
+    comments: [{
+      text: String,
+      sender: {type: mongoose.Schema.Types.ObjectId, ref: 'User'},
+      date: String,
+      default: []
+    }]
 
 }, {timestamps: {createdAt: 'created_at'}});
 

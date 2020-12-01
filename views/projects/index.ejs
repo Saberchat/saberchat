@@ -108,18 +108,17 @@
                         </div>
                       </form>
 
-                    <% } else { %>
+                    <% } %>
 
                       <% if (project.likes.includes(currentUser._id)) { %>
-                        <a style="color: #03a5fc; text-decoration: none;" id="like-<%=project._id%>-index" onclick="like(this)"><i class="fas fa-thumbs-up"></i></a> <span id="likeCount-<%=project._id%>"><%=project.likes.length%></span>
+                        <a style="color: #03a5fc; text-decoration: none; margin-left: 10px;" id="like-<%=project._id%>-index" onclick="like(this)"><i class="fas fa-thumbs-up"></i></a> <span id="likeCount-<%=project._id%>"><%=project.likes.length%></span>
 
                       <% } else { %>
-                        <a style="color: white; text-decoration: none;" id="like-<%=project._id%>-index" onclick="like(this)"><i class="fas fa-thumbs-up"></i></a> <span id="likeCount-<%=project._id%>"><%=project.likes.length%></span>
+                        <a style="color: white; text-decoration: none; margin-left: 10px;" id="like-<%=project._id%>-index" onclick="like(this)"><i class="fas fa-thumbs-up"></i></a> <span id="likeCount-<%=project._id%>"><%=project.likes.length%></span>
 
                       <% }%>
-                      <!-- <a style="color: white; text-decoration: none;" href="#"><i class="fas fa-comment-dots"></i></a> -->
+                      <a style="color: white; text-decoration: none; margin-left: 10px;" href="/projects/<%=project._id%>#comment-section"><i class="fas fa-comment-dots"></i> <%=project.comments.length%></a>
                     <% }%>
-                  <% } %>
 
               </div>
 

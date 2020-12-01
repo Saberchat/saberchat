@@ -111,12 +111,11 @@
               <% for (let item of type.items) { %>
                 <% upvoteCount += item.upvotes.length%>
               <% } %>
-              <div class="list-group-item list-group-item-action menu-item ItemOrderCategories" id="type-<%=type.id%>"><strong><%=type.name%></strong> (<%=type.items.length%> items) <strong style="color: red;">You cannot modify this category </strong> <span title="Sum of all upvotes for this category (Cafe admins cannot upvote items from here)" style="color: grey; text-decoration: none; display: inline;"><i class="fas fa-arrow-circle-up"></i></span><span> <%=upvoteCount%></span>
+              <div class="list-group-item list-group-item-action menu-item ItemOrderCategories" id="type-<%=type.id%>"><strong><%=type.name%></strong> (<%=type.items.length%> items) <strong style="color: red;">You cannot modify this category </strong> <span title="Sum of all upvotes for this category (Cafe admins cannot upvote items from here)" style="color: grey; text-decoration: none; display: inline;"><i class="fas fa-arrow-circle-up"></i></span><span> <%=upvoteCount%></span></div>
             <% } %>
           <% }) %>
 
           <br />
-        </div>
       </div>
     </div>
   </body>

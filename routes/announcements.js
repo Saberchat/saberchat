@@ -10,6 +10,7 @@ const nodemailer = require('nodemailer');
 //SCHEMA
 const User = require('../models/user');
 const Announcement = require('../models/announcement');
+const Notification = require('../models/message');
 
 let transporter = nodemailer.createTransport({
   service: 'gmail',
@@ -68,6 +69,7 @@ router.get('/mark/:id', middleware.isLoggedIn, (req, res) => {
 router.get('/:id', (req, res) => { //RESTful Routing 'SHOW' route
   Announcement.findById(req.params.id) //Find only the announcement specified from form
   .populate('sender')
+  .populate('comments.sender')
   .exec((err, foundAnn) => { //Get info about the announcement's sender, and then release it to user
     if (err || !foundAnn) {
       req.flash('error', 'Unable To Access Database');
@@ -178,6 +180,119 @@ router.post('/', middleware.isLoggedIn, middleware.isMod, (req, res) => { //REST
     return res.redirect('back');
   });
 });
+
+router.put('/like', middleware.isLoggedIn, (req, res) => {
+  Announcement.findById(req.body.announcement, (err, announcement) => {
+    if (err || !announcement) {
+      res.json({error: 'Error updating announcement'});
+
+    } else {
+      if (announcement.likes.includes(req.user._id)) { //Remove like
+        announcement.likes.splice(announcement.likes.indexOf(req.user._id), 1);
+        announcement.save();
+
+        res.json({
+          success: `Removed a like from ${announcement.subject}`,
+          likeCount: announcement.likes.length
+        });
+
+      } else { //Add like
+        announcement.likes.push(req.user._id);
+        announcement.save();
+
+        res.json({
+          success: `Liked ${announcement.subject}`,
+          likeCount: announcement.likes.length
+        });
+      }
+    }
+  });
+});
+
+router.put('/comment', middleware.isLoggedIn, (req, res) => {
+
+  (async() => {
+
+    const announcement = await Announcement.findById(req.body.announcement);
+
+    if (!announcement) {
+      return res.json({error: 'Error commenting'});
+    }
+
+    let comment = {
+      text: req.body.text,
+      sender: req.user,
+      date: dateFormat(new Date(), "h:MM TT | mmm d")
+    };
+
+    announcement.comments.push(comment);
+    announcement.save();
+
+    let users = [];
+    let user;
+
+    for (let line of comment.text.split(" ")) {
+      if (line[0] == '@') {
+        user = await User.findById(line.split("#")[1].split("_")[0]);
+
+        if (!user) {
+          return res.json({error: "Error accessing user"});
+        }
+
+        users.push(user);
+      }
+    }
+
+    let notif;
+    let commentEmail;
+
+    for (let user of users) {
+
+      notif = await Notification.create({subject: `New Mention in ${announcement.subject}`, sender: req.user, recipients: [user], read: [], toEveryone: false, images: []}); //Create a notification to alert the user
+
+      if (!notif) {
+        return res.json({error: "Error creating notification"});
+      }
+
+      notif.date = dateFormat(notif.created_at, "h:MM TT | mmm d");
+      notif.text = `Hello ${user.firstName},\n\n${req.user.firstName} ${req.user.lastName} mentioned you in a comment on "${announcement.subject}":\n${comment.text}`;
+
+      await notif.save();
+
+      commentEmail = {
+        from: 'noreply.saberchat@gmail.com',
+        to: user.email,
+        subject: `New Mention in ${announcement.subject}`,
+        html: `<p>Hello ${user.firstName},</p><p>${req.user.firstName} ${req.user.lastName} mentioned you in a comment on <strong>${announcement.subject}</strong>.<p>${comment.text}</p>`
+      };
+
+      transporter.sendMail(commentEmail, (err, info) => {
+        if (err) {
+          console.log(err);
+        } else {
+          console.log('Email sent: ' + info.response);
+        }
+      });
+
+      user.inbox.push(notif); //Add notif to user's inbox
+      user.msgCount += 1;
+      await user.save();
+
+    }
+
+    res.json({
+      success: 'Successful comment',
+      comments: announcement.comments
+    });
+
+  })().catch(err => {
+    console.log(err)
+    res.json({
+      error: 'Error Commenting'
+    });
+  })
+
+})
 
 router.put('/:id', middleware.isLoggedIn, middleware.isMod, (req, res) => { //RESTful Routing 'UPDATE' route
   (async() => {

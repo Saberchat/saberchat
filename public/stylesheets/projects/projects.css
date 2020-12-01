@@ -37,3 +37,241 @@
 .user-tag button:hover {
     background-color: #b92c3a;
 }
+
+/*
+===========================
+Chat template styling
+*/
+
+.chat-box::-webkit-scrollbar {
+    width: 5px;
+}
+
+.chat-box::-webkit-scrollbar-track {
+    width: 5px;
+    background: #e6e6e6;
+}
+
+.chat-box::-webkit-scrollbar-thumb {
+    width: 1em;
+    background-color: rgb(179, 179, 179);
+    /* outline: 1px solid slategrey; */
+    border-radius: 1rem;
+}
+
+
+body::-webkit-scrollbar {
+    display: none;
+}
+
+body {
+-ms-overflow-style: none;
+scrollbar-width: none;
+}
+
+.text-small {
+    font-size: 0.9rem;
+}
+
+
+.chat-box {
+    position: relative;
+    height: 510px;
+    overflow-y: scroll;
+    padding-top: 5rem;
+    padding-bottom: 3rem;
+}
+
+.rounded-lg {
+    border-radius: 0.5rem;
+}
+
+input::placeholder {
+    font-size: 0.9rem;
+    color: #999;
+}
+
+#m {
+    outline: none;
+    box-shadow: none;
+    border: none;
+}
+
+.bg-grey {
+    background-color: #dfe0e1;
+}
+
+header {
+    background-color: rgba(255, 255, 255, 0.8);
+    padding: 50px 10px;
+    box-shadow: 0px 10px 10px #868686,
+                0px -5px 15px #727272;
+}
+
+#message-display a {
+    font-size: 1.3rem;
+}
+
+.send-icon {
+    font-size: 1.5rem;
+    color: rgb(255, 255, 255);
+}
+
+#send-button {
+    background-color: #424651;
+}
+
+#send-button:hover {
+    background-color: #9f9aa4;
+}
+
+span.username {
+    font-weight: 700;
+}
+
+.user-image {
+    object-fit: cover;
+    border-radius: 50%;
+    height: 50px;
+    width: 50px;
+}
+
+/*
+===========================
+Exit button
+*/
+.exit-button {
+    position: absolute;
+    font-size: 1.3rem;
+    z-index: 1;
+    padding: 15px;
+    border-radius: 4px;
+}
+
+.exit-button:hover {
+    background-color: rgba(255, 255, 255, 0.7);
+}
+
+/*
+===========================
+General msgs and badword response
+*/
+.announcement {
+    width: 100%;
+    text-align: center;
+}
+
+.announcement h4{
+    display: inline-block;
+    color: #9f9aa4;
+    font-size: 1.3rem;
+    font-weight: 300;
+}
+
+.small.text-muted.msg-info {
+    display: inline-block;
+    margin-right: 1rem;
+}
+
+/*
+===========================
+Report comment styling
+*/
+.flag {
+    display: inline-block;
+    height: 19px;
+    padding: 0;
+    border: none;
+    background: none;
+    color: #6c757d;
+    transition: color 0.3s;
+    -webkit-transition: color 0.3s;
+    -moz-transition: color 0.3s;
+}
+
+.flag .flag-tooltip {
+    display: inline-block;
+    opacity: 0;
+    padding: 0 5px;
+    border-radius: 5px;
+    background: #424651;
+    color: #ffffff;
+    transition: opacity 0.3s;
+    -webkit-transition: opacity 0.3s;
+    -moz-transition: opacity 0.3s;
+}
+
+.flag:hover {
+    color: #000000;
+}
+
+.flag:hover .flag-tooltip {
+    opacity: 100%;
+}
+
+.media-body {
+    position: relative;
+}
+
+/*
+===========================
+Scroll To Bottom Button
+*/
+.btn-scrolldown {
+    position: absolute;
+    z-index: 1;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    -webkit-transform: translateX(-50%);
+    -moz-transform: translateX(-50%);
+    -ms-transform: translateX(-50%);
+
+    height: 0;
+    overflow: hidden;
+
+    border: none;
+    border-radius: 0px 0px 15px 15px;
+    padding: 0;
+    background-color: #e6e4e48a;
+    color: #000000;
+
+    transition: 0.3s linear;
+    -webkit-transition: 0.3s linear;
+    -moz-transition: 0.3s linear;
+}
+
+.btn-scrolldown.display {
+    padding: 15px;
+    height: 54px;
+}
+
+.btn-scrolldown:hover {
+    background-color: #e6e4e4;
+}
+
+/*
+===========================
+Screen customizations
+ */
+@media (max-width: 550px) {
+    .w-65 {
+        width: 100%;
+    }
+}
+@media (min-width: 550px) {
+    .w-65 {
+        width: 90%;
+    }
+}
+@media (min-width: 760px) {
+    .w-65 {
+        width: 50%;
+    }
+}
+
+@media (max-width: 992px) {
+    .btn-scrolldown {
+        background-color: #f7f7f7;
+    }
+}

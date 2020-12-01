@@ -46,14 +46,12 @@
                   <% for (let status of statusMatrix) { %>
                     <% for (let user of users) { %>
                       <% if(!user._id.equals(currentUser._id) && user.status.toLowerCase() == status[0].toLowerCase()){ %>
-                        <li class="list-group-item user" id="<%=user._id%>">
-                          <%= user.username %> (<%= user.firstName %> <%= user.lastName %>) <span hidden><%=status[0]%> <%=status[1]%>
                             <% for (let perm of permMatrix) { %>
                               <% if (perm[0].toLowerCase() == user.permission.toLowerCase())  { %>
-                                <%=perm[0]%> <%=perm[1]%> data_end
+                                <li class="list-group-item user <%=status[0].toLowerCase()%> <%=status[1].toLowerCase()%> <%=perm[0]%>" id="<%=user._id%>">
+                                  <%= user.username %> (<%= user.firstName %> <%= user.lastName %>)
                               <% } %>
                             <% } %>
-                          </span>
                           <select name="status" class="role-select" onchange="updateStatus(this)" id="<%= user._id %>">
 
                             <% for (let status of statusMatrix) { %>
@@ -83,7 +81,7 @@
         let filter = searchInput.value.toLowerCase();
 
         for (let i = 0; i < users.length; i += 1) {
-          if (!users[i].textContent.split('data_end')[0].toLowerCase().includes(filter)) {
+          if (!(users[i].textContent.split('\n')[1].toLowerCase().includes(filter) || users[i].classList.toString().includes(filter))) {
             $(`#${users[i].id}`).hide();
 
           } else {

@@ -1,5 +1,3 @@
-//Implement JSON likes
-
 //Project routes dictate the posting, viewing, and editing of the Saberchat Student Projects Board
 
 //LIBRARIES
@@ -126,7 +124,7 @@ router.post('/',middleware.isLoggedIn, middleware.isFaculty, (req, res) => { //R
       notif = await Notification.create({subject: "New Project Post", sender: req.user, recipients: [follower], read: [], toEveryone: false, images: project.images}); //Create a notification to alert the user
 
       if (!notif) {
-        req.flash('error', 'Unable to send notification'); return res.redirect('/cafe/orders');
+        req.flash('error', 'Unable to send notification'); return res.redirect('back');
       }
 
       notif.date = dateFormat(notif.created_at, "h:MM TT | mmm d");
@@ -205,6 +203,7 @@ router.get('/:id', (req, res) => { //RESTful Routing 'SHOW' route
   Project.findById(req.params.id)
   .populate('poster')
   .populate('creators')
+  .populate('comments.sender')
   .exec((err, foundProject) => { //Find the project specified in the form, get info about its poster and creators (part of the User schema)
     if (err || !foundProject) {
       req.flash('error', "Unable to access database");
@@ -225,16 +224,108 @@ router.put('/like', middleware.isLoggedIn, (req, res) => {
       if (project.likes.includes(req.user._id)) { //Remove like
         project.likes.splice(project.likes.indexOf(req.user._id), 1);
         project.save();
-        res.json({success: `Removed a like from ${project.title}`, likeCount: project.likes.length});
+
+        res.json({
+          success: `Removed a like from ${project.title}`,
+          likeCount: project.likes.length
+        });
 
       } else { //Add like
         project.likes.push(req.user._id);
         project.save();
-        res.json({success: `Liked ${project.title}`, likeCount: project.likes.length});
+
+        res.json({
+          success: `Liked ${project.title}`,
+          likeCount: project.likes.length
+        });
       }
     }
   });
 });
+
+router.put('/comment', middleware.isLoggedIn, (req, res) => {
+
+  (async() => {
+
+    const project = await Project.findById(req.body.project);
+
+    if (!project) {
+      return res.json({error: 'Error commenting'});
+    }
+
+    let comment = {
+      text: req.body.text,
+      sender: req.user,
+      date: dateFormat(new Date(), "h:MM TT | mmm d")
+    };
+
+    project.comments.push(comment);
+    project.save();
+
+    let users = [];
+    let user;
+
+    for (let line of comment.text.split(" ")) {
+      if (line[0] == '@') {
+        user = await User.findById(line.split("#")[1].split("_")[0]);
+
+        if (!user) {
+          return res.json({error: "Error accessing user"});
+        }
+
+        users.push(user);
+      }
+    }
+
+    let notif;
+    let commentEmail;
+
+    for (let user of users) {
+
+      notif = await Notification.create({subject: `New Mention in ${project.title}`, sender: req.user, recipients: [user], read: [], toEveryone: false, images: []}); //Create a notification to alert the user
+
+      if (!notif) {
+        return res.json({error: "Error creating notification"});
+      }
+
+      notif.date = dateFormat(notif.created_at, "h:MM TT | mmm d");
+      notif.text = `Hello ${user.firstName},\n\n${req.user.firstName} ${req.user.lastName} mentioned you in a comment on "${project.title}":\n${comment.text}`;
+
+      await notif.save();
+
+      commentEmail = {
+        from: 'noreply.saberchat@gmail.com',
+        to: user.email,
+        subject: `New Mention in ${project.title}`,
+        html: `<p>Hello ${user.firstName},</p><p>${req.user.firstName} ${req.user.lastName} mentioned you in a comment on <strong>${project.title}</strong>.<p>${comment.text}</p>`
+      };
+
+      transporter.sendMail(commentEmail, (err, info) => {
+        if (err) {
+          console.log(err);
+        } else {
+          console.log('Email sent: ' + info.response);
+        }
+      });
+
+      user.inbox.push(notif); //Add notif to user's inbox
+      user.msgCount += 1;
+      await user.save();
+
+    }
+
+    res.json({
+      success: 'Successful comment',
+      comments: project.comments
+    });
+
+  })().catch(err => {
+    console.log(err)
+    res.json({
+      error: 'Error Commenting'
+    });
+  })
+})
 
 
 router.put('/:id', middleware.isLoggedIn, middleware.isFaculty, (req, res) => {
@@ -326,7 +417,7 @@ router.put('/:id', middleware.isLoggedIn, middleware.isFaculty, (req, res) => {
       notif = await Notification.create({subject: "New Project Post", sender: req.user, recipients: [follower], read: [], toEveryone: false, images: updatedProject.images}); //Create a notification to alert the user
 
       if (!notif) {
-        req.flash('error', 'Unable to send notification'); return res.redirect('/cafe/orders');
+        req.flash('error', 'Unable to send notification'); return res.redirect('back');
       }
 
       notif.date = dateFormat(notif.created_at, "h:MM TT | mmm d");

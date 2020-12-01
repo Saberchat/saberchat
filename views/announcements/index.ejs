@@ -126,6 +126,16 @@
                         </div>
                       </form>
                     <% } %>
+
+                    <% if (announcement.likes.includes(currentUser._id)) { %>
+                      <a style="color: #03a5fc; text-decoration: none; margin-left: 10px;" id="like-<%=announcement._id%>-index" onclick="like(this)"><i class="fas fa-thumbs-up"></i></a> <span id="likeCount-<%=announcement._id%>"><%=announcement.likes.length%></span>
+
+                    <% } else { %>
+                      <a style="color: white; text-decoration: none; margin-left: 10px;" id="like-<%=announcement._id%>-index" onclick="like(this)"><i class="fas fa-thumbs-up"></i></a> <span id="likeCount-<%=announcement._id%>"><%=announcement.likes.length%></span>
+
+                    <% }%>
+                    <a style="color: white; text-decoration: none; margin-left: 10px;" href="/announcements/<%=announcement._id%>#comment-section"><i class="fas fa-comment-dots"></i> <%=announcement.comments.length%></a>
+
                   <% } %>
 
 
@@ -146,6 +156,7 @@
         <% }) %>
       </div>
     </body>
+    <script src="/javascript/announcements/like.js"></script>
     <script>
 
     const searchFunction = (() => {

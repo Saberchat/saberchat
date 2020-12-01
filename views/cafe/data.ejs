@@ -68,13 +68,25 @@
 
         </ol>
 
-        <h3>Most Popular Items (Pie Chart/Bar Graph)</h3>
+        <h3>Most Popular Items BY ORDERS (Pie Chart/Bar Graph)</h3>
 
         <ol>
 
         <% for (let item of popularItems) { %>
           <li>
             <%=item.item.name%>: <%=item.orderCount%> orders
+          </li>
+        <% } %>
+
+        </ol>
+
+        <h3>Most Popular Items BY UPVOTES (Pie Chart/Bar Graph)</h3>
+
+        <ol>
+
+        <% for (let item of upvotedItems) { %>
+          <li>
+            <%=item.name%>: <%=item.upvotes.length%> upvotes
           </li>
         <% } %>
 
