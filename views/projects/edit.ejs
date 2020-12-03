@@ -95,7 +95,7 @@
             <% let reversedImages = project.images.reverse() %>
             <% for (let i = 0; i< reversedImages.length; i += 1) { %>
               <div class="image-group" style="text-align: left;">
-                <div class="input-container" id="block-<%=i%>">
+                <div class="input-container" id="block-<%=reversedImages.length - (i+1)%>">
                   <input type="text" id="<%=reversedImages.length - (i+1)%>" class="form-control" oninput="createImg(this)" placeholder="Url..." name="images[<%= reversedImages.length - (i+1) %>]" required value="<%= reversedImages[i] %>">
                   <img id="image-<%=reversedImages.length - (i+1)%>" style = "width: 50%; height: 50%; margin-top: 10px; border-radius: 15px;" src="<%= reversedImages[i] %>" alt="Image Does Not Exist"/>
                 </div>

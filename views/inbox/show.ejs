@@ -12,6 +12,7 @@
     <link rel="stylesheet" href="/stylesheets/components/navbar.css">
     <link rel="stylesheet" href="/stylesheets/components/header.css">
     <link rel="stylesheet" href="/stylesheets/inbox/show.css">
+    <link rel="stylesheet" href="/stylesheets/inbox/form.css">
 
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
@@ -48,15 +49,18 @@
                     Everyone
                   <% } else { %>
                     <% message.recipients.forEach(user => { %>
-                      <a href="/profiles/<%= user._id %>" class="user-link">
-                        <span class="badge badge-pill badge-secondary">
-                          <% if(user._id.equals(currentUser._id)) { %>
-                            me
-                          <% } else { %>
-                            <%= user.username %>
-                          <% } %>
-                        </span>
-                      </a>
+
+                      <% if (!user._id.equals(message.sender._id)) { %>
+                        <a href="/profiles/<%= user._id %>" class="user-link">
+                          <span class="badge badge-pill badge-secondary">
+                            <% if(user._id.equals(currentUser._id)) { %>
+                              me
+                            <% } else { %>
+                              <%= user.username %>
+                            <% } %>
+                          </span>
+                        </a>
+                      <% } %>
                     <% }); %>
                   <% } %>
                 </p>
@@ -64,15 +68,18 @@
                   Seen By:
                   <% if (message.read.length > 0) { %>
                     <% message.read.forEach(user => { %>
-                      <a href="/profiles/<%= user._id %>" class="user-link">
-                        <span class="badge badge-pill badge-info">
-                          <% if(user._id.equals(currentUser._id)) { %>
-                            me
-                          <% } else { %>
-                            <%= user.username %>
-                          <% } %>
-                        </span>
-                      </a>
+
+                      <% if (!user._id.equals(message.sender._id)) { %>
+                        <a href="/profiles/<%= user._id %>" class="user-link">
+                          <span class="badge badge-pill badge-info">
+                            <% if(user._id.equals(currentUser._id)) { %>
+                              me
+                            <% } else { %>
+                              <%= user.username %>
+                            <% } %>
+                          </span>
+                        </a>
+                      <% } %>
                     <% }) %>
                   <% } else { %>
                     <span class="badge badge-pill badge-info">
@@ -81,7 +88,12 @@
                   <% } %>
                 </p>
                 <span><%=message.date%></span>
-                <a href="/inbox" class="btn btn-primary back-btn"><i class="fas fa-arrow-left"></i> Back</a>
+                <a href="/inbox" class="btn btn-primary"><i class="fas fa-arrow-left"></i> Back</a>
+
+                <% if (!message.anonymous) { %>
+                  <a onclick="reply()" class="btn btn-success" href="#reply-box"><i class="fas fa-reply"></i> Reply</a>
+                <% } %>
+
               </div>
               <div class="msg-body">
                 <p style="white-space: pre-wrap;"><%= message.text %></p>
@@ -92,9 +104,60 @@
                   <% }) %>
                 </div>
               </div>
-            </article>
+              </article>
+
+              <br />
+
+              <% for (let reply of message.replies) { %>
+                <article class="msg-container replies" style="padding: 20px;">
+                  <h4>
+                    Reply From <a style="color: black;" href="../../profiles/<%=reply.sender._id%>"><%=reply.sender.username%></a>
+                  </h4>
+
+                  <p>
+                    <%=reply.date%>
+                  </p>
+                  <p>
+                    <%=reply.text%>
+                  </p>
+
+                  <% for (let image of reply.images) { %>
+                    <img src="<%=image%>" style="width: 40%; height: 40%; margin-bottom: 10px; border-radius: 15px;"/>
+                    <br />
+                  <% } %>
+
+                </article>
+                <br />
+              <% } %>
+
+              <article class="msg-container" style="padding: 20px;" id="reply-box" hidden>
+
+              <form id="message-form-<%=message._id%>" onsubmit="sendReply(this, event)">
+
+                <div class="form-group">
+                  <label for="message"><h4>Reply</h4></label><br />
+                  <textarea name="message" id="message" placeholder="Message text..." rows="5" class="form-control"></textarea>
+                </div>
+
+                <div id="image-header">
+                  <h4>Images</h4>
+                  <button type="button" onclick="addImg()" class="btn btn-primary"><i class="fas fa-plus"></i> Image</button>
+                  <hr>
+                </div>
+
+                <div id="image-block">
+                </div>
+                <button style="margin-bottom: 10px;" type="submit" class="btn btn-primary btn-block">Send Reply</button>
+                <button type="button" class="btn btn-danger btn-block" onclick="cancelReply()" >Cancel</button>
+              </form>
+
+              </article>
+
           </div>
         </div>
     </div>
 </body>
+<script src="/javascript/inbox/form.js"></script>
+<script src="/javascript/inbox/new.js"></script>
+<script src="/javascript/inbox/reply.js"></script>
 </html>

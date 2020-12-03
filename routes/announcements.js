@@ -209,6 +209,34 @@ router.put('/like', middleware.isLoggedIn, (req, res) => {
   });
 });
 
+router.put('/like-comment', middleware.isLoggedIn, (req, res) => {
+  Announcement.findById(req.body.announcement, (err, announcement) => {
+    if (err || !announcement) {
+      res.json({error: 'Error updating comment'});
+
+    } else {
+      if (announcement.comments[req.body.commentIndex].likes.includes(req.user._id)) {
+        announcement.comments[req.body.commentIndex].likes.splice(announcement.comments[req.body.commentIndex].likes.indexOf(req.user._id), 1);
+        announcement.save();
+
+        res.json({
+          success: `Removed a like from comment ${req.body.commentIndex} on ${announcement._id}`,
+          likeCount: announcement.comments[req.body.commentIndex].likes.length
+        });
+
+      } else { //Add like
+        announcement.comments[req.body.commentIndex].likes.push(req.user._id);
+        announcement.save();
+
+        res.json({
+          success: `Liked comment ${req.body.commentIndex} on ${announcement._id}`,
+          likeCount: announcement.comments[req.body.commentIndex].likes.length
+        });
+      }
+    }
+  });
+});
+
 router.put('/comment', middleware.isLoggedIn, (req, res) => {
 
   (async() => {

@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Saberchat</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/stylesheets/main.css">
+    <!-- link css for navbar. Don't need to include public/javascript/userForm.js since user is already logged in and does not need to access login and register forms.  -->
+    <link rel="stylesheet" href="/stylesheets/components/header.css">
+    <link rel="stylesheet" href="/stylesheets/components/navbar.css">
+    <link rel="stylesheet" href="/stylesheets/projects/projects.css">
+    <link rel="stylesheet" href="/stylesheets/announcements/index.css">
+    <link rel="stylesheet" href="/stylesheets/home/index.css">
+    <link rel="stylesheet" href="/stylesheets/chat/new.css">
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js"></script>
+    <script src="https://cdn.anychart.com/releases/v8/js/anychart-base.min.js"></script>
+    <script src="https://cdn.anychart.com/releases/v8/js/anychart-tag-cloud.min.js"></script>
+    <script src="../javascript/socket.js"></script>
+    <script src="/javascript/nav/userForm.js"></script>
+    <script src="/javascript/nav/navbar.js"></script>
+    <script src="/javascript/home/index.js"></script>
+
+    <!-- I'm using my fontawesome kit -->
+    <script src="https://kit.fontawesome.com/dccc745c41.js" crossorigin="anonymous"></script>
+    <!-- include the navbar via ejs -->
+    <%- include('../partials/navbar') %>
+    <%- include('../partials/header') %>
+
+    <style>
+      html, body, #container {
+      width: 50%;
+      height: 50%;
+      }
+
+      #container {
+        margin-left: 300px;
+      }
+    </style>
+
+  </head>
+  <body>
+
+    <div class="container mt-5">
+      <div class="row">
+        <div class="col-12">
+          <div class="jumbotron text-center">
+            <h1><i class="fas fa-paint-brush"></i> Student Projects </h1>
+            <p>Our Students' Artwork, Gardening Projects, Science Projects and More</p>
+            <% if (currentUser) { %>
+              <% if (currentUser.status == 'faculty') { %>
+                <a class="btn btn-primary" href="/projects"><i class="fas fa-arrow-left"></i> Back</a>
+              <%}%>
+            <% } %>
+          </div>
+        </div>
+      </div>
+
+      <h3>Popular Projects</h3>
+      <p>Projects which were the most popular in the community</p>
+      <ul>
+        <%for (let project of popularProjects) { %>
+          <li><a href="../projects/<%=project._id%>"><%=project.title%></a></li>
+        <% } %>
+      </ul>
+
+      <br />
+
+      <h3>Popular Project Keywords</h3>
+      <span>Keywords that generated the best responses from the community</span>
+    </div>
+    <div id="container">
+      <ul hidden>
+      <% for (let [keyword, occurences] of new Map(Array.from(projectKeywords).slice(0, 20)).entries()) { %>
+        <li>'<strong class="keyword" id="word-<%=keyword%>"><%=keyword.charAt(0).toUpperCase()%><%=keyword.slice(1)%></strong>': <span class="occurence" id="occurences-<%=keyword%>"><%=occurences%></span> times</li>
+      <% } %>
+      </ul>
+
+    </div>
+
+  </body>
+  <script>
+
+    const keywords = document.getElementsByClassName("keyword");
+    const occurences = document.getElementsByClassName("occurence");
+
+    anychart.onDocumentReady(function() {
+      var data = [];
+
+      for (let i = 0; i < keywords.length; i ++) {
+        data.push({"x": keywords[i].innerText, "value": parseInt(occurences[i].innerText)})
+      }
+
+
+    // create a tag (word) cloud chart
+      var chart = anychart.tagCloud(data);
+      // set an array of angles at which the words will be laid out
+      chart.angles([0])
+      // enable a color range
+      chart.colorRange(true);
+      // set the color range length
+      chart.colorRange().length('80%');
+    // display the word cloud chart
+      chart.container("container");
+      chart.draw();
+
+    });
+
+  </script>
+</html>

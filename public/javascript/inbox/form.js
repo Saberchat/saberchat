@@ -9,7 +9,7 @@ const addImg = (() => {
     img.innerHTML = `<div class="input-container">
     <input type="text" id="${i}" class="form-control" oninput="createImg(this)" placeholder="Url..." name="images[${i}]" required>
   </div>
-  <button type="button" onclick="deleteImg(this)" class="btn btn-danger"><i class="fas fa-minus"></i></button>`;
+  <button type="button" onclick="deleteImg(this)" style="display: inline;" class="btn btn-danger"><i class="fas fa-minus"></i></button>`;
     imgContainer.prepend(img);
     i++;
 });
@@ -23,7 +23,7 @@ const createImg = (val => { //Creates an image based on value of image input
     if (val.value.replace(' ', '') != '') {
       imageDisplay.src = val.value;
       imageDisplay.alt = "Image Does Not Exist";
-      imageDisplay.style = "width: 50%; height: 50%; margin-top: 10px; border-radius: 15px;";
+      imageDisplay.style = "width: 40%; height: 40%; margin-top: 10px; border-radius: 15px;";
       document.getElementById(`block-${val.id}`).appendChild(imageDisplay);
     }
 

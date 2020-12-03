@@ -20,6 +20,7 @@ var announcementSchema = new mongoose.Schema({
       text: String,
       sender: {type: mongoose.Schema.Types.ObjectId, ref: 'User'},
       date: String,
+      likes: [{type: mongoose.Schema.Types.ObjectId, ref: 'User', default: []}],
       default: []
     }]
 

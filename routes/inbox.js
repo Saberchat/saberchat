@@ -1,3 +1,6 @@
+//Build messaging box inside show.ejs
+//When a reply is sent, if the message is not already in all recipients' inboxes, add it. (if it is already there, it's already a new message)
+
 const express = require('express');
 const middleware = require('../middleware');
 const router = express.Router(); //start express router
@@ -235,6 +238,51 @@ router.get('/sent', middleware.isLoggedIn, (req, res) => {
 	});
 });
 
+//Algorithm is correct in theory. However, causing Stack Trace problems because user.inbox references message and message.recipients references user. Figure out how Alex solves this in message sending.
+router.put('/reply', middleware.isLoggedIn, (req, res) => {
+  Message.findById(req.body.message).populate('recipients').exec((err, message) => {
+    if (err || !message) {
+      res.json({error: "Error accessing message"});
+
+    } else {
+      let reply = {sender: req.user, text: req.body.text, images: req.body.images, date: dateFormat(new Date(), "h:MM TT | mmm d")};
+      let readRecipients = message.read; //Users who have read the original message will need to have their msgCount incremented again
+
+      message.replies.push(reply);
+
+      for (let i = message.recipients.length-1; i >= 0; i--) {
+        if (message.recipients[i]._id.equals(message.sender)) {
+          message.recipients.splice(i, 1);
+        }
+      }
+
+      message.recipients.push(message.sender);
+      message.read = [];
+      message.save();
+
+      for (let rec of message.recipients) { //Remove original message and add it back so that it appears 'new'
+
+        for (let i = rec.inbox.length - 1; i >= 0; i --) {
+          if (rec.inbox[i].equals(message._id)) {
+            rec.inbox.splice(i, 1);
+          }
+        }
+
+        rec.inbox.push(message);
+
+        if (readRecipients.includes(rec._id)) {
+          rec.msgCount += 1;
+        }
+
+        rec.save();
+      }
+
+      res.json({success: `Replied to ${message._id}`, message: message});
+
+    }
+  });
+});
+
 // Message show route
 router.get('/:id', middleware.isLoggedIn, (req, res) => {
 	( async () => {
@@ -255,7 +303,7 @@ router.get('/:id', middleware.isLoggedIn, (req, res) => {
 			await message.save();
 		}
 
-		await message.populate({path: 'sender', select: 'username'}).populate({path:'recipients', select: 'username'}).populate({path: 'read', select: 'username'}).execPopulate();
+		await message.populate({path: 'sender', select: 'username'}).populate({path:'recipients', select: 'username'}).populate({path: 'read', select: 'username'}).populate({path: 'replies.sender'}).execPopulate();
 
 		res.render('inbox/show', {message: message});
 

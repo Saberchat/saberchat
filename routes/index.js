@@ -13,6 +13,7 @@ const middleware = require('../middleware');
 const User = require('../models/user');
 const Email = require('../models/email');
 const Announcement = require('../models/announcement');
+const Notification = require('../models/message');
 
 let transporter = nodemailer.createTransport({
   service: 'gmail',
