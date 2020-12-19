@@ -63,7 +63,7 @@
                     <ul class="list-group">
 
                       <% inbox.forEach((notif) => { %>
-                        <li class="list-group-item list-group-item-action">
+                        <li class="list-group-item list-group-item-action read">
 
                           <% if (notif.sender == null) { %>
                             <div class="message-check">
@@ -78,6 +78,7 @@
                                   Anonymous
                                 </div>
                               </div>
+
                               <div class="message-text">
                                 <%= notif.text %>
                               </div>
@@ -95,7 +96,20 @@
                                 </div>
                               </div>
                               <div class="message-text">
-                                <%= notif.text %>
+                                <% let replied = false;%>
+
+                                <% for (let reply of notif.replies.reverse()) { %>
+
+                                  <% if (reply.sender.equals(currentUser._id)) { %>
+                                    <%=reply.text%>
+                                    <% replied = true%>
+                                    <% break%>
+                                  <% } %>
+                                <% } %>
+
+                                <% if (!replied) { %>
+                                  <%= notif.text %>
+                                <% } %>
                               </div>
                             </a>
 
@@ -115,7 +129,20 @@
                                   </div>
                                 </div>
                                 <div class="message-text">
-                                  <%= notif.text %>
+                                  <% let replied = false;%>
+
+                                  <% for (let reply  of notif.replies.reverse()) { %>
+
+                                    <% if (reply.sender.equals(currentUser._id)) { %>
+                                      <%=reply.text%>
+                                      <% replied = true%>
+                                      <% break%>
+                                    <% } %>
+                                  <% } %>
+
+                                  <% if (!replied) { %>
+                                    <%= notif.text %>
+                                  <% } %>
                                 </div>
                               </a>
 
@@ -131,7 +158,20 @@
                                   </div>
                                 </div>
                                 <div class="message-text">
-                                  <%= notif.text %>
+                                  <% let replied = false;%>
+
+                                  <% for (let reply  of notif.replies.reverse()) { %>
+
+                                    <% if (reply.sender.equals(currentUser._id)) { %>
+                                      <%=reply.text%>
+                                      <% replied = true%>
+                                      <% break%>
+                                    <% } %>
+                                  <% } %>
+
+                                  <% if (!replied) { %>
+                                    <%= notif.text %>
+                                  <% } %>
                                 </div>
                               </a>
                             <% } %>

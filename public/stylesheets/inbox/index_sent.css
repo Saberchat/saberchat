@@ -352,6 +352,9 @@ Misc.
     height: 100%;
 }
 
+.read {
+  background-color: #e0e0e0;
+}
 /*
 ===============================
 Style variances for screen sizes

@@ -227,15 +227,35 @@ router.post('/messages', middleware.isLoggedIn, (req, res) => {
 
 //Accesses every notification that you have sent
 router.get('/sent', middleware.isLoggedIn, (req, res) => {
-	Message.find({sender: req.user._id}, (err, foundMsg) => {
-		if (err || !foundMsg) {
-			req.flash('error', 'Unable to access database');
-			res.redirect('/inbox');
 
-		} else {
-			res.render('inbox/index_sent', {inbox: foundMsg.reverse()});
-		}
-	});
+  Message.find({}, (err, messages) => {
+    if (err || !messages) {
+      req.flash('error', 'Unable to access database');
+      res.redirect('/inbox');
+
+    } else {
+      let sent_inbox = []; //Inbox of all messages user has sent
+
+      for (let message of messages) {
+
+        //If this user sent the message
+        if (message.sender.equals(req.user._id))  {
+          sent_inbox.push(message)
+
+        } else {
+          //Check to see if this user has replied to any of the messages
+          for (let reply of message.replies.reverse()) { //Get most  recent reply by reversing replies
+            if (reply.sender.equals(req.user._id)) {
+              sent_inbox.push(message);
+              break;
+            }
+          }
+        }
+      }
+
+      res.render('inbox/index_sent', {inbox: sent_inbox.reverse()});
+    }
+  });
 });
 
 //Allows you to reply to notifications sent to you
@@ -244,9 +264,23 @@ router.put('/reply', middleware.isLoggedIn, (req, res) => {
     if (err || !message) {
       res.json({error: "Error accessing message"});
 
+    } else if (message.anonymous) {
+      res.json({error: "Cannot reply to anonymous message"});
+
     } else {
       let reply = {sender: req.user, text: req.body.text, images: req.body.images, date: dateFormat(new Date(), "h:MM TT | mmm d")};
       message.replies.push(reply); //Add reply to message thread
+
+      let replyEmail;
+
+      //Create string to track reply's images
+      let imageString = "";
+
+      if (reply.images) {
+        for (let image of reply.images) {
+          imageString += `<img src="${image}">`;
+        }
+      }
 
       let readRecipients = message.read; //Users who have read the original message will need to have their msgCount incremented again
 
@@ -273,17 +307,6 @@ router.put('/reply', middleware.isLoggedIn, (req, res) => {
       message.recipients.push(message.sender); //Add original sender to recipient list (code above ensures that they are not added multiple times)
       message.read = [req.user]; //Since the current user replied to this message, they've seen the completely updated message. Nobody else has
       message.save();
-
-      let replyEmail;
-
-      //Create string to track reply's images
-      let imageString = "";
-
-      if (reply.images) {
-        for (let image of reply.images) {
-          imageString += `<img src="${image}">`;
-        }
-      }
 
       for (let recipient of message.recipients) { //Remove original message and add it back so that it appears 'new'
 
@@ -323,7 +346,10 @@ router.put('/reply', middleware.isLoggedIn, (req, res) => {
         }
       }
 
-      res.json({success: `Replied to ${message._id}`, message: message}); //Send JSON response to front-end
+      res.json({ //Send JSON response to front-end
+        success: `Replied to ${message._id}`,
+        message: message
+      });
     }
   });
 });

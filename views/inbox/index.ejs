@@ -117,7 +117,11 @@
 
                             </div>
                             <div class="message-text">
-                              <%= msg.text%>
+                              <% if (msg.replies.length > 0) { %>
+                                <%= msg.replies[msg.replies.length - 1].text%>
+                              <% } else { %>
+                                <%= msg.text %>
+                              <% } %>
                             </div>
                           </a>
                           <span class="message-date">
