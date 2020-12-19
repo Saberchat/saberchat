@@ -238,47 +238,92 @@ router.get('/sent', middleware.isLoggedIn, (req, res) => {
 	});
 });
 
-//Algorithm is correct in theory. However, causing Stack Trace problems because user.inbox references message and message.recipients references user. Figure out how Alex solves this in message sending.
+//Allows you to reply to notifications sent to you
 router.put('/reply', middleware.isLoggedIn, (req, res) => {
-  Message.findById(req.body.message).populate('recipients').exec((err, message) => {
+  Message.findById(req.body.message).populate('recipients').populate('sender').exec((err, message) => {
     if (err || !message) {
       res.json({error: "Error accessing message"});
 
     } else {
       let reply = {sender: req.user, text: req.body.text, images: req.body.images, date: dateFormat(new Date(), "h:MM TT | mmm d")};
+      message.replies.push(reply); //Add reply to message thread
+
       let readRecipients = message.read; //Users who have read the original message will need to have their msgCount incremented again
 
-      message.replies.push(reply);
+      //Iterates through the recipients and sees if the sender is part of them. If not, then no reply has been sent yet, but since the sender has sent the message, they have 'read' it. Hence, they are added to the readRecipients array.
 
-      for (let i = message.recipients.length-1; i >= 0; i--) {
-        if (message.recipients[i]._id.equals(message.sender)) {
+      senderIncluded = false; //Checks whether the sender is part of the thread
+      for (let recipient of message.recipients) {
+        if (recipient._id.equals(message.sender._id)) {
+          senderIncluded = true;
+          break;
+        }
+      }
+
+      if (!senderIncluded) {
+        readRecipients.push(message.sender);
+      }
+
+      for (let i = message.recipients.length-1; i >= 0; i--) { //If the original sender is already part of the recipients, remove them just in case
+        if (message.recipients[i]._id.equals(message.sender._id)) {
           message.recipients.splice(i, 1);
         }
       }
 
-      message.recipients.push(message.sender);
-      message.read = [];
+      message.recipients.push(message.sender); //Add original sender to recipient list (code above ensures that they are not added multiple times)
+      message.read = [req.user]; //Since the current user replied to this message, they've seen the completely updated message. Nobody else has
       message.save();
 
-      for (let rec of message.recipients) { //Remove original message and add it back so that it appears 'new'
+      let replyEmail;
 
-        for (let i = rec.inbox.length - 1; i >= 0; i --) {
-          if (rec.inbox[i].equals(message._id)) {
-            rec.inbox.splice(i, 1);
+      //Create string to track reply's images
+      let imageString = "";
+
+      if (reply.images) {
+        for (let image of reply.images) {
+          imageString += `<img src="${image}">`;
+        }
+      }
+
+      for (let recipient of message.recipients) { //Remove original message and add it back so that it appears 'new'
+
+        //Remove message from recipient's inbox
+        for (let i = recipient.inbox.length - 1; i >= 0; i --) {
+          if (recipient.inbox[i].equals(message._id)) {
+            recipient.inbox.splice(i, 1);
           }
         }
 
-        rec.inbox.push(message);
+        //Add it to the front of the recipient's inbox
+        recipient.inbox.push(message._id);
 
-        if (readRecipients.includes(rec._id)) {
-          rec.msgCount += 1;
+        //If the recipient has already read this message and it is not the person sending the reply (or the recipient is the original message sender), increment their message count again
+        if ((readRecipients.includes(recipient._id)) && (!(recipient._id.equals(req.user._id)))) {
+          recipient.msgCount += 1;
         }
 
-        rec.save();
+        recipient.save();
+
+        //Send email notifying about the reply to everyone except person who posted the reply
+        if (!(recipient._id.equals(req.user._id))) {
+          replyEmail = {
+            from: 'noreply.saberchat@gmail.com',
+            to: recipient.email,
+            subject: `New Reply On ${message.subject}`,
+            html: `<p>Hello ${recipient.firstName},</p><p><strong>${req.user.username}</strong> replied to <strong>${message.subject}</strong>.<p>${reply.text}</p><p>You can access the full message at https://alsion-saberchat.herokuapp.com</p> ${imageString}`
+          };
+
+          transporter.sendMail(replyEmail, (err, info) => {
+            if (error) {
+              console.log(err);
+            } else {
+              console.log('Email sent: ' + info.response);
+            }
+          });
+        }
       }
 
-      res.json({success: `Replied to ${message._id}`, message: message});
-
+      res.json({success: `Replied to ${message._id}`, message: message}); //Send JSON response to front-end
     }
   });
 });

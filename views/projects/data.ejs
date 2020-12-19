@@ -75,7 +75,7 @@
     </div>
     <div id="container">
       <ul hidden>
-      <% for (let [keyword, occurences] of new Map(Array.from(projectKeywords).slice(0, 20)).entries()) { %>
+      <% for (let [keyword, occurences] of new Map(Array.from(projectKeywords)).entries()) { %>
         <li>'<strong class="keyword" id="word-<%=keyword%>"><%=keyword.charAt(0).toUpperCase()%><%=keyword.slice(1)%></strong>': <span class="occurence" id="occurences-<%=keyword%>"><%=occurences%></span> times</li>
       <% } %>
       </ul>

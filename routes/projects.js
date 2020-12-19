@@ -164,90 +164,91 @@ router.post('/',middleware.isLoggedIn, middleware.isFaculty, (req, res) => { //R
   });
 });
 
-router.get('/data', middleware.isLoggedIn, middleware.isFaculty, (req, res) => {
+//COMMENTED OUT FOR NOW, UNTIL WE MAKE FURTHER DECISIONS AT MEETING
 
-  (async() => {
-
-    let projectKeywords = new Map(); //Store keywords
-    let commentKeywords = new Map(); //Maps positive comments to their respective projects
-    let popularProjects = [];
-    const regEx = new RegExp('[^a-zA-Z0-9]');
-    let projects = await Project.find({poster: req.user._id})
-
-    if (!projects) {
-      req.flash('error', "Unable to find projects"); return res.redirect('back');
-    }
-
-    let avgLikes = 0;
-
-    for (let project of projects) {
-      avgLikes += project.likes.length;
-    }
-
-    avgLikes /= projects.length;
-
-    for (let project of projects) {
-      if (project.likes.length >= avgLikes) {
-        popularProjects.push(project);
-      }
-    }
-
-    //Sort popular projects
-
-    let tempProject;
-    for (let i = 0; i < popularProjects.length - 1; i ++) {
-      for (let j = 0; j < popularProjects.length - 1; j ++) {
-        if (popularProjects[j].likes < popularProjects[j+1].likes) {
-          tempProject = popularProjects[j];
-          popularProjects[j] = popularProjects[j+1];
-          popularProjects[j+1] = tempProject;
-        }
-      }
-    }
-
-    //Map keywords from popular projects
-
-    for (let project of popularProjects) {
-      for (let word of `${project.title} ${project.text}`.toLowerCase().split(regEx)) {
-
-        if (word.length > 3 && !fillers.includes(word)) {
-          if (projectKeywords.has(word)) {
-            projectKeywords.set(word, projectKeywords.get(word) + project.likes.length);
-
-          } else {
-            projectKeywords.set(word, project.likes.length); //Give 'points' based on how many likes the project has. That way, this keyword carries more value
-          }
-        }
-      }
-    }
-
-    let avgOccurences = 0; //Averages occurences of keywords
-
-    for (let [keyword, occurences] of projectKeywords.entries()) {
-      avgOccurences += occurences;
-    }
-
-    avgOccurences /= projectKeywords.size;
-
-    for (let [keyword, occurences] of projectKeywords.entries()) {
-      if (occurences < avgOccurences) {
-        projectKeywords.delete(keyword);
-      }
-    }
-
-    const sortStringValues = (a, b) => (a[1] < b[1] && 1) || (a[1] === b[1] ? 0 : -1) //Sort/switch map algorithm
-
-    projectKeywords = new Map([...projectKeywords].sort(sortStringValues)) //Map notation. Got it from MDN
-
-    res.render('projects/data', {popularProjects, projectKeywords})
-
-  })().catch(err => {
-    console.log(err);
-    req.flash('error', "Unable to access database");
-    res.redirect('back');
-  })
-})
-
+// router.get('/data', middleware.isLoggedIn, middleware.isFaculty, (req, res) => {
+//
+//   (async() => {
+//
+//     let projectKeywords = new Map(); //Store keywords
+//     let commentKeywords = new Map(); //Maps positive comments to their respective projects
+//     let popularProjects = [];
+//     const regEx = new RegExp('[^a-zA-Z0-9]');
+//     let projects = await Project.find({poster: req.user._id})
+//
+//     if (!projects) {
+//       req.flash('error', "Unable to find projects"); return res.redirect('back');
+//     }
+//
+//     let avgLikes = 0;
+//
+//     for (let project of projects) {
+//       avgLikes += project.likes.length;
+//     }
+//
+//     avgLikes /= projects.length;
+//
+//     for (let project of projects) {
+//       if (project.likes.length >= avgLikes) {
+//         popularProjects.push(project);
+//       }
+//     }
+//
+//     //Sort popular projects
+//
+//     let tempProject;
+//     for (let i = 0; i < popularProjects.length - 1; i ++) {
+//       for (let j = 0; j < popularProjects.length - 1; j ++) {
+//         if (popularProjects[j].likes < popularProjects[j+1].likes) {
+//           tempProject = popularProjects[j];
+//           popularProjects[j] = popularProjects[j+1];
+//           popularProjects[j+1] = tempProject;
+//         }
+//       }
+//     }
+//
+//     //Map keywords from popular projects
+//
+//     for (let project of popularProjects) {
+//       for (let word of `${project.title} ${project.text}`.toLowerCase().split(regEx)) {
+//
+//         if (word.length > 3 && !fillers.includes(word)) {
+//           if (projectKeywords.has(word)) {
+//             projectKeywords.set(word, projectKeywords.get(word) + project.likes.length);
+//
+//           } else {
+//             projectKeywords.set(word, project.likes.length); //Give 'points' based on how many likes the project has. That way, this keyword carries more value
+//           }
+//         }
+//       }
+//     }
+//
+//     let avgOccurences = 0; //Averages occurences of keywords
+//
+//     for (let [keyword, occurences] of projectKeywords.entries()) {
+//       avgOccurences += occurences;
+//     }
+//
+//     avgOccurences /= projectKeywords.size;
+//
+//     for (let [keyword, occurences] of projectKeywords.entries()) {
+//       if (occurences < avgOccurences) {
+//         projectKeywords.delete(keyword);
+//       }
+//     }
+//
+//     const sortStringValues = (a, b) => (a[1] < b[1] && 1) || (a[1] === b[1] ? 0 : -1) //Sort/switch map algorithm
+//
+//     projectKeywords = new Map([...projectKeywords].sort(sortStringValues)) //Map notation. Got it from MDN
+//
+//     res.render('projects/data', {popularProjects, projectKeywords})
+//
+//   })().catch(err => {
+//     console.log(err);
+//     req.flash('error', "Unable to access database");
+//     res.redirect('back');
+//   })
+// })
 
 router.get('/:id/edit', middleware.isLoggedIn, middleware.isFaculty, (req, res) => { //RESTful Routing 'EDIT' route
 
