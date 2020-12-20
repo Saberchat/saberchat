@@ -98,7 +98,6 @@ router.post("/register",  (req, res) => {
         charSetMatrix.push('qwertyuiopasdfghjklzxcvbnm'.split(''));
         charSetMatrix.push('QWERTYUIOPASDFGHJKLZXCVBNM'.split(''));
         charSetMatrix.push('1234567890'.split(''));
-        charSetMatrix.push('()%!~$#*[){]|,.<>');
 
         let tokenLength = Math.round((Math.random() * 15)) + 15;
         let token = "";
@@ -106,12 +105,12 @@ router.post("/register",  (req, res) => {
         let charSet; //Which character set to choose from
 
         for (let i = 0; i < tokenLength; i += 1) {
-          charSet = charSetMatrix[Math.floor(Math.random() * 4)];
+          charSet = charSetMatrix[Math.floor(Math.random() * 3)];
           token += charSet[Math.floor((Math.random() * charSet.length))];
         }
 
 				//creates new user from form info
-				newUser = new User(
+				let newUser = new User(
 					{
 						email: email,
 						firstName: firstName,
@@ -194,7 +193,6 @@ router.get('/authenticate/:id', (req, res) => {
       charSetMatrix.push('qwertyuiopasdfghjklzxcvbnm'.split(''));
       charSetMatrix.push('QWERTYUIOPASDFGHJKLZXCVBNM'.split(''));
       charSetMatrix.push('1234567890'.split(''));
-      charSetMatrix.push('()%!~$#*[){]|,.<>');
 
       let tokenLength = Math.round((Math.random() * 15)) + 15;
       let token = "";
@@ -202,25 +200,26 @@ router.get('/authenticate/:id', (req, res) => {
       let charSet; //Which character set to choose from
 
       for (let i = 0; i < tokenLength; i += 1) {
-        charSet = charSetMatrix[Math.floor(Math.random() * 4)];
+        charSet = charSetMatrix[Math.floor(Math.random() * 3)];
         token += charSet[Math.floor((Math.random() * charSet.length))];
       }
 
-      if (req.query.token.toString() == user.authenticationToken) {
+      if (req.query.token.toString() == user.authenticationToken.toString()) {
         user.authenticated = true;
         user.authenticationToken = token;
         user.save();
 
         req.logIn(user, (err) => {
           if (err) {
+            console.log(err)
             return next(err);
           }
 
           let welcomeMessage = {
             from: 'noreply.saberchat@gmail.com',
-            to: newUser.email,
+            to: user.email,
             subject: 'Welcome To Saberchat!',
-            html: `<p>Hello ${newUser.firstName},</p><p>Welcome to Saberchat! A confirmation of your account:</p><ul><li>Your username is ${newUser.username}.</li><li>Your full name is ${newUser.firstName} ${newUser.lastName}.</li><li>Your linked email is ${newUser.email}</li></ul><p>You will be assigned a role and status soon.</p>`
+            html: `<p>Hello ${user.firstName},</p><p>Welcome to Saberchat! A confirmation of your account:</p><ul><li>Your username is ${user.username}.</li><li>Your full name is ${user.firstName} ${user.lastName}.</li><li>Your linked email is ${user.email}</li></ul><p>You will be assigned a role and status soon.</p>`
           };
 
           transporter.sendMail(welcomeMessage, (err, info) =>{
@@ -236,6 +235,8 @@ router.get('/authenticate/:id', (req, res) => {
         });
 
       } else {
+        console.log(req.query.token)
+        console.log(user.authenticationToken.toString())
         req.flash('error', "Invalid authentication token");
         res.redirect('/');
       }
@@ -291,7 +292,7 @@ router.post('/forgot-password', (req, res) => {
 
       let charSet; //Which character set to choose from
       for (let i = 0; i < pwd_length; i += 1) {
-        charSet = charSetMatrix[Math.floor(Math.random() * 4)];
+        charSet = charSetMatrix[Math.floor(Math.random() * 3)];
         pwd += charSet[Math.floor((Math.random() * charSet.length))];
       }
 

@@ -152,6 +152,7 @@ router.delete('/whitelist/:id', middleware.isLoggedIn, middleware.isPrincipal, (
 
 		let messagesReceived = null;
 		let messageUpdate;
+    let messageSender;
 		let emptyMessages = null;
 
 		let anns = null;
@@ -185,20 +186,6 @@ router.delete('/whitelist/:id', middleware.isLoggedIn, middleware.isPrincipal, (
 			return res.redirect('back');
 		}
 
-		messagesSent = await Message.find({sender: req.user._id}).populate('read');
-
-		if (!messagesSent) {
-			req.flash('error', "Unable to delete your messages");
-			return res.redirect('back');
-		}
-
-		for (let message of messagesSent) {
-			for (let user of message.read) {
-				user.msgCount -= 1;
-				await user.save();
-			}
-		}
-
 		deletedMessages = await Message.deleteMany({sender: user._id});
 
 		if (!deletedMessages) {
@@ -214,8 +201,8 @@ router.delete('/whitelist/:id', middleware.isLoggedIn, middleware.isPrincipal, (
 		}
 
 		for (let message of messagesReceived) {
-			if (message.recipients.includes(req.user._id)) {
-				messageUpdate = await Message.findByIdAndUpdate(message._id, {$pull: {recipients: req.user._id}});
+			if (message.recipients.includes(user._id)) {
+				messageUpdate = await Message.findByIdAndUpdate(message._id, {$pull: {recipients: user._id, read: req.user._id}});
 
 				if (!messageUpdate) {
 					req.flash('error', "Unable to update your messages");
@@ -223,6 +210,33 @@ router.delete('/whitelist/:id', middleware.isLoggedIn, middleware.isPrincipal, (
 				}
 			}
 		}
+
+    //Remove all messages which are now 'empty', but still have the original sender in the 'recipients' (meaning the person who is being deleted replied to this message)
+    for (let message of messagesReceived) {
+      if (message.recipients.length == 1 && message.recipients[0].equals(message.sender)) {
+
+        //Remove 1 from the original sender's read (if they haven't read this message yet)
+
+        if (!message.read.includes(message.sender)) {
+          messageSender = await User.findById(message.sender);
+
+          if (!messageSender) {
+            req.flash('error', "Unable to update your messages");
+            return res.redirect('back');
+          }
+
+          messageSender.msgCount -= 1;
+          messageSender.save();
+        }
+
+        messageUpdate = await Message.findByIdAndDelete(message._id);
+
+        if (!messageUpdate) {
+          req.flash('error', "Unable to update your messages");
+          return res.redirect('back');
+        }
+      }
+    }
 
 		emptyMessages = await Message.deleteMany({recipients: []});
 
@@ -270,7 +284,7 @@ router.delete('/whitelist/:id', middleware.isLoggedIn, middleware.isPrincipal, (
 			return res.redirect('back');
 		}
 
-		orders = await Order.find({customer: req.user._id});
+		orders = await Order.find({customer: user._id});
 
     if (!orders) {
       req.flash('error', "Unable to find your orders");

@@ -206,13 +206,13 @@ router.post('/messages', middleware.isLoggedIn, (req, res) => {
   			};
       }
 
-			transporter.sendMail(inboxEmail, (err, info) => {
-				if (error) {
-					console.log(err);
-				} else {
-					console.log('Email sent: ' + info.response);
-				}
-			});
+			// transporter.sendMail(inboxEmail, (err, info) => {
+			// 	if (error) {
+			// 		console.log(err);
+			// 	} else {
+			// 		console.log('Email sent: ' + info.response);
+			// 	}
+			// });
 		}
 
 		req.flash('success', 'Message sent');
