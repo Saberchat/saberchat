@@ -1254,7 +1254,6 @@ router.put('/type/:id', middleware.isLoggedIn, middleware.isMod, (req, res) => {
         req.flash('error', "Unable to update item category"); return res.redirect('back');
       }
 
-      //Problem here
       const ft = await Type.find({_id: {$ne: type._id}}); //Find all other types
 
       if (!ft) {
@@ -1332,23 +1331,23 @@ router.delete('/type/:id', middleware.isLoggedIn, middleware.isMod, (req, res) =
 
   (async() => {
 
+    const other = await Type.findOne({name: "Other"}); //Find the type with name 'Other' - we've created this type so that any unselected items go here
+
+    if (!other) {
+      req.flash('error', "Unable to find item category 'Other', please add it"); return res.redirect('back');
+    }
+
     const type = await Type.findByIdAndDelete(req.params.id); //Delete type based on specified ID
 
     if (!type) {
       req.flash('error', "Unable to find item category"); return res.redirect('back');
     }
 
-    const other = await Type.findOne({name: "Other"}); //Find the type with name 'Other' - we've created this type so that any unselected items go here
+    for (let item of type.items) {
+      other.items.push(item);
+    }
 
-      if (!other) {
-        req.flash('error', "Unable to find item category 'Other', please add it"); return res.redirect('back');
-      }
-
-      for (let item of type.items) {
-        other.items.push(item);
-      }
-
-      await other.save();
+    await other.save();
 
     req.flash('success', "Item category deleted!");
     res.redirect('/cafe/manage');

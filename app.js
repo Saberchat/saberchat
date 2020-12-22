@@ -22,6 +22,12 @@ const dateFormat = require('dateformat');
 //Allows Node.js to send emails
 const nodemailer = require("nodemailer");
 
+//Image Upload Modules
+const crypto = require('crypto')
+const multer = require('multer');
+const GridFsStorage = require('multer-gridfs-storage');
+const Grid = require('gridfs-stream');
+
 //pretty up the console
 // const colors = require('colors');
 // add favicon
@@ -50,7 +56,7 @@ const adminRoutes = require('./routes/admin');
 const cafeRoutes = require('./routes/cafe');
 const announcementRoutes = require('./routes/announcements');
 const projectRoutes = require('./routes/projects');
-// const wHeightsRoutes = require('./routes/wHeights');
+const wHeightsRoutes = require('./routes/wHeights');
 
 //set up ports and socket.io
 const http = require('http').createServer(app);
@@ -64,6 +70,47 @@ mongoose.connect(process.env.DATABASE_URL,
   useUnifiedTopology: true,
   useFindAndModify: false
 });
+
+// const conn = mongoose.connect(process.env.DATABASE_URL, {
+//   useNewUrlParser: true,
+//   useUnifiedTopology: true,
+//   useFindAndModify: false
+// });
+//
+// let gfs;
+//
+// conn.once('open', () => {
+//   gfs = Grid(conn.db, mongoose.mongo);
+//   gfs.collection('uploads');
+// });
+//
+// //Create storage object
+//
+// const storage = new GridFsStorage({
+//   url: process.env.DATABASE_URL,
+//   file: (req, file) => {
+//
+//     return new Promise((resolve, reject) => {
+//       crypto.randomBytes(16, (err, buf) => {
+//
+//         if (err) {
+//           return reject(err);
+//         }
+//
+//         const filename = buf.toString('hex') + path.extname(file.originalname);
+//
+//         const fileInfo = {
+//           filename: filename,
+//           bucketName: 'uploads'
+//         };
+//
+//         resolve(fileInfo);
+//       });
+//     });
+//   }
+// });
+//
+// const upload = multer({ storage });
 
 // ============================
 // app configuration

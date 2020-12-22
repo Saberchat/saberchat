@@ -208,6 +208,12 @@ router.delete('/whitelist/:id', middleware.isLoggedIn, middleware.isPrincipal, (
 					req.flash('error', "Unable to update your messages");
 					return res.redirect('back');
 				}
+
+        for (let i = message.replies.length; i > 0; i--) {
+          if (message.replies[i].sender.equals(user._id)) {
+            message.replies.splice(i, 1);
+          }
+        }
 			}
 		}
 

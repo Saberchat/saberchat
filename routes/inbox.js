@@ -258,7 +258,7 @@ router.get('/sent', middleware.isLoggedIn, (req, res) => {
   });
 });
 
-//Allows you to reply to notifications sent to you
+//User can reply to notifications sent to them
 router.put('/reply', middleware.isLoggedIn, (req, res) => {
   Message.findById(req.body.message).populate('recipients').populate('sender').exec((err, message) => {
     if (err || !message) {

@@ -367,11 +367,13 @@ router.delete('/delete-account', middleware.isLoggedIn, (req, res) => {
           req.flash('error', "Unable to update your messages");
           return res.redirect('back');
         }
-      }
 
-      console.log(message.subject)
-      console.log(message.recipients)
-      console.log(message.sender)
+        for (let i = message.replies.length-1; i > 0; i--) {
+          if (message.replies[i].sender.equals(user._id)) {
+            message.replies.splice(i, 1);
+          }
+        }
+      }
 
     //Remove all messages which are now 'empty', but still have the original sender in the 'recipients' (meaning the person who is being deleted replied to this message)
       if (message.recipients.length == 1 && message.recipients[0].equals(message.sender)) {

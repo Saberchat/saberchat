@@ -12,6 +12,7 @@ const User = require('../models/user');
 const Announcement = require('../models/announcement');
 const Notification = require('../models/message');
 
+//Sets up NodeMailer Transporter object (sends out emails)
 let transporter = nodemailer.createTransport({
   service: 'gmail',
   auth: {
@@ -39,23 +40,24 @@ router.get('/new', middleware.isLoggedIn, middleware.isMod, (req, res) => { //RE
   res.render('announcements/new');
 });
 
-router.get('/mark-all', middleware.isLoggedIn, (req, res) => {
-  req.user.annCount = [];
+router.get('/mark-all', middleware.isLoggedIn, (req, res) => { //Mark all announceents as read
+  req.user.annCount = []; //No new announcements in user's annCount
   req.user.save();
   req.flash('success', 'All Announcements Marked As Read!');
   res.redirect(`/announcements`);
 });
 
-router.get('/mark/:id', middleware.isLoggedIn, (req, res) => {
-  let index = -1;
+router.get('/mark/:id', middleware.isLoggedIn, (req, res) => { //Mark specific announcement as read
 
+  //Iterate through user's announcement count and find the announcement that is being marked as read
+  let index = -1;
   for (let i = 0; i < req.user.annCount.length; i ++) {
     if (req.user.annCount[i].announcement.toString() == req.params.id.toString()) {
       index = i;
     }
   }
 
-  console.log(index);
+  //If the announcement exists, remove it from announcement count
   if (index > -1) {
     req.user.annCount.splice(index, 1);
     req.user.save()
@@ -77,7 +79,7 @@ router.get('/:id', (req, res) => { //RESTful Routing 'SHOW' route
 
     } else {
 
-      if (req.user) {
+      if (req.user) { //If user is logged in, remove this announcement from their announcement count
 
         let index = -1;
         for (let i = 0; i < req.user.annCount.length; i += 1) {
