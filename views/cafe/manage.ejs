@@ -75,9 +75,9 @@
               </li>
               <% type.items.forEach(item => { %>
                 <% if (item.isAvailable == true) { %>
-                  <a href="item/<%= item._id %>" id="item-<%=item.id%>" class="list-group-item list-group-item-action menu-item <%=type.name.split(' ').join('')%>"><strong><%= item.name %></strong> (<%= item.availableItems%> orders available) <span hidden><%=type.name%></span> <span title="Upvotes (Cafe admins cannot upvote items from here)" style="color: grey; text-decoration: none; display: inline;"><i class="fas fa-arrow-circle-up"></i></span><span id="upvoteCount-<%=item._id%>"> <%=item.upvotes.length%></span></a>
+                  <a href="item/<%= item._id %>" id="item-<%=item.id%>" class="list-group-item list-group-item-action menu-item <%=type.name.replace(' ', '')%>"><strong><%= item.name %></strong> (<%= item.availableItems%> orders available) <span title="Upvotes (Cafe admins cannot upvote items from here)" style="color: grey; text-decoration: none; display: inline;"></span><strong id="upvoteCount-<%=item._id%>" style="float: right; color: green;"> Upvotes: <%=item.upvotes.length%></strong></a>
                 <% } else {%>
-                  <a href="item/<%= item._id %>" id="item-<%=item.id%>" class="list-group-item list-group-item-action menu-item <%=type.name.split(' ').join('')%>"><strong><%= item.name %></strong> (Unavailable) <span hidden><%=type.name%></span> <span title="Upvotes (Cafe admins cannot upvote items from here)" style="color: grey; text-decoration: none; display: inline;"><i class="fas fa-arrow-circle-up"></i></span><span id="upvoteCount-<%=item._id%>"> <%=item.upvotes.length%></span></a>
+                  <a href="item/<%= item._id %>" id="item-<%=item.id%>" class="list-group-item list-group-item-action menu-item <%=type.name.replace(' ', '')%>"><strong><%= item.name %></strong> (Unavailable) <span title="Upvotes (Cafe admins cannot upvote items from here)" style="color: grey; text-decoration: none; display: inline;"></span><strong id="upvoteCount-<%=item._id%>" style="float: right; color: green;"> Upvotes: <%=item.upvotes.length%></strong></a>
                 <% } %>
               <% }) %>
               <br class="category-break" id="<%=type._id%>-break"/>
@@ -100,7 +100,7 @@
               <% for (let item of type.items) { %>
                 <% upvoteCount += item.upvotes.length%>
               <% } %>
-              <a href="type/<%=type._id%>" id="type-<%=type.id%>" class="list-group-item list-group-item-action menu-item ItemOrderCategories"><strong><%=type.name%></strong> (<%=type.items.length%> items) <span title="Sum of all upvotes for this category (Cafe admins cannot upvote items from here)" style="color: grey; text-decoration: none; display: inline;"><i class="fas fa-arrow-circle-up"></i></span><span> <%=upvoteCount%></span> </a>
+              <a href="type/<%=type._id%>" id="type-<%=type.id%>" class="list-group-item list-group-item-action menu-item ItemOrderCategories"><strong><%=type.name%></strong> (<%=type.items.length%> items) <span title="Sum of all upvotes for this category (Cafe admins cannot upvote items from here)" style="color: grey; text-decoration: none; display: inline;"></span><strong id="upvoteCount-<%=type._id%>" style="float: right; color: green;"> Upvotes: <%=upvoteCount%></strong> </a>
             <% } %>
           <% }) %>
 
@@ -111,7 +111,7 @@
               <% for (let item of type.items) { %>
                 <% upvoteCount += item.upvotes.length%>
               <% } %>
-              <div class="list-group-item list-group-item-action menu-item ItemOrderCategories" id="type-<%=type.id%>"><strong><%=type.name%></strong> (<%=type.items.length%> items) <strong style="color: red;">You cannot modify this category </strong> <span title="Sum of all upvotes for this category (Cafe admins cannot upvote items from here)" style="color: grey; text-decoration: none; display: inline;"><i class="fas fa-arrow-circle-up"></i></span><span> <%=upvoteCount%></span></div>
+              <div class="list-group-item list-group-item-action menu-item ItemOrderCategories" id="type-<%=type.id%>"><strong><%=type.name%></strong> (<%=type.items.length%> items) <strong style="color: red;">You cannot modify this category </strong> <span title="Sum of all upvotes for this category (Cafe admins cannot upvote items from here)" style="color: grey; text-decoration: none; display: inline;"></span><strong id="upvoteCount-<%=type._id%>" style="float: right; color: green;"> Upvotes: <%=upvoteCount%></strong></div>
             <% } %>
           <% }) %>
 
@@ -127,14 +127,14 @@
     const catBreaks = document.getElementsByClassName('category-break'); //Category page break
     const menuItems = document.getElementsByClassName('menu-item');
     const input = document.getElementById("search-input");
-    let filter = input.value.toLowerCase();
+    let filter = input.value.toLowerCase().replace(' ', '');
 
     for (let item of menuItems) {
-      if(!item.textContent.toLowerCase().includes(filter)) {
-        $(`#${item.id}`).hide();
+      if ((item.textContent.replace(' ', '').toLowerCase().includes(filter)) || (item.classList.toString().toLowerCase().includes(filter))) {
+        $(`#${item.id}`).show();
 
       } else {
-        $(`#${item.id}`).show();
+        $(`#${item.id}`).hide();
       }
     }
 
@@ -144,7 +144,7 @@
       catIncluded = false;
 
       for (let item of document.getElementsByClassName(catHeaders[h].getElementsByTagName("h2")[0].textContent.split(' ').join(''))) {
-        if(item.textContent.toLowerCase().includes(filter)) {
+        if((item.textContent.replace(' ', '').toLowerCase().includes(filter)) || (item.classList.toString().toLowerCase().includes(filter))) {
           catIncluded = true;
           break;
         }

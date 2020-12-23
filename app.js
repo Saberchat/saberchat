@@ -72,12 +72,13 @@ mongoose.connect(process.env.DATABASE_URL,
   useFindAndModify: false
 });
 
-// const conn = mongoose.connect(process.env.DATABASE_URL, {
+// const conn = mongoose.createConnection(process.env.DATABASE_URL,
+// {
 //   useNewUrlParser: true,
 //   useUnifiedTopology: true,
 //   useFindAndModify: false
 // });
-//
+
 // let gfs;
 //
 // conn.once('open', () => {

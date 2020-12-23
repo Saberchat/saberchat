@@ -77,7 +77,7 @@
 
               <% type.items.forEach(item => { %>
                 <% if (item.isAvailable == true) { %>
-                  <span class="list-group-item list-group-item-action menu-item <%=type.name%>" id="item-<%=item.id%>"><strong><%= item.name %> (<%= item.availableItems%> orders available)</strong>
+                  <span class="list-group-item list-group-item-action menu-item <%=type.name.replace(' ', '')%>" id="item-<%=item.id%>"><strong><%= item.name %> (<%= item.availableItems%> orders available)</strong>
 
                   <% if (!item.price.toString().includes('.')) { %>
                     - $<%=item.price%>.00
@@ -101,7 +101,7 @@
                     <span id="upvoteCount-<%=item._id%>"> <%=item.upvotes.length%></span>
                   </div>
 
-                  <br /> <em><%= item.description %></em><br /><br /><img  src=<%=item.imgUrl%> style="width: 20%; height: 20%; border-radius: 20px;"/><span hidden><%=type.name%></span></span>
+                  <br /> <em><%= item.description %></em><br /><br /><img  src=<%=item.imgUrl%> style="width: 20%; height: 20%; border-radius: 20px;"/></span>
 
                 <% }%>
               <% }) %>
@@ -122,14 +122,14 @@
       const catBreaks = document.getElementsByClassName('category-break') //Category page break
       const menuItems = document.getElementsByClassName('menu-item')
       const input = document.getElementById("search-input");
-      let filter = input.value.toLowerCase();
+      let filter = input.value.toLowerCase().replace(' ', '');
 
       for (let item of menuItems) {
-        if(!item.textContent.toLowerCase().includes(filter)) {
-          $(`#${item.id}`).hide()
+        if((item.textContent.replace(' ', '').toLowerCase().includes(filter)) || (item.classList.toString().toLowerCase().includes(filter))) {
+          $(`#${item.id}`).show();
 
         } else {
-          $(`#${item.id}`).show()
+          $(`#${item.id}`).hide();
         }
       }
 
@@ -138,20 +138,20 @@
       for (let h = 0; h < catHeaders.length; h+= 1) {
         catIncluded = false;
 
-        for (let item of document.getElementsByClassName(catHeaders[h].getElementsByTagName("h2")[0].textContent)) {
-          if(item.textContent.toLowerCase().includes(filter)) {
+        for (let item of document.getElementsByClassName(catHeaders[h].getElementsByTagName("h2")[0].textContent.replace(' ', ''))) {
+          if((item.textContent.replace(' ', '').toLowerCase().includes(filter)) || (item.classList.toString().toLowerCase().includes(filter))) {
             catIncluded = true;
-            break
+            break;
           }
         }
 
         if (catIncluded) {
-          $(`#${catHeaders[h].id}`).show()
-          $(`#${catBreaks[h].id}`).show()
+          $(`#${catHeaders[h].id}`).show();
+          $(`#${catBreaks[h].id}`).show();
 
         } else {
-          $(`#${catHeaders[h].id}`).hide()
-          $(`#${catBreaks[h].id}`).hide()
+          $(`#${catHeaders[h].id}`).hide();
+          $(`#${catBreaks[h].id}`).hide();
         }
       }
 

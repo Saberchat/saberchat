@@ -19,6 +19,9 @@ const Project = require('../models/project');
 const Order = require('../models/order');
 const Article = require('../models/article');
 
+const Permission = require('../models/permission');
+const Status = require('../models/status');
+
 const middleware = require('../middleware');
 
 let transporter = nodemailer.createTransport({
@@ -71,7 +74,7 @@ router.get('/status', middleware.isLoggedIn, middleware.isMod, (req, res) => {
 			req.flash('error', 'Cannot access Database');
 			res.redirect('/admin');
 		} else {
-			res.render('admin/status', {users: foundUsers});
+			res.render('admin/status', {users: foundUsers, tags: ['Cashier', 'Tutor', 'Editor']});
 		}
 	});
 });
@@ -125,6 +128,32 @@ router.post('/whitelist', middleware.isLoggedIn, middleware.isPrincipal, (req, r
 		req.flash('error', "Unable to access database");
 		res.redirect('back');
 	});
+});
+
+router.post('/add-permission', (req, res) => {
+  Permission.create({title: req.body.permission}, (err, permission ) => {
+    if (err || !permission) {
+      req.flash('error', "Unable to create permission");
+      res.redirect('back');
+
+    } else {
+      req.flash('success', "Permission created!");
+      res.redirect('/admin/permissions');
+    }
+  });
+});
+
+router.post('/add-status', (req, res) => {
+  Status.create({title: req.body.status, version: req.body.version}, (err, status) => {
+    if (err || !status) {
+      req.flash('error', "Unable to create status");
+      res.redirect('back');
+
+    } else {
+      req.flash('success', "Status created!");
+      res.redirect('/admin/status');
+    }
+  });
 });
 
 router.delete('/whitelist/:id', middleware.isLoggedIn, middleware.isPrincipal, (req, res) => {
@@ -472,6 +501,27 @@ router.put('/status', middleware.isLoggedIn, middleware.isMod, (req, res) => {
 	});
 
 });
+
+router.put('/tag', middleware.isLoggedIn, middleware.isMod, (req, res) => {
+  User.findById(req.body.user, (err, user) => {
+    if(err || !user) {
+      res.json({error: 'Error. Could not change'});
+
+    } else {
+      if (user.tags.includes(req.body.tag)) {
+        user.tags.splice(user.tags.indexOf(req.body.tag), 1);
+        user.save();
+        res.json({success: "Successfully removed status"})
+
+      } else {
+        user.tags.push(req.body.tag);
+        user.save();
+        res.json({success: "Successfully added status"})
+      }
+
+    }
+  })
+})
 
 // route for ignoring reported comments
 router.put('/moderate', middleware.isLoggedIn, middleware.isMod, (req, res) => {

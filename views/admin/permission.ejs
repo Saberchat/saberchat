@@ -39,10 +39,34 @@
 
                 <li class="list-group-item">
                   <strong>Modify Permissions</strong>
+                  <form action="/admin/add-permission" method="post" id="add-email-form" style="display: inline; margin-left: 10px;">
+                    <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#modal" id="delete-button"><i class="fas fa-user"></i> Add Permission</button>
+                    <div class="modal fade" id="modal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+                      <div class="modal-dialog">
+                        <div class="modal-content">
+                          <div class="modal-header">
+                            <h5 class="modal-title" id="exampleModalLabel">Add Permission</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                              <span aria-hidden="true">&times;</span>
+                            </button>
+                          </div>
+                          <div class="modal-body">
+                            <input class="form-control" type="text" name="permission" placeholder="Enter permission name"/>
+                          </div>
+                          <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Back</button>
+                            <button type="submit" class="btn btn-primary">Add</button>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </form>
                 </li>
 
                 <% let permMatrix = [["principal", "Principal"], ["admin", "Administrator"], ["mod", "Moderator"], ["student", "Student"]]; %>
                 <% let statusMatrix = [ ["faculty", "Faculty", []], ["12th", "Seniors", []], ["11th", "Juniors", []], ["10th", "Sophomores", []], ["9th", "Freshmen", []], ["8th", "8th Graders", []], ["7th", "7th Graders", []], ["alumnus", "Alumni", []], ["parent", "Parents", []], ["guest", "Guests", []] ] %>
+                <% let statusMap = new Map([["faculty", "Faculty"], ["12th", "Senior"], ["11th", "Junior"], ["10th", "Sophomore"], ["9th", "Freshman"], ["8th", "8th Grader"], ["7th", "7th Grader"], ["alumnus", "Alumnus"], ["parent", "Parent"], ["guest", "Guest"]]); %>
+                <% let tagMap = new Map([["Tutor", "warning"], ["Cashier", "success"], ["Editor", "primary"]])%>
 
                 <% for (let perm of permMatrix) { %>
 
@@ -50,7 +74,7 @@
                       <% if(!user._id.equals(currentUser._id) && user.permission == perm[0]){ %>
                             <% for (let status of statusMatrix) { %>
                               <% if (status[0].toLowerCase() == user.status.toLowerCase())  { %>
-                                <li class="list-group-item user <%=perm[1].toLowerCase()%> <%=status[0].toLowerCase()%> <status[1].toLowerCase()%>" id="<%=user._id%>">
+                                <li class="list-group-item user <%=perm[1].toLowerCase()%> <%=status[0].toLowerCase()%> <%=status[1].toLowerCase()%> <%=perm[0]%> <%=user.tags.join(' ')%>" id="<%=user._id%>">
                                   <%= user.username %> (<%= user.firstName %> <%= user.lastName %>)
                               <% } %>
                             <% } %>
@@ -66,6 +90,12 @@
                               <% }%>
                             <% } %>
                           </select>
+
+                          <span style="margin-left: 10px; margin-right: 20px;" class="badge badge-secondary"><%=statusMap.get(user.status)%></span>
+
+                          <% for (let tag of user.tags) { %>
+                            <span class="badge badge-pill badge-<%=tagMap.get(tag)%>"><%=tag%></span>
+                          <% } %>
                         </li>
                       <% } %>
                   <% } %>
@@ -85,7 +115,7 @@
         let filter = searchInput.value.toLowerCase();
 
         for (let i = 0; i < users.length; i += 1) {
-          if (! (users[i].textContent.split('\n')[1].toLowerCase().includes(filter) || users[i].classList.toString().includes(filter))) {
+          if (!(users[i].textContent.split('\n')[1].toLowerCase().includes(filter) || users[i].classList.toString().toLowerCase().includes(filter.toLowerCase()))) {
             $(`#${users[i].id}`).hide();
 
           } else {
@@ -95,6 +125,5 @@
       })
 
       </script>
-
     </body>
   </html>

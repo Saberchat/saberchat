@@ -46,7 +46,8 @@ var userSchema = new mongoose.Schema({
 		}
 	],
 	permission: {type: String, default: "student"}, // for permissions
-	status: {type: String, default: 'guest'}, // 7th, 8th, 9th, 10th, 11th, 12th, alumni, parents, faculty
+	status: {type: String, default: "guest"}, // 7th, 8th, 9th, 10th, 11th, 12th, alumni, parents, faculty, cashier, editor, tutor, etc.
+	tags: [{type: String, default: []}], //Cashier, Editor, Tutor, Etc.
 	balance: {type: Number, default: 0},
 	debt: {type: Number, default: 0},
 }, {timestamps: {createdAt: 'created_at'}});

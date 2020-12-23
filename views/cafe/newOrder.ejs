@@ -148,7 +148,7 @@
                       <div class="list-group-item list-group-item-info form-check menu-item <%=type.name%>" id="item-<%=item.id%>" title="You have frequently ordered this item">
 
                     <% } else { %>
-                      <div class="list-group-item list-group-item-secondary form-check menu-item <%=type.name%>" id="item-<%=item.id%>">
+                      <div class="list-group-item list-group-item-secondary form-check menu-item <%=type.name.replace(' ', '')%>" id="item-<%=item.id%>">
                     <% } %>
 
                       <!-- Div to put margins on text inside outer div -->
@@ -185,7 +185,6 @@
                           <span style="font-weight: bold; color: green;  margin-left: 5px;">Frequently Ordered</span>
                         <% } %>
 
-                        <span hidden><%=type.name%></span>
                         </label>
 
                         <div title="Upvotes" style="margin-left: 10px; display: inline;">
@@ -268,14 +267,14 @@
     const catBreaks = document.getElementsByClassName('category-break') //Category page break
     const menuItems = document.getElementsByClassName('menu-item')
     const input = document.getElementById("search-input");
-    let filter = input.value.toLowerCase();
+    let filter = input.value.toLowerCase().replace(' ', '');
 
     for (let item of menuItems) {
-      if(!item.textContent.toLowerCase().includes(filter)) {
-        $(`#${item.id}`).hide()
+      if((item.textContent.replace(' ', '').toLowerCase().includes(filter)) || (item.classList.toString().toLowerCase().includes(filter))) {
+        $(`#${item.id}`).show()
 
       } else {
-        $(`#${item.id}`).show()
+        $(`#${item.id}`).hide()
       }
     }
 
@@ -284,8 +283,8 @@
     for (let h = 0; h < catHeaders.length; h+= 1) {
       catIncluded = false;
 
-      for (let item of document.getElementsByClassName(catHeaders[h].getElementsByTagName("h2")[0].textContent)) {
-        if(item.textContent.toLowerCase().includes(filter)) {
+      for (let item of document.getElementsByClassName(catHeaders[h].getElementsByTagName("h2")[0].textContent.replace(' ', ''))) {
+        if((item.textContent.replace(' ', '').toLowerCase().includes(filter)) || (item.classList.toString().toLowerCase().includes(filter))) {
           catIncluded = true;
           break
         }
