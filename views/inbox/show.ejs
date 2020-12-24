@@ -85,27 +85,31 @@
 
               <br />
 
-              <% for (let reply of message.replies) { %>
-                <article class="msg-container replies" style="padding: 20px;">
-                  <h4>
-                    Reply From <a style="color: black;" href="../../profiles/<%=reply.sender._id%>"><%=reply.sender.username%></a>
-                  </h4>
+              <div id="reply-container">
 
-                  <p>
-                    <%=reply.date%>
-                  </p>
-                  <p>
-                    <%=reply.text%>
-                  </p>
+                <% for (let reply of message.replies) { %>
+                  <article class="msg-container replies" style="padding: 20px;">
+                    <h4>
+                      Reply From <a style="color: black;" href="../../profiles/<%=reply.sender._id%>"><%=reply.sender.username%></a>
+                    </h4>
 
-                  <% for (let image of reply.images) { %>
-                    <img src="<%=image%>" style="width: 40%; height: 40%; margin-bottom: 10px; border-radius: 15px;"/>
-                    <br />
-                  <% } %>
+                    <p>
+                      <%=reply.date%>
+                    </p>
+                    <p>
+                      <%=reply.text%>
+                    </p>
 
-                </article>
-                <br />
-              <% } %>
+                    <% for (let image of reply.images) { %>
+                      <img src="<%=image%>" style="width: 40%; height: 40%; margin-bottom: 10px; border-radius: 15px;"/>
+                      <br />
+                    <% } %>
+
+                  </article>
+                  <br />
+                <% } %>
+              </div>
+              <br />
 
               <article class="msg-container" style="padding: 20px;" id="reply-box" hidden>
 

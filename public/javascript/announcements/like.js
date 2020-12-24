@@ -20,8 +20,8 @@ const like = (button => {
       }
 
       document.getElementById(`likeCount-${announcementId}`).innerText = data.likeCount;
-
-    } else if(data.error) {}
+    }
+    
   });
 })
 

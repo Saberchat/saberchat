@@ -50,7 +50,8 @@
                               </button>
                             </div>
                             <div class="modal-body">
-                              <input class="form-control" type="text" name="status" placeholder="Enter status name"/>
+                              <input class="form-control" type="text" name="status" placeholder="Enter status name (e.g. 'Parent')"/><br />
+                              <input class="form-control" type="text" name="plural" placeholder="Enter status plural form (e.g. 'Parents')"/>
 
                               <input style="margin-top: 20px; margin-bottom: 20px;" type="radio" name="version" value="position" id="position"/>
                               <label style="font-size: 15px;" for="position">Position (e.g. 'faculty', 'parent', '12th grader')</label>
@@ -72,14 +73,14 @@
                   <% let statusMatrix = [ ["Faculty", "Faculty", []], ["12th", "Seniors", []], ["11th", "Juniors", []], ["10th", "Sophomores", []], ["9th", "Freshmen", []], ["8th", "8th Graders", []], ["7th", "7th Graders", []], ["Alumnus", "Alumni", []], ["Parent", "Parents", []], ["Guest", "Guests", []] ] %>
                   <% let permMatrix = [["principal", "Principal"], ["admin", "Administrator"], ["mod", "Moderator"], ["student", "Student"]]; %>
                   <% let permMap = new Map([["principal", "Principal"], ["admin", "Administrator"], ["mod", "Moderator"], ["student", "Student"]]); %>
-                  <% let tagMap = new Map([["Tutor", "warning"], ["Cashier", "success"], ["Editor", "primary"]])%>
+                  <% let tagMap = new Map([["Tutor", "warning"], ["Cashier", "success"], ["Editor", "info"]]); %>
 
                   <% for (let status of statusMatrix) { %>
                     <% for (let user of users) { %>
                       <% if(!user._id.equals(currentUser._id) && user.status.toLowerCase() == status[0].toLowerCase()){ %>
                             <% for (let perm of permMatrix) { %>
                               <% if (perm[0].toLowerCase() == user.permission.toLowerCase())  { %>
-                                <li class="list-group-item user <%=status[0].toLowerCase()%> <%=status[1].toLowerCase()%> <%=perm[0]%> <%=user.tags.join(' ')%>" id="<%=user._id%>">
+                                <li class="list-group-item user <%=status[0].toLowerCase()%> <%=status[1].toLowerCase()%> <%=perm[0]%> <%=user.tags.join(' ')%>" id="user-<%=user._id%>">
                                   <%= user.username %> (<%= user.firstName %> <%= user.lastName %>)
                               <% } %>
                             <% } %>
@@ -105,7 +106,7 @@
                           <span style="margin-left: 10px; margin-right: 20px;" class="badge badge-secondary%>"><%=permMap.get(user.permission)%></span>
 
                           <% for (let tag of user.tags) { %>
-                            <span class="badge badge-pill badge-<%=tagMap.get(tag)%>"><%=tag%></span>
+                            <span class="badge badge-pill badge-<%=tagMap.get(tag)%> tag-<%=user._id%>" style="margin-right: 5px;"><%=tag%></span>
                           <% } %>
                         </li>
                       <% } %>

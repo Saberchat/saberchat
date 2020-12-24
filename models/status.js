@@ -4,6 +4,7 @@ const mongoose = require("mongoose");
 
 var statusSchema = new mongoose.Schema({
   title: String,
+  plural: String,
   version: String
 });
 

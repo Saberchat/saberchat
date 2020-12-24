@@ -21,7 +21,7 @@ const like = (button => {
 
       document.getElementById(`likeCount-${projectId}`).innerText = data.likeCount;
 
-    } else if(data.error) {}
+    }
   });
 })
 

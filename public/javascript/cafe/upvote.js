@@ -14,7 +14,7 @@ const upvote = (button => {
       }
 
       document.getElementById(`upvoteCount-${itemId}`).innerText = data.upvoteCount;
-
-    } else if(data.error) {}
+    }
+    
   });
 })

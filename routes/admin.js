@@ -144,7 +144,7 @@ router.post('/add-permission', (req, res) => {
 });
 
 router.post('/add-status', (req, res) => {
-  Status.create({title: req.body.status, version: req.body.version}, (err, status) => {
+  Status.create({title: req.body.status, plural: req.body.plural, version: req.body.version}, (err, status) => {
     if (err || !status) {
       req.flash('error', "Unable to create status");
       res.redirect('back');
@@ -511,12 +511,12 @@ router.put('/tag', middleware.isLoggedIn, middleware.isMod, (req, res) => {
       if (user.tags.includes(req.body.tag)) {
         user.tags.splice(user.tags.indexOf(req.body.tag), 1);
         user.save();
-        res.json({success: "Successfully removed status"})
+        res.json({success: "Successfully removed status", tag: req.body.tag})
 
       } else {
         user.tags.push(req.body.tag);
         user.save();
-        res.json({success: "Successfully added status"})
+        res.json({success: "Successfully added status", tag: req.body.tag})
       }
 
     }
