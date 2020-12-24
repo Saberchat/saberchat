@@ -8,7 +8,7 @@ const addImg = (() => { //Adds the image input field
     img.id = `block-${i}`
     img.style="text-align: left;";
     img.innerHTML = `<div class="input-container" >
-    <input id="${i}" type="text" class="form-control" oninput="createImg(this)" placeholder="Url..." name="images[${i}]" required >
+    <input id="${i}" type="text" class="form-control project-image" oninput="createImg(this)" placeholder="Url..." name="images[${i}]" required >
   </div>
   <button type="button" onclick="deleteImg(this)" class="btn btn-danger" style="float: right;"><i class="fas fa-minus"></i></button>`;
     imgContainer.prepend(img);

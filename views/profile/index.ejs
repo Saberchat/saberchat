@@ -78,15 +78,18 @@
                                 <span class="badge badge-<%=permMap.get(user.permission)[1]%>"><%=permMap.get(user.permission)[0]%></span>
                               <% } %>
 
+                              <% if (user._id.toString() == currentUser._id.toString())  { %>
+                                <span class="badge badge-dark">Me</span>
+                              <% } %>
+
+                              <span style="margin-right: 20px;"></span>
+
                               <% for (let tag of user.tags) { %>
-                                <span class="badge badge-pill badge-<%=tagMap.get(tag)%>"><%=tag%></span>
+                                <span style="margin-right: 5px;" class="badge badge-pill badge-<%=tagMap.get(tag)%>"><%=tag%></span>
                               <% } %>
                               </a>
 
-                              <% if (user._id.toString() == currentUser._id.toString())  { %>
-                                <span class="badge badge-dark">Me</span>
-
-                              <% } else if (!(user._id.toString() == currentUser._id.toString())) { %>
+                              <% if (!(user._id.toString() == currentUser._id.toString())) { %>
 
                                 <% if (user.followers.includes(currentUser._id)) { %>
                                   <button type="button" data-toggle="modal" data-target="#modal-<%=user._id%>-follow" id="delete-button-<%=user._id%>" style="float: right; color: white;" class="btn btn-danger">Unfollow</button>

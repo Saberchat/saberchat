@@ -64,7 +64,7 @@ router.post('/',middleware.isLoggedIn, middleware.isFaculty, (req, res) => { //R
       creators = [];
 
     } else {
-      let statuses = ['7th', '8th', '9th', '11th', '12th'];
+      let statuses = ['7th', '8th', '9th', '10th', '11th', '12th'];
 
       for (let creator of req.body.creatorInput.split(',')) {
 
@@ -108,7 +108,7 @@ router.post('/',middleware.isLoggedIn, middleware.isFaculty, (req, res) => { //R
     const followers = await User.find({authenticated: true, _id: {$in: req.user.followers}});
 
     if (!followers) {
-      req.flash('error', "Umable to access your followers");
+      req.flash('error', "Unable to access your followers");
       return res.redirect('back');
     }
 
