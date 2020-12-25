@@ -115,7 +115,16 @@ middleware.isFaculty = ((req, res, next) => {
 });
 
 middleware.isStudent = ((req, res, next) => {
-	if(req.user.status != 'faculty' && req.user.status != "parent") {
+	if(req.user.status != 'faculty' && req.user.status != "parent" && req.user.status != "guest" && req.user.status != "alumnus") {
+		next();
+	} else {
+		req.flash('error', 'You do not have permission to do that');
+		res.redirect('back');
+	}
+});
+
+middleware.isTutor = ((req, res, next) => {
+	if (req.user.tags.toString().toLowerCase().includes('tutor')) {
 		next();
 	} else {
 		req.flash('error', 'You do not have permission to do that');
