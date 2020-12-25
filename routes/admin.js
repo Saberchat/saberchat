@@ -81,7 +81,7 @@ router.get('/status', middleware.isLoggedIn, middleware.isMod, (req, res) => {
 
 router.get('/whitelist', middleware.isLoggedIn, middleware.isPrincipal, (req, res) => {
 	(async() => {
-		const emails = await Email.find({name: {$nin: [req.user.email]}});
+		const emails = await Email.find({name: {$ne: req.user.email}});
 
 		if (!emails) {
 			req.flash('error', "Unable to find emails");

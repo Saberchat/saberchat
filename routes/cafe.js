@@ -1221,7 +1221,7 @@ router.get('/type/:id', middleware.isLoggedIn, middleware.isMod, (req, res) => {
       req.flash('error', "You cannot modify that category"); return res.redirect('/cafe/manage');
     }
 
-    const types = await Type.find({_id: {$nin: type._id}}).populate('items'); //Find all items
+    const types = await Type.find({_id: {$ne: type._id}}).populate('items'); //Find all items
 
     if (!types) {
       req.flash('error', "Unable to access database"); return res.redirect('back');

@@ -133,7 +133,7 @@ router.post('/', middleware.isLoggedIn, middleware.isMod, (req, res) => { //REST
     announcement.date = dateFormat(announcement.created_at, "h:MM TT | mmm d");
     await announcement.save();
 
-    const users = await User.find({authenticated: true, _id: {$nin: [req.user._id]}});
+    const users = await User.find({authenticated: true, _id: {$ne: req.user._id}});
     let announcementEmail;
 
     let imageString = "";
@@ -354,7 +354,7 @@ router.put('/:id', middleware.isLoggedIn, middleware.isMod, (req, res) => { //RE
 
       await updatedAnnouncement.save();
 
-      const users = await User.find({authenticated: true, _id: {$nin: [req.user._id]}});
+      const users = await User.find({authenticated: true, _id: {$ne: req.user._id}});
 
       let announcementEmail;
 

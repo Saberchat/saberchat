@@ -39,6 +39,13 @@
         <p class="card-text"><strong>Teacher: </strong><%=course.teacher.firstName%> <%=course.teacher.lastName%> (<%=course.teacher.username%>)</p>
         <p class="card-text"><strong>Join Code: </strong><%=course.joinCode%></p>
         <p class="card-text"><%=course.description%></p>
+        <a class="btn btn-primary" href="/homework"><i class="fas fa-arrow-left"></i> Back</a><br /><br />
+
+        <% if (studentTutorIds.includes(currentUser._id.toString())) { %>
+          <form action="/homework/unenroll/<%=course._id%>" method="post">
+            <button class="btn btn-danger" type="submit"><i class="fas fa-arrow-left"></i> Unenroll</button>
+          </form>
+        <% } %>
       </div>
     </div>
 

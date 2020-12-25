@@ -93,7 +93,7 @@ router.post('/join', middleware.isLoggedIn, middleware.isStudent, (req, res) => 
       course.students.push(req.user);
       course.save();
       req.flash('success', `Successfully joined ${course.name}!`);
-      res.redirect('/homework');
+      res.redirect(`/homework/${course._id}`);
 
     }
   });
@@ -117,7 +117,7 @@ router.post('/join-tutor', middleware.isLoggedIn, middleware.isTutor, (req, res)
       course.tutors.push(req.user);
       course.save();
       req.flash('success', `Successfully joined ${course.name} as a tutor!`);
-      res.redirect('/homework');
+      res.redirect(`/homework/${course._id}`);
 
     }
   });
@@ -140,13 +140,25 @@ router.get('/:id', middleware.isLoggedIn, (req, res) => {
       }
 
       if (course.teacher.equals(req.user._id) || studentTutorIds.includes(req.user._id.toString())) {
-        res.render('homework/show', {course});
+        res.render('homework/show', {course, studentTutorIds});
 
       } else {
         req.flash('error', "You do not have permission to view that course");
         res.redirect('back');
       }
+    }
+  });
+});
 
+router.post('/unenroll/:id', middleware.isLoggedIn, (req, res) => {
+  Course.findByIdAndUpdate(req.params.id, {$pull: {students: req.user._id, tutors: req.user._id}}, (err, course) => {
+    if (err || !course) {
+      req.flash('error', "Unable to find course");
+      res.redirect('back');
+
+    } else {
+      req.flash('success', `Unenrolled from ${course.name}!`);
+      res.redirect('/homework');
     }
   });
 });

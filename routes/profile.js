@@ -93,7 +93,7 @@ router.put('/profile', middleware.isLoggedIn, (req, res) => {
 
   (async() => {
 
-    const overlap = await User.find({authenticated: true, username: filter.clean(req.body.username), _id: {$nin: [req.user._id]}});
+    const overlap = await User.find({authenticated: true, username: filter.clean(req.body.username), _id: {$ne: req.user._id}});
 
     if (!overlap) {
       req.flash('error', "Unable to find users");
@@ -178,7 +178,7 @@ router.put('/change-email', middleware.isLoggedIn, (req, res) => {
       return res.redirect('back');
     }
 
-    const overlap = await User.find({authenticated: true, email: req.body.email, _id: {$nin: [req.user._id]}});
+    const overlap = await User.find({authenticated: true, email: req.body.email, _id: {$ne: req.user._id}});
 
     if (!overlap) {
       req.flash('error', "Unable to find users");
