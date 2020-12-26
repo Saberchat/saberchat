@@ -38,7 +38,8 @@
 
     <div class="row">
       <div class="col-md-8 offset-md-2 col-12">
-        <form action="/announcements/" method="post">
+        <form action="/announcements/" method="post" enctype="multipart/form-data">
+          <input type="file" name="imageFile">
           <div class="form-group">
             <label for="subject"><strong>Subject</strong></label>
             <input type="text" class="form-control" name="subject" placeholder="A short title..." maxlength="30" required>

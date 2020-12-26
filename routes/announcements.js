@@ -7,10 +7,15 @@ const router = express.Router(); //start express router
 const dateFormat = require('dateformat');
 const nodemailer = require('nodemailer');
 
+const multerUpload = require('../services/multer');
+const parseBuffer = require('../services/dataUri');
+const cloudUploader = require('../services/cloudinary');
+
 //SCHEMA
 const User = require('../models/user');
 const Announcement = require('../models/announcement');
 const Notification = require('../models/message');
+const multer = require('multer');
 
 //Sets up NodeMailer Transporter object (sends out emails)
 let transporter = nodemailer.createTransport({
@@ -115,73 +120,102 @@ router.get('/:id/edit', middleware.isLoggedIn, middleware.isMod, (req, res) => {
   });
 });
 
-router.post('/', middleware.isLoggedIn, middleware.isMod, (req, res) => { //RESTful Routing 'CREATE' route
-  (async() => {
-    const announcement = await Announcement.create({sender: req.user, subject: req.body.subject, text: req.body.message});
-
-    if(!announcement) {
-      req.flash('error', 'Unable to create announcement');
-      return res.redirect('back');
-    }
-
-    if (req.body.images) { //If any images were added (if not, the 'images' property is null)
-      for(const image in req.body.images) {
-        announcement.images.push(req.body.images[image]);
-      }
-    }
-
-    announcement.date = dateFormat(announcement.created_at, "h:MM TT | mmm d");
-    await announcement.save();
-
-    const users = await User.find({authenticated: true, _id: {$nin: [req.user._id]}});
-    let announcementEmail;
-
-    let imageString = "";
-
-    for (let image of announcement.images) {
-      imageString += `<img src="${image}">`;
-    }
-
-    if (!users) {
-      req.flash('error', "Unable To Access Database");
-      res.rediect('back');
-    }
-
-    let announcementObject = {
-      announcement: announcement,
-      version: "new"
-    };
-
-    for (let user of users) {
-
-      announcementEmail = {
-        from: 'noreply.saberchat@gmail.com',
-        to: user.email,
-        subject: `New Saberchat Announcement - ${announcement.subject}`,
-        html: `<p>Hello ${user.firstName},</p><p>${req.user.username} has recently posted a new announcement - '${announcement.subject}'.</p><p>${announcement.text}</p><p>You can access the full announcement at https://alsion-saberchat.herokuapp.com</p> ${imageString}`
-      };
-
-      transporter.sendMail(announcementEmail, (err, info) => {
-				if (err) {
-					console.log(err);
-				} else {
-					console.log('Email sent: ' + info.response);
-				}
-			});
-
-      user.annCount.push(announcementObject);
-      await user.save();
-    }
-
-    req.flash('success', 'Announcement posted to bulletin!');
-    res.redirect(`/announcements/${announcement._id}`);
-
-  })().catch(err => {
-    console.log(err);
-    req.flash('error', "Unable To Access Database2");
-    return res.redirect('back');
-  });
+// test for image uploading
+router.post('/', middleware.isLoggedIn, (req, res) => {
+	multerUpload(req, res, function(err) {
+		if(err instanceof multer.MulterError) {
+			// multer error
+			req.flash('error', err.message);
+			return res.redirect('back');
+		} else if(err) {
+			// an unknown error
+			req.flash('error', err.message);
+			return res.redirect('back');
+		}
+		// everything went fine
+		const imgFile = parseBuffer(req.file.originalname, req.file.buffer).content;
+		// const [cloudErr, result] = cloudUpload(imgFile);
+		cloudUploader.upload(imgFile, {folder:'SaberChat'}, (err, result)=> {
+			if(err) {
+				req.flash('error', err.message);
+				return res.redirect('back');
+			}
+			console.log(result.secure_url);
+			res.redirect('back');
+		});
+		// if(cloudErr) {req.flash('error', err.message); return res.redirect('back');}
+		// console.log('results:');
+		// console.log(result.secure_url);
+	});
 });
+
+// router.post('/', middleware.isLoggedIn, middleware.isMod, (req, res) => { //RESTful Routing 'CREATE' route
+//   (async() => {
+//     const announcement = await Announcement.create({sender: req.user, subject: req.body.subject, text: req.body.message});
+
+//     if(!announcement) {
+//       req.flash('error', 'Unable to create announcement');
+//       return res.redirect('back');
+//     }
+
+//     if (req.body.images) { //If any images were added (if not, the 'images' property is null)
+//       for(const image in req.body.images) {
+//         announcement.images.push(req.body.images[image]);
+//       }
+//     }
+
+//     announcement.date = dateFormat(announcement.created_at, "h:MM TT | mmm d");
+//     await announcement.save();
+
+//     const users = await User.find({authenticated: true, _id: {$nin: [req.user._id]}});
+//     let announcementEmail;
+
+//     let imageString = "";
+
+//     for (let image of announcement.images) {
+//       imageString += `<img src="${image}">`;
+//     }
+
+//     if (!users) {
+//       req.flash('error', "Unable To Access Database");
+//       res.rediect('back');
+//     }
+
+//     let announcementObject = {
+//       announcement: announcement,
+//       version: "new"
+//     };
+
+//     for (let user of users) {
+
+//       announcementEmail = {
+//         from: 'noreply.saberchat@gmail.com',
+//         to: user.email,
+//         subject: `New Saberchat Announcement - ${announcement.subject}`,
+//         html: `<p>Hello ${user.firstName},</p><p>${req.user.username} has recently posted a new announcement - '${announcement.subject}'.</p><p>${announcement.text}</p><p>You can access the full announcement at https://alsion-saberchat.herokuapp.com</p> ${imageString}`
+//       };
+
+//       transporter.sendMail(announcementEmail, (err, info) => {
+// 				if (err) {
+// 					console.log(err);
+// 				} else {
+// 					console.log('Email sent: ' + info.response);
+// 				}
+// 			});
+
+//       user.annCount.push(announcementObject);
+//       await user.save();
+//     }
+
+//     req.flash('success', 'Announcement posted to bulletin!');
+//     res.redirect(`/announcements/${announcement._id}`);
+
+//   })().catch(err => {
+//     console.log(err);
+//     req.flash('error', "Unable To Access Database2");
+//     return res.redirect('back');
+//   });
+// });
 
 router.put('/like', middleware.isLoggedIn, (req, res) => {
   Announcement.findById(req.body.announcement, (err, announcement) => {
