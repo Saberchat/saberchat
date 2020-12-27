@@ -17,4 +17,4 @@ const updateRole = (select => {
         loading.innerHTML = data.error;
     }
   });
-})
+});

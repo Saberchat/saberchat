@@ -150,6 +150,19 @@ router.get('/:id', middleware.isLoggedIn, (req, res) => {
   });
 });
 
+router.put('/:id', middleware.isLoggedIn, (req, res) => {
+  Course.findByIdAndUpdate(req.params.id, {name: req.body.newName, description: req.body.description, thumbnail: req.body.thumbnailUrl}, (err, course) => {
+    if (err || !course) {
+      req.flash('error', "Unable to update course");
+      res.redirect('back');
+
+    } else {
+      req.flash('success', "Updated course info!");
+      res.redirect(`/homework/${course._id}`);
+    }
+  });
+});
+
 router.post('/unenroll/:id', middleware.isLoggedIn, (req, res) => {
   Course.findByIdAndUpdate(req.params.id, {$pull: {students: req.user._id, tutors: req.user._id}}, (err, course) => {
     if (err || !course) {

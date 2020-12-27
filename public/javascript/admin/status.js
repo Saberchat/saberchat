@@ -17,7 +17,7 @@ const updateStatus = (select => {
         loading.innerHTML = data.error;
     }
   });
-})
+});
 
 // sends put request with data
 const updateTag = (select => {
@@ -63,4 +63,4 @@ const updateTag = (select => {
         loading.innerHTML = data.error;
     }
   });
-})
+});

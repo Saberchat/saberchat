@@ -165,7 +165,7 @@ router.post('/',middleware.isLoggedIn, middleware.isFaculty, (req, res) => { //R
 });
 
 //COMMENTED OUT FOR NOW, UNTIL WE MAKE FURTHER DECISIONS AT MEETING
-
+// 
 // router.get('/data', middleware.isLoggedIn, middleware.isFaculty, (req, res) => {
 //
 //   (async() => {

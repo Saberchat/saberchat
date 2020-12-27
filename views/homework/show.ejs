@@ -14,6 +14,8 @@
     <link rel="stylesheet" href="/stylesheets/announcements/index.css">
     <link rel="stylesheet" href="/stylesheets/home/index.css">
     <link rel="stylesheet" href="/stylesheets/chat/new.css">
+    <link rel="stylesheet" href="/stylesheets/profile/index.css">
+    <link rel="stylesheet" href="/stylesheets/profile/edit.css">
 
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
@@ -32,32 +34,80 @@
   </head>
   <body>
 
-    <div class="card mb-3">
-      <span class="card-img-top"style="width: 50%; height: 50%;">
-      <div class="card-body">
-        <h5 class="card-title"><%=course.name%></h5>
-        <p class="card-text"><strong>Teacher: </strong><%=course.teacher.firstName%> <%=course.teacher.lastName%> (<%=course.teacher.username%>)</p>
-        <p class="card-text"><strong>Join Code: </strong><%=course.joinCode%></p>
-        <p class="card-text"><%=course.description%></p>
-        <a class="btn btn-primary" href="/homework"><i class="fas fa-arrow-left"></i> Back</a><br /><br />
+    <div class="container mt-5" style="margin-bottom: -20px;">
+      <div class="row">
+        <div class="col-12">
+          <div class="jumbotron text-center" style="background-image: url('<%=course.thumbnail%>'); color: white; background-repeat: no-repeat; background-size: 100%;">
+            <h1><%=course.name%></h1>
+            <p><%=course.description%></p>
+            <a style="margin-right: 10px;" class="btn btn-primary" href="/homework"><i class="fas fa-arrow-left"></i> Back</a>
 
-        <% if (studentTutorIds.includes(currentUser._id.toString())) { %>
-          <form action="/homework/unenroll/<%=course._id%>" method="post">
-            <button class="btn btn-danger" type="submit"><i class="fas fa-arrow-left"></i> Unenroll</button>
-          </form>
-        <% } %>
+            <% if (studentTutorIds.includes(currentUser._id.toString())) { %>
+              <form action="/homework/unenroll/<%=course._id%>" method="post" style="display: inline-block;">
+                <button class="btn btn-danger" type="button" data-toggle="modal" data-target="#modal-<%=course._id%>"><i class="fas fa-minus"></i> Unenroll</button>
+                <div class="modal fade" id="modal-<%=course._id%>" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+                  <div class="modal-dialog">
+                    <div class="modal-content">
+                      <div class="modal-header">
+                        <h5 class="modal-title" id="exampleModalLabel" style="color: black;">Unenroll from <%=course.name%>?</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                          <span aria-hidden="true">&times;</span>
+                        </button>
+                      </div>
+                      <div class="modal-body" style="color: black; text-align: left;">
+                        You will have to be given the join code again to join back.
+                      </div>
+                      <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">No, Go Back</button>
+                        <button type="submit" class="btn btn-danger">Yes, Unenroll</button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </form>
+            <% } %>
+          </div>
+        </div>
       </div>
     </div>
 
-    <div class="container mt-5">
+      <ul class="nav justify-content-center" style="margin-bottom: -20px; margin-top: 10px;">
+        <li class="nav-item tab-header" id="people" onclick="changeTab(this)" style="color: blue; font-weight: bold;">
+          <a class="nav-link active" >People</a>
+        </li>
+
+        <% if (course.teacher._id.equals(currentUser._id)) { %>
+          <li class="nav-item tab-header" id="settings" onclick="changeTab(this)" style="font-weight: bold;">
+            <a class="nav-link">Settings</a>
+          </li>
+        <% } %>
+      </ul>
+
+    <div class="container mt-5 people">
       <div class="row">
         <div class="col-12">
+
+          <ul class="list-group">
+            <li class="list-group-item"><strong>Teacher</strong></li>
+            <li class="list-group-item">
+              <a href="../profiles/<%=course.teacher._id%>" style="color: black; text-decoration: none;" class="user-element-text">
+                <img class="profile-image" src="<%= course.teacher.imageUrl %>" alt="profile picture">
+                <span class="username <%=course.teacher.status%> <%=course.teacher.permission%> <%=course.teacher.tags.join(' ')%>"><strong><%=course.teacher.firstName%> <%=course.teacher.lastName%></strong> <span style="font-size: 80%;"><%=`${course.teacher.username}`%></span></span>
+              </a>
+            </li>
+          </ul>
+          <br />
 
           <% if (course.students.length > 0) { %>
             <ul class="list-group">
               <li class="list-group-item"><strong>Students</strong></li>
               <% for (let student of course.students) { %>
-                <li class="list-group-item"><%=student.firstName%> <%=student.lastName%> (<%=student.username%>)</li>
+                <li class="list-group-item">
+                  <a href="../profiles/<%=student._id%>" style="color: black; text-decoration: none;" class="user-element-text">
+                    <img class="profile-image" src="<%= student.imageUrl %>" alt="profile picture">
+                    <span class="username <%=student.status%> <%=student.permission%> <%=student.tags.join(' ')%>"><strong><%=student.firstName%> <%=student.lastName%></strong> <span style="font-size: 80%;"><%=`${student.username}`%></span></span>
+                  </a>
+                </li>
               <% } %>
             </ul>
           <br />
@@ -67,7 +117,12 @@
             <ul class="list-group">
               <li class="list-group-item"><strong>Tutors</strong></li>
               <% for (let tutor of course.tutors) { %>
-                <li class="list-group-item"><%=tutor.firstName%> <%=tutor.lastName%> (<%=tutor.username%>)</li>
+                <li class="list-group-item">
+                  <a href="../profiles/<%=tutor._id%>" style="color: black; text-decoration: none;" class="user-element-text">
+                    <img class="profile-image" src="<%= tutor.imageUrl %>" alt="profile picture">
+                    <span class="username <%=tutor.status%> <%=tutor.permission%> <%=tutor.tags.join(' ')%>"><strong><%=tutor.firstName%> <%=tutor.lastName%></strong> <span style="font-size: 80%;"><%=`${tutor.username}`%></span></span>
+                  </a>
+                </li>
               <% } %>
             </ul>
           <% } %>
@@ -75,6 +130,53 @@
       </div>
     </div>
 
+    <% if (course.teacher._id.equals(currentUser._id)) { %>
+      <div class="container mt-5 settings" hidden>
+        <div class="row">
+          <div class="col-12">
+            <form action="/homework/<%=course._id%>?_method=put" method="post">
+              <div class="form-group">
+                  <label for="newName">Name</label>
+                  <input id="newName" class="form-control" type="text" name="newName" value="<%= course.name %>" placeholder="Enter Course Name" required>
+              </div>
+              <div class="form-group">
+                  <label for="descInput">Description</label>
+                  <% if(course.description){ %>
+                      <textarea id="descInput" class="form-control" name="description" placeholder="Enter Course Description" rows="5"><%= course.description %></textarea>
+                  <% } else { %>
+                      <textarea id="descInput" class="form-control" name="description" placeholder="Enter Course Description" rows="5" aria-describedby="descHelp"></textarea>
+                  <% } %>
+              </div>
+              <div class="form-group">
+                  <label for="thumbnail-input">Thumbnail Image Url</label><br />
+                  <input id="thumbnail-input" class="form-control" type="text" oninput="changeThumbnail(this)" name="thumbnailUrl" value="<%= course.thumbnail %>" placeholder="Enter Thumbnail Url">
+              </div>
+              <button class="btn btn-lg btn-primary btn-block">Submit Changes</button><br />
+            </form>
+          </div>
+        </div>
+      </div>
+    <% } %>
 
   </body>
+
+  <script>
+
+  const changeThumbnail = (input => {
+    document.getElementsByClassName('jumbotron')[0].style.backgroundImage = `url('${input.value}`;
+  });
+
+  const changeTab = (tab => {
+    const tabs = document.getElementsByClassName('tab-header');
+
+    for (let t of tabs) {
+      document.getElementsByClassName(t.id)[0].hidden = true;
+      t.style.color = "black";
+    }
+
+    document.getElementsByClassName(tab.id)[0].hidden = false;
+    tab.style.color = "blue";
+  })
+
+  </script>
 </html>

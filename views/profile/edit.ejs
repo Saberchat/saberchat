@@ -15,6 +15,7 @@
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js"></script>
+    <script src="/javascript/profile/tags.js"></script>
 
     <!-- I'm using my fontawesome kit -->
     <script src="https://kit.fontawesome.com/dccc745c41.js" crossorigin="anonymous"></script>
@@ -65,19 +66,41 @@
                             <small id="titleHelp" class="form-text text-muted">Ex. Ninja Warrior, Guardian of Bread, Champion of the art room</small>
                         <% } %>
                     </div>
-                    <div class="form-group">
-                        <label for="status">Select Status</label>
-                        <select class="form-control" id="status" name="status">
-                          <option selected value=""><%=currentUser.status%></option>
-                          <% if (currentUser.permission == 'admin' || currentUser.permission == 'principal') { %>
-                            <% ['7th', '8th', '9th', '10th', '11th', '12th', 'alumnus', 'guest', 'parent', 'faculty'].forEach( status => { %>
-                              <% if (currentUser.status.toLowerCase() != status.toLowerCase()) { %>
-                                <option value="<%=status%>"><%=status%></option>
-                              <% }%>
+                    <% if (currentUser.permission == 'admin' || currentUser.permission == 'principal') { %>
+                      <div class="form-group">
+                          <label for="status">Select Status</label>
+                          <select class="form-control" id="status" name="status">
+                            <option selected value=""><%=currentUser.status%></option>
+                              <% ['7th', '8th', '9th', '10th', '11th', '12th', 'alumnus', 'guest', 'parent', 'faculty'].forEach( status => { %>
+                                <% if (currentUser.status.toLowerCase() != status.toLowerCase()) { %>
+                                  <option value="<%=status%>"><%=status%></option>
+                                <% }%>
+                              <% }) %>
+                          </select>
+                      </div>
+                    <% }%>
+
+                    <% if (currentUser.permission == 'admin' || currentUser.permission == 'principal') { %>
+                      <% let tagMap = new Map([["Tutor", "warning"], ["Cashier", "success"], ["Editor", "info"]]); %>
+                      <div class="form-group">
+                        <label for="tags">Select Temporary Statuses
+                          <div id="tag-group" style="margin-left: 10px; display: inline;">
+                            <% currentUser.tags.forEach(tag => { %>
+                              <span class="badge badge-pill badge-<%=tagMap.get(tag)%> user-tag"><%=tag%></span>
                             <% }) %>
-                          <% }%>
+                          </div>
+                        </label>
+                        <select class="form-control" id="<%=currentUser.id%>" name="tags" onchange="updateTag(this)">
+                          <option value=""></option>
+                          <% ['Cashier', 'Tutor', 'Editor'].forEach(tag => { %>
+                            <option>
+                              <%=tag%>
+                            </option>
+                          <% }) %>
                         </select>
-                    </div>
+                          <br />
+                      </div>
+                    <% } %>
                     <div class="form-group">
                       <label for="profile-input">Profile Image Upload or URL</label><br />
                         <!-- <input type="file" id="imageInput" accept="image/*" name="image" required> -->

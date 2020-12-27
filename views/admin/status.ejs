@@ -99,7 +99,13 @@
                             <option value=""></option>
 
                             <% for (let tag of tags) { %>
+
+                              <% if (currentUser.tags.includes(tag)) { %>
                                 <option value="<%=tag%>"><%=tag%></option>
+                              <% } else { %>
+                                <option value="<%=tag%>"><%=tag%></option>
+                              <% }%>
+
                             <% } %>
                           </select>
 

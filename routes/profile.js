@@ -163,6 +163,19 @@ router.put('/profile', middleware.isLoggedIn, (req, res) => {
   });
 });
 
+router.put('/tag', middleware.isAdmin, (req, res) => {
+  if (req.user.tags.includes(req.body.tag)) {
+    req.user.tags.splice(req.user.tags.indexOf(req.body.tag), 1);
+    req.user.save();
+    res.json({success: "Succesfully removed status", tag: req.body.tag, user: req.user._id});
+
+  } else {
+    req.user.tags.push(req.body.tag);
+    req.user.save();
+    res.json({success: "Succesfully added status", tag: req.body.tag, user: req.user._id});
+  }
+});
+
 //route for changing email. Similar to edit profiles route. But changing email logs out user for some reason.
 router.put('/change-email', middleware.isLoggedIn, (req, res) => {
   (async() => {
@@ -663,4 +676,5 @@ router.get('/remove/:id', (req, res) => {
     }
   });
 });
+
 module.exports = router;
