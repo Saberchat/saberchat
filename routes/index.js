@@ -8,6 +8,7 @@ const passport = require('passport');
 const nodemailer = require('nodemailer');
 
 const middleware = require('../middleware');
+const controller = require('../controllers');
 
 //import user schema for db actions
 const User = require('../models/user');
@@ -24,9 +25,12 @@ let transporter = nodemailer.createTransport({
 });
 
 // Home route. gives the landing or home or index page (whatever you want to call it).
-router.get('/', (req, res) => {
-	res.render('index');
-});
+// router.get('/', (req, res) => {
+// 	res.render('index');
+// });
+
+router.route('/')
+  .get(controller.index);
 
 // ===========================
 // User Routes
