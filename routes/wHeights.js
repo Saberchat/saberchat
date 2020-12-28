@@ -11,14 +11,18 @@ const Type = require('../models/articleType');
 
 // index page
 router.get('/', middleware.isLoggedIn, (req, res) => {
+  (async() => {
+    const articles = await Article.find({}).populate('author');
+    if(!articles) {
+      req.flash('error', 'Cannot access Database');
+      res.redirect('/articles');
+    }
+    res.render('wHeights/index', {articles: articles});
 
-  Article.find({}).populate('author').exec((err, foundArticles) => {
-      if(err) {
-          req.flash('error', 'Cannot access Database');
-          res.redirect('/articles');
-      } else {
-        res.render('wHeights/index', {articles: foundArticles});
-      }
+  })().catch(err => {
+    console.log(err);
+    req.flash('error', "Unable to access database");
+    res.redirect('back');
   });
 });
 

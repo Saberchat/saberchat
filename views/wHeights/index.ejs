@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
+  <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Witherly Heights</title>
@@ -11,6 +11,9 @@
     <link rel="stylesheet" href="/stylesheets/wHeights/nav.css">
     <link rel="stylesheet" href="/stylesheets/components/navbar.css">
     <link rel="stylesheet" href="/stylesheets/components/header.css">
+    <link rel="stylesheet" href="/stylesheets/announcements/index.css">
+    <link rel="stylesheet" href="/stylesheets/home/index.css">
+    <link rel="stylesheet" href="/stylesheets/chat/new.css">
 
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
@@ -18,33 +21,130 @@
 
     <!-- I'm using my fontawesome kit -->
     <script src="https://kit.fontawesome.com/dccc745c41.js" crossorigin="anonymous"></script>
-</head>
-<body>
+  </head>
+  <body>
 
-  <%- include('../partials/navbar') %>
-  <%- include('../partials/header') %>
-  <%- include('../partials/wHeightsNav') %>
+    <%- include('../partials/navbar') %>
+    <%- include('../partials/header') %>
+    <!-- include('../partials/wHeightsNav') -->
 
     <section class="container mt-5">
-      <h1 class="text-center mb-3">Articles</h1>
-      <div style="text-align: center;">
-        <a href="/articles/new" class="btn btn-info">New Article</a><br /><br />
-      </div>
-      <div class="row">
-        <% articles.forEach(article => { %>
-          <div class="col-md-6 col-lg-4 col-12 px-2">
-            <div class="card article" style="width: 18rem;">
-              <img class="card-img-top" src="https://images.unsplash.com/photo-1505235687559-28b5f54645b7?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=2090&q=80" alt="Card image cap">
-              <div class="card-body">
-                <h5 class="card-title"><%= article.title %></h5>
-                <p class="card-text"><%= article.author %></p>
-                <a href="/articles/<%= article._id %>">Read More...</a>
-              </div>
+      <div class="container mt-5">
+        <div class="row">
+          <div class="col-12">
+            <div class="jumbotron text-center">
+              <h1>Latest Witherly Heights Articles</h1>
+              <p>Lorem ipsum dolor sit amet</p>
+              <% if (currentUser) { %>
+                <% if (currentUser.tags.includes("Editor")) { %>
+                  <a class="btn btn-info" href="/articles/new"><i class="fas fa-paint-brush"></i> New Article</a>
+                  <!-- <a class="btn btn-secondary" href="projects/data"><i class="fas fa-chart-bar"></i> My Project Data</a> -->
+                <%}%>
+              <% } %>
             </div>
           </div>
-        <% }) %>
+        </div>
+      </div>
+      <div class="projects">
+        <div class="search-filter mb-3">
+          <i class="fas fa-search"></i>
+          <input id="search-input" oninput="searchFunction()" class="form-control" type="text" placeholder="Search..." title="Type a project segment"/>
+        </div><br />
+        <% if (currentUser) { %>
+          <span id="loading"></span>
+        <% } %>
+        <% articles.reverse().forEach(article => { %>
+          <div class="row">
+            <div class="col-lg-12">
+              <article class="text-block" id="<%=article._id%>">
+                <div class="block-header grey" style="padding-bottom: 20px;">
+                  <h5>
+                    <a style="color: white;" href="articles/<%=article._id%>"><%=article.title%></a>
+                    <a class= "float-right" style="color:white; font-size: 80%;">placeholder: 12/25/2020</a>
+                  </h5>
+                  <span style="color:white;">
+                    <img src="<%= article.author.imageUrl %>" alt="profile pic" style="width: 30px; height: 30px; object-fit: cover; border-radius: 50%;">
+                    <%=article.author.firstName%> <%=article.author.lastName%>
+                  </span>
+                  <% if (currentUser) { %>
+                    <% if (currentUser._id.toString() == article.author._id.toString()) { %>
+                      <button style="margin-left: 10px;" id="edit-button"type="button" class="btn btn-info"><a style="color: white;" href="projects/<%=project._id%>/edit"><i class="fas fa-cog"></i> Edit</a></button>
+
+                      <form action="projects/<%=project._id%>?_method=delete" method="post" style="display: inline-block;">
+                        <button style="color: white;" class="btn btn-danger" type="button" data-toggle="modal" data-target="#modal-<%=project._id%>"><i class="far fa-trash-alt"></i> Delete</button>
+                        <div class="modal fade" id="modal-<%=project._id%>" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+                          <div class="modal-dialog">
+                            <div class="modal-content">
+                              <div class="modal-header">
+                                <h5 class="modal-title" id="exampleModalLabel" style="color: black;">Delete Post?</h5>
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                  <span aria-hidden="true">&times;</span>
+                                </button>
+                              </div>
+                              <div class="modal-body" style="color: black;">
+                                This action is irreversible. You will have to manually recreate this post.
+                              </div>
+                              <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-dismiss="modal">No, Go Back</button>
+                                <button type="submit" class="btn btn-danger">Yes, Delete Post</button>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </form>
+                    <% } %>
+                  <% } %>
+                </div>
+                <div class="block-content" style="text-align: center;">
+                    <!-- <img style="width: 25%; height: 25%; float: left; border-radius: 15px; margin-bottom: 20px; margin-right: 20px;" src="<%=article.thumbnail%>"/> -->
+                    <img style="width: 25%; height: 25%; float: left; border-radius: 15px; margin-bottom: 20px; margin-right: 20px;" src="https://images.unsplash.com/photo-1505235687559-28b5f54645b7?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=2090&q=80"/>
+
+                    <span hidden>
+                      <%=article.author.firstName %> <%=article.author.lastName %> <%=article.author.username%>
+                    </span>
+                    <p style="float: left;"><strong>Creator:</strong> <span style="color: black"><img src="<%= article.author.imageUrl %>" alt="profile pic" style="width: 30px; height: 30px; object-fit: cover; border-radius: 50%;"> <em><%=article.author.firstName%> <%=article.author.lastName%></em></p>
+                    <br /><br />
+
+                    <p style="text-align: left;"><%=article.content[0].data.text.substring(0, 250)%>
+
+                    <!-- <% //for (let segment of article.content) { %>
+                      <% //if (segment.type == "paragraph") { %>
+                        <p style="text-align: left; white-space: pre-wrap;"><%=//segment.data.text%>
+                      <% //} else if (segment.type == "image") { %>
+                        <img style="width: 50%; height: 50%;" src="<%=//segment.data.url%>" /><br /><br />
+                      <% //} %>
+                    <% //} %> -->
+                      <a href="/articles/<%=article._id%>">(Read More)</a>
+                    </p>
+                  </div>
+                </article>
+              </div>
+            </div>
+          <br class="text-break" id="break-<%=article._id%>"/>
+        <% }); %>
       </div>
     </section>
 
-</body>
+  </body>
+  <script>
+
+  const searchFunction = (() => {
+    const projects = document.getElementsByClassName('text-block');
+    const breaks = document.getElementsByClassName('text-break');
+    const searchInput = document.getElementById('search-input');
+    let filter = searchInput.value.toLowerCase();
+
+    for (let i = 0; i < projects.length; i += 1) {
+      if (!projects[i].textContent.replace("(Read More)", "").toLowerCase().includes(filter)) {
+        $(`#${projects[i].id}`).hide();
+        $(`#${breaks[i].id}`).hide();
+
+      } else {
+        $(`#${projects[i].id}`).show();
+        $(`#${breaks[i].id}`).show();
+      }
+    }
+  })
+
+  </script>
 </html>

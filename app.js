@@ -1,5 +1,5 @@
 // set up env vars. commented out for deployment
-// require('dotenv').config();
+require('dotenv').config();
 // Require NodeJS modules
 //set up and start the express server
 const express = require('express');
@@ -192,9 +192,9 @@ app.use('/articles', wHeightsRoutes);
 app.use('/homework', hwRoutes);
 
 // Catch-all route
-app.get('*', (req, res) => {
-	res.redirect('/');
-});
+// app.get('*', (req, res) => {
+// 	res.redirect('/');
+// });
 
 // list of responses to bad words
 const curseResponse = [
