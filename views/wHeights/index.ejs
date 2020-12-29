@@ -70,7 +70,7 @@
                     <% if (currentUser._id.toString() == article.author._id.toString()) { %>
                       <button style="margin-left: 10px;" id="edit-button"type="button" class="btn btn-info"><a style="color: white;" href="projects/<%=project._id%>/edit"><i class="fas fa-cog"></i> Edit</a></button>
 
-                      <form action="projects/<%=project._id%>?_method=delete" method="post" style="display: inline-block;">
+                      <form action="articles/<%=article._id%>?_method=delete" method="post" style="display: inline-block;">
                         <button style="color: white;" class="btn btn-danger" type="button" data-toggle="modal" data-target="#modal-<%=project._id%>"><i class="far fa-trash-alt"></i> Delete</button>
                         <div class="modal fade" id="modal-<%=project._id%>" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
                           <div class="modal-dialog">
@@ -114,7 +114,7 @@
                         <img style="width: 50%; height: 50%;" src="<%=//segment.data.url%>" /><br /><br />
                       <% //} %>
                     <% //} %> -->
-                      <a href="/articles/<%=article._id%>">(Read More)</a>
+                      <a target="_blank" href="https://witherlyheights.org/">(Read More)</a>
                     </p>
                   </div>
                 </article>
