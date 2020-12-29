@@ -22,6 +22,7 @@
     <script src="/javascript/nav/userForm.js"></script>
     <script src="/javascript/nav/navbar.js"></script>
     <script src="/javascript/home/index.js"></script>
+    <script src="/javascript/homework/settings.js"></script>
 
     <!-- I'm using my fontawesome kit -->
     <script src="https://kit.fontawesome.com/dccc745c41.js" crossorigin="anonymous"></script>
@@ -53,7 +54,7 @@
                       </div>
                       <div class="modal-body">
                         <input class="form-control" type="text" name="title" placeholder="Course Name"/><br />
-                        <input class="form-control" type="text" id="thumbnail" name="thumbnail" placeholder="Course Thumbnail" oninput="changeThumbnail()"/>
+                        <input class="form-control" type="text" id="thumbnail" name="thumbnail" placeholder="Course Thumbnail" oninput="changeThumbnailInit()"/>
                         <img hidden id="thumbnail-photo" style="min-height:250px; min-width: 300px; overflow: hidden; width: 60%; height: 60%; margin: 20px; border-radius: 15px;" src="" /><br />
                         <textarea rows="5" class="form-control" name="description" placeholder="Course Description"></textarea>
                       </div>
@@ -102,7 +103,8 @@
                         </button>
                       </div>
                       <div class="modal-body">
-                        <input class="form-control" type="text" name="joincode" placeholder="Enter Join Code"/>
+                        <input class="form-control" type="text" name="joincode" placeholder="Enter Join Code"/><br />
+                        <textarea rows="5" minlength="150" maxlength="250" class="form-control" name="bio" placeholder="A Short Bio About Yourself"></textarea>
                       </div>
                       <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-dismiss="modal">Back</button>
@@ -123,18 +125,23 @@
         <h2>No Courses</h2>
       <% } else { %>
         <% for (let course of courses) { %>
-          <div class="card" style="width: 20rem; display: inline-block; margin-right: 20px; margin-bottom: 20px;">
+          <div class="card" style="width: 20rem; display: inline-block; margin-right: 20px; margin-bottom: 20px;" title="<%=course.name%>">
             <img class="card-img-top" src="<%=course.thumbnail%>" alt="Card image cap" style="min-height:250px; min-width: 300px; overflow: hidden;"/>
             <div class="card-body">
-              <h5 class="card-title"><%=course.name%></h5>
+              <h5 class="card-title"><%=course.name.slice(0, 25)%><% if (course.name.length > 24) {%>... <% } %></h5>
 
               <strong class="card-text" style="color: blue;">
               <% if (course.teacher.equals(currentUser._id)) { %>
                 Teacher
               <% } else if (course.students.includes(currentUser._id)) { %>
                 Student
-              <% } else if (course.tutors.includes(currentUser._id)) { %>
-                Tutor
+              <% } else { %>
+                <% for (let tutor of course.tutors) { %>
+                  <% if (tutor.tutor.equals(currentUser._id)) { %>
+                    Tutor
+                    <% break;%>
+                  <% } %>
+                <% } %>
               <% } %>
               </strong><br />
 
@@ -146,17 +153,4 @@
       <% } %>
     </div>
   </body>
-
-  <script>
-    const changeThumbnail = (() => {
-      if (document.getElementById('thumbnail').value.replace(' ', '' != "")) {
-        document.getElementById('thumbnail-photo').src = document.getElementById('thumbnail').value;
-        document.getElementById('thumbnail-photo').hidden = false;
-
-      } else {
-        document.getElementById('thumbnail-photo').hidden = true;
-      }
-    });
-
-  </script>
 </html>

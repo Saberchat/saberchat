@@ -1,3 +1,15 @@
+const updateImage = (imageInput => {
+  const imageMap = new Map([['profile-input', 'profile-image'], ['banner-input', 'banner-image']]);
+
+  if (imageInput.value != '') {
+    document.getElementById(imageMap.get(imageInput.id)).src = imageInput.value;
+    document.getElementById(imageMap.get(imageInput.id)).hidden = false;
+
+  } else {
+    document.getElementById(imageMap.get(imageInput.id)).hidden = true;
+  }
+});
+
 // sends put request with data
 const updateTag = (select => {
   const tagGroup = document.getElementById('tag-group');

@@ -19,6 +19,7 @@
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js" integrity="sha384-OgVRvuATP1z7JjHLkuOU7Xw704+h835Lr+6QL9UvYjZE3Ipu6Tp75j7Bh/kR0JKI" crossorigin="anonymous"></script>
 
     <script src="https://kit.fontawesome.com/dccc745c41.js" crossorigin="anonymous"></script>
+    <script src="/javascript/cafe/search.js"></script>
   </head>
   <body>
     <%- include('../partials/navbar') %>
@@ -48,7 +49,7 @@
         <div class="col-md-8 offset-md-2 col-12">
           <div class="search-filter mb-3">
             <i class="fas fa-search"></i>
-            <input id="search-input" oninput="searchFunction()" class="form-control" type="text" placeholder="Search..." title="Type in itemname" />
+            <input id="search-input" oninput="search()" class="form-control" type="text" placeholder="Search..." title="Type in itemname" />
           </div>
 
           <% let temp;%>
@@ -119,47 +120,4 @@
       </div>
     </div>
   </body>
-
-  <script>
-
-  const searchFunction = (() => {
-    const catHeaders = document.getElementsByClassName('category-header'); //Category header
-    const catBreaks = document.getElementsByClassName('category-break'); //Category page break
-    const menuItems = document.getElementsByClassName('menu-item');
-    const input = document.getElementById("search-input");
-    let filter = input.value.toLowerCase().replace(' ', '');
-
-    for (let item of menuItems) {
-      if ((item.textContent.replace(' ', '').toLowerCase().includes(filter)) || (item.classList.toString().toLowerCase().includes(filter))) {
-        $(`#${item.id}`).show();
-
-      } else {
-        $(`#${item.id}`).hide();
-      }
-    }
-
-    let catIncluded; //"Category Included"
-
-    for (let h = 0; h < catHeaders.length; h+= 1) {
-      catIncluded = false;
-
-      for (let item of document.getElementsByClassName(catHeaders[h].getElementsByTagName("h2")[0].textContent.split(' ').join(''))) {
-        if((item.textContent.replace(' ', '').toLowerCase().includes(filter)) || (item.classList.toString().toLowerCase().includes(filter))) {
-          catIncluded = true;
-          break;
-        }
-      }
-
-      if (catIncluded) {
-        $(`#${catHeaders[h].id}`).show();
-        $(`#${catBreaks[h].id}`).show();
-
-      } else {
-        $(`#${catHeaders[h].id}`).hide();
-        $(`#${catBreaks[h].id}`).hide();
-      }
-    }
-  });
-
-  </script>
 </html>

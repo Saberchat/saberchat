@@ -113,23 +113,6 @@
         </div>
     </div>
     <script src="/javascript/admin/status.js"></script>
-    <script>
-
-      const searchFunction = (() => {
-        const emails = document.getElementsByClassName('email');
-        const searchInput = document.getElementById('search-input');
-        let filter = searchInput.value.toLowerCase();
-
-        for (let i = 0; i < emails.length; i += 1) {
-          if (!emails[i].innerText.replace('User Exists', '').toLowerCase().includes(filter)) {
-            $(`#${emails[i].id}`).hide();
-
-          } else {
-            $(`#${emails[i].id}`).show();
-          }
-        }
-      })
-
-    </script>
+    <script src="/javascript/admin/whitelist.js"></script>
 </body>
 </html>

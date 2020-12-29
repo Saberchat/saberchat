@@ -18,3 +18,18 @@ const updateRole = (select => {
     }
   });
 });
+
+const searchFunction = (() => {
+  const users = document.getElementsByClassName('user');
+  const searchInput = document.getElementById('search-input');
+  let filter = searchInput.value.toLowerCase();
+
+  for (let i = 0; i < users.length; i += 1) {
+    if (!(users[i].textContent.split('\n')[1].toLowerCase().includes(filter) || users[i].classList.toString().toLowerCase().includes(filter.toLowerCase()))) {
+      users[i].hidden = true;
+
+    } else {
+      users[i].hidden = false;
+    }
+  }
+});

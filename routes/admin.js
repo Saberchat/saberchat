@@ -487,7 +487,6 @@ router.put('/permissions', middleware.isLoggedIn, middleware.isAdmin, (req, res)
 			}
 		})
 	}
-
 });
 
 // changes status
@@ -499,7 +498,6 @@ router.put('/status', middleware.isLoggedIn, middleware.isMod, (req, res) => {
 			res.json({success: 'Succesfully changed'});
 		}
 	});
-
 });
 
 router.put('/tag', middleware.isLoggedIn, middleware.isMod, (req, res) => {
@@ -520,8 +518,8 @@ router.put('/tag', middleware.isLoggedIn, middleware.isMod, (req, res) => {
       }
 
     }
-  })
-})
+  });
+});
 
 // route for ignoring reported comments
 router.put('/moderate', middleware.isLoggedIn, middleware.isMod, (req, res) => {

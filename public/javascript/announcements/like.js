@@ -21,9 +21,9 @@ const like = (button => {
 
       document.getElementById(`likeCount-${announcementId}`).innerText = data.likeCount;
     }
-    
+
   });
-})
+});
 
 const likeComment = (button => {
   const announcementId = button.id.split("-")[2];
@@ -42,6 +42,6 @@ const likeComment = (button => {
 
       document.getElementById(`likeCountComment-${commentIndex}-${announcementId}`).innerText = data.likeCount;
 
-    } else if(data.error) { alert(data.error)}
+    }
   });
-})
+});

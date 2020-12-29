@@ -22,6 +22,8 @@
     <script src="/javascript/nav/userForm.js"></script>
     <script src="/javascript/nav/navbar.js"></script>
     <script src="/javascript/home/index.js"></script>
+    <script src="/javascript/announcements/search.js"></script>
+    <script src="/javascript/announcements/like.js"></script>
 
     <%- include('../partials/navbar') %>
     <%- include('../partials/header') %>
@@ -156,26 +158,4 @@
         <% }) %>
       </div>
     </body>
-    <script src="/javascript/announcements/like.js"></script>
-    <script>
-
-    const searchFunction = (() => {
-      const announcements = document.getElementsByClassName('text-block');
-      const breaks = document.getElementsByClassName('text-break');
-      const searchInput = document.getElementById('search-input');
-      let filter = searchInput.value.toLowerCase();
-
-      for (let i = 0; i < announcements.length; i += 1) {
-        if (!announcements[i].innerText.replace("(Read More)", "").toLowerCase().includes(filter)) {
-          $(`#${announcements[i].id}`).hide();
-          $(`#${breaks[i].id}`).hide();
-
-        } else {
-          $(`#${announcements[i].id}`).show();
-          $(`#${breaks[i].id}`).show();
-        }
-      }
-    })
-
-    </script>
 </html>

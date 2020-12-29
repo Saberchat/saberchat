@@ -23,7 +23,7 @@ var userSchema = new mongoose.Schema({
 		}
 	],
 
-	reqCount: {type:Number, default: 0},
+	reqCount: {type: Number, default: 0},
 	inbox: [
 		{
 			type: mongoose.Schema.Types.ObjectId,

@@ -18,6 +18,7 @@
 
       <!-- I'm using my fontawesome kit -->
       <script src="https://kit.fontawesome.com/dccc745c41.js" crossorigin="anonymous"></script>
+      <script src="/javascript/cafe/image.js"></script>
   </head>
   <body>
     <!-- include the navbar via ejs -->
@@ -90,7 +91,7 @@
                 <div class="col">
                   <label for="usernameInput">Image</label>
                   <div style="text-align: center;">
-                    <input id="image-input" class="form-control" type="text" name="image" value="<%=item.imgUrl%>" placeholder="Enter URL for Item Image">
+                    <input id="image-input" oninput="createImage(this)" class="form-control" type="text" name="image" value="<%=item.imgUrl%>" placeholder="Enter URL for Item Image">
                     <br />
                     <img id="item-image" style="width: 30%; border-radius: 15px;" src="<%=item.imgUrl%>" alt="Image Does Not Exist"/>
                   </div>
@@ -133,35 +134,4 @@
       </div>
     </div>
   </body>
-  <script>
-
-  const imageInput = document.getElementById("image-input");
-  const itemImage = document.getElementById("item-image");
-
-  imageInput.addEventListener('keydown', () => {
-
-    setTimeout(() => {
-      if (imageInput.value != '') {
-        itemImage.src = imageInput.value;
-        $('#item-image').show();
-
-      } else {
-        $('#item-image').hide();
-      }
-    }, 3)
-  })
-
-  imageInput.addEventListener('paste', () => {
-    setTimeout(() => {
-      if (imageInput.value != '') {
-        itemImage.src = imageInput.value;
-        $('#item-image').show();
-
-      } else {
-        $('#item-image').hide();
-      }
-    }, 3)
-  })
-
-  </script>
 </html>

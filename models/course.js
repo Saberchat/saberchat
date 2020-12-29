@@ -14,7 +14,18 @@ const courseSchema = new mongoose.Schema({
     type: mongoose.Schema.Types.ObjectId, ref: 'User', default: []
   }],
   tutors: [{
-    type: mongoose.Schema.Types.ObjectId, ref: 'User', default: []
+    tutor: {type: mongoose.Schema.Types.ObjectId, ref: 'User'},
+    bio: String,
+    students: [{type: mongoose.Schema.Types.ObjectId, ref: 'User', default: []}],
+    upvotes: [{type: mongoose.Schema.Types.ObjectId, ref: 'User', default: []}],
+    reviews: [{
+      text: String,
+      sender: {type: mongoose.Schema.Types.ObjectId, ref: 'User'},
+      date: String,
+      likes: [{type: mongoose.Schema.Types.ObjectId, ref: 'User', default: []}],
+      default: []
+    }],
+    default: []
   }],
 }, {timestamps: {createdAt: 'created_at'}});
 

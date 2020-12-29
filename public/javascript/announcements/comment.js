@@ -1,12 +1,12 @@
 // sends put request with data
-const comment = (form => {
+const comment = ((form, event) => {
 
   if (document.getElementById('comment-input').value.split(' ').join('') != '') {
     const announcementId = form.id.split("-")[1];
     const url = `/announcements/comment?_method=put`;
     const data = {announcement: announcementId, text: document.getElementById('comment-input').value};
     document.getElementById('comment-input').value = ""; //Empty input field
-    
+
     $.post(url, data, function(data) {
 
       if(data.success) {
