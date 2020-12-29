@@ -106,7 +106,6 @@ router.post('/join', middleware.isLoggedIn, middleware.isStudent, (req, res) => 
   });
 });
 
-// Studied APES under Ms. Jen from 2018-19. Scored a 5 on the AP Exam and finished with an A. I have past tutoring experience in Biology and AP Environmental Science, and am currently studying Environmental Science at Ohlone College. Z8AMlDxRV5Ek8x147o6lsbxvtWa
 router.post('/join-tutor', middleware.isLoggedIn, middleware.isTutor, (req, res) => {
   Course.findOne({joinCode: req.body.joincode}, (err, course) => {
     if (err || !course) {
