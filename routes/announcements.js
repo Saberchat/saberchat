@@ -8,7 +8,6 @@ const dateFormat = require('dateformat');
 const nodemailer = require('nodemailer');
 
 const multerUpload = require('../services/multer');
-const parseBuffer = require('../services/dataUri');
 const { cloudUpload, cloudDelete } = require('../services/cloudinary');
 
 //SCHEMA
