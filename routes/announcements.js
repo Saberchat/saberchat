@@ -9,7 +9,7 @@ const nodemailer = require('nodemailer');
 
 const multerUpload = require('../services/multer');
 const parseBuffer = require('../services/dataUri');
-const { cloudUploader, cloudDestroyer } = require('../services/cloudinary');
+const { cloudUpload, cloudDelete } = require('../services/cloudinary');
 
 //SCHEMA
 const User = require('../models/user');
@@ -140,18 +140,7 @@ router.post('/', middleware.isLoggedIn, middleware.isMod, (req, res) => { //REST
     }
     // if a file was uploaded
     if(req.file) {
-      // turn buffer into file
-      const imgFile = parseBuffer(req.file.originalname, req.file.buffer).content;
-
-      // upload to cloudinary
-      const options = {
-        folder: 'SaberChat'
-      };
-      let cloudErr;
-      let cloudResult;
-      await cloudUploader(imgFile, options)
-        .then(result => { cloudResult = result; })
-        .catch(err => { cloudErr = err; });
+      const [cloudErr, cloudResult] = await cloudUpload(req.file);
       if(cloudErr || !cloudResult){req.flash('error', 'Upload failed'); return res.redirect('back');}
 
       // set upload info
@@ -387,13 +376,7 @@ router.put('/:id', middleware.isLoggedIn, middleware.isMod, (req, res) => { //RE
     // delete image if delete upload check is checked
     if(req.body.deleteUpload === "true" && updatedAnnouncement.imageFile.filename) {
       const filename = updatedAnnouncement.imageFile.filename;
-      let cloudResult;
-      let cloudError;
-      // delete image
-      await cloudDestroyer(filename)
-        .catch(err=> {cloudError = err;})
-        .then(result=> {cloudResult = result;});
-      
+      const [cloudError, cloudResult] = await cloudDelete(filename);
       // check for failure
       if(cloudError || !cloudResult || cloudResult.result !== 'ok') {
         req.flash('error', 'Could not delete image');
@@ -403,18 +386,7 @@ router.put('/:id', middleware.isLoggedIn, middleware.isMod, (req, res) => { //RE
     }
     // Replace image if there is an upload
     if(req.file) {
-      // turn buffer into file
-      const imgFile = parseBuffer(req.file.originalname, req.file.buffer).content;
-
-      // upload to cloudinary
-      const options = {
-        folder: 'SaberChat'
-      };
-      let cloudErr;
-      let cloudResult;
-      await cloudUploader(imgFile, options)
-        .then(result => { cloudResult = result; })
-        .catch(err => { cloudErr = err; });
+      const [cloudErr, cloudResult] = await cloudUpload(req.file);
       if(cloudErr || !cloudResult){req.flash('error', 'Re-upload failed'); return res.redirect('back');}
 
       // set upload info
@@ -505,13 +477,7 @@ router.delete('/:id', middleware.isLoggedIn, middleware.isMod, (req, res) => { /
     // delete any uploads
     if(announcement.imageFile && announcement.imageFile.filename) {
       const filename = announcement.imageFile.filename;
-      let cloudResult;
-      let cloudError;
-      // delete image
-      await cloudDestroyer(filename)
-        .catch(err=> {cloudError = err;})
-        .then(result=> {cloudResult = result;});
-      
+      const [cloudError, cloudResult] = await cloudDelete(filename);
       // check for failure
       if(cloudError || !cloudResult || cloudResult.result !== 'ok') {
         req.flash('error', 'Error deleting uploaded image');
