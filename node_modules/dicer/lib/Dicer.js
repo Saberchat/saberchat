@@ -1,4 +1,5 @@
-var WritableStream = require('stream').Writable,
+var WritableStream = require('stream').Writable
+                     || require('readable-stream').Writable,
     inherits = require('util').inherits;
 
 var StreamSearch = require('streamsearch');
@@ -7,8 +8,8 @@ var PartStream = require('./PartStream'),
     HeaderParser = require('./HeaderParser');
 
 var DASH = 45,
-    B_ONEDASH = Buffer.from('-'),
-    B_CRLF = Buffer.from('\r\n'),
+    B_ONEDASH = new Buffer('-'),
+    B_CRLF = new Buffer('\r\n'),
     EMPTY_FN = function() {};
 
 function Dicer(cfg) {

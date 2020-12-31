@@ -32,7 +32,7 @@ let inboxDisplay = 'message';
 let reqDisplay = 'current';
 
 // changes view to messages
-function setMessages() {
+const setMessages = (() => {
     if(inboxDisplay == 'request') {
         messageActions.classList.add('display');
         messageList.classList.add('display');
@@ -46,10 +46,10 @@ function setMessages() {
 
         inboxDisplay = 'message';
     }
-}
+});
 
 //changes view to requests
-function setRequests() {
+const setRequests = (() => {
     if(inboxDisplay == 'message') {
         requestActions.classList.add('display');
         requestList.classList.add('display');
@@ -63,14 +63,15 @@ function setRequests() {
 
         inboxDisplay = 'request';
     }
-}
+});
 
 // sends form info for deleting selected messages
-function submitDelete() {
+const submitDelete = (() => {
     delSelForm.submit();
-}
+});
+
 // changes req inbox to current
-function seeCurrentReq() {
+const seeCurrentReq = (() => {
     if(reqDisplay == 'history') {
         currentReq.classList.add('display');
         pastReq.classList.remove('display');
@@ -80,9 +81,10 @@ function seeCurrentReq() {
 
         reqDisplay = 'current';
     }
-}
+});
+
 // changes req inbox to history
-function seePastReq() {
+const seePastReq = (() => {
     if(reqDisplay == 'current') {
         pastReq.classList.add('display');
         currentReq.classList.remove('display');
@@ -92,10 +94,10 @@ function seePastReq() {
 
         reqDisplay = 'history';
     }
-}
+});
 
 // switches between delete all to delete selected
-function updateDelete() {
+const updateDelete = (() => {
     const inputs = document.getElementsByClassName('del-form-input');
     let selected = false;
     for (let i = 0; i < inputs.length; i++) {
@@ -117,4 +119,4 @@ function updateDelete() {
         markSelBtn.style.display = 'none';
         markAllBtn.style.display = 'block';
     }
-}
+});

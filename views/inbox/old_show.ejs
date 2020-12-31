@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Saberchat</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/stylesheets/main.css">
+    <!-- link css for navbar. Don't need to include public/javascript/userForm.js since user is already logged in and does not need to access login and register forms.  -->
+    <link rel="stylesheet" href="/stylesheets/inbox/index.css">
+    <link rel="stylesheet" href="/stylesheets/components/navbar.css">
+    <link rel="stylesheet" href="/stylesheets/components/header.css">
+    <link rel="stylesheet" href="/stylesheets/chat/edit.css">
+    <!-- <link rel="stylesheet" href="/stylesheets/inbox/sendNotif.css"> -->
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js"></script>
+    <script src="../javascript/socket.js"></script>
+
+    <!-- I'm using my fontawesome kit -->
+    <script src="https://kit.fontawesome.com/dccc745c41.js" crossorigin="anonymous"></script>
+
+    </head>
+    <body>
+      <!-- include the navbar via ejs -->
+      <%- include('../partials/navbar') %>
+      <!-- include the backdrop for nav -->
+      <%- include('../partials/header') %>
+      <div class="container">
+        <div class="row">
+          <div class="col-12">
+
+            <div class="inbox-container" style="overflow: auto;">
+              <!-- navigation between tabs -->
+              <nav class="inbox-nav">
+                <div class="btn-group" role="group" aria-label="inbox navigation">
+                  <button
+                    class="nav-tab active"
+                    id="view-msg"
+                    disabled
+                    >Messages</button>
+
+                  <!-- <button
+                    class="nav-tab"
+                    id="view-req"
+                    onclick="setRequests()"
+                    >Requests</button> -->
+                </div>
+                <!-- <button id="refresh-btn" onclick="window.location.reload();">Refresh</button> -->
+              </nav>
+
+                <!-- actions -->
+                <div class="action-bar">
+                  <!-- message actions -->
+                  <div class="message-actions display">
+                    <a href="/inbox/" class="action-btn">Inbox</a>
+                    <a href="/inbox/new" class="action-btn">Send New</a>
+                    <a href="/inbox/sent" class="action-btn">View Sent</a>
+                  </div>
+                  <!-- request actions -->
+                  <div class="request-actions">
+                    <button id="current-req" class="action-btn" onclick="seeCurrentReq()" disabled>Current</button>
+                    <button id="past-req" class="action-btn" onclick="seePastReq()">History</button>
+                  </div>
+                </div>
+
+                <div class="main-section" style="overflow: auto; padding: 1.5rem; ">
+                  <h3><%=notif.subject%></h3>
+
+                  <p style="font-size: 15px;"><%=notif.date.split(', ')[1]%> | <%=notif.date.split(', ')[0]%></p>
+
+                  <% if (notif.sender == null) { %>
+                    <strong>From</strong>: <span>Anonymous</span><br />
+
+                  <% } else if (currentUser._id.toString() != notif.sender._id.toString()) { %>
+                    <strong>From</strong>: <a style="color: inherit;" href="/profiles/<%=notif.sender._id%>"><%=notif.sender.username%></a><br />
+
+                  <% } else { %>
+                    <strong>From</strong>: <a style="color: inherit;" href="/profiles/<%=currentUser._id%>">me</a><br />
+                  <% } %>
+
+                  <!-- To everyone  -->
+
+                  <% if (notif.toEveryone == true && notif.sender != null) { %>
+                    <strong>To:</strong><span> everyone</span>
+
+                  <!-- To a group including the user  -->
+
+                  <% } else if ((notif.sender != null) && (currentUser._id.toString() != notif.sender._id.toString())) { %>
+                    <strong>To:</strong>
+
+                    <% let tempRecipients = recipient_profiles.slice(0, recipient_profiles.length - 1) %>
+
+                    <% tempRecipients.forEach(recipient => { %>
+
+                      <% if (recipient._id.toString() == currentUser._id.toString()) { %>
+                        <a style="color: black;" href="/profiles/<%=currentUser._id%>">me, </a>
+
+                      <% } else { %>
+                          <a style="color: black;" href="/profiles/<%=recipient._id%>"><%=recipient.username%>, </a>
+                      <% } %>
+
+                    <% }) %>
+
+                    <% if (recipient_profiles[recipient_profiles.length - 1]._id.toString() == currentUser._id.toString()) { %>
+                      <a style="color: black;" href="/profiles/<%=currentUser._id%>">me</a>
+
+                    <% } else { %>
+                        <a style="color: black;" href="/profiles/<%=recipient_profiles[recipient_profiles.length - 1]._id%>"><%=recipient_profiles[recipient_profiles.length - 1].username%></a>
+                    <% } %>
+
+                  <!-- To a group not involving the user (a notification the user sent)  -->
+
+                  <% } else { %>
+
+                    <strong>To:</strong>
+                    <% let tempRecipients = recipient_profiles.slice(0, recipient_profiles.length - 1) %>
+
+                    <% tempRecipients.forEach(recipient => { %>
+
+                      <% if (recipient._id.toString() == currentUser._id.toString()) { %>
+                        <a style="color: black;" href="/profiles/<%=currentUser._id%>">me, </a>
+
+                      <% } else { %>
+                          <a style="color: black;" href="/profiles/<%=recipient._id%>"><%=recipient.username%>, </a>
+                      <% } %>
+
+                    <% }) %>
+
+                    <% if (recipient_profiles[recipient_profiles.length - 1]._id.toString() == currentUser._id.toString()) { %>
+                        <a style="color: black;" href="/profiles/<%=currentUser._id%>">me</a>
+
+                    <% } else {  %>
+
+                        <a style="color: black;" href="/profiles/<%=recipient_profiles[recipient_profiles.length - 1]._id%>"><%=recipient_profiles[recipient_profiles.length - 1].username%></a>
+
+                    <% } %>
+                  <% } %>
+
+                  <p style="margin-top: 10px; white-space: pre-wrap; text-align: left;"><%=notif.text%></p>
+                  <%notif.images.forEach(image => { %>
+                    <img style="width: 30%; height: 30%; object-fit: contain; margin-bottom: 20px; display: inline-block;" src="<%=image%>"/>
+                  <%})%>
+
+                </div>
+            </div>
+        </div>
+  </body>
+</html>

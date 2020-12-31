@@ -1,0 +1,37 @@
+h1.title {
+    color: #424651;
+    font-weight: 400;
+    font-size: 2.5rem;
+    text-align: center;
+    margin-top: 3rem;
+}
+
+.search-filter {
+    margin-bottom: 2rem;
+    border-bottom: 1px solid #424651;
+}
+
+input#search-input {
+    display: inline-block;
+    width: 80%;
+    border: none;
+    border-radius: 0;
+    outline: 0;
+    box-shadow: none;
+}
+
+#search-input:focus, #search-input:active {
+    border-bottom: 3px solid rgb(255, 177, 33);
+}
+
+.profile-image{
+    display: inline-block;
+    border-radius:50%;
+    width:40px;
+    height:40px;
+    object-fit: cover;
+}
+
+strong {
+  font-weight: bold;
+}

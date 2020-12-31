@@ -6,17 +6,16 @@ const orderSchema = new mongoose.Schema({
     ref: 'User'
   },
   name: String,
-  items: [
-    {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: 'OrderItem'
-    }
-  ],
-  quantities: [{type: Number}],
+  items: [{
+    item: {type: mongoose.Schema.Types.ObjectId, ref: 'OrderItem'},
+    quantity: Number,
+    price: Number
+  }],
   instructions: String,
   charge: Number,
   date: String,
-  present: Boolean
+  present: Boolean,
+  payingInPerson: Boolean
 }, {timestamps: {createdAt: 'created_at'}});
 
 module.exports = mongoose.model('Order', orderSchema);

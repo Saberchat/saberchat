@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Saberchat</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/stylesheets/main.css">
+    <!-- link css for navbar. Don't need to include public/javascript/userForm.js since user is already logged in and does not need to access login and register forms.  -->
+    <link rel="stylesheet" href="/stylesheets/components/header.css">
+    <link rel="stylesheet" href="/stylesheets/components/navbar.css">
+    <link rel="stylesheet" href="/stylesheets/announcements/index.css">
+    <link rel="stylesheet" href="/stylesheets/projects/projects.css">
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js"></script>
+    <script src="../javascript/socket.js"></script>
+    <script src="/javascript/nav/userForm.js"></script>
+    <script src="/javascript/nav/navbar.js"></script>
+    <script src="/javascript/home/index.js"></script>
+
+    <!-- I'm using my fontawesome kit -->
+    <script src="https://kit.fontawesome.com/dccc745c41.js" crossorigin="anonymous"></script>
+
+  </head>
+  <body>
+    <%- include('../partials/navbar') %>
+    <%- include('../partials/header') %>
+
+    <div class="container mt-5">
+      <div class="row">
+        <div class="col-12">
+          <div class="jumbotron text-center">
+            <h1><i class="fas fa-paint-brush"></i> Student Projects </h1>
+            <p>Our Students' Artwork, Gardening Projects, Science Projects and More</p>
+            <a class="btn btn-primary" href="/projects"><i class="fas fa-arrow-left"></i> Back</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="col-12">
+          <article class="ann-container" style="text-align: center; padding-left: 50px; padding-right: 50px; padding-bottom: 50px;">
+            <div class="ann-head">
+              <h1><%=project.title%></h1>
+
+              <% if (currentUser) { %>
+                <a style="color: black;" href="../profiles/<%=project.poster._id%>">
+                  <img src="<%= project.poster.imageUrl %>" alt="profile pic" style="width: 30px; height: 30px; object-fit: cover; border-radius: 50%;">
+                  <%=project.poster.firstName%> <%=project.poster.lastName%>
+                </a>
+                <br /><br />
+
+              <% } else { %>
+                <span style="color: black;">
+                  <img src="<%= project.poster.imageUrl %>" alt="profile pic" style="width: 30px; height: 30px; object-fit: cover; border-radius: 50%;">
+                  <%=project.poster.firstName%> <%=project.poster.lastName%>
+                </span>
+              <% } %>
+
+              <span style="color: #6e6e6e;"><%=project.date%></span>
+
+              <% if (currentUser) { %>
+                <% if (currentUser.username == project.poster.username) { %>
+                  <div style="margin-bottom: 15px; margin-top: -15px;">
+                    <button id="edit-button" type="button" class="btn btn-info"><a style="color: white;" href="<%=project._id%>/edit"><i class="fas fa-cog"></i> Edit</a></button>
+
+                    <form action="<%=project._id%>?_method=delete" method="post" style="display: inline-block;">
+                      <button style="color: white; " class="btn btn-danger" type="button" data-toggle="modal" data-target="#modal-<%=project._id%>"><i class="far fa-trash-alt"></i> Delete</button>
+                      <div class="modal fade" id="modal-<%=project._id%>" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+                        <div class="modal-dialog">
+                          <div class="modal-content">
+                            <div class="modal-header">
+                              <h5 class="modal-title" id="exampleModalLabel" style="color: black;">Delete Post?</h5>
+                              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                              </button>
+                            </div>
+                            <div class="modal-body" style="color: black; text-align: left;">
+                              This action is irreversible. You will have to manually recreate this post.
+                            </div>
+                            <div class="modal-footer">
+                              <button type="button" class="btn btn-secondary" data-dismiss="modal">No, Go Back</button>
+                              <button type="submit" class="btn btn-danger">Yes, Delete Post</button>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </form>
+                  </div>
+                  <br />
+
+                  <% } %>
+
+                    <div style="margin-bottom: 15px; margin-top: -15px;">
+                      <% if (project.likes.includes(currentUser._id)) { %>
+                        <a style="color: #03a5fc; text-decoration: none; font-size: 140%;" id="like-<%=project._id%>-show" onclick="like(this)"><i class="fas fa-thumbs-up"></i></a> <span style="display: inline; font-size: 140%;" id="likeCount-<%=project._id%>"><%=project.likes.length%></span>
+
+                      <% } else { %>
+                        <a style="color: grey; text-decoration: none; font-size: 140%;" id="like-<%=project._id%>-show" onclick="like(this)"><i class="fas fa-thumbs-up"></i></a> <span style="display: inline; font-size: 140%;" id="likeCount-<%=project._id%>"><%=project.likes.length%></span>
+
+                      <% }%>
+                      <a id="comments-count-icon" style="color: grey; text-decoration: none; font-size: 140%; margin-left: 10px;" href="#comment-section"><i class="fas fa-comment-dots"></i> <%=project.comments.length%></a>
+                    </div>
+
+              <% } %>
+
+            <% if (currentUser) { %>
+
+              <% if (project.creators.length > 2) { %>
+                <span><strong>Creators:</strong>
+
+                  <% let tempcreators = project.creators.slice(0, project.creators.length - 2)%>
+
+                  <%tempcreators.forEach(creator => { %>
+                     <em><a style="color: black" href="../profiles/<%=creator._id%>"><img src="<%= creator.imageUrl %>" alt="profile pic" style="width: 30px; height: 30px; object-fit: cover; border-radius: 50%;"> <%=creator.firstName%> <%=creator.lastName%></a>,</em>
+                  <%})%>
+
+                  <em><a style="color: black" href="../profiles/<%=project.creators[project.creators.length - 2]._id%>"><img src="<%= project.creators[project.creators.length - 2].imageUrl %>" alt="profile pic" style="width: 30px; height: 30px; object-fit: cover; border-radius: 50%;"> <%=project.creators[project.creators.length - 2].firstName%> <%=project.creators[project.creators.length - 2].lastName%></a>,</em>
+                  <em><a style="color: black" href="../profiles/<%=project.creators[project.creators.length - 1]._id%>"><img src="<%= project.creators[project.creators.length - 1].imageUrl %>" alt="profile pic" style="width: 30px; height: 30px; object-fit: cover; border-radius: 50%;"> <%=project.creators[project.creators.length - 1].firstName%> <%=project.creators[project.creators.length - 1].lastName%></a></em>
+
+                </span>
+
+              <%} else if (project.creators.length == 2){ %>
+                <p><strong>Creators:</strong> <a style="color: black" href="../profiles/<%=project.creators[0]._id%>"><em><img src="<%= project.creators[0].imageUrl %>" alt="profile pic" style="width: 30px; height: 30px; object-fit: cover; border-radius: 50%;"> <%=project.creators[0].firstName%> <%=project.creators[0].lastName%></a>, <a style="color: black" href="profiles/<%=project.creators[0]._id%>"><img src="<%= project.creators[1].imageUrl %>" alt="profile pic" style="width: 30px; height: 30px; object-fit: cover; border-radius: 50%;"> <%=project.creators[1].firstName%> <%=project.creators[1].lastName%></a></em></p>
+
+              <%} else if (project.creators.length == 1){ %>
+                <p><strong>Creator:</strong> <a style="color: black" href="../profiles/<%=project.creators[0]._id%>"><em><img src="<%= project.creators[0].imageUrl %>" alt="profile pic" style="width: 30px; height: 30px; object-fit: cover; border-radius: 50%;"> <%=project.creators[0].firstName%> <%=project.creators[0].lastName%></em></a></p>
+
+              <% } else { %>
+                <p><strong>Creators:</strong> <em>None</em></p>
+              <% } %>
+
+            <% } else { %>
+
+              <% if (project.creators.length > 2) { %>
+                <strong>Creators:</strong>
+
+                  <% let tempcreators = project.creators.slice(0, project.creators.length - 2)%>
+
+                  <span style="color: black; display: inline;"><em>
+                    <%tempcreators.forEach(creator => { %>
+                       <img src="<%= creator.imageUrl %>" alt="profile pic" style="width: 30px; height: 30px; object-fit: cover; border-radius: 50%;"> <%=creator.firstName%> <%=creator.lastName%>,
+                    <%})%>
+
+                  <img src="<%= project.creators[project.creators.length - 2].imageUrl %>" alt="profile pic" style="width: 30px; height: 30px; object-fit: cover; border-radius: 50%;"> <%=project.creators[project.creators.length - 2].firstName%> <%=project.creators[project.creators.length - 2].lastName%>,
+                  <img src="<%= project.creators[project.creators.length - 1].imageUrl %>" alt="profile pic" style="width: 30px; height: 30px; object-fit: cover; border-radius: 50%;"> <%=project.creators[project.creators.length - 1].firstName%> <%=project.creators[project.creators.length - 1].lastName%>
+
+                  </em></span>
+
+              <%} else if (project.creators.length == 2){ %>
+                <p><strong>Creators:</strong> <span style="color: black; display: inline;"><em><img src="<%= project.creators[0].imageUrl %>" alt="profile pic" style="width: 30px; height: 30px; object-fit: cover; border-radius: 50%;"> <%=project.creators[0].firstName%> <%=project.creators[0].lastName%>, <img src="<%= project.creators[1].imageUrl %>" alt="profile pic" style="width: 30px; height: 30px; object-fit: cover; border-radius: 50%;"> <%=project.creators[1].firstName%> <%=project.creators[1].lastName%></span></em></p>
+
+              <%} else if (project.creators.length == 1){ %>
+                <p><strong>Creator:</strong> <span style="color: black; display: inline;"><em><img src="<%= project.creators[0].imageUrl %>" alt="profile pic" style="width: 30px; height: 30px; object-fit: cover; border-radius: 50%;"> <%=project.creators[0].firstName%> <%=project.creators[0].lastName%></em></span></p>
+
+              <% } else { %>
+                <p><strong>Creators:</strong> <em>None</em></p>
+              <% } %>
+
+            <% } %>
+
+            <p style="margin-top: 10px; white-space: pre-wrap;"><%=project.text%></p>
+
+            <% for (let img of project.images) { %>
+              <img style="width: 40%; height: 40%; object-fit: contain; border-radius: 15px;" src="<%=img%>"/>
+              <br /><br />
+            <%}%>
+          </article>
+
+          <br />
+
+
+          <% if (currentUser) { %>
+            <article class="ann-container" id="comment-section" style="text-align: center; padding-left: 50px; padding-right: 50px; padding-bottom: 50px;">
+              <h3 id="comments-heading" style="padding-top: 50px; padding-bottom: 20px;">Comments (<%=project.comments.length%>)</h3>
+
+              <form id="form-<%=project._id%>" onsubmit="comment(this, event)">
+                <div class="input-group" style="border-color: black; border-width: 1px;">
+                  <input type="text"aria-describedby="send-button" class="form-control rounded-0 border-0 py-4" style="background-color: #cdd0d4;"autocomplete="off" placeholder="Comment on the project!" id="comment-input" />
+                  <div class="input-group-append">
+                    <button type="submit" class="btn btn-secondary"> <i class="fa fa-paper-plane send-icon"></i></button>
+                  </div>
+                </div>
+              </form><br />
+
+              <div id="all-comments">
+                <% for (let i = project.comments.length - 1; i >=0; i --) { %>
+                  <% if (project.comments[i].sender && project.comments[i].sender._id.equals(currentUser._id)) { %>
+                    <!-- Reciever Message-->
+                    <div class="media mb-2 comment-body" style="text-align: left;">
+                      <img src="<%= project.comments[i].sender.imageUrl %>" alt="user" class="user-image">
+                      <div class="media-body ml-3">
+                        <div class="bg-primary rounded py-2 px-3 mb-2 w-75">
+                          <p class="text-small mb-0 text-white">
+
+                            <% for (let line of project.comments[i].text.split(" ")) { %>
+                              <% if (line[0] == '@') {%>
+                                <a style="color: white;" href="../profiles/<%=line.split('#')[1].split('_')[0]%>"><%=line.split("#")[0]%></a>
+                              <% } else { %>
+                                <%=line%>
+                              <% } %>
+                            <% } %>
+                          </p>
+                        </div>
+                        <p class="small text-muted msg-info"><span class="username">Me</span>, <%= project.comments[i].date %></p>
+                      </div>
+                    </div>
+                  <% } else if(project.comments[i].sender) { %>
+                    <!-- Sender message -->
+                    <div class="media mb-2" style="text-align: left;">
+                      <img src="<%= project.comments[i].sender.imageUrl %>" alt="user" class="user-image">
+                      <div class="media-body ml-3">
+                        <% if (project.comments[i].text.includes(`@${currentUser.username.split(' ').join('')}#${currentUser._id.toString()}`)) { %>
+                          <div class="rounded py-2 px-3 mb-2 w-75" style="background-color: yellow;">
+                        <% } else { %>
+                          <div class="bg-grey rounded py-2 px-3 mb-2 w-75">
+                        <% } %>
+
+                          <p class="text-small mb-0 text-dark">
+                            <% for (let line of project.comments[i].text.split(" ")) { %>
+                              <% if (line[0] == '@') {%>
+                                <a href="../profiles/<%=line.split('#')[1].split('_')[0]%>"><%=line.split("#")[0]%></a>
+                              <% } else { %>
+                                <%=line%>
+                              <% } %>
+                            <% } %>
+                          </p>
+                        </div>
+                        <p class="small text-muted msg-info"><span class="username"><%= project.comments[i].sender.username %></span>, <%= project.comments[i].date %> <a style="margin-left: 10px;" id="comment-<%=project.comments[i].sender.username.split(' ').join('')%>#<%=project.comments[i].sender._id%>" href="#project.comments[i]-section" onclick="reply(this)">Reply</a></p>
+
+
+                        <% if (project.comments[i].likes.includes(currentUser._id)) { %>
+                          <a style="color: #03a5fc; text-decoration: none;" id="likeComment-<%=i%>-<%=project._id%>" onclick="likeComment(this)"><i class="fas fa-thumbs-up"></i></a> <span style="display: inline;" id="likeCountComment-<%=i%>-<%=project._id%>"><%=project.comments[i].likes.length%></span>
+
+                        <% } else { %>
+                          <a style="color: grey; text-decoration: none;" id="likeComment-<%=i%>-<%=project._id%>" onclick="likeComment(this)"><i class="fas fa-thumbs-up"></i></a> <span style="display: inline;" id="likeCountComment-<%=i%>-<%=project._id%>"><%=project.comments[i].likes.length%></span>
+                        <% }%>
+
+                      </div>
+                    </div>
+                  <% } %>
+                <% } %>
+              </div>
+
+            </article>
+          <% } %>
+
+          <br />
+        </div>
+      </div>
+    </div>
+  </body>
+  <script src="/javascript/projects/like.js"></script>
+  <script src="/javascript/projects/comment.js"></script>
+</html>

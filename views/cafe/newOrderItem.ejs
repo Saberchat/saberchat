@@ -8,7 +8,6 @@
       <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css">
       <link rel="stylesheet" href="/stylesheets/main.css">
       <!-- link css for navbar. Don't need to include public/javascript/userForm.js since user is already logged in and does not need to access login and register forms.  -->
-      <link rel="stylesheet" href="/stylesheets/components/announcement.css">
       <link rel="stylesheet" href="/stylesheets/components/header.css">
       <link rel="stylesheet" href="/stylesheets/components/navbar.css">
       <link rel="stylesheet" href="/stylesheets/chat/new.css">
@@ -24,17 +23,17 @@
     <!-- include the navbar via ejs -->
     <%- include('../partials/navbar') %>
     <%- include('../partials/header') %>
-    <%- include('../partials/announcement') %>
 
     <div class="container mt-5">
       <div class="row">
-        <div class="col-12">
+        <div class="col-12" style="text-align: center;">
           <h1 style="text-align: center; width: 100%">New Cafe Item</h1>
+          <a class="btn btn-primary" href="/cafe/manage"><i class="fas fa-arrow-left"></i> Back</a><br /><br />
         </div>
       </div>
       <div class="row">
         <div class="col-md-8 offset-md-2 col-12">
-          <form action="/cafe/newOrderItem" method="post">
+          <form action="/cafe/item" method="post">
             <div class="form-group">
               <div class="row">
                 <div class="col">
@@ -55,6 +54,31 @@
                   <input id="usernameInput" class="form-control" type="text" name="available" placeholder="Enter Number Available" maxlength="45" required>
                 </div>
               </div>
+
+              <div class="row">
+                <div class="col">
+                  <div class="input-group mb-3" style="width: 100%;">
+                    <label style="padding-top: 20px;" for="typeInput">Type</label>
+                    <select id="typeInput" name="type" style="width: 100%;">
+                      <option disabled selected required >Meal Type</option>
+                      <% types.forEach(type => { %>
+                        <option><%=type.name%></option>
+                      <% }) %>
+                    </select>
+                  </div>
+                </div>
+              </div>
+
+              <div class="row">
+                <div class="col">
+                  <label for="usernameInput">Image</label>
+                  <div style="text-align: center;">
+                    <input id="image-input" class="form-control" type="text" name="image" placeholder="Enter URL for Item Image">
+                    <br />
+                    <img id="item-image" style="width: 30%; border-radius: 15px;" src="" alt="Image Does Not Exist"/>
+                  </div>
+                </div>
+              </div>
             </div>
             <div class="form-group">
               <label for="descInput">Description</label>
@@ -62,9 +86,43 @@
             </div>
             <button class="btn btn-lg btn-primary btn-block">Submit</button>
           </form>
-          <a style="display: block; margin-top: 1rem; margin-bottom: 5rem;" href="/cafe/manage">Go Back</a>
         </div>
       </div>
     </div>
   </body>
+
+  <script>
+
+    const imageInput = document.getElementById("image-input");
+    const itemImage = document.getElementById("item-image");
+
+    $('#item-image').hide();
+
+    imageInput.addEventListener('keydown', () => {
+
+      setTimeout(() => {
+        if (imageInput.value != '') {
+          itemImage.src = imageInput.value;
+          $('#item-image').show();
+
+        } else {
+          $('#item-image').hide();
+        }
+      }, 3)
+    })
+
+    imageInput.addEventListener('paste', () => {
+      setTimeout(() => {
+        if (imageInput.value != '') {
+          itemImage.src = imageInput.value;
+          $('#item-image').show();
+
+        } else {
+          $('#item-image').hide();
+        }
+      }, 3)
+    })
+
+
+  </script>
 </html>

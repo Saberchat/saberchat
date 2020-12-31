@@ -11,7 +11,6 @@
     <!-- link css for navbar. Don't need to include public/javascript/userForm.js since user is already logged in and does not need to access login and register forms.  -->
     <link rel="stylesheet" href="/stylesheets/components/navbar.css">
     <link rel="stylesheet" href="/stylesheets/components/header.css">
-    <link rel="stylesheet" href="/stylesheets/components/announcement.css">
 
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
@@ -20,14 +19,12 @@
     <!-- I'm using my fontawesome kit -->
     <script src="https://kit.fontawesome.com/dccc745c41.js" crossorigin="anonymous"></script>
 
-    <!-- include the navbar via ejs -->
-    <%- include('../partials/navbar') %>
-    <!-- include the backdrop for nav -->
-    <%- include('../partials/header') %>
-    <%- include('../partials/announcement') %>
-
     </head>
     <body>
+      <!-- include the navbar via ejs -->
+      <%- include('../partials/navbar') %>
+      <!-- include the backdrop for nav -->
+      <%- include('../partials/header') %>
       <div class="container">
         <div class="row">
           <div class="col-12">
@@ -58,16 +55,16 @@
                 <div class="action-bar">
                   <!-- message actions -->
                   <div class="message-actions display">
-                    <a href="/notif" class="action-btn">Send New</a>
-                    <a href="/sent" class="action-btn">View Sent</a>
-                    <% if (viewing_sent == false)  { %>
-                      <hr>
-                      <a href="/clear" class="action-btn" id="del-all-btn">Clear All</a>
-                      <button class="action-btn" formAction="/delete?_method=delete" id="del-sel-btn">Clear Selected</button>
+                    <a href="/inbox/messages/new" class="action-btn">Send New</a>
+                    <a href="/inbox/sent" class="action-btn">View Sent</a>
+                    <hr>
+                    <!-- <a href="/inbox/clear?_method=delete" class="action-btn" id="del-all-btn">Clear All</a> -->
+                    <button class="action-btn" formAction="/inbox/clear?_method=delete" id="del-all-btn">Clear All</button>
+                    <button class="action-btn" formAction="/inbox/delete?_method=delete" id="del-sel-btn">Clear Selected</button>
 
-                      <a href="/mark_all" class="action-btn" id="mark-all-btn">Mark All As Read</a>
-                      <button class="action-btn" formAction="/mark_selected" id="mark-sel-btn" style="display: none;">Mark Selected As Read</button>
-                    <% } %>
+                    <!-- <a href="/mark_all?_method=put" class="action-btn" id="mark-all-btn">Mark All As Read</a> -->
+                    <button class="action-btn" formAction="/inbox/mark-all?_method=put" id="mark-all-btn">Mark All As Read</button>
+                    <button class="action-btn" formAction="/inbox/mark-selected?_method=put" id="mark-sel-btn" style="display: none;">Mark Selected As Read</button>
 
                   </div>
                   <!-- request actions -->
@@ -85,107 +82,57 @@
 
                     <ul class="list-group">
 
-                      <% inbox.forEach((notif) => { %>
-                        <li class="list-group-item list-group-item-action">
+                      <% inbox.forEach((msg) => { %>
+                        <% if(msg.read.includes(currentUser._id)) { %>
+                          <li class="list-group-item list-group-item-action read">
+                        <% } else { %>
+                          <li class="list-group-item list-group-item-action">
+                        <% } %>
+                          <div class="message-check">
+                            <input class="del-form-input" type="checkbox" name="<%= msg._id %>" value="" onchange="updateDelete()">
+                          </div>
 
-                          <% if (notif.sender == null) { %>
+                          <a href="/inbox/<%= msg._id %>" class="message-body">
+                            <div class="message-head">
 
-                            <div class="message-check">
-                              <input class="del-form-input" type="checkbox" name="<%= notif._id %>" value="" onchange="updateDelete()">
-                            </div>
-
-                            <% if (notif.read[notif.recipients.indexOf(currentUser.username)] == true) { %>
-
-                              <a href="/message/<%= notif._id %>" class="message-body">
-                                <div class="message-head">
-                                  <div class="message-from">
-                                    <%= notif.subject %>
-                                  </div>
-                                  <div class="message-from">
-                                    Anonymous
-                                  </div>
-                                </div>
-                                <div class="message-text">
-                                  <%= notif.text %>
-                                </div>
-                              </a>
-
-                            <% } else { %>
-
-                              <a href="/message/<%= notif._id %>" class="message-body">
-                                <div class="message-head">
-                                  <div class="message-subject">
-                                    <%= notif.subject %>
-                                  </div>
-                                  <div class="message-from">
-                                    Anonymous
-                                  </div>
-                                </div>
-                                <div class="message-text">
-                                  <%= notif.text %>
-                                </div>
-                              </a>
-                            <% } %>
-
-
-                          <% } else if (notif.sender._id.toString() == currentUser._id.toString()) { %>
-
-                            <a href="/message/<%= notif._id %>" class="message-body">
-                              <div class="message-head">
+                              <% if (msg.read.includes(currentUser._id)) { %>
                                 <div class="message-from">
-                                  <%= notif.subject %>
-                                </div>
-                                <div class="message-from">
-                                  <%= notif.sender.username %>
-                                </div>
-                              </div>
-                              <div class="message-text">
-                                <%= notif.text %>
-                              </div>
-                            </a>
 
-                          <% } else { %>
-                            <div class="message-check">
-                              <input class="del-form-input" type="checkbox" name="<%= notif._id %>" value="" onchange="updateDelete()">
+                                <% } else { %>
+                                  <div class="message-from" style="font-weight: 700">
+                                <% } %>
+                                  (<%=1+msg.replies.length%>) <%= msg.sender.username %>
+                              </div>
+
+                              <% if (msg.read.includes(currentUser._id)) { %>
+                                <div class="message-subject">
+                                <strong><%= msg.subject %></strong>
+                                </div>
+
+                              <% } else { %>
+                                <div class="message-subject" style="font-weight: 700">
+                                  <strong><%= msg.subject %></strong>
+                                </div>
+                              <% } %>
+
                             </div>
-
-                            <% if (notif.read[notif.recipients.indexOf(currentUser.username)] == true) { %>
-
-                              <a href="/message/<%= notif._id %>" class="message-body">
-                                <div class="message-head">
-                                  <div class="message-from">
-                                    <%= notif.subject %>
-                                  </div>
-                                  <div class="message-from">
-                                    <%= notif.sender.username %>
-                                  </div>
-                                </div>
-                                <div class="message-text">
-                                  <%= notif.text %>
-                                </div>
-                              </a>
-
-                            <% } else { %>
-
-                              <a href="/message/<%= notif._id %>" class="message-body">
-                                <div class="message-head">
-                                  <div class="message-subject">
-                                    <%= notif.subject %>
-                                  </div>
-                                  <div class="message-from">
-                                    <%= notif.sender.username %>
-                                  </div>
-                                </div>
-                                <div class="message-text">
-                                  <%= notif.text %>
-                                </div>
-                              </a>
-                            <% } %>
-                          <% }%>
-
-
+                            <div class="message-text">
+                              <% if (msg.replies.length > 0) { %>
+                                <%= msg.replies[msg.replies.length - 1].text%>
+                              <% } else { %>
+                                <%= msg.text %>
+                              <% } %>
+                            </div>
+                          </a>
                           <span class="message-date">
-                            <%=notif.date.split(',')[0]%>
+
+                            <% if (msg.replies.length > 0) { %>
+                              <%= msg.replies[msg.replies.length - 1].date.split(',')[0].split('|')[1] %>
+
+                            <% } else { %>
+                              <%= msg.date.split(',')[0].split('|')[1] %>
+                            <% } %>
+
                           </span>
                         </li>
                       <% }); %>

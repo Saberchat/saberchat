@@ -8,6 +8,7 @@
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css">
     <link rel="stylesheet" href="/stylesheets/main.css">
     <link rel="stylesheet" href="/stylesheets/wHeights/index.css">
+    <link rel="stylesheet" href="/stylesheets/wHeights/nav.css">
     <link rel="stylesheet" href="/stylesheets/components/navbar.css">
     <link rel="stylesheet" href="/stylesheets/components/header.css">
 
@@ -22,39 +23,8 @@
 
   <%- include('../partials/navbar') %>
   <%- include('../partials/header') %>
+  <%- include('../partials/wHeightsNav') %>
 
-    <!-- witherly heights navbar -->
-    <nav class="navbar navbar-expand-md navbar-dark bg-dark">
-      <div class="container">
-        <a class="navbar-brand" href="#">Witherly Heights</a>
-
-        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarToggler" aria-controls="navbarToggler" aria-expanded="false" aria-label="Toggle navigation">
-          <span class="navbar-toggler-icon"></span>
-        </button>
-
-        <div class="collapse navbar-collapse" id="navbarToggler">
-          <ul class="navbar-nav mr-auto mt-2 mt-md-0">
-            <li class="nav-item">
-              <a class="nav-link" href="#">Home</a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link" href="#">Contact</a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link" href="#">About</a>
-            </li>
-          </ul>
-        </div>
-      </div>
-    </nav>
-
-    <!-- background image -->
-    <section id="background">
-      <div class="background-content">
-        <h1>Witherly Heights</h1>
-        <p>Alsion Student Newspaper</p>
-      </div>
-    </section>
     <section class="container mt-5">
       <h1 class="text-center mb-3">Articles</h1>
       <div style="text-align: center;">
@@ -75,5 +45,6 @@
         <% }) %>
       </div>
     </section>
+
 </body>
 </html>

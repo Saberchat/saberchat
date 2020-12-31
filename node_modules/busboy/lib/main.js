@@ -1,5 +1,6 @@
 var fs = require('fs'),
-    WritableStream = require('stream').Writable,
+    WritableStream = require('stream').Writable
+                     || require('readable-stream').Writable,
     inherits = require('util').inherits;
 
 var parseParams = require('./utils').parseParams;

@@ -1,5 +1,5 @@
 var inherits = require('util').inherits,
-    ReadableStream = require('stream').Readable;
+    ReadableStream = require('stream').Readable || require('readable-stream');
 
 function PartStream(opts) {
   ReadableStream.call(this, opts);

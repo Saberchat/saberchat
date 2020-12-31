@@ -1,4 +1,4 @@
-function animateDisplay() {
+const animateDisplay = (() => {
     const container = document.getElementById('main-container');
     const block2 = document.getElementById('block-2');
     const block3 = document.getElementById('block-3');
@@ -32,4 +32,4 @@ function animateDisplay() {
             block3.classList.remove('fade-in');
         }
     }
-}
+})

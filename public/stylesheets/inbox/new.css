@@ -1,0 +1,83 @@
+.form-container {
+    margin: 3rem 0;
+    padding: 2rem;
+    border-radius: 15px;
+    box-shadow: 0px 7px 15px rgb(116, 116, 116);
+}
+
+.form-container h1 {
+    text-align: center;
+    font-size: 2rem;
+    margin-bottom: 1.5rem;
+}
+
+.form-container .form-group label {
+    font-weight: 500;
+    font-size: 1.2rem;
+}
+
+/* Recipients block */
+#to-block {
+    margin-bottom: 2rem;
+}
+
+#to-block .form-check-input {
+    width: 15px;
+    height: 15px;
+}
+
+#anony-msg {
+    display: none;
+}
+
+/* user tags */
+#user-display {
+    padding-top: 1rem;
+    padding-bottom: 2rem;
+}
+
+.user-tag {
+    background-color: #1ba6bb;
+    color: #ffffff;
+    border-radius: 15px;
+    display: inline-block;
+    overflow: hidden;
+    height: 2.3rem;
+    margin-right: 0.5rem;
+}
+
+.user-tag span {
+    display: inline-block;
+    height: 100%;
+    padding-top: 0.2rem;
+    padding-bottom: 0.2rem;
+    padding-left: 1rem;
+    padding-right: 0.5rem;
+    vertical-align: middle;
+
+    max-width: 15rem;
+    overflow-x: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
+@media (max-width: 330px) {
+    .user-tag span {
+        max-width: 7rem;
+    }
+}
+
+.user-tag button {
+    height: 100%;
+    border: none;
+    padding-left: 0.7rem;
+    padding-right: 0.7rem;
+    font-size: 1.2rem;
+    font-weight: 600;
+    background-color: #dc3545;
+    color: #ffffff;
+}
+
+.user-tag button:hover {
+    background-color: #b92c3a;
+}

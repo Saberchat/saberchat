@@ -2,19 +2,32 @@ const mongoose = require("mongoose");
 
 var projectSchema = new mongoose.Schema({
     title: String,
-    imgUrl: String,
+    images: [{type: String}],
     text: String,
+    date: String,
     poster: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'User'
     },
 
-    creators: [
-      {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'User'
-      }
-    ],
+    creators: [{
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'User'
+    }],
+
+    likes: [{
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'User',
+      default: []
+    }],
+
+    comments: [{
+      text: String,
+      sender: {type: mongoose.Schema.Types.ObjectId, ref: 'User'},
+      date: String,
+      likes: [{type: mongoose.Schema.Types.ObjectId, ref: 'User', default: []}],
+      default: []
+    }]
 
 }, {timestamps: {createdAt: 'created_at'}});
 

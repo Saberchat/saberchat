@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Saberchat</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/stylesheets/main.css">
+    <!-- link css for navbar. Don't need to include public/javascript/userForm.js since user is already logged in and does not need to access login and register forms.  -->
+    <link rel="stylesheet" href="/stylesheets/components/navbar.css">
+    <link rel="stylesheet" href="/stylesheets/components/header.css">
+    <link rel="stylesheet" href="/stylesheets/projects/projects.css">
+    <link rel="stylesheet" href="/stylesheets/announcements/form.css">
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js"></script>
+    <script src="../javascript/socket.js"></script>
+
+    <!-- I'm using my fontawesome kit -->
+    <script src="https://kit.fontawesome.com/dccc745c41.js" crossorigin="anonymous"></script>
+
+  </head>
+  <body style="text-align: center;">
+    <!-- include the navbar via ejs -->
+    <%- include('../partials/navbar') %>
+    <%- include('../partials/header') %>
+    <div class="container mt-5">
+      <div class="row">
+        <div class="col-12">
+          <div class="jumbotron text-center">
+            <h1><i class="fas fa-paint-brush"></i> Add Project </h1>
+            <p>Submit an exceptional or unique student project</p>
+            <a class="btn btn-primary" href="/projects"><i class="fas fa-arrow-left"></i> Back</a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col-md-8 offset-md-2 col-12">
+        <form action="/projects" method="post" style="text-align: center;">
+          <div class="form-group">
+            <label style="float: left;" for="new-project-message"><strong>Title</strong></label>
+            <input id="new-project-message" name="title" maxlength="30" type="text" class="form-control" placeholder="Project Title" aria-label="Username" aria-describedby="basic-addon1" required>
+          </div><br />
+
+          <div class="form-group" id="creator-div" style="text-align: left;">
+            <label style="float: left;" for="creator-select"><strong>Creators</strong></label>
+            <select id="creator-select" class="form-control" onchange="addCreator('user')" required>
+              <option class="creator-group" value="" selected disabled>Select Students</option>
+              <option class="creator-group" value="7th">7th Graders</option>
+              <option class="creator-group" value="8th">8th Graders</option>
+              <option class="creator-group" value="9th">9th Graders</option>
+              <option class="creator-group" value="10th">EC Sophomores</option>
+              <option class="creator-group" value="11th">EC Juniors</option>
+              <option class="creator-group" value="12th">EC Seniors</option>
+
+              <% ['7th', '8th', '9th', '10th', '11th', '12th'].forEach(status => { %>
+                <% students.forEach(student => { %>
+                  <% if (student.status == status) { %>
+                    <option class="<%=student.status%>" value="<%=student._id%>"><%=student.username%> (<%=student.firstName%> <%=student.lastName%>)</option>
+                  <% } %>
+                <% }) %>
+              <% }) %>
+
+            </select>
+            <input type="text" id="creator-input" name="creatorInput" hidden />
+            <br />
+          </div>
+
+          <div class="form-group">
+            <label style="float: left;" for="new-project-text"><strong>Description</strong></label>
+            <textarea id="new-project-text" minlength="200" maxlength="800" name="text" rows="6" placeholder="Write a little about the project" class="form-control" aria-label="With textarea" required></textarea>
+          </div>
+
+
+          <div id="image-header">
+            <h4 style="float: left;">Images</h4>
+            <button type="button" onclick="addImg()" class="btn btn-primary"><i class="fas fa-plus"></i> Image</button>
+            <br /><br />
+            <hr>
+          </div>
+
+          <div id="image-block">
+          </div>
+
+          <br />
+          <button type="submit" class="btn btn-primary btn-block" type="submit">Post</button><br />
+        </form>
+      </div>
+    </div>
+  </body>
+
+  <script src="/javascript/projects/form.js"></script>
+  <script src="/javascript/projects/creators.js"></script>
+</html>

@@ -1,0 +1,39 @@
+.back-btn {
+    width: 10rem;
+}
+
+.user-link:hover .badge.badge-pill{
+    color: #dadada;
+}
+
+.msg-container {
+    border-radius: 15px;
+    box-shadow: 0px 3px 15px rgb(168, 168, 168);
+}
+
+.msg-head {
+    position: relative;
+    padding: 2rem 5rem;
+    text-align: center;
+}
+
+.msg-head > span {
+    display: block;
+    color: rgb(105, 105, 105);
+    font-weight: 300;
+    margin-bottom: 1rem;
+}
+
+.msg-body {
+    padding:2rem 5rem;
+}
+
+.msg-body hr {
+    border-radius: 5px;
+    border: 1px solid #525252;
+}
+
+.msg-images img {
+    margin-bottom: 2rem;
+    box-shadow: 0px 1px 5px #6d6d6d;
+}

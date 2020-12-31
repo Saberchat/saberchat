@@ -5,7 +5,7 @@
 //  * support limits.fieldNameSize
 //     -- this will require modifications to utils.parseParams
 
-var ReadableStream = require('stream').Readable,
+var ReadableStream = require('stream').Readable || require('readable-stream'),
     inherits = require('util').inherits;
 
 var Dicer = require('dicer');
@@ -193,7 +193,6 @@ function Multipart(boy, cfg) {
         curFile = file;
         file.on('end', function() {
           --nends;
-          self._pause = false;
           checkFinished();
           if (self._cb && !self._needDrain) {
             var cb = self._cb;

@@ -32,14 +32,14 @@ const editor = new EditorJS({
 
 const saveButton = document.getElementById('save-button');
 
-function postIt(url, data){
+const postIt = ((url, data) {
 
     $('body').append($('<form/>', {
       id: 'jQueryPostItForm',
       method: 'post',
       action: url
-    }));
-  
+    })));
+
     for (let i in data) {
       $('#jQueryPostItForm').append($('<input/>', {
         type: 'hidden',
@@ -60,9 +60,9 @@ saveButton.addEventListener('click', () => {
             author: articleAuthor,
             content: JSON.stringify(savedData.blocks)
         }
-    
+
         console.log(article);
-    
+
         postIt('/articles/new', article);
         console.log('Saved Article');
     }).catch((error) => {

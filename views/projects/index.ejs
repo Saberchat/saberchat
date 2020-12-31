@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Saberchat</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/stylesheets/main.css">
+    <!-- link css for navbar. Don't need to include public/javascript/userForm.js since user is already logged in and does not need to access login and register forms.  -->
+    <link rel="stylesheet" href="/stylesheets/components/header.css">
+    <link rel="stylesheet" href="/stylesheets/components/navbar.css">
+    <link rel="stylesheet" href="/stylesheets/projects/projects.css">
+    <link rel="stylesheet" href="/stylesheets/announcements/index.css">
+    <link rel="stylesheet" href="/stylesheets/home/index.css">
+    <link rel="stylesheet" href="/stylesheets/chat/new.css">
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js"></script>
+    <script src="../javascript/socket.js"></script>
+    <script src="/javascript/nav/userForm.js"></script>
+    <script src="/javascript/nav/navbar.js"></script>
+    <script src="/javascript/home/index.js"></script>
+
+    <!-- I'm using my fontawesome kit -->
+    <script src="https://kit.fontawesome.com/dccc745c41.js" crossorigin="anonymous"></script>
+    <!-- include the navbar via ejs -->
+    <%- include('../partials/navbar') %>
+    <%- include('../partials/header') %>
+
+  </head>
+  <body>
+
+    <div class="container mt-5">
+      <div class="row">
+        <div class="col-12">
+          <div class="jumbotron text-center">
+            <h1><i class="fas fa-paint-brush"></i> Student Projects </h1>
+            <p>Our Students' Artwork, Gardening Projects, Science Projects and More</p>
+            <% if (currentUser) { %>
+              <% if (currentUser.status == 'faculty') { %>
+                <a class="btn btn-info" href="projects/new"><i class="fas fa-paint-brush"></i> Add Project</a>
+                <!-- <a class="btn btn-secondary" href="projects/data"><i class="fas fa-chart-bar"></i> My Project Data</a> -->
+              <%}%>
+            <% } %>
+          </div>
+        </div>
+      </div>
+
+    <div class="projects">
+
+      <div class="search-filter mb-3">
+        <i class="fas fa-search"></i>
+        <input id="search-input" oninput="searchFunction()" class="form-control" type="text" placeholder="Search..." title="Type a project segment"/>
+      </div><br />
+
+      <% if (currentUser) { %>
+        <span id="loading"></span>
+      <% } %>
+
+      <%projects.reverse().forEach(project => { %>
+        <div class="row">
+          <div class="col-lg-12">
+            <article class="text-block" id="<%=project._id%>">
+              <div class="block-header grey" style="padding-bottom: 20px;">
+                <h5>
+                  <a style="color: white;" href="projects/<%=project._id%>"><%=project.title%></a>
+                  <a class= "float-right" style="color:white; font-size: 80%;"><%=project.date%></a>
+                </h5>
+
+                <% if (currentUser) { %>
+                  <a style="color:white;" href= "../profiles/<%=project.poster._id%>" >
+                    <img src="<%= project.poster.imageUrl %>" alt="profile pic" style="width: 30px; height: 30px; object-fit: cover; border-radius: 50%;">
+                    <%=project.poster.firstName%> <%=project.poster.lastName%>
+                  </a>
+
+                <% } else { %>
+                  <span style="color:white;">
+                    <img src="<%= project.poster.imageUrl %>" alt="profile pic" style="width: 30px; height: 30px; object-fit: cover; border-radius: 50%;">
+                    <%=project.poster.firstName%> <%=project.poster.lastName%>
+                  </span>
+                <% } %>
+
+                  <% if (currentUser) { %>
+                    <% if (currentUser._id.toString() == project.poster._id.toString()) { %>
+                      <button style="margin-left: 10px;" id="edit-button"type="button" class="btn btn-info"><a style="color: white;" href="projects/<%=project._id%>/edit"><i class="fas fa-cog"></i> Edit</a></button>
+
+                      <form action="projects/<%=project._id%>?_method=delete" method="post" style="display: inline-block;">
+                        <button style="color: white;" class="btn btn-danger" type="button" data-toggle="modal" data-target="#modal-<%=project._id%>"><i class="far fa-trash-alt"></i> Delete</button>
+                        <div class="modal fade" id="modal-<%=project._id%>" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+                          <div class="modal-dialog">
+                            <div class="modal-content">
+                              <div class="modal-header">
+                                <h5 class="modal-title" id="exampleModalLabel" style="color: black;">Delete Post?</h5>
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                  <span aria-hidden="true">&times;</span>
+                                </button>
+                              </div>
+                              <div class="modal-body" style="color: black;">
+                                This action is irreversible. You will have to manually recreate this post.
+                              </div>
+                              <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-dismiss="modal">No, Go Back</button>
+                                <button type="submit" class="btn btn-danger">Yes, Delete Post</button>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </form>
+
+                    <% } %>
+
+                      <% if (project.likes.includes(currentUser._id)) { %>
+                        <a style="color: #03a5fc; text-decoration: none; margin-left: 10px;" id="like-<%=project._id%>-index" onclick="like(this)"><i class="fas fa-thumbs-up"></i></a> <span id="likeCount-<%=project._id%>"><%=project.likes.length%></span>
+
+                      <% } else { %>
+                        <a style="color: white; text-decoration: none; margin-left: 10px;" id="like-<%=project._id%>-index" onclick="like(this)"><i class="fas fa-thumbs-up"></i></a> <span id="likeCount-<%=project._id%>"><%=project.likes.length%></span>
+
+                      <% }%>
+                      <a style="color: white; text-decoration: none; margin-left: 10px;" href="/projects/<%=project._id%>#comment-section"><i class="fas fa-comment-dots"></i> <%=project.comments.length%></a>
+                    <% }%>
+
+              </div>
+
+              <div class="block-content" style="text-align: center;">
+                  <% if (project.images.length > 0) { %>
+                    <img style="width: 25%; height: 25%; float: left; border-radius: 15px; margin-bottom: 20px; margin-right: 20px;" src="<%=project.images[0]%>"/>
+                  <% } %>
+
+                  <span hidden>
+                    <% for (let c of project.creators) {%>
+                      <%=c.firstName %> <%=c.lastName %> <%=c.username%>
+                    <% } %></span>
+
+                  <% if (currentUser) { %>
+
+                    <% if (project.creators.length == 0) { %>
+                      <p style="float: left;"><strong>Creators:</strong> <em>None</em></p>
+
+                      <%} else if (project.creators.length == 1){%>
+                        <p style="float: left;"><strong>Creator:</strong> <a style="color: black" href="profiles/<%=project.creators[0]._id%>"><img src="<%= project.creators[0].imageUrl %>" alt="profile pic" style="width: 30px; height: 30px; object-fit: cover; border-radius: 50%;"> <em><%=project.creators[0].firstName%> <%=project.creators[0].lastName%></em></a></p>
+
+                    <%} else if (project.creators.length == 2){%>
+                      <p style="float: left;"><strong>Creators:</strong> <em><a style="color: black" href="profiles/<%=project.creators[0]._id%>"><img src="<%= project.creators[0].imageUrl %>" alt="profile pic" style="width: 30px; height: 30px; object-fit: cover; border-radius: 50%;"> <%=project.creators[0].firstName%> <%=project.creators[0].lastName%></a>, <a style="color: black" href="profiles/<%=project.creators[1]._id%>"><img src="<%= project.creators[1].imageUrl %>" alt="profile pic" style="width: 30px; height: 30px; object-fit: cover; border-radius: 50%;"> <%=project.creators[1].firstName%> <%=project.creators[1].lastName%></a></em></p>
+
+                    <% } else if (project.creators.length > 2) {%>
+                      <p style="float: left;"><strong>Creators:</strong> <em><a style="color: black" href="profiles/<%=project.creators[0]._id%>"><img src="<%= project.creators[0].imageUrl %>" alt="profile pic" style="width: 30px; height: 30px; object-fit: cover; border-radius: 50%;"> <%=project.creators[0].firstName%> <%=project.creators[0].lastName%></a> and <%=project.creators.length - 1%> others</em></p>
+                    <% } %>
+
+                  <% } else { %>
+                    <% if (project.creators.length == 0) { %>
+                      <p style="float: left;"><strong>Creators:</strong> <em>None</em></p>
+
+                      <%} else if (project.creators.length == 1){%>
+                        <p style="float: left;"><strong>Creator:</strong> <span style="color: black"><img src="<%= project.creators[0].imageUrl %>" alt="profile pic" style="width: 30px; height: 30px; object-fit: cover; border-radius: 50%;"> <em><%=project.creators[0].firstName%> <%=project.creators[0].lastName%></em></span></p>
+
+                    <%} else if (project.creators.length == 2){%>
+                      <p style="float: left;"><strong>Creators:</strong> <em><span style="color: black" ><img src="<%= project.creators[0].imageUrl %>" alt="profile pic" style="width: 30px; height: 30px; object-fit: cover; border-radius: 50%;"> <%=project.creators[0].firstName%> <%=project.creators[0].lastName%></span>, <span style="color: black"><img src="<%= project.creators[1].imageUrl %>" alt="profile pic" style="width: 30px; height: 30px; object-fit: cover; border-radius: 50%;"> <%=project.creators[1].firstName%> <%=project.creators[1].lastName%></span></em></p>
+
+                    <% } else if (project.creators.length > 2) {%>
+                      <p style="float: left;"><strong>Creators:</strong> <em><span style="color: black"><img src="<%= project.creators[0].imageUrl %>" alt="profile pic" style="width: 30px; height: 30px; object-fit: cover; border-radius: 50%;"> <%=project.creators[0].firstName%> <%=project.creators[0].lastName%></span> and <%=project.creators.length - 1%> others</em></p>
+                    <% } %>
+                  <% } %>
+
+                  <br /><br />
+
+                <% if (project.text.split(" ").length > 70) { %>
+                  <p style="white-space: pre-wrap;"><%=project.text.split(" ").slice(0,71).join(" ")%> <a href="/projects/<%=project._id%>">(Read More)</a></p>
+                <% } else { %>
+                  <p style="white-space: pre-wrap;"><%=project.text%></p>
+                <% } %>
+
+              </div>
+            </article>
+          </div>
+        </div>
+        <br class="text-break" id="break-<%=project._id%>"/>
+
+      <% }) %>
+    </div>
+  </div>
+</body>
+<script src="/javascript/projects/like.js"></script>
+
+<script>
+
+const searchFunction = (() => {
+  const projects = document.getElementsByClassName('text-block');
+  const breaks = document.getElementsByClassName('text-break');
+  const searchInput = document.getElementById('search-input');
+  let filter = searchInput.value.toLowerCase();
+
+  for (let i = 0; i < projects.length; i += 1) {
+    if (!projects[i].textContent.replace("(Read More)", "").toLowerCase().includes(filter)) {
+      $(`#${projects[i].id}`).hide();
+      $(`#${breaks[i].id}`).hide();
+
+    } else {
+      $(`#${projects[i].id}`).show();
+      $(`#${breaks[i].id}`).show();
+    }
+  }
+})
+
+</script>
+
+</html>

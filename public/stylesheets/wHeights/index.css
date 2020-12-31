@@ -1,10 +1,10 @@
-/* 
+/*
 ================================
 background
 ================================
  */
  #background{
-    background-image: url('https://images.unsplash.com/photo-1432821596592-e2c18b78144f?ixlib=rb-1.2.1&auto=format&fit=crop&w=1950&q=80');
+    background-image: url("https://witherlyheights.org/wp-content/uploads/2019/09/WH-Banner-300x800.jpeg");
     background-position: center;
     background-size: cover;
     min-height: 30rem;
@@ -43,4 +43,3 @@ background
     margin: 0 auto;
     margin-bottom: 3rem;
 }
-

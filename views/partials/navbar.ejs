@@ -17,47 +17,93 @@
                 <ul class="navbar-nav">
                   <% if (currentUser) { %>
                     <li class="nav-item">
-                        <a class="nav-link" href="/chat"><i class="far fa-comment-dots"></i> Chat</a>
+                        <a class="nav-link" href="/projects"><i class="fas fa-paint-brush"></i> Projects</a>
                     </li>
                     <li class="nav-item"></li>
-                      <a class="nav-link disabled" href="/cafe"><i class="fas fa-coffee"></i> EC Cafe</a>
+                      <a class="nav-link" href="/cafe"><i class="fas fa-coffee"></i> EC Cafe</a>
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                         <i class="fas fa-align-justify"></i> Other
                         </a>
 
                         <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-                          <% if (currentUser) { %>
-                            <% if (currentUser.permission == 'admin' || currentUser.status == 'faculty') { %>
-                              <a class="dropdown-item" href="/announce"><i class="fas fa-bullhorn"></i> Send Announcement</a>
-                            <% } %>
-                          <% } %>
+
+                          <a class="dropdown-item" target="_blank" href="https://witherlyheights.org/"><i class="far fa-newspaper"></i> Witherly Heights</a>
                           <!-- <a class="dropdown-item" href="/articles"><i class="far fa-newspaper"></i> Witherly Heights</a> -->
-                          <a class="dropdown-item" href="/projects"><i class="fas fa-paint-brush"></i> Student Projects</a>
+                          <a class="dropdown-item" href="/chat"><i class="fas fa-comment-dots"></i> Chat</a>
+                          <% if (currentUser.annCount.length > 0) { %>
+                            <a class="dropdown-item" href="/announcements"><i class="fas fa-bullhorn"></i> Announcements <span class="badge badge-pill badge-danger"><%=currentUser.annCount.length%></span></a>
+                          <% } else { %>
+                            <a class="dropdown-item" href="/announcements"><i class="fas fa-bullhorn"></i> Announcements</a>
+                          <% }%>
+                          <a class="dropdown-item" href="/homework"><i class="fas fa-chalkboard-teacher"></i> Homework Help</a>
                           <a class="dropdown-item" href="/profiles"><i class="fas fa-user"></i> Users</a>
                         </div>
 
                     </li>
-                  <% } %>
+
+                  <% } else { %>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/projects"><i class="fas fa-paint-brush"></i> Projects</a>
+                    </li>
+
+                    <li class="nav-item">
+                      <a class="nav-link" href="/announcements"><i class="fas fa-bullhorn"></i> Announcements</a>
+                    </li>
+                  <% }%>
 
                 </ul>
                 <ul class="navbar-nav ml-auto">
                   <!-- ejs logic. If there is a user, show the bootstrap dropdown and links below -->
                   <% if(currentUser) { %>
                         <li class="nav-item">
-                            <a class="nav-link" href="/inbox"><i class="fas fa-inbox"></i> Inbox (<%=currentUser.notifCount + currentUser.requests.length%>)</a>
+                          <% if ((currentUser.msgCount + currentUser.requests.length) > 0) { %>
+                            <a class="nav-link" href="/inbox/"><i class="fas fa-inbox"></i> Inbox <span class="badge badge-pill badge-danger"><%=currentUser.msgCount + currentUser.requests.length%></span></a>
+                          <% } else { %>
+                            <a class="nav-link" href="/inbox/"><i class="fas fa-inbox"></i> Inbox</a>
+                          <% } %>
                         </li>
+
+                        <% if (currentUser.permission == 'mod') { %>
+                          <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="" id="navbarDropdownMenuLink" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="fas fa-align-justify"></i> Mod</a>
+                            <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
+                              <a href="/admin/status" class="dropdown-item"><i class="fas fa-user"></i> Change Statuses</a>
+                              <a href="/admin/moderate" class="dropdown-item"><i class="fas fa-flag"></i> Moderate Comments</a>
+                          </li>
+
+                        <% } else if (currentUser.permission == 'admin') { %>
+                          <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="" id="navbarDropdownMenuLink" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="fas fa-align-justify"></i> Admin</a>
+                            <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
+                              <a href="/admin/permissions" class="dropdown-item"><i class="fas fa-user"></i> Change Permissions</a>
+                              <a href="/admin/status" class="dropdown-item"><i class="fas fa-user"></i> Change Statuses</a>
+                              <a href="/admin/moderate" class="dropdown-item"><i class="fas fa-flag"></i> Moderate Comments</a>
+                              <a href="/admin/manageCafe" class="dropdown-item"><i class="fas fa-coffee"></i> Manage EC Cafe</a>
+                          </li>
+
+                        <% } else if (currentUser.permission == 'principal') {%>
+                          <li class="nav-item dropdown">
+                          <a class="nav-link dropdown-toggle" href="" id="navbarDropdownMenuLink" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="fas fa-align-justify"></i> Principal</a>
+                          <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
+                            <a href="/admin/permissions" class="dropdown-item"><i class="fas fa-user"></i> Change Permissions</a>
+                            <a href="/admin/status" class="dropdown-item"><i class="fas fa-user"></i> Change Statuses</a>
+                            <a href="/admin/moderate" class="dropdown-item"><i class="fas fa-flag"></i> Moderate Comments</a>
+                            <a href="/admin/manageCafe" class="dropdown-item"><i class="fas fa-coffee"></i> Manage EC Cafe</a>
+                            <a href="/admin/whitelist" class="dropdown-item"><i class="fas fa-inbox"></i> Email Whitelist</a>
+                              <a href="#" class="dropdown-item"><i class="fas fa-money-check"></i> Student Balances</a>
+                          </li>
+                        <% } %>
+
+
                         <li class="nav-item dropdown">
                           <a class="nav-link dropdown-toggle" href="" id="navbarDropdownMenuLink" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                               <img src="<%= currentUser.imageUrl %>" alt="profile pic" style="width: 20px; height: 20px; object-fit: cover; border-radius: 50%; display: inline-block;">
                               <%= currentUser.firstName.charAt(0) %>.<%= currentUser.lastName.charAt(0) %>.
                           </a>
                           <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
-                            <a class="dropdown-item" href="/profiles/<%= currentUser._id %>">View Profile</a>
-                            <% if (currentUser.permission == 'admin' || currentUser.permission == 'principal') { %>
-                                    <a class="dropdown-item" href="/admin">Admin Controls</a>
-                            <% } %>
-                            <a class="dropdown-item" href="/logout">Logout</a>
+                            <a class="dropdown-item" href="/profiles/<%= currentUser._id %>"><i class="fas fa-user"></i> View Profile</a>
+                            <a class="dropdown-item" href="/logout"><i class="fas fa-sign-out-alt"></i> Logout</a>
                           </div>
                       </li>
                   <!-- if there is no user, show the register and login links -->
@@ -75,30 +121,31 @@
     </nav>
 
     <!-- Login Form -->
-    <form class="user-form login" action="/login" method="post">
+    <form class="user-form login" method="post" id="login-form">
         <span class="form-close login"><i class="far fa-window-close"></i></span>
         <div class="form-group mt-3">
             <label for="email-login">Email address</label>
-            <input name="email" type="email" class="form-control" id="email-login" placeholder="enter email" required>
+            <input name="email" type="email" class="form-control" id="email-login" placeholder="enter email">
         </div>
         <div class="form-group">
             <label for="password-login">Password</label>
-            <input name="password" type="password" class="form-control" id="password-login" placeholder="enter password" required>
+            <input name="password" type="password" class="form-control" id="password-login" placeholder="enter password">
         </div>
-        <button type="submit" class="btn btn-success float-right">Login</button>
+        <button data-toggle="modal" data-target="#modal-pwd" id="forgot-button" type="button" class="btn btn-warning float-left">Forgot Password?</button>
+        <button type="submit" formaction="/login"  class="btn btn-success float-right">Login</button>
     </form>
 
     <!-- onsubmit="disableBtn()" -->
     <!-- Sign Up Form -->
-    <form name="signup" class="user-form signup" action="/register" method="post" onsubmit="return submitActions()">
+    <form name="signup" id="signup" action="/register"  method="post" class="user-form signup">
         <span class="form-close signup"><i class="far fa-window-close"></i></span>
         <div class="user-info display">
             <div class="form-group mt-3">
-                <label for="firstName-signup">First</label>
+                <label for="firstName-signup">First Name</label>
                 <input name="firstName" type="text" class="form-control" id="firstName-signup">
             </div>
             <div class="form-group">
-                <label for="lastName-signup">Last</label>
+                <label for="lastName-signup">Last Name</label>
                 <input name="lastName" type="text" class="form-control" id="lastName-signup">
             </div>
             <div class="form-group">
@@ -111,15 +158,15 @@
             <div class="form-group mt-3">
                 <label for="email-signup">Email address</label>
                 <input name="email" type="email" class="form-control" id="email-signup" aria-describedby="emailHelp">
-                <small id="emailHelp" class="form-text text-muted">We'll never share your email with anyone else.</small>
+                <small id="emailHelp" class="form-text text-muted">Your email determines whether you are part of the Alsion community.</small>
             </div>
             <div class="form-group">
                 <label for="password-signup">Password</label>
-                <input name="password" type="password" class="form-control" id="password-signup" placeholder="(min 8 char)">
+                <input name="password" type="password" class="form-control" id="password-signup" minlength="8" placeholder="(min 8)">
             </div>
-            <div style="position: relative;">
-                <button type="button" class="btn btn-secondary btn-h btn-l" onclick="back()"><i class="fas fa-arrow-left"></i> Back</button>
-                <button type="submit" id="register-button" class="btn btn-success btn-h btn-r"><i class="far fa-plus-square"></i> Sign Up</button>
+            <div style="position: relative; text-align: center;">
+                <button type="button" class="btn btn-secondary" onclick="back()"><i class="fas fa-arrow-left"></i> Go Back</button>
+                <button type="button" id="register-button" data-toggle="modal" data-target="#modal-terms" class="btn btn-success"><i class="far fa-plus-square"></i> Sign Up</button>
             </div>
         </div>
     </form>
@@ -138,3 +185,19 @@
         <% } %>
     </div>
 </div>
+<%- include('forgot-password') %>
+<%- include('agreement') %>
+
+<script>
+
+  const checkIfAgree = e => {
+    if(!document.getElementById('agree').checked) {
+      e.preventDefault();
+    }
+  }
+
+  document.getElementById('confirm-agreement').addEventListener('click', e => {
+    checkIfAgree(e)
+  })
+
+</script>

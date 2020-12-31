@@ -1,30 +1,37 @@
-function order(form, customer) {
+const order = ((form, customer) => {
   var socket = io();
+  let items = document.getElementById('item-list');
 
   $(form).submit(function (e) {
-    // e.preventDefault();
 
     var instructions = $('#descInput').val();
+    var payingInPerson = document.getElementById('payingInPerson').checked;
+    var balance = parseFloat(document.getElementById('balance-box').innerText.split("$")[1]);
+    var charge = parseFloat(document.getElementById('total-cost').innerText.split("$")[1]);
     var itemList = [];
     var itemCount = [];
-    $('#item-list > .form-check').each(function(index) {
+
+    $('#item-list > .form-check > .style-div').each(function(index) {
 
       if ($(this).find('input').is(':checked')) {
         let currentItemName = $(this).find('input').attr('id');
         itemList.push(currentItemName);
         let currentItemCount = $(this).find('select').val();
         itemCount.push(currentItemCount);
-        console.log(itemList)
       }
       // this = current accessed element
       // index = int index of current element relative to parent list
     });
-    socket.emit('order', itemList, itemCount, instructions, customer);
-    console.log("_" + instructions + "_");
-  });
-}
 
-function getOrders(outputStream) {
+    if (itemList.length > 0) {
+      if (!payingInPerson && charge > balance) {} else {
+        socket.emit('order', itemList, itemCount, instructions, payingInPerson, customer);
+      }
+    }
+  });
+})
+
+const getOrders = (outputStream => {
   var socket = io();
 
   socket.on('connect', () => {
@@ -34,15 +41,15 @@ function getOrders(outputStream) {
   socket.on('order', (order, foundItems) => {
     console.log("new order");
 
-    function getInstructions() {
+    const getInstructions = (() => {
       if (!order.instructions || order.instructions == "") {
         return `<p class="card-text">No extra instructions</p>`;
       } else {
-        return `<p class="card-text"><strong>Extra Instructions:</strong> ${order.instructions}</p>`
+        return `<p class="card-text"><strong>Extra Instructions:</strong> ${order.instructions}</p>`;
       }
-    }
+    })
 
-    function getItems() {
+    const getItems = (() => {
       var str = ``;
 
       for (let i = 0; i < order.items.length; i++) {
@@ -50,7 +57,7 @@ function getOrders(outputStream) {
       }
 
       return str;
-    }
+    })
 
     $(outputStream).prepend(`
       <div class="card mt-3">
@@ -69,4 +76,4 @@ function getOrders(outputStream) {
       </div>
     `);
   });
-}
+})

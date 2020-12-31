@@ -28,7 +28,14 @@
             <div class="col-12">
                 <h1>Moderator Page</h1>
                 <hr>
-                <h4>Reported Comments</h4>
+
+                <% if (comments.length == 0) { %>
+                  <h4>No Reported Comments</h4>
+                  
+                <% } else { %>
+                  <h4>Reported Comments</h4>
+                <% } %>
+
                 <hr>
                 <ul class="list-group mt-3">
                     <% comments.forEach(comment => { %>

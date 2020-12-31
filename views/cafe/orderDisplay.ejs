@@ -6,9 +6,11 @@
     <title>Saberchat</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css" integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk" crossorigin="anonymous">
     <!-- link chat stylesheet -->
+    <link rel="stylesheet" href="/stylesheets/main.css">
     <link rel="stylesheet" href="/stylesheets/components/header.css">
     <link rel="stylesheet" href="/stylesheets/components/navbar.css">
-    <link rel="stylesheet" href="/stylesheets/components/announcement.css">
+    <link rel="stylesheet" href="/stylesheets/home/index.css">
+    <link rel="stylesheet" href="/stylesheets/chat/new.css">
 
     <!-- using my fontawesome kit -->
     <script src="https://kit.fontawesome.com/dccc745c41.js" crossorigin="anonymous"></script>
@@ -26,7 +28,6 @@
   <body>
     <%- include("../partials/navbar") %>
     <%- include('../partials/header') %>
-    <%- include('../partials/announcement') %>
 
     <div class="container mt-5">
       <div class="row">
@@ -34,37 +35,112 @@
           <div class="jumbotron text-center">
             <h1><i class="fas fa-coffee"></i> Orders</h1>
             <p>All New Orders</p>
+            <a class="btn btn-primary" href="manage"><i class="fas fa-arrow-left"></i> Back</a>
           </div>
         </div>
       </div>
     </div>
 
     <div id="output-stream" class="container mt-3">
-      <% orders.reverse().forEach((order) => { %>
-        <div class="card mt-3">
-          <div class="card-body">
-            <h5 class="card-title">Order for <%= order.name %></h5>
-            <% if (!order.instructions || order.instructions == "") { %>
-              <p class="card-text">No extra instructions</p>
-            <% } else { %>
+
+      <div class="search-filter mb-3">
+        <i class="fas fa-search"></i>
+        <input id="search-input" oninput="searchFunction()" class="form-control" type="text" placeholder="Search..." title="Type in an order segment"/>
+      </div><br />
+
+      <% if (orders.length == 0) { %>
+        <h2 style="text-align: center;">No New Orders</h2>
+      <% } else { %>
+        <% orders.reverse().forEach((order) => { %>
+          <div class="card mt-3" id="<%=order._id%>">
+            <div class="card-body">
+              <h5 class="card-title">Order for <%= order.name %></h5>
               <p class="card-text"><strong>Extra Instructions:</strong> <%= order.instructions %></p>
-            <% } %>
-            <ul class="list-group">
-              <% for (let i = 0; i < order.items.length; i++) { %>
-                  <li class="list-group-item"><%= order.items[i].name %>: <%=order.quantities[i] %> order(s)</li>
+              <ul class="list-group">
+                <% for (let i = 0; i < order.items.length; i++) { %>
+
+                  <% if (!(order.items[i].quantity * order.items[i].item.price).toString().includes('.')) { %>
+                    <li class="list-group-item"><%= order.items[i].item.name %> (<%=order.items[i].quantity %> orders) - $<%=order.items[i].quantity * order.items[i].item.price%>.00</li>
+
+                  <% } else if ((order.items[i].quantity * order.items[i].item.price).toString().split('.')[1].length == 1){ %>
+                    <li class="list-group-item"><%= order.items[i].item.name %> (<%=order.items[i].quantity %> orders) - $<%=order.items[i].quantity * order.items[i].item.price%>0</li>
+
+                  <% } else { %>
+                    <li class="list-group-item"><%= order.items[i].item.name %> (<%=order.items[i].quantity %> orders) - $<%=order.items[i].quantity * order.items[i].item.price%></li>
+                  <% } %>
+
+                <% } %>
+              </ul>
+
+              <% if (!order.charge.toString().includes('.')) { %>
+                <p class="card-text mt-3"><strong>Cost:</strong> $<%= order.charge %>.00</p>
+
+              <% } else if (order.charge.toString().split('.')[1].length == 1){ %>
+                <p class="card-text mt-3"><strong>Cost:</strong> $<%= order.charge %>0</p>
+
+              <% } else { %>
+                <p class="card-text mt-3"><strong>Cost:</strong> $<%= order.charge %></p>
               <% } %>
-            </ul>
-            <p class="card-text mt-3"><strong>Cost:</strong> $<%= order.charge %></p>
-            <p class="card-text"><%= order.date %></p>
-            <form class="ready-form" action="<%= order._id %>/ready" method="post">
-              <button type="submit" class="btn btn-primary" name="button">Order Ready</button>
-            </form>
+
+              <p style="margin-top: 20px;"><strong>
+
+              <% if (order.payingInPerson) { %>
+                Paying In-Person
+              <% } else { %>
+                Paying Online
+              <% } %>
+            </strong></p>
+
+              <p class="card-text"><%= order.date %></p>
+              <form class="ready-form" action="<%= order._id %>/ready" method="post">
+                <button type="submit" class="btn btn-primary" name="button">Order Ready</button>
+                <button type="button" data-toggle="modal" data-target="#modal<%=order._id%>" class="btn btn-danger" name="button">Reject Order</button>
+
+                <div class="modal fade" id="modal<%=order._id%>" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+                  <div class="modal-dialog">
+                    <div class="modal-content">
+                      <div class="modal-header">
+                        <h5 class="modal-title" id="exampleModalLabel">Reject Order?</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                          <span aria-hidden="true">&times;</span>
+                        </button>
+                      </div>
+                      <div class="modal-body">
+                        This action is irreversible. Only reject this order if there is something wrong about it, or you suspect it to not be genuine. You might want to check with a faculty member and the customer first.
+                        <br /><input class="form-control" style="margin-top: 10px;" type="text" name="rejectionReason" placeholder="Enter reason for rejecting order" />
+                      </div>
+                      <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">No, Go Back</button>
+                        <button type="submit" class="btn btn-danger" formaction="<%=order._id%>/reject" >Yes, Reject Order</button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+              </form>
+            </div>
           </div>
-        </div>
-      <% }); %>
+        <% }); %>
+      <% } %>
     </div>
     <script>
       getOrders("#output-stream");
+
+      const searchFunction = (() => {
+        const orders = document.getElementsByClassName('card');
+        const searchInput = document.getElementById('search-input');
+        let filter = searchInput.value.toLowerCase();
+
+        for (let i = 0; i < orders.length; i += 1) {
+          if (!orders[i].innerText.toLowerCase().includes(filter)) {
+            $(`#${orders[i].id}`).hide();
+
+          } else {
+            $(`#${orders[i].id}`).show();
+          }
+        }
+      })
+
     </script>
   </body>
 </html>

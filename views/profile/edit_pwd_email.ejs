@@ -10,7 +10,6 @@
     <!-- link css for navbar. Don't need to include public/javascript/userForm.js since user is already logged in and does not need to access login and register forms.  -->
     <link rel="stylesheet" href="/stylesheets/components/navbar.css">
     <link rel="stylesheet" href="/stylesheets/components/header.css">
-    <link rel="stylesheet" href="/stylesheets/components/announcement.css">
 
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
@@ -24,12 +23,12 @@
     <%- include('../partials/navbar') %>
     <!-- include the backdrop for nav -->
     <%- include('../partials/header') %>
-    <%- include('../partials/announcement') %>
 
     <div class="container mt-5">
         <div class="row">
-            <div class="col-12">
-                <h1 style="text-align: center; width: 100%">Change Email Or Password</h1>
+            <div class="col-12" style="text-align: center;">
+                <h1 style="width: 100%">Edit Account Settings</h1>
+                <a class="btn btn-primary" href="/profiles/<%= currentUser._id %>"><i class="fas fa-arrow-left"></i> Back</a>
             </div>
         </div>
         <div class="row mt-3">
@@ -41,7 +40,7 @@
                         <input id="usernameInput" class="form-control" type="text" name="email" value="<%= currentUser.email %>" placeholder="Enter New Email" required>
                     </div>
 
-                    <button class="btn btn-lg btn-primary btn-block">Submit</button>
+                    <button class="btn btn-lg btn-primary btn-block">Change Email</button>
                 </form>
                 <h4 class="mt-5 mb-3">Change Password</h4>
                 <form action="/profiles/change-password?_method=put" method="post">
@@ -51,12 +50,38 @@
                     </div>
                     <div class="form-group">
                         <label for="usernameInput">New Password</label>
-                        <input id="usernameInput" class="form-control" type="password" name="newPassword" placeholder="Enter New Password" required>
+                        <input id="usernameInput" class="form-control" type="password" name="newPassword" placeholder="Enter New Password" minlength="8" required><br />
+                        <label for="usernameInput">Confirm New Password</label>
+                        <input id="usernameInput" class="form-control" type="password" name="newPasswordConfirm" placeholder="Confirm New Password" minlength="8" required>
                     </div>
 
-                    <button class="btn btn-lg btn-primary btn-block">Submit</button>
+                    <button class="btn btn-lg btn-primary btn-block">Change Password</button>
                 </form>
-                <a style="display: block; margin-top: 1rem;" href="/profiles/<%= currentUser._id %>">Go Back</a>
+
+                <br />
+                <form action="/profiles/delete-account?_method=delete" method="post" style="margin-top: 30px;">
+                  <button type="button" class="btn btn-lg btn-danger btn-block" data-toggle="modal" data-target="#modal" id="delete-button">Delete Account</button>
+                  <div class="modal fade" id="modal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+                    <div class="modal-dialog">
+                      <div class="modal-content">
+                        <div class="modal-header">
+                          <h5 class="modal-title" id="exampleModalLabel">Delete Account?</h5>
+                          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                          </button>
+                        </div>
+                        <div class="modal-body">
+                          All of your account data will be deleted.
+                        </div>
+                        <div class="modal-footer">
+                          <button type="button" class="btn btn-secondary" data-dismiss="modal">No, Go Back</button>
+                          <button type="submit" class="btn btn-danger">Yes, Delete My Account</button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </form>
+                <br />
             </div>
         </div>
     </div>

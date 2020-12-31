@@ -7,6 +7,8 @@ const getDiscriminatorByValue = require('../discriminator/getDiscriminatorByValu
 const isPathExcluded = require('../projection/isPathExcluded');
 const getSchemaTypes = require('./getSchemaTypes');
 const getVirtual = require('./getVirtual');
+const lookupLocalFields = require('./lookupLocalFields');
+const mpath = require('mpath');
 const normalizeRefPath = require('./normalizeRefPath');
 const util = require('util');
 const utils = require('../../utils');
@@ -65,6 +67,7 @@ module.exports = function getModelsMapForPopulate(model, docs, options) {
     modelNames = null;
     let isRefPath = !!_firstWithRefPath;
     let normalizedRefPath = _firstWithRefPath ? get(_firstWithRefPath, 'options.refPath', null) : null;
+    let schemaOptions = null;
 
     if (Array.isArray(schema)) {
       const schemasArray = schema;
@@ -102,6 +105,7 @@ module.exports = function getModelsMapForPopulate(model, docs, options) {
         isRefPath = res.isRefPath;
         normalizedRefPath = res.refPath;
         justOne = res.justOne;
+        schemaOptions = get(schema, 'options.populate', null);
       } catch (error) {
         return error;
       }
@@ -121,6 +125,8 @@ module.exports = function getModelsMapForPopulate(model, docs, options) {
         _virtualRes.nestedSchemaPath + '.' : '';
       if (typeof virtual.options.localField === 'function') {
         localField = virtualPrefix + virtual.options.localField.call(doc, doc);
+      } else if (Array.isArray(virtual.options.localField)) {
+        localField = virtual.options.localField.map(field => virtualPrefix + field);
       } else {
         localField = virtualPrefix + virtual.options.localField;
       }
@@ -191,6 +197,27 @@ module.exports = function getModelsMapForPopulate(model, docs, options) {
       foreignField = foreignField.call(doc);
     }
 
+    let match = get(options, 'match', null) ||
+      get(currentOptions, 'match', null) ||
+      get(options, 'virtual.options.match', null) ||
+      get(options, 'virtual.options.options.match', null);
+
+    let hasMatchFunction = typeof match === 'function';
+    if (hasMatchFunction) {
+      match = match.call(doc, doc);
+    }
+
+    if (Array.isArray(localField) && Array.isArray(foreignField) && localField.length === foreignField.length) {
+      match = Object.assign({}, match);
+      for (let i = 1; i < localField.length; ++i) {
+        match[foreignField[i]] = convertTo_id(mpath.get(localField[i], doc, lookupLocalFields), schema);
+        hasMatchFunction = true;
+      }
+
+      localField = localField[0];
+      foreignField = foreignField[0];
+    }
+
     const localFieldPathType = modelSchema._getPathType(localField);
     const localFieldPath = localFieldPathType === 'real' ? modelSchema.path(localField) : localFieldPathType.schema;
     const localFieldGetters = localFieldPath && localFieldPath.getters ? localFieldPath.getters : [];
@@ -203,30 +230,20 @@ module.exports = function getModelsMapForPopulate(model, docs, options) {
       options.isVirtual && get(virtual, 'options.getters', false);
     if (localFieldGetters.length > 0 && getters) {
       const hydratedDoc = (doc.$__ != null) ? doc : model.hydrate(doc);
-      const localFieldValue = utils.getValue(localField, doc);
+      const localFieldValue = mpath.get(localField, doc, lookupLocalFields);
       if (Array.isArray(localFieldValue)) {
-        const localFieldHydratedValue = utils.getValue(localField.split('.').slice(0, -1), hydratedDoc);
+        const localFieldHydratedValue = mpath.get(localField.split('.').slice(0, -1), hydratedDoc, lookupLocalFields);
         ret = localFieldValue.map((localFieldArrVal, localFieldArrIndex) =>
           localFieldPath.applyGetters(localFieldArrVal, localFieldHydratedValue[localFieldArrIndex]));
       } else {
         ret = localFieldPath.applyGetters(localFieldValue, hydratedDoc);
       }
     } else {
-      ret = convertTo_id(utils.getValue(localField, doc), schema);
+      ret = convertTo_id(mpath.get(localField, doc, lookupLocalFields), schema);
     }
 
     const id = String(utils.getValue(foreignField, doc));
     options._docs[id] = Array.isArray(ret) ? ret.slice() : ret;
-
-    let match = get(options, 'match', null) ||
-      get(currentOptions, 'match', null) ||
-      get(options, 'virtual.options.match', null) ||
-      get(options, 'virtual.options.options.match', null);
-
-    const hasMatchFunction = typeof match === 'function';
-    if (hasMatchFunction) {
-      match = match.call(doc, doc);
-    }
 
     // Re: gh-8452. Embedded discriminators may not have `refPath`, so clear
     // out embedded discriminator docs that don't have a `refPath` on the
@@ -282,7 +299,12 @@ module.exports = function getModelsMapForPopulate(model, docs, options) {
           originalModel :
           modelName[modelSymbol] ? modelName : connection.model(modelName);
       } catch (error) {
-        return error;
+        // If `ret` is undefined, we'll add an empty entry to modelsMap. We shouldn't
+        // execute a query, but it is necessary to make sure `justOne` gets handled
+        // correctly for setting an empty array (see gh-8455)
+        if (ret !== undefined) {
+          return error;
+        }
       }
 
       let ids = ret;
@@ -292,13 +314,15 @@ module.exports = function getModelsMapForPopulate(model, docs, options) {
         ids = flat.filter((val, i) => modelNames[i] === modelName);
       }
 
-      if (!available[modelName] || currentOptions.perDocumentLimit != null) {
+      if (!available[modelName] || currentOptions.perDocumentLimit != null || get(currentOptions, 'options.perDocumentLimit') != null) {
         currentOptions = {
           model: Model
         };
 
         if (isVirtual && get(virtual, 'options.options')) {
           currentOptions.options = utils.clone(virtual.options.options);
+        } else if (schemaOptions != null) {
+          currentOptions.options = Object.assign({}, schemaOptions);
         }
         utils.merge(currentOptions, options);
 
