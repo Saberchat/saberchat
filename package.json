@@ -21,6 +21,7 @@
     "@editorjs/editorjs": "^2.18.0",
     "@editorjs/header": "^2.5.0",
     "@editorjs/list": "^1.5.0",
+    "Validator": "^1.1.2",
     "bad-words": "^3.0.3",
     "body-parser": "^1.19.0",
     "cloudinary": "^1.23.0",

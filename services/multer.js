@@ -1,5 +1,6 @@
 const multer = require('multer');
 const path = require('path');
+const util = require('util');
 
 const storage = multer.memoryStorage();
 const imageFilter = (req, file, callback) => {
@@ -18,6 +19,6 @@ const multerConfig = {
     }
 };
 
-const multerUpload = multer(multerConfig).single('imageFile');
+const multerUpload = util.promisify(multer(multerConfig).single('imageFile'));
 
 module.exports = multerUpload;

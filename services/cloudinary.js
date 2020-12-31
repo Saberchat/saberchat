@@ -1,6 +1,7 @@
 require('dotenv').config();
 
 const cloudinary = require('cloudinary').v2;
+const util = require('util');
 
 cloudinary.config({
     cloud_name:"dhifj0kpt",
@@ -20,5 +21,6 @@ cloudinary.config({
 //     });
 //     return [err, result];
 // };
+const cloudUploader = util.promisify(cloudinary.uploader.upload);
 
-module.exports = cloudinary.uploader;
+module.exports = cloudUploader;
