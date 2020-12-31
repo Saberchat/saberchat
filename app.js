@@ -13,14 +13,10 @@ const LocalStrategy = require('passport-local');
 const flash = require('connect-flash');
 //middleware; parses incoming data from client under req.body
 const bodyParser = require('body-parser');
-//parses and creates cookies
-const cookieParser = require('cookie-parser');
-//allow us to use PUT and DELETE methods
+//allow us to use other methods besides post and get
 const methodOverride = require('method-override');
 // package for formating dates on the serverside
 const dateFormat = require('dateformat');
-//Allows Node.js to send emails
-const nodemailer = require("nodemailer");
 
 //pretty up the console
 // const colors = require('colors');
@@ -79,7 +75,6 @@ app.use('/editor', express.static(__dirname + "/node_modules/@editorjs"));
 app.use(bodyParser.urlencoded({
   extended: true
 }));
-app.use(cookieParser());
 //set view engine to ejs
 app.set("view engine", "ejs");
 // I think yall already know what method override is
