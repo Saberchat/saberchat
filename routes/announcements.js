@@ -9,7 +9,7 @@ const nodemailer = require('nodemailer');
 
 const multerUpload = require('../services/multer');
 const parseBuffer = require('../services/dataUri');
-const cloudUploader = require('../services/cloudinary');
+const { cloudUploader, cloudDestroyer } = require('../services/cloudinary');
 
 //SCHEMA
 const User = require('../models/user');
@@ -187,7 +187,7 @@ router.post('/', middleware.isLoggedIn, middleware.isMod, (req, res) => { //REST
         from: 'noreply.saberchat@gmail.com',
         to: user.email,
         subject: `New Saberchat Announcement - ${announcement.subject}`,
-        html: `<p>Hello ${user.firstName},</p><p>${req.user.username} has recently posted a new announcement - '${announcement.subject}'.</p><p>${announcement.text}</p><p>You can access the full announcement at https://alsion-saberchat.herokuapp.com</p> ${imageString}`
+        html: `<p>Hello ${user.firstName},</p><p>${req.user.username} has recently posted a new announcement - '${announcement.subject}'.</p><p>${announcement.text}</p><p>You can access the full announcement at https://alsion-saberchat.herokuapp.com</p> ${announcement.imageFile.url} ${imageString}`
       };
 
       transporter.sendMail(announcementEmail, (err, info) => {
@@ -355,6 +355,9 @@ router.put('/comment', middleware.isLoggedIn, (req, res) => {
 
 router.put('/:id', middleware.isLoggedIn, middleware.isMod, (req, res) => { //RESTful Routing 'UPDATE' route
   (async() => {
+    // parse req.body and upload img buffer to memory as req.file
+    const multError = await multerUpload(req, res).catch(err=>{return err});
+    if(multError){req.flash('error', multError.message); return res.redirect('back');}
 
     const announcement = await Announcement.findById(req.params.id).populate('sender');
 
@@ -369,76 +372,114 @@ router.put('/:id', middleware.isLoggedIn, middleware.isMod, (req, res) => { //RE
     }
 
     const updatedAnnouncement = await Announcement.findByIdAndUpdate(req.params.id, {subject: req.body.subject, text: req.body.message});
-      if (!updatedAnnouncement) {
-        req.flash('error', "Unable to update announcement");
+    if (!updatedAnnouncement) {
+      req.flash('error', "Unable to update announcement");
+      return res.redirect('back');
+    }
+
+    updatedAnnouncement.images = []; //Empty image array so that you can fill it with whatever images are added (all images are there, not just new ones)
+    if(req.body.images) { //Only add images if any are provided
+      for(const image in req.body.images) {
+        updatedAnnouncement.images.push(req.body.images[image]);
+      }
+    }
+
+    // delete image if delete upload check is checked
+    if(req.body.deleteUpload === "true" && updatedAnnouncement.imageFile.filename) {
+      const filename = updatedAnnouncement.imageFile.filename;
+      let cloudResult;
+      let cloudError;
+      // delete image
+      await cloudDestroyer(filename)
+        .catch(err=> {cloudError = err;})
+        .then(result=> {cloudResult = result;});
+      
+      // check for failure
+      if(cloudError || !cloudResult || cloudResult.result !== 'ok') {
+        req.flash('error', 'Could not delete image');
         return res.redirect('back');
       }
+      updatedAnnouncement.imageFile = {};
+    }
+    // Replace image if there is an upload
+    if(req.file) {
+      // turn buffer into file
+      const imgFile = parseBuffer(req.file.originalname, req.file.buffer).content;
 
-      updatedAnnouncement.images = []; //Empty image array so that you can fill it with whatever images are added (all images are there, not just new ones)
-      if(req.body.images) { //Only add images if any are provided
-        for(const image in req.body.images) {
-          updatedAnnouncement.images.push(req.body.images[image]);
-        }
-      }
+      // upload to cloudinary
+      const options = {
+        folder: 'SaberChat'
+      };
+      let cloudErr;
+      let cloudResult;
+      await cloudUploader(imgFile, options)
+        .then(result => { cloudResult = result; })
+        .catch(err => { cloudErr = err; });
+      if(cloudErr || !cloudResult){req.flash('error', 'Re-upload failed'); return res.redirect('back');}
 
-      await updatedAnnouncement.save();
+      // set upload info
+      updatedAnnouncement.imageFile.url = cloudResult.secure_url;
+      updatedAnnouncement.imageFile.filename = cloudResult.public_id;
+    }
 
-      const users = await User.find({authenticated: true, _id: {$nin: [req.user._id]}});
+    await updatedAnnouncement.save();
 
-      let announcementEmail;
+    const users = await User.find({authenticated: true, _id: {$nin: [req.user._id]}});
 
-      let imageString = "";
+    let announcementEmail;
 
-      for (let image of announcement.images) {
-        imageString += `<img src="${image}">`;
-      }
+    let imageString = "";
 
-      if (!users) {
-        req.flash('error', "Unable To Access Database");
-        res.rediect('back');
-      }
+    for (let image of announcement.images) {
+      imageString += `<img src="${image}">`;
+    }
 
-      let announcementObject = {
-        announcement: updatedAnnouncement,
-        version: "updated"
+    if (!users) {
+      req.flash('error', "Unable To Access Database");
+      return res.rediect('back');
+    }
+
+    let announcementObject = {
+      announcement: updatedAnnouncement,
+      version: "updated"
+    };
+
+    let overlap;
+
+    for (let user of users) {
+
+      announcementEmail = {
+        from: 'noreply.saberchat@gmail.com',
+        to: user.email,
+        subject: `Updated Saberchat Announcement - ${announcement.subject}`,
+        html: `<p>Hello ${user.firstName},</p><p>${req.user.username} has recently updated an announcement - '${announcement.subject}'.</p><p>${announcement.text}</p><p>You can access the full announcement at https://alsion-saberchat.herokuapp.com</p> ${imageString}`
       };
 
-      let overlap;
-
-      for (let user of users) {
-
-        announcementEmail = {
-          from: 'noreply.saberchat@gmail.com',
-          to: user.email,
-          subject: `Updated Saberchat Announcement - ${announcement.subject}`,
-          html: `<p>Hello ${user.firstName},</p><p>${req.user.username} has recently updated an announcement - '${announcement.subject}'.</p><p>${announcement.text}</p><p>You can access the full announcement at https://alsion-saberchat.herokuapp.com</p> ${imageString}`
-        };
-
-        transporter.sendMail(announcementEmail, (err, info) => {
-  				if (error) {
-  					console.log(err);
-  				} else {
-  					console.log('Email sent: ' + info.response);
-  				}
-  			});
-
-        overlap = false;
-
-        for (let a of user.annCount) {
-          if (a.announcement.toString() == updatedAnnouncement._id.toString()) {
-            overlap = true;
-            break;
-          }
+      transporter.sendMail(announcementEmail, (err, info) => {
+        if (error) {
+          console.log(err);
+        } else {
+          console.log('Email sent: ' + info.response);
         }
+      });
 
-        if (!overlap) {
-          user.annCount.push(announcementObject);
-          await user.save();
+      overlap = false;
+
+      for (let a of user.annCount) {
+        if (a.announcement.toString() == updatedAnnouncement._id.toString()) {
+          overlap = true;
+          break;
         }
       }
 
-      req.flash('success', 'Announcement Updated!');
-      res.redirect(`/announcements/${updatedAnnouncement._id}`);
+      if (!overlap) {
+        user.annCount.push(announcementObject);
+        await user.save();
+      }
+    }
+
+    req.flash('success', 'Announcement Updated!');
+    res.redirect(`/announcements/${updatedAnnouncement._id}`);
 
   })().catch(err => {
     console.log(err)
@@ -460,41 +501,57 @@ router.delete('/:id', middleware.isLoggedIn, middleware.isMod, (req, res) => { /
       req.flash('error', "You can only delete announcements that you have posted");
       return res.redirect('back');
 
-    } else {
-      const deletedAnn = await Announcement.findByIdAndDelete(announcement._id);
+    }
+    // delete any uploads
+    if(announcement.imageFile && announcement.imageFile.filename) {
+      const filename = announcement.imageFile.filename;
+      let cloudResult;
+      let cloudError;
+      // delete image
+      await cloudDestroyer(filename)
+        .catch(err=> {cloudError = err;})
+        .then(result=> {cloudResult = result;});
+      
+      // check for failure
+      if(cloudError || !cloudResult || cloudResult.result !== 'ok') {
+        req.flash('error', 'Error deleting uploaded image');
+        return res.redirect('back');
+      }
+    }
 
-      if (!deletedAnn) {
-        req.flash('error', "Unable to delete announcement");
+    const deletedAnn = await Announcement.findByIdAndDelete(announcement._id);
+
+    if (!deletedAnn) {
+      req.flash('error', "Unable to delete announcement");
+      return res.redirect('back');
+    }
+
+    const users = await User.find({authenticated: true}, (err, users) => {
+      if (!users) {
+        req.flash('error', "Unable to find users");
         return res.redirect('back');
       }
 
-      const users = await User.find({authenticated: true}, (err, users) => {
-        if (!users) {
-          req.flash('error', "Unable to find users");
-          return res.redirect('back');
-        }
+      for (let user of users) {
 
-        for (let user of users) {
+        let index;
 
-          let index;
-
-          for (let i = 0; i < user.annCount.length; i += 1) {
-            if (user.annCount[i].announcement.toString() == deletedAnn._id.toString()) {
-              index = i;
-            }
-          }
-
-          if (index > -1) {
-            user.annCount.splice(index, 1);
-            user.save();
+        for (let i = 0; i < user.annCount.length; i += 1) {
+          if (user.annCount[i].announcement.toString() == deletedAnn._id.toString()) {
+            index = i;
           }
         }
-      })
 
-      req.flash('success', 'Announcement Deleted!');
-      res.redirect('/announcements/');
+        if (index > -1) {
+          user.annCount.splice(index, 1);
+          user.save();
+        }
+      }
+    })
 
-    }
+    req.flash('success', 'Announcement Deleted!');
+    res.redirect('/announcements/');
+
   })().catch(err => {
     console.log(err)
     req.flash('error', "Unable To Access Database")
