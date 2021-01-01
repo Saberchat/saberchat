@@ -1,5 +1,8 @@
-// set up env vars. commented out for deployment
-require('dotenv').config();
+// set up env vars if in local developmeent
+if(process.env.NODE_ENV !== "production") {
+	require('dotenv').config();
+}
+
 // Require NodeJS modules
 //set up and start the express server
 const express = require('express');

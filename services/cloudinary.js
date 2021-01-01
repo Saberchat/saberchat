@@ -1,4 +1,6 @@
-require('dotenv').config();
+if(process.env.NODE_ENV !== "production") {
+  require('dotenv').config();
+}
 
 const parseBuffer = require('./dataUri');
 const cloudinary = require('cloudinary').v2;
