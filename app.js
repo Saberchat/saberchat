@@ -17,6 +17,10 @@ const bodyParser = require('body-parser');
 const methodOverride = require('method-override');
 // package for formating dates on the serverside
 const dateFormat = require('dateformat');
+// Sets HTTP headers for security
+const helmet = require('helmet');
+
+const { scriptUrls, styleUrls } = require('./srcUrls');
 
 //pretty up the console
 // const colors = require('colors');
@@ -81,6 +85,26 @@ app.set("view engine", "ejs");
 app.use(methodOverride('_method'));
 // use connect-flash for flash messages
 app.use(flash());
+
+// Helmet security headers
+app.use(helmet());
+
+// customizations for helmet content security policy
+app.use(helmet.contentSecurityPolicy({
+	directives: {
+		defaultSrc: [],
+		connectSrc: ["'self'", "https://ka-f.fontawesome.com/"],
+		scriptSrc: ["'unsafe-inline'", "'self'", ...scriptUrls],
+		styleSrc: ["'self'", "'unsafe-inline'", ...styleUrls],
+		workerSrc: ["'self'", "blob:"],
+		objectSrc: [],
+		imgSrc: [
+			"https:",
+			"data:"
+		],
+		fontSrc: ["'self'", "https://ka-f.fontawesome.com/"]
+	}
+}));
 
 // express session stuff for authorization that I know nothing about
 const session = require('express-session');
