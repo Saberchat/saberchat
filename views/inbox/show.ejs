@@ -73,7 +73,7 @@
 
               </div>
               <div class="msg-body">
-                <p style="white-space: pre-wrap;"><%= message.text %></p>
+                <p class="msg-text"><%= message.text %></p>
                 <hr>
                 <div class="msg-images">
                   <% message.images.forEach(image => { %>
@@ -88,9 +88,9 @@
               <div id="reply-container">
 
                 <% for (let reply of message.replies) { %>
-                  <article class="msg-container replies" style="padding: 20px;">
+                  <article class="msg-container replies">
                     <h4>
-                      Reply From <a style="color: black;" href="../../profiles/<%=reply.sender._id%>"><%=reply.sender.username%></a>
+                      Reply From <a class="reply-sender" href="../../profiles/<%=reply.sender._id%>"><%=reply.sender.username%></a>
                     </h4>
 
                     <p>
@@ -101,7 +101,7 @@
                     </p>
 
                     <% for (let image of reply.images) { %>
-                      <img src="<%=image%>" style="width: 40%; height: 40%; margin-bottom: 10px; border-radius: 15px;"/>
+                      <img src="<%=image%>" class="reply-image"/>
                       <br />
                     <% } %>
 
@@ -111,7 +111,7 @@
               </div>
               <br />
 
-              <article class="msg-container" style="padding: 20px;" id="reply-box" hidden>
+              <article class="msg-container" id="reply-box" hidden>
 
               <form id="message-form-<%=message._id%>" onsubmit="sendReply(this, event)">
 
@@ -128,7 +128,7 @@
 
                 <div id="image-block">
                 </div>
-                <button style="margin-bottom: 10px;" type="submit" class="btn btn-primary btn-block">Send Reply</button>
+                <button id="send-reply" type="submit" class="btn btn-primary btn-block">Send Reply</button>
                 <button type="button" class="btn btn-danger btn-block" onclick="cancelReply()" >Cancel</button>
               </form>
 

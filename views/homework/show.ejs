@@ -12,6 +12,7 @@
     <link rel="stylesheet" href="/stylesheets/components/navbar.css">
     <link rel="stylesheet" href="/stylesheets/home/index.css">
     <link rel="stylesheet" href="/stylesheets/profile/index.css">
+    <link rel="stylesheet" href="/stylesheets/homework/show.css">
 
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
@@ -32,27 +33,27 @@
   <body>
 
     <div class="container mt-5">
-      <div class="header-section" style="margin-bottom: -20px;">
+      <div class="header-section">
         <div class="row">
           <div class="col-12">
-            <div class="jumbotron text-center" style="background-image: url('<%=course.thumbnail%>'); color: white; background-repeat: no-repeat; background-size: 100%;">
+            <div class="jumbotron text-center" id="course-thumbnail" style="background-image: url('<%=course.thumbnail%>');">
               <h1 id="courseName"><%=course.name%></h1>
               <p id="courseDescription"><%=course.description%></p>
-              <a style="margin-right: 10px;" class="btn btn-primary" href="/homework"><i class="fas fa-arrow-left"></i> Back</a>
+              <a id="back-button" class="btn btn-primary" href="/homework"><i class="fas fa-arrow-left"></i> Back</a>
 
               <% if (studentTutorIds.includes(currentUser._id.toString())) { %>
-                <form action="/homework/unenroll/<%=course._id%>" method="post" style="display: inline-block;">
+                <form action="/homework/unenroll/<%=course._id%>" method="post" id="unenroll-form">
                   <button class="btn btn-danger" type="button" data-toggle="modal" data-target="#modal-<%=course._id%>"><i class="fas fa-minus"></i> Unenroll</button>
                   <div class="modal fade" id="modal-<%=course._id%>" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
                     <div class="modal-dialog">
                       <div class="modal-content">
                         <div class="modal-header">
-                          <h5 class="modal-title" id="exampleModalLabel" style="color: black;">Unenroll from <%=course.name%>?</h5>
+                          <h5 class="modal-title" id="exampleModalLabel">Unenroll from <%=course.name%>?</h5>
                           <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                             <span aria-hidden="true">&times;</span>
                           </button>
                         </div>
-                        <div class="modal-body" style="color: black; text-align: left;">
+                        <div class="modal-body">
                           You will have to be given the join code again to join back.
                         </div>
                         <div class="modal-footer">
@@ -69,31 +70,31 @@
         </div>
       </div>
 
-        <ul class="nav justify-content-center" style="margin-bottom: -20px; margin-top: 10px;">
-          <li class="nav-item tab-header" id="people" onclick="changeTab(this)" style="color: blue; font-weight: bold;">
+        <ul class="nav justify-content-center">
+          <li class="nav-item tab-header" id="people" onclick="changeTab(this)">
             <a class="nav-link active" >People</a>
           </li>
 
-          <li class="nav-item tab-header" id="tutors" onclick="changeTab(this)" style="font-weight: bold;">
+          <li class="nav-item tab-header" id="tutors" onclick="changeTab(this)">
             <a class="nav-link">Tutors</a>
           </li>
 
           <% if (course.teacher._id.equals(currentUser._id)) { %>
-            <li class="nav-item tab-header" id="settings" onclick="changeTab(this)" style="font-weight: bold;">
+            <li class="nav-item tab-header" id="settings" onclick="changeTab(this)">
               <a class="nav-link">Settings</a>
             </li>
           <% } %>
         </ul>
 
-      <div class="row people" style="margin-top: 30px;"><br />
+      <div class="row people"><br />
         <div class="col-12">
 
           <ul class="list-group">
             <li class="list-group-item list-group-item-success"><strong>Teacher</strong></li>
             <li class="list-group-item">
-              <a href="../profiles/<%=course.teacher._id%>" style="color: black; text-decoration: none;" class="user-element-text">
+              <a href="../profiles/<%=course.teacher._id%>" class="user-element-text">
                 <img class="profile-image" src="<%= course.teacher.imageUrl %>" alt="profile picture">
-                <span class="username <%=course.teacher.status%> <%=course.teacher.permission%> <%=course.teacher.tags.join(' ')%>"><strong><%=course.teacher.firstName%> <%=course.teacher.lastName%></strong> <span style="font-size: 80%;"><%=`${course.teacher.username}`%></span></span>
+                <span class="username <%=course.teacher.status%> <%=course.teacher.permission%> <%=course.teacher.tags.join(' ')%>"><strong><%=course.teacher.firstName%> <%=course.teacher.lastName%></strong> <span class="enrolled-username"><%=`${course.teacher.username}`%></span></span>
               </a>
             </li>
           </ul>
@@ -104,9 +105,9 @@
               <li class="list-group-item list-group-item-success"><strong>Students</strong></li>
               <% for (let student of course.students) { %>
                 <li class="list-group-item">
-                  <a href="../profiles/<%=student._id%>" style="color: black; text-decoration: none;" class="user-element-text">
+                  <a href="../profiles/<%=student._id%>"class="user-element-text">
                     <img class="profile-image" src="<%= student.imageUrl %>" alt="profile picture">
-                    <span class="username <%=student.status%> <%=student.permission%> <%=student.tags.join(' ')%>"><strong><%=student.firstName%> <%=student.lastName%></strong> <span style="font-size: 80%;"><%=`${student.username}`%></span></span>
+                    <span class="username <%=student.status%> <%=student.permission%> <%=student.tags.join(' ')%>"><strong><%=student.firstName%> <%=student.lastName%></strong> <span class="enrolled-username"><%=`${student.username}`%></span></span>
                   </a>
                 </li>
               <% } %>
@@ -119,9 +120,9 @@
               <li class="list-group-item list-group-item-success"><strong>Tutors</strong></li>
               <% for (let tutor of course.tutors) { %>
                 <li class="list-group-item">
-                  <a href="../profiles/<%=tutor.tutor._id%>" style="color: black; text-decoration: none;" class="user-element-text">
+                  <a href="../profiles/<%=tutor.tutor._id%>" class="user-element-text">
                     <img class="profile-image" src="<%= tutor.tutor.imageUrl %>" alt="profile picture">
-                    <span class="username <%=tutor.tutor.status%> <%=tutor.tutor.permission%> <%=tutor.tutor.tags.join(' ')%>"><strong><%=tutor.tutor.firstName%> <%=tutor.tutor.lastName%></strong> <span style="font-size: 80%;"><%=`${tutor.tutor.username}`%></span></span>
+                    <span class="username <%=tutor.tutor.status%> <%=tutor.tutor.permission%> <%=tutor.tutor.tags.join(' ')%>"><strong><%=tutor.tutor.firstName%> <%=tutor.tutor.lastName%></strong> <span class="enrolled-username"><%=`${tutor.tutor.username}`%></span></span>
                   </a>
                 </li>
               <% } %>
@@ -130,18 +131,18 @@
         </div>
       </div>
 
-      <div class="row tutors" style="margin-top: 30px;" hidden><br />
+      <div class="row tutors" hidden><br />
         <div class="col-12">
 
           <% if (course.tutors.length > 0) { %>
               <li class="list-group-item list-group-item-success"><strong>Tutors</strong></li>
               <% for (let tutor of course.tutors) { %>
-                <span class="list-group-item list-group-item-action" style="color: black; height: 40%; padding: 20px;">
-                  <a href="../profiles/<%=tutor.tutor._id%>" style="color: black;">
+                <span class="list-group-item list-group-item-action tutor-profile">
+                  <a href="../profiles/<%=tutor.tutor._id%>" class="tutor-link">
                     <img class="profile-image" src="<%= tutor.tutor.imageUrl %>" alt="profile picture">
-                    <span style="margin-left: 5px;" class="<%=tutor.tutor.status%> <%=tutor.tutor.permission%> <%=tutor.tutor.tags.join(' ')%>"><strong><%=tutor.tutor.firstName%> <%=tutor.tutor.lastName%></strong> <span style="font-size: 90%;"><%=`${tutor.tutor.username}`%></span></span>
+                    <span class="tutor-name <%=tutor.tutor.status%> <%=tutor.tutor.permission%> <%=tutor.tutor.tags.join(' ')%>"><strong><%=tutor.tutor.firstName%> <%=tutor.tutor.lastName%></strong> <span class="tutor-username"><%=`${tutor.tutor.username}`%></span></span>
                   </a>
-                  <p style="margin-top: 10px;"><%=tutor.bio%></p>
+                  <p class="tutor-bio"><%=tutor.bio%></p>
                 </span>
               <% } %>
           <% } %>
@@ -150,15 +151,15 @@
       </div>
 
       <% if (course.teacher._id.equals(currentUser._id)) { %>
-        <div class="row settings" style="margin-top: 30px;" hidden><br />
+        <div class="row settings" hidden><br />
           <div class="col-12">
             <div class="form-group">
                 <strong>Join Code:</strong> <span id="joinCode"><%=course.joinCode%></span>
-                <button class="badge badge-pill badge-info" style="margin-left: 10px; padding: 5px;" onclick="changeJoinCode('<%=course._id%>', event)">Change</button>
+                <button class="badge badge-pill badge-info" id="change-join-code" onclick="changeJoinCode('<%=course._id%>', event)">Change</button>
             </div>
-            <span style="font-size: 110%;" id="loading"></span>
+            <span id="loading"></span>
 
-            <form style="margin-top: 10px;" onsubmit="updateSettings('<%=course._id%>', event)">
+            <form id="update-settings" onsubmit="updateSettings('<%=course._id%>', event)">
               <div class="form-group">
                   <label for="newName">Name</label>
                   <input id="newName" class="form-control" type="text" name="newName" value="<%= course.name %>" placeholder="Enter Course Name" oninput="changeName(this)" required>

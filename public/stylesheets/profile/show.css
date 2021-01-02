@@ -191,6 +191,67 @@ Username
     object-fit: cover;
 }
 
+.profile-box {
+  float: right;
+}
+
+.edit-button {
+  margin-right: 10px;
+  margin-bottom: 10px;
+  width: 100%;
+}
+
+#follower-data {
+  margin-top: 50px;
+}
+
+#follower-buttons {
+  text-align: center;
+  padding-top: 15px;
+  padding-bottom: 15px;
+}
+
+#following-button, #followers-button {
+  width: 47.5%;
+}
+
+#followers-list, #following-list {
+  overflow: hidden;
+}
+
+.search-bar-container {
+  text-align: center;
+}
+
+#search-bar-followers, #search-bar-following {
+  width: 95%;
+  margin: 15px;
+  border-radius: 5px;
+  padding-left: 10px;
+  padding-top: 5px;
+  padding-bottom: 5px;
+}
+
+.follower-block, .following-block {
+  margin-left: 20px;
+}
+
+.follower-link, .following-link, .remove-follower-text, .remove-follower-text:hover {
+  color: black;
+  text-decoration: none;
+}
+
+.edit-button-text, .edit-button-text:hover, .block-following-text, .block-following-text:hover {
+  color: white;
+  text-decoration: none;
+}
+
+.remove-follower, .block-following {
+  float: right;
+  margin-right: 20px;
+}
+
+
 @media only screen and (max-width: 768px) {
     .profile-desc {
         margin: 1.7rem 0;

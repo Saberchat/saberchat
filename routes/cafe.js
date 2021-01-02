@@ -77,8 +77,6 @@ router.put('/upvote', middleware.isLoggedIn, (req, res) => {
 router.get('/data', middleware.isLoggedIn, middleware.isAdmin, (req, res) => {
   (async() => {
 
-    //Evaluate our most common customers
-
     const customers = await User.find({authenticated: true});
     if (!customers) {
       req.flash('error', "Unable to find customers");

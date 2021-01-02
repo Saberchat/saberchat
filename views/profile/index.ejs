@@ -71,9 +71,9 @@
                         <% if (user.status.toLowerCase() == status[0]) { %>
                             <li class="list-group-item list-group-item-action user-element">
 
-                              <a href="../profiles/<%=user._id%>" style="color: black; text-decoration: none;" class="user-element-text">
+                              <a href="../profiles/<%=user._id%>" class="user-element-text">
                                 <img class="profile-image" src="<%= user.imageUrl %>" alt="profile picture">
-                                <span class="username <%=status[0]%> <%=status[1]%> <%=user.permission%> <%=user.tags.join(' ')%>"><strong><%=user.firstName%> <%=user.lastName%></strong> <span style="font-size: 80%;"><%=`${user.username}`%></span></span>
+                                <span class="username <%=status[0]%> <%=status[1]%> <%=user.permission%> <%=user.tags.join(' ')%>"><strong><%=user.firstName%> <%=user.lastName%></strong> <span class="span-tag-username"><%=`${user.username}`%></span></span>
 
                               <% if (permMap.has(user.permission)) { %>
                                 <span class="badge badge-<%=permMap.get(user.permission)[1]%>"><%=permMap.get(user.permission)[0]%></span>
@@ -83,21 +83,21 @@
                                 <span class="badge badge-dark">Me</span>
                               <% } %>
 
-                              <span style="margin-right: 20px;"></span>
+                              <span class="tags"></span>
 
                               <% for (let tag of user.tags) { %>
-                                <span style="margin-right: 5px;" class="badge badge-pill badge-<%=tagMap.get(tag)%>"><%=tag%></span>
+                                <span class="tag badge badge-pill badge-<%=tagMap.get(tag)%>"><%=tag%></span>
                               <% } %>
                               </a>
 
                               <% if (!(user._id.toString() == currentUser._id.toString())) { %>
 
                                 <% if (user.followers.includes(currentUser._id)) { %>
-                                  <button type="button" data-toggle="modal" data-target="#modal-<%=user._id%>-follow" id="delete-button-<%=user._id%>" style="float: right; color: white;" class="btn btn-danger">Unfollow</button>
+                                  <button type="button" data-toggle="modal" data-target="#modal-<%=user._id%>-unfollow" id="delete-button-<%=user._id%>" class="btn btn-danger unfollow-button">Unfollow</button>
 
                                 <% } else { %>
 
-                                  <button type="button" data-toggle="modal" data-target="#modal-<%=user._id%>-unfollow" id="delete-button-<%=user._id%>" style="float: right; color: white;"class="btn btn-primary">Follow</button>
+                                  <button type="button" data-toggle="modal" data-target="#modal-<%=user._id%>-follow" id="delete-button-<%=user._id%>" class="btn btn-primary follow-button">Follow</button>
 
                                 <% } %>
                                 </span>
@@ -114,7 +114,7 @@
     </div>
 
     <% for (let user of users) { %>
-      <div class="modal fade" id="modal-<%=user._id%>-follow" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+      <div class="modal fade" id="modal-<%=user._id%>-unfollow" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
         <div class="modal-dialog">
           <div class="modal-content">
             <div class="modal-header">
@@ -134,7 +134,7 @@
         </div>
       </div>
 
-      <div class="modal fade" id="modal-<%=user._id%>-unfollow" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+      <div class="modal fade" id="modal-<%=user._id%>-follow" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
         <div class="modal-dialog">
           <div class="modal-content">
             <div class="modal-header">

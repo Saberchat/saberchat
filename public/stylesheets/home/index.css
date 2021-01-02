@@ -81,6 +81,14 @@ footer hr {
     color: #808080;
 }
 
+.background-inner-div {
+  margin-bottom: 0;
+}
+
+.element {
+  margin-bottom: 5rem;
+}
+
 /* changes for different screens */
 @media only screen and (min-width: 992px) {
     article.text-block {

@@ -1,3 +1,140 @@
+.announcement-button, .announcement-button:hover, .announcement-sender, .announcement-sender:hover {
+  color: white;
+  text-decoration: none;
+}
+
+.bottom-text {
+  padding-bottom: 15px;
+}
+
+.announcement-subject-header, .announcement-subject-header:hover {
+  text-decoration: none;
+  color: white;
+  margin-right: 10px;
+}
+
+.modal-body, .modal-title, #sender-info {
+  color: black;
+}
+
+.modal-body {
+  text-align: left;
+}
+
+.announcement-date {
+  color: white;
+  font-size: 80%;
+}
+
+.sender-profile-image {
+  width: 30px;
+  height: 30px;
+  object-fit: cover;
+  border-radius: 50%;
+}
+
+.edit-button, .reply-button {
+  margin-left: 10px;
+}
+
+.delete-announcement {
+  display: inline-block;
+}
+
+.comment-button, .comment-button:hover {
+  color: white;
+  text-decoration: none;
+  margin-left: 10px;
+}
+
+.announcement-text {
+  white-space: pre-wrap;
+}
+
+.liked-button, .liked-button-show {
+  color: #03a5fc;
+  text-decoration: none;
+  margin-left: 10px;
+  font-size: 70%;
+}
+
+.unliked-button, .unliked-button-show {
+  color: white;
+  text-decoration: none;
+  margin-left: 10px;
+  font-size: 70%;
+}
+
+.fa-thumbs-up {
+  margin-left: 0px;
+  font-size: 140%;
+  display: inline;
+}
+
+.announcement-row {
+  margin-bottom: 15px;
+  margin-top: -15px;
+}
+
+#comments-count-icon {
+  color: grey;
+  font-size: 140%;
+}
+
+#comments-heading {
+  padding-top: 50px;
+  padding-bottom: 20px;
+}
+
+#comment-section {
+  text-align: center;
+  padding: 50px;
+}
+
+#comment-input {
+  background-color: #cdd0d4;
+  border-radius: 15px;
+}
+
+.comment-input-field {
+  border-color: black;
+  border-width: 1px;
+}
+
+.receiver-message {
+  text-align: left;
+}
+
+.text-muted {
+  float: left;
+}
+
+.message-reply {
+  background-color: orange;
+}
+
+.like-comment {
+  text-decoration: none;
+  float: left;
+  font-size: 80%;
+}
+
+.like-comment-active, .liked-announcement {
+  color: #03a5fc;
+}
+
+.like-comment-inactive, .unliked-announcement {
+  color: grey;
+}
+
+#announcement-like-row, #like-count {
+  display: inline;
+}
+
+#like-count {
+  font-size: 130%;
+}
+
 .btn-setting {
     width: 8rem;
 }

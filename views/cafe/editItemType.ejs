@@ -11,6 +11,7 @@
       <link rel="stylesheet" href="/stylesheets/components/header.css">
       <link rel="stylesheet" href="/stylesheets/components/navbar.css">
       <link rel="stylesheet" href="/stylesheets/chat/new.css">
+      <link rel="stylesheet" href="/stylesheets/cafe/edit.css">
 
       <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
       <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
@@ -27,8 +28,8 @@
     <div class="container mt-5">
       <div class="row">
         <div class="col-12">
-          <div style="text-align: center;"  class="col-12">
-            <h1 style="text-align: center; width: 100%">Edit Cafe Category - "<%=type.name%>"</h1>
+          <div class="col-12 main">
+            <h1 id="heading">Edit Cafe Category - "<%=type.name%>"</h1>
             <a class="btn btn-primary" href="/cafe/manage"><i class="fas fa-arrow-left"></i> Back</a><br /><br />
           </div>
         </div>
@@ -36,20 +37,20 @@
 
       <form action="/cafe/type/<%=type._id%>?_method=put" method="post">
 
-        <h2 style="text-align: center;">Name</h2>
+        <h2 class="element">Name</h2>
         <div class="row">
           <div class="col-md-8 offset-md-2 col-12">
               <div class="form-group">
                 <div class="row">
                   <div class="input-group mb-3">
-                    <input id="usernameInput" class="form-control" type="text" name="name" value="<%=type.name%>" placeholder="Enter Item Name" maxlength="45" required style="display: inline-block;"/>
+                    <input id="itemInput" class="form-control" type="text" name="name" value="<%=type.name%>" placeholder="Enter Item Name" maxlength="45" required/>
                   </div>
                 </div>
               </div>
           </div>
         </div>
 
-        <h2 style="text-align: center;">Items</h2>
+        <h2 class="element">Items</h2>
         <div class="row">
           <div class="col-md-8 offset-md-2 col-12">
             <div class="form-group">

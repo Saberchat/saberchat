@@ -11,6 +11,7 @@ const nodemailer = require('nodemailer');
 const User = require('../models/user');
 const Announcement = require('../models/announcement');
 const Notification = require('../models/message');
+const PostComment = require('../models/postComment');
 
 //Sets up NodeMailer Transporter object (sends out emails)
 let transporter = nodemailer.createTransport({
@@ -71,8 +72,13 @@ router.get('/mark/:id', middleware.isLoggedIn, (req, res) => { //Mark specific a
 router.get('/:id', (req, res) => { //RESTful Routing 'SHOW' route
   Announcement.findById(req.params.id) //Find only the announcement specified from form
   .populate('sender')
-  .populate('comments.sender')
-  .exec((err, foundAnn) => { //Get info about the announcement's sender, and then release it to user
+  .populate({
+    path: "comments",
+    populate: {
+      path: "sender"
+    }
+  })
+  .exec((err, foundAnn) => { //Get info about the announcement's sender and comments, and then release it to user
     if (err || !foundAnn) {
       req.flash('error', 'Unable To Access Database');
       res.redirect('back');
@@ -212,27 +218,27 @@ router.put('/like', middleware.isLoggedIn, (req, res) => {
 });
 
 router.put('/like-comment', middleware.isLoggedIn, (req, res) => {
-  Announcement.findById(req.body.announcement, (err, announcement) => {
-    if (err || !announcement) {
+  PostComment.findById(req.body.commentId, (err, comment) => {
+    if (err || !comment) {
       res.json({error: 'Error updating comment'});
 
     } else {
-      if (announcement.comments[req.body.commentIndex].likes.includes(req.user._id)) {
-        announcement.comments[req.body.commentIndex].likes.splice(announcement.comments[req.body.commentIndex].likes.indexOf(req.user._id), 1);
-        announcement.save();
 
+      if (comment.likes.includes(req.user._id)) { //Remove Like
+        comment.likes.splice(comment.likes.indexOf(req.user._id), 1);
+        comment.save();
         res.json({
-          success: `Removed a like from comment ${req.body.commentIndex} on ${announcement._id}`,
-          likeCount: announcement.comments[req.body.commentIndex].likes.length
+          success: `Removed a like from a comment`,
+          likeCount: comment.likes.length
         });
 
-      } else { //Add like
-        announcement.comments[req.body.commentIndex].likes.push(req.user._id);
-        announcement.save();
+      } else { //Add Like
+        comment.likes.push(req.user._id);
+        comment.save();
 
         res.json({
-          success: `Liked comment ${req.body.commentIndex} on ${announcement._id}`,
-          likeCount: announcement.comments[req.body.commentIndex].likes.length
+          success: `Liked comment`,
+          likeCount: comment.likes.length
         });
       }
     }
@@ -243,17 +249,25 @@ router.put('/comment', middleware.isLoggedIn, (req, res) => {
 
   (async() => {
 
-    const announcement = await Announcement.findById(req.body.announcement);
+    const announcement = await Announcement.findById(req.body.announcement)
+    .populate({
+      path: "comments",
+      populate: {
+        path: "sender"
+      }
+    });
 
     if (!announcement) {
       return res.json({error: 'Error commenting'});
     }
 
-    let comment = {
-      text: req.body.text,
-      sender: req.user,
-      date: dateFormat(new Date(), "h:MM TT | mmm d")
-    };
+    const comment = await PostComment.create({text: req.body.text, sender: req.user});
+    if (!comment) {
+      return res.json({error: 'Error commenting'});
+    }
+
+    comment.date = dateFormat(comment.created_at, "h:MM TT | mmm d");
+    comment.save();
 
     announcement.comments.push(comment);
     announcement.save();
@@ -268,7 +282,6 @@ router.put('/comment', middleware.isLoggedIn, (req, res) => {
         if (!user) {
           return res.json({error: "Error accessing user"});
         }
-
         users.push(user);
       }
     }
@@ -307,7 +320,6 @@ router.put('/comment', middleware.isLoggedIn, (req, res) => {
       user.inbox.push(notif); //Add notif to user's inbox
       user.msgCount += 1;
       await user.save();
-
     }
 
     res.json({

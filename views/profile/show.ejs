@@ -30,7 +30,7 @@
     <div class="container mb-5">
       <img src="<%= user.imageUrl %>" alt="profile image" class="profile-image">
       <h1 class="username"><%= user.username %></h1>
-          <div class="col-md-4 col-12 order-md-2 profile-box" style="float: right;">
+          <div class="col-md-4 col-12 order-md-2 profile-box">
               <section class="profile-card">
                   <div class="profile-head">
                       <h1><%= user.firstName %> <%= user.lastName %></h1>
@@ -55,13 +55,13 @@
                       <p><%= user.email %></p>
 
                       <% if (currentUser._id.toString() == user._id.toString()) { %>
-                        <button class="btn btn-primary" style="margin-right: 10px; margin-bottom: 10px; width: 100%;"><a style="color: white" href="/profiles/edit">Edit Profile Settings</a></button>
-                        <button class="btn btn-info" style="margin-right: 10px; margin-bottom: 10px; width: 100%;"><a style="color: white" href="/profiles/change-login-info">Edit Account Settings</a></button>
+                        <button class="btn btn-primary edit-button" id="edit-profile"><a class="edit-button-text" href="/profiles/edit">Edit Profile Settings</a></button>
+                        <button class="btn btn-info edit-button" id="edit-account"><a class="edit-button-text" href="/profiles/change-login-info">Edit Account Settings</a></button>
 
                       <% } else if (!(user._id.toString() == currentUser._id.toString())) { %>
 
                         <% if (followerIds.toString().includes(currentUser._id.toString())) { %>
-                          <button type="button" class="btn btn-danger" style="margin-right: 10px; margin-bottom: 10px; width: 100%;"><a style="color: white" data-toggle="modal" data-target="#modal" id="delete-button" href="/profiles/unfollow/<%=user._id%>">Unfollow</a></button>
+                          <button type="button" class="btn btn-danger edit-button" ><a class="edit-button-text" data-toggle="modal" data-target="#modal" id="delete-button" href="/profiles/unfollow/<%=user._id%>">Unfollow</a></button>
 
                           <div class="modal fade" id="modal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
                             <div class="modal-dialog">
@@ -84,7 +84,7 @@
                           </div>
 
                         <% } else { %>
-                          <button type="button" class="btn btn-primary" style="margin-right: 10px; margin-bottom: 10px; width: 100%;"><a style="color: white" data-toggle="modal" data-target="#modal" id="delete-button" href="/profiles/follow/<%=user._id%>">Follow</a></button>
+                          <button type="button" class="btn btn-primary edit-button"><a class="edit-button-text" data-toggle="modal" data-target="#modal" id="delete-button" href="/profiles/follow/<%=user._id%>">Follow</a></button>
 
                           <div class="modal fade" id="modal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
                             <div class="modal-dialog">
@@ -126,31 +126,32 @@
 
         <% if (currentUser._id.equals(user._id)) { %>
 
-          <div class="col-md-8 col-12" style="margin-top: 50px;">
+          <div class="col-md-8 col-12" id="follower-data">
 
               <section class="profile-desc">
                   <div class="desc-head">
 
-                    <div style="text-align: center; padding-top: 15px; padding-bottom: 15px;">
-                      <button id="followers-button" class="btn btn-dark" style="width: 47.5%;" onclick="changeFollowerTab(this)"><%=user.followers.length%> Followers</button>
-                      <button id="following-button" class="btn btn-secondary" style="width: 47.5%;;" onclick="changeFollowerTab(this)"><%=following.length%> Following</button>
+                    <div id="follower-buttons">
+                      <button id="followers-button" class="btn btn-dark" onclick="changeFollowerTab(this)"><%=user.followers.length%> Followers</button>
+                      <button id="following-button" class="btn btn-secondary" onclick="changeFollowerTab(this)"><%=following.length%> Following</button>
                     </div>
                   </div>
                   <div class="desc-body">
 
-                      <div id="followers-list" style="overflow: hidden;">
-                        <div style="text-align: center;">
-                          <input id="search-bar-followers" type="text" placeholder="&#x1F50D; Search followers" style="width: 95%; margin: 15px; border-radius: 5px; padding-left: 10px; padding-top: 5px; padding-bottom: 5px;" oninput="searchFunctionFollowers()"/>
+                      <div id="followers-list">
+                        <div class="search-bar-container">
+                          <input id="search-bar-followers" type="text" placeholder="&#x1F50D; Search followers" oninput="searchFunctionFollowers()"/>
                         </div>
-                        <% for (let follower of user.followers) { %>
-                          <span style="margin-left: 20px;" id="follower-<%=follower._id%>" class="follower-block">
 
-                            <a href="../profiles/<%=follower._id%>" style="color: black; text-decoration: none;">
+                        <% for (let follower of user.followers) { %>
+                          <span id="follower-<%=follower._id%>" class="follower-block">
+
+                            <a href="../profiles/<%=follower._id%>" class="follower-link">
                               <img class="follower-image" src="<%= follower.imageUrl %>" alt="profile picture">
                               <strong><%=follower.firstName%> <%=follower.lastName%></strong> <%=follower.username%>
                             </a>
 
-                            <button type="button" class="btn btn-warning" style="float: right; margin-right: 20px;"><a style="color: black" data-toggle="modal" data-target="#modal-<%=follower._id%>-remove" id="delete-button" href="/profiles/remove/<%=follower._id%>">Remove</a></button>
+                            <button type="button" class="btn btn-warning remove-follower"><a data-toggle="modal" data-target="#modal-<%=follower._id%>-remove" class="remove-follower-text" href="/profiles/remove/<%=follower._id%>">Remove</a></button>
 
                             <div class="modal fade" id="modal-<%=follower._id%>-remove" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
                               <div class="modal-dialog">
@@ -176,20 +177,20 @@
                         <% } %>
                       </div>
 
-                      <div id="following-list" style="overflow: hidden;" hidden>
-                        <div style="text-align: center;">
-                          <input id="search-bar-following" type="text" placeholder="&#x1F50D; Search following" style="width: 95%; margin: 15px; border-radius: 5px; padding-left: 10px; padding-top: 5px; padding-bottom: 5px;" oninput="searchFunctionFollowing()"/>
+                      <div id="following-list" hidden>
+                        <div class="search-bar-container">
+                          <input id="search-bar-following" type="text" placeholder="&#x1F50D; Search following" oninput="searchFunctionFollowing()"/>
                         </div>
 
                         <% for (let user of following) { %>
-                          <span style="margin-left: 20px;" id="following-<%=user._id%>" class="following-block">
+                          <span id="following-<%=user._id%>" class="following-block">
 
-                            <a href="../profiles/<%=user._id%>" style="color: black; text-decoration: none;" >
+                            <a href="../profiles/<%=user._id%>" class="following-link">
                               <img class="follower-image" src="<%= user.imageUrl %>" alt="profile picture">
                               <strong><%=user.firstName%> <%=user.lastName%></strong> <%=user.username%>
                             </a>
 
-                            <button type="button" class="btn btn-danger" style="float: right; margin-right: 20px;"><a style="color: white" data-toggle="modal" data-target="#modal-<%=user._id%>-unfollow" id="delete-button" href="/profiles/unfollow/<%=user._id%>">Unfollow</a></button>
+                            <button type="button" class="btn btn-danger block-following"><a class="block-following-text" data-toggle="modal" data-target="#modal-<%=user._id%>-unfollow" id="delete-button" href="/profiles/unfollow/<%=user._id%>">Unfollow</a></button>
 
                             <div class="modal fade" id="modal-<%=user._id%>-unfollow" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
                               <div class="modal-dialog">

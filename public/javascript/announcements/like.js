@@ -19,17 +19,16 @@ const like = (button => {
         button.style.color = "#03a5fc";
       }
 
-      document.getElementById(`likeCount-${announcementId}`).innerText = data.likeCount;
+      document.getElementsByClassName(`likeCount-${announcementId}`)[0].innerText = data.likeCount;
     }
 
   });
 });
 
 const likeComment = (button => {
-  const announcementId = button.id.split("-")[2];
-  const commentIndex = parseInt(button.id.split("-")[1]);
+  const commentId = button.id.split("-")[1];
   const url = `/announcements/like-comment?_method=put`;
-  const data = {announcement: announcementId, commentIndex: commentIndex};
+  const data = {commentId};
   $.post(url, data, function(data) {
     if(data.success) {
 
@@ -40,7 +39,7 @@ const likeComment = (button => {
         button.style.color = "#03a5fc";
       }
 
-      document.getElementById(`likeCountComment-${commentIndex}-${announcementId}`).innerText = data.likeCount;
+      document.getElementById(`likeCountComment-${commentId}`).innerText = data.likeCount;
 
     }
   });

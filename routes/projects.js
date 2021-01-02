@@ -12,6 +12,7 @@ const fillers = require('../fillerWords');
 const User = require('../models/user');
 const Project = require('../models/project');
 const Notification = require('../models/message');
+const PostComment = require('../models/postComment');
 
 let transporter = nodemailer.createTransport({
   service: 'gmail',
@@ -165,7 +166,7 @@ router.post('/',middleware.isLoggedIn, middleware.isFaculty, (req, res) => { //R
 });
 
 //COMMENTED OUT FOR NOW, UNTIL WE MAKE FURTHER DECISIONS AT MEETING
-// 
+//
 // router.get('/data', middleware.isLoggedIn, middleware.isFaculty, (req, res) => {
 //
 //   (async() => {
@@ -290,7 +291,12 @@ router.get('/:id', (req, res) => { //RESTful Routing 'SHOW' route
   Project.findById(req.params.id)
   .populate('poster')
   .populate('creators')
-  .populate('comments.sender')
+  .populate({
+    path: "comments",
+    populate: {
+      path: "sender"
+    }
+  })
   .exec((err, foundProject) => { //Find the project specified in the form, get info about its poster and creators (part of the User schema)
     if (err || !foundProject) {
       req.flash('error', "Unable to access database");
@@ -331,27 +337,27 @@ router.put('/like', middleware.isLoggedIn, (req, res) => {
 });
 
 router.put('/like-comment', middleware.isLoggedIn, (req, res) => {
-  Project.findById(req.body.project, (err, project) => {
-    if (err || !project) {
+  PostComment.findById(req.body.commentId, (err, comment) => {
+    if (err || !comment) {
       res.json({error: 'Error updating comment'});
 
     } else {
-      if (project.comments[req.body.commentIndex].likes.includes(req.user._id)) {
-        project.comments[req.body.commentIndex].likes.splice(project.comments[req.body.commentIndex].likes.indexOf(req.user._id), 1);
-        project.save();
 
+      if (comment.likes.includes(req.user._id)) { //Remove Like
+        comment.likes.splice(comment.likes.indexOf(req.user._id), 1);
+        comment.save();
         res.json({
-          success: `Removed a like from comment ${req.body.commentIndex} on ${project._id}`,
-          likeCount: project.comments[req.body.commentIndex].likes.length
+          success: `Removed a like from a comment`,
+          likeCount: comment.likes.length
         });
 
-      } else { //Add like
-        project.comments[req.body.commentIndex].likes.push(req.user._id);
-        project.save();
+      } else { //Add Like
+        comment.likes.push(req.user._id);
+        comment.save();
 
         res.json({
-          success: `Liked comment ${req.body.commentIndex} on ${project._id}`,
-          likeCount: project.comments[req.body.commentIndex].likes.length
+          success: `Liked comment`,
+          likeCount: comment.likes.length
         });
       }
     }
@@ -362,17 +368,25 @@ router.put('/comment', middleware.isLoggedIn, (req, res) => {
 
   (async() => {
 
-    const project = await Project.findById(req.body.project);
+    const project = await Project.findById(req.body.project)
+    .populate({
+      path: "comments",
+      populate: {
+        path: "sender"
+      }
+    });
 
     if (!project) {
       return res.json({error: 'Error commenting'});
     }
 
-    let comment = {
-      text: req.body.text,
-      sender: req.user,
-      date: dateFormat(new Date(), "h:MM TT | mmm d")
-    };
+    const comment = await PostComment.create({text: req.body.text, sender: req.user, date: dateFormat(new Date(), "h:MM TT | mmm d")});
+    if (!comment) {
+      return res.json({error: 'Error commenting'});
+    }
+
+    comment.date = dateFormat(comment.created_at, "h:MM TT | mmm d");
+    comment.save();
 
     project.comments.push(comment);
     project.save();

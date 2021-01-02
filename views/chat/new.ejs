@@ -19,6 +19,7 @@
       <!-- I'm using my fontawesome kit -->
       <script src="https://kit.fontawesome.com/dccc745c41.js" crossorigin="anonymous"></script>
       <script src="/javascript/chat/new.js"></script>
+      
   </head>
   <body>
       <!-- include the navbar via ejs -->
@@ -28,8 +29,8 @@
 
       <div class="container mt-5">
           <div class="row">
-              <div class="col-12" style="text-align: center;">
-                  <h1 style="text-align: center; width: 100%">New Chat Room</h1>
+              <div class="col-12 new-room">
+                  <h1 class="new-chat-header">New Chat Room</h1>
                   <a class="btn btn-primary" href="/chat"><i class="fas fa-arrow-left"></i> Back</a>
               </div>
           </div>
@@ -52,7 +53,7 @@
                         <input name="type" id="roomType" type="checkbox" onclick="updateDisplayNewRoom()" class="form-check-input" value="true">
                         <label for="roomType" class="form-check-label">Private (limited to only specified users)</label>
                     </div>
-                    <div id="user-selection" style="display: none;">
+                    <div id="user-selection">
                         <h4>Select Members</h4>
 
                         <div class="search-filter mb-3">

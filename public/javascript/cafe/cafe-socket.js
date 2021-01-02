@@ -1,15 +1,20 @@
 const order = ((form, customer) => {
-  var socket = io();
+  let socket = io();
   let items = document.getElementById('item-list');
 
   $(form).submit(function (e) {
 
-    var instructions = $('#descInput').val();
-    var payingInPerson = document.getElementById('payingInPerson').checked;
-    var balance = parseFloat(document.getElementById('balance-box').innerText.split("$")[1]);
-    var charge = parseFloat(document.getElementById('total-cost').innerText.split("$")[1]);
-    var itemList = [];
-    var itemCount = [];
+    let payingInPerson = document.getElementById('payingInPerson').checked;
+    let instructions = $('#descInput').val();
+
+    //If paying is online, collect DOM elements of balance and charge to evaluate
+    if (!payingInPerson) {
+      let balance = parseFloat(document.getElementById('balance-box').innerText.split("$")[1]);
+      let charge = parseFloat(document.getElementById('total-cost').innerText.split("$")[1]);
+    }
+
+    let itemList = [];
+    let itemCount = [];
 
     $('#item-list > .form-check > .style-div').each(function(index) {
 
@@ -24,15 +29,18 @@ const order = ((form, customer) => {
     });
 
     if (itemList.length > 0) {
-      if (!payingInPerson && charge > balance) {} else {
-        socket.emit('order', itemList, itemCount, instructions, payingInPerson, customer);
+      if (payingInPerson) {
+        socket.emit('order', itemList, itemCount, instructions, true, customer);
+
+      } else if (charge <= balance) {
+        socket.emit('order', itemList, itemCount, instructions, false, customer);
       }
     }
   });
 })
 
 const getOrders = (outputStream => {
-  var socket = io();
+  let socket = io();
 
   socket.on('connect', () => {
     console.log("connection from cafe use");
@@ -50,7 +58,7 @@ const getOrders = (outputStream => {
     })
 
     const getItems = (() => {
-      var str = ``;
+      let str = ``;
 
       for (let i = 0; i < order.items.length; i++) {
         str += `<li class="list-group-item">${foundItems[i].name}: ${order.quantities[i]} order(s)</li>\n`;

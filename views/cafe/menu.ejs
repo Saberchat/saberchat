@@ -71,7 +71,7 @@
           <% tempTypes.forEach(type => { %>
             <% if (type.items.length > 0) { %>
 
-              <li class="list-group-item list-group-item-success category-header" id="<%=type._id%>-header" style="margin-top: 40px;">
+              <li class="list-group-item list-group-item-success category-header" id="<%=type._id%>-header">
                 <div class="d-flex w-100 justify-content-between">
                   <h2 class="mb-1"><%=type.name%></h2>
                   <span><%=type.items.length%> item(s)</span>
@@ -92,19 +92,19 @@
                      - $<%=item.price%>
                   <% } %>
 
-                  <div title="Upvotes" style="margin-left: 10px; display: inline;">
+                  <div title="Upvotes" class="upvotes">
 
                     <% if (item.upvotes.includes(currentUser._id)) { %>
-                      <a style="color: red; text-decoration: none;" id="upvote-<%=item._id%>" onclick="upvote(this)"><i class="fas fa-arrow-circle-up"></i></a>
+                      <span class="upvoted" id="upvote-<%=item._id%>" onclick="upvote(this)"><i class="fas fa-arrow-circle-up"></i></span>
 
                     <% } else { %>
-                      <a style="color: grey; text-decoration: none;" id="upvote-<%=item._id%>" onclick="upvote(this)"><i class="fas fa-arrow-circle-up"></i></a>
+                      <span class="not-upvoted" id="upvote-<%=item._id%>" onclick="upvote(this)"><i class="fas fa-arrow-circle-up"></i></span>
                     <% }%>
 
                     <span id="upvoteCount-<%=item._id%>"> <%=item.upvotes.length%></span>
                   </div>
 
-                  <br /><em><%= item.description %></em><br /><br /><img src=<%=item.imgUrl%> style="width: 20%; height: 20%; border-radius: 20px;"/>
+                  <br /><em><%= item.description %></em><br /><br /><img src="<%=item.imgUrl%>" class="item-image"/>
                 </span>
 
                 <% }%>

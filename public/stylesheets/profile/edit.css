@@ -16,3 +16,36 @@
     filter: brightness(70%);
     width: 100%;
 }
+
+#edit-settings, #profile-image-update, #settings-header {
+  text-align: center;
+}
+
+#settings-header {
+  width: 100%;
+}
+
+#delete-account {
+  margin-top: 30px;
+}
+
+#tag-group {
+  margin-left: 10px;
+  display: inline;
+}
+
+#profile-input {
+  margin-bottom: 10px;
+}
+
+#password-reset {
+  border-color: black;
+  background-color: lightgrey;
+  border-radius: 15px;
+  padding: 30px;
+}
+
+.password-input {
+  border-color: darkgrey;
+  border-width: 1px;
+}

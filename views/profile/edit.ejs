@@ -28,8 +28,8 @@
 
     <div class="container mt-5">
         <div class="row">
-            <div class="col-12" style="text-align: center;">
-                <h1 style="text-align: center; width: 100%">Edit Profile Settings</h1>
+            <div class="col-12" id="edit-settings">
+                <h1 id="settings-header">Edit Profile Settings</h1>
                 <a class="btn btn-primary" href="/profiles/<%= currentUser._id %>"><i class="fas fa-arrow-left"></i> Back</a>
             </div>
         </div>
@@ -84,7 +84,7 @@
                       <% let tagMap = new Map([["Tutor", "warning"], ["Cashier", "success"], ["Editor", "info"]]); %>
                       <div class="form-group">
                         <label for="tags">Select Temporary Statuses
-                          <div id="tag-group" style="margin-left: 10px; display: inline;">
+                          <div id="tag-group">
                             <% currentUser.tags.forEach(tag => { %>
                               <span class="badge badge-pill badge-<%=tagMap.get(tag)%> user-tag"><%=tag%></span>
                             <% }) %>
@@ -104,8 +104,8 @@
                     <div class="form-group">
                       <label for="profile-input">Profile Image Upload or URL</label><br />
                         <!-- <input type="file" id="imageInput" accept="image/*" name="image" required> -->
-                        <div style="text-align: center;">
-                          <input id="profile-input" oninput="updateImage(this)" class="form-control" type="text" name="imageUrl" value="<%= currentUser.imageUrl %>" placeholder="Enter Image Url" style="margin-bottom: 10px;">
+                        <div id="profile-image-update">
+                          <input id="profile-input" oninput="updateImage(this)" class="form-control" type="text" name="imageUrl" value="<%= currentUser.imageUrl %>" placeholder="Enter Image Url">
                           <br />
                           <img id="profile-image" src="<%=currentUser.imageUrl %>" alt="Image Does Not Exist"/>
                         </div>

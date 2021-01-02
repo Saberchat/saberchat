@@ -100,7 +100,7 @@
 
                         <li class="nav-item dropdown">
                           <a class="nav-link dropdown-toggle" href="" id="navbarDropdownMenuLink" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                              <img src="<%= currentUser.imageUrl %>" alt="profile pic" style="width: 20px; height: 20px; object-fit: cover; border-radius: 50%; display: inline-block;">
+                              <img src="<%= currentUser.imageUrl %>" alt="profile pic" class="nav-profile-img">
                               <%= currentUser.firstName.charAt(0) %>.<%= currentUser.lastName.charAt(0) %>.
                           </a>
                           <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
@@ -166,7 +166,7 @@
                 <label for="password-signup">Password</label>
                 <input name="password" type="password" class="form-control" id="password-signup" minlength="8" placeholder="(min 8)">
             </div>
-            <div style="position: relative; text-align: center;">
+            <div class="back">
                 <button type="button" class="btn btn-secondary" onclick="back()"><i class="fas fa-arrow-left"></i> Go Back</button>
                 <button type="button" id="register-button" data-toggle="modal" data-target="#modal-terms" class="btn btn-success"><i class="far fa-plus-square"></i> Sign Up</button>
             </div>

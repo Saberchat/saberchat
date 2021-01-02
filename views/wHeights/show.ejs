@@ -25,7 +25,7 @@
   <%- include('../partials/header') %>
 
     <!-- article -->
-    <div class="container mt-5" style="display: flex; justify-content: left;">
+    <div class="container mt-5">
       <div class="row">
         <div class="col-12">
           <!-- <div class="jumbotron text-center" style="width: 700px; padding: 50px;"> -->
@@ -44,7 +44,7 @@
               <% }) %>
             <!-- </div> -->
 
-            <div class="container" style="width: 50%; float: left;">
+            <div class="container article-content">
               <% for (let segment of article.content) { %>
 
                 <% if (segment.type == "text") { %>
@@ -53,7 +53,7 @@
                   </p>
 
                 <% } else if (segment.type == "image") { %>
-                  <img style="width: 50%; height: 50%;" src="<%=segment.data.url%>" /><br /><br />
+                  <img class="article-image" src="<%=segment.data.url%>" /><br /><br />
                 <% } %>
               <% }%>
             </div>

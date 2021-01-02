@@ -1,3 +1,15 @@
+.new-room, .title {
+  text-align: center;
+}
+
+.title {
+  width: 100%;
+}
+
+#remove-block, #add-block {
+  display: none;
+}
+
 .user-list {
     max-height: 10rem;
     overflow-y: scroll;

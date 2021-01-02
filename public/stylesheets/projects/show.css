@@ -1,0 +1,124 @@
+.ann-container {
+  text-align: center;
+  padding-left: 50px;
+  padding-right: 50px;
+  padding-bottom: 50px;
+}
+
+.project-info, #exampleModalLabel, .modal-body, .creator-name, .creator-div {
+  color: black;
+}
+
+#poster-profile, .creator-profile {
+  width: 30px;
+  height: 30px;
+  object-fit: cover;
+  border-radius: 50%;
+}
+
+#project-date {
+  color: #6e6e6e;
+}
+
+#edit-div, #like-div {
+  margin-bottom: 15px;
+  margin-top: -15px;
+}
+
+.edit-button-text {
+  color: white;
+}
+
+#delete-form {
+  display: inline-block;
+}
+
+.modal-body, .comment-body {
+  text-align: left;
+}
+
+.creator-div, .like-count-comment {
+  display: inline;
+}
+
+.project-description {
+  margin-top: 10px;
+  white-space: pre-wrap;
+}
+
+.project-image {
+  width: 40%;
+  height: 40%;
+  object-fit: contain;
+  border-radius: 15px;
+}
+
+#comment-section {
+  text-align: center;
+  padding-left: 50px;
+  padding-right: 50px;
+  padding-bottom: 50px;
+}
+
+#comments-heading {
+  padding-top: 50px;
+  padding-bottom: 20px;
+}
+
+#comment-input-box {
+  border-color: black;
+  border-width: 1px;
+}
+
+#comment-input {
+  background-color: #cdd0d4;
+}
+
+.mentioned-comment {
+  background-color: orange;
+}
+
+.comment-date {
+  margin-left: 10px;
+}
+
+.liked-project, .unliked-project {
+  color: #03a5fc;
+  text-decoration: none;
+  font-size: 140%;
+  display: inline;
+}
+
+.unliked-project {
+  color: grey;
+  text-decoration: none;
+  font-size: 160%;
+  display: inline;
+}
+
+#like-count {
+  font-size: 130%;
+}
+
+#comments-count-icon {
+  color: grey;
+  text-decoration: none;
+  font-size: 140%;
+  margin-left: 10px;
+}
+
+#project-like-row {
+  display: inline;
+}
+
+.liked-comment {
+  color: #03a5fc;
+  text-decoration: none;
+  font-size: 75%;
+}
+
+.unliked-comment {
+  color: grey;
+  text-decoration: none;
+  font-size: 75%;
+}

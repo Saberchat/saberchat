@@ -11,6 +11,7 @@
     <link rel="stylesheet" href="/stylesheets/components/navbar.css">
     <link rel="stylesheet" href="/stylesheets/home/index.css">
     <link rel="stylesheet" href="/stylesheets/chat/new.css">
+    <link rel="stylesheet" href="/stylesheets/cafe/show.css">
 
     <!-- using my fontawesome kit -->
     <script src="https://kit.fontawesome.com/dccc745c41.js" crossorigin="anonymous"></script>
@@ -50,7 +51,7 @@
       </div><br />
 
       <% if (orders.length == 0) { %>
-        <h2 style="text-align: center;">No New Orders</h2>
+        <h2>No New Orders</h2>
       <% } else { %>
         <% orders.reverse().forEach((order) => { %>
           <div class="card mt-3" id="<%=order._id%>">
@@ -83,7 +84,7 @@
                 <p class="card-text mt-3"><strong>Cost:</strong> $<%= order.charge %></p>
               <% } %>
 
-              <p style="margin-top: 20px;"><strong>
+              <p class="paying-in-person"><strong>
 
               <% if (order.payingInPerson) { %>
                 Paying In-Person
@@ -108,7 +109,7 @@
                       </div>
                       <div class="modal-body">
                         This action is irreversible. Only reject this order if there is something wrong about it, or you suspect it to not be genuine. You might want to check with a faculty member and the customer first.
-                        <br /><input class="form-control" style="margin-top: 10px;" type="text" name="rejectionReason" placeholder="Enter reason for rejecting order" />
+                        <br /><input class="form-control" class="rejection-input" type="text" name="rejectionReason" placeholder="Enter reason for rejecting order" />
                       </div>
                       <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-dismiss="modal">No, Go Back</button>

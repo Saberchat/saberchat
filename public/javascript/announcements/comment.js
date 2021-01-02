@@ -19,6 +19,7 @@ const comment = ((form, event) => {
         document.getElementById('comments-heading').innerText = `Comments (${data.comments.length})`;
 
         //Build a comment body for new message
+        console.log(data.comments);
         let newComment = document.createElement('div');
         newComment.className = "media mb-2 comment-body";
         newComment.style = "text-align: left;";
@@ -49,4 +50,4 @@ const comment = ((form, event) => {
 
 const reply = (comment => {
   document.getElementById('comment-input').value = `@${comment.id.split("comment-")[1]}_ `
-})
+});

@@ -11,12 +11,17 @@
     <link rel="stylesheet" href="/stylesheets/components/header.css">
     <link rel="stylesheet" href="/stylesheets/admin/permission.css">
     <link rel="stylesheet" href="/stylesheets/chat/new.css">
+    <link rel="stylesheet" href="/stylesheets/admin/permission.css">
 
     <script src="https://code.jquery.com/jquery-3.5.1.min.js" integrity="sha256-9/aliU8dGd2tb6OSsuzixeV4y/faTqgFtohetphbbj0=" crossorigin="anonymous"></script>
     <script src="https://unpkg.com/@popperjs/core@2" crossorigin="anonymous"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js" integrity="sha384-OgVRvuATP1z7JjHLkuOU7Xw704+h835Lr+6QL9UvYjZE3Ipu6Tp75j7Bh/kR0JKI" crossorigin="anonymous"></script>
 
     <script src="https://kit.fontawesome.com/dccc745c41.js" crossorigin="anonymous"></script>
+
+    <style>
+
+    </style>
 </head>
 <body>
     <%- include('../partials/navbar') %>
@@ -38,7 +43,7 @@
 
                   <li class="list-group-item">
                     <strong>Modify Statuses</strong>
-                    <form action="/admin/add-status" method="post" id="add-email-form" style="display: inline; margin-left: 10px;">
+                    <form action="/admin/add-status" method="post" id="add-email-form">
                       <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#modal" id="delete-button"><i class="fas fa-user"></i> Add Status</button>
                       <div class="modal fade" id="modal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
                         <div class="modal-dialog">
@@ -53,12 +58,12 @@
                               <input class="form-control" type="text" name="status" placeholder="Enter status name (e.g. 'Parent')"/><br />
                               <input class="form-control" type="text" name="plural" placeholder="Enter status plural form (e.g. 'Parents')"/>
 
-                              <input style="margin-top: 20px; margin-bottom: 20px;" type="radio" name="version" value="position" id="position"/>
-                              <label style="font-size: 15px;" for="position">Position (e.g. 'faculty', 'parent', '12th grader')</label>
+                              <input id="position" type="radio" name="version" value="position"/>
+                              <label id="position-label" for="position">Position (e.g. 'faculty', 'parent', '12th grader')</label>
 
                               <br />
                               <input type="radio" name="version" value="role" id="role"/>
-                              <label style="font-size: 15px;" for="role">Temporary Role (e.g. 'cashier', 'tutor', 'editor')</label>
+                              <label id="role-label" for="role">Temporary Role (e.g. 'cashier', 'tutor', 'editor')</label>
                             </div>
                             <div class="modal-footer">
                               <button type="button" class="btn btn-secondary" data-dismiss="modal">Back</button>
@@ -109,10 +114,10 @@
                             <% } %>
                           </select>
 
-                          <span style="margin-left: 10px; margin-right: 20px;" class="badge badge-secondary%>"><%=permMap.get(user.permission)%></span>
+                          <span class="badge badge-secondary user-permission%>"><%=permMap.get(user.permission)%></span>
 
                           <% for (let tag of user.tags) { %>
-                            <span class="badge badge-pill badge-<%=tagMap.get(tag)%> tag-<%=user._id%>" style="margin-right: 5px;"><%=tag%></span>
+                            <span class="badge badge-pill badge-<%=tagMap.get(tag)%> tag-<%=user._id%> user-tag"><%=tag%></span>
                           <% } %>
                         </li>
                       <% } %>

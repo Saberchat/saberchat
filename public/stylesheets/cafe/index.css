@@ -1,0 +1,20 @@
+#menu {
+  margin-top: -1px;
+}
+
+.section-heading {
+  color: inherit;
+}
+
+.paying-style {
+  margin-top: 20px;
+}
+
+.date {
+  margin-top: 10px;
+}
+
+.cancel {
+  text-decoration: none;
+  color: inherit;
+}

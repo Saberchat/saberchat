@@ -33,7 +33,34 @@
     border: 1px solid #525252;
 }
 
+.msg-text {
+  white-space: pre-wrap;
+}
+
 .msg-images img {
     margin-bottom: 2rem;
     box-shadow: 0px 1px 5px #6d6d6d;
+}
+
+.replies {
+  padding: 20px;
+}
+
+.reply-sender {
+  color: black;
+}
+
+.reply-image {
+  width: 40%;
+  height: 40%;
+  margin-bottom: 10px;
+  border-radius: 15px;
+}
+
+#reply-box {
+  padding: 20px;
+}
+
+#send-reply {
+  margin-bottom: 10px;
 }
