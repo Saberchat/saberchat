@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html lang="en">
-
   <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -8,10 +7,11 @@
 
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css">
     <link rel="stylesheet" href="/stylesheets/main.css">
+
+    <link rel="stylesheet" href="/stylesheets/components/navbar.css">
     <link rel="stylesheet" href="/stylesheets/wHeights/index.css">
     <link rel="stylesheet" href="/stylesheets/wHeights/show.css">
-    <link rel="stylesheet" href="/stylesheets/components/navbar.css">
-    <link rel="stylesheet" href="/stylesheets/components/header.css">
+    <link rel="stylesheet" href="/stylesheets/announcements/index.css">
     <link rel="stylesheet" href="/stylesheets/projects/index.css">
     <link rel="stylesheet" href="/stylesheets/projects/show.css">
 
@@ -32,7 +32,7 @@
 
     <div class="container mt-5">
 
-      <div class="row ann-container">
+      <div class="row">
         <div class="col-12">
           <div class="jumbotron text-center">
             <h1><%= article.title %></h1>
@@ -44,35 +44,37 @@
 
 
       <!-- article -->
-      <div class="row ann-container">
+      <div class="row">
         <div class="col-12">
+          <article class="ann-container">
 
-          <h1><%= article.title %></h1>
-          <strong>By <a href="../profiles/<%=article.author._id%>"><%= article.author.username %></a></strong><br />
-          <strong>Posted <%=date%></strong>
-          <br /><br />
+            <h1><%= article.title %></h1>
+            <strong>By <a href="../profiles/<%=article.author._id%>"><%= article.author.username %></a></strong><br />
+            <strong>Posted <%=date%></strong>
+            <br /><br />
 
-          <% article.content.forEach(element => { %>
+            <% article.content.forEach(element => { %>
 
-            <% if (element.type == 'paragraph') { %>
-              <p><%- element.data.text %></p>
+              <% if (element.type == 'paragraph') { %>
+                <p><%- element.data.text %></p>
 
-            <% } %>
-
-          <% }); %>
-
-          <div class="container article-content">
-            <% for (let segment of article.content) { %>
-
-              <% if (segment.type == "text") { %>
-                <p><%=segment.content%></p>
-
-              <% } else if (segment.type == "image") { %>
-                <img class="article-image" src="<%=segment.data.url%>" /><br /><br />
               <% } %>
 
-            <% } %>
-          </div>
+            <% }); %>
+
+            <div class="container article-content">
+              <% for (let segment of article.content) { %>
+
+                <% if (segment.type == "text") { %>
+                  <p><%=segment.content%></p>
+
+                <% } else if (segment.type == "image") { %>
+                  <img class="article-image" src="<%=segment.data.url%>" /><br /><br />
+                <% } %>
+
+              <% } %>
+            </div>
+          </article>
         </div>
       </div>
     </div>
