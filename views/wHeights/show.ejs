@@ -1,73 +1,81 @@
 <!DOCTYPE html>
 <html lang="en">
 
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Witherly Heights</title>
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Witherly Heights</title>
 
-  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css">
-  <link rel="stylesheet" href="/stylesheets/main.css">
-  <link rel="stylesheet" href="/stylesheets/wHeights/index.css">
-  <link rel="stylesheet" href="/stylesheets/wHeights/show.css">
-  <link rel="stylesheet" href="/stylesheets/components/navbar.css">
-  <link rel="stylesheet" href="/stylesheets/components/header.css">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/stylesheets/main.css">
+    <link rel="stylesheet" href="/stylesheets/wHeights/index.css">
+    <link rel="stylesheet" href="/stylesheets/wHeights/show.css">
+    <link rel="stylesheet" href="/stylesheets/components/navbar.css">
+    <link rel="stylesheet" href="/stylesheets/components/header.css">
+    <link rel="stylesheet" href="/stylesheets/projects/index.css">
+    <link rel="stylesheet" href="/stylesheets/projects/show.css">
 
-  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
-  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js"></script>
 
-  <!-- I'm using my fontawesome kit -->
-  <script src="https://kit.fontawesome.com/dccc745c41.js" crossorigin="anonymous"></script>
-</head>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js"></script>
 
-<body>
+    <!-- I'm using my fontawesome kit -->
+    <script src="https://kit.fontawesome.com/dccc745c41.js" crossorigin="anonymous"></script>
+  </head>
 
-  <%- include('../partials/navbar') %>
-  <%- include('../partials/header') %>
+  <body>
 
-  <div class="container mt-5">
-    <div class="row">
-      <div class="col-12">
-        <div class="jumbotron text-center">
-          <h1><i class="fas fa-paint-brush"></i> Student Projects </h1>
-          <p>Our Students' Artwork, Gardening Projects, Science Projects and More</p>
-          <a class="btn btn-primary" href="/projects"><i class="fas fa-arrow-left"></i> Back</a>
+    <%- include('../partials/navbar') %>
+    <%- include('../partials/header') %>
+
+
+    <div class="container mt-5">
+
+      <div class="row ann-container">
+        <div class="col-12">
+          <div class="jumbotron text-center">
+            <h1><%= article.title %></h1>
+            <p>Article</p>
+            <a class="btn btn-primary" href="/articles"><i class="fas fa-arrow-left"></i> Back</a>
+          </div>
+        </div>
+      </div>
+
+
+      <!-- article -->
+      <div class="row ann-container">
+        <div class="col-12">
+
+          <h1><%= article.title %></h1>
+          <strong>By <a href="../profiles/<%=article.author._id%>"><%= article.author.username %></a></strong><br />
+          <strong>Posted <%=date%></strong>
+          <br /><br />
+
+          <% article.content.forEach(element => { %>
+
+            <% if (element.type == 'paragraph') { %>
+              <p><%- element.data.text %></p>
+
+            <% } %>
+
+          <% }); %>
+
+          <div class="container article-content">
+            <% for (let segment of article.content) { %>
+
+              <% if (segment.type == "text") { %>
+                <p><%=segment.content%></p>
+
+              <% } else if (segment.type == "image") { %>
+                <img class="article-image" src="<%=segment.data.url%>" /><br /><br />
+              <% } %>
+
+            <% } %>
+          </div>
         </div>
       </div>
     </div>
-
-
-    <!-- article -->
-    <div class="row">
-      <div class="col-12">
-
-        <h1><%= article.title %></h1>
-        <strong>By <a href="../profiles/<%=article.author._id%>"><%= article.author.username %></a></strong><br />
-        <strong>Posted <%=date%></strong>
-        <br /><br />
-        <% article.content.forEach(element => { %>
-        <% if (element.type == 'paragraph') { %>
-        <p><%- element.data.text %></p>
-        <% } %>
-        <% }) %>
-
-        <div class="container article-content">
-          <% for (let segment of article.content) { %>
-
-          <% if (segment.type == "text") { %>
-          <p>
-            <%=segment.content%>
-          </p>
-
-          <% } else if (segment.type == "image") { %>
-          <img class="article-image" src="<%=segment.data.url%>" /><br /><br />
-          <% } %>
-          <% }%>
-        </div>
-      </div>
-    </div>
-  </div>
-</body>
+  </body>
 
 </html>
