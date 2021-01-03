@@ -1,8 +1,9 @@
 // sends put request with data
 const upvote = (button => {
-  const itemId = button.id.split("-")[1];
-  const url = `/cafe/upvote?_method=put`;
-  const data = {item: itemId};
+  const courseId = button.id.split('-')[1];
+  const tutorId = button.id.split("-")[2];
+  const url = `/homework/upvote/${courseId}?_method=put`;
+  const data = {tutor: tutorId};
   $.post(url, data, function(data) {
     if(data.success) {
 
@@ -13,8 +14,7 @@ const upvote = (button => {
         button.style.color = "red";
       }
 
-      document.getElementById(`upvoteCount-${itemId}`).innerText = data.upvoteCount;
+      document.getElementById(`upvoteCount-${courseId}-${tutorId}`).innerText = data.upvoteCount;
     }
-
   });
 });

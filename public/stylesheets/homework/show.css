@@ -82,3 +82,7 @@
 #loading {
   font-size: 110%;
 }
+
+.book-button, .upvoted, .not-upvoted, .review-button {
+  margin-left: 10px;
+}

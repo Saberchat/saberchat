@@ -13,15 +13,14 @@
     <link rel="stylesheet" href="/stylesheets/home/index.css">
     <link rel="stylesheet" href="/stylesheets/profile/index.css">
     <link rel="stylesheet" href="/stylesheets/homework/show.css">
+    <link rel="stylesheet" href="/stylesheets/cafe/menu.css">
 
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js"></script>
-    <script src="../javascript/socket.js"></script>
-    <script src="/javascript/nav/userForm.js"></script>
-    <script src="/javascript/nav/navbar.js"></script>
-    <script src="/javascript/home/index.js"></script>
+
     <script src="/javascript/homework/settings.js"></script>
+    <script src="/javascript/homework/upvote.js"></script>
 
     <!-- I'm using my fontawesome kit -->
     <script src="https://kit.fontawesome.com/dccc745c41.js" crossorigin="anonymous"></script>
@@ -137,13 +136,29 @@
           <% if (course.tutors.length > 0) { %>
               <li class="list-group-item list-group-item-success"><strong>Tutors</strong></li>
               <% for (let tutor of course.tutors) { %>
-                <span class="list-group-item list-group-item-action tutor-profile">
-                  <a href="../profiles/<%=tutor.tutor._id%>" class="tutor-link">
-                    <img class="profile-image" src="<%= tutor.tutor.imageUrl %>" alt="profile picture">
-                    <span class="tutor-name <%=tutor.tutor.status%> <%=tutor.tutor.permission%> <%=tutor.tutor.tags.join(' ')%>"><strong><%=tutor.tutor.firstName%> <%=tutor.tutor.lastName%></strong> <span class="tutor-username"><%=`${tutor.tutor.username}`%></span></span>
-                  </a>
-                  <p class="tutor-bio"><%=tutor.bio%></p>
-                </span>
+                <% if (tutor.available) { %>
+                  <span class="list-group-item list-group-item-action tutor-profile">
+                    <a href="../profiles/<%=tutor.tutor._id%>" class="tutor-link">
+                      <img class="profile-image" src="<%= tutor.tutor.imageUrl %>" alt="profile picture">
+                      <span class="tutor-name <%=tutor.tutor.status%> <%=tutor.tutor.permission%> <%=tutor.tutor.tags.join(' ')%>"><strong><%=tutor.tutor.firstName%> <%=tutor.tutor.lastName%></strong> <span class="tutor-username"><%=`${tutor.tutor.username}`%></span></span>
+                    </a>
+
+                    <% if (tutor.students.includes(currentUser._id)) { %>
+                      <span class="btn btn-warning review-button">Leave A Review</span>
+                      <div title="Upvotes" class="upvotes">
+                        <% if (tutor.upvotes.includes(currentUser._id)) { %>
+                          <span class="upvoted" id="upvote-<%=course._id%>-<%=tutor.tutor._id%>" onclick="upvote(this)"><i class="fas fa-arrow-circle-up"></i></span>
+                        <% } else { %>
+                          <span class="not-upvoted" id="upvote-<%=course._id%>-<%=tutor.tutor._id%>" onclick="upvote(this)"><i class="fas fa-arrow-circle-up"></i></span>
+                        <% }%>
+                        <span id="upvoteCount-<%=course._id%>-<%=tutor.tutor._id%>"> <%=tutor.upvotes.length%></span>
+                      </div>
+                    <% } else { %>
+                      <a href="../homework/book/<%=course._id%>?tutor=<%=tutor.tutor._id%>" class="btn btn-info book-button">Book This Tutor</a>
+                    <% }%>
+                    <p class="tutor-bio"><%=tutor.bio%></p>
+                  </span>
+                <% } %>
               <% } %>
           <% } %>
 

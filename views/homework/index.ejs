@@ -10,7 +10,7 @@
     <!-- link css for navbar. Don't need to include public/javascript/userForm.js since user is already logged in and does not need to access login and register forms.  -->
     <link rel="stylesheet" href="/stylesheets/components/header.css">
     <link rel="stylesheet" href="/stylesheets/components/navbar.css">
-    <link rel="stylesheet" href="/stylesheets/projects/projects.css">
+    <link rel="stylesheet" href="/stylesheets/projects/index.css">
     <link rel="stylesheet" href="/stylesheets/announcements/index.css">
     <link rel="stylesheet" href="/stylesheets/home/index.css">
     <link rel="stylesheet" href="/stylesheets/chat/new.css">
@@ -69,7 +69,7 @@
               </form>
 
             <%} else if (studentStatuses.includes(currentUser.status)) { %>
-              <form action="/homework/join" method="post" id="add-course-form">
+              <form action="/homework/join" method="post" id="join-course-student">
                 <button type="button" data-toggle="modal" data-target="#modal-join" class="btn btn-primary"><i class="fas fa-chalkboard-teacher"></i> Join Course</button>
                 <div class="modal fade" id="modal-join" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
                   <div class="modal-dialog">
@@ -92,7 +92,7 @@
                 </div>
               </form>
 
-              <form action="/homework/join-tutor" method="post" id="add-course-form">
+              <form action="/homework/join-tutor" method="post" id="join-course-tutor">
                 <button type="button" data-toggle="modal" data-target="#modal-tutor" class="btn btn-success"><i class="fas fa-chalkboard-teacher"></i> Join Course As Tutor</button>
                 <div class="modal fade" id="modal-tutor" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
                   <div class="modal-dialog">

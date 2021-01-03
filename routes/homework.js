@@ -213,4 +213,60 @@ router.post('/unenroll/:id', middleware.isLoggedIn, (req, res) => {
   });
 });
 
+router.get('/book/:id', middleware.isLoggedIn, middleware.isStudent, (req, res) => {
+  Course.findById(req.params.id).populate('tutors.tutor').exec((err, course) => {
+    if (err || !course) {
+      req.flash('error', "Unable to find course");
+      res.redirect('back');
+
+    } else if (!course.students.includes(req.user._id)) {
+      req.flash('error', "You are not a student in that course");
+      res.redirect('back');
+
+    } else {
+      for (let tutor of course.tutors) {
+        if (tutor.tutor._id.equals(req.query.tutor) && tutor.available) {
+          tutor.students.push(req.user._id);
+          course.save();
+          req.flash('success', `You are now a student of ${tutor.tutor.firstName} ${tutor.tutor.lastName}`);
+          res.redirect(`/homework/${course._id}`);
+        }
+      }
+    }
+  });
+});
+
+router.put('/upvote/:id', middleware.isLoggedIn, (req, res) => {
+  Course.findById(req.params.id, (err, course) => {
+    if (err || !course) {
+      res.json({error: "Error upvoting tutor"});
+
+    } else {
+      for (let tutor of course.tutors) {
+
+        if (tutor.tutor.equals(req.body.tutor)) {
+
+          if (tutor.students.includes(req.user._id)) {
+            if (tutor.upvotes.includes(req.user._id)) {
+              tutor.upvotes.splice(tutor.upvotes.indexOf(req.user._id), 1);
+              course.save();
+              res.json({success: "Downvoted tutor", upvoteCount: tutor.upvotes.length});
+
+            } else {
+              tutor.upvotes.push(req.user._id);
+              course.save();
+              res.json({success: "Upvoted tutor", upvoteCount: tutor.upvotes.length});
+            }
+            
+          } else {
+            res.json({error: "You are not a student of this tutor"});
+          }
+
+        }
+      }
+    }
+  });
+});
+
+
 module.exports = router;
