@@ -4,6 +4,7 @@ const filter = new Filter();
 //create express router
 const router = express.Router();
 const nodemailer = require('nodemailer');
+const {transport, transport_mandatory} = require("../transport");
 
 //import middleware
 const middleware = require('../middleware');
@@ -214,20 +215,7 @@ router.post('/:id/request-access', middleware.isLoggedIn, (req, res) => {
       roomCreator.requests.push(createdReq._id);
       roomCreator.save();
 
-      let requestEmail = {
-				from: 'noreply.saberchat@gmail.com',
-				to: roomCreator.email,
-				subject: `New Room Access Request`,
-				html: `<p>Hello ${roomCreator.firstName},</p><p><strong>${req.user.username}</strong> is requesting to join your room, <strong>${foundRoom.name}.</strong></p><p>You can access the full request at https://alsion-saberchat.herokuapp.com</p>`
-			};
-
-			transporter.sendMail(requestEmail, (err, info) => {
-				if (err) {
-					console.log(err);
-				} else {
-					console.log('Email sent: ' + info.response);
-				}
-			});
+      transport(transporter, roomCreator, 'New Room Access Request', `<p>Hello ${roomCreator.firstName},</p><p><strong>${req.user.username}</strong> is requesting to join your room, <strong>${foundRoom.name}.</strong></p><p>You can access the full request at https://alsion-saberchat.herokuapp.com</p>`);
 
       req.flash('success', 'Request for access sent');
       res.redirect('back');

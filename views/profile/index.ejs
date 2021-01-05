@@ -19,6 +19,7 @@
     <!-- I'm using my fontawesome kit -->
     <script src="https://kit.fontawesome.com/dccc745c41.js" crossorigin="anonymous"></script>
     <script src="/javascript/profile/search.js"></script>
+    <script src="/javascript/profile/follow.js"></script>
 </head>
 <body>
     <!-- include the navbar via ejs -->
@@ -91,16 +92,16 @@
                               </a>
 
                               <% if (!(user._id.toString() == currentUser._id.toString())) { %>
+                                <div id="follow-div-<%=user._id%>" class="follow-div">
 
                                 <% if (user.followers.includes(currentUser._id)) { %>
-                                  <button type="button" data-toggle="modal" data-target="#modal-<%=user._id%>-unfollow" id="delete-button-<%=user._id%>" class="btn btn-danger unfollow-button">Unfollow</button>
+                                  <button type="button" data-toggle="modal" data-target="#modal-<%=user._id%>-unfollow" id="unfollow-<%=user._id%>" class="btn btn-danger unfollow-button">Unfollow</button>
 
                                 <% } else { %>
-
-                                  <button type="button" data-toggle="modal" data-target="#modal-<%=user._id%>-follow" id="delete-button-<%=user._id%>" class="btn btn-primary follow-button">Follow</button>
-
+                                  <button type="button" data-toggle="modal" data-target="#modal-<%=user._id%>-follow" id="follow-<%=user._id%>" class="btn btn-primary follow-button">Follow</button>
                                 <% } %>
-                                </span>
+
+                                </div>
                               <% } %>
                             </li>
                         <% } %>
@@ -128,7 +129,7 @@
             </div>
             <div class="modal-footer">
               <button type="button" class="btn btn-secondary" data-dismiss="modal">No, Go Back</button>
-              <a type="button" href="/profiles/unfollow/<%=user._id%>" class="btn btn-danger">Yes, Unfollow</a>
+              <button type="button" id="unfollow-confirm-<%=user._id%>" onclick="unfollow(this)" class="btn btn-danger">Yes, Unfollow</button>
             </div>
           </div>
         </div>
@@ -148,7 +149,7 @@
             </div>
             <div class="modal-footer">
               <button type="button" class="btn btn-secondary" data-dismiss="modal">No, Go Back</button>
-              <a type="button" href="/profiles/follow/<%=user._id%>" class="btn btn-primary">Yes, Follow</a>
+              <button type="button" id="follow-confirm-<%=user._id%>" onclick="follow(this)" class="btn btn-primary">Yes, Follow</button>
             </div>
           </div>
         </div>

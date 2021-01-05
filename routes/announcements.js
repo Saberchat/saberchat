@@ -6,6 +6,7 @@ const middleware = require('../middleware');
 const router = express.Router(); //start express router
 const dateFormat = require('dateformat');
 const nodemailer = require('nodemailer');
+const {transport, transport_mandatory} = require("../transport");
 
 //SCHEMA
 const User = require('../models/user');
@@ -159,22 +160,7 @@ router.post('/', middleware.isLoggedIn, middleware.isMod, (req, res) => { //REST
     };
 
     for (let user of users) {
-
-      announcementEmail = {
-        from: 'noreply.saberchat@gmail.com',
-        to: user.email,
-        subject: `New Saberchat Announcement - ${announcement.subject}`,
-        html: `<p>Hello ${user.firstName},</p><p>${req.user.username} has recently posted a new announcement - '${announcement.subject}'.</p><p>${announcement.text}</p><p>You can access the full announcement at https://alsion-saberchat.herokuapp.com</p> ${imageString}`
-      };
-
-      transporter.sendMail(announcementEmail, (err, info) => {
-				if (err) {
-					console.log(err);
-				} else {
-					console.log('Email sent: ' + info.response);
-				}
-			});
-
+      transport(transporter, user, `New Saberchat Announcement - ${announcement.subject}`, `<p>Hello ${user.firstName},</p><p>${req.user.username} has recently posted a new announcement - '${announcement.subject}'.</p><p>${announcement.text}</p><p>You can access the full announcement at https://alsion-saberchat.herokuapp.com</p> ${imageString}`);
       user.annCount.push(announcementObject);
       await user.save();
     }
@@ -287,8 +273,6 @@ router.put('/comment', middleware.isLoggedIn, (req, res) => {
     }
 
     let notif;
-    let commentEmail;
-
     for (let user of users) {
 
       notif = await Notification.create({subject: `New Mention in ${announcement.subject}`, sender: req.user, recipients: [user], read: [], toEveryone: false, images: []}); //Create a notification to alert the user
@@ -299,24 +283,9 @@ router.put('/comment', middleware.isLoggedIn, (req, res) => {
 
       notif.date = dateFormat(notif.created_at, "h:MM TT | mmm d");
       notif.text = `Hello ${user.firstName},\n\n${req.user.firstName} ${req.user.lastName} mentioned you in a comment on "${announcement.subject}":\n${comment.text}`;
-
       await notif.save();
 
-      commentEmail = {
-        from: 'noreply.saberchat@gmail.com',
-        to: user.email,
-        subject: `New Mention in ${announcement.subject}`,
-        html: `<p>Hello ${user.firstName},</p><p>${req.user.firstName} ${req.user.lastName} mentioned you in a comment on <strong>${announcement.subject}</strong>.<p>${comment.text}</p>`
-      };
-
-      transporter.sendMail(commentEmail, (err, info) => {
-        if (err) {
-          console.log(err);
-        } else {
-          console.log('Email sent: ' + info.response);
-        }
-      });
-
+      transport(transporter, user, `New Mention in ${announcement.subject}`, `<p>Hello ${user.firstName},</p><p>${req.user.firstName} ${req.user.lastName} mentioned you in a comment on <strong>${announcement.subject}</strong>.<p>${comment.text}</p>`);
       user.inbox.push(notif); //Add notif to user's inbox
       user.msgCount += 1;
       await user.save();
@@ -389,22 +358,7 @@ router.put('/:id', middleware.isLoggedIn, middleware.isMod, (req, res) => { //RE
       let overlap;
 
       for (let user of users) {
-
-        announcementEmail = {
-          from: 'noreply.saberchat@gmail.com',
-          to: user.email,
-          subject: `Updated Saberchat Announcement - ${announcement.subject}`,
-          html: `<p>Hello ${user.firstName},</p><p>${req.user.username} has recently updated an announcement - '${announcement.subject}'.</p><p>${announcement.text}</p><p>You can access the full announcement at https://alsion-saberchat.herokuapp.com</p> ${imageString}`
-        };
-
-        transporter.sendMail(announcementEmail, (err, info) => {
-  				if (error) {
-  					console.log(err);
-  				} else {
-  					console.log('Email sent: ' + info.response);
-  				}
-  			});
-
+        transport(transporter, user, `Updated Saberchat Announcement - ${announcement.subject}`, `<p>Hello ${user.firstName},</p><p>${req.user.username} has recently updated an announcement - '${announcement.subject}'.</p><p>${announcement.text}</p><p>You can access the full announcement at https://alsion-saberchat.herokuapp.com</p> ${imageString}`);
         overlap = false;
 
         for (let a of user.annCount) {

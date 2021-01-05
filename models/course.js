@@ -20,8 +20,11 @@ const courseSchema = new mongoose.Schema({
     students: [{type: mongoose.Schema.Types.ObjectId, ref: 'User', default: []}],
     upvotes: [{type: mongoose.Schema.Types.ObjectId, ref: 'User', default: []}],
     reviews: [{
-      type: mongoose.Schema.Types.ObjectId,
-      ref: 'PostComment',
+      review: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'PostComment',
+      },
+      rating: Number,
       default: []
     }],
     default: []

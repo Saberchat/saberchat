@@ -38,7 +38,9 @@
                 <form action="/profiles/change-email?_method=put" method="post">
                     <div class="form-group">
                         <label for="usernameInput">Email</label>
-                        <input id="usernameInput" class="form-control" type="text" name="email" value="<%= currentUser.email %>" placeholder="Enter New Email" required>
+                        <input id="usernameInput" class="form-control" type="text" name="email" value="<%= currentUser.email %>" placeholder="Enter New Email" required><br />
+                        <input type="checkbox" name="receiving_emails" id="receiving_emails" <% if (currentUser.receiving_emails) {%> checked <%}%>/>
+                        <label for="receiving_emails">Send Me Emails</label>
                     </div>
 
                     <button class="btn btn-lg btn-primary btn-block">Change Email</button>

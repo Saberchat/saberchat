@@ -6,6 +6,7 @@ const middleware = require('../middleware');
 const router = express.Router();
 const dateFormat = require('dateformat');
 const nodemailer = require('nodemailer');
+const {transport, transport_mandatory} = require("../transport");
 
 //SCHEMA
 const User = require('../models/user');
@@ -748,20 +749,7 @@ router.post('/:id/ready', middleware.isLoggedIn, middleware.isMod, (req, res) =>
 
       await notif.save();
 
-      let orderEmail = {
-  		  from: 'noreply.saberchat@gmail.com',
-  		  to: order.customer.email,
-  		  subject: 'Cafe Order Ready',
-  			text: `Hello ${order.customer.firstName},\n\n${notif.text}\n\n`
-  		};
-
-  		transporter.sendMail(orderEmail, (err, info) => {
-  		  if (err) {
-  		    console.log(err);
-  		  } else {
-  		    console.log('Email sent: ' + info.response);
-  		  }
-  		});
+      transport(transporter, order.customer, 'Cafe Order Ready', `<p>Hello ${order.customer.firstName},</p><p>${notif.text}</p>`);
 
       order.customer.inbox.push(notif); //Add notif to user's inbox
       order.customer.msgCount += 1;
@@ -835,20 +823,7 @@ router.post('/:id/reject', middleware.isLoggedIn, middleware.isMod, (req, res) =
 
     await notif.save();
 
-    let orderEmail = {
-      from: 'noreply.saberchat@gmail.com',
-      to: order.customer.email,
-      subject: 'Cafe Order Rejected',
-      text: `Hello ${order.customer.firstName},\n\n${notif.text}\n\n`
-    };
-
-    transporter.sendMail(orderEmail, (err, info) => {
-      if (err) {
-        console.log(err);
-      } else {
-        console.log('Email sent: ' + info.response);
-      }
-    });
+    transport(transporter, order.customer, 'Cafe Order Rejected', `<p>Hello ${order.customer.firstName},</p><p>${notif.text}</p>`);
 
     if (!order.payingInPerson) {
       order.customer.balance += order.charge; //Refund

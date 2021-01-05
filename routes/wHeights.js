@@ -3,6 +3,7 @@ const express = require('express');
 const router = express.Router();
 const middleware = require('../middleware');
 const dateFormat = require('dateformat');
+const {transport, transport_mandatory} = require("../transport");
 
 //SCHEMA
 const Article = require('../models/article');

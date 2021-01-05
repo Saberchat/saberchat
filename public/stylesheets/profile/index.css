@@ -69,3 +69,7 @@ strong {
   float: right;
   color: white;
 }
+
+.follow-div {
+  display: inline;
+}

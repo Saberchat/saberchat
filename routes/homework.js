@@ -1,4 +1,4 @@
-//Project routes dictate the posting, viewing, and editing of the Saberchat Student Projects Board
+//Homework routes dictate interactions between teachers, tutors and students
 
 //LIBRARIES
 const express = require('express');
@@ -6,11 +6,13 @@ const middleware = require('../middleware');
 const router = express.Router(); //start express router
 const dateFormat = require('dateformat');
 const nodemailer = require('nodemailer');
+const {transport, transport_mandatory} = require("../transport");
 
 //SCHEMA
 const User = require('../models/user');
 const Notification = require('../models/message');
 const Course = require('../models/course');
+const PostComment = require('../models/postComment');
 
 let transporter = nodemailer.createTransport({
   service: 'gmail',
@@ -137,23 +139,24 @@ router.post('/join-tutor', middleware.isLoggedIn, middleware.isTutor, (req, res)
 });
 
 router.get('/:id', middleware.isLoggedIn, (req, res) => {
-  Course.findById(req.params.id).populate('teacher').populate('students').populate('tutors.tutor').exec((err, course) => {
+  Course.findById(req.params.id).populate('teacher').populate('students').populate('tutors.tutor').populate('tutors.reviews.review').exec((err, course) => {
     if (err || !course) {
       req.flash('error', "Unable to find course");
       res.redirect('back');
 
     } else {
-      let studentTutorIds = [];
+      let studentIds = [];
+      let tutorIds = [];
       for (let student of course.students) {
-        studentTutorIds.push(student._id.toString());
+        studentIds.push(student._id.toString());
       }
 
       for (let tutor of course.tutors) {
-        studentTutorIds.push(tutor.tutor._id.toString());
+        tutorIds.push(tutor.tutor._id.toString());
       }
 
-      if (course.teacher.equals(req.user._id) || studentTutorIds.includes(req.user._id.toString())) {
-        res.render('homework/show', {course, studentTutorIds});
+      if (course.teacher.equals(req.user._id) || studentIds.includes(req.user._id.toString()) || tutorIds.includes(req.user._id.toString())) {
+        res.render('homework/show', {course, studentIds, tutorIds});
 
       } else {
         req.flash('error', "You do not have permission to view that course");
@@ -201,42 +204,49 @@ router.put('/joinCode/:id', middleware.isLoggedIn, middleware.isFaculty, (req, r
 });
 
 router.post('/unenroll/:id', middleware.isLoggedIn, (req, res) => {
-  Course.findByIdAndUpdate(req.params.id, {$pull: {students: req.user._id, tutors: req.user._id}}, (err, course) => {
+  Course.findByIdAndUpdate(req.params.id, {$pull: {students: req.user._id}}, (err, course) => {
     if (err || !course) {
       req.flash('error', "Unable to find course");
       res.redirect('back');
 
     } else {
+      for (let i = course.tutors.length-1; i >= 0; i --) {
+        if (course.tutors[i].tutor.equals(req.user._id)) {
+          course.tutors.splice(i, 1);
+
+        } else if (course.tutors[i].students.includes(req.user._id)) {
+          course.tutors[i].students.splice(course.tutors[i].students.indexOf(req.user._id), 1);
+        }
+      }
+
+      course.save();
       req.flash('success', `Unenrolled from ${course.name}!`);
       res.redirect('/homework');
     }
   });
 });
 
-router.get('/book/:id', middleware.isLoggedIn, middleware.isStudent, (req, res) => {
+router.put('/book/:id', middleware.isLoggedIn, middleware.isStudent, (req, res) => {
   Course.findById(req.params.id).populate('tutors.tutor').exec((err, course) => {
     if (err || !course) {
-      req.flash('error', "Unable to find course");
-      res.redirect('back');
+      res.json({error: "Error accessing course"});
 
     } else if (!course.students.includes(req.user._id)) {
-      req.flash('error', "You are not a student in that course");
-      res.redirect('back');
+      res.json({error: "You are not a student of that tutor"});
 
     } else {
       for (let tutor of course.tutors) {
-        if (tutor.tutor._id.equals(req.query.tutor) && tutor.available) {
+        if (tutor.tutor._id.equals(req.body.tutor) && tutor.available) {
           tutor.students.push(req.user._id);
           course.save();
-          req.flash('success', `You are now a student of ${tutor.tutor.firstName} ${tutor.tutor.lastName}`);
-          res.redirect(`/homework/${course._id}`);
+          res.json({success: "Succesfully joined tutor"});
         }
       }
     }
   });
 });
 
-router.put('/upvote/:id', middleware.isLoggedIn, (req, res) => {
+router.put('/upvote/:id', middleware.isLoggedIn, middleware.isStudent, (req, res) => {
   Course.findById(req.params.id, (err, course) => {
     if (err || !course) {
       res.json({error: "Error upvoting tutor"});
@@ -257,7 +267,7 @@ router.put('/upvote/:id', middleware.isLoggedIn, (req, res) => {
               course.save();
               res.json({success: "Upvoted tutor", upvoteCount: tutor.upvotes.length});
             }
-            
+
           } else {
             res.json({error: "You are not a student of this tutor"});
           }
@@ -268,5 +278,145 @@ router.put('/upvote/:id', middleware.isLoggedIn, (req, res) => {
   });
 });
 
+router.put('/rate/:id', middleware.isLoggedIn, middleware.isStudent, (req, res) => {
+  (async() => {
+
+    const course = await Course.findById(req.params.id);
+    if (!course) {
+      return res.json({error: "Error reviewing tutor"});
+    }
+
+    for (let tutor of course.tutors) {
+      if (tutor.tutor.equals(req.body.tutor)) {
+        if (tutor.students.includes(req.user._id)) {
+
+          let review = await PostComment.create({text: req.body.review, sender: req.user});
+          if (!review) {
+            return res.json({error: "Error reviewing tutor"});
+          }
+
+          review.date = dateFormat(review.created_at, "h:MM TT | mmm d");
+          review.save();
+
+          let reviewObject = {review, rating: req.body.rating};
+          tutor.reviews.push(reviewObject);
+          course.save();
+
+          let averageRating = 0;
+          for (let review of tutor.reviews) {
+            averageRating += review.rating;
+          }
+          averageRating = Math.round(averageRating/tutor.reviews.length);
+
+          res.json({success: "Succesfully upvoted tutor", averageRating, reviews_length: tutor.reviews.length, review: reviewObject, user: req.user});
+
+        } else {
+          res.json({error: "You are not a student of this tutor"});
+        }
+      }
+    }
+
+  })().catch(err => {
+    console.log(err);
+    res.json({error: err});
+  });
+});
+
+router.put('/leave/:id', middleware.isLoggedIn, middleware.isStudent, (req, res) => {
+  Course.findById(req.params.id, (err, course) => {
+    if (err || !course) {
+      res.json({error: "Error leaving course"});
+
+    } else {
+      for (let tutor of course.tutors) {
+        if (tutor.tutor.equals(req.body.tutor)) {
+          if (tutor.students.includes(req.user._id)) {
+            tutor.students.splice(tutor.students.indexOf(req.user._id), 1);
+            course.save();
+            res.json({success: "Succesfully left tutor"});
+          } else {
+            res.json({error: "You are not a student of this tutor"});
+          }
+        }
+      }
+    }
+  });
+});
+
+router.put('/close-lessons/:id', middleware.isLoggedIn, (req, res) => {
+  Course.findById(req.params.id, (err, course) => {
+    if (err || !course) {
+      res.json({error: "Error closing lessons"});
+
+    } else {
+      for (let tutor of course.tutors) {
+        if (tutor.tutor.equals(req.user._id)) {
+          tutor.available = false;
+          course.save();
+          res.json({success: "Successfully closed lessons"});
+        }
+      }
+    }
+  });
+});
+
+router.put('/reopen-lessons/:id', middleware.isLoggedIn, (req, res) => {
+  Course.findById(req.params.id, (err, course) => {
+    if (err || !course) {
+      res.json({error: "Error closing lessons"});
+
+    } else {
+      for (let tutor of course.tutors) {
+        if (tutor.tutor.equals(req.user._id)) {
+          tutor.available = true;
+          course.save();
+          res.json({success: "Successfully closed lessons"});
+        }
+      }
+    }
+  });
+});
+
+router.get('/tutors/:id', middleware.isLoggedIn, (req, res) => {
+  Course.findById(req.params.id).populate("tutors.tutor").populate({path: "tutors.reviews.review", populate: {path: "sender"}}).exec((err, course) => {
+    if (err || !course) {
+      req.flash('error', "Unable to find course");
+      res.redirect('back');
+
+    } else {
+      for (let tutor of course.tutors) {
+        if (tutor.tutor._id.equals(req.query.tutor)) {
+
+          let studentIds = [];
+          for (let student of course.students) {
+            studentIds.push(student.toString());
+          }
+
+          res.render('homework/tutor-show', {course, tutor, studentIds});
+        }
+      }
+    }
+  });
+});
+
+router.put('/like-review/:id', middleware.isLoggedIn, (req, res) => {
+  PostComment.findById(req.params.id, (err, review) => {
+    if (err || !review) {
+      res.json({error: "Error accessing review"});
+
+    } else {
+      if (review.likes.includes(req.user._id)) {
+        review.likes.splice(review.likes.indexOf(req.user._id), 1);
+        review.save();
+        res.json({success: "Removed a like", likeCount: review.likes.length, review});
+
+      } else {
+        review.likes.push(req.user._id);
+        review.save();
+        res.json({success: "Liked", likeCount: review.likes.length});
+      }
+    }
+  });
+});
 
 module.exports = router;

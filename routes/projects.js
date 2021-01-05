@@ -7,6 +7,7 @@ const router = express.Router(); //start express router
 const dateFormat = require('dateformat');
 const nodemailer = require('nodemailer');
 const fillers = require('../fillerWords');
+const {transport, transport_mandatory} = require("../transport");
 
 //SCHEMA
 const User = require('../models/user');
@@ -134,21 +135,7 @@ router.post('/',middleware.isLoggedIn, middleware.isFaculty, (req, res) => { //R
 
       await notif.save();
 
-      postEmail = {
-        from: 'noreply.saberchat@gmail.com',
-        to: follower.email,
-        subject: `New Project Post - ${project.title}`,
-        html: `<p>Hello ${follower.firstName},</p><p>${req.user.firstName} ${req.user.lastName} recently posted a new project: <strong>${project.title}</strong>. Check it out!</p>${imageString}`
-      };
-
-      transporter.sendMail(postEmail, (err, info) => {
-        if (err) {
-          console.log(err);
-        } else {
-          console.log('Email sent: ' + info.response);
-        }
-      });
-
+      transport(transporter, follower, `New Project Post - ${project.title}`, `<p>Hello ${follower.firstName},</p><p>${req.user.firstName} ${req.user.lastName} recently posted a new project: <strong>${project.title}</strong>. Check it out!</p>${imageString}`);
       follower.inbox.push(notif); //Add notif to user's inbox
       follower.msgCount += 1;
       await follower.save();
@@ -422,25 +409,11 @@ router.put('/comment', middleware.isLoggedIn, (req, res) => {
 
       await notif.save();
 
-      commentEmail = {
-        from: 'noreply.saberchat@gmail.com',
-        to: user.email,
-        subject: `New Mention in ${project.title}`,
-        html: `<p>Hello ${user.firstName},</p><p>${req.user.firstName} ${req.user.lastName} mentioned you in a comment on <strong>${project.title}</strong>.<p>${comment.text}</p>`
-      };
-
-      transporter.sendMail(commentEmail, (err, info) => {
-        if (err) {
-          console.log(err);
-        } else {
-          console.log('Email sent: ' + info.response);
-        }
-      });
+      transport(transporter, user, `New Mention in ${project.title}`, `<p>Hello ${user.firstName},</p><p>${req.user.firstName} ${req.user.lastName} mentioned you in a comment on <strong>${project.title}</strong>.<p>${comment.text}</p>`);
 
       user.inbox.push(notif); //Add notif to user's inbox
       user.msgCount += 1;
       await user.save();
-
     }
 
     res.json({
@@ -553,25 +526,11 @@ router.put('/:id', middleware.isLoggedIn, middleware.isFaculty, (req, res) => {
 
       await notif.save();
 
-      postEmail = {
-        from: 'noreply.saberchat@gmail.com',
-        to: follower.email,
-        subject: `New Project Post - ${updatedProject.title}`,
-        html: `<p>Hello ${follower.firstName},</p><p>${req.user.firstName} ${req.user.lastName} recently updated one of their projects: <strong>${updatedProject.title}</strong>. Check it out!</p>${imageString}`
-      };
-
-      transporter.sendMail(postEmail, (err, info) => {
-        if (err) {
-          console.log(err);
-        } else {
-          console.log('Email sent: ' + info.response);
-        }
-      });
+      transport(transporter, follower, `New Project Post - ${updatedProject.title}`, `<p>Hello ${follower.firstName},</p><p>${req.user.firstName} ${req.user.lastName} recently updated one of their projects: <strong>${updatedProject.title}</strong>. Check it out!</p>${imageString}`);
 
       follower.inbox.push(notif); //Add notif to user's inbox
       follower.msgCount += 1;
       await follower.save();
-
     }
 
     req.flash("success", "Project Updated!");

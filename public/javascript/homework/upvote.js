@@ -18,3 +18,23 @@ const upvote = (button => {
     }
   });
 });
+
+const likeReview = (button => {
+  const reviewId = button.id.split('-')[1];
+  const url = `/homework/like-review/${reviewId}?_method=put`;
+  const data = {};
+
+  $.post(url, data, function(data) {
+    if(data.success) {
+
+      if (data.success.includes("Liked")) {
+        button.style.color = "#03a5fc";
+
+      } else {
+        button.style.color = "white";
+      }
+
+      document.getElementById(`like-count-${reviewId}`).innerText = data.likeCount;
+    }
+  });
+});

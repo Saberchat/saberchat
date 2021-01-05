@@ -86,3 +86,49 @@
 .book-button, .upvoted, .not-upvoted, .review-button {
   margin-left: 10px;
 }
+
+#rating-label {
+  margin-left: 10px;
+}
+
+.review {
+  margin-top: 20px;
+}
+
+.ratings {
+  display: inline;
+  margin-left: 20px;
+}
+
+.average-rating-selected {
+  color: #cc9537
+}
+
+.leave-button {
+  margin-left: 10px;
+}
+
+.tutor-actions {
+  display: inline;
+}
+
+.close-lessons, .reopen-lessons {
+  margin-left: 20px;
+}
+
+.unavailable-tutor {
+  color: red;
+  margin-left: 20px;
+  font-weight: bold;
+}
+
+.reviews-length, .reviews-length:hover {
+  margin-left: 20px;
+  font-size: 120%;
+  color: black;
+  text-decoration: none;
+}
+
+.reviews-icon {
+  color: grey;
+}
