@@ -6,7 +6,7 @@ const storage = multer.memoryStorage();
 const imageFilter = (req, file, callback) => {
     const ext = path.extname(file.originalname);
     if(ext !== '.png' && ext !== '.jpg' && ext !== '.jpeg') {
-        return callback(new Error('Invalid format!'));
+        return callback(new Error('Invalid image format!'));
     }
     callback(null, true);
 };

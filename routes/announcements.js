@@ -8,8 +8,6 @@ const dateFormat = require('dateformat');
 const nodemailer = require('nodemailer');
 
 const multer = require('../middleware/multer');
-
-const multerUpload = require('../services/multer');
 const { cloudUpload, cloudDelete } = require('../services/cloudinary');
 
 const { validateAnn } = require('../middleware/validation');
@@ -124,13 +122,7 @@ router.get('/:id/edit', middleware.isLoggedIn, middleware.isMod, (req, res) => {
 
 router.post('/', middleware.isLoggedIn, middleware.isMod, multer, validateAnn, (req, res) => { //RESTful Routing 'CREATE' route
   (async() => {
-    // parse req.body and upload img buffer to memory as req.file
-    // const multError = await multerUpload(req, res).catch(err=>{return err});
-    // if(multError){req.flash('error', multError.message); return res.redirect('back');}
-    console.log(req.headers.referer);
-    req.flash('error', 'blocker!');
-    return res.redirect('back');
-    // We'll want to validate the announcement sometime in the future
+
     const announcement = await Announcement.create({sender: req.user, subject: req.body.subject, text: req.body.message});
 
     if(!announcement) {
@@ -347,11 +339,8 @@ router.put('/comment', middleware.isLoggedIn, (req, res) => {
 
 })
 
-router.put('/:id', middleware.isLoggedIn, middleware.isMod, (req, res) => { //RESTful Routing 'UPDATE' route
+router.put('/:id', middleware.isLoggedIn, middleware.isMod, multer, validateAnn, (req, res) => { //RESTful Routing 'UPDATE' route
   (async() => {
-    // parse req.body and upload img buffer to memory as req.file
-    const multError = await multerUpload(req, res).catch(err=>{return err});
-    if(multError){req.flash('error', multError.message); return res.redirect('back');}
 
     const announcement = await Announcement.findById(req.params.id).populate('sender');
 
