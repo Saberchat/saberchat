@@ -19,6 +19,8 @@ const multerConfig = {
     }
 };
 
-const multerUpload = util.promisify(multer(multerConfig).single('imageFile'));
+// const multerUpload = util.promisify(multer(multerConfig).single('imageFile'));
 
-module.exports = multerUpload;
+// module.exports = multerUpload;
+
+module.exports = multer(multerConfig).single('imageFile');

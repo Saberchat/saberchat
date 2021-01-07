@@ -110,6 +110,11 @@ app.use(helmet.contentSecurityPolicy({
 	}
 }));
 
+// customizations for helmet referrer policy
+app.use(helmet.referrerPolicy({
+  policy: "same-origin"
+}));
+
 // express session stuff for authorization that I know nothing about
 const session = require('express-session');
 // using memorystore package because express-session leads to memory leaks and isnt optimized for production.
@@ -166,7 +171,7 @@ app.use('/projects', projectRoutes);
 app.use('/articles', wHeightsRoutes);
 app.use('/homework', hwRoutes);
 
-// Catch-all route
+// Catch-all route. uncomment when done
 app.get('*', (req, res) => {
 	res.redirect('/');
 });
