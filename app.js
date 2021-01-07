@@ -102,7 +102,8 @@ app.use(helmet.contentSecurityPolicy({
 		workerSrc: ["'self'", "blob:"],
 		objectSrc: [],
 		imgSrc: [
-			"https:",
+      "https:",
+      "blob:",
 			"data:"
 		],
 		fontSrc: ["'self'", "https://ka-f.fontawesome.com/"]
