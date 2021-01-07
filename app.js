@@ -22,6 +22,8 @@ const methodOverride = require('method-override');
 const dateFormat = require('dateformat');
 // Sets HTTP headers for security
 const helmet = require('helmet');
+// prevents MongoDB Operator Injection
+const mongoSanitize = require('express-mongo-sanitize');
 
 const { scriptUrls, styleUrls } = require('./srcUrls');
 
@@ -88,6 +90,11 @@ app.set("view engine", "ejs");
 app.use(methodOverride('_method'));
 // use connect-flash for flash messages
 app.use(flash());
+
+// replaces $ and .  with _ in req.body, req.query, or req.params
+app.use(mongoSanitize({
+  replaceWith: '_'
+}));
 
 // Helmet security headers
 app.use(helmet());
