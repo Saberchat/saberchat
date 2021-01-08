@@ -1,0 +1,30 @@
+#add-email-form {
+  display: inline;
+  margin-left: 10px;
+}
+
+#position {
+  margin-top: 20px;
+  margin-bottom: 20px;
+}
+
+#position-label, #role-label {
+  font-size: 15px;
+}
+
+.user-tag {
+  margin-right: 5px;
+}
+
+.user-status {
+  margin-left: 10px;
+  margin-right: 20px;
+}
+
+.user-exists {
+  color: white;
+}
+
+.delete-email {
+  float: right;
+}

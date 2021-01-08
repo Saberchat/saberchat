@@ -1,0 +1,134 @@
+.header-section {
+  margin-bottom: -20px;
+}
+
+#course-thumbnail {
+  color: white;
+  background-repeat: no-repeat;
+  background-size: 100%;
+}
+
+#back-button {
+  margin-right: 10px;
+}
+
+#unenroll-form {
+  display: inline-block;
+}
+
+#exampleModalLabel {
+  color: black;
+}
+
+.modal-body {
+  color: black;
+  text-align: left;
+}
+
+.nav {
+  margin-bottom: -20px;
+  margin-top: 10px;
+}
+
+.nav-item {
+  font-weight: bold;
+}
+
+#people {
+  color: blue;
+}
+
+.people, .tutors, .settings {
+  margin-top: 30px;
+}
+
+.user-element-text {
+  color: black;
+  text-decoration: none;
+}
+
+.enrolled-username {
+  font-size: 80%;
+}
+
+.tutor-profile {
+  color: black;
+  height: 40%;
+  padding: 20px;
+}
+
+.tutor-link, .tutor-link:hover {
+  color: black;
+  text-decoration: none;
+}
+
+.tutor-name {
+  margin-left: 5px;
+}
+
+.tutor-username {
+  font-size: 90%;
+}
+
+.tutor-bio, #update-settings {
+  margin-top: 10px;
+}
+
+#change-join-code {
+  margin-left: 10px;
+  padding: 5px;
+}
+
+#loading {
+  font-size: 110%;
+}
+
+.book-button, .upvoted, .not-upvoted, .review-button {
+  margin-left: 10px;
+}
+
+#rating-label {
+  margin-left: 10px;
+}
+
+.review {
+  margin-top: 20px;
+}
+
+.ratings {
+  display: inline;
+  margin-left: 20px;
+}
+
+.average-rating-selected {
+  color: #cc9537
+}
+
+.leave-button {
+  margin-left: 10px;
+}
+
+.tutor-actions {
+  display: inline;
+}
+
+.close-lessons, .reopen-lessons {
+  margin-left: 20px;
+}
+
+.unavailable-tutor {
+  color: red;
+  margin-left: 20px;
+  font-weight: bold;
+}
+
+.reviews-length, .reviews-length:hover {
+  margin-left: 20px;
+  font-size: 120%;
+  color: black;
+  text-decoration: none;
+}
+
+.reviews-icon {
+  color: grey;
+}

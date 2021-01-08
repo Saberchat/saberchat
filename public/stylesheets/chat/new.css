@@ -1,3 +1,15 @@
+.new-room, .new-chat-header {
+  text-align: center;
+}
+
+.new-chat-header {
+  width: 100%;
+}
+
+#user-selection {
+  display: none;
+}
+
 #user-list {
     max-height: 10rem;
     overflow-y: scroll;

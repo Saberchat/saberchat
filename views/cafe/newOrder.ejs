@@ -12,12 +12,15 @@
   <link rel="stylesheet" href="/stylesheets/components/header.css">
   <link rel="stylesheet" href="/stylesheets/components/navbar.css">
   <link rel="stylesheet" href="/stylesheets/chat/new.css">
+  <link rel="stylesheet" href="/stylesheets/cafe/new.css">
+  <link rel="stylesheet" href="/stylesheets/cafe/menu.css">
 
   <script src="/socket.io/socket.io.js"></script>
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js"></script>
   <script src="/javascript/cafe/cafe-socket.js"></script>
+  <script src="/javascript/cafe/search.js"></script>
 
   <!-- I'm using my fontawesome kit -->
   <script src="https://kit.fontawesome.com/dccc745c41.js" crossorigin="anonymous"></script>
@@ -33,12 +36,12 @@
     <div class="row">
       <div class="col-12">
         <div class="jumbotron text-center">
-          <h1 style="text-align: center; width: 100%">New Cafe Order</h1>
+          <h1>New Cafe Order</h1>
           <p>Place an order that will be delivered to you at lunch</p>
           <a class="btn btn-primary" href='/cafe'><i class="fas fa-arrow-left"></i> Back</a>
           <a class="btn btn-info" href='/cafe/menu'><i class="fas fa-bars"></i> Menu </a>
           <br /><br />
-          <strong style="font-size: 120%;">Current Balance:
+          <strong id="balance-heading">Current Balance:
 
             <% if (!currentUser.balance.toString().includes('.')) { %>
               $<span id="balance"><%= currentUser.balance %>.00
@@ -61,7 +64,7 @@
 
             <div class="search-filter mb-3">
               <i class="fas fa-search"></i>
-              <input id="search-input" oninput="searchFunction()" class="form-control" type="text" placeholder="Search..." title="Type in product" />
+              <input id="search-input" oninput="search()" class="form-control" type="text" placeholder="Search..." title="Type in product" />
             </div>
           </div>
 
@@ -94,7 +97,7 @@
             <% for (let type of tempTypes) { %>
               <% if (type.items.length > 0) { %>
 
-                <li class="list-group-item list-group-item-success category-header" id="<%=type._id%>-header" style="margin-top: 40px;">
+                <li class="list-group-item list-group-item-success category-header" id="<%=type._id%>-header">
                   <div class="d-flex w-100 justify-content-between">
                     <h2 class="mb-1"><%=type.name%></h2>
                     <span><%=type.items.length%> item(s)</span>
@@ -152,7 +155,7 @@
                     <% } %>
 
                       <!-- Div to put margins on text inside outer div -->
-                      <div style="margin-left: 2%;" class="style-div">
+                      <div class="style-div">
 
                         <input name="check[<%= item._id %>]" id="<%= item._id%>" class="form-check-input" type="checkbox" value="">
                         <select class="num-orders" id="dd_<%=item._id%>" name="<%=item.name%>" onchange="changeOrderConfirmation()">
@@ -169,7 +172,7 @@
                           <% } %>
                         </select>
 
-                        <label style="margin-left: 1%; font-size: 15px;" class="form-check-label" for="<%= item._id%>"><strong><%= item.name %></strong> (<%= item.availableItems %> orders available) -
+                        <label class="form-check-label" for="<%= item._id%>"><strong><%= item.name %></strong> (<%= item.availableItems %> orders available) -
 
                         <% if (!item.price.toString().includes('.')) { %>
                           $<%= item.price %>.00
@@ -182,18 +185,18 @@
                         <% } %>
 
                         <% if (popular) { %>
-                          <span style="font-weight: bold; color: green;  margin-left: 5px;">Frequently Ordered</span>
+                          <span class="popular">Frequently Ordered</span>
                         <% } %>
 
                         </label>
 
-                        <div title="Upvotes" style="margin-left: 10px; display: inline;">
+                        <div title="Upvotes" class="upvotes">
 
                           <% if (item.upvotes.includes(currentUser._id)) { %>
-                            <a style="color: red; text-decoration: none;" id="upvote-<%=item._id%>" onclick="upvote(this)"><i class="fas fa-arrow-circle-up"></i></a>
+                            <span class="upvoted" id="upvote-<%=item._id%>" onclick="upvote(this)"><i class="fas fa-arrow-circle-up"></i></span>
 
                           <% } else { %>
-                            <a style="color: grey; text-decoration: none;" id="upvote-<%=item._id%>" onclick="upvote(this)"><i class="fas fa-arrow-circle-up"></i></a>
+                            <span class="not-upvoted" id="upvote-<%=item._id%>" onclick="upvote(this)"><i class="fas fa-arrow-circle-up"></i></span>
                           <% }%>
 
                           <span id="upvoteCount-<%=item._id%>"> <%=item.upvotes.length%></span>
@@ -228,9 +231,9 @@
           </li>
 
           <div>
-            <div style="margin: 0px;" id="order-confirm">
-              <span  style="color: blue; margin: 0px;" id="extra-instructions" class="list-group-item list-group-item-action form-check"><strong>Extra Instructions:</strong> None</span>
-              <strong style="color: purple; margin: 0px;" id="balance-box" class="list-group-item list-group-item-action form-check">Current Balance:
+            <div id="order-confirm">
+              <span id="extra-instructions" class="list-group-item list-group-item-action form-check"><strong>Extra Instructions:</strong> None</span>
+              <strong id="balance-box" class="list-group-item list-group-item-action form-check">Current Balance:
                 <% if (!currentUser.balance.toString().includes('.')) { %>
                   $<%= currentUser.balance %>.00
 
@@ -241,8 +244,8 @@
                   $<%= currentUser.balance %>
                 <% } %>
               </strong>
-              <strong style="color: green; margin: 0px;" id="total-cost" class="list-group-item list-group-item-action form-check">Total: $0.00</strong>
-              <strong style="color: red; margin: 0px;" id="paying-style" class="list-group-item list-group-item-action form-check">Paying Online</strong>
+              <strong id="total-cost" class="list-group-item list-group-item-action form-check">Total: $0.00</strong>
+              <strong id="paying-style" class="list-group-item list-group-item-action form-check">Paying Online</strong>
             </div>
           </div>
 
@@ -260,47 +263,5 @@
 
 <script>
   order(orderForm, '<%=currentUser._id%>');
-
-
-  const searchFunction = (() => {
-    const catHeaders = document.getElementsByClassName('category-header') //Category header
-    const catBreaks = document.getElementsByClassName('category-break') //Category page break
-    const menuItems = document.getElementsByClassName('menu-item')
-    const input = document.getElementById("search-input");
-    let filter = input.value.toLowerCase().replace(' ', '');
-
-    for (let item of menuItems) {
-      if((item.textContent.replace(' ', '').toLowerCase().includes(filter)) || (item.classList.toString().toLowerCase().includes(filter))) {
-        $(`#${item.id}`).show()
-
-      } else {
-        $(`#${item.id}`).hide()
-      }
-    }
-
-    let catIncluded; //"Category Included"
-
-    for (let h = 0; h < catHeaders.length; h+= 1) {
-      catIncluded = false;
-
-      for (let item of document.getElementsByClassName(catHeaders[h].getElementsByTagName("h2")[0].textContent.replace(' ', ''))) {
-        if((item.textContent.replace(' ', '').toLowerCase().includes(filter)) || (item.classList.toString().toLowerCase().includes(filter))) {
-          catIncluded = true;
-          break
-        }
-      }
-
-      if (catIncluded) {
-        $(`#${catHeaders[h].id}`).show()
-        $(`#${catBreaks[h].id}`).show()
-
-      } else {
-        $(`#${catHeaders[h].id}`).hide()
-        $(`#${catBreaks[h].id}`).hide()
-      }
-    }
-
-  });
-
 </script>
 </html>

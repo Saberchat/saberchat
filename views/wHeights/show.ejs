@@ -1,16 +1,17 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
+  <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Witherly Heights</title>
 
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css">
     <link rel="stylesheet" href="/stylesheets/main.css">
-    <link rel="stylesheet" href="/stylesheets/wHeights/index.css">
-    <link rel="stylesheet" href="/stylesheets/wHeights/show.css">
+    <!-- <link rel="stylesheet" href="/stylesheets/wHeights/index.css">
+    <link rel="stylesheet" href="/stylesheets/wHeights/show.css"> -->
     <link rel="stylesheet" href="/stylesheets/components/navbar.css">
     <link rel="stylesheet" href="/stylesheets/components/header.css">
+
 
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
@@ -18,50 +19,62 @@
 
     <!-- I'm using my fontawesome kit -->
     <script src="https://kit.fontawesome.com/dccc745c41.js" crossorigin="anonymous"></script>
-</head>
-<body>
+  </head>
 
-  <%- include('../partials/navbar') %>
-  <%- include('../partials/header') %>
-  <%- include('../partials/wHeightsNav') %>
+  <body>
 
+    <%- include('../partials/navbar') %>
+    <%- include('../partials/header') %>
 
-
-    <!-- article -->
-    <div class="container mt-5" style="display: flex; justify-content: center;">
+    <div class="container mt-5">
       <div class="row">
         <div class="col-12">
-          <!-- <div class="jumbotron text-center" style="width: 700px; padding: 50px;"> -->
+          <div class="jumbotron text-center">
+            <h1><%= article.title %> </h1>
 
-    <!-- <div class="container">
-        <div class="row">
-            <div class="col-md-8 offset-md-2 col-12"> -->
+            <p>Article</p>
+
+            <a class="btn btn-primary" href="/articles"><i class="fas fa-arrow-left"></i> Back</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="col-12">
+          <article class="ann-container">
+            <div class="ann-head">
               <h1><%= article.title %></h1>
-              <strong>By <a href="../profiles/<%=article.author._id%>"><%= article.author.username %></a></strong><br />
-              <strong>Posted <%=date%></strong>
+
+              <strong class="project-info">By <a href="../profiles/<%=article.author._id%>"><%= article.author.username %></a></strong><br />
+              <strong id="project-date">Posted <%=date%></strong>
               <br /><br />
+
               <% article.content.forEach(element => { %>
-                  <% if (element.type == 'paragraph') { %>
+
+                <% if (element.type == 'paragraph') { %>
                   <p><%- element.data.text %></p>
-                  <% } %>
-              <% }) %>
-            <!-- </div> -->
 
-            <div class="container" style="width: 50%; float: left;">
-              <% for (let segment of article.content) { %>
-
-                <% if (segment.type == "text") { %>
-                  <p>
-                    <%=segment.content%>
-                  </p>
-
-                <% } else if (segment.type == "image") { %>
-                  <img style="width: 50%; height: 50%;" src="<%=segment.data.url%>" /><br /><br />
                 <% } %>
-              <% }%>
+
+              <% }); %>
+
+              <div class="container article-content project-description">
+                <% for (let segment of article.content) { %>
+
+                  <% if (segment.type == "text") { %>
+                    <p><%=segment.content%></p>
+
+                  <% } else if (segment.type == "image") { %>
+                    <img class="article-image" src="<%=segment.data.url%>" /><br /><br />
+                  <% } %>
+
+                <% } %>
+              </div>
             </div>
+          </article>
         </div>
       </div>
     </div>
-</body>
+  </body>
+
 </html>

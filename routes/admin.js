@@ -4,6 +4,7 @@ const express = require('express');
 //start express router
 const router = express.Router();
 const nodemailer = require('nodemailer');
+const {transport, transport_mandatory} = require("../transport");
 
 const User = require('../models/user');
 const Email = require('../models/email');
@@ -81,7 +82,7 @@ router.get('/status', middleware.isLoggedIn, middleware.isMod, (req, res) => {
 
 router.get('/whitelist', middleware.isLoggedIn, middleware.isPrincipal, (req, res) => {
 	(async() => {
-		const emails = await Email.find({name: {$nin: [req.user.email]}});
+		const emails = await Email.find({name: {$ne: req.user.email}});
 
 		if (!emails) {
 			req.flash('error', "Unable to find emails");
@@ -427,20 +428,7 @@ router.delete('/whitelist/:id', middleware.isLoggedIn, middleware.isPrincipal, (
 			return res.redirect('back');
 		}
 
-		let deleteEmail = {
-			from: 'noreply.saberchat@gmail.com',
-			to: deletedUser.email,
-			subject: 'Profile Deletion Notice',
-			text: `Hello ${deletedUser.firstName},\n\nYou are receiving this email because your email has been removed from Saberchat's email whitelist. Your account and all of its data has been deleted. Please contact a faculty member if  you think there has been a mistake.`
-		};
-
-		transporter.sendMail(deleteEmail, (err, info) => {
-			if (err) {
-				console.log(err);
-			} else {
-				console.log('Email sent: ' + info.response);
-			}
-		});
+    transport(transporter, deletedUser, 'Profile Deletion Notice', `<p>Hello ${deletedUser.firstName},</p><p>You are receiving this email because your email has been removed from Saberchat's email whitelist. Your account and all of its data has been deleted. Please contact a faculty member if  you think there has been a mistake.</p>`);
 	}
 
 	req.flash('success', "Email Removed From Whitelist! Any users with this email have been removed.");
@@ -487,7 +475,6 @@ router.put('/permissions', middleware.isLoggedIn, middleware.isAdmin, (req, res)
 			}
 		})
 	}
-
 });
 
 // changes status
@@ -499,7 +486,6 @@ router.put('/status', middleware.isLoggedIn, middleware.isMod, (req, res) => {
 			res.json({success: 'Succesfully changed'});
 		}
 	});
-
 });
 
 router.put('/tag', middleware.isLoggedIn, middleware.isMod, (req, res) => {
@@ -520,8 +506,8 @@ router.put('/tag', middleware.isLoggedIn, middleware.isMod, (req, res) => {
       }
 
     }
-  })
-})
+  });
+});
 
 // route for ignoring reported comments
 router.put('/moderate', middleware.isLoggedIn, middleware.isMod, (req, res) => {

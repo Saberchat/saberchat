@@ -43,3 +43,56 @@ background
     margin: 0 auto;
     margin-bottom: 3rem;
 }
+
+.block-header {
+  padding-bottom: 20px;
+}
+
+.article-date {
+  color: white;
+  font-size: 80%;
+}
+
+.author-profile {
+  width: 30px;
+  height: 30px;
+  object-fit: cover;
+  border-radius: 50%;
+}
+
+.edit-button {
+  margin-left: 10px;
+}
+
+.edit-button-text {
+  color: white;
+}
+
+.delete-article {
+  display: inline-block;
+}
+
+#exampleModalLabel, .modal-body {
+  color: black;
+}
+
+.block-content {
+  text-align: center;
+}
+
+.article-photo {
+  width: 25%;
+  height: 25%;
+  float: left;
+  border-radius: 15px;
+  margin-bottom: 20px;
+  margin-right: 20px;"
+}
+
+.creator-heading {
+  float: left;
+}
+
+.article-content {
+  text-align: left;
+}

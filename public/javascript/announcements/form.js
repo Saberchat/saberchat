@@ -28,17 +28,14 @@ const createImg = (val => { //Creates an image based on value of image input
     }
 
   } else {
-    setTimeout(() => {
+    if (val.value.replace(' ', '') != '') {
+      $(`#block-${val.id}`).find('img')[0].src = val.value;
+      $(`#${$(`#block-${val.id}`).find('img')[0].id}`).hidden = false;
 
-      if (val.value.replace(' ', '') != '') {
-        $(`#block-${val.id}`).find('img')[0].src = val.value;
-        $(`#${$(`#block-${val.id}`).find('img')[0].id}`).show();
-
-      } else {
-        $(`#${$(`#block-${val.id}`).find('img')[0].id}`).hide();
-      }
-    }, 3);
-  }
+    } else {
+      $(`#${$(`#block-${val.id}`).find('img')[0].id}`).hidden = true;
+    }
+}
 })
 
 const deleteImg = (btn => {

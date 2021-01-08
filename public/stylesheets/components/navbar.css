@@ -88,7 +88,7 @@ User login form
     right: 0;
 }
 
-/* 
+/*
 SignUp form animations
 ================================
  */
@@ -175,12 +175,26 @@ div.dropdown-menu.show {
     }
 }
 
+.nav-profile-img, .profile-img {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  object-fit: cover;
+  display: inline-block;
+}
+
 .profile-img {
   height:25px;
   width: 25px;
-  object-fit: cover;
-  display: inline-block;
   margin-left: 5px;
   margin-bottom: 5px;
-  border-radius: 50%;
+}
+
+.back {
+  position: relative;
+  text-align: center;
+}
+
+.reset-password-text {
+  margin-bottom: 10px;
 }

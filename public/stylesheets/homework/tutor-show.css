@@ -1,0 +1,64 @@
+.desc-head {
+  padding-top: 20px;
+  background-color: #91393f;
+}
+
+.profile-head {
+  background-color: #91393f;
+}
+
+h3, .ratings {
+  display: inline;
+}
+
+.review-liked, .review-unliked {
+  display: inline;
+  font-size: 120%;
+}
+
+.review-liked {
+  color: #03a5fc;
+}
+
+.review-unliked, .like-count {
+  color: white;
+}
+
+.review-date {
+  display: inline;
+  color: white;
+  float: right;
+  margin-right: 20px;
+}
+
+.reviews-heading {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+@media only screen and (max-width: 768px) {
+    .profile-desc {
+        margin: 1.7rem 0;
+    }
+
+    .profile-box {
+      margin-bottom: 50px;
+    }
+
+    .desc-head {
+      font-size: 80%;
+    }
+
+    h3 {
+      font-size: 120%;
+    }
+
+    .ratings{
+      display: block;
+      margin-top: 10px;
+    }
+
+    .review-date {
+      display: none;
+    }
+}

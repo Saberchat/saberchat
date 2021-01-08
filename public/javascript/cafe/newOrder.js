@@ -116,7 +116,7 @@ const changeOrderConfirmation = (() => {
   if (!payingInPerson.checked) {
     orderConfirm.appendChild(balanceBox);
   }
-  
+
   orderConfirm.appendChild(totalNew);
   orderConfirm.appendChild(payingStyleNew);
 

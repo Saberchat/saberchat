@@ -11,6 +11,7 @@
       <link rel="stylesheet" href="/stylesheets/components/header.css">
       <link rel="stylesheet" href="/stylesheets/components/navbar.css">
       <link rel="stylesheet" href="/stylesheets/chat/new.css">
+      <link rel="stylesheet" href="/stylesheets/cafe/new.css">
 
       <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
       <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
@@ -18,6 +19,7 @@
 
       <!-- I'm using my fontawesome kit -->
       <script src="https://kit.fontawesome.com/dccc745c41.js" crossorigin="anonymous"></script>
+      <script src="/javascript/cafe/image.js"></script>
   </head>
   <body>
     <!-- include the navbar via ejs -->
@@ -26,8 +28,8 @@
 
     <div class="container mt-5">
       <div class="row">
-        <div class="col-12" style="text-align: center;">
-          <h1 style="text-align: center; width: 100%">New Cafe Item</h1>
+        <div class="col-12" id="heading">
+          <h1>New Cafe Item</h1>
           <a class="btn btn-primary" href="/cafe/manage"><i class="fas fa-arrow-left"></i> Back</a><br /><br />
         </div>
       </div>
@@ -57,9 +59,9 @@
 
               <div class="row">
                 <div class="col">
-                  <div class="input-group mb-3" style="width: 100%;">
-                    <label style="padding-top: 20px;" for="typeInput">Type</label>
-                    <select id="typeInput" name="type" style="width: 100%;">
+                  <div class="input-group mb-3 field">
+                    <label id="type-input-label" for="typeInput">Type</label>
+                    <select id="typeInput" name="type" class="field">
                       <option disabled selected required >Meal Type</option>
                       <% types.forEach(type => { %>
                         <option><%=type.name%></option>
@@ -72,10 +74,10 @@
               <div class="row">
                 <div class="col">
                   <label for="usernameInput">Image</label>
-                  <div style="text-align: center;">
-                    <input id="image-input" class="form-control" type="text" name="image" placeholder="Enter URL for Item Image">
+                  <div id="image-block">
+                    <input id="image-input" oninput="createImage(this)" class="form-control" type="text" name="image" placeholder="Enter URL for Item Image">
                     <br />
-                    <img id="item-image" style="width: 30%; border-radius: 15px;" src="" alt="Image Does Not Exist"/>
+                    <img id="item-image" src="" alt="Image Does Not Exist" hidden/>
                   </div>
                 </div>
               </div>
@@ -90,39 +92,4 @@
       </div>
     </div>
   </body>
-
-  <script>
-
-    const imageInput = document.getElementById("image-input");
-    const itemImage = document.getElementById("item-image");
-
-    $('#item-image').hide();
-
-    imageInput.addEventListener('keydown', () => {
-
-      setTimeout(() => {
-        if (imageInput.value != '') {
-          itemImage.src = imageInput.value;
-          $('#item-image').show();
-
-        } else {
-          $('#item-image').hide();
-        }
-      }, 3)
-    })
-
-    imageInput.addEventListener('paste', () => {
-      setTimeout(() => {
-        if (imageInput.value != '') {
-          itemImage.src = imageInput.value;
-          $('#item-image').show();
-
-        } else {
-          $('#item-image').hide();
-        }
-      }, 3)
-    })
-
-
-  </script>
 </html>

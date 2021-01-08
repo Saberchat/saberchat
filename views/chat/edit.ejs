@@ -19,6 +19,7 @@
     <!-- I'm using my fontawesome kit -->
     <script src="https://kit.fontawesome.com/dccc745c41.js" crossorigin="anonymous"></script>
     <script defer src="/javascript/chat/edit.js"></script>
+
   </head>
   <body>
     <!-- include the navbar via ejs -->
@@ -28,8 +29,8 @@
 
     <div class="container mt-5">
       <div class="row">
-          <div class="col-12" style="text-align: center;">
-              <h1 style="text-align: center; width: 100%" class="title"><span>Edit <%= room.name %></span></h1>
+          <div class="col-12 new-room">
+              <h1 class="title"><span>Edit <%= room.name %></span></h1>
               <a class="btn btn-primary" href="/chat/<%= room._id %>"><i class="fas fa-arrow-left"></i> Back</a>
           </div>
       </div>
@@ -63,7 +64,7 @@
               <label for="roomType" class="form-check-label">Private (public if left blank)</label>
             </div>
 
-            <div id="remove-block" style="display: none;">
+            <div id="remove-block">
               <h4>Remove Members</h4>
               <div class="search-filter mb-3">
                   <i class="fas fa-search"></i>
@@ -81,7 +82,7 @@
               </div>
             </div>
 
-            <div id="add-block" style="display: none;">
+            <div id="add-block">
               <h4>Add Members</h4>
               <div class="search-filter mb-3">
                   <i class="fas fa-search"></i>

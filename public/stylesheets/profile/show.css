@@ -80,11 +80,15 @@ Profile card info
     margin-top: 10px;
 }
 
-.profile-head h1 {
+.profile-head h1, h3 {
     text-align: center;
     padding: 20px 15px 0px 15px;
     font-size: 2rem;
     color: #edf2f9;
+}
+
+.review-sender {
+  margin-left: 10px;
 }
 
 /* - card body */
@@ -190,6 +194,67 @@ Username
     height:40px;
     object-fit: cover;
 }
+
+.profile-box {
+  float: right;
+}
+
+.edit-button, .leave-button, .review-button {
+  margin-right: 10px;
+  margin-bottom: 10px;
+  width: 100%;
+}
+
+#follower-data {
+  margin-top: 50px;
+}
+
+#follower-buttons {
+  text-align: center;
+  padding-top: 15px;
+  padding-bottom: 15px;
+}
+
+#following-button, #followers-button {
+  width: 47.5%;
+}
+
+#followers-list, #following-list {
+  overflow: hidden;
+}
+
+.search-bar-container {
+  text-align: center;
+}
+
+#search-bar-followers, #search-bar-following {
+  width: 95%;
+  margin: 15px;
+  border-radius: 5px;
+  padding-left: 10px;
+  padding-top: 5px;
+  padding-bottom: 5px;
+}
+
+.follower-block, .following-block {
+  margin-left: 20px;
+}
+
+.follower-link, .following-link, .remove-follower-text, .remove-follower-text:hover {
+  color: black;
+  text-decoration: none;
+}
+
+.edit-button-text, .edit-button-text:hover, .block-following-text, .block-following-text:hover {
+  color: white;
+  text-decoration: none;
+}
+
+.remove-follower, .block-following {
+  float: right;
+  margin-right: 20px;
+}
+
 
 @media only screen and (max-width: 768px) {
     .profile-desc {

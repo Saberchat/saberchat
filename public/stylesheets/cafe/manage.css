@@ -1,0 +1,18 @@
+.category-header {
+  margin-top: 40px;
+}
+
+.upvote {
+  color: grey;
+  text-decoration: none;
+  display: inline;
+}
+
+.upvote-count {
+  float: right;
+  color: green;
+}
+
+#modify-banned {
+  color: red;
+}

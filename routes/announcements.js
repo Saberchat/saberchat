@@ -6,6 +6,7 @@ const middleware = require('../middleware/index');
 const router = express.Router(); //start express router
 const dateFormat = require('dateformat');
 const nodemailer = require('nodemailer');
+const {transport} = require("../transport");
 
 const multer = require('../middleware/multer');
 const { cloudUpload, cloudDelete } = require('../services/cloudinary');
@@ -16,6 +17,7 @@ const { validateAnn } = require('../middleware/validation');
 const User = require('../models/user');
 const Announcement = require('../models/announcement');
 const Notification = require('../models/message');
+const PostComment = require('../models/postComment');
 
 
 //Sets up NodeMailer Transporter object (sends out emails)
@@ -76,8 +78,13 @@ router.get('/mark/:id', middleware.isLoggedIn, (req, res) => { //Mark specific a
 router.get('/:id', (req, res) => { //RESTful Routing 'SHOW' route
   Announcement.findById(req.params.id) //Find only the announcement specified from form
   .populate('sender')
-  .populate('comments.sender')
-  .exec((err, foundAnn) => { //Get info about the announcement's sender, and then release it to user
+  .populate({
+    path: "comments",
+    populate: {
+      path: "sender"
+    }
+  })
+  .exec((err, foundAnn) => { //Get info about the announcement's sender and comments, and then release it to user
     if (err || !foundAnn) {
       req.flash('error', 'Unable To Access Database');
       res.redirect('back');
@@ -148,7 +155,7 @@ router.post('/', middleware.isLoggedIn, middleware.isMod, multer, validateAnn, (
     announcement.date = dateFormat(announcement.created_at, "h:MM TT | mmm d");
     await announcement.save();
 
-    const users = await User.find({authenticated: true, _id: {$nin: [req.user._id]}});
+    const users = await User.find({authenticated: true, _id: {$ne: req.user._id}});
     let announcementEmail;
 
     let imageString = "";
@@ -168,22 +175,7 @@ router.post('/', middleware.isLoggedIn, middleware.isMod, multer, validateAnn, (
     };
 
     for (let user of users) {
-
-      announcementEmail = {
-        from: 'noreply.saberchat@gmail.com',
-        to: user.email,
-        subject: `New Saberchat Announcement - ${announcement.subject}`,
-        html: `<p>Hello ${user.firstName},</p><p>${req.user.username} has recently posted a new announcement - '${announcement.subject}'.</p><p>${announcement.text}</p><p>You can access the full announcement at https://alsion-saberchat.herokuapp.com</p> ${announcement.imageFile.url} ${imageString}`
-      };
-
-      transporter.sendMail(announcementEmail, (err, info) => {
-				if (err) {
-					console.log(err);
-				} else {
-					console.log('Email sent: ' + info.response);
-				}
-			});
-
+      transport(transporter, user, `New Saberchat Announcement - ${announcement.subject}`, `<p>Hello ${user.firstName},</p><p>${req.user.username} has recently posted a new announcement - '${announcement.subject}'.</p><p>${announcement.text}</p><p>You can access the full announcement at https://alsion-saberchat.herokuapp.com</p> ${imageString}`);
       user.annCount.push(announcementObject);
       await user.save();
     }
@@ -227,27 +219,27 @@ router.put('/like', middleware.isLoggedIn, (req, res) => {
 });
 
 router.put('/like-comment', middleware.isLoggedIn, (req, res) => {
-  Announcement.findById(req.body.announcement, (err, announcement) => {
-    if (err || !announcement) {
+  PostComment.findById(req.body.commentId, (err, comment) => {
+    if (err || !comment) {
       res.json({error: 'Error updating comment'});
 
     } else {
-      if (announcement.comments[req.body.commentIndex].likes.includes(req.user._id)) {
-        announcement.comments[req.body.commentIndex].likes.splice(announcement.comments[req.body.commentIndex].likes.indexOf(req.user._id), 1);
-        announcement.save();
 
+      if (comment.likes.includes(req.user._id)) { //Remove Like
+        comment.likes.splice(comment.likes.indexOf(req.user._id), 1);
+        comment.save();
         res.json({
-          success: `Removed a like from comment ${req.body.commentIndex} on ${announcement._id}`,
-          likeCount: announcement.comments[req.body.commentIndex].likes.length
+          success: `Removed a like from a comment`,
+          likeCount: comment.likes.length
         });
 
-      } else { //Add like
-        announcement.comments[req.body.commentIndex].likes.push(req.user._id);
-        announcement.save();
+      } else { //Add Like
+        comment.likes.push(req.user._id);
+        comment.save();
 
         res.json({
-          success: `Liked comment ${req.body.commentIndex} on ${announcement._id}`,
-          likeCount: announcement.comments[req.body.commentIndex].likes.length
+          success: `Liked comment`,
+          likeCount: comment.likes.length
         });
       }
     }
@@ -258,17 +250,25 @@ router.put('/comment', middleware.isLoggedIn, (req, res) => {
 
   (async() => {
 
-    const announcement = await Announcement.findById(req.body.announcement);
+    const announcement = await Announcement.findById(req.body.announcement)
+    .populate({
+      path: "comments",
+      populate: {
+        path: "sender"
+      }
+    });
 
     if (!announcement) {
       return res.json({error: 'Error commenting'});
     }
 
-    let comment = {
-      text: req.body.text,
-      sender: req.user,
-      date: dateFormat(new Date(), "h:MM TT | mmm d")
-    };
+    const comment = await PostComment.create({text: req.body.text, sender: req.user});
+    if (!comment) {
+      return res.json({error: 'Error commenting'});
+    }
+
+    comment.date = dateFormat(comment.created_at, "h:MM TT | mmm d");
+    comment.save();
 
     announcement.comments.push(comment);
     announcement.save();
@@ -283,14 +283,11 @@ router.put('/comment', middleware.isLoggedIn, (req, res) => {
         if (!user) {
           return res.json({error: "Error accessing user"});
         }
-
         users.push(user);
       }
     }
 
     let notif;
-    let commentEmail;
-
     for (let user of users) {
 
       notif = await Notification.create({subject: `New Mention in ${announcement.subject}`, sender: req.user, recipients: [user], read: [], toEveryone: false, images: []}); //Create a notification to alert the user
@@ -301,28 +298,12 @@ router.put('/comment', middleware.isLoggedIn, (req, res) => {
 
       notif.date = dateFormat(notif.created_at, "h:MM TT | mmm d");
       notif.text = `Hello ${user.firstName},\n\n${req.user.firstName} ${req.user.lastName} mentioned you in a comment on "${announcement.subject}":\n${comment.text}`;
-
       await notif.save();
 
-      commentEmail = {
-        from: 'noreply.saberchat@gmail.com',
-        to: user.email,
-        subject: `New Mention in ${announcement.subject}`,
-        html: `<p>Hello ${user.firstName},</p><p>${req.user.firstName} ${req.user.lastName} mentioned you in a comment on <strong>${announcement.subject}</strong>.<p>${comment.text}</p>`
-      };
-
-      transporter.sendMail(commentEmail, (err, info) => {
-        if (err) {
-          console.log(err);
-        } else {
-          console.log('Email sent: ' + info.response);
-        }
-      });
-
+      transport(transporter, user, `New Mention in ${announcement.subject}`, `<p>Hello ${user.firstName},</p><p>${req.user.firstName} ${req.user.lastName} mentioned you in a comment on <strong>${announcement.subject}</strong>.<p>${comment.text}</p>`);
       user.inbox.push(notif); //Add notif to user's inbox
       user.msgCount += 1;
       await user.save();
-
     }
 
     res.json({
@@ -390,7 +371,7 @@ router.put('/:id', middleware.isLoggedIn, middleware.isMod, multer, validateAnn,
 
     await updatedAnnouncement.save();
 
-    const users = await User.find({authenticated: true, _id: {$nin: [req.user._id]}});
+      const users = await User.find({authenticated: true, _id: {$ne: req.user._id}});
 
     let announcementEmail;
 
@@ -413,22 +394,7 @@ router.put('/:id', middleware.isLoggedIn, middleware.isMod, multer, validateAnn,
     let overlap;
 
     for (let user of users) {
-
-      announcementEmail = {
-        from: 'noreply.saberchat@gmail.com',
-        to: user.email,
-        subject: `Updated Saberchat Announcement - ${announcement.subject}`,
-        html: `<p>Hello ${user.firstName},</p><p>${req.user.username} has recently updated an announcement - '${announcement.subject}'.</p><p>${announcement.text}</p><p>You can access the full announcement at https://alsion-saberchat.herokuapp.com</p> ${imageString}`
-      };
-
-      transporter.sendMail(announcementEmail, (err, info) => {
-        if (error) {
-          console.log(err);
-        } else {
-          console.log('Email sent: ' + info.response);
-        }
-      });
-
+      transport(transporter, user, `Updated Saberchat Announcement - ${announcement.subject}`, `<p>Hello ${user.firstName},</p><p>${req.user.username} has recently updated an announcement - '${announcement.subject}'.</p><p>${announcement.text}</p><p>You can access the full announcement at https://alsion-saberchat.herokuapp.com</p> ${imageString}`);
       overlap = false;
 
       for (let a of user.annCount) {
@@ -437,11 +403,11 @@ router.put('/:id', middleware.isLoggedIn, middleware.isMod, multer, validateAnn,
           break;
         }
       }
+    }
 
-      if (!overlap) {
-        user.annCount.push(announcementObject);
-        await user.save();
-      }
+    if (!overlap) {
+      user.annCount.push(announcementObject);
+      await user.save();
     }
 
     req.flash('success', 'Announcement Updated!');

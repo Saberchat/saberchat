@@ -115,7 +115,7 @@ middleware.isFaculty = ((req, res, next) => {
 });
 
 middleware.isStudent = ((req, res, next) => {
-	if(req.user.status != 'faculty' && req.user.status != "parent" && req.user.status != "guest" && req.user.status != "alumnus") {
+	if(['7th', '8th', '9th', '10th', '11th', '12th'].includes(req.user.status)) {
 		next();
 	} else {
 		req.flash('error', 'You do not have permission to do that');

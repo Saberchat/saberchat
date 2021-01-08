@@ -18,6 +18,8 @@
 
       <!-- I'm using my fontawesome kit -->
       <script src="https://kit.fontawesome.com/dccc745c41.js" crossorigin="anonymous"></script>
+      <script src="/javascript/chat/new.js"></script>
+      
   </head>
   <body>
       <!-- include the navbar via ejs -->
@@ -27,8 +29,8 @@
 
       <div class="container mt-5">
           <div class="row">
-              <div class="col-12" style="text-align: center;">
-                  <h1 style="text-align: center; width: 100%">New Chat Room</h1>
+              <div class="col-12 new-room">
+                  <h1 class="new-chat-header">New Chat Room</h1>
                   <a class="btn btn-primary" href="/chat"><i class="fas fa-arrow-left"></i> Back</a>
               </div>
           </div>
@@ -48,15 +50,15 @@
                         <label for="moderate" class="form-check-label">Disable moderation and reporting comments (enabled if left blank)</label>
                     </div>
                     <div class="form-check mb-3">
-                        <input name="type" id="roomType" type="checkbox" onclick="updateDisplay()" class="form-check-input" value="true">
+                        <input name="type" id="roomType" type="checkbox" onclick="updateDisplayNewRoom()" class="form-check-input" value="true">
                         <label for="roomType" class="form-check-label">Private (limited to only specified users)</label>
                     </div>
-                    <div id="user-selection" style="display: none;">
+                    <div id="user-selection">
                         <h4>Select Members</h4>
 
                         <div class="search-filter mb-3">
                             <i class="fas fa-search"></i>
-                            <input id="search-input" oninput="searchFunction()" class="form-control" type="text" placeholder="Search..." title="Type in Username">
+                            <input id="search-input" oninput="searchFunctionNewRoom()" class="form-control" type="text" placeholder="Search..." title="Type in Username">
                         </div>
 
                         <div id="user-list">
@@ -76,31 +78,6 @@
           </div>
       </div>
     <script>
-        const updateDisplay = (() => {
-            let userSelect = document.getElementById('roomType');
-            let display = document.getElementById('user-selection');
-            if(userSelect.checked == true) {
-                display.style.display = "";
-            } else {
-                display.style.display = "none";
-            }
-        });
-
-        const searchFunction = (() => {
-            let input = document.getElementById("search-input");
-            let filter = input.value.toUpperCase();
-            let list = document.getElementById("user-list");
-            let users = list.getElementsByClassName('form-check');
-            for (i = 0; i < users.length; i++) {
-                let user = users[i].getElementsByTagName('label')[0];
-                let txtValue = user.textContent || user.innerText;
-                if (txtValue.toUpperCase().indexOf(filter) > -1) {
-                    users[i].style.display = "";
-                } else {
-                    users[i].style.display = "none";
-                }
-            }
-        });
 
     </script>
   </body>

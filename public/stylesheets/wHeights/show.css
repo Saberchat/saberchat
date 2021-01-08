@@ -5,3 +5,18 @@ pre {
     white-space: -o-pre-wrap;    /* Opera 7 */
     word-wrap: break-word;       /* Internet Explorer 5.5+ */
 }
+
+.mt-5 {
+  display: flex;
+  justify-content: left;
+}
+
+.article-content {
+  width: 50%;
+  float: left;
+}
+
+.article-image {
+  width: 50%;
+  height: 50%;
+}
