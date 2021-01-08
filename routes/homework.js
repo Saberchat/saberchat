@@ -13,6 +13,7 @@ const User = require('../models/user');
 const Notification = require('../models/message');
 const Course = require('../models/course');
 const PostComment = require('../models/postComment');
+const Room = require('../models/room');
 
 let transporter = nodemailer.createTransport({
   service: 'gmail',
@@ -32,6 +33,7 @@ router.get('/', middleware.isLoggedIn, (req, res) => {
       let courseList = [];
       let userIncluded;
       for (let course of courses) {
+
         if ((course.teacher.equals(req.user._id)) || (course.students.includes(req.user._id))) {
           courseList.push(course);
 
@@ -129,7 +131,7 @@ router.post('/join-tutor', middleware.isLoggedIn, middleware.isTutor, (req, res)
       }
 
       if (!enrolled) {
-        course.tutors.push({tutor: req.user, bio: req.body.bio});
+        course.tutors.push({tutor: req.user, bio: req.body.bio, slots: parseInt(req.body.slots), available: (parseInt(req.body.slots) > 0), dateJoined: new Date(Date.now())});
         course.save();
         req.flash('success', `Successfully joined ${course.name} as a tutor!`);
         res.redirect(`/homework/${course._id}`);
@@ -216,6 +218,8 @@ router.post('/unenroll/:id', middleware.isLoggedIn, (req, res) => {
 
         } else if (course.tutors[i].students.includes(req.user._id)) {
           course.tutors[i].students.splice(course.tutors[i].students.indexOf(req.user._id), 1);
+          course.tutors[i].slots += 1;
+          course.tutors[i].available = true;
         }
       }
 
@@ -227,9 +231,12 @@ router.post('/unenroll/:id', middleware.isLoggedIn, (req, res) => {
 });
 
 router.put('/book/:id', middleware.isLoggedIn, middleware.isStudent, (req, res) => {
-  Course.findById(req.params.id).populate('tutors.tutor').exec((err, course) => {
-    if (err || !course) {
-      res.json({error: "Error accessing course"});
+  (async() => {
+
+    const course = await Course.findById(req.params.id).populate('tutors.tutor');
+
+    if (!course) {
+      return res.json({error: "Error accessing course"});
 
     } else if (!course.students.includes(req.user._id)) {
       res.json({error: "You are not a student of that tutor"});
@@ -238,11 +245,32 @@ router.put('/book/:id', middleware.isLoggedIn, middleware.isStudent, (req, res) 
       for (let tutor of course.tutors) {
         if (tutor.tutor._id.equals(req.body.tutor) && tutor.available) {
           tutor.students.push(req.user._id);
+          tutor.slots -= 1;
+          if (tutor.slots == 0) {
+            tutor.available = false;
+          }
+
+          const room = await Room.create({
+            name: `${req.user.firstName}'s Tutoring Sessions With ${tutor.tutor.firstName} - ${course.name}`,
+            creator: {id: tutor._id, username: tutor.username},
+            members: [req.user._id],
+            type: "private",
+          });
+
+          const roomObject = {
+            student: req.user._id,
+            room: room._id
+          };
+
+          tutor.rooms.push(roomObject);
           course.save();
           res.json({success: "Succesfully joined tutor"});
         }
       }
     }
+
+  })().catch(err => {
+    res.json({error: "Error accessing course"});
   });
 });
 
@@ -256,7 +284,7 @@ router.put('/upvote/:id', middleware.isLoggedIn, middleware.isStudent, (req, res
 
         if (tutor.tutor.equals(req.body.tutor)) {
 
-          if (tutor.students.includes(req.user._id)) {
+          if (tutor.students.includes(req.user._id) || tutor.formerStudents.includes(req.user._id)) {
             if (tutor.upvotes.includes(req.user._id)) {
               tutor.upvotes.splice(tutor.upvotes.indexOf(req.user._id), 1);
               course.save();
@@ -288,7 +316,7 @@ router.put('/rate/:id', middleware.isLoggedIn, middleware.isStudent, (req, res) 
 
     for (let tutor of course.tutors) {
       if (tutor.tutor.equals(req.body.tutor)) {
-        if (tutor.students.includes(req.user._id)) {
+        if (tutor.students.includes(req.user._id) || tutor.formerStudents.includes(req.user._id)) {
 
           let review = await PostComment.create({text: req.body.review, sender: req.user});
           if (!review) {
@@ -298,7 +326,7 @@ router.put('/rate/:id', middleware.isLoggedIn, middleware.isStudent, (req, res) 
           review.date = dateFormat(review.created_at, "h:MM TT | mmm d");
           review.save();
 
-          let reviewObject = {review, rating: req.body.rating};
+          const reviewObject = {review, rating: req.body.rating};
           tutor.reviews.push(reviewObject);
           course.save();
 
@@ -322,24 +350,44 @@ router.put('/rate/:id', middleware.isLoggedIn, middleware.isStudent, (req, res) 
   });
 });
 
+//Leave Tutor
 router.put('/leave/:id', middleware.isLoggedIn, middleware.isStudent, (req, res) => {
-  Course.findById(req.params.id, (err, course) => {
-    if (err || !course) {
-      res.json({error: "Error leaving course"});
+  (async() => {
+    const course = await Course.findById(req.params.id);
+
+    if (!course) {
+      return res.json({error: "Error leaving course"});
 
     } else {
       for (let tutor of course.tutors) {
         if (tutor.tutor.equals(req.body.tutor)) {
           if (tutor.students.includes(req.user._id)) {
             tutor.students.splice(tutor.students.indexOf(req.user._id), 1);
+            tutor.formerStudents.push(req.user._id);
+            tutor.slots += 1;
+            tutor.available = true;
+
+            for (let i = 0; i < tutor.rooms.length; i += 1) {
+              if (tutor.rooms[i].student.equals(req.user._id)) {
+                const room = await Room.findByIdAndDelete(tutor.rooms[i].room);
+                tutor.rooms.splice(i, 1);
+                break;
+              }
+            }
+
             course.save();
-            res.json({success: "Succesfully left tutor"});
+            return res.json({success: "Succesfully left tutor"});
+
           } else {
-            res.json({error: "You are not a student of this tutor"});
+            return res.json({error: "You are not a student of this tutor"});
           }
         }
       }
     }
+
+  })().catch(err => {
+    console.log(err)
+    res.json({error: "Error accessing course"});
   });
 });
 
@@ -399,7 +447,7 @@ router.get('/tutors/:id', middleware.isLoggedIn, (req, res) => {
   });
 });
 
-router.put('/like-review/:id', middleware.isLoggedIn, (req, res) => {
+router.put('/like-review/:id', middleware.isLoggedIn, middleware.isStudent, (req, res) => {
   PostComment.findById(req.params.id, (err, review) => {
     if (err || !review) {
       res.json({error: "Error accessing review"});
