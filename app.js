@@ -132,8 +132,10 @@ const MemoryStore = require('memorystore')(session);
 // 	resave: false,
 // 	saveUninitialized: false
 // }));
-app.use(session({
+const sessionConfig = {
+  name: 'app-ses',
   cookie: {
+    httpOnly: true,
     maxAge: 86400000
   },
   store: new MemoryStore({
@@ -142,7 +144,15 @@ app.use(session({
   secret: "Programming For Alsion is Cool",
   resave: false,
   saveUninitialized: false
-}));
+};
+
+if(process.env.NODE_ENV === 'production') {
+  // allows cookies to only be accessed over https
+  // this wouldn't allow authentication for local dev since local host is http
+  sessionConfig.cookie.secure = true;
+}
+
+app.use(session(sessionConfig));
 
 // passport required authorization setup that I also know nothing about.
 app.use(passport.initialize());
