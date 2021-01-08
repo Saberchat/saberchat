@@ -10,10 +10,11 @@
     <!-- link css for navbar. Don't need to include public/javascript/userForm.js since user is already logged in and does not need to access login and register forms.  -->
     <link rel="stylesheet" href="/stylesheets/components/header.css">
     <link rel="stylesheet" href="/stylesheets/components/navbar.css">
-    <link rel="stylesheet" href="/stylesheets/projects/projects.css">
+    <link rel="stylesheet" href="/stylesheets/projects/index.css">
     <link rel="stylesheet" href="/stylesheets/announcements/index.css">
     <link rel="stylesheet" href="/stylesheets/home/index.css">
     <link rel="stylesheet" href="/stylesheets/chat/new.css">
+    <link rel="stylesheet" href="/stylesheets/homework/index.css">
 
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
@@ -22,6 +23,7 @@
     <script src="/javascript/nav/userForm.js"></script>
     <script src="/javascript/nav/navbar.js"></script>
     <script src="/javascript/home/index.js"></script>
+    <script src="/javascript/homework/settings.js"></script>
 
     <!-- I'm using my fontawesome kit -->
     <script src="https://kit.fontawesome.com/dccc745c41.js" crossorigin="anonymous"></script>
@@ -40,8 +42,8 @@
             <h1><i class="fas fa-chalkboard-teacher"></i> Homework Help/Tutoring Center </h1>
             <p>A platform for students to communicate and help each other learn</p>
             <% if (currentUser.status == 'faculty') { %>
-              <form action="/homework" method="post" id="add-email-form" style="display: inline; margin-left: 10px;">
-                <button type="button" data-toggle="modal" data-target="#modal-teacher" class="btn btn-info"><i class="fas fa-chalkboard-teacher"></i> Add Course</button>
+              <form action="/homework" method="post" id="add-course-form">
+                <button type="button" data-toggle="modal" data-target="#modal-teacher" class="btn btn-info"><i class="fas fa-chalkboard-teacher"></i> Create Course</button>
                 <div class="modal fade" id="modal-teacher" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
                   <div class="modal-dialog">
                     <div class="modal-content">
@@ -53,8 +55,8 @@
                       </div>
                       <div class="modal-body">
                         <input class="form-control" type="text" name="title" placeholder="Course Name"/><br />
-                        <input class="form-control" type="text" id="thumbnail" name="thumbnail" placeholder="Course Thumbnail" oninput="changeThumbnail()"/>
-                        <img hidden id="thumbnail-photo" style="min-height:250px; min-width: 300px; overflow: hidden; width: 60%; height: 60%; margin: 20px; border-radius: 15px;" src="" /><br />
+                        <input class="form-control" type="text" id="thumbnail" name="thumbnail" placeholder="Course Thumbnail" oninput="changeThumbnailInit()"/>
+                        <img hidden id="thumbnail-photo" src="" /><br />
                         <textarea rows="5" class="form-control" name="description" placeholder="Course Description"></textarea>
                       </div>
                       <div class="modal-footer">
@@ -67,7 +69,7 @@
               </form>
 
             <%} else if (studentStatuses.includes(currentUser.status)) { %>
-              <form action="/homework/join" method="post" id="add-email-form" style="display: inline; margin-left: 10px;">
+              <form action="/homework/join" method="post" id="join-course-student">
                 <button type="button" data-toggle="modal" data-target="#modal-join" class="btn btn-primary"><i class="fas fa-chalkboard-teacher"></i> Join Course</button>
                 <div class="modal fade" id="modal-join" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
                   <div class="modal-dialog">
@@ -90,7 +92,7 @@
                 </div>
               </form>
 
-              <form action="/homework/join-tutor" method="post" id="add-email-form" style="display: inline; margin-left: 10px;">
+              <form action="/homework/join-tutor" method="post" id="join-course-tutor">
                 <button type="button" data-toggle="modal" data-target="#modal-tutor" class="btn btn-success"><i class="fas fa-chalkboard-teacher"></i> Join Course As Tutor</button>
                 <div class="modal fade" id="modal-tutor" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
                   <div class="modal-dialog">
@@ -102,7 +104,8 @@
                         </button>
                       </div>
                       <div class="modal-body">
-                        <input class="form-control" type="text" name="joincode" placeholder="Enter Join Code"/>
+                        <input class="form-control" type="text" name="joincode" placeholder="Enter Join Code"/><br />
+                        <textarea rows="5" minlength="150" maxlength="250" class="form-control" name="bio" placeholder="A Short Bio About Yourself"></textarea>
                       </div>
                       <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-dismiss="modal">Back</button>
@@ -118,27 +121,32 @@
         </div>
       </div>
 
-      <div style="text-align: center;">
+      <div id="courses">
       <% if (courses.length == 0) { %>
         <h2>No Courses</h2>
       <% } else { %>
         <% for (let course of courses) { %>
-          <div class="card" style="width: 20rem; display: inline-block; margin-right: 20px; margin-bottom: 20px;">
-            <img class="card-img-top" src="<%=course.thumbnail%>" alt="Card image cap" style="min-height:250px; min-width: 300px; overflow: hidden;"/>
+          <div class="card course-title" title="<%=course.name%>">
+            <img class="card-img-top course-thumbnail" src="<%=course.thumbnail%>" alt="Card image cap">
             <div class="card-body">
-              <h5 class="card-title"><%=course.name%></h5>
+              <h5 class="card-title"><%=course.name.slice(0, 25)%><% if (course.name.length > 24) {%>... <% } %></h5>
 
-              <strong class="card-text" style="color: blue;">
+              <strong class="card-text user-position">
               <% if (course.teacher.equals(currentUser._id)) { %>
                 Teacher
               <% } else if (course.students.includes(currentUser._id)) { %>
                 Student
-              <% } else if (course.tutors.includes(currentUser._id)) { %>
-                Tutor
+              <% } else { %>
+                <% for (let tutor of course.tutors) { %>
+                  <% if (tutor.tutor.equals(currentUser._id)) { %>
+                    Tutor
+                    <% break;%>
+                  <% } %>
+                <% } %>
               <% } %>
               </strong><br />
 
-              <p class="card-text" style="margin-top: 10px;"><%=course.description.slice(0, 151)%><%if (course.description.length > 150) {%>...<%}%></p>
+              <p class="card-tex course-description"><%=course.description.slice(0, 151)%><%if (course.description.length > 150) {%>...<%}%></p>
               <a href="homework/<%=course._id%>" class="btn btn-primary">Go to Course</a>
             </div>
           </div>
@@ -146,17 +154,4 @@
       <% } %>
     </div>
   </body>
-
-  <script>
-    const changeThumbnail = (() => {
-      if (document.getElementById('thumbnail').value.replace(' ', '' != "")) {
-        document.getElementById('thumbnail-photo').src = document.getElementById('thumbnail').value;
-        document.getElementById('thumbnail-photo').hidden = false;
-
-      } else {
-        document.getElementById('thumbnail-photo').hidden = true;
-      }
-    });
-
-  </script>
 </html>

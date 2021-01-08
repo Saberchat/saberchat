@@ -10,7 +10,7 @@
     <!-- link css for navbar. Don't need to include public/javascript/userForm.js since user is already logged in and does not need to access login and register forms.  -->
     <link rel="stylesheet" href="/stylesheets/components/header.css">
     <link rel="stylesheet" href="/stylesheets/components/navbar.css">
-    <link rel="stylesheet" href="/stylesheets/projects/projects.css">
+    <link rel="stylesheet" href="/stylesheets/projects/index.css">
     <link rel="stylesheet" href="/stylesheets/announcements/index.css">
     <link rel="stylesheet" href="/stylesheets/home/index.css">
     <link rel="stylesheet" href="/stylesheets/chat/new.css">
@@ -24,6 +24,7 @@
     <script src="/javascript/nav/userForm.js"></script>
     <script src="/javascript/nav/navbar.js"></script>
     <script src="/javascript/home/index.js"></script>
+    <script src="/javascript/projects/data.js"></script>
 
     <!-- I'm using my fontawesome kit -->
     <script src="https://kit.fontawesome.com/dccc745c41.js" crossorigin="anonymous"></script>
@@ -83,32 +84,4 @@
     </div>
 
   </body>
-  <script>
-
-    const keywords = document.getElementsByClassName("keyword");
-    const occurences = document.getElementsByClassName("occurence");
-
-    anychart.onDocumentReady(function() {
-      var data = [];
-
-      for (let i = 0; i < keywords.length; i ++) {
-        data.push({"x": keywords[i].innerText, "value": parseInt(occurences[i].innerText)})
-      }
-
-
-    // create a tag (word) cloud chart
-      var chart = anychart.tagCloud(data);
-      // set an array of angles at which the words will be laid out
-      chart.angles([0])
-      // enable a color range
-      chart.colorRange(true);
-      // set the color range length
-      chart.colorRange().length('80%');
-    // display the word cloud chart
-      chart.container("container");
-      chart.draw();
-
-    });
-
-  </script>
 </html>

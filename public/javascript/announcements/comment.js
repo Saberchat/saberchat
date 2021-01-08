@@ -1,12 +1,12 @@
 // sends put request with data
-const comment = (form => {
+const comment = ((form, event) => {
 
   if (document.getElementById('comment-input').value.split(' ').join('') != '') {
     const announcementId = form.id.split("-")[1];
     const url = `/announcements/comment?_method=put`;
     const data = {announcement: announcementId, text: document.getElementById('comment-input').value};
     document.getElementById('comment-input').value = ""; //Empty input field
-    
+
     $.post(url, data, function(data) {
 
       if(data.success) {
@@ -19,6 +19,7 @@ const comment = (form => {
         document.getElementById('comments-heading').innerText = `Comments (${data.comments.length})`;
 
         //Build a comment body for new message
+        console.log(data.comments);
         let newComment = document.createElement('div');
         newComment.className = "media mb-2 comment-body";
         newComment.style = "text-align: left;";
@@ -49,4 +50,4 @@ const comment = (form => {
 
 const reply = (comment => {
   document.getElementById('comment-input').value = `@${comment.id.split("comment-")[1]}_ `
-})
+});

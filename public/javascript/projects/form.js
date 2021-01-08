@@ -33,10 +33,10 @@ const createImg = (val => { //Creates an image based on value of image input
 
       if (val.value.replace(' ', '') != '') {
         $(`#block-${val.id}`).find('img')[0].src = val.value;
-        $(`#${$(`#block-${val.id}`).find('img')[0].id}`).show();
+        $(`#${$(`#block-${val.id}`).find('img')[0].id}`).hidden = false;
 
       } else {
-        $(`#${$(`#block-${val.id}`).find('img')[0].id}`).hide();
+        $(`#${$(`#block-${val.id}`).find('img')[0].id}`).hidden = true;
       }
     }, 3);
   }

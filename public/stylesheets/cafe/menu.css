@@ -35,3 +35,28 @@ input#search-input {
 strong {
   font-weight: bold;
 }
+
+.category-header {
+  margin-top: 40px;
+}
+
+.upvotes {
+  margin-left: 10px;
+  display: inline;
+}
+
+.upvoted {
+  color: red;
+  text-decoration: none;
+}
+
+.not-upvoted {
+  color: grey;
+  text-decoration: none;
+}
+
+.item-image {
+  width: 20%;
+  height: 20%;
+  border-radius: 20px;
+}

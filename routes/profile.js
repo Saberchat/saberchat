@@ -3,6 +3,7 @@ const router = express.Router();
 const Filter = require('bad-words');
 const filter = new Filter();
 const nodemailer = require('nodemailer');
+const {transport, transport_mandatory} = require("../transport");
 
 const User = require('../models/user');
 const Email = require('../models/email');
@@ -93,7 +94,7 @@ router.put('/profile', middleware.isLoggedIn, (req, res) => {
 
   (async() => {
 
-    const overlap = await User.find({authenticated: true, username: filter.clean(req.body.username), _id: {$nin: [req.user._id]}});
+    const overlap = await User.find({authenticated: true, username: filter.clean(req.body.username), _id: {$ne: req.user._id}});
 
     if (!overlap) {
       req.flash('error', "Unable to find users");
@@ -138,21 +139,7 @@ router.put('/profile', middleware.isLoggedIn, (req, res) => {
       return res.redirect('back');
     }
 
-    let updateEmail = {
-		  from: 'noreply.saberchat@gmail.com',
-		  to: updatedUser.email,
-		  subject: 'Profile Update Confirmation',
-			text: `Hello ${user.firstName},\n\nYou are receiving this email because you recently made changes to your Saberchat profile.\n\nIf you did not recently make any changes, contact a faculty member immediately.`
-		};
-
-		transporter.sendMail(updateEmail, (err, info) =>{
-		  if (err) {
-		    console.log(err);
-		  } else {
-		    console.log('Email sent: ' + info.response);
-		  }
-		});
-
+    transport(transporter, updatedUser, 'Profile Update Confirmation', `<p>Hello ${user.firstName},</p><p>You are receiving this email because you recently made changes to your Saberchat profile.\n\nIf you did not recently make any changes, contact a faculty member immediately.</p>`);
     req.flash('success', 'Updated your profile');
     res.redirect('/profiles/' + req.user._id);
 
@@ -163,9 +150,31 @@ router.put('/profile', middleware.isLoggedIn, (req, res) => {
   });
 });
 
+router.put('/tag', middleware.isAdmin, (req, res) => {
+  if (req.user.tags.includes(req.body.tag)) {
+    req.user.tags.splice(req.user.tags.indexOf(req.body.tag), 1);
+    req.user.save();
+    res.json({success: "Succesfully removed status", tag: req.body.tag, user: req.user._id});
+
+  } else {
+    req.user.tags.push(req.body.tag);
+    req.user.save();
+    res.json({success: "Succesfully added status", tag: req.body.tag, user: req.user._id});
+  }
+});
+
 //route for changing email. Similar to edit profiles route. But changing email logs out user for some reason.
 router.put('/change-email', middleware.isLoggedIn, (req, res) => {
   (async() => {
+
+    if(req.body.receiving_emails) {
+      req.user.receiving_emails = true;
+      req.user.save();
+
+    } else {
+      req.user.receiving_emails = false;
+      req.user.save();
+    }
 
     const emails = await Email.find({address: req.body.email});
 
@@ -178,7 +187,7 @@ router.put('/change-email', middleware.isLoggedIn, (req, res) => {
       return res.redirect('back');
     }
 
-    const overlap = await User.find({authenticated: true, email: req.body.email, _id: {$nin: [req.user._id]}});
+    const overlap = await User.find({authenticated: true, email: req.body.email, _id: {$ne: req.user._id}});
 
     if (!overlap) {
       req.flash('error', "Unable to find users");
@@ -189,6 +198,7 @@ router.put('/change-email', middleware.isLoggedIn, (req, res) => {
       return res.redirect('back');
     }
 
+    //Since the user must go to their email to change their email address, the transporter function does not work.
     let updateEmail = {
       from: 'noreply.saberchat@gmail.com',
       to: req.body.email,
@@ -247,6 +257,7 @@ router.get('/confirm-email/:id', (req, res) => {
         user.authenticationToken = token;
         user.save();
 
+        //Since the user must go to their email to change their email address, the transporter function does not work.
         let updateEmail = {
           from: 'noreply.saberchat@gmail.com',
           to: req.body.email,
@@ -290,20 +301,7 @@ router.put('/change-password', middleware.isLoggedIn, (req, res) => {
 
           } else {
 
-            let updateEmail = {
-              from: 'noreply.saberchat@gmail.com',
-              to: req.user.email,
-              subject: 'Password Update Confirmation',
-              text: `Hello ${req.user.firstName},\n\nYou are receiving this email because you recently made changes to your Saberchat password. This is a confirmation of your profile.\n\nYour username is ${req.user.username}.\nYour full name is ${req.user.firstName} ${req.user.lastName}.\nYour email is ${req.user.email}\n\nIf you did not recently change your password, reset it immediately and contact a faculty member.`
-            };
-
-            transporter.sendMail(updateEmail, (err, info) =>{
-              if (err) {
-                console.log(err);
-              } else {
-                console.log('Email sent: ' + info.response);
-              }
-            });
+            transport_mandatory(transporter, req.user, 'Password Update Confirmation', `<p>Hello ${req.user.firstName},</p><p>You are receiving this email because you recently made changes to your Saberchat password. This is a confirmation of your profile.\n\nYour username is ${req.user.username}.\nYour full name is ${req.user.firstName} ${req.user.lastName}.\nYour email is ${req.user.email}\n\nIf you did not recently change your password, reset it immediately and contact a faculty member.</p>`);
 
             req.flash('success', 'Successfully changed your password');
             res.redirect('/profiles/' + req.user._id);
@@ -564,20 +562,7 @@ router.delete('/delete-account', middleware.isLoggedIn, (req, res) => {
       return res.redirect('back');
     }
 
-    let deleteEmail = {
-      from: 'noreply.saberchat@gmail.com',
-      to: deletedUser.email,
-      subject: 'Profile Deletion Confirmation',
-      text: `Hello ${deletedUser.firstName},\n\nYou are receiving this email because you recently deleted your Saberchat account. If you did not delete your account, contact a staff member immediately.`
-    };
-
-    transporter.sendMail(deleteEmail, (err, info) =>{
-      if (err) {
-        console.log(err);
-      } else {
-        console.log('Email sent: ' + info.response);
-      }
-    })
+    transport_mandatory(transporter, deletedUser, 'Profile Deletion Confirmation', `<p>Hello ${deletedUser.firstName},</p><p>You are receiving this email because you recently deleted your Saberchat account. If you did not delete your account, contact a staff member immediately.</p>`);
 
     req.flash('success', "Account deleted!");
     res.redirect('/');
@@ -589,35 +574,30 @@ router.delete('/delete-account', middleware.isLoggedIn, (req, res) => {
   });
 });
 
-router.get('/follow/:id', (req, res) => {
+router.put('/follow/:id', (req, res) => {
   User.findById(req.params.id, (err, user) => {
     if (err || !user) {
-      req.flash('error', "Unable to find user");
-      res.redirect('back');
+      res.json({error: "Error finding user"});
 
     } else if (user.followers.includes(req.user._id)) {
-      req.flash('error', `You are already following ${user.firstName} ${user.lastName}`);
-      res.redirect('/profiles');
+      res.json({error: "You are already following this user"});
 
     } else if (user._id.equals(req.user._id)) {
-      req.flash('error', `You may not follow yourself`);
-      res.redirect('/profiles');
+      res.json({error: "You may not follow yourself"});
 
     } else {
       user.followers.push(req.user);
       user.save();
-      req.flash('success', `You are now following ${user.firstName} ${user.lastName}!`);
-      res.redirect('/profiles');
+      res.json({success: "Succesfully followed user"});
 
     }
   });
 });
 
-router.get('/unfollow/:id', (req, res) => {
+router.put('/unfollow/:id', (req, res) => {
   User.findById(req.params.id, (err, user) => {
     if (err || !user) {
-      req.flash('error', "Unable to find user");
-      res.redirect('back');
+      res.json({error: "Error finding user"});
 
     } else {
       let index = -1;
@@ -630,37 +610,31 @@ router.get('/unfollow/:id', (req, res) => {
       if (index > -1) {
         user.followers.splice(index, 1);
         user.save();
-        req.flash('success', `You are no longer following ${user.firstName} ${user.lastName}.`);
-        res.redirect('/profiles');
+        res.json({success: "Unfollowed user"});
 
       } else {
-        req.flash('error', `You do not appear to be following ${user.firstName} ${user.lastName}`);
-        res.redirect('/profiles');
+        res.json({error: "You are not following this user"});
       }
-
     }
   });
 });
 
-router.get('/remove/:id', (req, res) => {
-
+router.put('/remove/:id', (req, res) => {
   User.findById(req.params.id, (err, user) => {
     if (err || !user) {
-      req.flash('error', "Unable to find user");
-      res.redirect('back');
+      res.json({error: "Error finding user"});
 
     } else {
       if (req.user.followers.includes(user._id)) {
         req.user.followers.splice(req.user.followers.indexOf(user._id), 1);
         req.user.save();
-        req.flash('success', `${user.firstName} ${user.lastName} was removed from your list of followers`);
-        res.redirect(`/profiles/${req.user._id}`);
+        res.json({success: "Succesfully removed user"});
 
       } else {
-        req.flash('error', `${user.firstName} ${user.lastName} does not appear to be following you.`);
-        res.redirect('back');
+        res.json({error: "User is not following you"});
       }
     }
   });
 });
+
 module.exports = router;

@@ -1,0 +1,40 @@
+#add-course-form {
+  display: inline;
+  margin-left: 10px;
+}
+
+#courses {
+  text-align: center;
+}
+
+.course-title {
+  width: 20rem;
+  display: inline-block;
+  margin-right: 20px;
+  margin-bottom: 20px;
+}
+
+.course-thumbnail, #thumbnail-photo {
+  min-height: 250px;
+  min-width: 300px;
+  overflow: hidden;
+}
+
+.user-position {
+  color: blue;
+}
+
+.course-description {
+  margin-top: 10px;
+}
+
+#thumbnail-photo {
+  width: 60%;
+  height: 60%;
+  margin: 20px;
+  border-radius: 15px;
+}
+
+#join-course-student, #join-course-tutor {
+  display: inline;
+}

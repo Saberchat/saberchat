@@ -27,10 +27,10 @@
         <!-- include the backdrop for nav -->
         <%- include('../../partials/header') %>
 
-        <div class="container mt-5" style="text-align: center;">
+        <div class="container mt-5">
             <div class="row">
                 <div class="col-12">
-                    <article class="msg-container" style="padding-top: 20px; padding-bottom: 30px;">
+                    <article class="msg-container">
                         <h1>Access Request</h1>
                         <h4><%= request.room.name %></h4>
                         <p>From:
@@ -53,13 +53,13 @@
                         </p>
 
                         <span><%=request.date%></span>
-                        <a style="margin-bottom: 50px;" href="/inbox" class="btn btn-primary back-btn"><i class="fas fa-arrow-left"></i> Back</a><br />
+                        <a id="back-button" href="/inbox" class="btn btn-primary back-btn"><i class="fas fa-arrow-left"></i> Back</a><br />
 
                         <% if(request.receiver.equals(currentUser._id) && request.status == 'pending') {%>
-                            <form action="/inbox/requests/<%= request._id %>/reject" method="post" style="display: inline-block;">
+                            <form action="/inbox/requests/<%= request._id %>/reject" method="post" class="evaluate-request">
                                 <button type="submit" class="btn btn-danger"><i class="fas fa-thumbs-down"></i> Reject</button>
                             </form>
-                            <form action="/inbox/requests/<%= request._id %>/accept" method="post" style="display: inline-block;">
+                            <form action="/inbox/requests/<%= request._id %>/accept" method="post" class="evaluate-request">
                                 <button type="submit" class="btn btn-success"><i class="fas fa-thumbs-up"></i> Accept</button>
                             </form>
                         <% } else { %>

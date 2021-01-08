@@ -15,7 +15,7 @@ const updateDisplay = (() => {
         display1.style.display = "none";
         display2.style.display = "none";
     }
-})
+});
 
 const searchFunction = (mode => {
     let input = document.getElementById(mode + "-search-input");
@@ -31,6 +31,6 @@ const searchFunction = (mode => {
             users[i].style.display = "none";
         }
     }
-})
+});
 
 updateDisplay();

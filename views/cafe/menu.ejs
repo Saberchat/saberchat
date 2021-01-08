@@ -17,6 +17,9 @@
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js" integrity="sha384-OgVRvuATP1z7JjHLkuOU7Xw704+h835Lr+6QL9UvYjZE3Ipu6Tp75j7Bh/kR0JKI" crossorigin="anonymous"></script>
 
     <script src="https://kit.fontawesome.com/dccc745c41.js" crossorigin="anonymous"></script>
+
+    <script src="/javascript/cafe/upvote.js"></script>
+    <script src="/javascript/cafe/search.js"></script>
   </head>
   <body>
     <%- include('../partials/navbar') %>
@@ -33,7 +36,7 @@
           </div>
           <div class="search-filter">
               <i class="fas fa-search"></i>
-              <input id="search-input" oninput="searchFunction()" class="form-control" type="text" placeholder="Search..." title="Type in Product">
+              <input id="search-input" oninput="search()" class="form-control" type="text" placeholder="Search..." title="Type in Product">
           </div>
         </div>
       </div>
@@ -68,7 +71,7 @@
           <% tempTypes.forEach(type => { %>
             <% if (type.items.length > 0) { %>
 
-              <li class="list-group-item list-group-item-success category-header" id="<%=type._id%>-header" style="margin-top: 40px;">
+              <li class="list-group-item list-group-item-success category-header" id="<%=type._id%>-header">
                 <div class="d-flex w-100 justify-content-between">
                   <h2 class="mb-1"><%=type.name%></h2>
                   <span><%=type.items.length%> item(s)</span>
@@ -77,7 +80,7 @@
 
               <% type.items.forEach(item => { %>
                 <% if (item.isAvailable == true) { %>
-                  <span class="list-group-item list-group-item-action menu-item <%=type.name.replace(' ', '')%>" id="item-<%=item.id%>"><strong><%= item.name %> (<%= item.availableItems%> orders available)</strong>
+                  <span class="list-group-item list-group-item-action menu-item <%=type.name.split(' ').join('')%>" id="item-<%=item.id%>"><strong><%= item.name %> (<%= item.availableItems%> orders available)</strong>
 
                   <% if (!item.price.toString().includes('.')) { %>
                     - $<%=item.price%>.00
@@ -89,19 +92,20 @@
                      - $<%=item.price%>
                   <% } %>
 
-                  <div title="Upvotes" style="margin-left: 10px; display: inline;">
+                  <div title="Upvotes" class="upvotes">
 
                     <% if (item.upvotes.includes(currentUser._id)) { %>
-                      <a style="color: red; text-decoration: none;" id="upvote-<%=item._id%>" onclick="upvote(this)"><i class="fas fa-arrow-circle-up"></i></a>
+                      <span class="upvoted" id="upvote-<%=item._id%>" onclick="upvote(this)"><i class="fas fa-arrow-circle-up"></i></span>
 
                     <% } else { %>
-                      <a style="color: grey; text-decoration: none;" id="upvote-<%=item._id%>" onclick="upvote(this)"><i class="fas fa-arrow-circle-up"></i></a>
+                      <span class="not-upvoted" id="upvote-<%=item._id%>" onclick="upvote(this)"><i class="fas fa-arrow-circle-up"></i></span>
                     <% }%>
 
                     <span id="upvoteCount-<%=item._id%>"> <%=item.upvotes.length%></span>
                   </div>
 
-                  <br /> <em><%= item.description %></em><br /><br /><img  src=<%=item.imgUrl%> style="width: 20%; height: 20%; border-radius: 20px;"/></span>
+                  <br /><em><%= item.description %></em><br /><br /><img src="<%=item.imgUrl%>" class="item-image"/>
+                </span>
 
                 <% }%>
               <% }) %>
@@ -113,51 +117,5 @@
         </div>
       </div>
     </div>
-    <script src="/javascript/cafe/upvote.js"></script>
-
-    <script>
-
-    const searchFunction = (() => {
-      const catHeaders = document.getElementsByClassName('category-header') //Category header
-      const catBreaks = document.getElementsByClassName('category-break') //Category page break
-      const menuItems = document.getElementsByClassName('menu-item')
-      const input = document.getElementById("search-input");
-      let filter = input.value.toLowerCase().replace(' ', '');
-
-      for (let item of menuItems) {
-        if((item.textContent.replace(' ', '').toLowerCase().includes(filter)) || (item.classList.toString().toLowerCase().includes(filter))) {
-          $(`#${item.id}`).show();
-
-        } else {
-          $(`#${item.id}`).hide();
-        }
-      }
-
-      let catIncluded; //"Category Included"
-
-      for (let h = 0; h < catHeaders.length; h+= 1) {
-        catIncluded = false;
-
-        for (let item of document.getElementsByClassName(catHeaders[h].getElementsByTagName("h2")[0].textContent.replace(' ', ''))) {
-          if((item.textContent.replace(' ', '').toLowerCase().includes(filter)) || (item.classList.toString().toLowerCase().includes(filter))) {
-            catIncluded = true;
-            break;
-          }
-        }
-
-        if (catIncluded) {
-          $(`#${catHeaders[h].id}`).show();
-          $(`#${catBreaks[h].id}`).show();
-
-        } else {
-          $(`#${catHeaders[h].id}`).hide();
-          $(`#${catBreaks[h].id}`).hide();
-        }
-      }
-
-    });
-
-
-    </script>
   </body>
 </html>

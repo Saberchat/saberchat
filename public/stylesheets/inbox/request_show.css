@@ -1,0 +1,16 @@
+.mt-5 {
+  text-align: center;
+}
+
+.msg-container {
+  padding-top: 20px;
+  padding-bottom: 30px;
+}
+
+#back-button {
+  margin-bottom: 50px;
+}
+
+.evaluate-request {
+  display: inline-block;
+}

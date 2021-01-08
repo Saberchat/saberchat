@@ -26,6 +26,9 @@ body {
     border-radius: 1rem;
 }
 
+#leave-room {
+  display: inline-block;
+}
 
 body::-webkit-scrollbar {
     display: none;

@@ -22,14 +22,16 @@
                     <li class="nav-item"></li>
                       <a class="nav-link" href="/cafe"><i class="fas fa-coffee"></i> EC Cafe</a>
                     <li class="nav-item dropdown">
+                    <li class="nav-item"></li>
+                      <a class="nav-link" target="_blank" href="https://witherlyheights.org/"><i class="far fa-newspaper"></i> Witherly Heights</a>
+                    <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                         <i class="fas fa-align-justify"></i> Other
                         </a>
 
                         <div class="dropdown-menu" aria-labelledby="navbarDropdown">
 
-                          <a class="dropdown-item" target="_blank" href="https://witherlyheights.org/"><i class="far fa-newspaper"></i> Witherly Heights</a>
-                          <!-- <a class="dropdown-item" href="/articles"><i class="far fa-newspaper"></i> Witherly Heights</a> -->
+                          <a class="dropdown-item" href="/articles"><i class="far fa-newspaper"></i> Articles</a>
                           <a class="dropdown-item" href="/chat"><i class="fas fa-comment-dots"></i> Chat</a>
                           <% if (currentUser.annCount.length > 0) { %>
                             <a class="dropdown-item" href="/announcements"><i class="fas fa-bullhorn"></i> Announcements <span class="badge badge-pill badge-danger"><%=currentUser.annCount.length%></span></a>
@@ -98,7 +100,7 @@
 
                         <li class="nav-item dropdown">
                           <a class="nav-link dropdown-toggle" href="" id="navbarDropdownMenuLink" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                              <img src="<%= currentUser.imageUrl %>" alt="profile pic" style="width: 20px; height: 20px; object-fit: cover; border-radius: 50%; display: inline-block;">
+                              <img src="<%= currentUser.imageUrl %>" alt="profile pic" class="nav-profile-img">
                               <%= currentUser.firstName.charAt(0) %>.<%= currentUser.lastName.charAt(0) %>.
                           </a>
                           <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
@@ -164,7 +166,7 @@
                 <label for="password-signup">Password</label>
                 <input name="password" type="password" class="form-control" id="password-signup" minlength="8" placeholder="(min 8)">
             </div>
-            <div style="position: relative; text-align: center;">
+            <div class="back">
                 <button type="button" class="btn btn-secondary" onclick="back()"><i class="fas fa-arrow-left"></i> Go Back</button>
                 <button type="button" id="register-button" data-toggle="modal" data-target="#modal-terms" class="btn btn-success"><i class="far fa-plus-square"></i> Sign Up</button>
             </div>

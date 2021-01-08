@@ -441,3 +441,11 @@ Classes to toggle displays
 .display {
     display: inline-block;
 }
+
+#mark-sel-btn {
+  display: none;
+}
+
+.unread {
+  font-weight: 700;
+}

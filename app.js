@@ -166,9 +166,9 @@ app.use('/articles', wHeightsRoutes);
 app.use('/homework', hwRoutes);
 
 // Catch-all route
-app.get('*', (req, res) => {
-	res.redirect('/');
-});
+// app.get('*', (req, res) => {
+// 	res.redirect('/');
+// });
 
 // list of responses to bad words
 const curseResponse = [
@@ -362,7 +362,7 @@ io.on('connect', (socket) => {
           orderInstructions = instructions;
         }
 
-        let order = await Order.create({customer: customerId, name: `${user.firstName} ${user.lastName}`, present: true, charge: 0, instructions: orderInstructions, payingInPerson}); //Assuming no setbacks, create the order
+        let order = await Order.create({customer: customerId, name: `${user.firstName} ${user.lastName}`, present: true, charge: 0, instructions: orderInstructions, payingInPerson: payingInPerson}); //Assuming no setbacks, create the order
 
         if (!order) {
           return console.log('error creating order');

@@ -32,13 +32,13 @@ const editor = new EditorJS({
 
 const saveButton = document.getElementById('save-button');
 
-const postIt = ((url, data) {
+const postIt = ((url, data) => {
 
     $('body').append($('<form/>', {
       id: 'jQueryPostItForm',
       method: 'post',
       action: url
-    })));
+    }));
 
     for (let i in data) {
       $('#jQueryPostItForm').append($('<input/>', {
@@ -48,7 +48,7 @@ const postIt = ((url, data) {
       }));
     }
     $('#jQueryPostItForm').submit();
-}
+});
 
 saveButton.addEventListener('click', () => {
     editor.save().then( savedData => {

@@ -250,6 +250,86 @@ Scroll To Bottom Button
     background-color: #e6e4e4;
 }
 
+.project-header {
+  padding-bottom: 20px;
+}
+
+.project-info, .project-info:hover {
+  color: white;
+  text-decoration: none;
+}
+
+.date {
+  font-size: 80%;
+}
+
+.poster-profile {
+  width: 30px;
+  height: 30px;
+  object-fit: cover;
+  border-radius: 50%;
+}
+
+.edit-button {
+  margin-left: 10px;
+}
+
+.delete-project {
+  display: inline-block;
+}
+
+#exampleModalLabel, .modal-body, .creator-names {
+  color: black;
+}
+
+.block-content {
+  text-align: center;
+}
+
+.project-first-image {
+  width: 25%;
+  height: 25%;
+  float: left;
+  border-radius: 15px;
+  margin-bottom: 20px;
+  margin-right: 20px;
+}
+
+.creator-row {
+  float: left;
+}
+
+.creator-profile {
+  width: 30px;
+  height: 30px;
+  object-fit: cover;
+  border-radius: 50%;
+}
+
+.project-description {
+  white-space: pre-wrap;
+}
+
+.comment-button {
+  color: white;
+  text-decoration: none;
+  margin-left: 10px;
+}
+
+.liked-button, .unliked-button {
+  text-decoration: none;
+  margin-left: 10px;
+  font-size: 70%;
+}
+
+.liked-button {
+  color: #03a5fc;
+}
+
+.unliked-button {
+  color: white;
+}
+
 /*
 ===========================
 Screen customizations

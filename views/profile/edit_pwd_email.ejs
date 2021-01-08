@@ -10,6 +10,7 @@
     <!-- link css for navbar. Don't need to include public/javascript/userForm.js since user is already logged in and does not need to access login and register forms.  -->
     <link rel="stylesheet" href="/stylesheets/components/navbar.css">
     <link rel="stylesheet" href="/stylesheets/components/header.css">
+    <link rel="stylesheet" href="/stylesheets/profile/edit.css">
 
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
@@ -26,8 +27,8 @@
 
     <div class="container mt-5">
         <div class="row">
-            <div class="col-12" style="text-align: center;">
-                <h1 style="width: 100%">Edit Account Settings</h1>
+            <div class="col-12" id="edit-settings">
+                <h1 id="settings-header">Edit Account Settings</h1>
                 <a class="btn btn-primary" href="/profiles/<%= currentUser._id %>"><i class="fas fa-arrow-left"></i> Back</a>
             </div>
         </div>
@@ -37,7 +38,9 @@
                 <form action="/profiles/change-email?_method=put" method="post">
                     <div class="form-group">
                         <label for="usernameInput">Email</label>
-                        <input id="usernameInput" class="form-control" type="text" name="email" value="<%= currentUser.email %>" placeholder="Enter New Email" required>
+                        <input id="usernameInput" class="form-control" type="text" name="email" value="<%= currentUser.email %>" placeholder="Enter New Email" required><br />
+                        <input type="checkbox" name="receiving_emails" id="receiving_emails" <% if (currentUser.receiving_emails) {%> checked <%}%>/>
+                        <label for="receiving_emails">Send Me Emails</label>
                     </div>
 
                     <button class="btn btn-lg btn-primary btn-block">Change Email</button>
@@ -59,7 +62,7 @@
                 </form>
 
                 <br />
-                <form action="/profiles/delete-account?_method=delete" method="post" style="margin-top: 30px;">
+                <form action="/profiles/delete-account?_method=delete" method="post" id="delete-account">
                   <button type="button" class="btn btn-lg btn-danger btn-block" data-toggle="modal" data-target="#modal" id="delete-button">Delete Account</button>
                   <div class="modal fade" id="modal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
                     <div class="modal-dialog">

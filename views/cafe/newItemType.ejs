@@ -11,6 +11,7 @@
       <link rel="stylesheet" href="/stylesheets/components/header.css">
       <link rel="stylesheet" href="/stylesheets/components/navbar.css">
       <link rel="stylesheet" href="/stylesheets/chat/new.css">
+      <link rel="stylesheet" href="/stylesheets/cafe/new.css">
 
       <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
       <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
@@ -26,28 +27,28 @@
 
     <div class="container mt-5">
       <div class="row">
-        <div class="col-12" style="text-align: center;">
-            <h1 style="text-align: center; width: 100%">New Cafe Item Type</h1>
+        <div class="col-12" id="heading">
+            <h1 id="new-heading">New Cafe Item Type</h1>
             <a class="btn btn-primary" href="/cafe/manage"><i class="fas fa-arrow-left"></i> Back</a><br /><br />
         </div>
       </div>
 
       <form action="/cafe/type" method="post">
 
-        <h2 style="text-align: center;">Name</h2>
+        <h2>Name</h2>
         <div class="row">
           <div class="col-md-8 offset-md-2 col-12">
             <div class="form-group">
               <div class="row">
                 <div class="input-group mb-3">
-                  <input id="usernameInput" class="form-control" type="text" name="name" placeholder="Enter Item Name" maxlength="45" required style="display: inline-block;"/>
+                  <input id="category-name" class="form-control" type="text" name="name" placeholder="Enter Item Category Name" maxlength="45" required/>
                 </div>
               </div>
             </div>
           </div>
         </div>
 
-        <h2 style="text-align: center;">Items</h2>
+        <h2>Items</h2>
         <div class="row">
           <div class="col-md-8 offset-md-2 col-12">
             <div class="form-group">

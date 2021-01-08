@@ -81,3 +81,7 @@
 .user-tag button:hover {
     background-color: #b92c3a;
 }
+
+#back-button {
+  text-align: center;
+}

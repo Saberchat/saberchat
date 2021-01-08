@@ -10,7 +10,7 @@ const ignoreComment = (button => {
         console.log(data.error);
     }
   });
-})
+});
 
 const deleteComment = (button => {
   const listItem = (button.parentNode).parentNode;
@@ -24,4 +24,4 @@ const deleteComment = (button => {
         console.log(data.error);
     }
   });
-})
+});
