@@ -125,10 +125,14 @@
 .reviews-length, .reviews-length:hover {
   margin-left: 20px;
   font-size: 120%;
-  color: black;
+  font-weight: bold;
   text-decoration: none;
 }
 
-.reviews-icon {
-  color: grey;
+.tutor-experience {
+  font-weight: bold;
+  color: purple;
+  margin-left: 10px;
+  font-style: italic;
+  display: inline;
 }

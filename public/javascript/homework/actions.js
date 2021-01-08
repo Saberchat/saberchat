@@ -17,7 +17,7 @@ const book = ((button, location) => {
       if (location == "show") {
         reviewButton.className ="review-button edit-button btn btn-warning";
         leaveButton.className ="leave-button edit-button btn btn-danger";
-        
+
       } else if (location == "tutor-show") {
         reviewButton.className ="edit-button btn btn-warning";
         leaveButton.className ="edit-button btn btn-danger";
@@ -128,3 +128,7 @@ const reopenLessons = ((button, location) => {
     }
   });
 });
+
+const setStudents = (() => {
+  document.getElementById("slots-label").innerText = `Number of Student Slots: ${document.getElementById('slots').value}`;
+})

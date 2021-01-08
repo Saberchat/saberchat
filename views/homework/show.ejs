@@ -11,7 +11,7 @@
     <link rel="stylesheet" href="/stylesheets/components/header.css">
     <link rel="stylesheet" href="/stylesheets/components/navbar.css">
     <link rel="stylesheet" href="/stylesheets/home/index.css">
-    <link rel="stylesheet" href="/stylesheets/profile/index.css">
+    <!-- <link rel="stylesheet" href="/stylesheets/profile/index.css"> -->
     <link rel="stylesheet" href="/stylesheets/homework/show.css">
     <link rel="stylesheet" href="/stylesheets/cafe/menu.css">
 
@@ -136,19 +136,26 @@
         <div class="col-12">
 
           <% if (course.tutors.length > 0) { %>
-              <li class="list-group-item list-group-item-success"><strong>Tutors</strong></li>
+              <li class="list-group-item list-group-item-success">
+                <div class="d-flex w-100 justify-content-between">
+                  <strong class="mb-1">Tutors</strong>
+                </div>
+              </li>
+
               <% for (let tutor of course.tutors) { %>
-                  <span class="list-group-item list-group-item-action tutor-profile" id="tutor-<%=tutor.tutor._id%>">
+                  <span class="list-group-item list-group-item-action tutor-profile menu-item" id="tutor-<%=tutor.tutor._id%>">
                     <a href="/homework/tutors/<%=course._id%>?tutor=<%=tutor.tutor._id%>" class="tutor-link">
                       <img class="profile-image" src="<%= tutor.tutor.imageUrl %>" alt="profile picture">
-                      <span class="tutor-name <%=tutor.tutor.status%> <%=tutor.tutor.permission%> <%=tutor.tutor.tags.join(' ')%>"><strong><%=tutor.tutor.firstName%> <%=tutor.tutor.lastName%></strong> <span class="tutor-username"><%=`${tutor.tutor.username}`%></span></span>
+                      <span class="tutor-name <%=tutor.tutor.status%> <%=tutor.tutor.permission%> <%=tutor.tutor.tags.join(' ')%>"><strong><%=tutor.tutor.firstName%> <%=tutor.tutor.lastName%></strong></span>
                     </a>
 
                       <% if (studentIds.includes(currentUser._id.toString())) { %>
                         <div id="tutor-actions-<%=tutor.tutor._id%>" class="tutor-actions">
-                          <% if (tutor.students.includes(currentUser._id)) { %>
+                          <% if (tutor.students.includes(currentUser._id) || tutor.formerStudents.includes(currentUser._id)) { %>
                             <button class="btn btn-warning review-button" id="review-button-<%=tutor.tutor._id%>" data-toggle="modal" data-target="#modal-review-<%=tutor.tutor._id%>">Leave A Review</button>
-                            <button class="btn btn-danger leave-button" id="leave-button-<%=tutor.tutor._id%>" data-toggle="modal" data-target="#modal-stop-<%=tutor.tutor._id%>">Stop Lessons</button>
+                            <% if (tutor.students.includes(currentUser._id)) { %>
+                              <button class="btn btn-danger leave-button" id="leave-button-<%=tutor.tutor._id%>" data-toggle="modal" data-target="#modal-stop-<%=tutor.tutor._id%>">Stop Lessons</button>
+                            <% } %>
                           <% } else { %>
                             <% if (tutor.available) { %>
                               <button class="btn btn-info book-button" id="book-button-<%=tutor.tutor._id%>" data-toggle="modal" data-target="#modal-book-<%=tutor.tutor._id%>">Book This Tutor</button>
@@ -186,7 +193,7 @@
                       <% } %>
                     </div>
 
-                    <a href="/homework/tutors/<%=course._id%>?tutor=<%=tutor.tutor._id%>" class="reviews-length"><i class="fas fa-comment-dots reviews-icon"></i> <span id="reviews-length-<%=tutor.tutor._id%>"><%=tutor.reviews.length%></span></a>
+                    <a href="/homework/tutors/<%=course._id%>?tutor=<%=tutor.tutor._id%>" class="reviews-length"><i class="fas fa-comment-dots reviews-icon"></i> <span id="reviews-length-<%=tutor.tutor._id%>"><%=tutor.reviews.length%></span> Review(s)</a>
 
                     <% if (tutor.tutor._id.equals(currentUser._id)) { %>
                       <% if (tutor.available) { %>
@@ -195,6 +202,40 @@
                         <button class="btn btn-success reopen-lessons" id="reopen-<%=course._id%>-<%=tutor.tutor._id%>" data-toggle="modal" data-target="#modal-reopen-<%=tutor.tutor._id%>">Reopen Lessons</button>
                       <% } %>
                     <% } %>
+
+                    <% let experience = (Date.now() - tutor.dateJoined.getTime())/60000; %>
+
+                    <div class="tutor-experience">Experience:
+                    <% if (experience < 60) { %>
+                      <%=Math.round(experience * 100) / 100%> minute(s)
+
+                    <% } else { %>
+                      <% experience /= 60; %>
+
+                      <% if (experience < 24) { %>
+                        <%=Math.round(experience * 100) / 100%> hour(s)
+
+                      <% } else { %>
+                        <% experience /= 24; %>
+
+                        <% if (experience < 7) { %>
+                          <%=Math.round(experience * 100) / 100%> day(s)
+
+                        <% } else {%>
+                          <% experience /= 7; %>
+
+                          <% if (experience < 52) { %>
+                            <%=Math.round(experience * 100) / 100%> week(s)
+
+                          <% } else { %>
+                            <% experience /= 52; %>
+                            <%=Math.round(experience * 100) / 100%> year(s)
+
+                          <% } %>
+                        <% } %>
+                      <% }%>
+                    <% } %>
+                    </div>
 
                     <p class="tutor-bio"><%=tutor.bio%></p>
                   </span>

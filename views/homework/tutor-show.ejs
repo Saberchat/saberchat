@@ -65,6 +65,41 @@
                       <h4>Username</h4>
                       <p><%=tutor.tutor.username%></p>
 
+                      <h4>Experience</h4>
+                      <% let experience = (Date.now() - tutor.dateJoined.getTime())/60000; %>
+
+                      <p>
+                      <% if (experience < 60) { %>
+                        <%=Math.round(experience * 100) / 100%> minute(s)
+
+                      <% } else { %>
+                        <% experience /= 60; %>
+
+                        <% if (experience < 24) { %>
+                          <%=Math.round(experience * 100) / 100%> hour(s)
+
+                        <% } else { %>
+                          <% experience /= 24; %>
+
+                          <% if (experience < 7) { %>
+                            <%=Math.round(experience * 100) / 100%> day(s)
+
+                          <% } else {%>
+                            <% experience /= 7; %>
+
+                            <% if (experience < 52) { %>
+                              <%=Math.round(experience * 100) / 100%> week(s)
+
+                            <% } else { %>
+                              <% experience /= 52; %>
+                              <%=Math.round(experience * 100) / 100%> year(s)
+
+                            <% } %>
+                          <% } %>
+                        <% }%>
+                      <% } %>
+                      </p>
+
                       <h4>Role</h4>
                       <% permMatrix = [["principal", "Principal"], ["admin", "Administrator"], ["mod", "Moderator"], ["student", "Student"]] %>
 
@@ -82,9 +117,11 @@
 
                       <% if (studentIds.includes(currentUser._id.toString())) { %>
                         <div id="tutor-actions-<%=tutor.tutor._id%>" class="tutor-actions">
-                          <% if (tutor.students.includes(currentUser._id)) { %>
+                          <% if (tutor.students.includes(currentUser._id) || tutor.formerStudents.includes(currentUser._id)) { %>
                             <button class="btn btn-warning edit-button" id="review-button-<%=tutor.tutor._id%>" data-toggle="modal" data-target="#modal-review-<%=tutor.tutor._id%>">Leave A Review</button>
-                            <button class="btn btn-danger edit-button" id="leave-button-<%=tutor.tutor._id%>" data-toggle="modal" data-target="#modal-stop-<%=tutor.tutor._id%>">Stop Lessons</button>
+                            <% if (tutor.students.includes(currentUser._id)) { %>
+                              <button class="btn btn-danger edit-button" id="leave-button-<%=tutor.tutor._id%>" data-toggle="modal" data-target="#modal-stop-<%=tutor.tutor._id%>">Stop Lessons</button>
+                            <% } %>
                           <% } else { %>
                             <% if (tutor.available) { %>
                               <button class="btn btn-info edit-button" id="book-button-<%=tutor.tutor._id%>" data-toggle="modal" data-target="#modal-book-<%=tutor.tutor._id%>">Book This Tutor</button>
@@ -227,7 +264,7 @@
                             <i id="like-<%=review.review._id%>" class="fas fa-thumbs-up review-unliked"
                           <% } %>
 
-                          <% if (tutor.students.includes(currentUser._id)) { %>
+                          <% if (tutor.students.includes(currentUser._id) || tutor.formerStudents.includes(currentUser._id)) { %>
                             onclick="likeReview(this)"
                           <% } %>
                           ></i>

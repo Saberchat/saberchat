@@ -38,3 +38,7 @@
 #join-course-student, #join-course-tutor {
   display: inline;
 }
+
+#slots {
+  margin-bottom: 20px;
+}
