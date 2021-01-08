@@ -1,5 +1,8 @@
-// set up env vars. commented out for deployment
-// require('dotenv').config();
+// set up env vars if in local developmeent
+if(process.env.NODE_ENV !== "production") {
+	require('dotenv').config();
+}
+
 // Require NodeJS modules
 //set up and start the express server
 const express = require('express');
@@ -13,20 +16,14 @@ const LocalStrategy = require('passport-local');
 const flash = require('connect-flash');
 //middleware; parses incoming data from client under req.body
 const bodyParser = require('body-parser');
-//parses and creates cookies
-const cookieParser = require('cookie-parser');
-//allow us to use PUT and DELETE methods
+//allow us to use other methods besides post and get
 const methodOverride = require('method-override');
 // package for formating dates on the serverside
 const dateFormat = require('dateformat');
-//Allows Node.js to send emails
-const nodemailer = require("nodemailer");
+// Sets HTTP headers for security
+const helmet = require('helmet');
 
-//Image Upload Modules
-const crypto = require('crypto')
-const multer = require('multer');
-const GridFsStorage = require('multer-gridfs-storage');
-const Grid = require('gridfs-stream');
+const { scriptUrls, styleUrls } = require('./srcUrls');
 
 //pretty up the console
 // const colors = require('colors');
@@ -64,55 +61,13 @@ const http = require('http').createServer(app);
 const io = require('socket.io')(http);
 const port = process.env.PORT || 3000;
 
-//connect to db. We should set the link as environment variable for security purposes in the future.
+//connect to db.
 mongoose.connect(process.env.DATABASE_URL,
 {
   useNewUrlParser: true,
   useUnifiedTopology: true,
   useFindAndModify: false
 });
-
-// const conn = mongoose.createConnection(process.env.DATABASE_URL,
-// {
-//   useNewUrlParser: true,
-//   useUnifiedTopology: true,
-//   useFindAndModify: false
-// });
-
-// let gfs;
-//
-// conn.once('open', () => {
-//   gfs = Grid(conn.db, mongoose.mongo);
-//   gfs.collection('uploads');
-// });
-//
-// //Create storage object
-//
-// const storage = new GridFsStorage({
-//   url: process.env.DATABASE_URL,
-//   file: (req, file) => {
-//
-//     return new Promise((resolve, reject) => {
-//       crypto.randomBytes(16, (err, buf) => {
-//
-//         if (err) {
-//           return reject(err);
-//         }
-//
-//         const filename = buf.toString('hex') + path.extname(file.originalname);
-//
-//         const fileInfo = {
-//           filename: filename,
-//           bucketName: 'uploads'
-//         };
-//
-//         resolve(fileInfo);
-//       });
-//     });
-//   }
-// });
-//
-// const upload = multer({ storage });
 
 // ============================
 // app configuration
@@ -127,13 +82,32 @@ app.use('/editor', express.static(__dirname + "/node_modules/@editorjs"));
 app.use(bodyParser.urlencoded({
   extended: true
 }));
-app.use(cookieParser());
 //set view engine to ejs
 app.set("view engine", "ejs");
 // I think yall already know what method override is
 app.use(methodOverride('_method'));
 // use connect-flash for flash messages
 app.use(flash());
+
+// Helmet security headers
+app.use(helmet());
+
+// customizations for helmet content security policy
+app.use(helmet.contentSecurityPolicy({
+	directives: {
+		defaultSrc: [],
+		connectSrc: ["'self'", "https://ka-f.fontawesome.com/"],
+		scriptSrc: ["'unsafe-inline'", "'self'", ...scriptUrls],
+		styleSrc: ["'self'", "'unsafe-inline'", ...styleUrls],
+		workerSrc: ["'self'", "blob:"],
+		objectSrc: [],
+		imgSrc: [
+			"https:",
+			"data:"
+		],
+		fontSrc: ["'self'", "https://ka-f.fontawesome.com/"]
+	}
+}));
 
 // express session stuff for authorization that I know nothing about
 const session = require('express-session');
@@ -228,22 +202,22 @@ const getRandMessage = (list => {
 
 //Update all students' statuses on July 1st at midnight
 
-const updateUsers = schedule.scheduleJob('0 0 0 1 7 *', () => {
+// const updateUsers = schedule.scheduleJob('0 0 0 1 7 *', () => {
 
-  let statuses = ['7th', '8th', '9th', '10th', '11th', '12th', 'alumnus'];
+//   let statuses = ['7th', '8th', '9th', '10th', '11th', '12th', 'alumnus'];
 
-  User.find({authenticated: true, status: {$in: statuses.slice(0, statuses.length-1)}}, (err, users) => { //Do not include CURRENT alumni in the people who will be updated, only 7th-12th graders
-    if (err || !users) {
-      console.log(err);
+//   User.find({authenticated: true, status: {$in: statuses.slice(0, statuses.length-1)}}, (err, users) => { //Do not include CURRENT alumni in the people who will be updated, only 7th-12th graders
+//     if (err || !users) {
+//       console.log(err);
 
-    } else {
-      for (let user of users) {
-        user.status = statuses[statuses.indexOf(user.status)+1];
-        user.save();
-      }
-    }
-  });
-});
+//     } else {
+//       for (let user of users) {
+//         user.status = statuses[statuses.indexOf(user.status)+1];
+//         user.save();
+//       }
+//     }
+//   });
+// });
 
 // Socket.io server-side code
 io.on('connect', (socket) => {

@@ -106,8 +106,11 @@
               <hr>
               <div class="ann-images">
                 <% announcement.images.forEach(image => { %>
-                  <img src="<%= image %>" alt="Added Image" class="img-fluid rounded">
+                  <img src="<%= image %>" alt="Attached Image" class="img-fluid rounded">
                 <% }) %>
+                <% if(announcement.imageFile.filename) { %>
+                  <img src="<%= announcement.imageFile.url %>" alt="Attached Image" class="img-fluid rounded">
+                <% } %>  
               </div>
             </div>
           </article>

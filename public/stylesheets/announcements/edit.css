@@ -1,0 +1,21 @@
+#delete-upload-check {
+    width: 15px;
+    height: 15px;
+}
+
+#replace-upload-block {
+    margin-top: 1rem;
+}
+
+#replace-upload-block span {
+    display: block;
+    font-size: 1rem;
+    margin-top: 0.5rem;
+    color: rgb(66, 66, 66);
+    font-style: italic;
+}
+
+.past-upload {
+    margin-bottom: 1rem;
+    box-shadow: 0px 1px 5px #6d6d6d;
+}

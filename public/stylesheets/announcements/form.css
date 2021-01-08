@@ -1,7 +1,21 @@
+/* Forms styling */
+.form-group label {
+    font-size: 1.2rem;
+    font-weight: 500;
+}
+
+form {
+    margin-bottom: 5rem;
+}
+
 /* Image block/area */
 #image-block {
     margin: 2rem 0;
     position: relative;
+}
+
+#image-header {
+    margin-top: 2rem;
 }
 
 #image-header h4 {
@@ -9,7 +23,6 @@
     font-size: 1.3rem;
 
     display: inline-block;
-    width: 5rem;
 }
 
 #image-header button {

@@ -49,7 +49,7 @@ messageDisplay.addEventListener('scroll', () => {
 }, false);
 
 //create function that sets up the socket chat
-const chatInit = ((username, userId, messageForm, input, chatDisplay, room, userImage) {
+function chatInit(username, userId, messageForm, input, chatDisplay, room, userImage) {
 
   var socket = io();
 
@@ -137,4 +137,4 @@ const chatInit = ((username, userId, messageForm, input, chatDisplay, room, user
       }
     }
   });
-})
+};

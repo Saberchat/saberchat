@@ -6,13 +6,17 @@ const middleware = require('../middleware');
 const router = express.Router(); //start express router
 const dateFormat = require('dateformat');
 const nodemailer = require('nodemailer');
-const {transport, transport_mandatory} = require("../transport");
+const {transport} = require("../transport");
+
+const multerUpload = require('../services/multer');
+const { cloudUpload, cloudDelete } = require('../services/cloudinary');
 
 //SCHEMA
 const User = require('../models/user');
 const Announcement = require('../models/announcement');
 const Notification = require('../models/message');
 const PostComment = require('../models/postComment');
+
 
 //Sets up NodeMailer Transporter object (sends out emails)
 let transporter = nodemailer.createTransport({
@@ -36,7 +40,6 @@ router.get('/', (req, res) => { //RESTful Routing 'INDEX' route
     }
   })
 })
-
 
 router.get('/new', middleware.isLoggedIn, middleware.isMod, (req, res) => { //RESTful Routing 'NEW' route
   res.render('announcements/new');
@@ -124,6 +127,11 @@ router.get('/:id/edit', middleware.isLoggedIn, middleware.isMod, (req, res) => {
 
 router.post('/', middleware.isLoggedIn, middleware.isMod, (req, res) => { //RESTful Routing 'CREATE' route
   (async() => {
+    // parse req.body and upload img buffer to memory as req.file
+    const multError = await multerUpload(req, res).catch(err=>{return err});
+    if(multError){req.flash('error', multError.message); return res.redirect('back');}
+
+    // We'll want to validate the announcement sometime in the future
     const announcement = await Announcement.create({sender: req.user, subject: req.body.subject, text: req.body.message});
 
     if(!announcement) {
@@ -135,6 +143,15 @@ router.post('/', middleware.isLoggedIn, middleware.isMod, (req, res) => { //REST
       for(const image in req.body.images) {
         announcement.images.push(req.body.images[image]);
       }
+    }
+    // if a file was uploaded
+    if(req.file) {
+      const [cloudErr, cloudResult] = await cloudUpload(req.file);
+      if(cloudErr || !cloudResult){req.flash('error', 'Upload failed'); return res.redirect('back');}
+
+      // set upload info
+      announcement.imageFile.url = cloudResult.secure_url;
+      announcement.imageFile.filename = cloudResult.public_id;
     }
 
     announcement.date = dateFormat(announcement.created_at, "h:MM TT | mmm d");
@@ -170,7 +187,7 @@ router.post('/', middleware.isLoggedIn, middleware.isMod, (req, res) => { //REST
 
   })().catch(err => {
     console.log(err);
-    req.flash('error', "Unable To Access Database2");
+    req.flash('error', "Unable To Access Database");
     return res.redirect('back');
   });
 });
@@ -307,6 +324,9 @@ router.put('/comment', middleware.isLoggedIn, (req, res) => {
 
 router.put('/:id', middleware.isLoggedIn, middleware.isMod, (req, res) => { //RESTful Routing 'UPDATE' route
   (async() => {
+    // parse req.body and upload img buffer to memory as req.file
+    const multError = await multerUpload(req, res).catch(err=>{return err});
+    if(multError){req.flash('error', multError.message); return res.redirect('back');}
 
     const announcement = await Announcement.findById(req.params.id).populate('sender');
 
@@ -321,61 +341,82 @@ router.put('/:id', middleware.isLoggedIn, middleware.isMod, (req, res) => { //RE
     }
 
     const updatedAnnouncement = await Announcement.findByIdAndUpdate(req.params.id, {subject: req.body.subject, text: req.body.message});
-      if (!updatedAnnouncement) {
-        req.flash('error', "Unable to update announcement");
+    if (!updatedAnnouncement) {
+      req.flash('error', "Unable to update announcement");
+      return res.redirect('back');
+    }
+
+    updatedAnnouncement.images = []; //Empty image array so that you can fill it with whatever images are added (all images are there, not just new ones)
+    if(req.body.images) { //Only add images if any are provided
+      for(const image in req.body.images) {
+        updatedAnnouncement.images.push(req.body.images[image]);
+      }
+    }
+
+    // delete image if delete upload check is checked
+    if(req.body.deleteUpload === "true" && updatedAnnouncement.imageFile.filename) {
+      const filename = updatedAnnouncement.imageFile.filename;
+      const [cloudError, cloudResult] = await cloudDelete(filename);
+      // check for failure
+      if(cloudError || !cloudResult || cloudResult.result !== 'ok') {
+        req.flash('error', 'Could not delete image');
         return res.redirect('back');
       }
+      updatedAnnouncement.imageFile = {};
+    }
+    // Replace image if there is an upload
+    if(req.file) {
+      const [cloudErr, cloudResult] = await cloudUpload(req.file);
+      if(cloudErr || !cloudResult){req.flash('error', 'Re-upload failed'); return res.redirect('back');}
 
-      updatedAnnouncement.images = []; //Empty image array so that you can fill it with whatever images are added (all images are there, not just new ones)
-      if(req.body.images) { //Only add images if any are provided
-        for(const image in req.body.images) {
-          updatedAnnouncement.images.push(req.body.images[image]);
-        }
-      }
+      // set upload info
+      updatedAnnouncement.imageFile.url = cloudResult.secure_url;
+      updatedAnnouncement.imageFile.filename = cloudResult.public_id;
+    }
 
-      await updatedAnnouncement.save();
+    await updatedAnnouncement.save();
 
       const users = await User.find({authenticated: true, _id: {$ne: req.user._id}});
 
-      let announcementEmail;
+    let announcementEmail;
 
-      let imageString = "";
+    let imageString = "";
 
-      for (let image of announcement.images) {
-        imageString += `<img src="${image}">`;
-      }
+    for (let image of announcement.images) {
+      imageString += `<img src="${image}">`;
+    }
 
-      if (!users) {
-        req.flash('error', "Unable To Access Database");
-        res.rediect('back');
-      }
+    if (!users) {
+      req.flash('error', "Unable To Access Database");
+      return res.rediect('back');
+    }
 
-      let announcementObject = {
-        announcement: updatedAnnouncement,
-        version: "updated"
-      };
+    let announcementObject = {
+      announcement: updatedAnnouncement,
+      version: "updated"
+    };
 
-      let overlap;
+    let overlap;
 
-      for (let user of users) {
-        transport(transporter, user, `Updated Saberchat Announcement - ${announcement.subject}`, `<p>Hello ${user.firstName},</p><p>${req.user.username} has recently updated an announcement - '${announcement.subject}'.</p><p>${announcement.text}</p><p>You can access the full announcement at https://alsion-saberchat.herokuapp.com</p> ${imageString}`);
-        overlap = false;
+    for (let user of users) {
+      transport(transporter, user, `Updated Saberchat Announcement - ${announcement.subject}`, `<p>Hello ${user.firstName},</p><p>${req.user.username} has recently updated an announcement - '${announcement.subject}'.</p><p>${announcement.text}</p><p>You can access the full announcement at https://alsion-saberchat.herokuapp.com</p> ${imageString}`);
+      overlap = false;
 
-        for (let a of user.annCount) {
-          if (a.announcement.toString() == updatedAnnouncement._id.toString()) {
-            overlap = true;
-            break;
-          }
-        }
-
-        if (!overlap) {
-          user.annCount.push(announcementObject);
-          await user.save();
+      for (let a of user.annCount) {
+        if (a.announcement.toString() == updatedAnnouncement._id.toString()) {
+          overlap = true;
+          break;
         }
       }
+    }
 
-      req.flash('success', 'Announcement Updated!');
-      res.redirect(`/announcements/${updatedAnnouncement._id}`);
+    if (!overlap) {
+      user.annCount.push(announcementObject);
+      await user.save();
+    }
+
+    req.flash('success', 'Announcement Updated!');
+    res.redirect(`/announcements/${updatedAnnouncement._id}`);
 
   })().catch(err => {
     console.log(err)
@@ -397,41 +438,51 @@ router.delete('/:id', middleware.isLoggedIn, middleware.isMod, (req, res) => { /
       req.flash('error', "You can only delete announcements that you have posted");
       return res.redirect('back');
 
-    } else {
-      const deletedAnn = await Announcement.findByIdAndDelete(announcement._id);
+    }
+    // delete any uploads
+    if(announcement.imageFile && announcement.imageFile.filename) {
+      const filename = announcement.imageFile.filename;
+      const [cloudError, cloudResult] = await cloudDelete(filename);
+      // check for failure
+      if(cloudError || !cloudResult || cloudResult.result !== 'ok') {
+        req.flash('error', 'Error deleting uploaded image');
+        return res.redirect('back');
+      }
+    }
 
-      if (!deletedAnn) {
-        req.flash('error', "Unable to delete announcement");
+    const deletedAnn = await Announcement.findByIdAndDelete(announcement._id);
+
+    if (!deletedAnn) {
+      req.flash('error', "Unable to delete announcement");
+      return res.redirect('back');
+    }
+
+    const users = await User.find({authenticated: true}, (err, users) => {
+      if (!users) {
+        req.flash('error', "Unable to find users");
         return res.redirect('back');
       }
 
-      const users = await User.find({authenticated: true}, (err, users) => {
-        if (!users) {
-          req.flash('error', "Unable to find users");
-          return res.redirect('back');
-        }
+      for (let user of users) {
 
-        for (let user of users) {
+        let index;
 
-          let index;
-
-          for (let i = 0; i < user.annCount.length; i += 1) {
-            if (user.annCount[i].announcement.toString() == deletedAnn._id.toString()) {
-              index = i;
-            }
-          }
-
-          if (index > -1) {
-            user.annCount.splice(index, 1);
-            user.save();
+        for (let i = 0; i < user.annCount.length; i += 1) {
+          if (user.annCount[i].announcement.toString() == deletedAnn._id.toString()) {
+            index = i;
           }
         }
-      })
 
-      req.flash('success', 'Announcement Deleted!');
-      res.redirect('/announcements/');
+        if (index > -1) {
+          user.annCount.splice(index, 1);
+          user.save();
+        }
+      }
+    })
 
-    }
+    req.flash('success', 'Announcement Deleted!');
+    res.redirect('/announcements/');
+
   })().catch(err => {
     console.log(err)
     req.flash('error', "Unable To Access Database")
