@@ -1,4 +1,4 @@
-const annSchema = require('../joiSchemas/announcement');
+const {annSchema} = require('../joiValidation/schemas');
 
 module.exports.validateAnn = (req, res, next) => {
     const { error } = annSchema.validate(req.body);
