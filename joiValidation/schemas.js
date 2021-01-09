@@ -12,4 +12,44 @@ const annSchema = Joi.object({
     deleteUpload: Joi.boolean()
 });
 
-module.exports = {annSchema};
+const newUserSchema = Joi.object({
+    firstName: Joi.string().required().max(50).min(2).escapeHtml().messages({
+        "string.empty": "Firstname is required.",
+        "string.max": "Firstname max 50 characters.",
+        "string.min": "Firstname minimum 2 characters."
+    }),
+    lastName: Joi.string().required().max(50).min(2).escapeHtml().messages({
+        "string.empty": "Lastname is required.",
+        "string.max": "Lastname max 50 characters.",
+        "string.min": "Lastname minimum 2 characters."
+    }),
+    username: Joi.string().required().max(23).escapeHtml().messages({
+        "string.empty": "Username is required.",
+        "string.max": "Username max 23 characters."
+    }),
+    email: Joi.string().email().required().escapeHtml().messages({
+        "string.empty": "Email is required.",
+        "string.email": "Invalid Email."
+    }),
+    password: Joi.string().required().min(8).escapeHtml().messages({
+        "string.empty": "Password is required.",
+        "string.min": "Password minimum 7 characters."
+    })
+});
+
+const userLoginSchema = Joi.object({
+    email: Joi.string().email().required().escapeHtml().messages({
+        "string.empty": "Email is required.",
+        "string.email": "Invalid Email."
+    }),
+    password: Joi.string().required().min(8).escapeHtml().messages({
+        "string.empty": "Password is required.",
+        "string.min": "Password minimum 7 characters."
+    })
+});
+
+module.exports = {
+    annSchema,
+    newUserSchema,
+    userLoginSchema
+};

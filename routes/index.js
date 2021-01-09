@@ -8,7 +8,8 @@ const passport = require('passport');
 const nodemailer = require('nodemailer');
 const {transport, transport_mandatory} = require("../transport");
 
-const middleware = require('../middleware');
+const middleware = require('../middleware/index');
+const { validateNewUser, validateUserLogin } = require('../middleware/validation');
 
 //import user schema for db actions
 const User = require('../models/user');
@@ -35,134 +36,108 @@ router.get('/', (req, res) => {
 // ===========================
 
 //new registered user
-router.post("/register",  (req, res) => {
-	if(req.body.email == '') {
-		req.flash('error', 'Fill in email');
-		res.redirect('/');
-	} else if(!/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test(req.body.email)) {
-		req.flash('error', 'Fill in valid email');
-		res.redirect('/');
+router.post("/register", validateNewUser, (req, res) => {
 
-	} else if(req.body.firstName == '') {
-		req.flash('error', 'Fill in first name');
-		res.redirect('/');
-	} else if(req.body.lastName == '') {
-		req.flash('error', 'Fill in last name');
-		res.redirect('/');
-	} else if(req.body.username == '') {
-		req.flash('error', 'Fill in username');
-		res.redirect('/');
-	} else if(req.body.password == '') {
-		req.flash('error', 'Fill in password');
-		res.redirect('/');
-	} else if(req.body.password.length < 8) {
-		req.flash('error', 'Password too short');
-		res.redirect('/');
+  Email.find({address: req.body.email}, (err, emails) => {
+    if (err || !emails) {
+      console.log(err);
+      req.flash('error', "Unable to find emails");
+      req.flash('error', 'Only members of the Alsion community may sign up');
+      res.redirect('/');
 
-	} else {
+    } else if (emails.length < 1 && req.body.email.split("@")[1] != "alsionschool.org" ) {
+      req.flash('error', 'Only members of the Alsion community may sign up');
+      res.redirect('/');
 
-		Email.find({address: req.body.email}, (err, emails) => {
-			if (err || !emails) {
-				console.log(err);
-				req.flash('error', "Unable to find emails");
-				req.flash('error', 'Only members of the Alsion community may sign up');
-				res.redirect('/');
+    } else {
+      let username = req.body.username;
+      if (username[username.length - 1] == ' ') { //Space at the end of username causes errors that are hard to fix, and unnecessary if we nip it in the bud here
+        username = username.slice(0, username.length - 1);
+      }
 
-			} else if (emails.length < 1 && req.body.email.split("@")[1] != "alsionschool.org" ) {
-				req.flash('error', 'Only members of the Alsion community may sign up');
-				res.redirect('/');
+      let firstName = req.body.firstName;
+      if (firstName[firstName.length - 1] == ' ') { //Space at the end of username causes errors that are hard to fix, and unnecessary if we nip it in the bud here
+        firstName = firstName.slice(0, firstName.length - 1);
+      }
 
-			} else {
-				let username = req.body.username;
-				if (username[username.length - 1] == ' ') { //Space at the end of username causes errors that are hard to fix, and unnecessary if we nip it in the bud here
-					username = username.slice(0, username.length - 1);
-				}
+      let lastName = req.body.lastName;
+      if (lastName[lastName.length - 1] == ' ') { //Space at the end of username causes errors that are hard to fix, and unnecessary if we nip it in the bud here
+        lastName = lastName.slice(0, lastName.length - 1);
+      }
 
-				let firstName = req.body.firstName;
-				if (firstName[firstName.length - 1] == ' ') { //Space at the end of username causes errors that are hard to fix, and unnecessary if we nip it in the bud here
-					firstName = firstName.slice(0, firstName.length - 1);
-				}
+      let email = req.body.email;
+      if (email[email.length - 1] == ' ') { //Space at the end of username causes errors that are hard to fix, and unnecessary if we nip it in the bud here
+        email = email.slice(0, email.length - 1);
+      }
 
-				let lastName = req.body.lastName;
-				if (lastName[lastName.length - 1] == ' ') { //Space at the end of username causes errors that are hard to fix, and unnecessary if we nip it in the bud here
-					lastName = lastName.slice(0, lastName.length - 1);
-				}
+      //Create authentication token
+      let charSetMatrix = [];
 
-				let email = req.body.email;
-				if (email[email.length - 1] == ' ') { //Space at the end of username causes errors that are hard to fix, and unnecessary if we nip it in the bud here
-					email = email.slice(0, email.length - 1);
-				}
+      charSetMatrix.push('qwertyuiopasdfghjklzxcvbnm'.split(''));
+      charSetMatrix.push('QWERTYUIOPASDFGHJKLZXCVBNM'.split(''));
+      charSetMatrix.push('1234567890'.split(''));
 
-        //Create authentication token
-        let charSetMatrix = [];
+      let tokenLength = Math.round((Math.random() * 15)) + 15;
+      let token = "";
 
-        charSetMatrix.push('qwertyuiopasdfghjklzxcvbnm'.split(''));
-        charSetMatrix.push('QWERTYUIOPASDFGHJKLZXCVBNM'.split(''));
-        charSetMatrix.push('1234567890'.split(''));
+      let charSet; //Which character set to choose from
 
-        let tokenLength = Math.round((Math.random() * 15)) + 15;
-        let token = "";
+      for (let i = 0; i < tokenLength; i += 1) {
+        charSet = charSetMatrix[Math.floor(Math.random() * 3)];
+        token += charSet[Math.floor((Math.random() * charSet.length))];
+      }
 
-        let charSet; //Which character set to choose from
+      //creates new user from form info
+      let newUser = new User(
+        {
+          email: email,
+          firstName: firstName,
+          lastName: lastName,
+          username: filter.clean(username),
+          msgCount: 0,
+          annCount: [],
+          reqCount: 0,
+          authenticated: false,
+          authenticationToken: token
+        }
+      );
 
-        for (let i = 0; i < tokenLength; i += 1) {
-          charSet = charSetMatrix[Math.floor(Math.random() * 3)];
-          token += charSet[Math.floor((Math.random() * charSet.length))];
+      //Update annCount with all announcements
+
+      Announcement.find({}, (err, anns) => {
+        if (err || !anns) {
+          req.flash('error', "Unable to find announcements");
+          res.redirect('back');
+
+        } else {
+          for (let ann of anns) {
+            newUser.annCount.push({announcement: ann,version : "new"});
+          }
+        }
+      });
+
+      //registers the user
+      User.register(newUser, req.body.password, (err, user) => {
+        if(err) {
+          //flash message the error if there is an error registering user
+          if(err.name == 'UserExistsError') {
+            req.flash('error', 'Email is already taken');
+          } else {
+            req.flash("error", err.message);
+          }
+          //redirect to root
+          return res.redirect("/");
         }
 
-				//creates new user from form info
-				let newUser = new User(
-					{
-						email: email,
-						firstName: firstName,
-						lastName: lastName,
-						username: filter.clean(username),
-						msgCount: 0,
-						annCount: [],
-						reqCount: 0,
-            authenticated: false,
-            authenticationToken: token
-					}
-				);
-
-        //Update annCount with all announcements
-
-        Announcement.find({}, (err, anns) => {
-          if (err || !anns) {
-            req.flash('error', "Unable to find announcements");
-            res.redirect('back');
-
-          } else {
-            for (let ann of anns) {
-              newUser.annCount.push({announcement: ann,version : "new"});
-            }
-          }
-        });
-
-    		//registers the user
-    		User.register(newUser, req.body.password, (err, user) => {
-    			if(err) {
-    				//flash message the error if there is an error registering user
-    				if(err.name == 'UserExistsError') {
-    					req.flash('error', 'Email is already taken');
-    				} else {
-    					req.flash("error", err.message);
-    				}
-    				console.log(err);
-    				//redirect to root
-    				return res.redirect("/");
-    			}
-
-    			// if registration is successful, login user.
-    			req.flash("success", "Welcome to Saberchat " + user.firstName + "! Go to your email to verify your account");
-    			res.redirect("/");
-
-        });
-
         transport_mandatory(transporter, newUser, 'Verify Saberchat Account', `<p>Hello ${newUser.firstName},</p><p>Welcome to Saberchat! A confirmation of your account:</p><ul><li>Your username is ${newUser.username}.</li><li>Your full name is ${newUser.firstName} ${newUser.lastName}.</li><li>Your linked email is ${newUser.email}</li></ul><p>Click <a href="https://alsion-saberchat.herokuapp.com/authenticate/${newUser._id}?token=${token}">this link</a> to verify your account.</p>`);
-      }
-  	});
-  }
+
+        // if registration is successful, login user.
+        req.flash("success", "Welcome to Saberchat " + user.firstName + "! Go to your email to verify your account");
+        res.redirect("/");
+
+      });
+    }
+  });
 });
 
 router.get('/authenticate/:id', (req, res) => {
@@ -217,7 +192,7 @@ router.get('/authenticate/:id', (req, res) => {
 });
 
 // Custom login handling so that flash messages can be sent. I'm not entirely sure how it works. Copy pasted from official doc
-router.post('/login', function(req, res, next) {
+router.post('/login', validateUserLogin, function(req, res, next) {
 	//authenticate user
     passport.authenticate('local', (err, user, info) => {
         if (err) { return next(err); }
