@@ -24,6 +24,7 @@
     <script src="/javascript/nav/navbar.js"></script>
     <script src="/javascript/home/index.js"></script>
     <script src="/javascript/homework/settings.js"></script>
+    <script src="/javascript/homework/actions.js"></script>
 
     <!-- I'm using my fontawesome kit -->
     <script src="https://kit.fontawesome.com/dccc745c41.js" crossorigin="anonymous"></script>
@@ -105,6 +106,8 @@
                       </div>
                       <div class="modal-body">
                         <input class="form-control" type="text" name="joincode" placeholder="Enter Join Code"/><br />
+                        <label for="slots" id="slots-label">Number of Student Slots: 0</label><br />
+                        <input type="range" min="0" max="5" value="0" class="slider" id="slots" name="slots" onchange="setStudents()">
                         <textarea rows="5" minlength="150" maxlength="250" class="form-control" name="bio" placeholder="A Short Bio About Yourself"></textarea>
                       </div>
                       <div class="modal-footer">
@@ -131,7 +134,7 @@
             <div class="card-body">
               <h5 class="card-title"><%=course.name.slice(0, 25)%><% if (course.name.length > 24) {%>... <% } %></h5>
 
-              <span class="card-text user-position">
+              <strong class="card-text user-position">
               <% if (course.teacher.equals(currentUser._id)) { %>
                 Teacher
               <% } else if (course.students.includes(currentUser._id)) { %>
@@ -144,7 +147,7 @@
                   <% } %>
                 <% } %>
               <% } %>
-            </span><br />
+              </strong><br />
 
               <p class="card-tex course-description"><%=course.description.slice(0, 151)%><%if (course.description.length > 150) {%>...<%}%></p>
               <a href="homework/<%=course._id%>" class="btn btn-primary">Go to Course</a>
