@@ -153,7 +153,7 @@ router.post('/',middleware.isLoggedIn, middleware.isFaculty, (req, res) => { //R
 });
 
 //COMMENTED OUT FOR NOW, UNTIL WE MAKE FURTHER DECISIONS AT MEETING
-//
+
 // router.get('/data', middleware.isLoggedIn, middleware.isFaculty, (req, res) => {
 //
 //   (async() => {
@@ -235,8 +235,8 @@ router.post('/',middleware.isLoggedIn, middleware.isFaculty, (req, res) => { //R
 //     console.log(err);
 //     req.flash('error', "Unable to access database");
 //     res.redirect('back');
-//   })
-// })
+//   });
+// });
 
 router.get('/:id/edit', middleware.isLoggedIn, middleware.isFaculty, (req, res) => { //RESTful Routing 'EDIT' route
 
