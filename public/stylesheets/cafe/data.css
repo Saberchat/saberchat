@@ -5,3 +5,12 @@
 h1 {
   width: 100%;
 }
+
+.item-name {
+  font-weight: bold;
+  font-style: italic;
+}
+
+.time {
+  font-weight: bold;
+}

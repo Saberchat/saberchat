@@ -426,24 +426,40 @@ router.put('/reopen-lessons/:id', middleware.isLoggedIn, (req, res) => {
 });
 
 router.get('/tutors/:id', middleware.isLoggedIn, (req, res) => {
-  Course.findById(req.params.id).populate("tutors.tutor").populate({path: "tutors.reviews.review", populate: {path: "sender"}}).exec((err, course) => {
-    if (err || !course) {
+  (async() => {
+    const course = await Course.findById(req.params.id).populate("tutors.tutor").populate({path: "tutors.reviews.review", populate: {path: "sender"}});
+    if (!course) {
       req.flash('error', "Unable to find course");
-      res.redirect('back');
+      return res.redirect('back');
 
-    } else {
-      for (let tutor of course.tutors) {
-        if (tutor.tutor._id.equals(req.query.tutor)) {
+    }
 
-          let studentIds = [];
-          for (let student of course.students) {
-            studentIds.push(student.toString());
-          }
+    for (let tutor of course.tutors) {
+      if (tutor.tutor._id.equals(req.query.tutor)) {
 
-          res.render('homework/tutor-show', {course, tutor, studentIds});
+        let studentIds = [];
+        for (let student of course.students) {
+          studentIds.push(student.toString());
         }
+
+        let enrolledCourses = [];
+        const courses = await Course.find({});
+
+        for (let course of courses) {
+          for (let t of course.tutors) {
+            if (t.tutor.equals(tutor.tutor._id)) {
+              enrolledCourses.push(course);
+            }
+          }
+        }
+
+        res.render('homework/tutor-show', {course, tutor, studentIds, courses: enrolledCourses});
       }
     }
+
+  })().catch(err => {
+    req.flash('error', "Unable to find course");
+    res.redirect('back');
   });
 });
 

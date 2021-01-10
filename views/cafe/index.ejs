@@ -56,13 +56,13 @@
                 <li class="list-group-item">
 
                   <% if (!order.charge.toString().includes('.')) { %>
-                    <h4><strong>Order - $<%= order.charge %>.00</strong></h4>
+                    <h4 class="order-heading">Order - $<%= order.charge %>.00</h4>
 
                   <% } else if (order.charge.toString().split('.')[1].length == 1){ %>
-                    <h4><strong>Order - $<%= order.charge %>0</strong></h4>
+                    <h4 class="order-heading">Order - $<%= order.charge %>0</h4>
 
                   <% } else { %>
-                    <h4><strong>Order - $<%= order.charge %></strong></h4>
+                    <h4 class="order-heading">Order - $<%= order.charge %></h4>
                   <% } %>
 
                   <ul>
@@ -83,7 +83,7 @@
                     <% } %>
                   </ul>
 
-                  <br /><strong>Extra Instructions: </strong><span>
+                  <br /><span class="instructions">Extra Instructions: </span><span>
 
                   <% if (order.instructions != "") {%>
                     <%=order.instructions%>
@@ -92,18 +92,18 @@
                     None
                   <% } %>
 
-                  <p class="paying-style"><strong>
+                  <p class="paying-style">
 
                   <% if (order.payingInPerson) { %>
                     Paying In-Person
                   <% } else { %>
                     Paying Online
                   <% } %>
-                </strong></p>
+                  </p>
 
                   </span>
 
-                  <p class"date"><em><%= order.date %></em></p>
+                  <p class="date"><%= order.date %></p>
                   <form action="cafe/order/<%=order._id%>?_method=delete" method="post">
                     <button type="button" data-toggle="modal" data-target="#modal<%=order._id%>" class="btn btn-danger"><a class="cancel">Cancel Order</a></button>
 
@@ -147,13 +147,13 @@
               <li class="list-group-item">
 
                 <% if (!order.charge.toString().includes('.')) { %>
-                  <h4><strong>Order - $<%= order.charge %>.00</strong></h4>
+                  <h4 class="order-heading">Order - $<%= order.charge %>.00</h4>
 
                 <% } else if (order.charge.toString().split('.')[1].length == 1){ %>
-                  <h4><strong>Order - $<%= order.charge %>0</strong></h4>
+                  <h4 class="order-heading">Order - $<%= order.charge %>0</h4>
 
                 <% } else { %>
-                  <h4><strong>Order - $<%= order.charge %></strong></h4>
+                  <h4 class="order-heading">Order - $<%= order.charge %></h4>
                 <% } %>
 
                 <ul>

@@ -115,6 +115,15 @@
                       <h4>Email</h4>
                       <p><%= tutor.tutor.email %></p>
 
+                      <h4>Current Courses</h4>
+                      <ul>
+                        <% for (let course of courses) { %>
+                          <li>
+                            <%=course.name%>
+                          </li>
+                        <% } %>
+                      </ul>
+
                       <% if (studentIds.includes(currentUser._id.toString())) { %>
                         <div id="tutor-actions-<%=tutor.tutor._id%>" class="tutor-actions">
                           <% if (tutor.students.includes(currentUser._id) || tutor.formerStudents.includes(currentUser._id)) { %>
@@ -174,7 +183,7 @@
                               <% for (let i = 0; i < 5; i += 1) { %>
                                 <i class="fas fa-star star-<%=tutor.tutor._id%>" onclick="rate(this, '<%=tutor.tutor._id%>')" id="<%=i+1%>" name="star" value="<%=i+1%>"></i>
                               <% } %>
-                              <strong id="rating-label">Rate <%=tutor.tutor.firstName%> out of 5</strong><br />
+                              <span id="rating-label">Rate <%=tutor.tutor.firstName%> out of 5</span><br />
 
                               <textarea rows="5" class="form-control review" id="review-<%=tutor.tutor._id%>" name="review" placeholder="Write a few sentences about your experience with <%=tutor.tutor.firstName%>"></textarea>
                             </div>

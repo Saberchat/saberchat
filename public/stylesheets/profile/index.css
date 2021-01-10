@@ -53,6 +53,10 @@ strong {
   text-decoration: none;
 }
 
+.span-tag-name {
+  font-weight: bold;
+}
+
 .span-tag-username {
   font-size: 80%;
 }

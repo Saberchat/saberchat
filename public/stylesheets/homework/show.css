@@ -47,6 +47,10 @@
   text-decoration: none;
 }
 
+.enrolled-name {
+  font-weight: bold;
+}
+
 .enrolled-username {
   font-size: 80%;
 }
@@ -64,6 +68,7 @@
 
 .tutor-name {
   margin-left: 5px;
+  font-weight: bold;
 }
 
 .tutor-username {
@@ -83,11 +88,7 @@
   font-size: 110%;
 }
 
-.book-button, .upvoted, .not-upvoted, .review-button {
-  margin-left: 10px;
-}
-
-#rating-label {
+.book-button, .upvoted, .not-upvoted, .review-button, .leave-button, #rating-label {
   margin-left: 10px;
 }
 
@@ -104,11 +105,7 @@
   color: #cc9537
 }
 
-.leave-button {
-  margin-left: 10px;
-}
-
-.tutor-actions {
+.tutor-actions, #rating-label {
   display: inline;
 }
 
@@ -135,4 +132,8 @@
   margin-left: 10px;
   font-style: italic;
   display: inline;
+}
+
+#rating-label, #join-code-heading, .list-group-item-success {
+  font-weight: bold;
 }

@@ -33,3 +33,11 @@ html, body {
   margin-top: 5px;
   border-radius: 50%;
 }
+
+#developers {
+  font-style: italic;
+}
+
+#developers-heading, .feature-description {
+  font-weight: bold;
+}

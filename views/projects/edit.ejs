@@ -44,12 +44,12 @@
         <form action="/projects/<%=project._id%>?_method=put" method="post" id="submit-project-edits">
 
           <div class="form-group">
-            <label for="new-project-message"><strong>Title</strong></label>
+            <label for="new-project-message" id="title-label">Title</label>
             <input id="new-project-title" name="title" maxlength="30" type="text" class="form-control" value = "<%=project.title%>" placeholder="Enter Project Name" aria-label="Username" aria-describedby="basic-addon1" required>
           </div>
 
           <div class="form-group" id="creator-div">
-            <label for="creator-select"><strong>Creators</strong></label>
+            <label for="creator-select" id="creator-label">Creators</label>
             <select id="creator-select" class="form-control" onchange="addCreator('user')">
               <option class="creator-group" value="" selected disabled>Select Students</option>
               <option class="creator-group" value="7th">7th Graders</option>
@@ -81,7 +81,7 @@
           <!-- <input id="creators" class="form-control" autocomplete="off" name="creators" type="text" aria-describedby="basic-addon2" value = "<%=creatornames.join(', ')%>" placeholder="Creators" required/> -->
 
           <div class="form-group">
-            <label for="new-project-description"><strong>Description</strong></label>
+            <label for="new-project-description" id="description-label">Description</label>
             <textarea id="new-project-description" minlength="200" maxlength="800" rows="6" name="text" placeholder="Write a little about the project" class="form-control" aria-label="With textarea" required><%=project.text%></textarea>
           </div>
 

@@ -122,7 +122,7 @@
           <ul>
             <% for (let name of nameArr) { %>
               <li>
-                <strong><%=name%></strong>
+                <span class="time"><%=name%></span>
               </li>
             <% } %>
           </ul>
@@ -137,7 +137,7 @@
 
           <% for (let i of items) { %>
             <% if (i._id.toString() == item) { %>
-              <em><strong><%=i.name%>:</strong></em>
+              <span class="item-name"><%=i.name%>:</span>
             <% } %>
           <% } %>
 
@@ -155,7 +155,7 @@
       <ul>
         <% for (let time of times.timeCount) { %>
           <li>
-            <strong>
+            <span class="time">
             <% if (parseInt(time[0].split(':')[0]) > 12) { %>
               <%=parseInt(time[0].split(':')[0])-12%>:<%=time[0].split(':')[1]%> PM
 
@@ -168,7 +168,7 @@
             <% } else { %>
               <%=time[0]%> AM
             <% }%>
-            </strong>
+          </span>
 
             (<%=time[1]%> times)
           </li>
@@ -180,7 +180,7 @@
 
           The average ordering time is
 
-          <strong>
+          <span class="time">
           <% if (parseInt(times.meanTime.split(':')[0]) > 12) { %>
             <%=parseInt(times.meanTime.split(':')[0])-12%>:<%=times.meanTime.split(':')[1]%> PM
 
@@ -193,7 +193,7 @@
           <% } else { %>
             <%=times.meanTime%> AM
           <% }%>
-          </strong>
+        </span>
 
         </p>
 
@@ -201,7 +201,7 @@
 
           The median ordering time is
 
-          <strong>
+          <span class="time">
           <% if (parseInt(times.medianTime.split(':')[0]) > 12) { %>
             <%=parseInt(times.medianTime.split(':')[0])-12%>:<%=times.medianTime.split(':')[1]%> PM
 
@@ -214,14 +214,14 @@
           <% } else { %>
             <%=times.medianTime%> AM
           <% }%>
-          </strong>
+        </span>
 
         </p>
 
         <p>
           Most orders will be placed between
 
-          <strong>
+          <span class="time">
           <% if (parseInt(times.minTime.split(':')[0]) > 12) { %>
             <%=parseInt(times.minTime.split(':')[0])-12%>:<%=times.minTime.split(':')[1]%> PM
 
@@ -234,11 +234,11 @@
           <% } else { %>
             <%=times.minTime%> AM
           <% }%>
-          </strong>
+          </span>
 
           and
 
-          <strong>
+          <span class="time">
           <% if (parseInt(times.maxTime.split(':')[0]) > 12) { %>
             <%=parseInt(times.maxTime.split(':')[0])-12%>:<%=times.maxTime.split(':')[1]%> PM
 
@@ -251,7 +251,7 @@
           <% } else { %>
             <%=times.maxTime%> AM
           <% }%>
-          </strong>
+          </span>
 
         </p>
     </div>

@@ -77,9 +77,9 @@
               </li>
               <% type.items.forEach(item => { %>
                 <% if (item.isAvailable == true) { %>
-                  <a href="item/<%= item._id %>" id="item-<%=item.id%>" class="list-group-item list-group-item-action menu-item <%=type.name.replace(' ', '')%>"><strong><%= item.name %></strong> (<%= item.availableItems%> orders available) <span class="upvote" title="Upvotes (Cafe admins cannot upvote items from here)"></span><strong id="upvoteCount-<%=item._id%>" class="upvote-count"> Upvotes: <%=item.upvotes.length%></strong></a>
+                  <a href="item/<%= item._id %>" id="item-<%=item.id%>" class="list-group-item list-group-item-action menu-item <%=type.name.replace(' ', '')%>"><span class="item-name"><%= item.name %></span> (<%= item.availableItems%> orders available) <span class="upvote" title="Upvotes (Cafe admins cannot upvote items from here)"></span><span id="upvoteCount-<%=item._id%>" class="upvote-count"> Upvotes: <%=item.upvotes.length%></span></a>
                 <% } else {%>
-                  <a href="item/<%= item._id %>" id="item-<%=item.id%>" class="list-group-item list-group-item-action menu-item <%=type.name.replace(' ', '')%>"><strong><%= item.name %></strong> (Unavailable) <span class="upvote" title="Upvotes (Cafe admins cannot upvote items from here)"></span><strong id="upvoteCount-<%=item._id%>" class="upvote-count"> Upvotes: <%=item.upvotes.length%></strong></a>
+                  <a href="item/<%= item._id %>" id="item-<%=item.id%>" class="list-group-item list-group-item-action menu-item <%=type.name.replace(' ', '')%>"><span class="item-name"><%= item.name %></span> (Unavailable) <span class="upvote" title="Upvotes (Cafe admins cannot upvote items from here)"></span><span id="upvoteCount-<%=item._id%>" class="upvote-count"> Upvotes: <%=item.upvotes.length%></span></a>
                 <% } %>
               <% }) %>
               <br class="category-break" id="<%=type._id%>-break"/>
@@ -102,7 +102,7 @@
               <% for (let item of type.items) { %>
                 <% upvoteCount += item.upvotes.length%>
               <% } %>
-              <a href="type/<%=type._id%>" id="type-<%=type.id%>" class="list-group-item list-group-item-action menu-item ItemOrderCategories"><strong><%=type.name%></strong> (<%=type.items.length%> items) <span class="upvote" title="Sum of all upvotes for this category (Cafe admins cannot upvote items from here)"></span><strong id="upvoteCount-<%=type._id%>" class="upvote-count"> Upvotes: <%=upvoteCount%></strong> </a>
+              <a href="type/<%=type._id%>" id="type-<%=type.id%>" class="list-group-item list-group-item-action menu-item ItemOrderCategories"><span class="item-name"><%=type.name%></span> (<%=type.items.length%> items) <span class="upvote" title="Sum of all upvotes for this category (Cafe admins cannot upvote items from here)"></span><span id="upvoteCount-<%=type._id%>" class="upvote-count"> Upvotes: <%=upvoteCount%></span> </a>
             <% } %>
           <% }) %>
 
@@ -113,7 +113,7 @@
               <% for (let item of type.items) { %>
                 <% upvoteCount += item.upvotes.length%>
               <% } %>
-              <div class="list-group-item list-group-item-action menu-item ItemOrderCategories" id="type-<%=type.id%>"><strong><%=type.name%></strong> (<%=type.items.length%> items) <strong id="modify-banned">You cannot modify this category </strong> <span title="Sum of all upvotes for this category (Cafe admins cannot upvote items from here)" class="upvote"></span><strong id="upvoteCount-<%=type._id%>" class="upvote-count"> Upvotes: <%=upvoteCount%></strong></div>
+              <div class="list-group-item list-group-item-action menu-item ItemOrderCategories" id="type-<%=type.id%>"><span class="item-name"><%=type.name%></span> (<%=type.items.length%> items) <span id="modify-banned">You cannot modify this category </span> <span title="Sum of all upvotes for this category (Cafe admins cannot upvote items from here)" class="upvote"></span><span id="upvoteCount-<%=type._id%>" class="upvote-count"> Upvotes: <%=upvoteCount%></span></div>
             <% } %>
           <% }) %>
 

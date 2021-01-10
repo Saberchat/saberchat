@@ -8,13 +8,19 @@
 
 .paying-style {
   margin-top: 20px;
+  font-weight: bold;
 }
 
 .date {
   margin-top: 10px;
+  font-style: italic;
 }
 
 .cancel {
   text-decoration: none;
   color: inherit;
+}
+
+.order-heading, .instructions {
+  font-weight: bold;
 }

@@ -11,6 +11,7 @@
     <link rel="stylesheet" href="/stylesheets/wHeights/show.css"> -->
     <link rel="stylesheet" href="/stylesheets/components/navbar.css">
     <link rel="stylesheet" href="/stylesheets/components/header.css">
+    <link rel="stylesheet" href="/stylesheets/projects/show.css">
 
 
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
@@ -45,8 +46,8 @@
             <div class="ann-head">
               <h1><%= article.title %></h1>
 
-              <strong class="project-info">By <a href="../profiles/<%=article.author._id%>"><%= article.author.username %></a></strong><br />
-              <strong id="project-date">Posted <%=date%></strong>
+              <span class="project-info">By <a href="../profiles/<%=article.author._id%>"><%= article.author.username %></a></span><br />
+              <span id="project-date">Posted <%=date%></span>
               <br /><br />
 
               <% article.content.forEach(element => { %>

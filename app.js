@@ -22,6 +22,8 @@ const methodOverride = require('method-override');
 const dateFormat = require('dateformat');
 // Sets HTTP headers for security
 const helmet = require('helmet');
+// prevents MongoDB Operator Injection
+const mongoSanitize = require('express-mongo-sanitize');
 
 const { scriptUrls, styleUrls } = require('./srcUrls');
 
@@ -89,6 +91,11 @@ app.use(methodOverride('_method'));
 // use connect-flash for flash messages
 app.use(flash());
 
+// replaces $ and .  with _ in req.body, req.query, or req.params
+app.use(mongoSanitize({
+  replaceWith: '_'
+}));
+
 // Helmet security headers
 app.use(helmet());
 
@@ -102,11 +109,17 @@ app.use(helmet.contentSecurityPolicy({
 		workerSrc: ["'self'", "blob:"],
 		objectSrc: [],
 		imgSrc: [
-			"https:",
+      "https:",
+      "blob:",
 			"data:"
 		],
 		fontSrc: ["'self'", "https://ka-f.fontawesome.com/"]
 	}
+}));
+
+// customizations for helmet referrer policy
+app.use(helmet.referrerPolicy({
+  policy: "same-origin"
 }));
 
 // express session stuff for authorization that I know nothing about
@@ -119,8 +132,10 @@ const MemoryStore = require('memorystore')(session);
 // 	resave: false,
 // 	saveUninitialized: false
 // }));
-app.use(session({
+const sessionConfig = {
+  name: 'app-ses',
   cookie: {
+    httpOnly: true,
     maxAge: 86400000
   },
   store: new MemoryStore({
@@ -129,7 +144,15 @@ app.use(session({
   secret: "Programming For Alsion is Cool",
   resave: false,
   saveUninitialized: false
-}));
+};
+
+if(process.env.NODE_ENV === 'production') {
+  // allows cookies to only be accessed over https
+  // this wouldn't allow authentication for local dev since local host is http
+  sessionConfig.cookie.secure = true;
+}
+
+app.use(session(sessionConfig));
 
 // passport required authorization setup that I also know nothing about.
 app.use(passport.initialize());
@@ -165,10 +188,10 @@ app.use('/projects', projectRoutes);
 app.use('/articles', wHeightsRoutes);
 app.use('/homework', hwRoutes);
 
-// Catch-all route
-// app.get('*', (req, res) => {
-// 	res.redirect('/');
-// });
+// Catch-all route. 
+app.get('*', (req, res) => {
+	res.redirect('/');
+});
 
 // list of responses to bad words
 const curseResponse = [

@@ -11,8 +11,14 @@
 .upvote-count {
   float: right;
   color: green;
+  font-weight: bold;
 }
 
 #modify-banned {
   color: red;
+  font-weight: bold;
+}
+
+.item-name {
+  font-weight: bold;
 }

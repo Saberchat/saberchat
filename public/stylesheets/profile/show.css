@@ -255,6 +255,10 @@ Username
   margin-right: 20px;
 }
 
+.follower-name {
+  font-weight: bold;
+}
+
 
 @media only screen and (max-width: 768px) {
     .profile-desc {

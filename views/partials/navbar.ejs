@@ -27,6 +27,9 @@
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                         <i class="fas fa-align-justify"></i> Other
+                        <% if (currentUser.annCount.length + currentUser.newRoomCount.length > 0) { %>
+                          <span class="badge badge-pill badge-danger"><%=currentUser.annCount.length + currentUser.newRoomCount.length%></span>
+                        <% } %>
                         </a>
 
                         <div class="dropdown-menu" aria-labelledby="navbarDropdown">

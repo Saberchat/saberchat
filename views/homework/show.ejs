@@ -91,11 +91,11 @@
         <div class="col-12">
 
           <ul class="list-group">
-            <li class="list-group-item list-group-item-success"><strong>Teacher</strong></li>
+            <li class="list-group-item list-group-item-success">Teacher</li>
             <li class="list-group-item">
               <a href="/profiles/<%=course.teacher._id%>" class="user-element-text">
                 <img class="profile-image" src="<%= course.teacher.imageUrl %>" alt="profile picture">
-                <span class="username <%=course.teacher.status%> <%=course.teacher.permission%> <%=course.teacher.tags.join(' ')%>"><strong><%=course.teacher.firstName%> <%=course.teacher.lastName%></strong> <span class="enrolled-username"><%=`${course.teacher.username}`%></span></span>
+                <span class="username <%=course.teacher.status%> <%=course.teacher.permission%> <%=course.teacher.tags.join(' ')%>"><span class="enrolled-name"><%=course.teacher.firstName%> <%=course.teacher.lastName%></span> <span class="enrolled-username"><%=`${course.teacher.username}`%></span></span>
               </a>
             </li>
           </ul>
@@ -103,12 +103,12 @@
 
           <% if (course.students.length > 0) { %>
             <ul class="list-group">
-              <li class="list-group-item list-group-item-success"><strong>Students</strong></li>
+              <li class="list-group-item list-group-item-success">Students</li>
               <% for (let student of course.students) { %>
                 <li class="list-group-item">
                   <a href="../profiles/<%=student._id%>"class="user-element-text">
                     <img class="profile-image" src="<%= student.imageUrl %>" alt="profile picture">
-                    <span class="username <%=student.status%> <%=student.permission%> <%=student.tags.join(' ')%>"><strong><%=student.firstName%> <%=student.lastName%></strong> <span class="enrolled-username"><%=`${student.username}`%></span></span>
+                    <span class="username <%=student.status%> <%=student.permission%> <%=student.tags.join(' ')%>"><span class="enrolled-name"><%=student.firstName%> <%=student.lastName%></span> <span class="enrolled-username"><%=`${student.username}`%></span></span>
                   </a>
                 </li>
               <% } %>
@@ -118,12 +118,12 @@
 
           <% if (course.tutors.length > 0) { %>
             <ul class="list-group">
-              <li class="list-group-item list-group-item-success"><strong>Tutors</strong></li>
+              <li class="list-group-item list-group-item-success">Tutors</li>
               <% for (let tutor of course.tutors) { %>
                 <li class="list-group-item">
                   <a href="../profiles/<%=tutor.tutor._id%>" class="user-element-text">
                     <img class="profile-image" src="<%= tutor.tutor.imageUrl %>" alt="profile picture">
-                    <span class="username <%=tutor.tutor.status%> <%=tutor.tutor.permission%> <%=tutor.tutor.tags.join(' ')%>"><strong><%=tutor.tutor.firstName%> <%=tutor.tutor.lastName%></strong> <span class="enrolled-username"><%=`${tutor.tutor.username}`%></span></span>
+                    <span class="username <%=tutor.tutor.status%> <%=tutor.tutor.permission%> <%=tutor.tutor.tags.join(' ')%>"><span class="enrolled-name"><%=tutor.tutor.firstName%> <%=tutor.tutor.lastName%></span> <span class="enrolled-username"><%=`${tutor.tutor.username}`%></span></span>
                   </a>
                 </li>
               <% } %>
@@ -138,7 +138,11 @@
           <% if (course.tutors.length > 0) { %>
               <li class="list-group-item list-group-item-success">
                 <div class="d-flex w-100 justify-content-between">
+<<<<<<< HEAD
                   <strong class="mb-1">Tutors</strong>
+=======
+                  <span class="mb-1">Tutors</span>
+>>>>>>> master
                 </div>
               </li>
 
@@ -146,7 +150,11 @@
                   <span class="list-group-item list-group-item-action tutor-profile menu-item" id="tutor-<%=tutor.tutor._id%>">
                     <a href="/homework/tutors/<%=course._id%>?tutor=<%=tutor.tutor._id%>" class="tutor-link">
                       <img class="profile-image" src="<%= tutor.tutor.imageUrl %>" alt="profile picture">
+<<<<<<< HEAD
                       <span class="tutor-name <%=tutor.tutor.status%> <%=tutor.tutor.permission%> <%=tutor.tutor.tags.join(' ')%>"><strong><%=tutor.tutor.firstName%> <%=tutor.tutor.lastName%></strong></span>
+=======
+                      <span class="tutor-name <%=tutor.tutor.status%> <%=tutor.tutor.permission%> <%=tutor.tutor.tags.join(' ')%>"><%=tutor.tutor.firstName%> <%=tutor.tutor.lastName%></span>
+>>>>>>> master
                     </a>
 
                       <% if (studentIds.includes(currentUser._id.toString())) { %>
@@ -274,7 +282,7 @@
                         <% for (let i = 0; i < 5; i += 1) { %>
                           <i class="fas fa-star star-<%=tutor.tutor._id%>" onclick="rate(this, '<%=tutor.tutor._id%>')" id="<%=i+1%>" name="star" value="<%=i+1%>"></i>
                         <% } %>
-                        <strong id="rating-label">Rate <%=tutor.tutor.firstName%> out of 5</strong><br />
+                        <span id="rating-label">Rate <%=tutor.tutor.firstName%> out of 5</span><br />
 
                         <textarea rows="5" class="form-control review" id="review-<%=tutor.tutor._id%>" name="review" placeholder="Write a few sentences about your experience with <%=tutor.tutor.firstName%>"></textarea>
                       </div>
@@ -356,7 +364,7 @@
         <div class="row settings" hidden><br />
           <div class="col-12">
             <div class="form-group">
-                <strong>Join Code:</strong> <span id="joinCode"><%=course.joinCode%></span>
+                <span id="join-code-heading">Join Code:</span> <span id="joinCode"><%=course.joinCode%></span>
                 <button class="badge badge-pill badge-info" id="change-join-code" onclick="changeJoinCode('<%=course._id%>', event)">Change</button>
             </div>
             <span id="loading"></span>

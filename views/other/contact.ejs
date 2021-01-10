@@ -59,10 +59,10 @@
                       </p>
 
                       <% [["Alexander Zhou", "alexanderz@alsionschool.org"], ["Kabir Samsi", "kabirs@alsionschool.org"], ["Siddharth Chavan", "siddharthc@alsionschool.org"], ["Vibhav Darsha", "vibhavec@alsionschool.org"]].forEach(developer => { %>
-                        <strong><%=developer[0]%></strong>
+                        <span class="developer-info"><%=developer[0]%></span>
                         <ul>
                           <li>
-                            <strong>Email: </strong> <a href="mailto: <%=developer[1]%>"><%=developer[1]%></a>
+                            <span class="developer-info">Email: </span> <a href="mailto: <%=developer[1]%>"><%=developer[1]%></a>
                           </li>
                         </ul>
                       <% }) %>
@@ -91,10 +91,10 @@
                       They are deeply involved in our student's studies and are devoted to giving students a thorough, interesting and entertaining education.
                     </p>
                     <% faculty.forEach(fac => { %>
-                      <strong><%=fac.firstName%> <%=fac.lastName%></strong>
+                      <span class="developer-info"><%=fac.firstName%> <%=fac.lastName%></span>
                       <ul>
                         <li>
-                          <strong>Email: </strong> <a href="mailto: <%=fac.email%>"><%=fac.email%></a>
+                          <span class="developer-info">Email: </span> <a href="mailto: <%=fac.email%>"><%=fac.email%></a>
                         </li>
                       </ul>
                     <% }) %>
