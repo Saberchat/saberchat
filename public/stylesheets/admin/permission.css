@@ -28,3 +28,7 @@
 .delete-email {
   float: right;
 }
+
+#modify-header {
+  font-weight: bold;
+}

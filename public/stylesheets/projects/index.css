@@ -1,3 +1,16 @@
+.creator-heading, #creator-heading {
+  font-weight: bold;
+  display: inline;
+  color: black;
+}
+
+.creator-names, .creator-div, #creator-div, .creator-names:hover {
+  display: inline;
+  font-style: italic;
+  color: black;
+  text-decoration: none;
+}
+
 .user-tag {
     background-color: #1ba6bb;
     color: #ffffff;
@@ -330,6 +343,13 @@ Scroll To Bottom Button
   color: white;
 }
 
+.author-name {
+  font-style: italic;
+}
+
+.creator-head {
+  font-weight: bold;
+}
 /*
 ===========================
 Screen customizations

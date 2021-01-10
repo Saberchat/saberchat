@@ -57,7 +57,7 @@
           <div class="card mt-3" id="<%=order._id%>">
             <div class="card-body">
               <h5 class="card-title">Order for <%= order.name %></h5>
-              <p class="card-text"><strong>Extra Instructions:</strong> <%= order.instructions %></p>
+              <p class="card-text"><span class="instructions">Extra Instructions:</span> <%= order.instructions %></p>
               <ul class="list-group">
                 <% for (let i = 0; i < order.items.length; i++) { %>
 
@@ -75,23 +75,23 @@
               </ul>
 
               <% if (!order.charge.toString().includes('.')) { %>
-                <p class="card-text mt-3"><strong>Cost:</strong> $<%= order.charge %>.00</p>
+                <p class="card-text mt-3"><span class="cost">Cost:</span> $<%= order.charge %>.00</p>
 
               <% } else if (order.charge.toString().split('.')[1].length == 1){ %>
-                <p class="card-text mt-3"><strong>Cost:</strong> $<%= order.charge %>0</p>
+                <p class="card-text mt-3"><span class="cost">Cost:</span> $<%= order.charge %>0</p>
 
               <% } else { %>
-                <p class="card-text mt-3"><strong>Cost:</strong> $<%= order.charge %></p>
+                <p class="card-text mt-3"><span class="cost">Cost:</span> $<%= order.charge %></p>
               <% } %>
 
-              <p class="paying-in-person"><strong>
+              <p class="paying-in-person">
 
               <% if (order.payingInPerson) { %>
                 Paying In-Person
               <% } else { %>
                 Paying Online
               <% } %>
-            </strong></p>
+            </p>
 
               <p class="card-text"><%= order.date %></p>
               <form class="ready-form" action="<%= order._id %>/ready" method="post">

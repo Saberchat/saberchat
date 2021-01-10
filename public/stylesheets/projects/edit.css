@@ -9,3 +9,7 @@ label, #image-heading {
 #creator-div, .image-group {
   text-align: left;
 }
+
+#title-label, #creator-label, #description-label {
+  font-weight: bold;
+}

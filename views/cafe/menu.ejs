@@ -80,7 +80,7 @@
 
               <% type.items.forEach(item => { %>
                 <% if (item.isAvailable == true) { %>
-                  <span class="list-group-item list-group-item-action menu-item <%=type.name.split(' ').join('')%>" id="item-<%=item.id%>"><strong><%= item.name %> (<%= item.availableItems%> orders available)</strong>
+                  <span class="list-group-item list-group-item-action menu-item <%=type.name.split(' ').join('')%>" id="item-<%=item.id%>"><span class="item-name"><%= item.name %> (<%= item.availableItems%> orders available)</span>
 
                   <% if (!item.price.toString().includes('.')) { %>
                     - $<%=item.price%>.00
@@ -104,7 +104,7 @@
                     <span id="upvoteCount-<%=item._id%>"> <%=item.upvotes.length%></span>
                   </div>
 
-                  <br /><em><%= item.description %></em><br /><br /><img src="<%=item.imgUrl%>" class="item-image"/>
+                  <br /><span class="item-description"><%= item.description %></span><br /><br /><img src="<%=item.imgUrl%>" class="item-image"/>
                 </span>
 
                 <% }%>

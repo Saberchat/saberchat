@@ -55,9 +55,17 @@ strong {
   text-decoration: none;
 }
 
+.item-description {
+  font-style: italic;
+}
+
 .item-image {
   width: 20%;
   height: 20%;
   border-radius: 20px;
   margin-top: 20px;
+}
+
+.item-name {
+  font-weight: bold;
 }

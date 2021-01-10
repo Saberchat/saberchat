@@ -41,7 +41,7 @@
           <a class="btn btn-primary" href='/cafe'><i class="fas fa-arrow-left"></i> Back</a>
           <a class="btn btn-info" href='/cafe/menu'><i class="fas fa-bars"></i> Menu </a>
           <br /><br />
-          <strong id="balance-heading">Current Balance:
+          <span id="balance-heading">Current Balance:
 
             <% if (!currentUser.balance.toString().includes('.')) { %>
               $<span id="balance"><%= currentUser.balance %>.00
@@ -53,7 +53,7 @@
               $<span id="balance"><%= currentUser.balance %>
             <% } %>
 
-          </span></strong>
+          </span></span>
         </div>
       </div>
     </div>
@@ -172,7 +172,7 @@
                           <% } %>
                         </select>
 
-                        <label class="form-check-label" for="<%= item._id%>"><strong><%= item.name %></strong> (<%= item.availableItems %> orders available) -
+                        <label class="form-check-label" for="<%= item._id%>"><span class="item-name"><%= item.name %></span> (<%= item.availableItems %> orders available) -
 
                         <% if (!item.price.toString().includes('.')) { %>
                           $<%= item.price %>.00
@@ -232,8 +232,8 @@
 
           <div>
             <div id="order-confirm">
-              <span id="extra-instructions" class="list-group-item list-group-item-action form-check"><strong>Extra Instructions:</strong> None</span>
-              <strong id="balance-box" class="list-group-item list-group-item-action form-check">Current Balance:
+              <span id="extra-instructions" class="list-group-item list-group-item-action form-check"><span class="instructions">Extra Instructions:</span> None</span>
+              <span id="balance-box" class="list-group-item list-group-item-action form-check">Current Balance:
                 <% if (!currentUser.balance.toString().includes('.')) { %>
                   $<%= currentUser.balance %>.00
 
@@ -243,9 +243,9 @@
                 <% } else { %>
                   $<%= currentUser.balance %>
                 <% } %>
-              </strong>
-              <strong id="total-cost" class="list-group-item list-group-item-action form-check">Total: $0.00</strong>
-              <strong id="paying-style" class="list-group-item list-group-item-action form-check">Paying Online</strong>
+              </span>
+              <span id="total-cost" class="list-group-item list-group-item-action form-check">Total: $0.00</span>
+              <span id="paying-style" class="list-group-item list-group-item-action form-check">Paying Online</span>
             </div>
           </div>
 

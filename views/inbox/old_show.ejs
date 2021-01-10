@@ -73,24 +73,24 @@
                   <p id="notif-date"><%=notif.date.split(', ')[1]%> | <%=notif.date.split(', ')[0]%></p>
 
                   <% if (notif.sender == null) { %>
-                    <strong>From</strong>: <span>Anonymous</span><br />
+                    <span class="sender-receiver-info">From</span>: <span>Anonymous</span><br />
 
                   <% } else if (currentUser._id.toString() != notif.sender._id.toString()) { %>
-                    <strong>From</strong>: <a id="message-from" href="/profiles/<%=notif.sender._id%>"><%=notif.sender.username%></a><br />
+                    <span class="sender-receiver-info">From</span>: <a id="message-from" href="/profiles/<%=notif.sender._id%>"><%=notif.sender.username%></a><br />
 
                   <% } else { %>
-                    <strong>From</strong>: <a id="message-from" href="/profiles/<%=currentUser._id%>">me</a><br />
+                    <span class="sender-receiver-info">From</span>: <a id="message-from" href="/profiles/<%=currentUser._id%>">me</a><br />
                   <% } %>
 
                   <!-- To everyone  -->
 
                   <% if (notif.toEveryone == true && notif.sender != null) { %>
-                    <strong>To:</strong><span> everyone</span>
+                    <span class="sender-receiver-info">To:</span><span> everyone</span>
 
                   <!-- To a group including the user  -->
 
                   <% } else if ((notif.sender != null) && (currentUser._id.toString() != notif.sender._id.toString())) { %>
-                    <strong>To:</strong>
+                    <span class="sender-receiver-info">To:</span>
 
                     <% let tempRecipients = recipient_profiles.slice(0, recipient_profiles.length - 1) %>
 
@@ -116,7 +116,7 @@
 
                   <% } else { %>
 
-                    <strong>To:</strong>
+                    <span class="sender-receiver-info">To:</span>
                     <% let tempRecipients = recipient_profiles.slice(0, recipient_profiles.length - 1) %>
 
                     <% tempRecipients.forEach(recipient => { %>
