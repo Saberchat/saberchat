@@ -130,7 +130,14 @@
                             <button class="btn btn-warning edit-button" id="review-button-<%=tutor.tutor._id%>" data-toggle="modal" data-target="#modal-review-<%=tutor.tutor._id%>">Leave A Review</button>
                             <% if (tutor.students.includes(currentUser._id)) { %>
                               <button class="btn btn-danger edit-button" id="leave-button-<%=tutor.tutor._id%>" data-toggle="modal" data-target="#modal-stop-<%=tutor.tutor._id%>">Stop Lessons</button>
-                            <% } %>
+                            <% } else { %>
+                              <% if (tutor.available) { %>
+                                <button class="btn btn-info edit-button" id="book-button-<%=tutor.tutor._id%>" data-toggle="modal" data-target="#modal-book-<%=tutor.tutor._id%>">Book This Tutor</button>
+                              <% } else { %>
+                                <span class="unavailable-tutor">Tutor Is Unavailable</span>
+                              <% } %>
+                            <% }%>
+                            
                           <% } else { %>
                             <% if (tutor.available) { %>
                               <button class="btn btn-info edit-button" id="book-button-<%=tutor.tutor._id%>" data-toggle="modal" data-target="#modal-book-<%=tutor.tutor._id%>">Book This Tutor</button>
