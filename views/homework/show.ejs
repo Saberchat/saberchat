@@ -138,11 +138,7 @@
           <% if (course.tutors.length > 0) { %>
               <li class="list-group-item list-group-item-success">
                 <div class="d-flex w-100 justify-content-between">
-<<<<<<< HEAD
-                  <strong class="mb-1">Tutors</strong>
-=======
                   <span class="mb-1">Tutors</span>
->>>>>>> master
                 </div>
               </li>
 
@@ -150,11 +146,7 @@
                   <span class="list-group-item list-group-item-action tutor-profile menu-item" id="tutor-<%=tutor.tutor._id%>">
                     <a href="/homework/tutors/<%=course._id%>?tutor=<%=tutor.tutor._id%>" class="tutor-link">
                       <img class="profile-image" src="<%= tutor.tutor.imageUrl %>" alt="profile picture">
-<<<<<<< HEAD
-                      <span class="tutor-name <%=tutor.tutor.status%> <%=tutor.tutor.permission%> <%=tutor.tutor.tags.join(' ')%>"><strong><%=tutor.tutor.firstName%> <%=tutor.tutor.lastName%></strong></span>
-=======
                       <span class="tutor-name <%=tutor.tutor.status%> <%=tutor.tutor.permission%> <%=tutor.tutor.tags.join(' ')%>"><%=tutor.tutor.firstName%> <%=tutor.tutor.lastName%></span>
->>>>>>> master
                     </a>
 
                       <% if (studentIds.includes(currentUser._id.toString())) { %>

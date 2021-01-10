@@ -134,7 +134,7 @@
             <div class="card-body">
               <h5 class="card-title"><%=course.name.slice(0, 25)%><% if (course.name.length > 24) {%>... <% } %></h5>
 
-              <strong class="card-text user-position">
+              <span class="card-text user-position">
               <% if (course.teacher.equals(currentUser._id)) { %>
                 Teacher
               <% } else if (course.students.includes(currentUser._id)) { %>
@@ -147,7 +147,7 @@
                   <% } %>
                 <% } %>
               <% } %>
-              </strong><br />
+            </span><br />
 
               <p class="card-tex course-description"><%=course.description.slice(0, 151)%><%if (course.description.length > 150) {%>...<%}%></p>
               <a href="homework/<%=course._id%>" class="btn btn-primary">Go to Course</a>
