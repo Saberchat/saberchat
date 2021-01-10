@@ -18,7 +18,7 @@
 
   <!-- Cdn for formating the dates -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-dateFormat/1.0/jquery.dateFormat.min.js"></script>
-  
+
 </head>
 <body>
 
@@ -27,36 +27,38 @@
     <h1 class="display-4 text-dark"><%= room.name %></h1>
     <p class="text-dark lead mb-3"><%= room.description %></p>
     <a href="/chat" class="btn btn-primary" class="exit-button"><i class="fas fa-arrow-left"></i> Exit</a>
-    <% if (room.creator.id.equals(currentUser._id)) { %>
-      <a href="/chat/<%= room._id %>/edit" class="btn btn-secondary"><i class="fas fa-cog"></i> Room Settings</a>
-    <% } else if(room.type == 'private') { %>
-      <!-- leave button/form with bootstrap modal -->
-      <form action="/chat/<%= room._id %>/leave" method="post" id="leave-room">
-        <!-- Button trigger modal -->
-        <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#leaveModalCenter">
-          <i class="fas fa-sign-out-alt"></i> Leave Room
-        </button>
-        <!-- Modal -->
-        <div class="modal fade" id="leaveModalCenter" tabindex="-1" role="dialog" aria-labelledby="leaveModalCenterTitle" aria-hidden="true">
-          <div class="modal-dialog modal-dialog-centered" role="document">
-            <div class="modal-content">
-              <div class="modal-header">
-                <h5 class="modal-title" id="leaveModalCenterTitle"><i class="fas fa-sign-out-alt"></i> Leave <%= room.name %>?</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                  <span aria-hidden="true">&times;</span>
-                </button>
-              </div>
-              <div class="modal-body">
-                You will need to be invited again to rejoin.
-              </div>
-              <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                <button type="submit" class="btn btn-danger">Confirm</button>
+    <% if (room.mutable) { %>
+      <% if (room.creator.id.equals(currentUser._id)) { %>
+        <a href="/chat/<%= room._id %>/edit" class="btn btn-secondary"><i class="fas fa-cog"></i> Room Settings</a>
+      <% } else if(room.type == 'private') { %>
+        <!-- leave button/form with bootstrap modal -->
+        <form action="/chat/<%= room._id %>/leave" method="post" id="leave-room">
+          <!-- Button trigger modal -->
+          <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#leaveModalCenter">
+            <i class="fas fa-sign-out-alt"></i> Leave Room
+          </button>
+          <!-- Modal -->
+          <div class="modal fade" id="leaveModalCenter" tabindex="-1" role="dialog" aria-labelledby="leaveModalCenterTitle" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered" role="document">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h5 class="modal-title" id="leaveModalCenterTitle"><i class="fas fa-sign-out-alt"></i> Leave <%= room.name %>?</h5>
+                  <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                  </button>
+                </div>
+                <div class="modal-body">
+                  You will need to be invited again to rejoin.
+                </div>
+                <div class="modal-footer">
+                  <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                  <button type="submit" class="btn btn-danger">Confirm</button>
+                </div>
               </div>
             </div>
           </div>
-        </div>
-      </form>
+        </form>
+      <% } %>
     <% } %>
   </div>
 </header>

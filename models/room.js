@@ -24,7 +24,8 @@ var roomSchema = new mongoose.Schema({
     },
     username: String
   },
-  moderate: {type: Boolean, default: true}
+  moderate: {type: Boolean, default: true},
+  mutable: {type: Boolean, default: true}
 }, {timestamps: {createdAt: 'created_at'}});
 
 module.exports = mongoose.model("Room", roomSchema);

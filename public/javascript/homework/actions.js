@@ -33,8 +33,18 @@ const book = ((button, location) => {
       leaveButton.setAttribute("data-target", `#modal-stop-${tutorId}`);
       leaveButton.innerHTML = "Stop Lessons";
 
-      tutorDiv.appendChild(reviewButton);
+      if (!data.formerStudent) {
+        tutorDiv.appendChild(reviewButton);
+      }
+
       tutorDiv.appendChild(leaveButton);
+
+
+      document.getElementById("new-count").innerText = `${data.user.newRoomCount.length + data.user.annCount.length}`;
+      document.getElementById("new-count").hidden = false;
+
+      document.getElementById("new-chat").innerText = `${data.user.newRoomCount.length}`;
+      document.getElementById("new-chat").hidden = false;
 
     }
   });
@@ -54,19 +64,44 @@ const leave = ((button, location) => {
       tutorDiv.removeChild(document.getElementById(`review-button-${tutorId}`));
       tutorDiv.removeChild(document.getElementById(`leave-button-${tutorId}`));
 
+      let reviewButton = document.createElement('button');
       let bookButton = document.createElement('button');
 
       if (location == "show") {
+        reviewButton.className ="review-button edit-button btn btn-warning";
         bookButton.className ="book-button edit-button btn btn-info";
+
       } else if (location == "tutor-show") {
+        reviewButton.className ="edit-button btn btn-warning";
         bookButton.className ="edit-button btn btn-info";
       }
+
+      reviewButton.id = `review-button-${tutorId}`;
+      reviewButton.setAttribute("data-toggle", "modal");
+      reviewButton.setAttribute("data-target", `#modal-review-${tutorId}`);
+      reviewButton.innerHTML = "Leave A Review";
+      tutorDiv.appendChild(reviewButton);
 
       bookButton.id = `book-button-${tutorId}`;
       bookButton.setAttribute("data-toggle", "modal");
       bookButton.setAttribute("data-target", `#modal-book-${tutorId}`);
       bookButton.innerHTML = "Book This Tutor";
       tutorDiv.appendChild(bookButton);
+
+      document.getElementById("new-count").innerText = `${data.user.newRoomCount.length + data.user.annCount.length}`;
+
+      if (data.user.newRoomCount.length + data.user.annCount.length > 0) {
+        document.getElementById("new-count").hidden = false;
+      } else {
+        document.getElementById("new-count").hidden = true;
+      }
+
+      document.getElementById("new-chat").innerText = `${data.user.newRoomCount.length}`;
+      if (data.user.newRoomCount.length > 0) {
+        document.getElementById("new-chat").hidden = false;
+      } else {
+        document.getElementById("new-chat").hidden = true;
+      }
     }
   });
 });
@@ -131,4 +166,4 @@ const reopenLessons = ((button, location) => {
 
 const setStudents = (() => {
   document.getElementById("slots-label").innerText = `Number of Student Slots: ${document.getElementById('slots').value}`;
-})
+});

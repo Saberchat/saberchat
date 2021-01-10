@@ -239,12 +239,19 @@ router.put('/book/:id', middleware.isLoggedIn, middleware.isStudent, (req, res) 
       return res.json({error: "Error accessing course"});
 
     } else if (!course.students.includes(req.user._id)) {
-      res.json({error: "You are not a student of that tutor"});
+      return res.json({error: "You are not a student of that tutor"});
 
     } else {
+      let formerStudent = false;
       for (let tutor of course.tutors) {
         if (tutor.tutor._id.equals(req.body.tutor) && tutor.available) {
           tutor.students.push(req.user._id);
+
+          if (tutor.formerStudents.includes(req.user._id)) {
+            formerStudent = true;
+            tutor.formerStudents.splice(tutor.formerStudents.indexOf(req.user._id), 1);
+          }
+
           tutor.slots -= 1;
           if (tutor.slots == 0) {
             tutor.available = false;
@@ -253,8 +260,9 @@ router.put('/book/:id', middleware.isLoggedIn, middleware.isStudent, (req, res) 
           const room = await Room.create({
             name: `${req.user.firstName}'s Tutoring Sessions With ${tutor.tutor.firstName} - ${course.name}`,
             creator: {id: tutor._id, username: tutor.username},
-            members: [req.user._id],
+            members: [req.user._id, tutor.tutor._id],
             type: "private",
+            mutable: false
           });
 
           const roomObject = {
@@ -262,9 +270,14 @@ router.put('/book/:id', middleware.isLoggedIn, middleware.isStudent, (req, res) 
             room: room._id
           };
 
+          tutor.tutor.newRoomCount.push(room._id);
+          req.user.newRoomCount.push(room._id);
+          tutor.tutor.save();
+          req.user.save();
+
           tutor.rooms.push(roomObject);
           course.save();
-          res.json({success: "Succesfully joined tutor"});
+          return res.json({success: "Succesfully joined tutor", user: req.user, formerStudent});
         }
       }
     }
@@ -336,10 +349,10 @@ router.put('/rate/:id', middleware.isLoggedIn, middleware.isStudent, (req, res) 
           }
           averageRating = Math.round(averageRating/tutor.reviews.length);
 
-          res.json({success: "Succesfully upvoted tutor", averageRating, reviews_length: tutor.reviews.length, review: reviewObject, user: req.user});
+          return res.json({success: "Succesfully upvoted tutor", averageRating, reviews_length: tutor.reviews.length, review: reviewObject, user: req.user});
 
         } else {
-          res.json({error: "You are not a student of this tutor"});
+          return res.json({error: "You are not a student of this tutor"});
         }
       }
     }
@@ -353,30 +366,38 @@ router.put('/rate/:id', middleware.isLoggedIn, middleware.isStudent, (req, res) 
 //Leave Tutor
 router.put('/leave/:id', middleware.isLoggedIn, middleware.isStudent, (req, res) => {
   (async() => {
-    const course = await Course.findById(req.params.id);
+    const course = await Course.findById(req.params.id).populate('tutors.tutor');
 
     if (!course) {
       return res.json({error: "Error leaving course"});
 
     } else {
       for (let tutor of course.tutors) {
-        if (tutor.tutor.equals(req.body.tutor)) {
+        if (tutor.tutor._id.equals(req.body.tutor)) {
           if (tutor.students.includes(req.user._id)) {
             tutor.students.splice(tutor.students.indexOf(req.user._id), 1);
-            tutor.formerStudents.push(req.user._id);
+
+            if (!tutor.formerStudents.includes(req.user._id)) {
+              tutor.formerStudents.push(req.user._id);
+            }
+
             tutor.slots += 1;
             tutor.available = true;
 
             for (let i = 0; i < tutor.rooms.length; i += 1) {
               if (tutor.rooms[i].student.equals(req.user._id)) {
                 const room = await Room.findByIdAndDelete(tutor.rooms[i].room);
+                tutor.tutor.newRoomCount.splice(tutor.tutor.newRoomCount.indexOf(tutor.rooms[i].room));
+                req.user.newRoomCount.splice(tutor.tutor.newRoomCount.indexOf(tutor.rooms[i].room));
+                tutor.tutor.save();
+                req.user.save();
                 tutor.rooms.splice(i, 1);
                 break;
               }
             }
 
             course.save();
-            return res.json({success: "Succesfully left tutor"});
+            return res.json({success: "Succesfully left tutor", user: req.user});
 
           } else {
             return res.json({error: "You are not a student of this tutor"});
