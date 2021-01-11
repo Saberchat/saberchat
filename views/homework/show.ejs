@@ -250,7 +250,7 @@
                         <label for="slots" id="slots-label"><span id="slots-heading">Number of Student Slots:</span> <span id="slots-count"><%=tutor.slots%></span></label>
                         <span id="change-message" hidden></span>
                         <br />
-                        <input type="range" min="<%=tutor.students.length%>" max="5" value="<%=tutor.slots%>" class="slider" id="slots" name="slots" onchange="setStudentsShow('<%=course._id%>')">
+                        <input type="range" min="<%=tutor.students.length%>" max="5" value="<%=tutor.slots+tutor.students.length%>" class="slider" id="slots" name="slots" onchange="setStudentsShow('<%=course._id%>')">
                       <% } %>
 
                     <p class="tutor-bio"><%=tutor.bio%></p>
