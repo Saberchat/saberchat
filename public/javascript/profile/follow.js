@@ -49,6 +49,7 @@ const unfollow_show = (button => {
     if (data.success) {
       $(`#modal-${userId}-unfollow`).modal('hide');
       document.getElementById(`following-${userId}`).parentNode.removeChild(document.getElementById(`following-${userId}`));
+      document.getElementById('following-button').innerText = `${parseInt(document.getElementById('following-button').innerText.split(' ')[0]) - 1} Following`;
     }
   });
 });
@@ -62,6 +63,7 @@ const remove = (button => {
     if (data.success) {
       $(`#modal-${userId}-remove`).modal('hide');
       document.getElementById(`follower-${userId}`).parentNode.removeChild(document.getElementById(`follower-${userId}`));
+      document.getElementById('followers-button').innerText = `${parseInt(document.getElementById('followers-button').innerText.split(' ')[0]) - 1} Follower(s)`;
     }
   });
 });
