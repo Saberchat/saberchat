@@ -48,5 +48,5 @@ const comment = ((form, event) => {
 });
 
 const reply = (comment => {
-  document.getElementById('comment-input').value = `@${comment.id.split("comment-")[1]}_ `
+  document.getElementById('comment-input').value = `@${comment.id.split("comment-")[1]}_ `;
 })

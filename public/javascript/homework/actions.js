@@ -167,3 +167,27 @@ const reopenLessons = ((button, location) => {
 const setStudents = (() => {
   document.getElementById("slots-label").innerText = `Number of Student Slots: ${document.getElementById('slots').value}`;
 });
+
+const setStudentsShow = ((courseId) => {
+  const url = `/homework/setStudents/${courseId}?_method=put`;
+  const slots = document.getElementById('slots').value;
+  const data = {courseId, slots};
+
+  $.post(url, data, function(data) {
+    if (data.success) {
+      document.getElementById("slots-count").innerText = `${slots}`;
+      document.getElementById("change-message").style.color = "green";
+      document.getElementById("change-message").innerText = "Succesfully Changed";
+
+    } else if (data.error) {
+      document.getElementById("change-message").style.color = "red";
+      document.getElementById("change-message").innerText = "An Error Occurred";
+    }
+
+    document.getElementById("change-message").hidden = false;
+    setTimeout(() => {
+      document.getElementById("change-message").hidden = true;
+    }, 1000);
+
+  });
+});

@@ -137,3 +137,16 @@
 #rating-label, #join-code-heading, .list-group-item-success {
   font-weight: bold;
 }
+
+#slots-heading {
+  font-weight: bold;
+}
+
+#slots-label {
+  margin-top: 20px;
+  font-style: italic;
+}
+
+#change-message {
+  margin-left: 10px;
+}

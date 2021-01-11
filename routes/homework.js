@@ -504,4 +504,27 @@ router.put('/like-review/:id', middleware.isLoggedIn, middleware.isStudent, (req
   });
 });
 
+router.put('/setStudents/:id', (req, res) => {
+  Course.findById(req.params.id, (err, course) => {
+    if (err || !course) {
+      res.json({error: "Error accessing course"});
+
+    } else {
+      let found = false;
+      for (let tutor of course.tutors) {
+        if (tutor.tutor.equals(req.user._id)) {
+          found = true;
+          tutor.slots = parseInt(req.body.slots);
+          course.save();
+          res.json({success: "Succesfully changed"});
+        }
+      }
+
+      if (!found) {
+        res.json({error: "Unable to find tutor"});
+      }
+    }
+  });
+});
+
 module.exports = router;
