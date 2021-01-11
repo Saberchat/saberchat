@@ -120,10 +120,11 @@
             <ul class="list-group">
               <li class="list-group-item list-group-item-success">Tutors</li>
               <% for (let tutor of course.tutors) { %>
-                <li class="list-group-item">
+                <li class="list-group-item list-group-item-action tutor-profile menu-item">
                   <a href="../profiles/<%=tutor.tutor._id%>" class="user-element-text">
                     <img class="profile-image" src="<%= tutor.tutor.imageUrl %>" alt="profile picture">
                     <span class="username <%=tutor.tutor.status%> <%=tutor.tutor.permission%> <%=tutor.tutor.tags.join(' ')%>"><span class="enrolled-name"><%=tutor.tutor.firstName%> <%=tutor.tutor.lastName%></span> <span class="enrolled-username"><%=`${tutor.tutor.username}`%></span></span>
+                    <br />
                   </a>
                 </li>
               <% } %>
@@ -136,6 +137,7 @@
         <div class="col-12">
 
           <% if (course.tutors.length > 0) { %>
+            <ul class="list-group">
               <li class="list-group-item list-group-item-success">
                 <div class="d-flex w-100 justify-content-between">
                   <span class="mb-1">Tutors</span>
@@ -143,7 +145,7 @@
               </li>
 
               <% for (let tutor of course.tutors) { %>
-                  <span class="list-group-item list-group-item-action tutor-profile menu-item" id="tutor-<%=tutor.tutor._id%>">
+                  <li class="list-group-item list-group-item-action tutor-profile menu-item" id="tutor-<%=tutor.tutor._id%>">
                     <a href="/homework/tutors/<%=course._id%>?tutor=<%=tutor.tutor._id%>" class="tutor-link">
                       <img class="profile-image" src="<%= tutor.tutor.imageUrl %>" alt="profile picture">
                       <span class="tutor-name <%=tutor.tutor.status%> <%=tutor.tutor.permission%> <%=tutor.tutor.tags.join(' ')%>"><%=tutor.tutor.firstName%> <%=tutor.tutor.lastName%></span>
@@ -244,7 +246,7 @@
                     </div>
 
                     <p class="tutor-bio"><%=tutor.bio%></p>
-                  </span>
+                  </li>
 
                 <div class="modal fade" id="modal-book-<%=tutor.tutor._id%>" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
                   <div class="modal-dialog">
@@ -353,6 +355,7 @@
                 </div>
 
               <% } %>
+            </ul>
           <% } %>
 
         </div>
