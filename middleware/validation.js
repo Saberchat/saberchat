@@ -1,4 +1,12 @@
-const { annSchema, newUserSchema, userLoginSchema } = require('../joiValidation/schemas');
+const { annSchema } = require('../joiValidation/announcement');
+const { 
+    newUserSchema, 
+    loginUserSchema, 
+    updateUserSchema, 
+    resetPasswordSchema,
+    updateEmailSchema,
+    updatePasswordSchema
+} = require('../joiValidation/user');
 
 const handleValidation = (schema, req, res, next) => {
     const { error } = schema.validate(req.body);
@@ -16,10 +24,26 @@ module.exports.validateAnn = (req, res, next) => {
     handleValidation(annSchema, req, res, next);
 };
 
+module.exports.validatePasswordReset = (req, res, next) => {
+    handleValidation(resetPasswordSchema, req, res, next);
+};
+
 module.exports.validateNewUser = (req, res, next) => {
     handleValidation(newUserSchema, req, res, next);
 };
 
 module.exports.validateUserLogin = (req, res, next) => {
-    handleValidation(userLoginSchema, req, res, next);
+    handleValidation(loginUserSchema, req, res, next);
+};
+
+module.exports.validateUserUpdate = (req, res, next) => {
+    handleValidation(updateUserSchema, req, res, next);
+};
+
+module.exports.validateEmailUpdate = (req, res, next) => {
+    handleValidation(updateEmailSchema, req, res, next);
+};
+
+module.exports.validatePasswordUpdate = (req, res, next) => {
+    handleValidation(updatePasswordSchema, req, res, next);
 };

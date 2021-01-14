@@ -9,13 +9,12 @@ const nodemailer = require('nodemailer');
 const {transport, transport_mandatory} = require("../transport");
 
 const middleware = require('../middleware/index');
-const { validateNewUser, validateUserLogin } = require('../middleware/validation');
+const { validateNewUser, validateUserLogin, validatePasswordReset } = require('../middleware/validation');
 
 //import user schema for db actions
 const User = require('../models/user');
 const Email = require('../models/email');
 const Announcement = require('../models/announcement');
-const Notification = require('../models/message');
 
 let transporter = nodemailer.createTransport({
   service: 'gmail',
@@ -214,8 +213,7 @@ router.post('/login', validateUserLogin, function(req, res, next) {
     })(req, res, next);
 });
 
-router.post('/forgot-password', (req, res) => {
-
+router.post('/forgot-password', validatePasswordReset, (req, res) => {
   User.find({authenticated: true, 'email': req.body.newPwdEmail}, (err,  users) => {
     if (!users) {
       req.flash('error', "Unable to find users");
