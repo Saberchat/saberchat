@@ -16,14 +16,6 @@ const Email = require('../models/email');
 const Announcement = require('../models/announcement');
 const Notification = require('../models/message');
 
-let transporter = nodemailer.createTransport({
-  service: 'gmail',
-  auth: {
-    user: 'noreply.saberchat@gmail.com',
-    pass: 'Tgy8erwIYtxRZrJHvKwkWbrkbUhv1Zr9'
-  }
-});
-
 // Home route. gives the landing or home or index page (whatever you want to call it).
 router.get('/', (req, res) => {
 	res.render('index');
@@ -159,7 +151,7 @@ router.post("/register",  (req, res) => {
 
         });
 
-        transport_mandatory(transporter, newUser, 'Verify Saberchat Account', `<p>Hello ${newUser.firstName},</p><p>Welcome to Saberchat! A confirmation of your account:</p><ul><li>Your username is ${newUser.username}.</li><li>Your full name is ${newUser.firstName} ${newUser.lastName}.</li><li>Your linked email is ${newUser.email}</li></ul><p>Click <a href="https://alsion-saberchat.herokuapp.com/authenticate/${newUser._id}?token=${token}">this link</a> to verify your account.</p>`);
+        transport_mandatory(newUser, 'Verify Saberchat Account', `<p>Hello ${newUser.firstName},</p><p>Welcome to Saberchat! A confirmation of your account:</p><ul><li>Your username is ${newUser.username}.</li><li>Your full name is ${newUser.firstName} ${newUser.lastName}.</li><li>Your linked email is ${newUser.email}</li></ul><p>Click <a href="https://alsion-saberchat.herokuapp.com/authenticate/${newUser._id}?token=${token}">this link</a> to verify your account.</p>`);
       }
   	});
   }
@@ -201,7 +193,7 @@ router.get('/authenticate/:id', (req, res) => {
             return next(err);
           }
 
-          transport_mandatory(transporter, user, 'Welcome To Saberchat!', `<p>Hello ${user.firstName},</p><p>Welcome to Saberchat! A confirmation of your account:</p><ul><li>Your username is ${user.username}.</li><li>Your full name is ${user.firstName} ${user.lastName}.</li><li>Your linked email is ${user.email}</li></ul><p>You will be assigned a role and status soon.</p>`);
+          transport_mandatory(user, 'Welcome To Saberchat!', `<p>Hello ${user.firstName},</p><p>Welcome to Saberchat! A confirmation of your account:</p><ul><li>Your username is ${user.username}.</li><li>Your full name is ${user.firstName} ${user.lastName}.</li><li>Your linked email is ${user.email}</li></ul><p>You will be assigned a role and status soon.</p>`);
           req.flash('success', 'Welcome ' + user.firstName);
           return res.redirect('/');
         });
@@ -273,7 +265,7 @@ router.post('/forgot-password', (req, res) => {
         user.save();
       }
 
-      transport_mandatory(transporter, users[0], 'Saberchat Password Reset', `<p>Hello ${users[0].firstName},</p><p>You are receiving this email because you recently requested a password reset.</p><p>Click <a href="https://alsion-saberchat.herokuapp.com/reset-password?user=${users[0]._id}">here</a> to reset your password. Use the following character sequence as your temporary password:</p><p>${pwd}</p>`);
+      transport_mandatory(users[0], 'Saberchat Password Reset', `<p>Hello ${users[0].firstName},</p><p>You are receiving this email because you recently requested a password reset.</p><p>Click <a href="https://alsion-saberchat.herokuapp.com/reset-password?user=${users[0]._id}">here</a> to reset your password. Use the following character sequence as your temporary password:</p><p>${pwd}</p>`);
       req.flash('success', "Check your email for instructions on  how to reset your password");
       res.redirect('/');
     }
@@ -300,7 +292,7 @@ router.put('/reset-password', (req, res) => {
             user.save();
           })
 
-          transport_mandatory(transporter, user, "Password Reset Confirmation", `<p>Hello ${user.firstName},</p><p>You are receiving this email because you recently reset your Saberchat password.</p><p>If you did not recently reset your password, contact a faculty member immediately.</p><p>If you did, you can ignore this message.</p>`);
+          transport_mandatory(user, "Password Reset Confirmation", `<p>Hello ${user.firstName},</p><p>You are receiving this email because you recently reset your Saberchat password.</p><p>If you did not recently reset your password, contact a faculty member immediately.</p><p>If you did, you can ignore this message.</p>`);
           req.flash('success', "Password reset!");
           res.redirect('/');
 

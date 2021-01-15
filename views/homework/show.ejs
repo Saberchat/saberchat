@@ -43,7 +43,7 @@
               <a id="back-button" class="btn btn-primary" href="/homework"><i class="fas fa-arrow-left"></i> Back</a>
 
               <% if (studentIds.includes(currentUser._id.toString()) || tutorIds.includes(currentUser._id.toString())) { %>
-                <form action="/homework/unenroll/<%=course._id%>" method="post" id="unenroll-form">
+                <form <%if (studentIds.includes(currentUser._id.toString())) {%> action="/homework/unenroll-student/<%=course._id%>" <% } else { %>action= "/homework/unenroll-tutor/<%=course._id%>" <% } %>method="post" id="unenroll-form">
                   <button class="btn btn-danger" type="button" data-toggle="modal" data-target="#modal-<%=course._id%>"><i class="fas fa-minus"></i> Unenroll</button>
                   <div class="modal fade" id="modal-<%=course._id%>" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
                     <div class="modal-dialog">
@@ -84,6 +84,10 @@
             <li class="nav-item tab-header" id="settings" onclick="changeTab(this)">
               <a class="nav-link">Settings</a>
             </li>
+
+            <li class="nav-item tab-header" id="blocked" onclick="changeTab(this)">
+              <a class="nav-link">Blocked</a>
+            </li>
           <% } %>
         </ul>
 
@@ -95,38 +99,84 @@
             <li class="list-group-item">
               <a href="/profiles/<%=course.teacher._id%>" class="user-element-text">
                 <img class="profile-image" src="<%= course.teacher.imageUrl %>" alt="profile picture">
-                <span class="username <%=course.teacher.status%> <%=course.teacher.permission%> <%=course.teacher.tags.join(' ')%>"><span class="enrolled-name"><%=course.teacher.firstName%> <%=course.teacher.lastName%></span> <span class="enrolled-username"><%=`${course.teacher.username}`%></span></span>
+                <span class="username <%=course.teacher.status%> <%=course.teacher.permission%> <%=course.teacher.tags.join(' ')%>"><span class="enrolled-name"><%=course.teacher.firstName%> <%=course.teacher.lastName%></span> <span class="enrolled-username"><%=course.teacher.username%></span></span>
               </a>
             </li>
           </ul>
           <br />
 
           <% if (course.students.length > 0) { %>
-            <ul class="list-group">
-              <li class="list-group-item list-group-item-success">Students</li>
+            <ul class="list-group" id="students">
+              <li class="list-group-item list-group-item-success" id="students-heading">Students</li>
               <% for (let student of course.students) { %>
-                <li class="list-group-item">
+                <li class="list-group-item" id="item-<%=student._id%>">
                   <a href="../profiles/<%=student._id%>"class="user-element-text">
                     <img class="profile-image" src="<%= student.imageUrl %>" alt="profile picture">
-                    <span class="username <%=student.status%> <%=student.permission%> <%=student.tags.join(' ')%>"><span class="enrolled-name"><%=student.firstName%> <%=student.lastName%></span> <span class="enrolled-username"><%=`${student.username}`%></span></span>
+                    <span class="username <%=student.status%> <%=student.permission%> <%=student.tags.join(' ')%>"><span class="enrolled-name"><%=student.firstName%> <%=student.lastName%></span> <span class="enrolled-username"><%=student.username%></span></span>
                   </a>
+                  <% if (course.teacher._id.equals(currentUser._id)) { %>
+                    <button class="btn btn-danger leave-button" id="remove-button-<%=student._id%>" data-toggle="modal" data-target="#modal-index-remove-<%=student._id%>">Remove Student</button>
+                  <% } %>
                 </li>
+
+                <div class="modal fade" id="modal-index-remove-<%=student._id%>" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+                  <div class="modal-dialog">
+                    <div class="modal-content">
+                      <div class="modal-header">
+                        <h5 class="modal-title" id="exampleModalLabel">Remove <%=student.firstName%> <%=student.lastName%> From Your Course?</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                          <span aria-hidden="true">&times;</span>
+                        </button>
+                      </div>
+                      <div class="modal-body">
+                        <textarea rows="5" class="form-control" id="reason-<%=student._id%>" name="review" placeholder="Please explain why you wish to remove <%=student.firstName%>."></textarea>
+                      </div>
+                      <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Back</button>
+                        <button type="button" class="btn btn-danger" id="<%=course._id%>-<%=student._id%>" onclick="removeStudent(this, 'show')">Yes, Remove Student</button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
               <% } %>
             </ul>
           <br />
           <% } %>
 
           <% if (course.tutors.length > 0) { %>
-            <ul class="list-group">
-              <li class="list-group-item list-group-item-success">Tutors</li>
+            <ul class="list-group" id="tutor-index">
+              <li class="list-group-item list-group-item-success" id="tutor-heading-index">Tutors</li>
               <% for (let tutor of course.tutors) { %>
-                <li class="list-group-item list-group-item-action tutor-profile menu-item">
+                <li class="list-group-item list-group-item-action tutor-profile menu-item" id="item-<%=tutor.tutor._id%>">
                   <a href="../profiles/<%=tutor.tutor._id%>" class="user-element-text">
                     <img class="profile-image" src="<%= tutor.tutor.imageUrl %>" alt="profile picture">
-                    <span class="username <%=tutor.tutor.status%> <%=tutor.tutor.permission%> <%=tutor.tutor.tags.join(' ')%>"><span class="enrolled-name"><%=tutor.tutor.firstName%> <%=tutor.tutor.lastName%></span> <span class="enrolled-username"><%=`${tutor.tutor.username}`%></span></span>
-                    <br />
+                    <span class="username <%=tutor.tutor.status%> <%=tutor.tutor.permission%> <%=tutor.tutor.tags.join(' ')%>"><span class="enrolled-name"><%=tutor.tutor.firstName%> <%=tutor.tutor.lastName%></span> <span class="enrolled-username"><%=tutor.tutor.username%></span></span>
                   </a>
+                  <% if (course.teacher._id.equals(currentUser._id)) { %>
+                    <button class="btn btn-danger leave-button" id="remove-button-<%=tutor.tutor._id%>" data-toggle="modal" data-target="#modal-index-remove-<%=tutor.tutor._id%>">Remove Tutor</button>
+                  <% } %>
                 </li>
+
+                <div class="modal fade" id="modal-index-remove-<%=tutor.tutor._id%>" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+                  <div class="modal-dialog">
+                    <div class="modal-content">
+                      <div class="modal-header">
+                        <h5 class="modal-title" id="exampleModalLabel">Remove <%=tutor.tutor.firstName%> <%=tutor.tutor.lastName%> From Your Course?</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                          <span aria-hidden="true">&times;</span>
+                        </button>
+                      </div>
+                      <div class="modal-body">
+                        <textarea rows="5" class="form-control" id="reason-<%=tutor.tutor._id%>" name="review" placeholder="Please explain why you wish to remove <%=tutor.tutor.firstName%>."></textarea>
+                      </div>
+                      <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Back</button>
+                        <button type="button" class="btn btn-danger" id="<%=course._id%>-<%=tutor.tutor._id%>" onclick="removeTutor(this, 'show')">Yes, Remove Tutor</button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
               <% } %>
             </ul>
           <% } %>
@@ -137,7 +187,7 @@
         <div class="col-12">
 
           <% if (course.tutors.length > 0) { %>
-            <ul class="list-group">
+            <ul class="list-group" id="tutor-div">
               <li class="list-group-item list-group-item-success">
                 <div class="d-flex w-100 justify-content-between">
                   <span class="mb-1">Tutors</span>
@@ -171,6 +221,10 @@
                               <span class="unavailable-tutor">Tutor Is Unavailable</span>
                             <% } %>
                           <% }%>
+                        </div>
+                      <% } else if (course.teacher._id.equals(currentUser._id)){ %>
+                        <div id="tutor-actions-<%=tutor.tutor._id%>" class="tutor-actions">
+                          <button class="btn btn-danger leave-button" id="remove-button-<%=tutor.tutor._id%>" data-toggle="modal" data-target="#modal-remove-<%=tutor.tutor._id%>">Remove Tutor</button>
                         </div>
                       <% } %>
 
@@ -362,6 +416,26 @@
                   </div>
                 </div>
 
+                <div class="modal fade" id="modal-remove-<%=tutor.tutor._id%>" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+                  <div class="modal-dialog">
+                    <div class="modal-content">
+                      <div class="modal-header">
+                        <h5 class="modal-title" id="exampleModalLabel">Remove <%=tutor.tutor.firstName%> <%=tutor.tutor.lastName%> From Your Course?</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                          <span aria-hidden="true">&times;</span>
+                        </button>
+                      </div>
+                      <div class="modal-body">
+                        <textarea rows="5" class="form-control" id="reason-<%=tutor.tutor._id%>" name="review" placeholder="Please explain why you wish to remove <%=tutor.tutor.firstName%>."></textarea>
+                      </div>
+                      <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Back</button>
+                        <button type="button" class="btn btn-danger" id="<%=course._id%>-<%=tutor.tutor._id%>" onclick="removeTutor(this, 'show')">Yes, Remove Tutor</button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
               <% } %>
             </ul>
           <% } %>
@@ -397,6 +471,49 @@
               </div>
               <button class="btn btn-lg btn-primary btn-block">Confirm Changes</button><br />
             </form>
+          </div>
+        </div>
+
+        <div class="row blocked" hidden>
+          <div class="col-12" id="blocked-column">
+            <% if (course.blocked.length > 0) { %>
+              <ul class="list-group" id="blocked-div">
+                <li class="list-group-item list-group-item-success">Blocked</li>
+                <% for (let b of course.blocked) { %>
+                  <li class="list-group-item" id="item-<%=b._id%>">
+                    <a href="../profiles/<%=b._id%>"class="user-element-text">
+                      <img class="profile-image" src="<%=b.imageUrl %>" alt="profile picture">
+                      <span class="username <%=b.status%> <%=b.permission%> <%=b.tags.join(' ')%>"><span class="enrolled-name"><%=b.firstName%> <%=b.lastName%></span> <span class="enrolled-username"><%=b.username%></span></span>
+                    </a>
+                    <button class="btn btn-danger leave-button" id="unblock-button-<%=b._id%>" data-toggle="modal" data-target="#modal-index-unblock-<%=b._id%>">Unblock</button>
+                  </li>
+
+                  <div class="modal fade" id="modal-index-unblock-<%=b._id%>" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+                    <div class="modal-dialog">
+                      <div class="modal-content">
+                        <div class="modal-header">
+                          <h5 class="modal-title" id="exampleModalLabel">Unblock <%=b.firstName%> <%=b.lastName%> From Your Course?</h5>
+                          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                          </button>
+                        </div>
+                        <div class="modal-body">
+                          <p>
+                            <%=b.firstName%> will be able to rejoin the course with the join code.
+                          </p>
+                        </div>
+                        <div class="modal-footer">
+                          <button type="button" class="btn btn-secondary" data-dismiss="modal">Back</button>
+                          <button type="button" class="btn btn-danger" id="<%=course._id%>-<%=b._id%>" onclick="unblock(this)">Yes, Unblock</button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                <% } %>
+              </ul>
+            <br />
+            <% } %>
           </div>
         </div>
       <% } %>

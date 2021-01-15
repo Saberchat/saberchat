@@ -10,9 +10,8 @@ const courseSchema = new mongoose.Schema({
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User'
   },
-  students: [{
-    type: mongoose.Schema.Types.ObjectId, ref: 'User', default: []
-  }],
+  students: [{type: mongoose.Schema.Types.ObjectId, ref: 'User', default: []}],
+  blocked: [{type: mongoose.Schema.Types.ObjectId, ref: 'User', default: []}],
   tutors: [{
     tutor: {type: mongoose.Schema.Types.ObjectId, ref: 'User'},
     slots: {type: Number, default: 0},
@@ -20,6 +19,8 @@ const courseSchema = new mongoose.Schema({
     bio: String,
     dateJoined: Date,
     students: [{type: mongoose.Schema.Types.ObjectId, ref: 'User', default: []}],
+    formerStudents: [{type: mongoose.Schema.Types.ObjectId, ref: 'User', default: []}],
+    upvotes: [{type: mongoose.Schema.Types.ObjectId, ref: 'User', default: []}],
     rooms: [
       {
         student: {type: mongoose.Schema.Types.ObjectId, ref: 'User'},
@@ -27,8 +28,6 @@ const courseSchema = new mongoose.Schema({
         default: []
       }
     ],
-    formerStudents: [{type: mongoose.Schema.Types.ObjectId, ref: 'User', default: []}],
-    upvotes: [{type: mongoose.Schema.Types.ObjectId, ref: 'User', default: []}],
     reviews: [{
       review: {
         type: mongoose.Schema.Types.ObjectId,

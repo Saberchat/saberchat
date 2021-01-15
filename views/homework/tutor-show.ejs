@@ -100,29 +100,35 @@
                       <% } %>
                       </p>
 
-                      <h4>Role</h4>
-                      <% permMatrix = [["principal", "Principal"], ["admin", "Administrator"], ["mod", "Moderator"], ["student", "Student"]] %>
-
-                      <% for (let perm of permMatrix) { %>
-                        <% if (tutor.tutor.permission.toLowerCase() == perm[0].toLowerCase()) { %>
-                          <p><%= perm[1] %></p>
-                        <% } %>
-                      <% } %>
-
                       <h4>Status</h4>
                       <p><%= tutor.tutor.status.charAt(0).toUpperCase() + tutor.tutor.status.slice(1) %></p>
 
                       <h4>Email</h4>
                       <p><%= tutor.tutor.email %></p>
 
-                      <h4>Current Courses</h4>
-                      <ul>
-                        <% for (let course of courses) { %>
-                          <li>
-                            <%=course.name%>
-                          </li>
+                      <% if (courses.length > 0) { %>
+                        <h4>Other Courses</h4>
+                        <ol>
+                          <% for (let c of courses) { %>
+                            <li>
+                              <%=c.name%>
+                            </li>
+                          <% } %>
+                        </ol>
+                      <% } %>
+
+                      <% if (students.length > 0) { %>
+                        <h4>Current Students</h4>
+                        <% if (currentUser._id.equals(tutor.tutor._id)) { %>
+                          <ol>
+                            <% for (let student of students) { %>
+                              <li><%=student.firstName%> <%=student.lastName%></li>
+                            <% } %>
+                          </ol>
+                        <% } else { %>
+                          <p><%=tutor.students.length%></p>
                         <% } %>
-                      </ul>
+                      <% } %>
 
                       <% if (studentIds.includes(currentUser._id.toString())) { %>
                         <div id="tutor-actions-<%=tutor.tutor._id%>" class="tutor-actions">
@@ -137,7 +143,7 @@
                                 <span class="unavailable-tutor">Tutor Is Unavailable</span>
                               <% } %>
                             <% }%>
-                            
+
                           <% } else { %>
                             <% if (tutor.available) { %>
                               <button class="btn btn-info edit-button" id="book-button-<%=tutor.tutor._id%>" data-toggle="modal" data-target="#modal-book-<%=tutor.tutor._id%>">Book This Tutor</button>

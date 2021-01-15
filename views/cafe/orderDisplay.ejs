@@ -12,6 +12,7 @@
     <link rel="stylesheet" href="/stylesheets/home/index.css">
     <link rel="stylesheet" href="/stylesheets/chat/new.css">
     <link rel="stylesheet" href="/stylesheets/cafe/show.css">
+    <script src="/javascript/cafe/ready.js"></script>
 
     <!-- using my fontawesome kit -->
     <script src="https://kit.fontawesome.com/dccc745c41.js" crossorigin="anonymous"></script>
@@ -54,7 +55,7 @@
         <h2>No New Orders</h2>
       <% } else { %>
         <% orders.reverse().forEach((order) => { %>
-          <div class="card mt-3" id="<%=order._id%>">
+          <div class="card mt-3 order-card" id="<%=order._id%>">
             <div class="card-body">
               <h5 class="card-title">Order for <%= order.name %></h5>
               <p class="card-text"><span class="instructions">Extra Instructions:</span> <%= order.instructions %></p>
@@ -95,10 +96,30 @@
 
               <p class="card-text"><%= order.date %></p>
               <form class="ready-form" action="<%= order._id %>/ready" method="post">
-                <button type="submit" class="btn btn-primary" name="button">Order Ready</button>
-                <button type="button" data-toggle="modal" data-target="#modal<%=order._id%>" class="btn btn-danger" name="button">Reject Order</button>
+                <button type="button" data-toggle="modal" data-target="#modal-<%=order._id%>-ready" class="btn btn-primary" name="button">Order Ready</button>
+                <button type="button" data-toggle="modal" data-target="#modal-<%=order._id%>-reject" class="btn btn-danger" name="button">Reject Order</button>
 
-                <div class="modal fade" id="modal<%=order._id%>" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+                <div class="modal fade" id="modal-<%=order._id%>-ready" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+                  <div class="modal-dialog">
+                    <div class="modal-content">
+                      <div class="modal-header">
+                        <h5 class="modal-title" id="exampleModalLabel">Order Ready?</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                          <span aria-hidden="true">&times;</span>
+                        </button>
+                      </div>
+                      <div class="modal-body">
+                        This will notify the customer that their order is ready.
+                      </div>
+                      <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">No, Go Back</button>
+                        <button type="button" class="btn btn-primary" id="<%=order._id%>-ready" onclick="ready(this)">Yes, Order Is Ready</button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="modal fade" id="modal-<%=order._id%>-reject" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
                   <div class="modal-dialog">
                     <div class="modal-content">
                       <div class="modal-header">
@@ -109,11 +130,11 @@
                       </div>
                       <div class="modal-body">
                         This action is irreversible. Only reject this order if there is something wrong about it, or you suspect it to not be genuine. You might want to check with a faculty member and the customer first.
-                        <br /><input class="form-control" class="rejection-input" type="text" name="rejectionReason" placeholder="Enter reason for rejecting order" />
+                         <textarea class="form-control rejection-input" id="rejection-reason-<%=order._id%>" rows="5" type="text" name="rejectionReason" placeholder="Enter reason for rejecting order"></textarea>
                       </div>
                       <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-dismiss="modal">No, Go Back</button>
-                        <button type="submit" class="btn btn-danger" formaction="<%=order._id%>/reject" >Yes, Reject Order</button>
+                        <button type="button" class="btn btn-danger" id="<%=order._id%>-reject" onclick="reject(this)" >Yes, Reject Order</button>
                       </div>
                     </div>
                   </div>

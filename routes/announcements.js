@@ -19,16 +19,6 @@ const Announcement = require('../models/announcement');
 const Notification = require('../models/message');
 const PostComment = require('../models/postComment');
 
-
-//Sets up NodeMailer Transporter object (sends out emails)
-let transporter = nodemailer.createTransport({
-  service: 'gmail',
-  auth: {
-    user: 'noreply.saberchat@gmail.com',
-    pass: 'Tgy8erwIYtxRZrJHvKwkWbrkbUhv1Zr9'
-  }
-});
-
 //ROUTES
 router.get('/', (req, res) => { //RESTful Routing 'INDEX' route
   Announcement.find({}).populate('sender').exec((err, foundAnns) => { //Collects data about all announcements
@@ -175,7 +165,7 @@ router.post('/', middleware.isLoggedIn, middleware.isMod, multer, validateAnn, (
     };
 
     for (let user of users) {
-      transport(transporter, user, `New Saberchat Announcement - ${announcement.subject}`, `<p>Hello ${user.firstName},</p><p>${req.user.username} has recently posted a new announcement - '${announcement.subject}'.</p><p>${announcement.text}</p><p>You can access the full announcement at https://alsion-saberchat.herokuapp.com</p> ${imageString}`);
+      transport(user, `New Saberchat Announcement - ${announcement.subject}`, `<p>Hello ${user.firstName},</p><p>${req.user.username} has recently posted a new announcement - '${announcement.subject}'.</p><p>${announcement.text}</p><p>You can access the full announcement at https://alsion-saberchat.herokuapp.com</p> ${imageString}`);
       user.annCount.push(announcementObject);
       await user.save();
     }
@@ -290,7 +280,7 @@ router.put('/comment', middleware.isLoggedIn, (req, res) => {
     let notif;
     for (let user of users) {
 
-      notif = await Notification.create({subject: `New Mention in ${announcement.subject}`, sender: req.user, recipients: [user], read: [], toEveryone: false, images: []}); //Create a notification to alert the user
+      notif = await Notification.create({subject: `New Mention in ${announcement.subject}`, sender: req.user, noReply: true, recipients: [user], read: [], toEveryone: false, images: []}); //Create a notification to alert the user
 
       if (!notif) {
         return res.json({error: "Error creating notification"});
@@ -300,7 +290,7 @@ router.put('/comment', middleware.isLoggedIn, (req, res) => {
       notif.text = `Hello ${user.firstName},\n\n${req.user.firstName} ${req.user.lastName} mentioned you in a comment on "${announcement.subject}":\n${comment.text}`;
       await notif.save();
 
-      transport(transporter, user, `New Mention in ${announcement.subject}`, `<p>Hello ${user.firstName},</p><p>${req.user.firstName} ${req.user.lastName} mentioned you in a comment on <strong>${announcement.subject}</strong>.<p>${comment.text}</p>`);
+      transport(user, `New Mention in ${announcement.subject}`, `<p>Hello ${user.firstName},</p><p>${req.user.firstName} ${req.user.lastName} mentioned you in a comment on <strong>${announcement.subject}</strong>.<p>${comment.text}</p>`);
       user.inbox.push(notif); //Add notif to user's inbox
       user.msgCount += 1;
       await user.save();
@@ -394,7 +384,7 @@ router.put('/:id', middleware.isLoggedIn, middleware.isMod, multer, validateAnn,
     let overlap;
 
     for (let user of users) {
-      transport(transporter, user, `Updated Saberchat Announcement - ${announcement.subject}`, `<p>Hello ${user.firstName},</p><p>${req.user.username} has recently updated an announcement - '${announcement.subject}'.</p><p>${announcement.text}</p><p>You can access the full announcement at https://alsion-saberchat.herokuapp.com</p> ${imageString}`);
+      transport(user, `Updated Saberchat Announcement - ${announcement.subject}`, `<p>Hello ${user.firstName},</p><p>${req.user.username} has recently updated an announcement - '${announcement.subject}'.</p><p>${announcement.text}</p><p>You can access the full announcement at https://alsion-saberchat.herokuapp.com</p> ${imageString}`);
       overlap = false;
 
       for (let a of user.annCount) {

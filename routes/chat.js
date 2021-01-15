@@ -15,15 +15,6 @@ const User = require('../models/user');
 const Room = require('../models/room');
 const AccessReq = require('../models/accessRequest');
 
-
-let transporter = nodemailer.createTransport({
-  service: 'gmail',
-  auth: {
-    user: 'noreply.saberchat@gmail.com',
-    pass: 'Tgy8erwIYtxRZrJHvKwkWbrkbUhv1Zr9'
-  }
-});
-
 //route for displaying room list
 router.get('/', middleware.isLoggedIn, (req, res) => {
   Room.find({}, (err, foundRooms) => {
@@ -245,7 +236,7 @@ router.post('/:id/request-access', middleware.isLoggedIn, (req, res) => {
       roomCreator.requests.push(createdReq._id);
       roomCreator.save();
 
-      transport(transporter, roomCreator, 'New Room Access Request', `<p>Hello ${roomCreator.firstName},</p><p><strong>${req.user.username}</strong> is requesting to join your room, <strong>${foundRoom.name}.</strong></p><p>You can access the full request at https://alsion-saberchat.herokuapp.com</p>`);
+      transport(roomCreator, 'New Room Access Request', `<p>Hello ${roomCreator.firstName},</p><p><strong>${req.user.username}</strong> is requesting to join your room, <strong>${foundRoom.name}.</strong></p><p>You can access the full request at https://alsion-saberchat.herokuapp.com</p>`);
 
       req.flash('success', 'Request for access sent');
       res.redirect('back');

@@ -108,7 +108,7 @@
                         <input class="form-control" type="text" name="joincode" placeholder="Enter Join Code"/><br />
                         <label for="slots" id="slots-label">Number of Student Slots: 0</label><br />
                         <input type="range" min="0" max="5" value="0" class="slider" id="slots" name="slots" onchange="setStudents()">
-                        <textarea rows="5" minlength="150" maxlength="250" class="form-control" name="bio" placeholder="A Short Bio About Yourself"></textarea>
+                        <textarea rows="5" minlength="100" maxlength="250" class="form-control" name="bio" placeholder="A Short Bio About Yourself"></textarea>
                       </div>
                       <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-dismiss="modal">Back</button>
@@ -149,7 +149,7 @@
               <% } %>
             </span><br />
 
-              <p class="card-tex course-description"><%=course.description.slice(0, 151)%><%if (course.description.length > 150) {%>...<%}%></p>
+              <p class="card-text course-description"><%=course.description.slice(0, 151)%><%if (course.description.length > 150) {%>...<%}%></p>
               <a href="homework/<%=course._id%>" class="btn btn-primary">Go to Course</a>
             </div>
           </div>

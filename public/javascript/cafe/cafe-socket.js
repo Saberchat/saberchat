@@ -29,12 +29,7 @@ const order = ((form, customer) => {
     });
 
     if (itemList.length > 0) {
-      if (payingInPerson) {
-        socket.emit('order', itemList, itemCount, instructions, true, customer);
-
-      } else if (charge <= balance) {
-        socket.emit('order', itemList, itemCount, instructions, false, customer);
-      }
+      socket.emit('order', itemList, itemCount, instructions, payingInPerson, customer);
     }
   });
 })

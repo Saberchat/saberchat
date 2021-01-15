@@ -16,6 +16,7 @@ const Request = require('../models/accessRequest');
 const Message = require('../models/message');
 const Announcement = require('../models/announcement');
 const Project = require('../models/project');
+const Course = require('../models/course');
 
 const Order = require('../models/order');
 const Article = require('../models/article');
@@ -24,14 +25,6 @@ const Permission = require('../models/permission');
 const Status = require('../models/status');
 
 const middleware = require('../middleware');
-
-let transporter = nodemailer.createTransport({
-  service: 'gmail',
-  auth: {
-    user: 'noreply.saberchat@gmail.com',
-    pass: 'Tgy8erwIYtxRZrJHvKwkWbrkbUhv1Zr9'
-  }
-});
 
 //Function to display user inbox
 router.get('/', middleware.isLoggedIn, middleware.isAdmin, (req, res) => {
@@ -428,7 +421,7 @@ router.delete('/whitelist/:id', middleware.isLoggedIn, middleware.isPrincipal, (
 			return res.redirect('back');
 		}
 
-    transport(transporter, deletedUser, 'Profile Deletion Notice', `<p>Hello ${deletedUser.firstName},</p><p>You are receiving this email because your email has been removed from Saberchat's email whitelist. Your account and all of its data has been deleted. Please contact a faculty member if  you think there has been a mistake.</p>`);
+    transport(deletedUser, 'Profile Deletion Notice', `<p>Hello ${deletedUser.firstName},</p><p>You are receiving this email because your email has been removed from Saberchat's email whitelist. Your account and all of its data has been deleted. Please contact a faculty member if  you think there has been a mistake.</p>`);
 	}
 
 	req.flash('success', "Email Removed From Whitelist! Any users with this email have been removed.");
@@ -489,23 +482,59 @@ router.put('/status', middleware.isLoggedIn, middleware.isMod, (req, res) => {
 });
 
 router.put('/tag', middleware.isLoggedIn, middleware.isMod, (req, res) => {
-  User.findById(req.body.user, (err, user) => {
-    if(err || !user) {
-      res.json({error: 'Error. Could not change'});
 
-    } else {
-      if (user.tags.includes(req.body.tag)) {
-        user.tags.splice(user.tags.indexOf(req.body.tag), 1);
-        user.save();
-        res.json({success: "Successfully removed status", tag: req.body.tag})
+  (async() => {
+    const user = await User.findById(req.body.user);
+
+    if(!user) {
+      return res.json({error: 'Error. Could not change'});
+    }
+
+    if (user.tags.includes(req.body.tag)) {
+
+      if (req.body.tag == "Tutor") {
+        const courses = await Course.find({});
+
+        if (!courses) {
+          return res.json({error: 'Error. Could not change'});
+        }
+
+        let active = false;
+
+        loop1:
+        for (let course of courses) {
+          loop2:
+          for (let tutor of course.tutors) {
+            if (tutor.tutor.equals(user._id)) {
+              active = true;
+              break loop1;
+            }
+          }
+        }
+
+        if (active) {
+          return res.json({error: "User is an Active Tutor"});
+
+        } else {
+          user.tags.splice(user.tags.indexOf(req.body.tag), 1);
+          user.save();
+          return res.json({success: "Successfully removed status", tag: req.body.tag})
+        }
 
       } else {
-        user.tags.push(req.body.tag);
+        user.tags.splice(user.tags.indexOf(req.body.tag), 1);
         user.save();
-        res.json({success: "Successfully added status", tag: req.body.tag})
+        return res.json({success: "Successfully removed status", tag: req.body.tag})
       }
 
+    } else {
+      user.tags.push(req.body.tag);
+      user.save();
+      return res.json({success: "Successfully added status", tag: req.body.tag})
     }
+
+  })().catch(err => {
+    res.json({error: 'Error. Could not change'});
   });
 });
 

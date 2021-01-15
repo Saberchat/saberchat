@@ -173,7 +173,7 @@ router.put('/comment', middleware.isLoggedIn, (req, res) => {
 
       await notif.save();
 
-      transport(transporter, user, `New Mention in ${article.title}`, `<p>Hello ${user.firstName},</p><p>${req.user.firstName} ${req.user.lastName} mentioned you in a comment on <strong>${article.title}</strong>.<p>${comment.text}</p>`);
+      transport(user, `New Mention in ${article.title}`, `<p>Hello ${user.firstName},</p><p>${req.user.firstName} ${req.user.lastName} mentioned you in a comment on <strong>${article.title}</strong>.<p>${comment.text}</p>`);
 
       user.inbox.push(notif); //Add notif to user's inbox
       user.msgCount += 1;

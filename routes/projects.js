@@ -15,14 +15,6 @@ const Project = require('../models/project');
 const Notification = require('../models/message');
 const PostComment = require('../models/postComment');
 
-let transporter = nodemailer.createTransport({
-  service: 'gmail',
-  auth: {
-    user: 'noreply.saberchat@gmail.com',
-    pass: 'Tgy8erwIYtxRZrJHvKwkWbrkbUhv1Zr9'
-  }
-});
-
 //ROUTES
 router.get('/', (req, res) => { //RESTful Routing 'INDEX' route
 
@@ -124,7 +116,7 @@ router.post('/',middleware.isLoggedIn, middleware.isFaculty, (req, res) => { //R
 
     for (let follower of followers) {
 
-      notif = await Notification.create({subject: "New Project Post", sender: req.user, recipients: [follower], read: [], toEveryone: false, images: project.images}); //Create a notification to alert the user
+      notif = await Notification.create({subject: "New Project Post", sender: req.user, noReply: true, recipients: [follower], read: [], toEveryone: false, images: project.images}); //Create a notification to alert the user
 
       if (!notif) {
         req.flash('error', 'Unable to send notification'); return res.redirect('back');
@@ -135,7 +127,7 @@ router.post('/',middleware.isLoggedIn, middleware.isFaculty, (req, res) => { //R
 
       await notif.save();
 
-      transport(transporter, follower, `New Project Post - ${project.title}`, `<p>Hello ${follower.firstName},</p><p>${req.user.firstName} ${req.user.lastName} recently posted a new project: <strong>${project.title}</strong>. Check it out!</p>${imageString}`);
+      transport(follower, `New Project Post - ${project.title}`, `<p>Hello ${follower.firstName},</p><p>${req.user.firstName} ${req.user.lastName} recently posted a new project: <strong>${project.title}</strong>. Check it out!</p>${imageString}`);
       follower.inbox.push(notif); //Add notif to user's inbox
       follower.msgCount += 1;
       await follower.save();
@@ -398,7 +390,7 @@ router.put('/comment', middleware.isLoggedIn, (req, res) => {
 
     for (let user of users) {
 
-      notif = await Notification.create({subject: `New Mention in ${project.title}`, sender: req.user, recipients: [user], read: [], toEveryone: false, images: []}); //Create a notification to alert the user
+      notif = await Notification.create({subject: `New Mention in ${project.title}`, sender: req.user, noReply: true, recipients: [user], read: [], toEveryone: false, images: []}); //Create a notification to alert the user
 
       if (!notif) {
         return res.json({error: "Error creating notification"});
@@ -409,7 +401,7 @@ router.put('/comment', middleware.isLoggedIn, (req, res) => {
 
       await notif.save();
 
-      transport(transporter, user, `New Mention in ${project.title}`, `<p>Hello ${user.firstName},</p><p>${req.user.firstName} ${req.user.lastName} mentioned you in a comment on <strong>${project.title}</strong>.<p>${comment.text}</p>`);
+      transport(user, `New Mention in ${project.title}`, `<p>Hello ${user.firstName},</p><p>${req.user.firstName} ${req.user.lastName} mentioned you in a comment on <strong>${project.title}</strong>.<p>${comment.text}</p>`);
 
       user.inbox.push(notif); //Add notif to user's inbox
       user.msgCount += 1;
@@ -515,7 +507,7 @@ router.put('/:id', middleware.isLoggedIn, middleware.isFaculty, (req, res) => {
 
     for (let follower of followers) {
 
-      notif = await Notification.create({subject: "New Project Post", sender: req.user, recipients: [follower], read: [], toEveryone: false, images: updatedProject.images}); //Create a notification to alert the user
+      notif = await Notification.create({subject: "New Project Post", sender: req.user, noReply: true, recipients: [follower], read: [], toEveryone: false, images: updatedProject.images}); //Create a notification to alert the user
 
       if (!notif) {
         req.flash('error', 'Unable to send notification'); return res.redirect('back');
@@ -526,7 +518,7 @@ router.put('/:id', middleware.isLoggedIn, middleware.isFaculty, (req, res) => {
 
       await notif.save();
 
-      transport(transporter, follower, `New Project Post - ${updatedProject.title}`, `<p>Hello ${follower.firstName},</p><p>${req.user.firstName} ${req.user.lastName} recently updated one of their projects: <strong>${updatedProject.title}</strong>. Check it out!</p>${imageString}`);
+      transport(follower, `New Project Post - ${updatedProject.title}`, `<p>Hello ${follower.firstName},</p><p>${req.user.firstName} ${req.user.lastName} recently updated one of their projects: <strong>${updatedProject.title}</strong>. Check it out!</p>${imageString}`);
 
       follower.inbox.push(notif); //Add notif to user's inbox
       follower.msgCount += 1;

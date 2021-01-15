@@ -16,14 +16,6 @@ const Notification = require('../models/message');
 const Type = require('../models/itemType');
 const Cafe = require('../models/cafe')
 
-let transporter = nodemailer.createTransport({
-  service: 'gmail',
-  auth: {
-    user: 'noreply.saberchat@gmail.com',
-    pass: 'Tgy8erwIYtxRZrJHvKwkWbrkbUhv1Zr9'
-  }
-});
-
 //ROUTES
 router.get('/', middleware.isLoggedIn, (req, res) => { //RESTful routing 'order/index' route
   Order.find({customer: req.user._id})
@@ -678,11 +670,9 @@ router.get('/orders', middleware.isLoggedIn, middleware.isMod, (req, res) => { /
 });
 
 router.delete('/order/:id', middleware.isLoggedIn, middleware.cafeOpen, (req, res) => { //RESTful routing 'order/destroy' (for users to delete an order they no longer want)
-
   Order.findByIdAndDelete(req.params.id).populate('items.item').exec((err, foundOrder) => { //Delete the item selected in the form (but first, collect info on its items so you can replace them)
     if (err || !foundOrder) {
-      req.flash("error", "Unable to access database");
-      res.redirect('back');
+      res.json({error: 'Could not find order'});
 
     } else {
 
@@ -698,8 +688,7 @@ router.delete('/order/:id', middleware.isLoggedIn, middleware.cafeOpen, (req, re
         foundOrder.items[i].item.save();
       }
 
-      req.flash('success', "Order canceled!");
-      res.redirect('/cafe');
+      res.json({success: 'Successfully canceled'});
     }
   });
 });
@@ -709,7 +698,7 @@ router.post('/:id/ready', middleware.isLoggedIn, middleware.isMod, (req, res) =>
   (async () => {
     const order = await Order.findById(req.params.id).populate('items.item').populate('customer'); //Find the order that is currently being handled based on id, and populate info about its items
     if (!order) {
-      req.flash('error', 'Could not find order'); return res.redirect('/cafe/orders');
+      return res.json({error: 'Could not find order'});
     }
 
     order.present = false; //Order is not active anymore
@@ -717,16 +706,15 @@ router.post('/:id/ready', middleware.isLoggedIn, middleware.isMod, (req, res) =>
 
     const cafes = await Cafe.find({});
     if (!cafes) {
-      req.flash('error', "Unable to find cafe info");
-      return res.redirect('back');
+      return res.json({error: 'Could not find cafe info'});
     }
 
     cafes[0].revenue += order.charge;
     cafes[0].save();
 
-    const notif = await Notification.create({subject: "Cafe Order Ready", sender: req.user, recipients: [order.customer], read: [], toEveryone: false, images: []}); //Create a notification to alert the user
+    const notif = await Notification.create({subject: "Cafe Order Ready", sender: req.user, noReply: true, recipients: [order.customer], read: [], toEveryone: false, images: []}); //Create a notification to alert the user
       if (!notif) {
-        req.flash('error', 'Unable to send notification'); return res.redirect('/cafe/orders');
+        return res.json({error: 'Unable to send notification'});
       }
 
       notif.date = dateFormat(notif.created_at, "h:MM TT | mmm d");
@@ -749,19 +737,16 @@ router.post('/:id/ready', middleware.isLoggedIn, middleware.isMod, (req, res) =>
 
       await notif.save();
 
-      transport(transporter, order.customer, 'Cafe Order Ready', `<p>Hello ${order.customer.firstName},</p><p>${notif.text}</p>`);
+      transport(order.customer, 'Cafe Order Ready', `<p>Hello ${order.customer.firstName},</p><p>${notif.text}</p>`);
 
       order.customer.inbox.push(notif); //Add notif to user's inbox
       order.customer.msgCount += 1;
       await order.customer.save();
 
-      req.flash('success', 'Order ready! A notification has been sent to the customer. If they do not arrive within 5 minutes, try contacting them again.');
-      res.redirect('/cafe/orders');
+      return res.json({success: 'Successfully confirmed order'});
 
   })().catch(err => {
-    console.log(err);
-    req.flash('error', "Unable to access database");
-    res.redirect('back');
+    res.json({error: "Unable to access database"});
   });
 });
 
@@ -770,13 +755,13 @@ router.post('/:id/reject', middleware.isLoggedIn, middleware.isMod, (req, res) =
     const order = await Order.findById(req.params.id).populate('items.item').populate('customer');
 
     if (!order) {
-      req.flash('error', 'Could not find order'); return res.redirect('back');
+      return res.json({error: 'Could not find order'});
     }
 
     const deletedOrder = await Order.findByIdAndDelete(order._id).populate('items.item').populate('customer');
 
     if (!deletedOrder) {
-      req.flash('error', "Unable to delete order"); return res.redirect('back');
+      return res.json({error: 'Could not delete order'});
     }
 
     for (let i of order.items) { //Iterate over each item/quantity object
@@ -785,9 +770,9 @@ router.post('/:id/reject', middleware.isLoggedIn, middleware.isMod, (req, res) =
       await i.item.save();
     }
 
-    const notif = await Notification.create({subject: "Cafe Order Rejected", sender: req.user, recipients: [order.customer], read: [], toEveryone: false, images: []}); //Create a notification to alert the user
+    const notif = await Notification.create({subject: "Cafe Order Rejected", sender: req.user, noReply: true, recipients: [order.customer], read: [], toEveryone: false, images: []}); //Create a notification to alert the user
     if (!notif) {
-      req.flash('error', 'Unable to send notification'); return res.redirect('/cafe/orders');
+      return res.json({error: 'Could not send notification'});
     }
 
     notif.date = dateFormat(notif.created_at, "h:MM TT | mmm d");
@@ -820,10 +805,9 @@ router.post('/:id/reject', middleware.isLoggedIn, middleware.isMod, (req, res) =
       }
     }
 
-
     await notif.save();
 
-    transport(transporter, order.customer, 'Cafe Order Rejected', `<p>Hello ${order.customer.firstName},</p><p>${notif.text}</p>`);
+    transport(order.customer, 'Cafe Order Rejected', `<p>Hello ${order.customer.firstName},</p><p>${notif.text}</p>`);
 
     if (!order.payingInPerson) {
       order.customer.balance += order.charge; //Refund
@@ -834,13 +818,11 @@ router.post('/:id/reject', middleware.isLoggedIn, middleware.isMod, (req, res) =
     order.customer.msgCount += 1;
     await order.customer.save();
 
-    req.flash('success', 'Order rejected! A message has been sent to the customer.');
-    res.redirect('/cafe/orders');
+    return res.json({success: 'Successfully rejected order'});
 
   })().catch(err => {
     console.log(err);
-    req.flash('error', "Unable to access database");
-    res.redirect('back');
+    res.json({error: "Unable to access database"});
   });
 });
 

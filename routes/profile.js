@@ -21,14 +21,6 @@ const Article = require('../models/article');
 
 const middleware = require('../middleware');
 
-let transporter = nodemailer.createTransport({
-  service: 'gmail',
-  auth: {
-    user: 'noreply.saberchat@gmail.com',
-    pass: 'Tgy8erwIYtxRZrJHvKwkWbrkbUhv1Zr9'
-  }
-});
-
 // renders the list of users page
 router.get('/', middleware.isLoggedIn, (req, res) => {
 
@@ -139,7 +131,7 @@ router.put('/profile', middleware.isLoggedIn, (req, res) => {
       return res.redirect('back');
     }
 
-    transport(transporter, updatedUser, 'Profile Update Confirmation', `<p>Hello ${user.firstName},</p><p>You are receiving this email because you recently made changes to your Saberchat profile.\n\nIf you did not recently make any changes, contact a faculty member immediately.</p>`);
+    transport(updatedUser, 'Profile Update Confirmation', `<p>Hello ${user.firstName},</p><p>You are receiving this email because you recently made changes to your Saberchat profile.\n\nIf you did not recently make any changes, contact a faculty member immediately.</p>`);
     req.flash('success', 'Updated your profile');
     res.redirect('/profiles/' + req.user._id);
 
@@ -301,7 +293,7 @@ router.put('/change-password', middleware.isLoggedIn, (req, res) => {
 
           } else {
 
-            transport_mandatory(transporter, req.user, 'Password Update Confirmation', `<p>Hello ${req.user.firstName},</p><p>You are receiving this email because you recently made changes to your Saberchat password. This is a confirmation of your profile.\n\nYour username is ${req.user.username}.\nYour full name is ${req.user.firstName} ${req.user.lastName}.\nYour email is ${req.user.email}\n\nIf you did not recently change your password, reset it immediately and contact a faculty member.</p>`);
+            transport_mandatory(req.user, 'Password Update Confirmation', `<p>Hello ${req.user.firstName},</p><p>You are receiving this email because you recently made changes to your Saberchat password. This is a confirmation of your profile.\n\nYour username is ${req.user.username}.\nYour full name is ${req.user.firstName} ${req.user.lastName}.\nYour email is ${req.user.email}\n\nIf you did not recently change your password, reset it immediately and contact a faculty member.</p>`);
 
             req.flash('success', 'Successfully changed your password');
             res.redirect('/profiles/' + req.user._id);
@@ -562,7 +554,7 @@ router.delete('/delete-account', middleware.isLoggedIn, (req, res) => {
       return res.redirect('back');
     }
 
-    transport_mandatory(transporter, deletedUser, 'Profile Deletion Confirmation', `<p>Hello ${deletedUser.firstName},</p><p>You are receiving this email because you recently deleted your Saberchat account. If you did not delete your account, contact a staff member immediately.</p>`);
+    transport_mandatory(deletedUser, 'Profile Deletion Confirmation', `<p>Hello ${deletedUser.firstName},</p><p>You are receiving this email because you recently deleted your Saberchat account. If you did not delete your account, contact a staff member immediately.</p>`);
 
     req.flash('success', "Account deleted!");
     res.redirect('/');

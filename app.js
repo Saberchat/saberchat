@@ -188,7 +188,7 @@ app.use('/projects', projectRoutes);
 app.use('/articles', wHeightsRoutes);
 app.use('/homework', hwRoutes);
 
-// Catch-all route. 
+// Catch-all route.
 app.get('*', (req, res) => {
 	res.redirect('/');
 });

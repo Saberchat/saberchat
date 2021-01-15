@@ -15,14 +15,6 @@ const Message = require('../models/message');
 const AccessReq = require('../models/accessRequest');
 const Room = require('../models/room');
 
-let transporter = nodemailer.createTransport({
-  service: 'gmail',
-  auth: {
-    user: 'noreply.saberchat@gmail.com',
-    pass: 'Tgy8erwIYtxRZrJHvKwkWbrkbUhv1Zr9'
-  }
-});
-
 //Route to display user inbox
 router.get('/', middleware.isLoggedIn, (req, res) => {
 	(async () => {
@@ -183,13 +175,13 @@ router.post('/messages', middleware.isLoggedIn, (req, res) => {
       }
 
       if (message.toEveryone) {
-        transport(transporter, r, `New Inbox Notification - ${newMessage.subject}`, `<p>Hello ${r.firstName},</p><p>You have a new Saberchat inbox notification from <strong>${req.user.username}</strong>!</p><p><strong>To</strong>: Everyone</p><p>${newMessage.text}</p><p>You can access the full message at https://alsion-saberchat.herokuapp.com</p> ${imageString}`);
+        transport(r, `New Inbox Notification - ${newMessage.subject}`, `<p>Hello ${r.firstName},</p><p>You have a new Saberchat inbox notification from <strong>${req.user.username}</strong>!</p><p><strong>To</strong>: Everyone</p><p>${newMessage.text}</p><p>You can access the full message at https://alsion-saberchat.herokuapp.com</p> ${imageString}`);
 
       } else if (message.anonymous) {
-        transport(transporter, r, `New Inbox Notification - ${newMessage.subject}`, `<p>Hello ${r.firstName},</p><p>You have a new Saberchat anonymous notification!</p><p><strong>To</strong>: ${recipientArr.join(', ')}</p><p>${newMessage.text}</p><p>You can access the full message at https://alsion-saberchat.herokuapp.com</p> ${imageString}`);
+        transport(r, `New Inbox Notification - ${newMessage.subject}`, `<p>Hello ${r.firstName},</p><p>You have a new Saberchat anonymous notification!</p><p><strong>To</strong>: ${recipientArr.join(', ')}</p><p>${newMessage.text}</p><p>You can access the full message at https://alsion-saberchat.herokuapp.com</p> ${imageString}`);
 
       } else {
-        transport(transporter, r, `New Inbox Notification - ${newMessage.subject}`, `<p>Hello ${r.firstName},</p><p>You have a new Saberchat inbox notification from <strong>${req.user.username}</strong>!</p><p><strong>To</strong>: ${recipientArr.join(', ')}</p><p>${newMessage.text}</p><p>You can access the full message at https://alsion-saberchat.herokuapp.com</p> ${imageString}`);
+        transport(r, `New Inbox Notification - ${newMessage.subject}`, `<p>Hello ${r.firstName},</p><p>You have a new Saberchat inbox notification from <strong>${req.user.username}</strong>!</p><p><strong>To</strong>: ${recipientArr.join(', ')}</p><p>${newMessage.text}</p><p>You can access the full message at https://alsion-saberchat.herokuapp.com</p> ${imageString}`);
       }
 
 		}
@@ -243,8 +235,8 @@ router.put('/reply', middleware.isLoggedIn, (req, res) => {
     if (err || !message) {
       res.json({error: "Error accessing message"});
 
-    } else if (message.anonymous) {
-      res.json({error: "Cannot reply to anonymous message"});
+    } else if (message.anonymous || message.noReply) {
+      res.json({error: "Cannot reply to this message"});
 
     } else {
       let reply = {sender: req.user, text: req.body.text, images: req.body.images, date: dateFormat(new Date(), "h:MM TT | mmm d")};
@@ -308,7 +300,7 @@ router.put('/reply', middleware.isLoggedIn, (req, res) => {
 
         //Send email notifying about the reply to everyone except person who posted the reply
         if (!(recipient._id.equals(req.user._id))) {
-          transport(transporter, recipient, `New Reply On ${message.subject}`, `<p>Hello ${recipient.firstName},</p><p><strong>${req.user.username}</strong> replied to <strong>${message.subject}</strong>.<p>${reply.text}</p><p>You can access the full message at https://alsion-saberchat.herokuapp.com</p> ${imageString}`);
+          transport(recipient, `New Reply On ${message.subject}`, `<p>Hello ${recipient.firstName},</p><p><strong>${req.user.username}</strong> replied to <strong>${message.subject}</strong>.<p>${reply.text}</p><p>You can access the full message at https://alsion-saberchat.herokuapp.com</p> ${imageString}`);
         }
       }
 
@@ -488,7 +480,7 @@ router.post('/requests/:id/accept', middleware.isLoggedIn, (req, res) => {
         req.user.save();
       }
 
-      transport(transporter, Req.requester, `Room Request Accepted - ${foundRoom.name}`, `<p>Hello ${Req.requester.firstName},</p><p>Your request to join chat room <strong>${foundRoom.name}</strong> has been accepted!<p><p>You can access the room at https://alsion-saberchat.herokuapp.com</p>`);
+      transport(Req.requester, `Room Request Accepted - ${foundRoom.name}`, `<p>Hello ${Req.requester.firstName},</p><p>Your request to join chat room <strong>${foundRoom.name}</strong> has been accepted!<p><p>You can access the room at https://alsion-saberchat.herokuapp.com</p>`);
 			req.flash('success', 'Request accepted');
 			res.redirect('/inbox');
 		}
@@ -536,7 +528,7 @@ router.post('/requests/:id/reject', middleware.isLoggedIn, (req, res) => {
         req.user.save();
       }
 
-      transport(transporter, Req.requester, `Room Request Rejected - ${Req.room.name}`, `<p>Hello ${Req.requester.firstName},</p><p>Your request to join chat room <strong>${Req.room.name}</strong> has been rejected. Contact the room creator, <strong>${Req.room.creator.username}</strong>, if  you think there has been a mistake.</p>`);
+      transport(Req.requester, `Room Request Rejected - ${Req.room.name}`, `<p>Hello ${Req.requester.firstName},</p><p>Your request to join chat room <strong>${Req.room.name}</strong> has been rejected. Contact the room creator, <strong>${Req.room.creator.username}</strong>, if  you think there has been a mistake.</p>`);
 			req.flash('success', 'Request rejected');
 			res.redirect('/inbox');
 		}
