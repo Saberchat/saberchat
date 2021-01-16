@@ -13,14 +13,17 @@ const book = ((button, location) => {
 
       let reviewButton = document.createElement('button');
       let leaveButton = document.createElement('button');
+      let chatButton = document.createElement('a');
 
       if (location == "show") {
         reviewButton.className ="review-button edit-button btn btn-warning";
         leaveButton.className ="leave-button edit-button btn btn-danger";
+        chatButton.className ="leave-button edit-button btn btn-success";
 
       } else if (location == "tutor-show") {
         reviewButton.className ="edit-button btn btn-warning";
         leaveButton.className ="edit-button btn btn-danger";
+        chatButton.className ="edit-button btn btn-success";
       }
 
       reviewButton.id = `review-button-${tutorId}`;
@@ -33,11 +36,16 @@ const book = ((button, location) => {
       leaveButton.setAttribute("data-target", `#modal-stop-${tutorId}`);
       leaveButton.innerHTML = "Stop Lessons";
 
+      chatButton.id = `leave-button-${tutorId}`;
+      chatButton.setAttribute("href", `/chat/${data.room}`);
+      chatButton.innerHTML = "Chat";
+
       if (!data.formerStudent) {
         tutorDiv.appendChild(reviewButton);
       }
 
       tutorDiv.appendChild(leaveButton);
+      tutorDiv.appendChild(chatButton);
 
 
       document.getElementById("new-count").innerText = `${data.user.newRoomCount.length + data.user.annCount.length}`;
@@ -63,6 +71,7 @@ const leave = ((button, location) => {
       const tutorDiv = document.getElementById(`tutor-actions-${tutorId}`);
       tutorDiv.removeChild(document.getElementById(`review-button-${tutorId}`));
       tutorDiv.removeChild(document.getElementById(`leave-button-${tutorId}`));
+      tutorDiv.removeChild(document.getElementById(`chat-button-${tutorId}`));
 
       let reviewButton = document.createElement('button');
       let bookButton = document.createElement('button');
@@ -298,8 +307,30 @@ const unblock = (button => {
       if (data.course.blocked.length == 0) {
         document.getElementById("blocked-div").parentNode.removeChild(document.getElementById("blocked-div"));
       }
-    } else {
-      console.log(data.error)
     }
   });
+});
+
+const changeBio = (button => {
+  const courseId = button.id.split('-')[2];
+  const bio = document.getElementById(`edit-bio-field`).value;
+
+  if (bio.length < 100 || bio.length > 250) {
+    document.getElementById("bio-length-error").hidden = false;
+    setTimeout(() => {
+      document.getElementById("bio-length-error").hidden = true;
+    }, 1000);
+
+  } else {
+    const url = `/homework/bio/${courseId}?_method=put`;
+    const data = {bio};
+
+    $.post(url, data, function(data) {
+
+      if (data.success) {
+        $(`#modal-edit-bio`).modal('hide');
+        document.getElementById("tutor-bio").innerText = bio;
+      }
+    });
+  }
 });

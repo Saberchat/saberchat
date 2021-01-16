@@ -132,6 +132,15 @@ middleware.isTutor = ((req, res, next) => {
 	}
 });
 
+middleware.isCashier = ((req, res, next) => {
+	if (req.user.tags.toString().toLowerCase().includes('cashier')) {
+		next();
+	} else {
+		req.flash('error', 'You do not have permission to do that');
+		res.redirect('back');
+	}
+});
+
 middleware.cafeOpen = ((req, res, next) => { //Cafe time restrictions
 
 	Cafe.find({}, (err, foundCafe) => {
@@ -150,7 +159,6 @@ middleware.cafeOpen = ((req, res, next) => { //Cafe time restrictions
 		}
 	})
 });
-
 
 //export the object with all the functions
 module.exports = middleware;

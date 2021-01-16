@@ -75,7 +75,6 @@ router.get('/:id', middleware.isLoggedIn, (req, res) => {
     res.render('profile/show', {user, following, followerIds});
 
   })().catch(err => {
-    console.log(err);
     req.flash('error', "Unable to access database");
     res.redirect('back');
   })
@@ -136,7 +135,6 @@ router.put('/profile', middleware.isLoggedIn, (req, res) => {
     res.redirect('/profiles/' + req.user._id);
 
   })().catch(err => {
-    console.log(err);
     req.flash('error', "Unable to access database");
     res.redirect('back');
   });
@@ -161,11 +159,11 @@ router.put('/change-email', middleware.isLoggedIn, (req, res) => {
 
     if(req.body.receiving_emails) {
       req.user.receiving_emails = true;
-      req.user.save();
+      await req.user.save();
 
     } else {
       req.user.receiving_emails = false;
-      req.user.save();
+      await req.user.save();
     }
 
     const emails = await Email.find({address: req.body.email});
@@ -210,7 +208,6 @@ router.put('/change-email', middleware.isLoggedIn, (req, res) => {
     res.redirect('/profiles/change-login-info');
 
   })().catch(err => {
-    console.log(err);
     req.flash('error', "Unable to access database");
     res.redirect('back');
   });
@@ -242,8 +239,6 @@ router.get('/confirm-email/:id', (req, res) => {
         token += charSet[Math.floor((Math.random() * charSet.length))];
       }
 
-      console.log(user.authenticationToken);
-      console.log(req.query.token);
       if (req.query.token.toString() == user.authenticationToken) {
         user.email = req.query.email;
         user.authenticationToken = token;
@@ -378,7 +373,7 @@ router.delete('/delete-account', middleware.isLoggedIn, (req, res) => {
           }
 
           messageSender.msgCount -= 1;
-          messageSender.save();
+          await messageSender.save();
         }
 
         messageUpdate = await Message.findByIdAndDelete(message._id);
@@ -560,7 +555,6 @@ router.delete('/delete-account', middleware.isLoggedIn, (req, res) => {
     res.redirect('/');
 
   })().catch(err => {
-    console.log(err);
     req.flash('error', "Unable to access database");
     res.redirect('back');
   });

@@ -51,8 +51,6 @@ const cancel = (button => {
     if (data.success) {
       $(`#modal-${orderId}-cancel`).modal('hide');
       document.getElementById("active-orders").removeChild(document.getElementById(`${orderId}`));
-    } else {
-      console.log(data)
     }
   });
 });

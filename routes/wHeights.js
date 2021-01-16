@@ -22,7 +22,6 @@ router.get('/', middleware.isLoggedIn, (req, res) => {
     res.render('wHeights/index', {articles: articles});
 
   })().catch(err => {
-    console.log(err);
     req.flash('error', "Unable to access database");
     res.redirect('back');
   });
@@ -46,7 +45,6 @@ router.get('/new', middleware.isLoggedIn, (req, res) => {
     res.render('wHeights/new', {students, types});
 
   })().catch(err => {
-    console.log(err);
     req.flash('error', "Unable to access database");
     res.redirect('back');
   })
@@ -78,7 +76,6 @@ router.post('/new', middleware.isLoggedIn, (req, res) => {
   (async () => {
 
     const content = JSON.parse(req.body.content);
-    console.log(req.body);
 
     const articleObj = {
         title: req.body.title,
@@ -109,14 +106,12 @@ router.post('/new', middleware.isLoggedIn, (req, res) => {
     res.redirect('/articles');
 
   })().catch(err => {
-    console.log(err);
     req.flash('error', "Unable to access database");
     res.redirect('back');
   });
 });
 
 router.put('/comment', middleware.isLoggedIn, (req, res) => {
-  console.log("successful");
   (async() => {
 
     const article = await Article.findById(req.body.article)
@@ -137,10 +132,10 @@ router.put('/comment', middleware.isLoggedIn, (req, res) => {
     }
 
     comment.date = dateFormat(comment.created_at, "h:MM TT | mmm d");
-    comment.save();
+    await comment.save();
 
     article.comments.push(comment);
-    article.save();
+    await article.save();
 
     let users = [];
     let user;
@@ -180,16 +175,10 @@ router.put('/comment', middleware.isLoggedIn, (req, res) => {
       await user.save();
     }
 
-    res.json({
-      success: 'Successful comment',
-      comments: article.comments
-    });
+    res.json({success: 'Successful comment', comments: article.comments});
 
   })().catch(err => {
-    console.log(err)
-    res.json({
-      error: 'Error Commenting'
-    });
+    res.json({error: "Error Commenting"});
   });
 });
 

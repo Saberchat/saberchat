@@ -1,4 +1,4 @@
-// sends put request with data
+// Upvotes a tutor
 const upvote = (button => {
   const courseId = button.id.split('-')[1];
   const tutorId = button.id.split("-")[2];

@@ -12,6 +12,7 @@ const courseSchema = new mongoose.Schema({
   },
   students: [{type: mongoose.Schema.Types.ObjectId, ref: 'User', default: []}],
   blocked: [{type: mongoose.Schema.Types.ObjectId, ref: 'User', default: []}],
+  lessons: Number,
   tutors: [{
     tutor: {type: mongoose.Schema.Types.ObjectId, ref: 'User'},
     slots: {type: Number, default: 0},
@@ -25,6 +26,13 @@ const courseSchema = new mongoose.Schema({
       {
         student: {type: mongoose.Schema.Types.ObjectId, ref: 'User'},
         room: {type: mongoose.Schema.Types.ObjectId, ref: 'Room'},
+        default: []
+      }
+    ],
+    lessons: [
+      {
+        student: {type: mongoose.Schema.Types.ObjectId, ref: 'User'},
+        time: Date,
         default: []
       }
     ],

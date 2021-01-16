@@ -36,6 +36,12 @@ h3, .ratings {
   margin-bottom: 20px;
 }
 
+#bio-length-error {
+  color: red;
+  margin-bottom: 10px;
+  text-align: left;
+}
+
 @media only screen and (max-width: 768px) {
     .profile-desc {
         margin: 1.7rem 0;

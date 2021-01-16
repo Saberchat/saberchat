@@ -4,10 +4,7 @@ const ignoreComment = (button => {
   const commentId = button.id;
   $.post(url, {id: commentId}, function(data) {
     if(data.success) {
-        console.log(data.success);
-        listItem.remove();
-    } else if(data.error) {
-        console.log(data.error);
+      listItem.remove();
     }
   });
 });
@@ -18,10 +15,7 @@ const deleteComment = (button => {
   const commentId = button.id;
   $.post(url, {id: commentId}, function(data) {
     if(data.success) {
-        console.log(data.success);
-        listItem.remove();
-    } else if(data.error) {
-        console.log(data.error);
+      listItem.remove();
     }
   });
 });

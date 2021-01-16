@@ -92,7 +92,6 @@ router.get('/whitelist', middleware.isLoggedIn, middleware.isPrincipal, (req, re
 		res.render('admin/whitelist', {emails, users});
 
 	})().catch(err => {
-		console.log(err);
 		req.flash('error', "Unable to access database");
 		res.redirect('back');
 	});
@@ -118,7 +117,6 @@ router.post('/whitelist', middleware.isLoggedIn, middleware.isPrincipal, (req, r
 
 
 	})().catch(err => {
-		console.log(err);
 		req.flash('error', "Unable to access database");
 		res.redirect('back');
 	});
@@ -428,7 +426,6 @@ router.delete('/whitelist/:id', middleware.isLoggedIn, middleware.isPrincipal, (
 	res.redirect('/admin/whitelist');
 
 	})().catch(err => {
-		console.log(err);
 		req.flash('error', "Unable to access database");
 		res.redirect('back');
 	});
@@ -472,12 +469,42 @@ router.put('/permissions', middleware.isLoggedIn, middleware.isAdmin, (req, res)
 
 // changes status
 router.put('/status', middleware.isLoggedIn, middleware.isMod, (req, res) => {
-	User.findByIdAndUpdate(req.body.user, {status: req.body.status}, (err, updatedUser) => {
-		if(err || !updatedUser) {
-			res.json({error: 'Error. Could not change'});
-		} else {
-			res.json({success: 'Succesfully changed'});
+	(async() => {
+		const user = await User.findById(req.body.user);
+
+		if(!user) {
+			return res.json({error: 'Error. Could not change'});
 		}
+
+		if (user.status == "faculty") {
+			let teaching = false;
+			const courses = await Course.find({});
+			if (!courses) {
+				return res.json({error: "Error. Could not change"});
+			}
+
+			for (let course of courses) {
+				if (course.teacher.equals(user._id)) {
+					teaching = true;
+					break;
+				}
+			}
+
+			if (teaching) {
+				return res.json({error: "User is an active teacher"});
+			}
+
+			user.status = req.body.status;
+			await user.save();
+			return res.json({success: 'Succesfully changed'});
+		}
+
+		user.status = req.body.status;
+		await user.save();
+		return res.json({success: "Successfully Changed"});
+
+	})().catch(err => {
+		res.json({error: "Error. Could not change"});
 	});
 });
 

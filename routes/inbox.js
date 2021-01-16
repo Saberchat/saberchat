@@ -33,7 +33,6 @@ router.get('/', middleware.isLoggedIn, (req, res) => {
 		res.render('inbox/index', {inbox: req.user.inbox.reverse(), requests: req.user.requests.reverse()});
 
 	})().catch(err => {
-		console.log(err);
 		req.flash('error', 'An error occured');
 		res.redirect('back');
 	});
@@ -190,7 +189,6 @@ router.post('/messages', middleware.isLoggedIn, (req, res) => {
 		res.redirect('back');
 
 	})().catch(err => {
-		console.log(err);
 		req.flash('error', 'An error occured');
 		res.redirect('back');
 	});
@@ -337,7 +335,6 @@ router.get('/:id', middleware.isLoggedIn, (req, res) => {
 		res.render('inbox/show', {message: message});
 
   })().catch(err => {
-		console.log(err);
 		req.flash('error','There was an error');
 		res.redirect('back');
 	});
@@ -379,7 +376,6 @@ router.delete('/delete', middleware.isLoggedIn, (req, res) => {
 
 		res.redirect('back');
 	})().catch(err => {
-		console.log(err);
 		req.flash('error', 'An error occured');
 		res.redirect('back');
 	});
@@ -477,7 +473,7 @@ router.post('/requests/:id/accept', middleware.isLoggedIn, (req, res) => {
 
       if (index != -1) {
         req.user.requests.splice(index, 1);
-        req.user.save();
+        await req.user.save();
       }
 
       transport(Req.requester, `Room Request Accepted - ${foundRoom.name}`, `<p>Hello ${Req.requester.firstName},</p><p>Your request to join chat room <strong>${foundRoom.name}</strong> has been accepted!<p><p>You can access the room at https://alsion-saberchat.herokuapp.com</p>`);
@@ -486,7 +482,6 @@ router.post('/requests/:id/accept', middleware.isLoggedIn, (req, res) => {
 		}
 
 	})().catch(err => {
-		console.log(err);
 		req.flash("error", "Unable to access database");
 		res.redirect('back');
 	});
@@ -525,7 +520,7 @@ router.post('/requests/:id/reject', middleware.isLoggedIn, (req, res) => {
 
       if (index != -1) {
         req.user.requests.splice(index, 1);
-        req.user.save();
+        await req.user.save();
       }
 
       transport(Req.requester, `Room Request Rejected - ${Req.room.name}`, `<p>Hello ${Req.requester.firstName},</p><p>Your request to join chat room <strong>${Req.room.name}</strong> has been rejected. Contact the room creator, <strong>${Req.room.creator.username}</strong>, if  you think there has been a mistake.</p>`);
@@ -534,7 +529,6 @@ router.post('/requests/:id/reject', middleware.isLoggedIn, (req, res) => {
 		}
 
 	})().catch(err => {
-		console.log(err);
 		req.flash("error", "Unable to access database");
 		res.redirect('back');
 	});

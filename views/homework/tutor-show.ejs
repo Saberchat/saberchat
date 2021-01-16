@@ -60,7 +60,7 @@
                       <% } %>
 
                     </span><br />
-                      <span><%= tutor.bio %></span><br />
+                      <span id="tutor-bio"><%= tutor.bio %></span><br />
 
                       <h4>Username</h4>
                       <p><%=tutor.tutor.username%></p>
@@ -136,6 +136,11 @@
                             <button class="btn btn-warning edit-button" id="review-button-<%=tutor.tutor._id%>" data-toggle="modal" data-target="#modal-review-<%=tutor.tutor._id%>">Leave A Review</button>
                             <% if (tutor.students.includes(currentUser._id)) { %>
                               <button class="btn btn-danger edit-button" id="leave-button-<%=tutor.tutor._id%>" data-toggle="modal" data-target="#modal-stop-<%=tutor.tutor._id%>">Stop Lessons</button>
+                              <% for (let room of tutor.rooms) { %>
+                                <% if (room.student.equals(currentUser._id)) { %>
+                                  <a id="chat-button-<%=tutor.tutor._id%>" class="btn btn-success edit-button" href="/chat/<%=room.room._id%>">Chat</a>
+                                <% } %>
+                              <% } %>
                             <% } else { %>
                               <% if (tutor.available) { %>
                                 <button class="btn btn-info edit-button" id="book-button-<%=tutor.tutor._id%>" data-toggle="modal" data-target="#modal-book-<%=tutor.tutor._id%>">Book This Tutor</button>
@@ -160,6 +165,7 @@
                         <% } else { %>
                           <button class="btn btn-success edit-button" id="reopen-<%=course._id%>-<%=tutor.tutor._id%>" data-toggle="modal" data-target="#modal-reopen-<%=tutor.tutor._id%>">Reopen Lessons</button>
                         <% } %>
+                        <button class="btn btn-info edit-button" id="edit-<%=course._id%>-<%=tutor.tutor._id%>" data-toggle="modal" data-target="#modal-edit-bio">Edit Bio</button>
                       <% } %>
 
                       <div class="modal fade" id="modal-book-<%=tutor.tutor._id%>" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
@@ -263,6 +269,31 @@
                             <div class="modal-footer">
                               <button type="button" class="btn btn-secondary" data-dismiss="modal">No, Go Back</button>
                               <button type="button" class="btn btn-success" id="<%=course._id%>-<%=tutor.tutor._id%>" onclick="reopenLessons(this, 'tutor-show')">Yes, Reopen Lessons</button>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div class="modal fade" id="modal-edit-bio" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+                        <div class="modal-dialog">
+                          <div class="modal-content">
+                            <div class="modal-header">
+                              <h5 class="modal-title" id="exampleModalLabel">Edit Bio?</h5>
+                              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                              </button>
+                            </div>
+                            <div class="modal-body">
+                              <% for (let tutor of course.tutors) { %>
+                                <% if (tutor.tutor._id.equals(currentUser._id)) { %>
+                                  <span id="bio-length-error" hidden>Make bio between 100-250 words</span>
+                                  <textarea rows="5" minlength="100" maxlength="250" class="form-control" id="edit-bio-field" placeholder="Enter new bio"><%=tutor.bio%></textarea>
+                                <% } %>
+                              <% } %>
+                            </div>
+                            <div class="modal-footer">
+                              <button type="button" class="btn btn-secondary" data-dismiss="modal">Back</button>
+                              <button type="button" class="btn btn-primary" id="edit-bio-<%=course._id%>" onclick="changeBio(this)">Submit Changes</button>
                             </div>
                           </div>
                         </div>
