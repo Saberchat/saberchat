@@ -55,7 +55,6 @@ router.post("/register",  (req, res) => {
 
 		Email.find({address: req.body.email}, (err, emails) => {
 			if (err || !emails) {
-				console.log(err);
 				req.flash('error', "Unable to find emails");
 				req.flash('error', 'Only members of the Alsion community may sign up');
 				res.redirect('/');
@@ -140,7 +139,6 @@ router.post("/register",  (req, res) => {
     				} else {
     					req.flash("error", err.message);
     				}
-    				console.log(err);
     				//redirect to root
     				return res.redirect("/");
     			}
@@ -189,7 +187,6 @@ router.get('/authenticate/:id', (req, res) => {
 
         req.logIn(user, (err) => {
           if (err) {
-            console.log(err)
             return next(err);
           }
 
@@ -199,8 +196,6 @@ router.get('/authenticate/:id', (req, res) => {
         });
 
       } else {
-        console.log(req.query.token)
-        console.log(user.authenticationToken.toString())
         req.flash('error', "Invalid authentication token");
         res.redirect('/');
       }

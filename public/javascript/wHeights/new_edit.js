@@ -61,8 +61,6 @@ saveButton.addEventListener('click', () => {
             content: JSON.stringify(savedData.blocks)
         }
 
-        console.log(article);
-
         postIt('/articles/new', article);
         console.log('Saved Article');
     }).catch((error) => {

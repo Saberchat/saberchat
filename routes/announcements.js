@@ -6,7 +6,7 @@ const middleware = require('../middleware/index');
 const router = express.Router(); //start express router
 const dateFormat = require('dateformat');
 const nodemailer = require('nodemailer');
-const {transport} = require("../transport");
+const {transport, transport_mandatory} = require("../transport");
 
 const multer = require('../middleware/multer');
 const { cloudUpload, cloudDelete } = require('../services/cloudinary');
@@ -23,7 +23,6 @@ const PostComment = require('../models/postComment');
 router.get('/', (req, res) => { //RESTful Routing 'INDEX' route
   Announcement.find({}).populate('sender').exec((err, foundAnns) => { //Collects data about all announcements
     if (err || !foundAnns) {
-      console.log(err);
       req.flash('error', "Unable To Access Database");
       res.redirect('back');
 
@@ -174,7 +173,6 @@ router.post('/', middleware.isLoggedIn, middleware.isMod, multer, validateAnn, (
     res.redirect(`/announcements/${announcement._id}`);
 
   })().catch(err => {
-    console.log(err);
     req.flash('error', "Unable To Access Database");
     return res.redirect('back');
   });
@@ -258,10 +256,10 @@ router.put('/comment', middleware.isLoggedIn, (req, res) => {
     }
 
     comment.date = dateFormat(comment.created_at, "h:MM TT | mmm d");
-    comment.save();
+    await comment.save();
 
     announcement.comments.push(comment);
-    announcement.save();
+    await announcement.save();
 
     let users = [];
     let user;
@@ -302,10 +300,7 @@ router.put('/comment', middleware.isLoggedIn, (req, res) => {
     });
 
   })().catch(err => {
-    console.log(err)
-    res.json({
-      error: 'Error Commenting'
-    });
+    res.json({error: 'Error Commenting'});
   })
 
 })
@@ -404,9 +399,8 @@ router.put('/:id', middleware.isLoggedIn, middleware.isMod, multer, validateAnn,
     res.redirect(`/announcements/${updatedAnnouncement._id}`);
 
   })().catch(err => {
-    console.log(err)
-    req.flash('error', "Unable To Access Database")
-    res.redirect('back')
+    req.flash('error', "Unable To Access Database");
+    res.redirect('back');
   });
 });
 
@@ -442,36 +436,33 @@ router.delete('/:id', middleware.isLoggedIn, middleware.isMod, (req, res) => { /
       return res.redirect('back');
     }
 
-    const users = await User.find({authenticated: true}, (err, users) => {
-      if (!users) {
-        req.flash('error', "Unable to find users");
-        return res.redirect('back');
-      }
+    const users = await User.find({authenticated: true});
+    if (!users) {
+      req.flash('error', "Unable to find users");
+      return res.redirect('back');
+    }
 
-      for (let user of users) {
+    for (let user of users) {
+      let index;
 
-        let index;
-
-        for (let i = 0; i < user.annCount.length; i += 1) {
-          if (user.annCount[i].announcement.toString() == deletedAnn._id.toString()) {
-            index = i;
-          }
-        }
-
-        if (index > -1) {
-          user.annCount.splice(index, 1);
-          user.save();
+      for (let i = 0; i < user.annCount.length; i += 1) {
+        if (user.annCount[i].announcement.toString() == deletedAnn._id.toString()) {
+          index = i;
         }
       }
-    })
+
+      if (index > -1) {
+        user.annCount.splice(index, 1);
+        await user.save();
+      }
+    }
 
     req.flash('success', 'Announcement Deleted!');
     res.redirect('/announcements/');
 
   })().catch(err => {
-    console.log(err)
-    req.flash('error', "Unable To Access Database")
-    res.redirect('back')
+    req.flash('error', "Unable To Access Database");
+    res.redirect('back');
   });
 });
 

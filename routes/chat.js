@@ -86,7 +86,6 @@ router.get('/:id/edit', middleware.isLoggedIn, middleware.checkRoomOwnership, (r
     res.render('chat/edit', {users, room});
 
   })().catch(err => {
-    console.log(err);
     req.flash('error', "Unable to access database");
     res.redirect('back');
   });
@@ -179,7 +178,6 @@ router.post('/:id/leave', middleware.isLoggedIn, middleware.checkForLeave, (req,
     res.redirect('/chat');
 
   })().catch(err => {
-    console.log(err);
     req.flash('Error accessing Database');
     res.redirect('back');
   });
@@ -243,7 +241,6 @@ router.post('/:id/request-access', middleware.isLoggedIn, (req, res) => {
     }
 
   })().catch(err => {
-    console.log(err)
     req.flash('error', 'Cannot access Database');
     res.redirect('back');
   });

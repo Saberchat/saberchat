@@ -126,7 +126,6 @@ const autoGrow = (element => {
 
 $('#create-btn').on('click', (() => {
   let preContent = $('#article-content').children();
-  console.log(preContent);
   for(let i=0;i < preContent.length; i++) {
     let element = preContent[i].children[0];
     if(element.tagName == 'TEXTAREA') {
@@ -146,8 +145,6 @@ $('#create-btn').on('click', (() => {
     author: articleAuthor,
     content: JSON.stringify(articleContent)
   }
-
-  console.log(article);
 
   postIt('/articles/new', article);
 });

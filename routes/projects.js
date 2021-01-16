@@ -23,7 +23,6 @@ router.get('/', (req, res) => { //RESTful Routing 'INDEX' route
   .populate('poster')
   .exec((err, foundProjects) => { //Find all projects, collect info on their creators and posters (part of the 'User' schema)
     if (err || !foundProjects) {
-      console.log(err);
       req.flash('error', 'Unable to access database');
       res.redirect('back');
 
@@ -36,7 +35,6 @@ router.get('/', (req, res) => { //RESTful Routing 'INDEX' route
 router.get('/new', middleware.isLoggedIn, middleware.isFaculty, (req, res) => { ////RESTful Routing 'NEW' route
   User.find({authenticated: true, status: {$nin: ['alumnus', 'guest', 'parent', 'faculty']}}, (err, foundUsers) => { //Find all students, so that when teachers post a project, they can select which students created it
     if (err || !foundUsers) {
-      console.log(err);
       req.flash('error', 'Unable to access database');
       res.redirect('back');
 
@@ -138,7 +136,6 @@ router.post('/',middleware.isLoggedIn, middleware.isFaculty, (req, res) => { //R
     res.redirect(`/projects/${project._id}`);
 
   })().catch(err => {
-    console.log(err);
     req.flash('error', "Unable to access database");
     res.redirect('back');
   });
@@ -224,7 +221,6 @@ router.post('/',middleware.isLoggedIn, middleware.isFaculty, (req, res) => { //R
 //     res.render('projects/data', {popularProjects, projectKeywords})
 //
 //   })().catch(err => {
-//     console.log(err);
 //     req.flash('error', "Unable to access database");
 //     res.redirect('back');
 //   });
@@ -259,7 +255,6 @@ router.get('/:id/edit', middleware.isLoggedIn, middleware.isFaculty, (req, res) 
     res.render('projects/edit', {project, students, creatornames});
 
   })().catch(err => {
-    console.log(err);
     req.flash('error', "Unable to access database");
     res.redirect('back');
   });
@@ -365,10 +360,10 @@ router.put('/comment', middleware.isLoggedIn, (req, res) => {
     }
 
     comment.date = dateFormat(comment.created_at, "h:MM TT | mmm d");
-    comment.save();
+    await comment.save();
 
     project.comments.push(comment);
-    project.save();
+    await project.save();
 
     let users = [];
     let user;
@@ -414,10 +409,7 @@ router.put('/comment', middleware.isLoggedIn, (req, res) => {
     });
 
   })().catch(err => {
-    console.log(err)
-    res.json({
-      error: 'Error Commenting'
-    });
+    res.json({error: "Error Commenting"});
   });
 });
 
@@ -436,8 +428,6 @@ router.put('/:id', middleware.isLoggedIn, middleware.isFaculty, (req, res) => {
       let statuses = ['7th', '8th', '9th', '11th', '12th'];
 
       let creatorInputArray = req.body.creatorInput.split(',');
-
-      console.log(creatorInputArray);
 
       for (let creator of creatorInputArray) {
 
@@ -529,7 +519,6 @@ router.put('/:id', middleware.isLoggedIn, middleware.isFaculty, (req, res) => {
     res.redirect(`/projects/${project._id}`);
 
   })().catch(err => {
-    console.log(err);
     req.flash('error', "Unable to access database");
     res.redirect('back');
   });
@@ -557,9 +546,8 @@ router.delete('/:id', middleware.isLoggedIn, middleware.isFaculty, (req, res) =>
     res.redirect('/projects');
 
   })().catch(err => {
-    console.log(err)
-    req.flash('error', "Unable to access database")
-    res.redirect('back')
+    req.flash('error', "Unable to access database");
+    res.redirect('back');
   });
 });
 

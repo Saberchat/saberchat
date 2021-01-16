@@ -1,7 +1,15 @@
 let starCounts = new Map();
 
 const rate = ((button, tutorId) => {
-  starCounts.set(tutorId, parseInt(button.id));
+  if (starCounts.has(tutorId)) {
+    if (starCounts.get(tutorId) == parseInt(button.id)) {
+      starCounts.set(tutorId, parseInt(button.id)-1);
+    } else {
+      starCounts.set(tutorId, parseInt(button.id));
+    }
+  } else {
+    starCounts.set(tutorId, parseInt(button.id));
+  }
 
   for (let star of document.getElementsByClassName(`star-${tutorId}`)) {
     star.style.color = "black";
@@ -20,7 +28,7 @@ const submitRating = ((button, location) => {
   }
 
   const url = `/homework/rate/${courseId}?_method=put`;
-  const data = {tutor: tutorId, rating: starCounts.get(tutorId), review: document.getElementById(`review-${tutorId}`).value};
+  const data = {tutorId, rating: starCounts.get(tutorId), review: document.getElementById(`review-${tutorId}`).value};
 
   $.post(url, data, function(data) {
     if(data.success) {
@@ -58,6 +66,9 @@ const submitRating = ((button, location) => {
       document.getElementById(`reviews-length-${tutorId}`).innerText = `${data.reviews_length}`;
 
       $(`#modal-review-${tutorId}`).modal('hide');
+
+    } else {
+      console.log(data)
     }
   });
 });
