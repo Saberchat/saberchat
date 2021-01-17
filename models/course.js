@@ -33,6 +33,7 @@ const courseSchema = new mongoose.Schema({
       {
         student: {type: mongoose.Schema.Types.ObjectId, ref: 'User'},
         time: Number,
+        date: String,
         summary: String,
         default: []
       }

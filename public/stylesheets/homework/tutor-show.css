@@ -76,8 +76,17 @@ h3, .ratings {
   float: right;
 }
 
+.lesson-button {
+  float: right;
+  margin-left: 10px;
+}
+
 .summary {
   margin-top: 10px;
+}
+
+.lesson-info {
+  font-weight: bold;
 }
 
 @media only screen and (max-width: 768px) {

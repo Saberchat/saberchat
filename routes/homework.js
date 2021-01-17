@@ -1008,12 +1008,13 @@ router.put("/mark/:id", middleware.isLoggedIn, middleware.isTutor, (req, res) =>
           let lessonObject = {
             student: studentId._id,
             time: req.body.time,
+            date: dateFormat(new Date(), "mmm d"),
             summary: req.body.summary
           }
 
           tutor.lessons.push(lessonObject);
           await course.save();
-          return res.json({success: "Succesfully updated", tutor});
+          return res.json({success: "Succesfully updated", lesson: lessonObject, student: studentId, tutor});
         }
       }
     }

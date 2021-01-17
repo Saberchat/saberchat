@@ -10,8 +10,8 @@
       <!-- link css for navbar. Don't need to include public/javascript/userForm.js since user is already logged in and does not need to access login and register forms.  -->
       <link rel="stylesheet" href="/stylesheets/components/navbar.css">
       <link rel="stylesheet" href="/stylesheets/components/header.css">
-      <!-- <link rel="stylesheet" href="/stylesheets/projects/index.css"> -->
-      <!-- <link rel="stylesheet" href="/stylesheets/announcements/index.css"> -->
+      <link rel="stylesheet" href="/stylesheets/projects/index.css">
+      <link rel="stylesheet" href="/stylesheets/announcements/index.css">
       <link rel="stylesheet" href="/stylesheets/home/index.css">
       <link rel="stylesheet" href="/stylesheets/chat/new.css">
 
@@ -297,7 +297,7 @@
                 <a class="nav-link active reviews-heading">Reviews (<span id="reviews-length-<%=tutor.tutor._id%>"><%=tutor.reviews.length%></span>)</a>
               </li>
 
-              <% if (studentIds.includes(currentUser._id) || tutor.tutor._id.equals(currentUser._id)) { %>
+              <% if (studentIds.includes(currentUser._id.toString()) || tutor.tutor._id.equals(currentUser._id)) { %>
                 <li class="nav-item tab-header tab" id="students" onclick="changeTab(this)">
                   <a class="nav-link active">Students (<%=tutor.students.length%>)</a>
                 </li>
@@ -358,7 +358,7 @@
 
           <div class="students" hidden>
             <% if (students.length > 0) { %>
-              <% if (currentUser._id.equals(tutor.tutor._id)) { %>
+              <% if (tutor.tutor._id.equals(currentUser._id) || studentIds.includes(currentUser._id.toString())) { %>
                 <div class="list-group">
                   <li class="list-group-item list-group-item-success status-header">
                     <div class="d-flex w-100 justify-content-between">
@@ -380,8 +380,17 @@
                           <% } %>
                         <% } %>
                       </a>
-                      <button type="button" data-toggle="modal" data-target="#modal-<%=student._id%>-mark" id="mark-<%=student._id%>" class="btn btn-success mark-button">Mark Lesson</button>
-                      <span class="lessons-length"><span id="lessons-length-<%=student._id%>"><%=lessonCount%></span> lesson(s)</span>
+                      <% if (tutor.tutor._id.equals(currentUser._id) || student._id.equals(currentUser._id)) { %>
+                        <button type="button" data-toggle="modal" data-target="#modal-<%=student._id%>-lessons" id="lessons-<%=student._id%>" class="btn btn-info lesson-button">Lesson History</button>
+                      <% } %>
+
+                      <% if (tutor.tutor._id.equals(currentUser._id)) { %>
+                        <button type="button" data-toggle="modal" data-target="#modal-<%=student._id%>-mark" id="mark-<%=student._id%>" class="btn btn-success mark-button">Mark Lesson</button>
+                      <% } %>
+
+                      <% if (tutor.tutor._id.equals(currentUser._id) || student._id.equals(currentUser._id)) { %>
+                        <span class="lessons-length"><span id="lessons-length-<%=student._id%>"><%=lessonCount%></span> lesson(s)</span>
+                      <% } %>
                     </div>
 
                     <div class="modal fade" id="modal-<%=student._id%>-mark" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
@@ -401,6 +410,33 @@
                           <div class="modal-footer">
                             <button type="button" class="btn btn-secondary" data-dismiss="modal">Back</button>
                             <button type="button" id="mark-<%=course._id%>-<%=student._id%>" onclick="mark(this)" class="btn btn-success">Confirm</button>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div class="modal fade" id="modal-<%=student._id%>-lessons" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+                      <div class="modal-dialog">
+                        <div class="modal-content">
+                          <div class="modal-header">
+                            <h5 class="modal-title" id="exampleModalLabel">Lesson History For <%=student.firstName%> <%=student.lastName%></h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                              <span aria-hidden="true">&times;</span>
+                            </button>
+                          </div>
+                          <div class="modal-body">
+                            <ol id="lesson-info-<%=student._id%>">
+                            <% for (let lesson of tutor.lessons.reverse()) { %>
+                              <% if (lesson.student.equals(student._id)) { %>
+                                <li>
+                                  <span class="lesson-info"><%=lesson.date%> | <%=lesson.time%> minute(s)</span><br />
+                                  <p>
+                                    <%=lesson.summary%>
+                                  </p>
+                                </li>
+                              <% } %>
+                            <% } %>
+                            </ol>
                           </div>
                         </div>
                       </div>
