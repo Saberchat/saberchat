@@ -71,21 +71,21 @@
         </div>
       </div>
 
-        <ul class="nav justify-content-center">
-          <li class="nav-item tab-header" id="people" onclick="changeTab(this)">
+        <ul class="nav justify-content-center options-bar">
+          <li class="nav-item tab-header tab" id="people" onclick="changeTab(this)">
             <a class="nav-link active" >People</a>
           </li>
 
-          <li class="nav-item tab-header" id="tutors" onclick="changeTab(this)">
+          <li class="nav-item tab-header tab" id="tutors" onclick="changeTab(this)">
             <a class="nav-link">Tutors</a>
           </li>
 
           <% if (course.teacher._id.equals(currentUser._id)) { %>
-            <li class="nav-item tab-header" id="settings" onclick="changeTab(this)">
+            <li class="nav-item tab-header tab" id="settings" onclick="changeTab(this)">
               <a class="nav-link">Settings</a>
             </li>
 
-            <li class="nav-item tab-header" id="blocked" onclick="changeTab(this)">
+            <li class="nav-item tab-header tab" id="blocked" onclick="changeTab(this)">
               <a class="nav-link">Blocked</a>
             </li>
           <% } %>

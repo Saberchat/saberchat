@@ -74,7 +74,7 @@
 
                               <a href="../profiles/<%=user._id%>" class="user-element-text">
                                 <img class="profile-image" src="<%= user.imageUrl %>" alt="profile picture">
-                                <span class="username <%=status[0]%> <%=status[1]%> <%=user.permission%> <%=user.tags.join(' ')%>"><span class="span-tag-name"><%=user.firstName%> <%=user.lastName%></span> <span class="span-tag-username"><%=`${user.username}`%></span></span>
+                                <span class="username <%=status[0]%> <%=status[1]%> <%=user.permission%> <%=user.tags.join(' ')%>"><span class="span-tag-name"><%=user.firstName%> <%=user.lastName%></span> <span class="span-tag-username"><%=user.username%></span></span>
 
                               <% if (permMap.has(user.permission)) { %>
                                 <span class="badge badge-<%=permMap.get(user.permission)[1]%>"><%=permMap.get(user.permission)[0]%></span>

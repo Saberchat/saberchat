@@ -16,14 +16,14 @@ const book = ((button, location) => {
       let chatButton = document.createElement('a');
 
       if (location == "show") {
-        reviewButton.className ="review-button edit-button btn btn-warning";
-        leaveButton.className ="leave-button edit-button btn btn-danger";
-        chatButton.className ="leave-button edit-button btn btn-success";
+        reviewButton.className ="review-button action-button btn btn-warning";
+        leaveButton.className ="leave-button action-button btn btn-danger";
+        chatButton.className ="leave-button action-button btn btn-success";
 
       } else if (location == "tutor-show") {
-        reviewButton.className ="edit-button btn btn-warning";
-        leaveButton.className ="edit-button btn btn-danger";
-        chatButton.className ="edit-button btn btn-success";
+        reviewButton.className ="action-button btn btn-warning";
+        leaveButton.className ="action-button btn btn-danger";
+        chatButton.className ="action-button btn btn-success";
       }
 
       reviewButton.id = `review-button-${tutorId}`;
@@ -77,12 +77,12 @@ const leave = ((button, location) => {
       let bookButton = document.createElement('button');
 
       if (location == "show") {
-        reviewButton.className ="review-button edit-button btn btn-warning";
-        bookButton.className ="book-button edit-button btn btn-info";
+        reviewButton.className ="review-button action-button btn btn-warning";
+        bookButton.className ="book-button action-button btn btn-info";
 
       } else if (location == "tutor-show") {
-        reviewButton.className ="edit-button btn btn-warning";
-        bookButton.className ="edit-button btn btn-info";
+        reviewButton.className ="action-button btn btn-warning";
+        bookButton.className ="action-button btn btn-info";
       }
 
       reviewButton.id = `review-button-${tutorId}`;
@@ -129,9 +129,9 @@ const closeLessons = ((button, location) => {
       let reopenButton = document.createElement('button');
 
       if (location == "show") {
-        reopenButton.className ="reopen-lessons edit-button btn btn-success";
+        reopenButton.className ="reopen-lessons action-button btn btn-success";
       } else if (location == "tutor-show") {
-        reopenButton.className ="edit-button btn btn-success";
+        reopenButton.className ="action-button btn btn-success";
       }
 
       reopenButton.id = `reopen-${courseId}-${tutorId}`;
@@ -158,9 +158,9 @@ const reopenLessons = ((button, location) => {
       let closeButton = document.createElement('button');
 
       if (location == "show") {
-        closeButton.className ="close-lessons edit-button btn btn-danger";
+        closeButton.className ="close-lessons action-button btn btn-danger";
       } else if (location == "tutor-show") {
-        closeButton.className ="edit-button btn btn-danger";
+        closeButton.className ="action-button btn btn-danger";
       }
 
       closeButton.id = `close-${courseId}-${tutorId}`;
@@ -333,4 +333,71 @@ const changeBio = (button => {
       }
     });
   }
+});
+
+const setTime = (input => {
+  const studentId = input.id.split('-')[1];
+  document.getElementById(`time-label-${studentId}`).innerText = input.value;
+});
+
+const getExperience = (experience => {
+  let result;
+  experience = parseInt(experience);
+  if (experience < 60) {
+    result = `${Math.round(experience * 100)/100} minute(s)`;
+
+  } else {
+    experience /= 60;
+
+    if (experience < 24) {
+      result = `${Math.round(experience * 100) / 100} hour(s)`;
+
+    } else {
+      experience /= 24;
+
+      if (experience < 7) {
+        result = `${Math.round(experience * 100) / 100} day(s)`;
+
+      } else {
+        experience /= 7;
+
+        if (experience < 52) {
+          result = `${Math.round(experience * 100) / 100} week(s)`;
+
+        } else {
+          experience /= 52;
+          result = `${Math.round(experience * 100) / 100} year(s)`;
+
+        }
+      }
+    }
+  }
+
+  return result;
+});
+
+const mark = (button => {
+  const courseId = button.id.split('-')[1];
+  const studentId = button.id.split('-')[2];
+  const time = parseInt(document.getElementById(`time-${studentId}`).value);
+  const summary = document.getElementById(`summary-${studentId}`).value;
+  const url = `/homework/mark/${courseId}?_method=put`;
+  const data = {studentId, time, summary};
+
+  $.post(url, data, function(data) {
+    if (data.success) {
+      document.getElementById(`time-${studentId}`).value = "0";
+      document.getElementById("lessons-length").innerText = data.tutor.lessons.length;
+      document.getElementById(`lessons-length-${studentId}`).innerText = parseInt(document.getElementById(`lessons-length-${studentId}`).innerText) + 1;
+
+      let experience = 0;
+      for (let lesson of data.tutor.lessons) {
+        experience += lesson.time;
+      }
+
+      document.getElementById("experience").innerText = getExperience(experience);
+
+      $(`#modal-${studentId}-mark`).modal('hide');
+    }
+  });
 });

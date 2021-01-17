@@ -199,7 +199,7 @@ Username
   float: right;
 }
 
-.edit-button, .leave-button, .review-button {
+.edit-button, .leave-button, .review-button, .action-button {
   margin-right: 10px;
   margin-bottom: 10px;
   width: 100%;

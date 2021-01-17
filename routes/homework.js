@@ -696,7 +696,7 @@ router.get('/tutors/:id', middleware.isLoggedIn, (req, res) => {
 
         //Collect all courses which this tutor teaches (that are not the current one)
         let enrolledCourses = [];
-        const courses = await Course.find({_id: {$ne: course._id}});
+        const courses = await Course.find({_id: {$ne: course._id}}).populate("teacher");
 
         for (let course of courses) {
           for (let t of course.tutors) {
@@ -984,6 +984,41 @@ router.put('/unblock/:id', middleware.isLoggedIn, middleware.isFaculty, (req, re
 
   })().catch(err => {
     res.json({error: "Unable to unblock user"});
+  });
+});
+
+router.put("/mark/:id", middleware.isLoggedIn, middleware.isTutor, (req, res) => {
+  (async() => {
+    const course = await Course.findById(req.params.id);
+    if (!course) {
+      return res.json({error: "Error accessing course"});
+    }
+
+    for (let tutor of course.tutors) {
+      if (tutor.tutor.equals(req.user._id)) {
+
+        const studentId = await User.findById(req.body.studentId);
+
+        if (!studentId) {
+          return res.json({error: "Error accessing student"});
+        }
+
+        if (tutor.tutor.equals(req.user._id)) {
+
+          let lessonObject = {
+            student: studentId._id,
+            time: req.body.time,
+            summary: req.body.summary
+          }
+
+          tutor.lessons.push(lessonObject);
+          await course.save();
+          return res.json({success: "Succesfully updated", tutor});
+        }
+      }
+    }
+  })().catch(err => {
+    res.json({error: "Error marking lesson"});
   });
 });
 

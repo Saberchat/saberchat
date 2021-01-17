@@ -93,31 +93,33 @@
                 </div>
               </form>
 
-              <form action="/homework/join-tutor" method="post" id="join-course-tutor">
-                <button type="button" data-toggle="modal" data-target="#modal-tutor" class="btn btn-success"><i class="fas fa-chalkboard-teacher"></i> Join Course As Tutor</button>
-                <div class="modal fade" id="modal-tutor" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
-                  <div class="modal-dialog">
-                    <div class="modal-content">
-                      <div class="modal-header">
-                        <h5 class="modal-title" id="exampleModalLabel">Join Course As Tutor</h5>
-                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                          <span aria-hidden="true">&times;</span>
-                        </button>
-                      </div>
-                      <div class="modal-body">
-                        <input class="form-control" type="text" name="joincode" placeholder="Enter Join Code"/><br />
-                        <label for="slots" id="slots-label">Number of Student Slots: 0</label><br />
-                        <input type="range" min="0" max="5" value="0" class="slider" id="slots" name="slots" onchange="setStudents()">
-                        <textarea rows="5" minlength="100" maxlength="250" class="form-control" name="bio" placeholder="A Short Bio About Yourself"></textarea>
-                      </div>
-                      <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Back</button>
-                        <button type="submit" class="btn btn-primary">Join</button>
+              <% if (currentUser.tags.includes("Tutor")) { %>
+                <form action="/homework/join-tutor" method="post" id="join-course-tutor">
+                  <button type="button" data-toggle="modal" data-target="#modal-tutor" class="btn btn-success"><i class="fas fa-chalkboard-teacher"></i> Join Course As Tutor</button>
+                  <div class="modal fade" id="modal-tutor" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+                    <div class="modal-dialog">
+                      <div class="modal-content">
+                        <div class="modal-header">
+                          <h5 class="modal-title" id="exampleModalLabel">Join Course As Tutor</h5>
+                          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                          </button>
+                        </div>
+                        <div class="modal-body">
+                          <input class="form-control" type="text" name="joincode" placeholder="Enter Join Code"/><br />
+                          <label for="slots" id="slots-label">Number of Student Slots: 0</label><br />
+                          <input type="range" min="0" max="5" value="0" class="slider" id="slots" name="slots" onchange="setStudents()">
+                          <textarea rows="5" minlength="100" maxlength="250" class="form-control" name="bio" placeholder="A Short Bio About Yourself"></textarea>
+                        </div>
+                        <div class="modal-footer">
+                          <button type="button" class="btn btn-secondary" data-dismiss="modal">Back</button>
+                          <button type="submit" class="btn btn-primary">Join</button>
+                        </div>
                       </div>
                     </div>
                   </div>
-                </div>
-              </form>
+                </form>
+              <% } %>
             <% } %>
 
           </div>
