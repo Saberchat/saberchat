@@ -692,7 +692,7 @@ router.get('/tutors/:id', middleware.isLoggedIn, (req, res) => {
 
     for (let tutor of course.tutors) {
       //If selected tutor matches the requested tutor, display them
-      if (tutor.tutor._id.equals(req.query.tutor)) {
+      if (tutor.tutor._id.equals(req.query.tutorId)) {
 
         //Collect info on all students who are members of this tutor
         let studentIds = [];
@@ -719,7 +719,19 @@ router.get('/tutors/:id', middleware.isLoggedIn, (req, res) => {
           return res.redirect('back');
         }
 
-        res.render('homework/tutor-show', {course, tutor, students, studentIds, courses: enrolledCourses});
+        if (req.query.studentId) {
+
+          const student = await User.findById(req.query.studentId);
+          if (!student) {
+            req.flash('error', "Unable to find students");
+            return res.redirect('back');
+          }
+
+          res.render('homework/lessons', {course, tutor, student});
+
+        } else {
+          res.render('homework/tutor-show', {course, tutor, students, studentIds, courses: enrolledCourses});
+        }
       }
     }
 
@@ -876,20 +888,43 @@ router.put('/remove-student/:id', middleware.isLoggedIn, middleware.isFaculty, (
 router.put('/remove-tutor/:id', middleware.isLoggedIn, middleware.isFaculty, (req, res) => {
   (async() => {
 
-    const tutorId = await User.findById(req.body.tutorId);
+    let tutorId;
+    if (req.body.show) {
+      tutorId = await User.findById(req.body.tutorId);
 
-    if (!tutorId) {
-      return res.json({error: "Error removing tutor"});
+      if (!tutorId) {
+        return res.json({error: "Error removing tutor"});
+      }
+
+    } else {
+      tutorId = await User.findById(req.query.tutorId);
+
+      if (!tutorId) {
+        req.flash("error", "Error removing tutor");
+        return res.redirect("back");
+      }
     }
 
     const course = await Course.findById(req.params.id).populate('tutors.tutor').populate('tutors.rooms.student');
 
     if (!course) {
-      return res.json({error: "Error removing tutor"});
+      if (req.body.show) {
+        return res.json({error: "Error removing tutor"});
+
+      } else {
+        req.flash("error", "Error removing tutor");
+        return res.redirect("back");
+      }
 
       //If user is not a teacher of the course, this action is not permitted
     } else if (!course.teacher.equals(req.user._id)) {
-      return res.json({error: "You are not a teacher of this course"});
+      if (req.body.show) {
+        return res.json({error: "You are not a teacher of this course"});
+
+      } else {
+        req.flash("error", "You are not a teacher of this course");
+        return res.redirect("back");
+      }
     }
 
     for (let i = 0; i < course.tutors.length; i ++) {
@@ -901,12 +936,18 @@ router.put('/remove-tutor/:id', middleware.isLoggedIn, middleware.isFaculty, (re
           deletedRoom = await Room.findByIdAndDelete(room.room);
 
           if (!deletedRoom) {
-            return res.json({error: "Error removing tutor"});
+            if (req.body.show) {
+              return res.json({error: "Error removing tutor"});
+
+            } else {
+              req.flash("error", "Error removing tutor");
+              return res.redirect("back");
+            }
           }
 
           if (room.student.newRoomCount.includes(deletedRoom._id)) {
             room.student.newRoomCount.splice(room.student.newRoomCount.indexOf(deletedRoom._id), 1);
-            room.student.save();
+            await room.student.save();
           }
 
           if (tutorId.newRoomCount.includes(deletedRoom._id)) {
@@ -917,7 +958,13 @@ router.put('/remove-tutor/:id', middleware.isLoggedIn, middleware.isFaculty, (re
         //Create a notification to alert tutor that they have been removed
         const notif = await Notification.create({subject: `Removal from ${course.name}`, text: `You were removed from ${course.name} for the following reason:\n"${req.body.reason}"`, sender: req.user, noReply: true, recipients: [tutorId], read: [], toEveryone: false, images: []}); //Create a notification to alert the user
         if (!notif) {
-          return res.json({error: "Error removing tutor"});
+          if (req.body.show) {
+            return res.json({error: "Error removing tutor"});
+
+          } else {
+            req.flash("error", "Error removing tutor");
+            return res.redirect("back");
+          }
         }
 
         notif.date = dateFormat(notif.created_at, "h:MM TT | mmm d");
@@ -934,12 +981,26 @@ router.put('/remove-tutor/:id', middleware.isLoggedIn, middleware.isFaculty, (re
         course.blocked.push(tutorId);
         course.tutors.splice(i, 1);
         await course.save();
-        return res.json({success: "Succesfully removed tutor", tutor: tutorId, course});
+
+        if (req.body.show) {
+          return res.json({success: "Succesfully removed tutor", tutor: tutorId, course});
+
+        } else {
+          req.flash("success", "Succesfully Removed Tutor!");
+          return res.redirect(`/homework/${course._id}`);
+        }
       }
     }
 
   })().catch(err => {
-    res.json({error: "Error removing tutor"});
+    console.log(err);
+    if (req.body.show) {
+      res.json({error: "Error removing tutor"});
+
+    } else {
+      req.flash("error", "Error removing tutor");
+      res.redirect("back");
+    }
   });
 });
 
@@ -973,7 +1034,7 @@ router.put('/unblock/:id', middleware.isLoggedIn, middleware.isFaculty, (req, re
     //Create a notification to alert user that they have been unblocked
     const notif = await Notification.create({subject: `Unblocked from ${course.name}`, text: `You have been unblocked from ${course.name}. You can rejoin with the join code now whenever you need to.`, sender: req.user, noReply: true, recipients: [blockedId], read: [], toEveryone: false, images: []}); //Create a notification to alert the user
     if (!notif) {
-      return res.json({error: "Error removing student 3"});
+      return res.json({error: "Error removing student"});
     }
 
     notif.date = dateFormat(notif.created_at, "h:MM TT | mmm d");

@@ -82,40 +82,21 @@ const book = ((button, location) => {
           userElement.innerHTML = `<a href="/profiles/${student._id}" style="color: black; text-decoration: none;"> <img class="student-profile-image" src="${student.imageUrl }" alt="profile picture"> <span class="${student.permission} ${student.status} ${student.tags.join(' ')} student-block"><span class="span-tag-name">${student.firstName} ${student.lastName}</span> <span class="span-tag-username">${student.username}</span></span></a>`;
 
           if (student._id == data.user._id) {
-            let lessonHistoryButton = document.createElement("button");
-            lessonHistoryButton.id = `lessons-${student._id}`;
-            lessonHistoryButton.className = "btn btn-info lesson-button";
-            lessonHistoryButton.innerText = "Lesson History";
-            lessonHistoryButton.setAttribute("type", "button");
-            lessonHistoryButton.setAttribute("data-toggle", "modal");
-            lessonHistoryButton.setAttribute("data-target", `#modal-${student._id}-lessons`);
+            let lessonInfoButton = document.createElement("a");
+            lessonInfoButton.className = "btn btn-info lesson-button";
+            lessonInfoButton.innerText = "Lesson Information";
+            lessonInfoButton.setAttribute("href", `/homework/tutors/${courseId}?tutorId=${tutorId}&studentId=${student._id}`);
 
             let lessonsLength = document.createElement("span");
             lessonsLength.className = "lessons-length";
             lessonsLength.innerHTML = `<span id="lessons-length-${student._id}">${lessonCount}</span> lesson(s)`;
 
-            userElement.appendChild(lessonHistoryButton);
+            userElement.appendChild(lessonInfoButton);
             userElement.appendChild(lessonsLength);
           }
 
-          let lessonsModal = document.createElement("div");
-          lessonsModal.className = "modal fade";
-          lessonsModal.id = `modal-${student._id}-lessons`;
-          lessonsModal.setAttribute("tabindex", "-1");
-          lessonsModal.setAttribute("aria-labelledby", "deleteModalLabel");
-          lessonsModal.setAttribute("aria-hidden", "true");
-
-          let lessonString = ``;
-          for (let lesson of data.tutor.lessons) {
-            if (lesson.student == data.user._id) {
-              lessonString += `<li> <span class="lesson-info">${lesson.date} | ${lesson.time} minute(s)</span><br /> <p> ${lesson.summary} </p> </li>`;
-            }
-          }
-
-          lessonsModal.innerHTML = `<div class="modal-dialog"> <div class="modal-content"> <div class="modal-header"> <h5 class="modal-title" id="exampleModalLabel">Lesson History For ${student.firstName} ${student.lastName}</h5> <button type="button" class="close" data-dismiss="modal" aria-label="Close"> <span aria-hidden="true">&times;</span> </button> </div> <div class="modal-body"> <ol id="lesson-info-${student._id}">${lessonString}</ol> </div> </div> </div>`
-
           studentsList.appendChild(userElement);
-          studentsList.appendChild(lessonsModal);
+
         }
 
         studentDiv.appendChild(studentsList);
@@ -331,7 +312,7 @@ const removeTutor = ((button, location) => {
   const tutorId = button.id.split('-')[1];
   const reason = document.getElementById(`reason-${tutorId}`).value;
   const url = `/homework/remove-tutor/${courseId}?_method=put`;
-  const data = {tutorId, reason};
+  const data = {tutorId, reason, show: true};
 
   $.post(url, data, function(data) {
     if (data.success) {
@@ -421,7 +402,7 @@ const setTime = (input => {
   document.getElementById(`time-label-${studentId}`).innerText = input.value;
 });
 
-const getExperience = (experience => {
+const getTime = (experience => {
   let result;
   experience = parseInt(experience);
   if (experience < 60) {
@@ -476,7 +457,7 @@ const mark = (button => {
         experience += lesson.time;
       }
 
-      document.getElementById("experience").innerText = getExperience(experience);
+      document.getElementById("experience").innerText = getTime(experience);
 
       let newLesson = document.createElement("li");
       const lessonList = document.getElementById(`lesson-info-${studentId}`);

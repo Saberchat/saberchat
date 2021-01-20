@@ -36,11 +36,12 @@
       <%- include('../partials/navbar') %>
 
       <!-- big background image -->
-      <div id="banner" style="background-image: url('<%= tutor.tutor.bannerUrl %>');">
-      </div>
+      <div id="banner" style="background-image: url('<%= tutor.tutor.bannerUrl %>');"></div>
       <div class="container mb-5">
-        <img src="<%= tutor.tutor.imageUrl %>" alt="profile image" class="profile-image">
-        <h1 class="username"><%= tutor.tutor.firstName %> <%= tutor.tutor.lastName %></h1>
+        <div class="tutor-info">
+          <a href="../../profiles/<%=tutor.tutor._id%>"><img src="<%= tutor.tutor.imageUrl %>" alt="profile image" class="profile-image"></a>
+          <h1 class="username"><%= tutor.tutor.firstName %> <%= tutor.tutor.lastName %></h1>
+        </div>
             <div class="col-md-4 col-12 order-md-2 profile-box">
                 <section class="profile-card">
                     <div class="profile-head">
@@ -78,37 +79,7 @@
                         <%experience += lesson.time;%>
                       <%}%>
 
-                      <p id="experience">
-                      <% if (experience < 60) { %>
-                        <%=Math.round(experience * 100) / 100%> minute(s)
-
-                      <% } else { %>
-                        <% experience /= 60; %>
-
-                        <% if (experience < 24) { %>
-                          <%=Math.round(experience * 100) / 100%> hour(s)
-
-                        <% } else { %>
-                          <% experience /= 24; %>
-
-                          <% if (experience < 7) { %>
-                            <%=Math.round(experience * 100) / 100%> day(s)
-
-                          <% } else {%>
-                            <% experience /= 7; %>
-
-                            <% if (experience < 52) { %>
-                              <%=Math.round(experience * 100) / 100%> week(s)
-
-                            <% } else { %>
-                              <% experience /= 52; %>
-                              <%=Math.round(experience * 100) / 100%> year(s)
-
-                            <% } %>
-                          <% } %>
-                        <% }%>
-                      <% } %>
-                      </p>
+                      <p id="experience"><%=experience%> minute(s)</p>
 
                       <h4>Lessons</h4>
                       <p id="lessons-length"><%=tutor.lessons.length%></p>
@@ -146,15 +117,38 @@
                             <% } %>
                           <% }%>
                         </div>
-                      <% } %>
 
-                      <% if (tutor.tutor._id.equals(currentUser._id)) { %>
+                      <% } else if (tutor.tutor._id.equals(currentUser._id)) { %>
                         <% if (tutor.available) { %>
                           <button class="btn btn-danger action-button" id="close-<%=course._id%>-<%=tutor.tutor._id%>" data-toggle="modal" data-target="#modal-close-<%=tutor.tutor._id%>">Prevent Further Bookings</button>
                         <% } else { %>
                           <button class="btn btn-success action-button" id="reopen-<%=course._id%>-<%=tutor.tutor._id%>" data-toggle="modal" data-target="#modal-reopen-<%=tutor.tutor._id%>">Reopen Lessons</button>
                         <% } %>
                         <button class="btn btn-info action-button" id="edit-<%=course._id%>-<%=tutor.tutor._id%>" data-toggle="modal" data-target="#modal-edit-bio">Edit Bio</button>
+
+                      <% } else if (course.teacher.equals(currentUser._id)) {%>
+                        <form action="/homework/remove-tutor/<%=course._id%>?_method=put&tutorId=<%=tutor.tutor._id%>" method="post">
+                          <button type="button" class="btn btn-danger action-button" data-toggle="modal" data-target="#modal-remove">Remove Tutor</button>
+                          <div class="modal fade" id="modal-remove" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+                            <div class="modal-dialog">
+                              <div class="modal-content">
+                                <div class="modal-header">
+                                  <h5 class="modal-title" id="exampleModalLabel">Remove <%=tutor.tutor.firstName%> <%=tutor.tutor.lastName%> From Your Course?</h5>
+                                  <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                  </button>
+                                </div>
+                                <div class="modal-body">
+                                  <textarea rows="5" class="form-control" id="reason-<%=tutor.tutor._id%>" name="reason" placeholder="Please explain why you wish to remove <%=tutor.tutor.firstName%>."></textarea>
+                                </div>
+                                <div class="modal-footer">
+                                  <button type="button" class="btn btn-secondary" data-dismiss="modal">Back</button>
+                                  <button type="submit" class="btn btn-danger">Yes, Remove Tutor</button>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </form>
                       <% } %>
 
                       <div class="modal fade" id="modal-book-<%=tutor.tutor._id%>" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
@@ -313,7 +307,7 @@
                 <div class="col-md-8 col-12">
                     <section class="profile-desc">
                         <div class="desc-head">
-                            <h3><img class="follower-image" src="<%=review.review.sender.imageUrl%>"/><span class="review-sender"><%=review.review.sender.firstName%> <%=review.review.sender.lastName%></span></h3>
+                            <a href="../../profiles/<%=review.review.sender._id%>" class="user-element-text"><h3><img class="follower-image" src="<%=review.review.sender.imageUrl%>"/><span class="review-sender"><%=review.review.sender.firstName%> <%=review.review.sender.lastName%></span></h3></a>
                             <% if (review.review.likes.includes(currentUser._id)) { %>
                               <i id="like-<%=review.review._id%>" class="fas fa-thumbs-up review-liked"
 
@@ -367,7 +361,7 @@
                   </li>
                   <% for (let student of students) { %>
                     <div class="list-group-item list-group-item-action user-element">
-                      <a href="/profiles/<%=student._id%>" style="color: black; text-decoration: none;">
+                      <a href="/profiles/<%=student._id%>" class="student-profile user-element-text">
                         <img class="student-profile-image" src="<%= student.imageUrl %>" alt="profile picture">
                         <span class="<%=student.permission%> <%=student.status%> <%=student.tags.join(' ')%> student-block"><span class="span-tag-name"><%=student.firstName%> <%=student.lastName%></span> <span class="span-tag-username"><%=student.username%></span></span>
 
@@ -381,7 +375,8 @@
                         <% } %>
                       </a>
                       <% if (tutor.tutor._id.equals(currentUser._id) || student._id.equals(currentUser._id)) { %>
-                        <button type="button" data-toggle="modal" data-target="#modal-<%=student._id%>-lessons" id="lessons-<%=student._id%>" class="btn btn-info lesson-button">Lesson History</button>
+                        <a class="btn btn-info lesson-button" href="/homework/tutors/<%=course._id%>?tutorId=<%=tutor.tutor._id%>&studentId=<%=student._id%>">Lesson Information</a>
+
                       <% } %>
 
                       <% if (tutor.tutor._id.equals(currentUser._id)) { %>
@@ -415,32 +410,6 @@
                       </div>
                     </div>
 
-                    <div class="modal fade" id="modal-<%=student._id%>-lessons" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
-                      <div class="modal-dialog">
-                        <div class="modal-content">
-                          <div class="modal-header">
-                            <h5 class="modal-title" id="exampleModalLabel">Lesson History For <%=student.firstName%> <%=student.lastName%></h5>
-                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                              <span aria-hidden="true">&times;</span>
-                            </button>
-                          </div>
-                          <div class="modal-body">
-                            <ol id="lesson-info-<%=student._id%>">
-                            <% for (let lesson of tutor.lessons.reverse()) { %>
-                              <% if (lesson.student.equals(student._id)) { %>
-                                <li>
-                                  <span class="lesson-info"><%=lesson.date%> | <%=lesson.time%> minute(s)</span><br />
-                                  <p>
-                                    <%=lesson.summary%>
-                                  </p>
-                                </li>
-                              <% } %>
-                            <% } %>
-                            </ol>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
                   <% } %>
                 </div>
               <% } %>
@@ -486,7 +455,7 @@
 
                             <% if (!included) { %>
                               <% if (!c.students.includes(currentUser._id)) { %>
-                                <form action="/homework/join" method="post" id="join-<%=c._id%>" class="join-course-student" style="display: inline; margin-left: 10px;">
+                                <form action="/homework/join" method="post" id="join-<%=c._id%>" class="join-course-student">
                                   <button type="button" data-toggle="modal" data-target="#modal-join" class="btn btn-primary"><i class="fas fa-chalkboard-teacher"></i> Join Course</button>
                                   <div class="modal fade" id="modal-join" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
                                     <div class="modal-dialog">
@@ -511,7 +480,7 @@
                               <% } %>
 
                               <% if (currentUser.tags.includes("Tutor")) { %>
-                                <form action="/homework/join-tutor" method="post" id="join-tutor-<%=c._id%>" class="join-course-tutor" style="display: inline; margin-left: 10px;">
+                                <form action="/homework/join-tutor" method="post" id="join-tutor-<%=c._id%>" class="join-course-tutor">
                                   <button type="button" data-toggle="modal" data-target="#modal-tutor-<%=c._id%>" class="btn btn-success"><i class="fas fa-chalkboard-teacher"></i> Join Course As Tutor</button>
                                   <div class="modal fade" id="modal-tutor-<%=c._id%>" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
                                     <div class="modal-dialog">
@@ -558,4 +527,7 @@
           </div>
     </div>
   </body>
+  <script>
+      document.getElementById("experience").innerText = getTime(document.getElementById("experience").innerText.split(' ')[0]);
+  </script>
 </html>

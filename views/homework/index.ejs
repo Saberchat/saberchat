@@ -40,7 +40,7 @@
         <div class="col-12">
           <div class="jumbotron text-center">
             <% let studentStatuses = ['7th', '8th', '9th', '10th', '11th', '12th'] %>
-            <h1><i class="fas fa-chalkboard-teacher"></i> Homework Help/Tutoring Center </h1>
+            <h1><i class="fas fa-chalkboard-teacher"></i> Tutoring Center </h1>
             <p>A platform for students to communicate and help each other learn</p>
             <% if (currentUser.status == 'faculty') { %>
               <form action="/homework" method="post" id="add-course-form">
@@ -108,7 +108,7 @@
                         <div class="modal-body">
                           <input class="form-control" type="text" name="joincode" placeholder="Enter Join Code"/><br />
                           <label for="slots" id="slots-label">Number of Student Slots: 0</label><br />
-                          <input type="range" min="0" max="5" value="0" class="slider" id="slots" name="slots" onchange="setStudents()">
+                          <input type="range" min="0" max="10" value="0" class="slider" id="slots" name="slots" onchange="setStudents()">
                           <textarea rows="5" minlength="100" maxlength="250" class="form-control" name="bio" placeholder="A Short Bio About Yourself"></textarea>
                         </div>
                         <div class="modal-footer">
