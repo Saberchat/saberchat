@@ -16,6 +16,15 @@ const updateStatus = (select => {
         loading.style.color = 'red';
         loading.innerHTML = data.error;
     }
+
+    if (data.user) {
+      for (let option of select) {
+        if (option.value == data.user.status) {
+          option.selected = true;
+        }
+      }
+    }
+
   });
 });
 
@@ -37,11 +46,6 @@ const updateTag = (select => {
     if(data.success) { //If data is successfully posted
       loading.style.color = 'green';
       loading.innerHTML = data.success;
-      for (let option of select) { //Make the option with no value (the top option) the default selected option
-        if (option.value == "") {
-          option.selected = true;
-        }
-      }
 
       if (data.success.includes("added")) { //If a tag has been added, create a new element, give it the bootstrap/CSS/text, and add it
         let new_tag = document.createElement('span');
@@ -61,6 +65,12 @@ const updateTag = (select => {
     } else if(data.error) {
         loading.style.color = 'red';
         loading.innerHTML = data.error;
+    }
+
+    for (let option of select) { //Make the option with no value (the top option) the default selected option
+      if (option.value == "") {
+        option.selected = true;
+      }
     }
   });
 });

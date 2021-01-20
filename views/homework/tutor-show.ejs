@@ -292,12 +292,12 @@
                 </section>
             </div>
 
-            <ul class="nav justify-content-center options-bar">
+            <ul class="nav justify-content-center options-bar" id="options-bar">
               <li class="nav-item tab-header tab" id="reviews" onclick="changeTab(this)">
                 <a class="nav-link active reviews-heading">Reviews (<span id="reviews-length-<%=tutor.tutor._id%>"><%=tutor.reviews.length%></span>)</a>
               </li>
 
-              <% if (studentIds.includes(currentUser._id.toString()) || tutor.tutor._id.equals(currentUser._id)) { %>
+              <% if (tutor.students.includes(currentUser._id.toString()) || tutor.tutor._id.equals(currentUser._id)) { %>
                 <li class="nav-item tab-header tab" id="students" onclick="changeTab(this)">
                   <a class="nav-link active">Students (<%=tutor.students.length%>)</a>
                 </li>
@@ -512,8 +512,8 @@
 
                               <% if (currentUser.tags.includes("Tutor")) { %>
                                 <form action="/homework/join-tutor" method="post" id="join-tutor-<%=c._id%>" class="join-course-tutor" style="display: inline; margin-left: 10px;">
-                                  <button type="button" data-toggle="modal" data-target="#modal-tutor" class="btn btn-success"><i class="fas fa-chalkboard-teacher"></i> Join Course As Tutor</button>
-                                  <div class="modal fade" id="modal-tutor" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+                                  <button type="button" data-toggle="modal" data-target="#modal-tutor-<%=c._id%>" class="btn btn-success"><i class="fas fa-chalkboard-teacher"></i> Join Course As Tutor</button>
+                                  <div class="modal fade" id="modal-tutor-<%=c._id%>" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
                                     <div class="modal-dialog">
                                       <div class="modal-content">
                                         <div class="modal-header">
@@ -524,8 +524,8 @@
                                         </div>
                                         <div class="modal-body">
                                           <input class="form-control" type="text" name="joincode" placeholder="Enter Join Code"/><br />
-                                          <label for="slots" id="slots-label">Number of Student Slots: 0</label><br />
-                                          <input type="range" min="0" max="5" value="0" class="slider" id="slots" name="slots" onchange="setStudents()">
+                                          <label for="slots-<%=c._id%>" id="slots-label-<%=c._id%>">Number of Student Slots: 0 </label><br />
+                                          <input type="range" min="0" max="5" value="0" class="slider" id="slots-<%=c._id%>" name="slots" onchange="setStudentsTutorShow(this)">
                                           <textarea rows="5" minlength="100" maxlength="250" class="form-control" name="bio" placeholder="A Short Bio About Yourself"></textarea>
                                         </div>
                                         <div class="modal-footer">

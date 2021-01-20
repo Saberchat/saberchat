@@ -488,7 +488,13 @@ router.put('/book/:id', middleware.isLoggedIn, middleware.isStudent, (req, res) 
 
           tutor.rooms.push(roomObject);
           await course.save();
-          return res.json({success: "Succesfully joined tutor", user: req.user, formerStudent, room: roomObject.room});
+
+          const studentIds = await User.find({_id: {$in: tutor.students}});
+          if (!studentIds) {
+            return res.json({error: "Error accessing students"});
+          }
+
+          return res.json({success: "Succesfully joined tutor", user: req.user, room: roomObject.room, tutor, formerStudent, students: studentIds});
         }
       }
     }

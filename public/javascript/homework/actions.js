@@ -54,6 +54,76 @@ const book = ((button, location) => {
       document.getElementById("new-chat").innerText = `${data.user.newRoomCount.length}`;
       document.getElementById("new-chat").hidden = false;
 
+      if (location == "tutor-show") {
+        let studentHeading = document.createElement("li");
+        studentHeading.className = "nav-item tab-header tab";
+        studentHeading.id = "students";
+        studentHeading.setAttribute("onclick", "changeTab(this)");
+        studentHeading.innerHTML = `<a class="nav-link active">Students (${data.tutor.students.length})</a>`;
+
+        let lessonCount = 0;
+        for (let lesson of data.tutor.lessons) {
+          if (lesson.student == data.user._id) {
+            lessonCount += 1;
+          }
+        }
+
+        let studentDiv = document.createElement("div");
+        studentDiv.className = "students";
+
+        let studentsList = document.createElement("div");
+        studentsList.className = "list-group";
+        studentsList.innerHTML = `<li class="list-group-item list-group-item-success status-header"> <div class="d-flex w-100 justify-content-between"> <h2 class="mb-1">Students</h2> </div> </li>`;
+
+        let userElement;
+        for (let student of data.students) {
+          userElement = document.createElement("div");
+          userElement.className = "list-group-item list-group-item-action user-element";
+          userElement.innerHTML = `<a href="/profiles/${student._id}" style="color: black; text-decoration: none;"> <img class="student-profile-image" src="${student.imageUrl }" alt="profile picture"> <span class="${student.permission} ${student.status} ${student.tags.join(' ')} student-block"><span class="span-tag-name">${student.firstName} ${student.lastName}</span> <span class="span-tag-username">${student.username}</span></span></a>`;
+
+          if (student._id == data.user._id) {
+            let lessonHistoryButton = document.createElement("button");
+            lessonHistoryButton.id = `lessons-${student._id}`;
+            lessonHistoryButton.className = "btn btn-info lesson-button";
+            lessonHistoryButton.innerText = "Lesson History";
+            lessonHistoryButton.setAttribute("type", "button");
+            lessonHistoryButton.setAttribute("data-toggle", "modal");
+            lessonHistoryButton.setAttribute("data-target", `#modal-${student._id}-lessons`);
+
+            let lessonsLength = document.createElement("span");
+            lessonsLength.className = "lessons-length";
+            lessonsLength.innerHTML = `<span id="lessons-length-${student._id}">${lessonCount}</span> lesson(s)`;
+
+            userElement.appendChild(lessonHistoryButton);
+            userElement.appendChild(lessonsLength);
+          }
+
+          let lessonsModal = document.createElement("div");
+          lessonsModal.className = "modal fade";
+          lessonsModal.id = `modal-${student._id}-lessons`;
+          lessonsModal.setAttribute("tabindex", "-1");
+          lessonsModal.setAttribute("aria-labelledby", "deleteModalLabel");
+          lessonsModal.setAttribute("aria-hidden", "true");
+
+          let lessonString = ``;
+          for (let lesson of data.tutor.lessons) {
+            if (lesson.student == data.user._id) {
+              lessonString += `<li> <span class="lesson-info">${lesson.date} | ${lesson.time} minute(s)</span><br /> <p> ${lesson.summary} </p> </li>`;
+            }
+          }
+
+          lessonsModal.innerHTML = `<div class="modal-dialog"> <div class="modal-content"> <div class="modal-header"> <h5 class="modal-title" id="exampleModalLabel">Lesson History For ${student.firstName} ${student.lastName}</h5> <button type="button" class="close" data-dismiss="modal" aria-label="Close"> <span aria-hidden="true">&times;</span> </button> </div> <div class="modal-body"> <ol id="lesson-info-${student._id}">${lessonString}</ol> </div> </div> </div>`
+
+          studentsList.appendChild(userElement);
+          studentsList.appendChild(lessonsModal);
+        }
+
+        studentDiv.appendChild(studentsList);
+        studentDiv.hidden = true;
+
+        document.getElementById("options-bar").insertBefore(studentHeading, document.getElementById("courses"));
+        document.getElementsByClassName("courses")[0].parentNode.insertBefore(studentDiv, document.getElementsByClassName("courses")[0]);
+      }
     }
   });
 });
@@ -108,8 +178,14 @@ const leave = ((button, location) => {
       document.getElementById("new-chat").innerText = `${data.user.newRoomCount.length}`;
       if (data.user.newRoomCount.length > 0) {
         document.getElementById("new-chat").hidden = false;
+
       } else {
         document.getElementById("new-chat").hidden = true;
+      }
+
+      if (location == "tutor-show") {
+        document.getElementById("students").parentNode.removeChild(document.getElementById("students"));
+        document.getElementsByClassName("students")[0].parentNode.removeChild(document.getElementsByClassName("students")[0]);
       }
     }
   });
@@ -175,6 +251,11 @@ const reopenLessons = ((button, location) => {
 
 const setStudents = (() => {
   document.getElementById("slots-label").innerText = `Number of Student Slots: ${document.getElementById('slots').value}`;
+});
+
+const setStudentsTutorShow = (slider => {
+  const courseId = slider.id.split('-')[1];
+  document.getElementById(`slots-label-${courseId}`).innerText = `Number of Student Slots: ${slider.value}`;
 });
 
 const setStudentsShow = (courseId => {

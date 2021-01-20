@@ -71,6 +71,9 @@ router.put('/upvote', middleware.isLoggedIn, (req, res) => {
 router.get('/data', middleware.isLoggedIn, middleware.isAdmin, (req, res) => {
   getData().then(data => {
     res.render("cafe/data", data);
+  }).catch(err => {
+    req.flash("error", "Unable to access database");
+    res.redirect("back");
   });
 });
 
@@ -239,7 +242,7 @@ router.post('/order', middleware.isLoggedIn, middleware.cafeOpen, (req, res) => 
 });
 
 
-router.get('/orders', middleware.isLoggedIn, middleware.isMod, (req, res) => { //This is for EC Cafe Workers to check all the available orders
+router.get('/orders', middleware.isLoggedIn, middleware.isMod, middleware.isCashier, (req, res) => { //This is for EC Cafe Workers to check all the available orders
   Order.find({present: true})
   .populate('items.item').exec((err, foundOrders) => { //Collect all orders which are currently active, and get all info on their items
     if (err) {

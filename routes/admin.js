@@ -433,38 +433,33 @@ router.delete('/whitelist/:id', middleware.isLoggedIn, middleware.isPrincipal, (
 
 // changes permissions
 router.put('/permissions', middleware.isLoggedIn, middleware.isAdmin, (req, res) => {
-	// check if trying to change to admin
 
-	if(req.body.role == 'admin' || req.body.role == "principal") {
-		// check if it's the principal
-		if(req.user.permission == 'principal') {
-			User.findByIdAndUpdate(req.body.user, {permission: req.body.role}, (err, updatedUser) => {
-				if(err || !updatedUser) {
-					res.json({error: 'Error. Could not change'});
-				} else {
-					res.json({success: 'Succesfully changed'});
-				}
-			});
-		} else {
-			res.json({error: 'You do not have permissions to do that'});
-		}
-	} else {
-		// else continue
-		User.findById(req.body.user, (err, user) => {
-			if ((user.permission == 'principal' || user.permission == 'admin') && req.user.permission != "principal") {
-				res.json({error: 'You do not have permissions to do that'});
+	User.findById(req.body.user, (err, user) => {
+		if (err || !user) {
+			res.json({error: "Error. Could not change"});
+
+		} else if (req.body.role == 'admin' || req.body.role == "principal") { //Changing a user to administrator or principal requires specific permissions
+
+			if(req.user.permission == 'principal') { // check if current user is the principal
+				user.permission = req.body.role;
+				user.save();
+				res.json({success: "Succesfully changed", user});
 
 			} else {
-				User.findByIdAndUpdate(req.body.user, {permission: req.body.role}, (err, updatedUser) => {
-					if(err || !updatedUser) {
-						res.json({error: 'Error. Could not change'});
-					} else {
-						res.json({success: 'Succesfully changed'});
-					}
-				});
+				res.json({error: "You do not have permissions to do that", user});
 			}
-		})
-	}
+
+		} else {
+			if ((user.permission == "principal" || user.permission == "admin") && req.user.permission != "principal") {
+				res.json({error: "You do not have permissions to do that", user});
+
+			} else {
+				user.permission = req.body.role;
+				user.save();
+				res.json({success: 'Succesfully changed', user});
+			}
+		}
+	});
 });
 
 // changes status
@@ -478,9 +473,10 @@ router.put('/status', middleware.isLoggedIn, middleware.isMod, (req, res) => {
 
 		if (user.status == "faculty") {
 			let teaching = false;
+
 			const courses = await Course.find({});
 			if (!courses) {
-				return res.json({error: "Error. Could not change"});
+				return res.json({error: "Error. Could not change", user});
 			}
 
 			for (let course of courses) {
@@ -491,17 +487,17 @@ router.put('/status', middleware.isLoggedIn, middleware.isMod, (req, res) => {
 			}
 
 			if (teaching) {
-				return res.json({error: "User is an active teacher"});
+				return res.json({error: "User is an active teacher", user});
 			}
 
 			user.status = req.body.status;
 			await user.save();
-			return res.json({success: 'Succesfully changed'});
+			return res.json({success: "Succesfully changed", user});
 		}
 
 		user.status = req.body.status;
 		await user.save();
-		return res.json({success: "Successfully Changed"});
+		return res.json({success: "Successfully Changed", user});
 
 	})().catch(err => {
 		res.json({error: "Error. Could not change"});
