@@ -1,5 +1,6 @@
 const { annSchema } = require('../joiValidation/announcement');
 const { projectSchema } = require('../joiValidation/project');
+const { chatSchema } = require('../joiValidation/chat');
 const { 
     newUserSchema, 
     loginUserSchema, 
@@ -21,14 +22,22 @@ const handleValidation = (schema, req, res, next) => {
     }
 };
 
+// Announcements
 module.exports.validateAnn = (req, res, next) => {
     handleValidation(annSchema, req, res, next);
 };
 
+// Projects
 module.exports.validateProject = (req, res, next) => {
     handleValidation(projectSchema, req, res, next);
 };
 
+// Chat room
+module.exports.validateRoom = (req, res, next) => {
+    handleValidation(chatSchema, req, res, next);
+};
+
+// Users and profiles
 module.exports.validatePasswordReset = (req, res, next) => {
     handleValidation(resetPasswordSchema, req, res, next);
 };

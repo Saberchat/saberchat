@@ -6,6 +6,8 @@ const router = express.Router();
 const nodemailer = require('nodemailer');
 const {transport, transport_mandatory} = require("../transport");
 
+const { validateRoom } = require('../middleware/validation');
+
 //import middleware
 const middleware = require('../middleware');
 
@@ -97,7 +99,7 @@ router.get('/:id/edit', middleware.isLoggedIn, middleware.checkRoomOwnership, (r
 });
 
 // create new rooms
-router.post('/', middleware.isLoggedIn, (req, res) => {
+router.post('/', middleware.isLoggedIn, validateRoom, (req, res) => {
   const room = {
     name: filter.clean(req.body.name),
     'creator.id': req.user._id,
@@ -253,7 +255,7 @@ router.put('/comments/:id/report', middleware.isLoggedIn, (req, res) => {
 });
 
 // edit room
-router.put('/:id', middleware.isLoggedIn, middleware.checkRoomOwnership, (req, res) => {
+router.put('/:id', middleware.isLoggedIn, middleware.checkRoomOwnership, validateRoom, (req, res) => {
   Room.findByIdAndUpdate(req.params.id, {name: filter.clean(req.body.name), description: filter.clean(req.body.description)}, (err, room) => {
     if (err || !room) {
       req.flash('error', 'Unable to access Database');

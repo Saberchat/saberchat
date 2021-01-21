@@ -6,10 +6,10 @@ const updateDisplay = (() => {
     const addCount = document.getElementById('add-user-list').childElementCount;
     if(userSelect.checked == true) {
         if(addCount > 0) {
-            display1.style.display = "";
+            display1.style.display = "block";
         }
         if(removeCount > 0) {
-            display2.style.display = "";
+            display2.style.display = "block";
         }
     } else {
         display1.style.display = "none";
