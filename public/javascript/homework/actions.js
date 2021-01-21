@@ -186,7 +186,7 @@ const closeLessons = ((button, location) => {
       let reopenButton = document.createElement('button');
 
       if (location == "show") {
-        reopenButton.className ="reopen-lessons action-button btn btn-success";
+        reopenButton.className ="reopen-lessons action-button btn btn-success lesson-action";
       } else if (location == "tutor-show") {
         reopenButton.className ="action-button btn btn-success";
       }
@@ -215,7 +215,7 @@ const reopenLessons = ((button, location) => {
       let closeButton = document.createElement('button');
 
       if (location == "show") {
-        closeButton.className ="close-lessons action-button btn btn-danger";
+        closeButton.className ="close-lessons action-button btn btn-danger lesson-action";
       } else if (location == "tutor-show") {
         closeButton.className ="action-button btn btn-danger";
       }
@@ -249,6 +249,14 @@ const setStudentsShow = (courseId => {
       document.getElementById("slots-count").innerText = `${slots}`;
       document.getElementById("change-message").style.color = "green";
       document.getElementById("change-message").innerText = "Succesfully Changed";
+
+      if (!data.tutor.available) {
+        const lessonButton = document.getElementsByClassName("lesson-action")[0];
+        lessonButton.className = "btn btn-success reopen-lessons lesson-action";
+        lessonButton.id = `reopen-${courseId}-${data.tutor.tutor}`;
+        lessonButton.setAttribute("data-target", `#modal-reopen-${data.tutor.tutor}`);
+        lessonButton.innerText = "Reopen Lessons";
+      }
 
     } else if (data.error) {
       document.getElementById("change-message").style.color = "red";

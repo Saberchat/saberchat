@@ -780,14 +780,12 @@ router.put('/setStudents/:id', (req, res) => {
           tutor.slots = parseInt(req.body.slots);
 
           //Update availability based on new slot info
-          if (parseInt(req.body.slots) == 0) {
+          if ((parseInt(req.body.slots)-tutor.students.length) == 0) {
             tutor.available = false;
-          } else {
-            tutor.available = true;
           }
 
           course.save();
-          res.json({success: "Succesfully changed"});
+          res.json({success: "Succesfully changed", tutor});
         }
       }
 

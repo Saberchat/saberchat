@@ -67,15 +67,15 @@ router.put('/upvote', middleware.isLoggedIn, (req, res) => {
   })
 })
 
-//Track cafe statistics
-router.get('/data', middleware.isLoggedIn, middleware.isAdmin, (req, res) => {
-  getData().then(data => {
-    res.render("cafe/data", data);
-  }).catch(err => {
-    req.flash("error", "Unable to access database");
-    res.redirect("back");
-  });
-});
+//Track cafe statistics (Commented out for now)
+// router.get('/data', middleware.isLoggedIn, middleware.isAdmin, (req, res) => {
+//   getData().then(data => {
+//     res.render("cafe/data", data);
+//   }).catch(err => {
+//     req.flash("error", "Unable to access database");
+//     res.redirect("back");
+//   });
+// });
 
 router.get('/order/new', middleware.isLoggedIn, middleware.cafeOpen, (req, res) => { //RESTFUL routing 'order/new' route
 
