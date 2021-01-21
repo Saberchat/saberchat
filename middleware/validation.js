@@ -1,4 +1,5 @@
 const { annSchema } = require('../joiValidation/announcement');
+const { projectSchema } = require('../joiValidation/project');
 const { 
     newUserSchema, 
     loginUserSchema, 
@@ -22,6 +23,10 @@ const handleValidation = (schema, req, res, next) => {
 
 module.exports.validateAnn = (req, res, next) => {
     handleValidation(annSchema, req, res, next);
+};
+
+module.exports.validateProject = (req, res, next) => {
+    handleValidation(projectSchema, req, res, next);
 };
 
 module.exports.validatePasswordReset = (req, res, next) => {

@@ -9,6 +9,8 @@ const nodemailer = require('nodemailer');
 const fillers = require('../fillerWords');
 const {transport, transport_mandatory} = require("../transport");
 
+const { validateProject } = require('../middleware/validation');
+
 //SCHEMA
 const User = require('../models/user');
 const Project = require('../models/project');
@@ -54,8 +56,7 @@ router.get('/new', middleware.isLoggedIn, middleware.isFaculty, (req, res) => { 
   });
 });
 
-router.post('/',middleware.isLoggedIn, middleware.isFaculty, (req, res) => { //RESTful Routing 'CREATE' route
-
+router.post('/',middleware.isLoggedIn, middleware.isFaculty, validateProject, (req, res) => { //RESTful Routing 'CREATE' route
   (async() => { //Asynchronous functions dictates that processes occur one at a time, reducing excessive callbacks
 
     let creators = [];
@@ -429,8 +430,7 @@ router.put('/comment', middleware.isLoggedIn, (req, res) => {
   });
 });
 
-router.put('/:id', middleware.isLoggedIn, middleware.isFaculty, (req, res) => {
-
+router.put('/:id', middleware.isLoggedIn, middleware.isFaculty, validateProject, (req, res) => {
   (async() => { //Asynchronous functions dictates that processes occur one at a time, reducing excessive callbacks
 
     let creators = [];
