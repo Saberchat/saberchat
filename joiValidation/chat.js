@@ -1,4 +1,3 @@
-const { boolean } = require('joi');
 const BaseJoi = require('joi');
 const { escapeHtmlExtension } = require('./extensions');
 
