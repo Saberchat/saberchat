@@ -61,16 +61,24 @@ h1 {
 
 #extra-instructions {
   color: blue;
+  font-weight: bold;
+}
+
+#balance-heading {
+  font-weight: bold;
 }
 
 #balance-box {
   color: purple;
+  font-weight: bold;
 }
 
 #total-cost {
   color: green;
+  font-weight: bold;
 }
 
 #paying-style {
   color: red;
+  font-weight: bold;
 }

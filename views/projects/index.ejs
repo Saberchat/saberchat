@@ -66,7 +66,7 @@
               <div class="block-header grey">
                 <h5>
                   <a class="project-info" href="projects/<%=project._id%>"><%=project.title%></a>
-                  <a class= "float-right project-info date"><%=project.date%></a>
+                  <span class= "float-right project-info date"><%=project.date%></span>
                 </h5>
 
                 <div class="project-header">
@@ -135,30 +135,30 @@
                   <% if (currentUser) { %>
 
                     <% if (project.creators.length == 0) { %>
-                      <p class="creator-row"><strong>Creators:</strong> <em>None</em></p>
+                      <p class="creator-row"><span class="creator-heading">Creators:</span> <span class="creator-names">None</span></p>
 
                       <%} else if (project.creators.length == 1){%>
-                        <p class="creator-row"><strong>Creator:</strong> <a class="creator-names" href="profiles/<%=project.creators[0]._id%>"><img src="<%= project.creators[0].imageUrl %>" alt="profile pic" class="creator-profile"> <em><%=project.creators[0].firstName%> <%=project.creators[0].lastName%></em></a></p>
+                        <p class="creator-row"><span class="creator-heading">Creator:</span> <a class="creator-names" href="profiles/<%=project.creators[0]._id%>"><img src="<%= project.creators[0].imageUrl %>" alt="profile pic" class="creator-profile"> <%=project.creators[0].firstName%> <%=project.creators[0].lastName%></a></p>
 
                     <%} else if (project.creators.length == 2){%>
-                      <p class="creator-row"><strong>Creators:</strong> <em><a class="creator-names" href="profiles/<%=project.creators[0]._id%>"><img src="<%= project.creators[0].imageUrl %>" alt="profile pic" class="creator-profile"> <%=project.creators[0].firstName%> <%=project.creators[0].lastName%></a>, <a class="creator-names" href="profiles/<%=project.creators[1]._id%>"><img src="<%= project.creators[1].imageUrl %>" alt="profile pic" class="creator-profile"> <%=project.creators[1].firstName%> <%=project.creators[1].lastName%></a></em></p>
+                      <p class="creator-row"><span class="creator-heading">Creators:</span> <a class="creator-names" href="profiles/<%=project.creators[0]._id%>"><img src="<%= project.creators[0].imageUrl %>" alt="profile pic" class="creator-profile"> <%=project.creators[0].firstName%> <%=project.creators[0].lastName%></a>, <a class="creator-names" href="profiles/<%=project.creators[1]._id%>"><img src="<%= project.creators[1].imageUrl %>" alt="profile pic" class="creator-profile"> <%=project.creators[1].firstName%> <%=project.creators[1].lastName%></a></p>
 
                     <% } else if (project.creators.length > 2) {%>
-                      <p class="creator-row"><strong>Creators:</strong> <em><a class="creator-names" href="profiles/<%=project.creators[0]._id%>"><img src="<%= project.creators[0].imageUrl %>" alt="profile pic" class="creator-profile"> <%=project.creators[0].firstName%> <%=project.creators[0].lastName%></a> and <%=project.creators.length - 1%> others</em></p>
+                      <p class="creator-row"><span class="creator-heading">Creators:</span> <a class="creator-names" href="profiles/<%=project.creators[0]._id%>"><img src="<%= project.creators[0].imageUrl %>" alt="profile pic" class="creator-profile"> <%=project.creators[0].firstName%> <%=project.creators[0].lastName%></a> and <%=project.creators.length - 1%> others</p>
                     <% } %>
 
                   <% } else { %>
                     <% if (project.creators.length == 0) { %>
-                      <p class="creator-row"><strong>Creators:</strong> <em>None</em></p>
+                      <p class="creator-row"><span class="creator-heading">Creators:</span> <span class="creator-names">None</span></p>
 
                     <%} else if (project.creators.length == 1){%>
-                      <p class="creator-row"><strong>Creator:</strong> <span class="creator-names"><img src="<%= project.creators[0].imageUrl %>" alt="profile pic" class="creator-profile"> <em><%=project.creators[0].firstName%> <%=project.creators[0].lastName%></em></span></p>
+                      <p class="creator-row"><span class="creator-heading">Creator:</span> <span class="creator-names"><img src="<%= project.creators[0].imageUrl %>" alt="profile pic" class="creator-profile"> <%=project.creators[0].firstName%> <%=project.creators[0].lastName%></span></p>
 
                     <%} else if (project.creators.length == 2){%>
-                      <p class="creator-row"><strong>Creators:</strong> <em><span class="creator-names"><img src="<%= project.creators[0].imageUrl %>" alt="profile pic" class="creator-profile"> <%=project.creators[0].firstName%> <%=project.creators[0].lastName%></span>, <span class="creator-names"><img src="<%= project.creators[1].imageUrl %>" alt="profile pic" class="creator-profile"> <%=project.creators[1].firstName%> <%=project.creators[1].lastName%></span></em></p>
+                      <p class="creator-row"><span class="creator-heading">Creators:</span> <span class="creator-names"><img src="<%= project.creators[0].imageUrl %>" alt="profile pic" class="creator-profile"> <%=project.creators[0].firstName%> <%=project.creators[0].lastName%></span>, <span class="creator-names"><img src="<%= project.creators[1].imageUrl %>" alt="profile pic" class="creator-profile"> <%=project.creators[1].firstName%> <%=project.creators[1].lastName%></span></p>
 
                     <% } else if (project.creators.length > 2) {%>
-                      <p class="creator-row"><strong>Creators:</strong> <em><span class="creator-names"><img src="<%= project.creators[0].imageUrl %>" alt="profile pic" class="creator-profile"> <%=project.creators[0].firstName%> <%=project.creators[0].lastName%></span> and <%=project.creators.length - 1%> others</em></p>
+                      <p class="creator-row"><span class="creator-heading">Creators:</span> <span class="creator-names"><img src="<%= project.creators[0].imageUrl %>" alt="profile pic" class="creator-profile"> <%=project.creators[0].firstName%> <%=project.creators[0].lastName%></span> and <%=project.creators.length - 1%> others</p>
                     <% } %>
                   <% } %>
 

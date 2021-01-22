@@ -151,7 +151,7 @@
 
                             <a href="../profiles/<%=follower._id%>" class="follower-link">
                               <img class="follower-image" src="<%= follower.imageUrl %>" alt="profile picture">
-                              <strong><%=follower.firstName%> <%=follower.lastName%></strong> <%=follower.username%>
+                              <span class="follower-name"><%=follower.firstName%> <%=follower.lastName%></span> <%=follower.username%>
                             </a>
 
                             <button type="button" class="btn btn-warning remove-follower" data-toggle="modal" data-target="#modal-<%=follower._id%>-remove">Remove</button>
@@ -190,7 +190,7 @@
 
                             <a href="../profiles/<%=user._id%>" class="following-link">
                               <img class="follower-image" src="<%= user.imageUrl %>" alt="profile picture">
-                              <strong><%=user.firstName%> <%=user.lastName%></strong> <%=user.username%>
+                              <span class="follower-name"><%=user.firstName%> <%=user.lastName%></span> <%=user.username%>
                             </a>
 
                             <button type="button" class="btn btn-danger block-following" data-toggle="modal" data-target="#modal-<%=user._id%>-unfollow">Unfollow</button>
@@ -221,8 +221,7 @@
                       </div>
                   </div>
               </section>
-          </div>
-
+            </div>
         <% } %>
   </div>
 </body>

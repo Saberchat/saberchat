@@ -106,12 +106,12 @@
 
                               <% if (msg.read.includes(currentUser._id)) { %>
                                 <div class="message-subject">
-                                <strong><%= msg.subject %></strong>
+                                <span><%= msg.subject %></span>
                                 </div>
 
                               <% } else { %>
                                 <div class="message-subject unread">
-                                  <strong><%= msg.subject %></strong>
+                                  <span><%= msg.subject %></span>
                                 </div>
                               <% } %>
 

@@ -4,8 +4,13 @@ h2 {
 
 .paying-in-person {
   margin-top: 20px;
+  font-weight: bold;
 }
 
 .rejection-input {
   margin-top: 10px;
+}
+
+.cost {
+  font-weight: bold;
 }

@@ -24,6 +24,7 @@
     <script src="/javascript/nav/navbar.js"></script>
     <script src="/javascript/home/index.js"></script>
     <script src="/javascript/homework/settings.js"></script>
+    <script src="/javascript/homework/actions.js"></script>
 
     <!-- I'm using my fontawesome kit -->
     <script src="https://kit.fontawesome.com/dccc745c41.js" crossorigin="anonymous"></script>
@@ -39,7 +40,7 @@
         <div class="col-12">
           <div class="jumbotron text-center">
             <% let studentStatuses = ['7th', '8th', '9th', '10th', '11th', '12th'] %>
-            <h1><i class="fas fa-chalkboard-teacher"></i> Homework Help/Tutoring Center </h1>
+            <h1><i class="fas fa-chalkboard-teacher"></i> Tutoring Center </h1>
             <p>A platform for students to communicate and help each other learn</p>
             <% if (currentUser.status == 'faculty') { %>
               <form action="/homework" method="post" id="add-course-form">
@@ -92,29 +93,33 @@
                 </div>
               </form>
 
-              <form action="/homework/join-tutor" method="post" id="join-course-tutor">
-                <button type="button" data-toggle="modal" data-target="#modal-tutor" class="btn btn-success"><i class="fas fa-chalkboard-teacher"></i> Join Course As Tutor</button>
-                <div class="modal fade" id="modal-tutor" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
-                  <div class="modal-dialog">
-                    <div class="modal-content">
-                      <div class="modal-header">
-                        <h5 class="modal-title" id="exampleModalLabel">Join Course As Tutor</h5>
-                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                          <span aria-hidden="true">&times;</span>
-                        </button>
-                      </div>
-                      <div class="modal-body">
-                        <input class="form-control" type="text" name="joincode" placeholder="Enter Join Code"/><br />
-                        <textarea rows="5" minlength="150" maxlength="250" class="form-control" name="bio" placeholder="A Short Bio About Yourself"></textarea>
-                      </div>
-                      <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Back</button>
-                        <button type="submit" class="btn btn-primary">Join</button>
+              <% if (currentUser.tags.includes("Tutor")) { %>
+                <form action="/homework/join-tutor" method="post" id="join-course-tutor">
+                  <button type="button" data-toggle="modal" data-target="#modal-tutor" class="btn btn-success"><i class="fas fa-chalkboard-teacher"></i> Join Course As Tutor</button>
+                  <div class="modal fade" id="modal-tutor" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+                    <div class="modal-dialog">
+                      <div class="modal-content">
+                        <div class="modal-header">
+                          <h5 class="modal-title" id="exampleModalLabel">Join Course As Tutor</h5>
+                          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                          </button>
+                        </div>
+                        <div class="modal-body">
+                          <input class="form-control" type="text" name="joincode" placeholder="Enter Join Code"/><br />
+                          <label for="slots" id="slots-label">Number of Student Slots: 0</label><br />
+                          <input type="range" min="0" max="10" value="0" class="slider" id="slots" name="slots" onchange="setStudents()">
+                          <textarea rows="5" minlength="50" maxlength="250" class="form-control" name="bio" placeholder="A Short Bio About Yourself"></textarea>
+                        </div>
+                        <div class="modal-footer">
+                          <button type="button" class="btn btn-secondary" data-dismiss="modal">Back</button>
+                          <button type="submit" class="btn btn-primary">Join</button>
+                        </div>
                       </div>
                     </div>
                   </div>
-                </div>
-              </form>
+                </form>
+              <% } %>
             <% } %>
 
           </div>
@@ -131,7 +136,7 @@
             <div class="card-body">
               <h5 class="card-title"><%=course.name.slice(0, 25)%><% if (course.name.length > 24) {%>... <% } %></h5>
 
-              <strong class="card-text user-position">
+              <span class="card-text user-position">
               <% if (course.teacher.equals(currentUser._id)) { %>
                 Teacher
               <% } else if (course.students.includes(currentUser._id)) { %>
@@ -144,9 +149,9 @@
                   <% } %>
                 <% } %>
               <% } %>
-              </strong><br />
+            </span><br />
 
-              <p class="card-tex course-description"><%=course.description.slice(0, 151)%><%if (course.description.length > 150) {%>...<%}%></p>
+              <p class="card-text course-description"><%=course.description.slice(0, 151)%><%if (course.description.length > 150) {%>...<%}%></p>
               <a href="homework/<%=course._id%>" class="btn btn-primary">Go to Course</a>
             </div>
           </div>

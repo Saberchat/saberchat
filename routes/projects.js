@@ -17,14 +17,6 @@ const Project = require('../models/project');
 const Notification = require('../models/message');
 const PostComment = require('../models/postComment');
 
-let transporter = nodemailer.createTransport({
-  service: 'gmail',
-  auth: {
-    user: 'noreply.saberchat@gmail.com',
-    pass: 'Tgy8erwIYtxRZrJHvKwkWbrkbUhv1Zr9'
-  }
-});
-
 //ROUTES
 router.get('/', (req, res) => { //RESTful Routing 'INDEX' route
 
@@ -33,7 +25,6 @@ router.get('/', (req, res) => { //RESTful Routing 'INDEX' route
   .populate('poster')
   .exec((err, foundProjects) => { //Find all projects, collect info on their creators and posters (part of the 'User' schema)
     if (err || !foundProjects) {
-      console.log(err);
       req.flash('error', 'Unable to access database');
       res.redirect('back');
 
@@ -46,7 +37,6 @@ router.get('/', (req, res) => { //RESTful Routing 'INDEX' route
 router.get('/new', middleware.isLoggedIn, middleware.isFaculty, (req, res) => { ////RESTful Routing 'NEW' route
   User.find({authenticated: true, status: {$nin: ['alumnus', 'guest', 'parent', 'faculty']}}, (err, foundUsers) => { //Find all students, so that when teachers post a project, they can select which students created it
     if (err || !foundUsers) {
-      console.log(err);
       req.flash('error', 'Unable to access database');
       res.redirect('back');
 
@@ -125,7 +115,7 @@ router.post('/',middleware.isLoggedIn, middleware.isFaculty, validateProject, (r
 
     for (let follower of followers) {
 
-      notif = await Notification.create({subject: "New Project Post", sender: req.user, recipients: [follower], read: [], toEveryone: false, images: project.images}); //Create a notification to alert the user
+      notif = await Notification.create({subject: "New Project Post", sender: req.user, noReply: true, recipients: [follower], read: [], toEveryone: false, images: project.images}); //Create a notification to alert the user
 
       if (!notif) {
         req.flash('error', 'Unable to send notification'); return res.redirect('back');
@@ -136,7 +126,7 @@ router.post('/',middleware.isLoggedIn, middleware.isFaculty, validateProject, (r
 
       await notif.save();
 
-      transport(transporter, follower, `New Project Post - ${project.title}`, `<p>Hello ${follower.firstName},</p><p>${req.user.firstName} ${req.user.lastName} recently posted a new project: <strong>${project.title}</strong>. Check it out!</p>${imageString}`);
+      transport(follower, `New Project Post - ${project.title}`, `<p>Hello ${follower.firstName},</p><p>${req.user.firstName} ${req.user.lastName} recently posted a new project: <strong>${project.title}</strong>. Check it out!</p>${imageString}`);
       follower.inbox.push(notif); //Add notif to user's inbox
       follower.msgCount += 1;
       await follower.save();
@@ -147,14 +137,13 @@ router.post('/',middleware.isLoggedIn, middleware.isFaculty, validateProject, (r
     res.redirect(`/projects/${project._id}`);
 
   })().catch(err => {
-    console.log(err);
     req.flash('error', "Unable to access database");
     res.redirect('back');
   });
 });
 
 //COMMENTED OUT FOR NOW, UNTIL WE MAKE FURTHER DECISIONS AT MEETING
-//
+
 // router.get('/data', middleware.isLoggedIn, middleware.isFaculty, (req, res) => {
 //
 //   (async() => {
@@ -233,11 +222,10 @@ router.post('/',middleware.isLoggedIn, middleware.isFaculty, validateProject, (r
 //     res.render('projects/data', {popularProjects, projectKeywords})
 //
 //   })().catch(err => {
-//     console.log(err);
 //     req.flash('error', "Unable to access database");
 //     res.redirect('back');
-//   })
-// })
+//   });
+// });
 
 router.get('/:id/edit', middleware.isLoggedIn, middleware.isFaculty, (req, res) => { //RESTful Routing 'EDIT' route
 
@@ -268,7 +256,6 @@ router.get('/:id/edit', middleware.isLoggedIn, middleware.isFaculty, (req, res) 
     res.render('projects/edit', {project, students, creatornames});
 
   })().catch(err => {
-    console.log(err);
     req.flash('error', "Unable to access database");
     res.redirect('back');
   });
@@ -374,10 +361,10 @@ router.put('/comment', middleware.isLoggedIn, (req, res) => {
     }
 
     comment.date = dateFormat(comment.created_at, "h:MM TT | mmm d");
-    comment.save();
+    await comment.save();
 
     project.comments.push(comment);
-    project.save();
+    await project.save();
 
     let users = [];
     let user;
@@ -399,7 +386,7 @@ router.put('/comment', middleware.isLoggedIn, (req, res) => {
 
     for (let user of users) {
 
-      notif = await Notification.create({subject: `New Mention in ${project.title}`, sender: req.user, recipients: [user], read: [], toEveryone: false, images: []}); //Create a notification to alert the user
+      notif = await Notification.create({subject: `New Mention in ${project.title}`, sender: req.user, noReply: true, recipients: [user], read: [], toEveryone: false, images: []}); //Create a notification to alert the user
 
       if (!notif) {
         return res.json({error: "Error creating notification"});
@@ -410,7 +397,7 @@ router.put('/comment', middleware.isLoggedIn, (req, res) => {
 
       await notif.save();
 
-      transport(transporter, user, `New Mention in ${project.title}`, `<p>Hello ${user.firstName},</p><p>${req.user.firstName} ${req.user.lastName} mentioned you in a comment on <strong>${project.title}</strong>.<p>${comment.text}</p>`);
+      transport(user, `New Mention in ${project.title}`, `<p>Hello ${user.firstName},</p><p>${req.user.firstName} ${req.user.lastName} mentioned you in a comment on <strong>${project.title}</strong>.<p>${comment.text}</p>`);
 
       user.inbox.push(notif); //Add notif to user's inbox
       user.msgCount += 1;
@@ -423,10 +410,7 @@ router.put('/comment', middleware.isLoggedIn, (req, res) => {
     });
 
   })().catch(err => {
-    console.log(err)
-    res.json({
-      error: 'Error Commenting'
-    });
+    res.json({error: "Error Commenting"});
   });
 });
 
@@ -444,8 +428,6 @@ router.put('/:id', middleware.isLoggedIn, middleware.isFaculty, validateProject,
       let statuses = ['7th', '8th', '9th', '11th', '12th'];
 
       let creatorInputArray = req.body.creatorInput.split(',');
-
-      console.log(creatorInputArray);
 
       for (let creator of creatorInputArray) {
 
@@ -515,7 +497,7 @@ router.put('/:id', middleware.isLoggedIn, middleware.isFaculty, validateProject,
 
     for (let follower of followers) {
 
-      notif = await Notification.create({subject: "New Project Post", sender: req.user, recipients: [follower], read: [], toEveryone: false, images: updatedProject.images}); //Create a notification to alert the user
+      notif = await Notification.create({subject: "New Project Post", sender: req.user, noReply: true, recipients: [follower], read: [], toEveryone: false, images: updatedProject.images}); //Create a notification to alert the user
 
       if (!notif) {
         req.flash('error', 'Unable to send notification'); return res.redirect('back');
@@ -526,7 +508,7 @@ router.put('/:id', middleware.isLoggedIn, middleware.isFaculty, validateProject,
 
       await notif.save();
 
-      transport(transporter, follower, `New Project Post - ${updatedProject.title}`, `<p>Hello ${follower.firstName},</p><p>${req.user.firstName} ${req.user.lastName} recently updated one of their projects: <strong>${updatedProject.title}</strong>. Check it out!</p>${imageString}`);
+      transport(follower, `New Project Post - ${updatedProject.title}`, `<p>Hello ${follower.firstName},</p><p>${req.user.firstName} ${req.user.lastName} recently updated one of their projects: <strong>${updatedProject.title}</strong>. Check it out!</p>${imageString}`);
 
       follower.inbox.push(notif); //Add notif to user's inbox
       follower.msgCount += 1;
@@ -537,7 +519,6 @@ router.put('/:id', middleware.isLoggedIn, middleware.isFaculty, validateProject,
     res.redirect(`/projects/${project._id}`);
 
   })().catch(err => {
-    console.log(err);
     req.flash('error', "Unable to access database");
     res.redirect('back');
   });
@@ -565,9 +546,8 @@ router.delete('/:id', middleware.isLoggedIn, middleware.isFaculty, (req, res) =>
     res.redirect('/projects');
 
   })().catch(err => {
-    console.log(err)
-    req.flash('error', "Unable to access database")
-    res.redirect('back')
+    req.flash('error', "Unable to access database");
+    res.redirect('back');
   });
 });
 

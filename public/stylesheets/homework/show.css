@@ -25,12 +25,12 @@
   text-align: left;
 }
 
-.nav {
+.options-bar {
   margin-bottom: -20px;
   margin-top: 10px;
 }
 
-.nav-item {
+.tab {
   font-weight: bold;
 }
 
@@ -38,13 +38,17 @@
   color: blue;
 }
 
-.people, .tutors, .settings {
+.people, .tutors, .settings, .blocked {
   margin-top: 30px;
 }
 
-.user-element-text {
+.user-element-text, .user-element-text:hover {
   color: black;
   text-decoration: none;
+}
+
+.enrolled-name {
+  font-weight: bold;
 }
 
 .enrolled-username {
@@ -54,7 +58,8 @@
 .tutor-profile {
   color: black;
   height: 40%;
-  padding: 20px;
+  padding-bottom, padding-top: 10px;
+  padding-left, padding-right: 20px;
 }
 
 .tutor-link, .tutor-link:hover {
@@ -64,6 +69,7 @@
 
 .tutor-name {
   margin-left: 5px;
+  font-weight: bold;
 }
 
 .tutor-username {
@@ -83,11 +89,7 @@
   font-size: 110%;
 }
 
-.book-button, .upvoted, .not-upvoted, .review-button {
-  margin-left: 10px;
-}
-
-#rating-label {
+.book-button, .upvoted, .not-upvoted, .review-button, .leave-button, #rating-label {
   margin-left: 10px;
 }
 
@@ -104,11 +106,7 @@
   color: #cc9537
 }
 
-.leave-button {
-  margin-left: 10px;
-}
-
-.tutor-actions {
+.tutor-actions, #rating-label {
   display: inline;
 }
 
@@ -125,10 +123,35 @@
 .reviews-length, .reviews-length:hover {
   margin-left: 20px;
   font-size: 120%;
-  color: black;
+  font-weight: bold;
   text-decoration: none;
 }
 
-.reviews-icon {
-  color: grey;
+.tutor-experience {
+  font-weight: bold;
+  color: purple;
+  margin-left: 10px;
+  font-style: italic;
+  display: inline;
+}
+
+#rating-label, #join-code-heading, .list-group-item-success {
+  font-weight: bold;
+}
+
+#slots-heading {
+  font-weight: bold;
+}
+
+#slots-label {
+  margin-top: 20px;
+  font-style: italic;
+}
+
+#slots {
+  width: 90%;
+}
+
+#change-message {
+  margin-left: 10px;
 }

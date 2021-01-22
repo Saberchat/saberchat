@@ -19,7 +19,6 @@ const comment = ((form, event) => {
         document.getElementById('comments-heading').innerText = `Comments (${data.comments.length})`;
 
         //Build a comment body for new message
-        console.log(data.comments);
         let newComment = document.createElement('div');
         newComment.className = "media mb-2 comment-body";
         newComment.style = "text-align: left;";
@@ -35,7 +34,7 @@ const comment = ((form, event) => {
         }
 
         // Add date value and closing tags
-        commentHTML += `</p></div><p class="small text-muted msg-info"><span class="username">Me</span>, ${data.comments[data.comments.length-1].date}</p></div>`;
+        commentHTML += `</p></div><p class="small text-muted msg-info"><span class="username">Me</span>, ${data.comments[data.comments.length-1].date}</p><span class="unliked-comment" id="likeComment-${data.comments[data.comments.length-1]._id}" onclick="likeComment(this)"><i class="fas fa-thumbs-up"></i></span> <span class="like-comment-comment" id="likeCountComment-${data.comments[data.comments.length-1]._id}">0</span></div>`;
 
         // Add the new comment to the top of the list of comments
         newComment.innerHTML = commentHTML;

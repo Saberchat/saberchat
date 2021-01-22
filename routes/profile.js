@@ -26,14 +26,6 @@ const Article = require('../models/article');
 
 const middleware = require('../middleware');
 
-let transporter = nodemailer.createTransport({
-  service: 'gmail',
-  auth: {
-    user: 'noreply.saberchat@gmail.com',
-    pass: 'Tgy8erwIYtxRZrJHvKwkWbrkbUhv1Zr9'
-  }
-});
-
 // renders the list of users page
 router.get('/', middleware.isLoggedIn, (req, res) => {
 
@@ -88,7 +80,6 @@ router.get('/:id', middleware.isLoggedIn, (req, res) => {
     res.render('profile/show', {user, following, followerIds});
 
   })().catch(err => {
-    console.log(err);
     req.flash('error', "Unable to access database");
     res.redirect('back');
   })
@@ -143,12 +134,11 @@ router.put('/profile', middleware.isLoggedIn, validateUserUpdate, (req, res) => 
       return res.redirect('back');
     }
 
-    transport(transporter, updatedUser, 'Profile Update Confirmation', `<p>Hello ${user.firstName},</p><p>You are receiving this email because you recently made changes to your Saberchat profile.\n\nIf you did not recently make any changes, contact a faculty member immediately.</p>`);
+    transport(updatedUser, 'Profile Update Confirmation', `<p>Hello ${user.firstName},</p><p>You are receiving this email because you recently made changes to your Saberchat profile.\n\nIf you did not recently make any changes, contact a faculty member immediately.</p>`);
     req.flash('success', 'Updated your profile');
     res.redirect('/profiles/' + req.user._id);
 
   })().catch(err => {
-    console.log(err);
     req.flash('error', "Unable to access database");
     res.redirect('back');
   });
@@ -173,11 +163,11 @@ router.put('/change-email', middleware.isLoggedIn, validateEmailUpdate, (req, re
 
     if(req.body.receiving_emails) {
       req.user.receiving_emails = true;
-      req.user.save();
+      await req.user.save();
 
     } else {
       req.user.receiving_emails = false;
-      req.user.save();
+      await req.user.save();
     }
 
     const emails = await Email.find({address: req.body.email});
@@ -222,7 +212,6 @@ router.put('/change-email', middleware.isLoggedIn, validateEmailUpdate, (req, re
     res.redirect('/profiles/change-login-info');
 
   })().catch(err => {
-    console.log(err);
     req.flash('error', "Unable to access database");
     res.redirect('back');
   });
@@ -254,8 +243,6 @@ router.get('/confirm-email/:id', (req, res) => {
         token += charSet[Math.floor((Math.random() * charSet.length))];
       }
 
-      console.log(user.authenticationToken);
-      console.log(req.query.token);
       if (req.query.token.toString() == user.authenticationToken) {
         user.email = req.query.email;
         user.authenticationToken = token;
@@ -304,7 +291,7 @@ router.put('/change-password', middleware.isLoggedIn, validatePasswordUpdate, (r
 
           } else {
 
-            transport_mandatory(transporter, req.user, 'Password Update Confirmation', `<p>Hello ${req.user.firstName},</p><p>You are receiving this email because you recently made changes to your Saberchat password. This is a confirmation of your profile.\n\nYour username is ${req.user.username}.\nYour full name is ${req.user.firstName} ${req.user.lastName}.\nYour email is ${req.user.email}\n\nIf you did not recently change your password, reset it immediately and contact a faculty member.</p>`);
+            transport_mandatory(req.user, 'Password Update Confirmation', `<p>Hello ${req.user.firstName},</p><p>You are receiving this email because you recently made changes to your Saberchat password. This is a confirmation of your profile.\n\nYour username is ${req.user.username}.\nYour full name is ${req.user.firstName} ${req.user.lastName}.\nYour email is ${req.user.email}\n\nIf you did not recently change your password, reset it immediately and contact a faculty member.</p>`);
 
             req.flash('success', 'Successfully changed your password');
             res.redirect('/profiles/' + req.user._id);
@@ -389,7 +376,7 @@ router.delete('/delete-account', middleware.isLoggedIn, (req, res) => {
           }
 
           messageSender.msgCount -= 1;
-          messageSender.save();
+          await messageSender.save();
         }
 
         messageUpdate = await Message.findByIdAndDelete(message._id);
@@ -565,13 +552,12 @@ router.delete('/delete-account', middleware.isLoggedIn, (req, res) => {
       return res.redirect('back');
     }
 
-    transport_mandatory(transporter, deletedUser, 'Profile Deletion Confirmation', `<p>Hello ${deletedUser.firstName},</p><p>You are receiving this email because you recently deleted your Saberchat account. If you did not delete your account, contact a staff member immediately.</p>`);
+    transport_mandatory(deletedUser, 'Profile Deletion Confirmation', `<p>Hello ${deletedUser.firstName},</p><p>You are receiving this email because you recently deleted your Saberchat account. If you did not delete your account, contact a staff member immediately.</p>`);
 
     req.flash('success', "Account deleted!");
     res.redirect('/');
 
   })().catch(err => {
-    console.log(err);
     req.flash('error', "Unable to access database");
     res.redirect('back');
   });

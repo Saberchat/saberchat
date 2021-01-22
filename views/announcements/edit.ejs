@@ -44,7 +44,7 @@
               <textarea class="form-control" name="message" rows="5" placeholder="What it is about..." required><%= announcement.text %></textarea>
             </div>
 
-            <% if(!announcement.imageFile.filename) { %> 
+            <% if(!announcement.imageFile.filename) { %>
               <div class="form-group">
                 <label for="imageFile">Image Upload</label>
                 <input type="file" name="imageFile" class="image-upload form-control-file">
@@ -60,7 +60,7 @@
                 <input type="file" name="imageFile" class="image-upload form-control-file">
                 <span>Leave blank if not replacing</span>
               </div>
-            <% } %>  
+            <% } %>
 
             <div id="image-header">
               <h4>Image Urls</h4>

@@ -23,7 +23,7 @@ var userSchema = new mongoose.Schema({
 			version: String
 		}
 	],
-
+	newRoomCount: [{type: mongoose.Schema.Types.ObjectID, ref: "Room"}],
 	reqCount: {type: Number, default: 0},
 	inbox: [
 		{

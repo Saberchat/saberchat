@@ -55,7 +55,7 @@
               <% types.forEach(type => { %>
 
                 <% if (type.items.length > 0) { %>
-                  <h5><strong><%=type.name%></strong></h5>
+                  <h5><%=type.name%></h5>
                   <%type.items.forEach(item => { %>
                     <input id="item<%=item._id%>" type="checkbox" name="<%=item._id%>"/>
                     <label for="item<%=item._id%>"><%=item.name%></label>

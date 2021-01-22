@@ -13,6 +13,8 @@
     <link rel="stylesheet" href="/stylesheets/announcements/index.css">
     <link rel="stylesheet" href="/stylesheets/projects/index.css">
     <link rel="stylesheet" href="/stylesheets/projects/show.css">
+    <script src="/javascript/projects/like.js"></script>
+    <script src="/javascript/projects/comment.js"></script>
 
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
@@ -111,37 +113,37 @@
             <% if (currentUser) { %>
 
               <% if (project.creators.length > 2) { %>
-                <span><strong>Creators:</strong>
+                <span><span id="creator-heading">Creators:</span>
 
                   <% let tempcreators = project.creators.slice(0, project.creators.length - 2)%>
 
                   <%tempcreators.forEach(creator => { %>
-                     <em><a class="creator-name" href="../profiles/<%=creator._id%>"><img src="<%= creator.imageUrl %>" alt="profile pic" class="creator-profile"> <%=creator.firstName%> <%=creator.lastName%></a>,</em>
+                     <a class="creator-names" href="../profiles/<%=creator._id%>"><img src="<%= creator.imageUrl %>" alt="profile pic" class="creator-profile"> <%=creator.firstName%> <%=creator.lastName%></a>,
                   <%})%>
 
-                  <em><a class="creator-name" href="../profiles/<%=project.creators[project.creators.length - 2]._id%>"><img src="<%= project.creators[project.creators.length - 2].imageUrl %>" alt="profile pic" class="creator-profile"> <%=project.creators[project.creators.length - 2].firstName%> <%=project.creators[project.creators.length - 2].lastName%></a>,</em>
-                  <em><a class="creator-name" href="../profiles/<%=project.creators[project.creators.length - 1]._id%>"><img src="<%= project.creators[project.creators.length - 1].imageUrl %>" alt="profile pic" class="creator-profile"> <%=project.creators[project.creators.length - 1].firstName%> <%=project.creators[project.creators.length - 1].lastName%></a></em>
+                  <a class="creator-names" href="../profiles/<%=project.creators[project.creators.length - 2]._id%>"><img src="<%= project.creators[project.creators.length - 2].imageUrl %>" alt="profile pic" class="creator-profile"> <%=project.creators[project.creators.length - 2].firstName%> <%=project.creators[project.creators.length - 2].lastName%></a>,
+                  <a class="creator-names" href="../profiles/<%=project.creators[project.creators.length - 1]._id%>"><img src="<%= project.creators[project.creators.length - 1].imageUrl %>" alt="profile pic" class="creator-profile"> <%=project.creators[project.creators.length - 1].firstName%> <%=project.creators[project.creators.length - 1].lastName%></a>
 
                 </span>
 
-              <%} else if (project.creators.length == 2){ %>
-                <p><strong>Creators:</strong> <a class="creator-name" href="../profiles/<%=project.creators[0]._id%>"><em><img src="<%= project.creators[0].imageUrl %>" alt="profile pic" class="creator-profile"> <%=project.creators[0].firstName%> <%=project.creators[0].lastName%></a>, <a class="creator-name" href="profiles/<%=project.creators[0]._id%>"><img src="<%= project.creators[1].imageUrl %>" alt="profile pic" class="creator-profile"> <%=project.creators[1].firstName%> <%=project.creators[1].lastName%></a></em></p>
+              <%} else if (project.creators.length == 2) { %>
+                <p><span id="creator-heading">Creators:</span> <span id="creator-div"><a class="creator-names" href="../profiles/<%=project.creators[0]._id%>"><img src="<%= project.creators[0].imageUrl %>" alt="profile pic" class="creator-profile"> <%=project.creators[0].firstName%> <%=project.creators[0].lastName%></a>, <a class="creator-names" href="../profiles/<%=project.creators[1]._id%>"><img src="<%= project.creators[1].imageUrl %>" class="creator-profile" alt="profile pic"/> <%=project.creators[1].firstName%> <%=project.creators[1].lastName%></a></span></p>
 
               <%} else if (project.creators.length == 1){ %>
-                <p><strong>Creator:</strong> <a class="creator-name" href="../profiles/<%=project.creators[0]._id%>"><em><img src="<%= project.creators[0].imageUrl %>" alt="profile pic" class="creator-profile"> <%=project.creators[0].firstName%> <%=project.creators[0].lastName%></em></a></p>
+                <p><span id="creator-heading">Creator:</span> <span id="creator-div"><a class="creator-names" href="../profiles/<%=project.creators[0]._id%>"><img src="<%= project.creators[0].imageUrl %>" alt="profile pic" class="creator-profile"> <%=project.creators[0].firstName%> <%=project.creators[0].lastName%></a></span></p>
 
               <% } else { %>
-                <p><strong>Creators:</strong> <em>None</em></p>
+                <p><span id="creator-heading">Creators:</span> <span id="creator-div">None</span></p>
               <% } %>
 
             <% } else { %>
 
               <% if (project.creators.length > 2) { %>
-                <strong>Creators:</strong>
+                <span id="creator-heading">Creators:</span>
 
                   <% let tempcreators = project.creators.slice(0, project.creators.length - 2)%>
 
-                  <span class="creator-div"><em>
+                  <span id="creator-div">
                     <%tempcreators.forEach(creator => { %>
                        <img src="<%= creator.imageUrl %>" alt="profile pic" class="creator-profile"> <%=creator.firstName%> <%=creator.lastName%>,
                     <%})%>
@@ -149,16 +151,16 @@
                   <img src="<%= project.creators[project.creators.length - 2].imageUrl %>" alt="profile pic" class="creator-profile"> <%=project.creators[project.creators.length - 2].firstName%> <%=project.creators[project.creators.length - 2].lastName%>,
                   <img src="<%= project.creators[project.creators.length - 1].imageUrl %>" alt="profile pic" class="creator-profile"> <%=project.creators[project.creators.length - 1].firstName%> <%=project.creators[project.creators.length - 1].lastName%>
 
-                  </em></span>
+                  </span>
 
               <%} else if (project.creators.length == 2){ %>
-                <p><strong>Creators:</strong> <span class="creator-div"><em><img src="<%= project.creators[0].imageUrl %>" alt="profile pic" class="creator-profile"> <%=project.creators[0].firstName%> <%=project.creators[0].lastName%>, <img src="<%= project.creators[1].imageUrl %>" alt="profile pic" class="creator-profile"> <%=project.creators[1].firstName%> <%=project.creators[1].lastName%></span></em></p>
+                <p><span id="creator-heading">Creators:</span> <span id="creator-div"><img src="<%= project.creators[0].imageUrl %>" alt="profile pic" class="creator-profile"> <%=project.creators[0].firstName%> <%=project.creators[0].lastName%>, <img src="<%= project.creators[1].imageUrl %>" alt="profile pic" class="creator-profile"> <%=project.creators[1].firstName%> <%=project.creators[1].lastName%></span></p>
 
               <%} else if (project.creators.length == 1){ %>
-                <p><strong>Creator:</strong> <span class="creator-div"><em><img src="<%= project.creators[0].imageUrl %>" alt="profile pic" class="creator-profile"> <%=project.creators[0].firstName%> <%=project.creators[0].lastName%></em></span></p>
+                <p><span id="creator-heading">Creator:</span> <span id="creator-div"><img src="<%= project.creators[0].imageUrl %>" alt="profile pic" class="creator-profile"> <%=project.creators[0].firstName%> <%=project.creators[0].lastName%></span></p>
 
               <% } else { %>
-                <p><strong>Creators:</strong> <em>None</em></p>
+                <p><span id="creator-heading">Creators:</span> <span id="creator-div">None</span></p>
               <% } %>
 
             <% } %>
@@ -262,6 +264,4 @@
     </div>
   </div>
   </body>
-  <script src="/javascript/projects/like.js"></script>
-  <script src="/javascript/projects/comment.js"></script>
 </html>

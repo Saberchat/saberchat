@@ -17,15 +17,6 @@ const User = require('../models/user');
 const Room = require('../models/room');
 const AccessReq = require('../models/accessRequest');
 
-
-let transporter = nodemailer.createTransport({
-  service: 'gmail',
-  auth: {
-    user: 'noreply.saberchat@gmail.com',
-    pass: 'Tgy8erwIYtxRZrJHvKwkWbrkbUhv1Zr9'
-  }
-});
-
 //route for displaying room list
 router.get('/', middleware.isLoggedIn, (req, res) => {
   Room.find({}, (err, foundRooms) => {
@@ -63,6 +54,11 @@ router.get('/:id', middleware.isLoggedIn, middleware.checkIfMember, (req, res) =
       await room.save();
     }
 
+    if (req.user.newRoomCount.includes(room._id)) {
+      req.user.newRoomCount.splice(req.user.newRoomCount.indexOf(room._id), 1);
+      await req.user.save();
+    }
+
     const comments = await Comment.find({ room: room._id }).sort({ _id: -1 }).limit(30)
     .populate({path: 'author', select: ['username', 'imageUrl']});
 
@@ -92,7 +88,6 @@ router.get('/:id/edit', middleware.isLoggedIn, middleware.checkRoomOwnership, (r
     res.render('chat/edit', {users, room});
 
   })().catch(err => {
-    console.log(err);
     req.flash('error', "Unable to access database");
     res.redirect('back');
   });
@@ -100,18 +95,20 @@ router.get('/:id/edit', middleware.isLoggedIn, middleware.checkRoomOwnership, (r
 
 // create new rooms
 router.post('/', middleware.isLoggedIn, validateRoom, (req, res) => {
-  const room = {
-    name: filter.clean(req.body.name),
-    'creator.id': req.user._id,
-    'creator.username': req.user.username,
-    members: [req.user._id]
-  };
+  (async() => {
 
-  Room.create(room, (err, room) => {
-    if (err) {
-      console.log(err);
-      req.flash('error', 'group could not be created');
-      res.redirect('/chat/new');
+    const roomObject = {
+      name: filter.clean(req.body.name),
+      'creator.id': req.user._id,
+      'creator.username': req.user.username,
+      members: [req.user._id]
+    };
+
+    const room = await Room.create(roomObject);
+    if (!room) {
+      req.flash('error', 'Group could not be created');
+      return res.redirect('/chat/new');
+      
     } else {
       if(req.body.type == 'true') {
         for (const user in req.body.check) {
@@ -125,11 +122,25 @@ router.post('/', middleware.isLoggedIn, validateRoom, (req, res) => {
       if(req.body.description) {
         room.description = filter.clean(req.body.description);
       }
-      room.save();
-      console.log('Database Room created: '.cyan);
-      console.log(room);
-      res.redirect('/chat/' + room._id);
+
+      await room.save();
+
+      const members = await User.find({_id: {$in: room.members}});
+      if (!members) {
+        req.flash('error', 'Members could not be found');
+        return res.redirect('/chat/new');
+      }
+
+      for (let member of members) {
+        member.newRoomCount.push(room._id);
+        member.save();
+      }
+
+      return res.redirect('/chat/' + room._id);
     }
+  })().catch(err => {
+    req.flash('error', 'Group could not be created');
+    res.redirect('/chat/new');
   });
 });
 
@@ -143,6 +154,11 @@ router.post('/:id/leave', middleware.isLoggedIn, middleware.checkForLeave, (req,
 
     if(room.creator.id.equals(req.user._id)) {
       req.flash('error', 'You cannot leave a room you created');
+      return res.redirect('back');
+    }
+
+    if (!room.mutable) {
+      req.flash('error', 'You cannot leave this room');
       return res.redirect('back');
     }
 
@@ -164,7 +180,6 @@ router.post('/:id/leave', middleware.isLoggedIn, middleware.checkForLeave, (req,
     res.redirect('/chat');
 
   })().catch(err => {
-    console.log(err);
     req.flash('Error accessing Database');
     res.redirect('back');
   });
@@ -182,6 +197,10 @@ router.post('/:id/request-access', middleware.isLoggedIn, (req, res) => {
 
     if(foundRoom.type == 'public') {
       req.flash('error', 'Room is public');
+      return res.redirect('back');
+
+    } else if (!foundRoom.mutable) {
+      req.flash('error', 'Room does not accept access requests');
       return res.redirect('back');
     }
 
@@ -217,14 +236,13 @@ router.post('/:id/request-access', middleware.isLoggedIn, (req, res) => {
       roomCreator.requests.push(createdReq._id);
       roomCreator.save();
 
-      transport(transporter, roomCreator, 'New Room Access Request', `<p>Hello ${roomCreator.firstName},</p><p><strong>${req.user.username}</strong> is requesting to join your room, <strong>${foundRoom.name}.</strong></p><p>You can access the full request at https://alsion-saberchat.herokuapp.com</p>`);
+      transport(roomCreator, 'New Room Access Request', `<p>Hello ${roomCreator.firstName},</p><p><strong>${req.user.username}</strong> is requesting to join your room, <strong>${foundRoom.name}.</strong></p><p>You can access the full request at https://alsion-saberchat.herokuapp.com</p>`);
 
       req.flash('success', 'Request for access sent');
       res.redirect('back');
     }
 
   })().catch(err => {
-    console.log(err)
     req.flash('error', 'Cannot access Database');
     res.redirect('back');
   });
@@ -292,13 +310,31 @@ router.put('/:id', middleware.isLoggedIn, middleware.checkRoomOwnership, validat
 // delete room
 router.delete('/:id/delete', middleware.isLoggedIn, middleware.checkRoomOwnership, (req, res) => {
   (async () => {
-    const deletedRoom = await Room.findByIdAndDelete(req.params.id);
+
+    const room = await Room.findById(req.params.id);
+    if (!room) {
+      req.flash('error', 'A problem occured');
+      return res.redirect('back');
+    }
+
+    if (!room.mutable) {
+      req.flash('error', 'You cannot delete this room');
+      return res.redirect('back');
+    }
+
+    const deletedRoom = await Room.findByIdAndDelete(req.params.id).populate("members");
     if(!deletedRoom) {req.flash('error', 'A problem occured'); return res.redirect('back');}
 
     await Promise.all([
       Comment.deleteMany({room: deletedRoom._id}),
       AccessReq.deleteMany({room: deletedRoom._id})
     ]);
+
+    for (let member of deletedRoom.members) {
+      if (member.newRoomCount.includes(deletedRoom._id)) {
+        member.newRoomCount.splice(member.newRoomCount.indexOf(deletedRoom._id), 1);
+      }
+    }
 
     req.flash('success', 'Deleted room');
     res.redirect('/chat');

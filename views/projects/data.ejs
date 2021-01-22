@@ -11,6 +11,7 @@
     <link rel="stylesheet" href="/stylesheets/components/header.css">
     <link rel="stylesheet" href="/stylesheets/components/navbar.css">
     <link rel="stylesheet" href="/stylesheets/projects/index.css">
+    <link rel="stylesheet" href="/stylesheets/projects/data.css">
     <link rel="stylesheet" href="/stylesheets/announcements/index.css">
     <link rel="stylesheet" href="/stylesheets/home/index.css">
     <link rel="stylesheet" href="/stylesheets/chat/new.css">
@@ -28,20 +29,10 @@
 
     <!-- I'm using my fontawesome kit -->
     <script src="https://kit.fontawesome.com/dccc745c41.js" crossorigin="anonymous"></script>
+
     <!-- include the navbar via ejs -->
     <%- include('../partials/navbar') %>
     <%- include('../partials/header') %>
-
-    <style>
-      html, body, #container {
-      width: 50%;
-      height: 50%;
-      }
-
-      #container {
-        margin-left: 300px;
-      }
-    </style>
 
   </head>
   <body>
@@ -77,7 +68,7 @@
     <div id="container">
       <ul hidden>
       <% for (let [keyword, occurences] of new Map(Array.from(projectKeywords)).entries()) { %>
-        <li>'<strong class="keyword" id="word-<%=keyword%>"><%=keyword.charAt(0).toUpperCase()%><%=keyword.slice(1)%></strong>': <span class="occurence" id="occurences-<%=keyword%>"><%=occurences%></span> times</li>
+        <li>'<span class="keyword" id="word-<%=keyword%>"><%=keyword.charAt(0).toUpperCase()%><%=keyword.slice(1)%></span>': <span class="occurence" id="occurences-<%=keyword%>"><%=occurences%></span> times</li>
       <% } %>
       </ul>
 

@@ -31,9 +31,80 @@ h3, .ratings {
   margin-right: 20px;
 }
 
-.reviews-heading {
+.tab {
+  font-size: 150%;
+  margin-bottom: 30px;
+}
+
+#reviews {
+  color: blue;
+}
+
+#bio-length-error {
+  color: red;
+  margin-bottom: 10px;
+  text-align: left;
+}
+
+.empty-field {
   text-align: center;
-  margin-bottom: 20px;
+}
+
+.student-profile-image {
+  display: inline-block;
+  border-radius:50%;
+  width:40px;
+  height:40px;
+  object-fit: cover;
+}
+
+.time {
+  width: 100%;
+}
+
+.student-block {
+  margin-right: 30px;
+}
+
+.lessons-length {
+  font-style: italic;
+  float: right;
+  margin-right: 30px;
+}
+
+.mark-button {
+  float: right;
+}
+
+.lesson-button {
+  float: right;
+  margin-left: 10px;
+}
+
+.summary {
+  margin-top: 10px;
+}
+
+.lesson-info {
+  font-weight: bold;
+}
+
+.student-profile {
+  color: black;
+  text-decoration: none;
+}
+
+.join-course-student, .join-course-tutor {
+  display: inline;
+  margin-left: 10px;
+}
+
+.tutor-info {
+  text-align: center;
+}
+
+.profile-image {
+  display: inline;
 }
 
 @media only screen and (max-width: 768px) {
@@ -60,5 +131,11 @@ h3, .ratings {
 
     .review-date {
       display: none;
+    }
+
+    .tab, .options-bar {
+      display: inline-block;
+      font-size: 100%;
+      float: center;
     }
 }

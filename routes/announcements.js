@@ -6,7 +6,7 @@ const middleware = require('../middleware/index');
 const router = express.Router(); //start express router
 const dateFormat = require('dateformat');
 const nodemailer = require('nodemailer');
-const {transport} = require("../transport");
+const {transport, transport_mandatory} = require("../transport");
 
 const multer = require('../middleware/multer');
 const { cloudUpload, cloudDelete } = require('../services/cloudinary');
@@ -19,21 +19,10 @@ const Announcement = require('../models/announcement');
 const Notification = require('../models/message');
 const PostComment = require('../models/postComment');
 
-
-//Sets up NodeMailer Transporter object (sends out emails)
-let transporter = nodemailer.createTransport({
-  service: 'gmail',
-  auth: {
-    user: 'noreply.saberchat@gmail.com',
-    pass: 'Tgy8erwIYtxRZrJHvKwkWbrkbUhv1Zr9'
-  }
-});
-
 //ROUTES
 router.get('/', (req, res) => { //RESTful Routing 'INDEX' route
   Announcement.find({}).populate('sender').exec((err, foundAnns) => { //Collects data about all announcements
     if (err || !foundAnns) {
-      console.log(err);
       req.flash('error', "Unable To Access Database");
       res.redirect('back');
 
@@ -175,7 +164,7 @@ router.post('/', middleware.isLoggedIn, middleware.isMod, multer, validateAnn, (
     };
 
     for (let user of users) {
-      transport(transporter, user, `New Saberchat Announcement - ${announcement.subject}`, `<p>Hello ${user.firstName},</p><p>${req.user.username} has recently posted a new announcement - '${announcement.subject}'.</p><p>${announcement.text}</p><p>You can access the full announcement at https://alsion-saberchat.herokuapp.com</p> ${imageString}`);
+      transport(user, `New Saberchat Announcement - ${announcement.subject}`, `<p>Hello ${user.firstName},</p><p>${req.user.username} has recently posted a new announcement - '${announcement.subject}'.</p><p>${announcement.text}</p><p>You can access the full announcement at https://alsion-saberchat.herokuapp.com</p> ${imageString}`);
       user.annCount.push(announcementObject);
       await user.save();
     }
@@ -184,7 +173,6 @@ router.post('/', middleware.isLoggedIn, middleware.isMod, multer, validateAnn, (
     res.redirect(`/announcements/${announcement._id}`);
 
   })().catch(err => {
-    console.log(err);
     req.flash('error', "Unable To Access Database");
     return res.redirect('back');
   });
@@ -268,10 +256,10 @@ router.put('/comment', middleware.isLoggedIn, (req, res) => {
     }
 
     comment.date = dateFormat(comment.created_at, "h:MM TT | mmm d");
-    comment.save();
+    await comment.save();
 
     announcement.comments.push(comment);
-    announcement.save();
+    await announcement.save();
 
     let users = [];
     let user;
@@ -290,7 +278,7 @@ router.put('/comment', middleware.isLoggedIn, (req, res) => {
     let notif;
     for (let user of users) {
 
-      notif = await Notification.create({subject: `New Mention in ${announcement.subject}`, sender: req.user, recipients: [user], read: [], toEveryone: false, images: []}); //Create a notification to alert the user
+      notif = await Notification.create({subject: `New Mention in ${announcement.subject}`, sender: req.user, noReply: true, recipients: [user], read: [], toEveryone: false, images: []}); //Create a notification to alert the user
 
       if (!notif) {
         return res.json({error: "Error creating notification"});
@@ -300,7 +288,7 @@ router.put('/comment', middleware.isLoggedIn, (req, res) => {
       notif.text = `Hello ${user.firstName},\n\n${req.user.firstName} ${req.user.lastName} mentioned you in a comment on "${announcement.subject}":\n${comment.text}`;
       await notif.save();
 
-      transport(transporter, user, `New Mention in ${announcement.subject}`, `<p>Hello ${user.firstName},</p><p>${req.user.firstName} ${req.user.lastName} mentioned you in a comment on <strong>${announcement.subject}</strong>.<p>${comment.text}</p>`);
+      transport(user, `New Mention in ${announcement.subject}`, `<p>Hello ${user.firstName},</p><p>${req.user.firstName} ${req.user.lastName} mentioned you in a comment on <strong>${announcement.subject}</strong>.<p>${comment.text}</p>`);
       user.inbox.push(notif); //Add notif to user's inbox
       user.msgCount += 1;
       await user.save();
@@ -312,10 +300,7 @@ router.put('/comment', middleware.isLoggedIn, (req, res) => {
     });
 
   })().catch(err => {
-    console.log(err)
-    res.json({
-      error: 'Error Commenting'
-    });
+    res.json({error: 'Error Commenting'});
   })
 
 })
@@ -394,7 +379,7 @@ router.put('/:id', middleware.isLoggedIn, middleware.isMod, multer, validateAnn,
     let overlap;
 
     for (let user of users) {
-      transport(transporter, user, `Updated Saberchat Announcement - ${announcement.subject}`, `<p>Hello ${user.firstName},</p><p>${req.user.username} has recently updated an announcement - '${announcement.subject}'.</p><p>${announcement.text}</p><p>You can access the full announcement at https://alsion-saberchat.herokuapp.com</p> ${imageString}`);
+      transport(user, `Updated Saberchat Announcement - ${announcement.subject}`, `<p>Hello ${user.firstName},</p><p>${req.user.username} has recently updated an announcement - '${announcement.subject}'.</p><p>${announcement.text}</p><p>You can access the full announcement at https://alsion-saberchat.herokuapp.com</p> ${imageString}`);
       overlap = false;
 
       for (let a of user.annCount) {
@@ -414,9 +399,8 @@ router.put('/:id', middleware.isLoggedIn, middleware.isMod, multer, validateAnn,
     res.redirect(`/announcements/${updatedAnnouncement._id}`);
 
   })().catch(err => {
-    console.log(err)
-    req.flash('error', "Unable To Access Database")
-    res.redirect('back')
+    req.flash('error', "Unable To Access Database");
+    res.redirect('back');
   });
 });
 
@@ -452,36 +436,33 @@ router.delete('/:id', middleware.isLoggedIn, middleware.isMod, (req, res) => { /
       return res.redirect('back');
     }
 
-    const users = await User.find({authenticated: true}, (err, users) => {
-      if (!users) {
-        req.flash('error', "Unable to find users");
-        return res.redirect('back');
-      }
+    const users = await User.find({authenticated: true});
+    if (!users) {
+      req.flash('error', "Unable to find users");
+      return res.redirect('back');
+    }
 
-      for (let user of users) {
+    for (let user of users) {
+      let index;
 
-        let index;
-
-        for (let i = 0; i < user.annCount.length; i += 1) {
-          if (user.annCount[i].announcement.toString() == deletedAnn._id.toString()) {
-            index = i;
-          }
-        }
-
-        if (index > -1) {
-          user.annCount.splice(index, 1);
-          user.save();
+      for (let i = 0; i < user.annCount.length; i += 1) {
+        if (user.annCount[i].announcement.toString() == deletedAnn._id.toString()) {
+          index = i;
         }
       }
-    })
+
+      if (index > -1) {
+        user.annCount.splice(index, 1);
+        await user.save();
+      }
+    }
 
     req.flash('success', 'Announcement Deleted!');
     res.redirect('/announcements/');
 
   })().catch(err => {
-    console.log(err)
-    req.flash('error', "Unable To Access Database")
-    res.redirect('back')
+    req.flash('error', "Unable To Access Database");
+    res.redirect('back');
   });
 });
 

@@ -199,7 +199,7 @@ Username
   float: right;
 }
 
-.edit-button, .leave-button, .review-button {
+.edit-button, .leave-button, .review-button, .action-button {
   margin-right: 10px;
   margin-bottom: 10px;
   width: 100%;
@@ -253,6 +253,10 @@ Username
 .remove-follower, .block-following {
   float: right;
   margin-right: 20px;
+}
+
+.follower-name {
+  font-weight: bold;
 }
 
 

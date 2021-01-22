@@ -55,7 +55,7 @@
           <div class="col-md-8 offset-md-2 col-12">
             <div class="form-group">
 
-              <h5><strong><%=type.name%></strong></h5>
+              <h5><%=type.name%></h5>
               <% if (type.items.length > 0) { %>
                 <% type.items.forEach(item => { %>
                   <input id="item<%=item._id%>" type="checkbox" name="<%=item._id%>" checked/>
@@ -75,7 +75,7 @@
 
                 <% if (t.name != "Other") { %>
                   <% if (t.items.length > 0) { %>
-                    <h5><strong><%=t.name%></strong></h5>
+                    <h5><%=t.name%></h5>
                     <% t.items.forEach(item => { %>
                       <input id="item<%=item._id%>" type="checkbox" name="<%=item._id%>"/>
                       <label for="item<%=item._id%>"><%=item.name%></label>
@@ -90,7 +90,7 @@
 
                 <% if (t.name == "Other") { %>
                   <% if (t.items.length > 0) { %>
-                    <h5><strong><%=t.name%></strong></h5>
+                    <h5><%=t.name%></h5>
                     <% t.items.forEach(item => { %>
                       <input id="item<%=item._id%>" type="checkbox" name="<%=item._id%>"/>
                       <label for="item<%=item._id%>"><%=item.name%></label>

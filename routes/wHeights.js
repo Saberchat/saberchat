@@ -9,6 +9,7 @@ const {transport, transport_mandatory} = require("../transport");
 const Article = require('../models/article');
 const User = require('../models/user');
 const Type = require('../models/articleType');
+const PostComment = require('../models/postComment');
 
 // index page
 router.get('/', middleware.isLoggedIn, (req, res) => {
@@ -21,7 +22,6 @@ router.get('/', middleware.isLoggedIn, (req, res) => {
     res.render('wHeights/index', {articles: articles});
 
   })().catch(err => {
-    console.log(err);
     req.flash('error', "Unable to access database");
     res.redirect('back');
   });
@@ -45,7 +45,6 @@ router.get('/new', middleware.isLoggedIn, (req, res) => {
     res.render('wHeights/new', {students, types});
 
   })().catch(err => {
-    console.log(err);
     req.flash('error', "Unable to access database");
     res.redirect('back');
   })
@@ -53,7 +52,15 @@ router.get('/new', middleware.isLoggedIn, (req, res) => {
 
 // display specific article
 router.get('/:id', middleware.isLoggedIn, (req, res) => {
-    Article.findById(req.params.id).populate('author').exec((err, foundArticle) => {
+    Article.findById(req.params.id)
+    .populate('author')
+    .populate({
+      path: 'comments',
+      populate: {
+        path: 'sender'
+      }
+    })
+    .exec((err, foundArticle) => {
         if(err) {
             req.flash('error', 'Cannot find article');
             res.redirect('/articles');
@@ -69,7 +76,6 @@ router.post('/new', middleware.isLoggedIn, (req, res) => {
   (async () => {
 
     const content = JSON.parse(req.body.content);
-    console.log(req.body);
 
     const articleObj = {
         title: req.body.title,
@@ -100,9 +106,107 @@ router.post('/new', middleware.isLoggedIn, (req, res) => {
     res.redirect('/articles');
 
   })().catch(err => {
-    console.log(err);
     req.flash('error', "Unable to access database");
     res.redirect('back');
+  });
+});
+
+router.put('/comment', middleware.isLoggedIn, (req, res) => {
+  (async() => {
+
+    const article = await Article.findById(req.body.article)
+    .populate({
+      path: "comments",
+      populate: {
+        path: "sender"
+      }
+    });
+
+    if (!article) {
+      return res.json({error: 'Error commenting'});
+    }
+
+    const comment = await PostComment.create({text: req.body.text, sender: req.user, date: dateFormat(new Date(), "h:MM TT | mmm d")});
+    if (!comment) {
+      return res.json({error: 'Error commenting'});
+    }
+
+    comment.date = dateFormat(comment.created_at, "h:MM TT | mmm d");
+    await comment.save();
+
+    article.comments.push(comment);
+    await article.save();
+
+    let users = [];
+    let user;
+
+    for (let line of comment.text.split(" ")) {
+      if (line[0] == '@') {
+        user = await User.findById(line.split("#")[1].split("_")[0]);
+
+        if (!user) {
+          return res.json({error: "Error accessing user"});
+        }
+
+        users.push(user);
+      }
+    }
+
+    let notif;
+    let commentEmail;
+
+    for (let user of users) {
+
+      notif = await Notification.create({subject: `New Mention in ${article.title}`, sender: req.user, recipients: [user], read: [], toEveryone: false, images: []}); //Create a notification to alert the user
+
+      if (!notif) {
+        return res.json({error: "Error creating notification"});
+      }
+
+      notif.date = dateFormat(notif.created_at, "h:MM TT | mmm d");
+      notif.text = `Hello ${user.firstName},\n\n${req.user.firstName} ${req.user.lastName} mentioned you in a comment on "${article.title}":\n${comment.text}`;
+
+      await notif.save();
+
+      transport(user, `New Mention in ${article.title}`, `<p>Hello ${user.firstName},</p><p>${req.user.firstName} ${req.user.lastName} mentioned you in a comment on <strong>${article.title}</strong>.<p>${comment.text}</p>`);
+
+      user.inbox.push(notif); //Add notif to user's inbox
+      user.msgCount += 1;
+      await user.save();
+    }
+
+    res.json({success: 'Successful comment', comments: article.comments});
+
+  })().catch(err => {
+    res.json({error: "Error Commenting"});
+  });
+});
+
+router.put('/like-comment', middleware.isLoggedIn, (req, res) => {
+  PostComment.findById(req.body.commentId, (err, comment) => {
+    if (err || !comment) {
+      res.json({error: 'Error updating comment'});
+
+    } else {
+
+      if (comment.likes.includes(req.user._id)) { //Remove Like
+        comment.likes.splice(comment.likes.indexOf(req.user._id), 1);
+        comment.save();
+        res.json({
+          success: `Removed a like from a comment`,
+          likeCount: comment.likes.length
+        });
+
+      } else { //Add Like
+        comment.likes.push(req.user._id);
+        comment.save();
+
+        res.json({
+          success: `Liked comment`,
+          likeCount: comment.likes.length
+        });
+      }
+    }
   });
 });
 

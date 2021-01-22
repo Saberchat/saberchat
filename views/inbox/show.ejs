@@ -67,7 +67,7 @@
                 <span><%=message.date%></span>
                 <a href="/inbox" class="btn btn-primary"><i class="fas fa-arrow-left"></i> Back</a>
 
-                <% if (!message.anonymous) { %>
+                <% if (!message.anonymous && !message.noReply) { %>
                   <a onclick="reply()" class="btn btn-success" href="#reply-box"><i class="fas fa-reply"></i> Reply</a>
                 <% } %>
 

@@ -2,9 +2,9 @@
 const comment = ((form, event) => {
 
   if (document.getElementById('comment-input').value.split(' ').join('') != '') {
-    const projectId = form.id.split("-")[1];
-    const url = `/projects/comment?_method=put`;
-    const data = {project: projectId, text: document.getElementById('comment-input').value};
+    const articleId = form.id.split("-")[1];
+    const url = `/articles/comment?_method=put`;
+    const data = {article: articleId, text: document.getElementById('comment-input').value};
     document.getElementById('comment-input').value = ""; //Empty input field
 
     $.post(url, data, function(data) {
@@ -48,5 +48,5 @@ const comment = ((form, event) => {
 });
 
 const reply = (comment => {
-  document.getElementById('comment-input').value = `@${comment.id.split("comment-")[1]}_ `;
+  document.getElementById('comment-input').value = `@${comment.id.split("comment-")[1]}_ `
 });

@@ -16,6 +16,7 @@ const Request = require('../models/accessRequest');
 const Message = require('../models/message');
 const Announcement = require('../models/announcement');
 const Project = require('../models/project');
+const Course = require('../models/course');
 
 const Order = require('../models/order');
 const Article = require('../models/article');
@@ -24,14 +25,6 @@ const Permission = require('../models/permission');
 const Status = require('../models/status');
 
 const middleware = require('../middleware');
-
-let transporter = nodemailer.createTransport({
-  service: 'gmail',
-  auth: {
-    user: 'noreply.saberchat@gmail.com',
-    pass: 'Tgy8erwIYtxRZrJHvKwkWbrkbUhv1Zr9'
-  }
-});
 
 //Function to display user inbox
 router.get('/', middleware.isLoggedIn, middleware.isAdmin, (req, res) => {
@@ -99,7 +92,6 @@ router.get('/whitelist', middleware.isLoggedIn, middleware.isPrincipal, (req, re
 		res.render('admin/whitelist', {emails, users});
 
 	})().catch(err => {
-		console.log(err);
 		req.flash('error', "Unable to access database");
 		res.redirect('back');
 	});
@@ -125,7 +117,6 @@ router.post('/whitelist', middleware.isLoggedIn, middleware.isPrincipal, (req, r
 
 
 	})().catch(err => {
-		console.log(err);
 		req.flash('error', "Unable to access database");
 		res.redirect('back');
 	});
@@ -428,14 +419,13 @@ router.delete('/whitelist/:id', middleware.isLoggedIn, middleware.isPrincipal, (
 			return res.redirect('back');
 		}
 
-    transport(transporter, deletedUser, 'Profile Deletion Notice', `<p>Hello ${deletedUser.firstName},</p><p>You are receiving this email because your email has been removed from Saberchat's email whitelist. Your account and all of its data has been deleted. Please contact a faculty member if  you think there has been a mistake.</p>`);
+    transport(deletedUser, 'Profile Deletion Notice', `<p>Hello ${deletedUser.firstName},</p><p>You are receiving this email because your email has been removed from Saberchat's email whitelist. Your account and all of its data has been deleted. Please contact a faculty member if  you think there has been a mistake.</p>`);
 	}
 
 	req.flash('success', "Email Removed From Whitelist! Any users with this email have been removed.");
 	res.redirect('/admin/whitelist');
 
 	})().catch(err => {
-		console.log(err);
 		req.flash('error', "Unable to access database");
 		res.redirect('back');
 	});
@@ -443,69 +433,131 @@ router.delete('/whitelist/:id', middleware.isLoggedIn, middleware.isPrincipal, (
 
 // changes permissions
 router.put('/permissions', middleware.isLoggedIn, middleware.isAdmin, (req, res) => {
-	// check if trying to change to admin
 
-	if(req.body.role == 'admin' || req.body.role == "principal") {
-		// check if it's the principal
-		if(req.user.permission == 'principal') {
-			User.findByIdAndUpdate(req.body.user, {permission: req.body.role}, (err, updatedUser) => {
-				if(err || !updatedUser) {
-					res.json({error: 'Error. Could not change'});
-				} else {
-					res.json({success: 'Succesfully changed'});
-				}
-			});
-		} else {
-			res.json({error: 'You do not have permissions to do that'});
-		}
-	} else {
-		// else continue
-		User.findById(req.body.user, (err, user) => {
-			if ((user.permission == 'principal' || user.permission == 'admin') && req.user.permission != "principal") {
-				res.json({error: 'You do not have permissions to do that'});
+	User.findById(req.body.user, (err, user) => {
+		if (err || !user) {
+			res.json({error: "Error. Could not change"});
+
+		} else if (req.body.role == 'admin' || req.body.role == "principal") { //Changing a user to administrator or principal requires specific permissions
+
+			if(req.user.permission == 'principal') { // check if current user is the principal
+				user.permission = req.body.role;
+				user.save();
+				res.json({success: "Succesfully changed", user});
 
 			} else {
-				User.findByIdAndUpdate(req.body.user, {permission: req.body.role}, (err, updatedUser) => {
-					if(err || !updatedUser) {
-						res.json({error: 'Error. Could not change'});
-					} else {
-						res.json({success: 'Succesfully changed'});
-					}
-				});
+				res.json({error: "You do not have permissions to do that", user});
 			}
-		})
-	}
-});
 
-// changes status
-router.put('/status', middleware.isLoggedIn, middleware.isMod, (req, res) => {
-	User.findByIdAndUpdate(req.body.user, {status: req.body.status}, (err, updatedUser) => {
-		if(err || !updatedUser) {
-			res.json({error: 'Error. Could not change'});
 		} else {
-			res.json({success: 'Succesfully changed'});
+			if ((user.permission == "principal" || user.permission == "admin") && req.user.permission != "principal") {
+				res.json({error: "You do not have permissions to do that", user});
+
+			} else {
+				user.permission = req.body.role;
+				user.save();
+				res.json({success: 'Succesfully changed', user});
+			}
 		}
 	});
 });
 
-router.put('/tag', middleware.isLoggedIn, middleware.isMod, (req, res) => {
-  User.findById(req.body.user, (err, user) => {
-    if(err || !user) {
-      res.json({error: 'Error. Could not change'});
+// changes status
+router.put('/status', middleware.isLoggedIn, middleware.isMod, (req, res) => {
+	(async() => {
+		const user = await User.findById(req.body.user);
 
-    } else {
-      if (user.tags.includes(req.body.tag)) {
-        user.tags.splice(user.tags.indexOf(req.body.tag), 1);
-        user.save();
-        res.json({success: "Successfully removed status", tag: req.body.tag})
+		if(!user) {
+			return res.json({error: 'Error. Could not change'});
+		}
+
+		if (user.status == "faculty") {
+			let teaching = false;
+
+			const courses = await Course.find({});
+			if (!courses) {
+				return res.json({error: "Error. Could not change", user});
+			}
+
+			for (let course of courses) {
+				if (course.teacher.equals(user._id)) {
+					teaching = true;
+					break;
+				}
+			}
+
+			if (teaching) {
+				return res.json({error: "User is an active teacher", user});
+			}
+
+			user.status = req.body.status;
+			await user.save();
+			return res.json({success: "Succesfully changed", user});
+		}
+
+		user.status = req.body.status;
+		await user.save();
+		return res.json({success: "Successfully Changed", user});
+
+	})().catch(err => {
+		res.json({error: "Error. Could not change"});
+	});
+});
+
+router.put('/tag', middleware.isLoggedIn, middleware.isMod, (req, res) => {
+
+  (async() => {
+    const user = await User.findById(req.body.user);
+
+    if(!user) {
+      return res.json({error: 'Error. Could not change'});
+    }
+
+    if (user.tags.includes(req.body.tag)) {
+
+      if (req.body.tag == "Tutor") {
+        const courses = await Course.find({});
+
+        if (!courses) {
+          return res.json({error: 'Error. Could not change'});
+        }
+
+        let active = false;
+
+        loop1:
+        for (let course of courses) {
+          loop2:
+          for (let tutor of course.tutors) {
+            if (tutor.tutor.equals(user._id)) {
+              active = true;
+              break loop1;
+            }
+          }
+        }
+
+        if (active) {
+          return res.json({error: "User is an Active Tutor"});
+
+        } else {
+          user.tags.splice(user.tags.indexOf(req.body.tag), 1);
+          user.save();
+          return res.json({success: "Successfully removed status", tag: req.body.tag})
+        }
 
       } else {
-        user.tags.push(req.body.tag);
+        user.tags.splice(user.tags.indexOf(req.body.tag), 1);
         user.save();
-        res.json({success: "Successfully added status", tag: req.body.tag})
+        return res.json({success: "Successfully removed status", tag: req.body.tag})
       }
 
+    } else {
+      user.tags.push(req.body.tag);
+      user.save();
+      return res.json({success: "Successfully added status", tag: req.body.tag})
     }
+
+  })().catch(err => {
+    res.json({error: 'Error. Could not change'});
   });
 });
 

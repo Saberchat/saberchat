@@ -24,6 +24,7 @@ var messageSchema = new mongoose.Schema({
     text: String,
     toEveryone: { type: Boolean, default: false},
     anonymous: { type: Boolean, default: false },
+    noReply: { type: Boolean, default: false },
     date: String,
 
     replies: [{

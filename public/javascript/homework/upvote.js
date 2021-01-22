@@ -1,9 +1,9 @@
-// sends put request with data
+// Upvotes a tutor
 const upvote = (button => {
   const courseId = button.id.split('-')[1];
   const tutorId = button.id.split("-")[2];
   const url = `/homework/upvote/${courseId}?_method=put`;
-  const data = {tutor: tutorId};
+  const data = {tutorId};
   $.post(url, data, function(data) {
     if(data.success) {
 

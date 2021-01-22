@@ -5,3 +5,16 @@
 .text-element {
   margin-bottom: 5rem;
 }
+
+#faculty-header {
+  font-weight: bold;
+  font-style: italic;
+}
+
+#faculty {
+  font-style: italic;
+}
+
+.developer-info {
+  font-weight: bold;
+}
