@@ -788,7 +788,7 @@ router.put('/like-review/:id', middleware.isLoggedIn, middleware.isStudent, (req
 });
 
 //For tutors to set availability on new students
-router.put('/setStudents/:id', (req, res) => {
+router.put('/set-students/:id', (req, res) => {
   Course.findById(req.params.id, (err, course) => {
     if (err || !course) {
       res.json({error: "Error accessing course"});
@@ -801,7 +801,7 @@ router.put('/setStudents/:id', (req, res) => {
           found = true;
 
           //Update slots based on data
-          tutor.slots = parseInt(req.body.slots);
+          tutor.slots = parseInt(req.body.slots)-tutor.students.length;
 
           //Update availability based on new slot info
           if ((parseInt(req.body.slots)-tutor.students.length) == 0) {

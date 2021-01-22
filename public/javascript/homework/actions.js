@@ -240,7 +240,7 @@ const setStudentsTutorShow = (slider => {
 });
 
 const setStudentsShow = (courseId => {
-  const url = `/homework/setStudents/${courseId}?_method=put`;
+  const url = `/homework/set-students/${courseId}?_method=put`;
   const slots = document.getElementById('slots').value;
   const data = {courseId, slots};
 
