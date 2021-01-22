@@ -4,6 +4,11 @@ const Filter = require('bad-words');
 const filter = new Filter();
 const nodemailer = require('nodemailer');
 const {transport, transport_mandatory} = require("../transport");
+const { 
+  validateUserUpdate, 
+  validateEmailUpdate, 
+  validatePasswordUpdate 
+} = require('../middleware/validation');
 
 const User = require('../models/user');
 const Email = require('../models/email');
@@ -81,8 +86,7 @@ router.get('/:id', middleware.isLoggedIn, (req, res) => {
 });
 
 // update user route. Check if current user matches profiles they're trying to edit with middleware.
-router.put('/profile', middleware.isLoggedIn, (req, res) => {
-
+router.put('/profile', middleware.isLoggedIn, validateUserUpdate, (req, res) => {
   (async() => {
 
     const overlap = await User.find({authenticated: true, username: filter.clean(req.body.username), _id: {$ne: req.user._id}});
@@ -154,7 +158,7 @@ router.put('/tag', middleware.isAdmin, (req, res) => {
 });
 
 //route for changing email. Similar to edit profiles route. But changing email logs out user for some reason.
-router.put('/change-email', middleware.isLoggedIn, (req, res) => {
+router.put('/change-email', middleware.isLoggedIn, validateEmailUpdate, (req, res) => {
   (async() => {
 
     if(req.body.receiving_emails) {
@@ -272,8 +276,7 @@ router.get('/confirm-email/:id', (req, res) => {
 });
 
 //route for changing password. Not too much different from previous routes.
-router.put('/change-password', middleware.isLoggedIn, (req, res) => {
-
+router.put('/change-password', middleware.isLoggedIn, validatePasswordUpdate, (req, res) => {
     if (req.body.newPassword == req.body.newPasswordConfirm)  {
       User.findById(req.user._id, (err, foundUser) => {
         if(err || !foundUser) {
