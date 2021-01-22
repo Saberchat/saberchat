@@ -43,12 +43,12 @@
       <div class="col-md-8 offset-md-2 col-12">
         <form action="/projects" method="post" id="submit-new-project">
           <div class="form-group">
-            <label for="new-project-message" id="title-label">Title</label>
-            <input id="new-project-message" name="title" maxlength="30" type="text" class="form-control" placeholder="Project Title" aria-label="Username" aria-describedby="basic-addon1" required>
+            <label for="new-project-title" id="title-label">Title</label>
+            <input id="new-project-title" type="text" class="form-control" name="title" placeholder="Project Title" maxlength="30" required>
           </div><br />
 
-          <div class="form-group" id="creator-div">
-            <label for="creator-select" id="creator-label">Creators</label>
+          <div class="form-group" id="creator-input-div">
+            <label for="creator-select" id="creator-input-label">Creators</label>
             <select id="creator-select" class="form-control" onchange="addCreator('user')" required>
               <option class="creator-group" value="" selected disabled>Select Students</option>
               <option class="creator-group" value="7th">7th Graders</option>

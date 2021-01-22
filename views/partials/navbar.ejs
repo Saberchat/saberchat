@@ -20,7 +20,7 @@
                         <a class="nav-link" href="/projects"><i class="fas fa-paint-brush"></i> Projects</a>
                     </li>
                     <li class="nav-item"></li>
-                      <a class="nav-link" href="/cafe"><i class="fas fa-coffee"></i> EC Cafe</a>
+                      <a class="nav-link" href="/cafe"><i class="fas fa-coffee"></i> Cafe</a>
                     <li class="nav-item dropdown">
                     <li class="nav-item"></li>
                       <a class="nav-link" target="_blank" href="https://witherlyheights.org/"><i class="far fa-newspaper"></i> Witherly Heights</a>
@@ -78,24 +78,24 @@
                               <a href="/admin/moderate" class="dropdown-item"><i class="fas fa-flag"></i> Moderate Comments</a>
                           </li>
 
-                        <% } else if (currentUser.permission == 'admin') { %>
+                        <% } else if (currentUser.permission == "admin") { %>
                           <li class="nav-item dropdown">
                             <a class="nav-link dropdown-toggle" href="" id="navbarDropdownMenuLink" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="fas fa-align-justify"></i> Admin</a>
                             <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
                               <a href="/admin/permissions" class="dropdown-item"><i class="fas fa-user"></i> Change Permissions</a>
                               <a href="/admin/status" class="dropdown-item"><i class="fas fa-user"></i> Change Statuses</a>
                               <a href="/admin/moderate" class="dropdown-item"><i class="fas fa-flag"></i> Moderate Comments</a>
-                              <a href="/admin/manageCafe" class="dropdown-item"><i class="fas fa-coffee"></i> Manage EC Cafe</a>
+                              <a href="/admin/manageCafe" class="dropdown-item"><i class="fas fa-coffee"></i> Manage Cafe</a>
                           </li>
 
-                        <% } else if (currentUser.permission == 'principal') {%>
+                        <% } else if (currentUser.permission == "principal") {%>
                           <li class="nav-item dropdown">
                           <a class="nav-link dropdown-toggle" href="" id="navbarDropdownMenuLink" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="fas fa-align-justify"></i> Principal</a>
                           <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
                             <a href="/admin/permissions" class="dropdown-item"><i class="fas fa-user"></i> Change Permissions</a>
                             <a href="/admin/status" class="dropdown-item"><i class="fas fa-user"></i> Change Statuses</a>
                             <a href="/admin/moderate" class="dropdown-item"><i class="fas fa-flag"></i> Moderate Comments</a>
-                            <a href="/admin/manageCafe" class="dropdown-item"><i class="fas fa-coffee"></i> Manage EC Cafe</a>
+                            <a href="/admin/manageCafe" class="dropdown-item"><i class="fas fa-coffee"></i> Manage Cafe</a>
                             <a href="/admin/whitelist" class="dropdown-item"><i class="fas fa-inbox"></i> Email Whitelist</a>
                               <!-- <a href="/admin/balances" class="dropdown-item"><i class="fas fa-money-check"></i> Student Balances</a> -->
                           </li>

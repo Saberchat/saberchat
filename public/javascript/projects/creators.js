@@ -1,5 +1,5 @@
 const creatorSelect = document.getElementById('creator-select');
-const creatorDiv = document.getElementById('creator-div');
+const creatorDiv = document.getElementById('creator-input-div');
 const creatorInput = document.getElementById('creator-input');
 
 $("#project-image").hide();

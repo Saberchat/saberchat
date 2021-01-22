@@ -293,7 +293,7 @@
 
               <% if (tutor.students.includes(currentUser._id.toString()) || tutor.tutor._id.equals(currentUser._id)) { %>
                 <li class="nav-item tab-header tab" id="students" onclick="changeTab(this)">
-                  <a class="nav-link active">Students (<%=tutor.students.length%>)</a>
+                  <a class="nav-link active">Students (<%=tutor.students.length + tutor.formerStudents.length%>)</a>
                 </li>
               <% } %>
 
@@ -352,7 +352,7 @@
 
           <div class="students" hidden>
             <% if (students.length > 0) { %>
-              <% if (tutor.tutor._id.equals(currentUser._id) || studentIds.includes(currentUser._id.toString())) { %>
+              <% if (tutor.tutor._id.equals(currentUser._id) || studentIds.includes(currentUser._id.toString()) || course.teacher.equals(currentUser._id)) { %>
                 <div class="list-group">
                   <li class="list-group-item list-group-item-success status-header">
                     <div class="d-flex w-100 justify-content-between">
@@ -366,11 +366,9 @@
                         <span class="<%=student.permission%> <%=student.status%> <%=student.tags.join(' ')%> student-block"><span class="span-tag-name"><%=student.firstName%> <%=student.lastName%></span> <span class="span-tag-username"><%=student.username%></span></span>
 
                         <% let lessonCount = 0;%>
-                        <% let timeCount = 0;%>
                         <% for (let lesson of tutor.lessons) { %>
                           <% if (lesson.student.equals(student._id)) { %>
                             <%lessonCount += 1;%>
-                            <%timeCount += lesson.time;%>
                           <% } %>
                         <% } %>
                       </a>
@@ -417,6 +415,43 @@
             <% } else {%>
               <h1 class="empty-field">No Students</h1>
             <% } %>
+
+            <br /><br />
+            <% if (tutor.formerStudents.length > 0) { %>
+              <% if (tutor.tutor._id.equals(currentUser._id) || studentIds.includes(currentUser._id.toString()) || course.teacher.equals(currentUser._id)) { %>
+                <div class="list-group">
+                  <li class="list-group-item list-group-item-success status-header">
+                    <div class="d-flex w-100 justify-content-between">
+                      <h2 class="mb-1">Former Students</h2>
+                    </div>
+                  </li>
+                  <% for (let student of tutor.formerStudents) { %>
+                    <div class="list-group-item list-group-item-action user-element">
+                      <a href="/profiles/<%=student._id%>" class="student-profile user-element-text">
+                        <img class="student-profile-image" src="<%= student.imageUrl %>" alt="profile picture">
+                        <span class="<%=student.permission%> <%=student.status%> <%=student.tags.join(' ')%> student-block"><span class="span-tag-name"><%=student.firstName%> <%=student.lastName%></span> <span class="span-tag-username"><%=student.username%></span></span>
+
+                        <% let lessonCount = 0;%>
+                        <% for (let lesson of tutor.lessons) { %>
+                          <% if (lesson.student.equals(student._id)) { %>
+                            <%lessonCount += 1;%>
+                          <% } %>
+                        <% } %>
+                      </a>
+                      <% if (tutor.tutor._id.equals(currentUser._id)) { %>
+                        <a class="btn btn-info lesson-button" href="/homework/tutors/<%=course._id%>?tutorId=<%=tutor.tutor._id%>&studentId=<%=student._id%>">Lesson Information</a>
+                      <% } %>
+
+                      <% if (tutor.tutor._id.equals(currentUser._id) || student._id.equals(currentUser._id)) { %>
+                        <span class="lessons-length"><span id="lessons-length-<%=student._id%>"><%=lessonCount%></span> lesson(s)</span>
+                      <% } %>
+                    </div>
+
+                  <% } %>
+                </div>
+              <% } %>
+            <% } %>
+
           </div>
 
           <div class="courses" hidden>

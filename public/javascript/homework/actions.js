@@ -466,12 +466,6 @@ const mark = (button => {
       }
 
       document.getElementById("experience").innerText = getTime(experience);
-
-      let newLesson = document.createElement("li");
-      const lessonList = document.getElementById(`lesson-info-${studentId}`);
-      newLesson.innerHTML = `<span class="lesson-info">${data.lesson.date} | ${data.lesson.time} minute(s)</span><br /> <p>${data.lesson.summary}</p>`;
-      lessonList.insertBefore(newLesson, lessonList.firstChild);
-
       $(`#modal-${studentId}-mark`).modal('hide');
     }
   });

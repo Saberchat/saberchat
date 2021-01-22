@@ -54,3 +54,17 @@ const cancel = (button => {
     }
   });
 });
+
+const changeCafeStatus = (() => {
+  const url = `/cafe/change-cafe-status?_method=put`;
+  const data = {};
+
+  $.post(url, data, function(data) {
+
+    if (data.success) {
+      const change = new Map([[true, ["btn btn-danger", "lock-open", "Close Cafe"]], [false, ["btn btn-success", "lock", "Open Cafe"]]]);
+      document.getElementById("cafe-status-button").className = change.get(data.open)[0];
+      document.getElementById("cafe-status-button").innerHTML = `<i class="fas fa-${change.get(data.open)[1]}"></i> ${change.get(data.open)[2]}`;
+    }
+  });
+});
