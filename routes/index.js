@@ -316,17 +316,17 @@ router.get('/alsion', (req, res) => {
 	});
 });
 
-router.get('/darkmode', middleware.isLoggedIn, (req, res) => {
-  if (req.user.darkmode) {
-    req.user.darkmode = false;
-
-  } else {
-    req.user.darkmode = true;
-  }
-
-  req.user.save();
-  res.redirect('back');
-});
+// router.get('/darkmode', middleware.isLoggedIn, (req, res) => {
+//   if (req.user.darkmode) {
+//     req.user.darkmode = false;
+//
+//   } else {
+//     req.user.darkmode = true;
+//   }
+//
+//   req.user.save();
+//   res.redirect('back');
+// });
 
 //export router with all the routes connected
 module.exports = router;
