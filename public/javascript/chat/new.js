@@ -2,7 +2,7 @@ const updateDisplayNewRoom = (() => {
   let userSelect = document.getElementById('roomType');
   let display = document.getElementById('user-selection');
   if(userSelect.checked == true) {
-      display.style.display = "";
+      display.style.display = "block";
   } else {
       display.style.display = "none";
   }

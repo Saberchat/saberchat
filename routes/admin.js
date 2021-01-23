@@ -148,323 +148,318 @@ router.post('/add-status', (req, res) => {
   });
 });
 
-router.delete('/whitelist/:id', middleware.isLoggedIn, middleware.isPrincipal, (req, res) => {
-	(async() => {
-		const email = await Email.findByIdAndDelete(req.params.id);
-
-		if (!email) {
-			req.flash('error', "Unable to remove email from database");
-			return res.redirect('back');
-		}
-
-		const users = await User.find({authenticated: true, email: email.address});
-
-		if (!users) {
-			req.flash('error', "Unable to delete users with this email");
-			return res.redirect('back');
-		}
-
-		const allUsers = await User.find({authenticated: true});
-
-		let deletedComments = null;
-
-		let messageSent = null;
-		let deletedMessages = null;
-
-		let messagesReceived = null;
-		let messageUpdate;
-    let messageSender;
-		let emptyMessages = null;
-
-		let anns = null;
-		let deletedAnns = null;
-
-		let deletedArticles = null;
-		let deletedRequests = null;
-
-		let orders = null;
-		let deletedOrder = null;
-
-		let roomsCreated = null;
-		let deletedRoomCreated = null;
-
-		let roomsPartOf = null;
-		let roomUpdates = null;
-		let updatedRoom = null;
-
-		let deletedProjectsPosted = null;
-
-		let projectsCreated = null;
-		let projectUpdates = null;
-		let updatedProjects = null;
-		let emptyProjects = null
-
-		for (let user of users) {
-			deletedComments = await Comment.deleteMany({author: user._id});
-
-		if (!deletedComments) {
-			req.flash('error', "Unable to delete your comments");
-			return res.redirect('back');
-		}
-
-		deletedMessages = await Message.deleteMany({sender: user._id});
-
-		if (!deletedMessages) {
-		 req.flash('error', "Unable to delete your messages");
-		 return res.redirect('back');
-		}
-
-		messagesReceived = await Message.find({});
-
-		if (!messagesReceived) {
-			req.flash('error', "Unable to find your messages");
-			return res.redirect('back');
-		}
-
-		for (let message of messagesReceived) {
-			if (message.recipients.includes(user._id)) {
-				messageUpdate = await Message.findByIdAndUpdate(message._id, {$pull: {recipients: user._id, read: req.user._id}});
-
-				if (!messageUpdate) {
-					req.flash('error', "Unable to update your messages");
-					return res.redirect('back');
-				}
-
-        for (let i = message.replies.length; i > 0; i--) {
-          if (message.replies[i].sender.equals(user._id)) {
-            message.replies.splice(i, 1);
-          }
-        }
-			}
-		}
-
-    //Remove all messages which are now 'empty', but still have the original sender in the 'recipients' (meaning the person who is being deleted replied to this message)
-    for (let message of messagesReceived) {
-      if (message.recipients.length == 1 && message.recipients[0].equals(message.sender)) {
-
-        //Remove 1 from the original sender's read (if they haven't read this message yet)
-
-        if (!message.read.includes(message.sender)) {
-          messageSender = await User.findById(message.sender);
-
-          if (!messageSender) {
-            req.flash('error', "Unable to update your messages");
-            return res.redirect('back');
-          }
-
-          messageSender.msgCount -= 1;
-          messageSender.save();
-        }
-
-        messageUpdate = await Message.findByIdAndDelete(message._id);
-
-        if (!messageUpdate) {
-          req.flash('error', "Unable to update your messages");
-          return res.redirect('back');
-        }
-      }
-    }
-
-		emptyMessages = await Message.deleteMany({recipients: []});
-
-		if (!emptyMessages) {
-			req.flash('error', "Unable to delete your messages");
-			return res.redirect('back');
-		}
-
-		anns = await Announcement.find({sender: user._id});
-
-		if (!anns) {
-      req.flash('error', "Unable to delete your announcements");
-      return res.redirect('back');
-    }
-
-    for (let ann of anns) {
-      for (let user of allUsers) {
-        for (let i = 0; i < user.annCount.length; i +=1) {
-          if (user.annCount[i].announcement.toString() == ann._id.toString()) {
-            user.annCount.splice(i, 1);
-          }
-        }
-        await user.save();
-      }
-    }
-
-		deletedAnns = await Announcement.deleteMany({sender: user._id});
-
-		if (!deletedAnns) {
-			req.flash('error', "Unable to delete your announcements");
-			return res.redirect('back');
-		}
-
-		deletedArticles = await Article.deleteMany({author: user._id});
-
-		if (!deletedArticles) {
-			req.flash('error', "Unable to delete your articles");
-			return res.redirect('back');
-		}
-
-		deletedRequests = await Request.deleteMany({requester: user._id});
-
-		if (!deletedRequests) {
-			req.flash('error', "Unable to delete your requests");
-			return res.redirect('back');
-		}
-
-		orders = await Order.find({customer: user._id});
-
-    if (!orders) {
-      req.flash('error', "Unable to find your orders");
-      return res.redirect('back');
-    }
-
-    for (let order of orders) {
-      deletedOrder = await Order.findByIdAndDelete(order._id).populate('items.item');
-      if (!deletedOrder) {
-        req.flash("error", "Unable to delete orders");
-        return res.redirect('back');
-      }
-
-      for (let i = 0; i < deletedOrder.items.length; i += 1) { //For each of the order's items, add the number ordered back to that item. (If there are 12 available quesadillas and our user ordered 3, there are now 15)
-
-        if (deletedOrder.present) {
-          deletedOrder.items[i].item.availableItems += deletedOrder.items[i].quantity;
-          deletedOrder.items[i].item.isAvailable = true;
-          await deletedOrder.items[i].item.save();
-        }
-      }
-    }
-
-		roomsCreated = await Room.find({});
-
-    if (!roomsCreated) {
-      req.flash('error', "Unable to delete your rooms");
-      return res.redirect('back');
-    }
-
-    for (let room of roomsCreated) {
-			if (room.creator.id.toString() == user._id.toString()) {
-      	deletedRoomCreated = await Room.findByIdAndDelete(room._id);
-
-				if (!deletedRoomCreated) {
-	        req.flash('error', "Unable to delete your rooms");
-	        return res.redirect('back');
-	      }
-			}
-    }
-
-		roomsPartOf = await Room.find({});
-
-		if (!roomsPartOf) {
-			req.flash('error', "Unable to find your rooms");
-			return res.redirect('back');
-		}
-
-		roomUpdates = [];
-
-		for (let room of roomsPartOf) {
-			if (room.members.includes(user._id)) {
-				roomUpdates.push(room._id);
-			}
-		}
-
-		for (let room of roomUpdates) {
-			updatedRoom = await Room.findByIdAndUpdate(room, {$pull: {members: user._id}});
-
-			if (!updatedRoom) {
-				req.flash('error', "Unable to access your rooms");
-				return res.redirect('back');
-			}
-		}
-
-		deletedProjectsPosted = await Project.deleteMany({poster: user._id});
-
-		if (!deletedProjectsPosted) {
-			req.flash('error', "Unable to remove you from your projects");
-			return res.redirect('back');
-		}
-
-		projectsCreated = await Project.find({});
-
-		if (!projectsCreated) {
-			req.flash('error', "Unable to find your projects");
-			return res.redirect('back');
-		}
-
-		projectUpdates = [];
-
-		for (let project of projectsCreated) {
-			if (project.creators.includes(user._id)) {
-				projectUpdates.push(project._id);
-			}
-		}
-
-		for (let project of projectUpdates) {
-			updatedProject = await Project.findByIdAndUpdate(project, {$pull: {creators: user._id}});
-
-			if (!updatedProject) {
-				req.flash('error', "Unable to access your projects");
-				return res.redirect('back');
-			}
-		}
-	}
-
-	let deletedUser;
-
-	for (let user of users) {
-		deletedUser = await User.findByIdAndDelete(user._id);
-
-		if (!deletedUser) {
-			req.flash('error', 'Unable to delete account');
-			return res.redirect('back');
-		}
-
-    transport(deletedUser, 'Profile Deletion Notice', `<p>Hello ${deletedUser.firstName},</p><p>You are receiving this email because your email has been removed from Saberchat's email whitelist. Your account and all of its data has been deleted. Please contact a faculty member if  you think there has been a mistake.</p>`);
-	}
-
-	req.flash('success', "Email Removed From Whitelist! Any users with this email have been removed.");
-	res.redirect('/admin/whitelist');
-
-	})().catch(err => {
-		req.flash('error', "Unable to access database");
-		res.redirect('back');
-	});
-});
+// router.delete('/whitelist/:id', middleware.isLoggedIn, middleware.isPrincipal, (req, res) => {
+// 	(async() => {
+// 		const email = await Email.findByIdAndDelete(req.params.id);
+//
+// 		if (!email) {
+// 			req.flash('error', "Unable to remove email from database");
+// 			return res.redirect('back');
+// 		}
+//
+// 		const users = await User.find({authenticated: true, email: email.address});
+//
+// 		if (!users) {
+// 			req.flash('error', "Unable to delete users with this email");
+// 			return res.redirect('back');
+// 		}
+//
+// 		const allUsers = await User.find({authenticated: true});
+//
+// 		let deletedComments = null;
+//
+// 		let messageSent = null;
+// 		let deletedMessages = null;
+//
+// 		let messagesReceived = null;
+// 		let messageUpdate;
+//     let messageSender;
+// 		let emptyMessages = null;
+//
+// 		let anns = null;
+// 		let deletedAnns = null;
+//
+// 		let deletedArticles = null;
+// 		let deletedRequests = null;
+//
+// 		let orders = null;
+// 		let deletedOrder = null;
+//
+// 		let roomsCreated = null;
+// 		let deletedRoomCreated = null;
+//
+// 		let roomsPartOf = null;
+// 		let roomUpdates = null;
+// 		let updatedRoom = null;
+//
+// 		let deletedProjectsPosted = null;
+//
+// 		let projectsCreated = null;
+// 		let projectUpdates = null;
+// 		let updatedProjects = null;
+// 		let emptyProjects = null
+//
+// 		for (let user of users) {
+// 			deletedComments = await Comment.deleteMany({author: user._id});
+//
+// 		if (!deletedComments) {
+// 			req.flash('error', "Unable to delete your comments");
+// 			return res.redirect('back');
+// 		}
+//
+// 		deletedMessages = await Message.deleteMany({sender: user._id});
+//
+// 		if (!deletedMessages) {
+// 		 req.flash('error', "Unable to delete your messages");
+// 		 return res.redirect('back');
+// 		}
+//
+// 		messagesReceived = await Message.find({});
+//
+// 		if (!messagesReceived) {
+// 			req.flash('error', "Unable to find your messages");
+// 			return res.redirect('back');
+// 		}
+//
+// 		for (let message of messagesReceived) {
+// 			if (message.recipients.includes(user._id)) {
+// 				messageUpdate = await Message.findByIdAndUpdate(message._id, {$pull: {recipients: user._id, read: req.user._id}});
+//
+// 				if (!messageUpdate) {
+// 					req.flash('error', "Unable to update your messages");
+// 					return res.redirect('back');
+// 				}
+//
+//         for (let i = message.replies.length; i > 0; i--) {
+//           if (message.replies[i].sender.equals(user._id)) {
+//             message.replies.splice(i, 1);
+//           }
+//         }
+// 			}
+// 		}
+//
+//     //Remove all messages which are now 'empty', but still have the original sender in the 'recipients' (meaning the person who is being deleted replied to this message)
+//     for (let message of messagesReceived) {
+//       if (message.recipients.length == 1 && message.recipients[0].equals(message.sender)) {
+//
+//         //Remove 1 from the original sender's read (if they haven't read this message yet)
+//
+//         if (!message.read.includes(message.sender)) {
+//           messageSender = await User.findById(message.sender);
+//
+//           if (!messageSender) {
+//             req.flash('error', "Unable to update your messages");
+//             return res.redirect('back');
+//           }
+//
+//           messageSender.msgCount -= 1;
+//           messageSender.save();
+//         }
+//
+//         messageUpdate = await Message.findByIdAndDelete(message._id);
+//
+//         if (!messageUpdate) {
+//           req.flash('error', "Unable to update your messages");
+//           return res.redirect('back');
+//         }
+//       }
+//     }
+//
+// 		emptyMessages = await Message.deleteMany({recipients: []});
+//
+// 		if (!emptyMessages) {
+// 			req.flash('error', "Unable to delete your messages");
+// 			return res.redirect('back');
+// 		}
+//
+// 		anns = await Announcement.find({sender: user._id});
+//
+// 		if (!anns) {
+//       req.flash('error', "Unable to delete your announcements");
+//       return res.redirect('back');
+//     }
+//
+//     for (let ann of anns) {
+//       for (let user of allUsers) {
+//         for (let i = 0; i < user.annCount.length; i +=1) {
+//           if (user.annCount[i].announcement.toString() == ann._id.toString()) {
+//             user.annCount.splice(i, 1);
+//           }
+//         }
+//         await user.save();
+//       }
+//     }
+//
+// 		deletedAnns = await Announcement.deleteMany({sender: user._id});
+//
+// 		if (!deletedAnns) {
+// 			req.flash('error', "Unable to delete your announcements");
+// 			return res.redirect('back');
+// 		}
+//
+// 		deletedArticles = await Article.deleteMany({author: user._id});
+//
+// 		if (!deletedArticles) {
+// 			req.flash('error', "Unable to delete your articles");
+// 			return res.redirect('back');
+// 		}
+//
+// 		deletedRequests = await Request.deleteMany({requester: user._id});
+//
+// 		if (!deletedRequests) {
+// 			req.flash('error', "Unable to delete your requests");
+// 			return res.redirect('back');
+// 		}
+//
+// 		orders = await Order.find({customer: user._id});
+//
+//     if (!orders) {
+//       req.flash('error', "Unable to find your orders");
+//       return res.redirect('back');
+//     }
+//
+//     for (let order of orders) {
+//       deletedOrder = await Order.findByIdAndDelete(order._id).populate('items.item');
+//       if (!deletedOrder) {
+//         req.flash("error", "Unable to delete orders");
+//         return res.redirect('back');
+//       }
+//
+//       for (let i = 0; i < deletedOrder.items.length; i += 1) { //For each of the order's items, add the number ordered back to that item. (If there are 12 available quesadillas and our user ordered 3, there are now 15)
+//
+//         if (deletedOrder.present) {
+//           deletedOrder.items[i].item.availableItems += deletedOrder.items[i].quantity;
+//           deletedOrder.items[i].item.isAvailable = true;
+//           await deletedOrder.items[i].item.save();
+//         }
+//       }
+//     }
+//
+// 		roomsCreated = await Room.find({});
+//
+//     if (!roomsCreated) {
+//       req.flash('error', "Unable to delete your rooms");
+//       return res.redirect('back');
+//     }
+//
+//     for (let room of roomsCreated) {
+// 			if (room.creator.id.toString() == user._id.toString()) {
+//       	deletedRoomCreated = await Room.findByIdAndDelete(room._id);
+//
+// 				if (!deletedRoomCreated) {
+// 	        req.flash('error', "Unable to delete your rooms");
+// 	        return res.redirect('back');
+// 	      }
+// 			}
+//     }
+//
+// 		roomsPartOf = await Room.find({});
+//
+// 		if (!roomsPartOf) {
+// 			req.flash('error', "Unable to find your rooms");
+// 			return res.redirect('back');
+// 		}
+//
+// 		roomUpdates = [];
+//
+// 		for (let room of roomsPartOf) {
+// 			if (room.members.includes(user._id)) {
+// 				roomUpdates.push(room._id);
+// 			}
+// 		}
+//
+// 		for (let room of roomUpdates) {
+// 			updatedRoom = await Room.findByIdAndUpdate(room, {$pull: {members: user._id}});
+//
+// 			if (!updatedRoom) {
+// 				req.flash('error', "Unable to access your rooms");
+// 				return res.redirect('back');
+// 			}
+// 		}
+//
+// 		deletedProjectsPosted = await Project.deleteMany({poster: user._id});
+//
+// 		if (!deletedProjectsPosted) {
+// 			req.flash('error', "Unable to remove you from your projects");
+// 			return res.redirect('back');
+// 		}
+//
+// 		projectsCreated = await Project.find({});
+//
+// 		if (!projectsCreated) {
+// 			req.flash('error', "Unable to find your projects");
+// 			return res.redirect('back');
+// 		}
+//
+// 		projectUpdates = [];
+//
+// 		for (let project of projectsCreated) {
+// 			if (project.creators.includes(user._id)) {
+// 				projectUpdates.push(project._id);
+// 			}
+// 		}
+//
+// 		for (let project of projectUpdates) {
+// 			updatedProject = await Project.findByIdAndUpdate(project, {$pull: {creators: user._id}});
+//
+// 			if (!updatedProject) {
+// 				req.flash('error', "Unable to access your projects");
+// 				return res.redirect('back');
+// 			}
+// 		}
+// 	}
+//
+// 	let deletedUser;
+//
+// 	for (let user of users) {
+// 		deletedUser = await User.findByIdAndDelete(user._id);
+//
+// 		if (!deletedUser) {
+// 			req.flash('error', 'Unable to delete account');
+// 			return res.redirect('back');
+// 		}
+//
+//     transport(deletedUser, 'Profile Deletion Notice', `<p>Hello ${deletedUser.firstName},</p><p>You are receiving this email because your email has been removed from Saberchat's email whitelist. Your account and all of its data has been deleted. Please contact a faculty member if  you think there has been a mistake.</p>`);
+// 	}
+//
+// 	req.flash('success', "Email Removed From Whitelist! Any users with this email have been removed.");
+// 	res.redirect('/admin/whitelist');
+//
+// 	})().catch(err => {
+// 		req.flash('error', "Unable to access database");
+// 		res.redirect('back');
+// 	});
+// });
 
 // changes permissions
 router.put('/permissions', middleware.isLoggedIn, middleware.isAdmin, (req, res) => {
-	// check if trying to change to admin
 
-	if(req.body.role == 'admin' || req.body.role == "principal") {
-		// check if it's the principal
-		if(req.user.permission == 'principal') {
-			User.findByIdAndUpdate(req.body.user, {permission: req.body.role}, (err, updatedUser) => {
-				if(err || !updatedUser) {
-					res.json({error: 'Error. Could not change'});
-				} else {
-					res.json({success: 'Succesfully changed'});
-				}
-			});
-		} else {
-			res.json({error: 'You do not have permissions to do that'});
-		}
-	} else {
-		// else continue
-		User.findById(req.body.user, (err, user) => {
-			if ((user.permission == 'principal' || user.permission == 'admin') && req.user.permission != "principal") {
-				res.json({error: 'You do not have permissions to do that'});
+	User.findById(req.body.user, (err, user) => {
+		if (err || !user) {
+			res.json({error: "Error. Could not change"});
+
+		} else if (req.body.role == 'admin' || req.body.role == "principal") { //Changing a user to administrator or principal requires specific permissions
+
+			if(req.user.permission == 'principal') { // check if current user is the principal
+				user.permission = req.body.role;
+				user.save();
+				res.json({success: "Succesfully changed", user});
 
 			} else {
-				User.findByIdAndUpdate(req.body.user, {permission: req.body.role}, (err, updatedUser) => {
-					if(err || !updatedUser) {
-						res.json({error: 'Error. Could not change'});
-					} else {
-						res.json({success: 'Succesfully changed'});
-					}
-				});
+				res.json({error: "You do not have permissions to do that", user});
 			}
-		})
-	}
+
+		} else {
+			if ((user.permission == "principal" || user.permission == "admin") && req.user.permission != "principal") {
+				res.json({error: "You do not have permissions to do that", user});
+
+			} else {
+				user.permission = req.body.role;
+				user.save();
+				res.json({success: 'Succesfully changed', user});
+			}
+		}
+	});
 });
 
 // changes status
@@ -478,9 +473,10 @@ router.put('/status', middleware.isLoggedIn, middleware.isMod, (req, res) => {
 
 		if (user.status == "faculty") {
 			let teaching = false;
+
 			const courses = await Course.find({});
 			if (!courses) {
-				return res.json({error: "Error. Could not change"});
+				return res.json({error: "Error. Could not change", user});
 			}
 
 			for (let course of courses) {
@@ -491,17 +487,17 @@ router.put('/status', middleware.isLoggedIn, middleware.isMod, (req, res) => {
 			}
 
 			if (teaching) {
-				return res.json({error: "User is an active teacher"});
+				return res.json({error: "User is an active teacher", user});
 			}
 
 			user.status = req.body.status;
 			await user.save();
-			return res.json({success: 'Succesfully changed'});
+			return res.json({success: "Succesfully changed", user});
 		}
 
 		user.status = req.body.status;
 		await user.save();
-		return res.json({success: "Successfully Changed"});
+		return res.json({success: "Successfully Changed", user});
 
 	})().catch(err => {
 		res.json({error: "Error. Could not change"});

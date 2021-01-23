@@ -79,13 +79,9 @@
               </li>
 
               <% type.items.forEach(item => { %>
-<<<<<<< HEAD
+
                 <% if (item.isAvailable) { %>
-                  <span class="list-group-item list-group-item-action menu-item <%=type.name.split(' ').join('')%>" id="item-<%=item.id%>"><strong><%= item.name %> (<%= item.availableItems%> orders available)</strong>
-=======
-                <% if (item.isAvailable == true) { %>
                   <span class="list-group-item list-group-item-action menu-item <%=type.name.split(' ').join('')%>" id="item-<%=item.id%>"><span class="item-name"><%= item.name %> (<%= item.availableItems%> orders available)</span>
->>>>>>> master
 
                   <% if (!item.price.toString().includes('.')) { %>
                     - $<%=item.price%>.00
@@ -109,12 +105,9 @@
                     <span id="upvoteCount-<%=item._id%>"> <%=item.upvotes.length%></span>
                   </div>
 
-<<<<<<< HEAD
                   <br /><em class="item-description"><%= item.description %></em><br />
                   <img src="<%=item.imgUrl%>" class="item-image"/>
-=======
-                  <br /><span class="item-description"><%= item.description %></span><br /><br /><img src="<%=item.imgUrl%>" class="item-image"/>
->>>>>>> master
+
                 </span>
 
                 <% }%>

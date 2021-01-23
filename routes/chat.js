@@ -6,6 +6,8 @@ const router = express.Router();
 const nodemailer = require('nodemailer');
 const {transport, transport_mandatory} = require("../transport");
 
+const { validateRoom } = require('../middleware/validation');
+
 //import middleware
 const middleware = require('../middleware');
 
@@ -92,7 +94,7 @@ router.get('/:id/edit', middleware.isLoggedIn, middleware.checkRoomOwnership, (r
 });
 
 // create new rooms
-router.post('/', middleware.isLoggedIn, (req, res) => {
+router.post('/', middleware.isLoggedIn, validateRoom, (req, res) => {
   (async() => {
 
     const roomObject = {
@@ -106,7 +108,7 @@ router.post('/', middleware.isLoggedIn, (req, res) => {
     if (!room) {
       req.flash('error', 'Group could not be created');
       return res.redirect('/chat/new');
-
+      
     } else {
       if(req.body.type == 'true') {
         for (const user in req.body.check) {
@@ -271,7 +273,7 @@ router.put('/comments/:id/report', middleware.isLoggedIn, (req, res) => {
 });
 
 // edit room
-router.put('/:id', middleware.isLoggedIn, middleware.checkRoomOwnership, (req, res) => {
+router.put('/:id', middleware.isLoggedIn, middleware.checkRoomOwnership, validateRoom, (req, res) => {
   Room.findByIdAndUpdate(req.params.id, {name: filter.clean(req.body.name), description: filter.clean(req.body.description)}, (err, room) => {
     if (err || !room) {
       req.flash('error', 'Unable to access Database');

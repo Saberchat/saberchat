@@ -10,6 +10,8 @@ const filter = new Filter();
 const nodemailer = require('nodemailer');
 const {transport, transport_mandatory} = require("../transport");
 
+const { validateMsg } = require('../middleware/validation');
+
 const User = require('../models/user');
 const Message = require('../models/message');
 const AccessReq = require('../models/accessRequest');
@@ -53,7 +55,7 @@ router.get('/messages/new', middleware.isLoggedIn, (req, res) => {
 });
 
 //Route to send notification to a group of people
-router.post('/messages', middleware.isLoggedIn, (req, res) => {
+router.post('/messages', middleware.isLoggedIn, validateMsg, (req, res) => {
 	( async () => {
 		let message = {
 			subject: filter.clean(req.body.subject),

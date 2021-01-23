@@ -16,6 +16,15 @@ const updateRole = (select => {
         loading.style.color = 'red';
         loading.innerHTML = data.error;
     }
+
+    if (data.user) {
+      for (let option of select) {
+        if (option.value == data.user.permission) {
+          option.selected = true;
+        }
+      }
+    }
+
   });
 });
 

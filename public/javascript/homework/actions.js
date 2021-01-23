@@ -54,6 +54,57 @@ const book = ((button, location) => {
       document.getElementById("new-chat").innerText = `${data.user.newRoomCount.length}`;
       document.getElementById("new-chat").hidden = false;
 
+      if (location == "tutor-show") {
+        let studentHeading = document.createElement("li");
+        studentHeading.className = "nav-item tab-header tab";
+        studentHeading.id = "students";
+        studentHeading.setAttribute("onclick", "changeTab(this)");
+        studentHeading.innerHTML = `<a class="nav-link active">Students (${data.tutor.students.length})</a>`;
+
+        let lessonCount = 0;
+        for (let lesson of data.tutor.lessons) {
+          if (lesson.student == data.user._id) {
+            lessonCount += 1;
+          }
+        }
+
+        let studentDiv = document.createElement("div");
+        studentDiv.className = "students";
+
+        let studentsList = document.createElement("div");
+        studentsList.className = "list-group";
+        studentsList.innerHTML = `<li class="list-group-item list-group-item-success status-header"> <div class="d-flex w-100 justify-content-between"> <h2 class="mb-1">Students</h2> </div> </li>`;
+
+        let userElement;
+        for (let student of data.students) {
+          userElement = document.createElement("div");
+          userElement.className = "list-group-item list-group-item-action user-element";
+          userElement.innerHTML = `<a href="/profiles/${student._id}" style="color: black; text-decoration: none;"> <img class="student-profile-image" src="${student.imageUrl }" alt="profile picture"> <span class="${student.permission} ${student.status} ${student.tags.join(' ')} student-block"><span class="span-tag-name">${student.firstName} ${student.lastName}</span> <span class="span-tag-username">${student.username}</span></span></a>`;
+
+          if (student._id == data.user._id) {
+            let lessonInfoButton = document.createElement("a");
+            lessonInfoButton.className = "btn btn-info lesson-button";
+            lessonInfoButton.innerText = "Lesson Information";
+            lessonInfoButton.setAttribute("href", `/homework/tutors/${courseId}?tutorId=${tutorId}&studentId=${student._id}`);
+
+            let lessonsLength = document.createElement("span");
+            lessonsLength.className = "lessons-length";
+            lessonsLength.innerHTML = `<span id="lessons-length-${student._id}">${lessonCount}</span> lesson(s)`;
+
+            userElement.appendChild(lessonInfoButton);
+            userElement.appendChild(lessonsLength);
+          }
+
+          studentsList.appendChild(userElement);
+
+        }
+
+        studentDiv.appendChild(studentsList);
+        studentDiv.hidden = true;
+
+        document.getElementById("options-bar").insertBefore(studentHeading, document.getElementById("courses"));
+        document.getElementsByClassName("courses")[0].parentNode.insertBefore(studentDiv, document.getElementsByClassName("courses")[0]);
+      }
     }
   });
 });
@@ -108,8 +159,14 @@ const leave = ((button, location) => {
       document.getElementById("new-chat").innerText = `${data.user.newRoomCount.length}`;
       if (data.user.newRoomCount.length > 0) {
         document.getElementById("new-chat").hidden = false;
+
       } else {
         document.getElementById("new-chat").hidden = true;
+      }
+
+      if (location == "tutor-show") {
+        document.getElementById("students").parentNode.removeChild(document.getElementById("students"));
+        document.getElementsByClassName("students")[0].parentNode.removeChild(document.getElementsByClassName("students")[0]);
       }
     }
   });
@@ -129,7 +186,7 @@ const closeLessons = ((button, location) => {
       let reopenButton = document.createElement('button');
 
       if (location == "show") {
-        reopenButton.className ="reopen-lessons action-button btn btn-success";
+        reopenButton.className ="reopen-lessons action-button btn btn-success lesson-action";
       } else if (location == "tutor-show") {
         reopenButton.className ="action-button btn btn-success";
       }
@@ -158,7 +215,7 @@ const reopenLessons = ((button, location) => {
       let closeButton = document.createElement('button');
 
       if (location == "show") {
-        closeButton.className ="close-lessons action-button btn btn-danger";
+        closeButton.className ="close-lessons action-button btn btn-danger lesson-action";
       } else if (location == "tutor-show") {
         closeButton.className ="action-button btn btn-danger";
       }
@@ -177,8 +234,13 @@ const setStudents = (() => {
   document.getElementById("slots-label").innerText = `Number of Student Slots: ${document.getElementById('slots').value}`;
 });
 
+const setStudentsTutorShow = (slider => {
+  const courseId = slider.id.split('-')[1];
+  document.getElementById(`slots-label-${courseId}`).innerText = `Number of Student Slots: ${slider.value}`;
+});
+
 const setStudentsShow = (courseId => {
-  const url = `/homework/setStudents/${courseId}?_method=put`;
+  const url = `/homework/set-students/${courseId}?_method=put`;
   const slots = document.getElementById('slots').value;
   const data = {courseId, slots};
 
@@ -187,6 +249,14 @@ const setStudentsShow = (courseId => {
       document.getElementById("slots-count").innerText = `${slots}`;
       document.getElementById("change-message").style.color = "green";
       document.getElementById("change-message").innerText = "Succesfully Changed";
+
+      if (!data.tutor.available) {
+        const lessonButton = document.getElementsByClassName("lesson-action")[0];
+        lessonButton.className = "btn btn-success reopen-lessons lesson-action";
+        lessonButton.id = `reopen-${courseId}-${data.tutor.tutor}`;
+        lessonButton.setAttribute("data-target", `#modal-reopen-${data.tutor.tutor}`);
+        lessonButton.innerText = "Reopen Lessons";
+      }
 
     } else if (data.error) {
       document.getElementById("change-message").style.color = "red";
@@ -250,7 +320,7 @@ const removeTutor = ((button, location) => {
   const tutorId = button.id.split('-')[1];
   const reason = document.getElementById(`reason-${tutorId}`).value;
   const url = `/homework/remove-tutor/${courseId}?_method=put`;
-  const data = {tutorId, reason};
+  const data = {tutorId, reason, show: true};
 
   $.post(url, data, function(data) {
     if (data.success) {
@@ -340,7 +410,7 @@ const setTime = (input => {
   document.getElementById(`time-label-${studentId}`).innerText = input.value;
 });
 
-const getExperience = (experience => {
+const getTime = (experience => {
   let result;
   experience = parseInt(experience);
   if (experience < 60) {
@@ -395,13 +465,7 @@ const mark = (button => {
         experience += lesson.time;
       }
 
-      document.getElementById("experience").innerText = getExperience(experience);
-
-      let newLesson = document.createElement("li");
-      const lessonList = document.getElementById(`lesson-info-${studentId}`);
-      newLesson.innerHTML = `<span class="lesson-info">${data.lesson.date} | ${data.lesson.time} minute(s)</span><br /> <p>${data.lesson.summary}</p>`;
-      lessonList.insertBefore(newLesson, lessonList.firstChild);
-
+      document.getElementById("experience").innerText = getTime(experience);
       $(`#modal-${studentId}-mark`).modal('hide');
     }
   });

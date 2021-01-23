@@ -311,7 +311,7 @@ router.put("/bio/:id", middleware.isLoggedIn, middleware.isTutor, (req, res) => 
       res.json({error: "Unable to find course"});
 
     } else {
-      //Iterate throguh tutors and search for current user
+      //Iterate through tutors and search for current user
       for (let tutor of course.tutors) {
         if (tutor.tutor.equals(req.user._id)) {
 
@@ -445,7 +445,7 @@ router.put('/book/:id', middleware.isLoggedIn, middleware.isStudent, (req, res) 
       return res.json({error: "Error accessing course"});
 
     } else if (!course.students.includes(req.user._id)) {
-      return res.json({error: "You are not a student of that tutor"});
+      return res.json({error: "You are not a student in that course"});
 
     } else {
       let formerStudent = false;
@@ -488,7 +488,13 @@ router.put('/book/:id', middleware.isLoggedIn, middleware.isStudent, (req, res) 
 
           tutor.rooms.push(roomObject);
           await course.save();
-          return res.json({success: "Succesfully joined tutor", user: req.user, formerStudent, room: roomObject.room});
+
+          const studentIds = await User.find({_id: {$in: tutor.students}});
+          if (!studentIds) {
+            return res.json({error: "Error accessing students"});
+          }
+
+          return res.json({success: "Succesfully joined tutor", user: req.user, room: roomObject.room, tutor, formerStudent, students: studentIds});
         }
       }
     }
@@ -675,18 +681,29 @@ router.put('/reopen-lessons/:id', middleware.isLoggedIn, (req, res) => {
   });
 });
 
+//HANDLE
 //RESTful routing "tutors/show" page
 router.get('/tutors/:id', middleware.isLoggedIn, (req, res) => {
   (async() => {
-    const course = await Course.findById(req.params.id).populate("tutors.tutor").populate({path: "tutors.reviews.review", populate: {path: "sender"}});
+    const course = await Course.findById(req.params.id).populate("tutors.tutor").populate("tutors.formerStudents").populate({path: "tutors.reviews.review", populate: {path: "sender"}});
     if (!course) {
       req.flash('error', "Unable to find course");
       return res.redirect('back');
     }
 
+    let tutorIds = [];
+    for (let tutor of course.tutors) {
+      tutorIds.push(tutor.tutor._id.toString());
+    }
+
+    let courseStudents = [];
+    for (let student of course.students) {
+      courseStudents.push(student.toString());
+    }
+
     for (let tutor of course.tutors) {
       //If selected tutor matches the requested tutor, display them
-      if (tutor.tutor._id.equals(req.query.tutor)) {
+      if (tutor.tutor._id.equals(req.query.tutorId)) {
 
         //Collect info on all students who are members of this tutor
         let studentIds = [];
@@ -713,7 +730,32 @@ router.get('/tutors/:id', middleware.isLoggedIn, (req, res) => {
           return res.redirect('back');
         }
 
-        res.render('homework/tutor-show', {course, tutor, students, studentIds, courses: enrolledCourses});
+        if (req.query.studentId) {
+
+          const student = await User.findById(req.query.studentId);
+          if (!student) {
+            req.flash('error', "Unable to find students");
+            return res.redirect('back');
+          }
+
+          if (student._id.equals(req.user._id) || tutor.tutor._id.equals(req.user._id)) {
+            return res.render('homework/lessons', {course, tutor, student});
+
+          } else {
+            req.flash('error', "You do not have permission to view that student");
+            return res.redirect('back');
+          }
+
+        } else {
+
+          if (courseStudents.includes(req.user._id.toString()) || course.teacher.equals(req.user._id) || tutorIds.includes(req.user._id.toString())) {
+            return res.render('homework/tutor-show', {course, tutor, students, studentIds, courses: enrolledCourses});
+
+          } else {
+            req.flash('error', "You do not have permission to view that tutor");
+            return res.redirect('back');
+          }
+        }
       }
     }
 
@@ -746,7 +788,7 @@ router.put('/like-review/:id', middleware.isLoggedIn, middleware.isStudent, (req
 });
 
 //For tutors to set availability on new students
-router.put('/setStudents/:id', (req, res) => {
+router.put('/set-students/:id', (req, res) => {
   Course.findById(req.params.id, (err, course) => {
     if (err || !course) {
       res.json({error: "Error accessing course"});
@@ -759,17 +801,15 @@ router.put('/setStudents/:id', (req, res) => {
           found = true;
 
           //Update slots based on data
-          tutor.slots = parseInt(req.body.slots);
+          tutor.slots = parseInt(req.body.slots)-tutor.students.length;
 
           //Update availability based on new slot info
-          if (parseInt(req.body.slots) == 0) {
+          if ((parseInt(req.body.slots)-tutor.students.length) == 0) {
             tutor.available = false;
-          } else {
-            tutor.available = true;
           }
 
           course.save();
-          res.json({success: "Succesfully changed"});
+          res.json({success: "Succesfully changed", tutor});
         }
       }
 
@@ -870,20 +910,43 @@ router.put('/remove-student/:id', middleware.isLoggedIn, middleware.isFaculty, (
 router.put('/remove-tutor/:id', middleware.isLoggedIn, middleware.isFaculty, (req, res) => {
   (async() => {
 
-    const tutorId = await User.findById(req.body.tutorId);
+    let tutorId;
+    if (req.body.show) {
+      tutorId = await User.findById(req.body.tutorId);
 
-    if (!tutorId) {
-      return res.json({error: "Error removing tutor"});
+      if (!tutorId) {
+        return res.json({error: "Error removing tutor"});
+      }
+
+    } else {
+      tutorId = await User.findById(req.query.tutorId);
+
+      if (!tutorId) {
+        req.flash("error", "Error removing tutor");
+        return res.redirect("back");
+      }
     }
 
     const course = await Course.findById(req.params.id).populate('tutors.tutor').populate('tutors.rooms.student');
 
     if (!course) {
-      return res.json({error: "Error removing tutor"});
+      if (req.body.show) {
+        return res.json({error: "Error removing tutor"});
+
+      } else {
+        req.flash("error", "Error removing tutor");
+        return res.redirect("back");
+      }
 
       //If user is not a teacher of the course, this action is not permitted
     } else if (!course.teacher.equals(req.user._id)) {
-      return res.json({error: "You are not a teacher of this course"});
+      if (req.body.show) {
+        return res.json({error: "You are not a teacher of this course"});
+
+      } else {
+        req.flash("error", "You are not a teacher of this course");
+        return res.redirect("back");
+      }
     }
 
     for (let i = 0; i < course.tutors.length; i ++) {
@@ -895,12 +958,18 @@ router.put('/remove-tutor/:id', middleware.isLoggedIn, middleware.isFaculty, (re
           deletedRoom = await Room.findByIdAndDelete(room.room);
 
           if (!deletedRoom) {
-            return res.json({error: "Error removing tutor"});
+            if (req.body.show) {
+              return res.json({error: "Error removing tutor"});
+
+            } else {
+              req.flash("error", "Error removing tutor");
+              return res.redirect("back");
+            }
           }
 
           if (room.student.newRoomCount.includes(deletedRoom._id)) {
             room.student.newRoomCount.splice(room.student.newRoomCount.indexOf(deletedRoom._id), 1);
-            room.student.save();
+            await room.student.save();
           }
 
           if (tutorId.newRoomCount.includes(deletedRoom._id)) {
@@ -911,7 +980,13 @@ router.put('/remove-tutor/:id', middleware.isLoggedIn, middleware.isFaculty, (re
         //Create a notification to alert tutor that they have been removed
         const notif = await Notification.create({subject: `Removal from ${course.name}`, text: `You were removed from ${course.name} for the following reason:\n"${req.body.reason}"`, sender: req.user, noReply: true, recipients: [tutorId], read: [], toEveryone: false, images: []}); //Create a notification to alert the user
         if (!notif) {
-          return res.json({error: "Error removing tutor"});
+          if (req.body.show) {
+            return res.json({error: "Error removing tutor"});
+
+          } else {
+            req.flash("error", "Error removing tutor");
+            return res.redirect("back");
+          }
         }
 
         notif.date = dateFormat(notif.created_at, "h:MM TT | mmm d");
@@ -928,12 +1003,26 @@ router.put('/remove-tutor/:id', middleware.isLoggedIn, middleware.isFaculty, (re
         course.blocked.push(tutorId);
         course.tutors.splice(i, 1);
         await course.save();
-        return res.json({success: "Succesfully removed tutor", tutor: tutorId, course});
+
+        if (req.body.show) {
+          return res.json({success: "Succesfully removed tutor", tutor: tutorId, course});
+
+        } else {
+          req.flash("success", "Succesfully Removed Tutor!");
+          return res.redirect(`/homework/${course._id}`);
+        }
       }
     }
 
   })().catch(err => {
-    res.json({error: "Error removing tutor"});
+    console.log(err);
+    if (req.body.show) {
+      res.json({error: "Error removing tutor"});
+
+    } else {
+      req.flash("error", "Error removing tutor");
+      res.redirect("back");
+    }
   });
 });
 
@@ -967,7 +1056,7 @@ router.put('/unblock/:id', middleware.isLoggedIn, middleware.isFaculty, (req, re
     //Create a notification to alert user that they have been unblocked
     const notif = await Notification.create({subject: `Unblocked from ${course.name}`, text: `You have been unblocked from ${course.name}. You can rejoin with the join code now whenever you need to.`, sender: req.user, noReply: true, recipients: [blockedId], read: [], toEveryone: false, images: []}); //Create a notification to alert the user
     if (!notif) {
-      return res.json({error: "Error removing student 3"});
+      return res.json({error: "Error removing student"});
     }
 
     notif.date = dateFormat(notif.created_at, "h:MM TT | mmm d");

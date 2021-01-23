@@ -149,7 +149,7 @@
               <li class="list-group-item list-group-item-success" id="tutor-heading-index">Tutors</li>
               <% for (let tutor of course.tutors) { %>
                 <li class="list-group-item list-group-item-action tutor-profile menu-item" id="item-<%=tutor.tutor._id%>">
-                  <a href="../profiles/<%=tutor.tutor._id%>" class="user-element-text">
+                  <a href="/homework/tutors/<%=course._id%>?tutorId=<%=tutor.tutor._id%>" class="user-element-text">
                     <img class="profile-image" src="<%= tutor.tutor.imageUrl %>" alt="profile picture">
                     <span class="username <%=tutor.tutor.status%> <%=tutor.tutor.permission%> <%=tutor.tutor.tags.join(' ')%>"><span class="enrolled-name"><%=tutor.tutor.firstName%> <%=tutor.tutor.lastName%></span> <span class="enrolled-username"><%=tutor.tutor.username%></span></span>
                   </a>
@@ -196,7 +196,7 @@
 
               <% for (let tutor of course.tutors) { %>
                   <li class="list-group-item list-group-item-action tutor-profile menu-item" id="tutor-<%=tutor.tutor._id%>">
-                    <a href="/homework/tutors/<%=course._id%>?tutor=<%=tutor.tutor._id%>" class="tutor-link">
+                    <a href="/homework/tutors/<%=course._id%>?tutorId=<%=tutor.tutor._id%>" class="tutor-link">
                       <img class="profile-image" src="<%= tutor.tutor.imageUrl %>" alt="profile picture">
                       <span class="tutor-name <%=tutor.tutor.status%> <%=tutor.tutor.permission%> <%=tutor.tutor.tags.join(' ')%>"><%=tutor.tutor.firstName%> <%=tutor.tutor.lastName%></span>
                     </a>
@@ -260,22 +260,22 @@
                       <% } %>
                     </div>
 
-                    <a href="/homework/tutors/<%=course._id%>?tutor=<%=tutor.tutor._id%>" class="reviews-length"><i class="fas fa-comment-dots reviews-icon"></i> <span id="reviews-length-<%=tutor.tutor._id%>"><%=tutor.reviews.length%></span> Review(s)</a>
+                    <a href="/homework/tutors/<%=course._id%>?tutorId=<%=tutor.tutor._id%>" class="reviews-length"><i class="fas fa-comment-dots reviews-icon"></i> <span id="reviews-length-<%=tutor.tutor._id%>"><%=tutor.reviews.length%></span> Review(s)</a>
 
                     <% if (tutor.tutor._id.equals(currentUser._id)) { %>
                       <% if (tutor.available) { %>
-                        <button class="btn btn-danger close-lessons" id="close-<%=course._id%>-<%=tutor.tutor._id%>" data-toggle="modal" data-target="#modal-close-<%=tutor.tutor._id%>">Prevent Further Bookings</button>
+                        <button class="btn btn-danger close-lessons lesson-action" id="close-<%=course._id%>-<%=tutor.tutor._id%>" data-toggle="modal" data-target="#modal-close-<%=tutor.tutor._id%>">Prevent Further Bookings</button>
                       <% } else { %>
-                        <button class="btn btn-success reopen-lessons" id="reopen-<%=course._id%>-<%=tutor.tutor._id%>" data-toggle="modal" data-target="#modal-reopen-<%=tutor.tutor._id%>">Reopen Lessons</button>
+                        <button class="btn btn-success reopen-lessons lesson-action" id="reopen-<%=course._id%>-<%=tutor.tutor._id%>" data-toggle="modal" data-target="#modal-reopen-<%=tutor.tutor._id%>">Reopen Lessons</button>
                       <% } %>
                     <% } %>
 
                       <% if (tutor.tutor._id.equals(currentUser._id)) { %>
                         <br />
-                        <label for="slots" id="slots-label"><span id="slots-heading">Number of Student Slots:</span> <span id="slots-count"><%=tutor.slots%></span></label>
+                        <label for="slots" id="slots-label"><span id="slots-heading">Number of Student Slots:</span> <span id="slots-count"><%=tutor.slots + tutor.students.length%></span></label>
                         <span id="change-message" hidden></span>
                         <br />
-                        <input type="range" min="<%=tutor.students.length%>" max="<%=tutor.slots+tutor.students.length+5%>" value="<%=tutor.slots+tutor.students.length%>" class="slider" id="slots" name="slots" onchange="setStudentsShow('<%=course._id%>')">
+                        <input type="range" min="<%=tutor.students.length%>" max="<%=tutor.slots+tutor.students.length+10%>" value="<%=tutor.slots+tutor.students.length%>" class="slider" id="slots" name="slots" onchange="setStudentsShow('<%=course._id%>')">
                       <% } %>
 
                     <p class="tutor-bio"><%=tutor.bio%></p>

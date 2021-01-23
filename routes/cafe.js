@@ -67,12 +67,15 @@ router.put('/upvote', middleware.isLoggedIn, (req, res) => {
   })
 })
 
-//Track cafe statistics
-router.get('/data', middleware.isLoggedIn, middleware.isAdmin, (req, res) => {
-  getData().then(data => {
-    res.render("cafe/data", data);
-  });
-});
+//Track cafe statistics (Commented out for now)
+// router.get('/data', middleware.isLoggedIn, middleware.isAdmin, (req, res) => {
+//   getData().then(data => {
+//     res.render("cafe/data", data);
+//   }).catch(err => {
+//     req.flash("error", "Unable to access database");
+//     res.redirect("back");
+//   });
+// });
 
 router.get('/order/new', middleware.isLoggedIn, middleware.cafeOpen, (req, res) => { //RESTFUL routing 'order/new' route
 
@@ -239,7 +242,7 @@ router.post('/order', middleware.isLoggedIn, middleware.cafeOpen, (req, res) => 
 });
 
 
-router.get('/orders', middleware.isLoggedIn, middleware.isMod, (req, res) => { //This is for EC Cafe Workers to check all the available orders
+router.get('/orders', middleware.isLoggedIn, middleware.isMod, middleware.isCashier, (req, res) => { //This is for EC Cafe Workers to check all the available orders
   Order.find({present: true})
   .populate('items.item').exec((err, foundOrders) => { //Collect all orders which are currently active, and get all info on their items
     if (err) {
@@ -428,34 +431,21 @@ router.get('/manage', middleware.isLoggedIn, middleware.isMod, (req, res) => { /
   });
 });
 
-router.get('/open', middleware.isLoggedIn, middleware.isMod, (req, res) => { //Route to open cafe
-  Cafe.find({}, (err, foundCafe) => {
-    if (err || !foundCafe) {
-      req.flash('error', "Unable to access database");
-      res.redirect('back');
+//Open/close cafe
+router.put('/change-cafe-status', middleware.isLoggedIn, middleware.isMod, (req, res) => { //Route to open cafe
+  Cafe.find({}, (err, cafes) => {
+    if (err || !cafes) {
+      res.json({error: "An error occurred"});
 
     } else {
-      //Open cafe here
-      foundCafe[0].open = true;
-      foundCafe[0].save();
-      req.flash('success', "Cafe is now open!");
-      res.redirect('/cafe/manage');
-    }
-  });
-});
+      if (cafes[0].open) {
+        cafes[0].open = false;
+      } else {
+        cafes[0].open = true;
+      }
 
-router.get('/close', middleware.isLoggedIn, middleware.isMod, (req, res) => { //Route to close cafe
-  Cafe.find({}, (err, foundCafe) => {
-    if (err || !foundCafe) {
-      req.flash('error', "Unable to access database");
-      res.redirect('back');
-
-    } else {
-      //Close cafe here
-      foundCafe[0].open = false;
-      foundCafe[0].save();
-      req.flash('success', "Cafe is now closed!");
-      res.redirect('/cafe/manage');
+      cafes[0].save();
+      res.json({success: "Succesfully updated cafe", open: cafes[0].open});
     }
   });
 });

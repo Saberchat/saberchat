@@ -89,6 +89,24 @@ h3, .ratings {
   font-weight: bold;
 }
 
+.student-profile {
+  color: black;
+  text-decoration: none;
+}
+
+.join-course-student, .join-course-tutor {
+  display: inline;
+  margin-left: 10px;
+}
+
+.tutor-info {
+  text-align: center;
+}
+
+.profile-image {
+  display: inline;
+}
+
 @media only screen and (max-width: 768px) {
     .profile-desc {
         margin: 1.7rem 0;
