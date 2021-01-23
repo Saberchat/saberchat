@@ -103,7 +103,7 @@
                       <% if (currentUser._id.toString() == announcement.sender._id.toString()) { %>
                         <button type="button" class="edit-button btn btn-info"><a class="announcement-button" href="/announcements/<%=announcement._id%>/edit"><i class="fas fa-cog"></i> Edit</a></button>
 
-                        <form action="announcements/<%=announcement._id%>?_method=delete" method="post" class="delete-announcement">
+                        <form action="/announcements/<%=announcement._id%>?_method=delete" method="post" class="delete-announcement">
                           <button class="btn btn-danger announcement-button" type="button" data-toggle="modal" data-target="#modal-<%=announcement._id%>"><i class="far fa-trash-alt"></i> Delete</button>
                           <div class="modal fade" id="modal-<%=announcement._id%>" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
                             <div class="modal-dialog">
