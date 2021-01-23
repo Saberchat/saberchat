@@ -149,7 +149,7 @@ const sessionConfig = {
 if(process.env.NODE_ENV === 'production') {
   // allows cookies to only be accessed over https
   // this wouldn't allow authentication for local dev since local host is http
-  sessionConfig.cookie.secure = true;
+  sessionConfig.cookie.secure = false;
 }
 
 app.use(session(sessionConfig));

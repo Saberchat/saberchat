@@ -1,5 +1,3 @@
-//Understand how JSON works
-
 const express = require('express');
 //start express router
 const router = express.Router();
