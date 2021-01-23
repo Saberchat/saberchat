@@ -13,7 +13,7 @@ const transport = ((recipient, subject, html) => {
     let email = {from: 'noreply.saberchat@gmail.com', to: recipient.email, subject, html};
 
     transporter.sendMail(email, (err, info) => {
-      if (error) {
+      if (err) {
         console.log(err);
       } else {
         console.log('Email sent: ' + info.response);
