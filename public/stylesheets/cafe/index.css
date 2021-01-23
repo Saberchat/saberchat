@@ -2,6 +2,11 @@
   margin-top: -1px;
 }
 
+.section-heading, .section-heading:hover {
+  color: inherit;
+  text-decoration: none;
+}
+
 .section-heading {
   color: inherit;
 }

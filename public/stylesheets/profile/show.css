@@ -240,7 +240,7 @@ Username
   margin-left: 20px;
 }
 
-.follower-link, .following-link, .remove-follower-text, .remove-follower-text:hover {
+.follower-link, .following-link, .follower-link:hover, .following-link:hover, .remove-follower-text, .remove-follower-text:hover {
   color: black;
   text-decoration: none;
 }
