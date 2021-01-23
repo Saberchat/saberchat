@@ -388,17 +388,18 @@ router.put('/:id', middleware.isLoggedIn, middleware.isMod, multer, validateAnn,
           break;
         }
       }
-    }
 
-    if (!overlap) {
-      user.annCount.push(announcementObject);
-      await user.save();
+      if (!overlap) {
+        user.annCount.push(announcementObject);
+        await user.save();
+      }
     }
 
     req.flash('success', 'Announcement Updated!');
     res.redirect(`/announcements/${updatedAnnouncement._id}`);
 
   })().catch(err => {
+    console.log(err);
     req.flash('error', "Unable To Access Database");
     res.redirect('back');
   });
