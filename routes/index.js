@@ -18,14 +18,7 @@ const Announcement = require('../models/announcement');
 
 // Home route. gives the landing or home or index page (whatever you want to call it).
 router.get('/', (req, res) => {
-	User.find({}, (err, users) => {
-		for (let user of users) {
-			user.authenticated = true;
-			user.save();
-		}
-		res.render('index');
-	});
-
+	res.render('index');
 });
 
 // ===========================
