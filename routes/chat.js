@@ -19,13 +19,26 @@ const AccessReq = require('../models/accessRequest');
 
 //route for displaying room list
 router.get('/', middleware.isLoggedIn, (req, res) => {
-  Room.find({}, (err, foundRooms) => {
-    if (err || !foundRooms) {
-      req.flash('error', 'Unable to access Database');
-      res.redirect('back');
-    } else {
-      res.render('chat/index', {rooms: foundRooms});
+  (async() => {
+
+    const rooms = await Room.find({});
+
+    if (!rooms) {
+      req.flash('error', 'Unable to find rooms');
+      return res.redirect('back');
     }
+
+    const requests = await AccessReq.find({requester: req.user._id, status: "pending"});
+    if (!requests) {
+      req.flash('error', 'Unable to find access requests');
+      return res.redirect('back');
+    }
+
+    return res.render('chat/index', {rooms, requests});
+
+  })().catch(err => {
+    req.flash('error', 'Unable to access Database');
+    res.redirect('back');
   });
 });
 
@@ -108,7 +121,7 @@ router.post('/', middleware.isLoggedIn, validateRoom, (req, res) => {
     if (!room) {
       req.flash('error', 'Group could not be created');
       return res.redirect('/chat/new');
-      
+
     } else {
       if(req.body.type == 'true') {
         for (const user in req.body.check) {
@@ -192,28 +205,24 @@ router.post('/:id/request-access', middleware.isLoggedIn, (req, res) => {
     const foundRoom = await Room.findById(req.params.id);
     // if no found room, exit
     if(!foundRoom) {
-      req.flash('error', 'Room does not Exist'); return res.redirect('back');
+      return res.json({error: 'Room does not Exist'});
     }
 
     if(foundRoom.type == 'public') {
-      req.flash('error', 'Room is public');
-      return res.redirect('back');
+      return res.json({error: 'Room is public'});
 
     } else if (!foundRoom.mutable) {
-      req.flash('error', 'Room does not accept access requests');
-      return res.redirect('back');
+      return res.json({error: 'Room does not accept access requests'});
     }
 
     // find if the request already exists to prevent spam
     const foundReq = await AccessReq.findOne({requester: req.user._id, room: foundRoom._id});
 
     if(foundReq && foundReq.status != 'pending') {
-      req.flash('error', 'Request has already been ' + foundReq.status);
-      res.redirect('back');
+      return res.json({error: `Request has already been ${foundReq.status}`});
 
     } else if(foundReq) {
-      req.flash('error', 'Identical request has already been sent');
-      res.redirect('back');
+      return res.json({error: 'Identical request has already been sent'});
 
     } else {
 
@@ -230,21 +239,41 @@ router.post('/:id/request-access', middleware.isLoggedIn, (req, res) => {
       ]);
 
       if(!createdReq || !roomCreator) {
-        req.flash('error', 'An error occured'); return res.redirect('back');
+        return res.json({error: 'An error occurred'});
       }
 
-      roomCreator.requests.push(createdReq._id);
+      await roomCreator.requests.push(createdReq._id);
       roomCreator.save();
 
       transport(roomCreator, 'New Room Access Request', `<p>Hello ${roomCreator.firstName},</p><p><strong>${req.user.username}</strong> is requesting to join your room, <strong>${foundRoom.name}.</strong></p><p>You can access the full request at https://alsion-saberchat.herokuapp.com</p>`);
 
-      req.flash('success', 'Request for access sent');
-      res.redirect('back');
+      return res.json({success: 'Request for access sent'});
     }
 
   })().catch(err => {
-    req.flash('error', 'Cannot access Database');
-    res.redirect('back');
+    req.json({error: 'Cannot access Database'});
+  });
+});
+
+router.delete('/:id/cancel-request', (req, res) => {
+  (async() => {
+    const room = await Room.findById(req.params.id).populate("creator.id");
+    if (!room) {
+      return res.json({error: "Unable to find room"});
+    }
+
+    const deletedReq = await AccessReq.deleteOne({room: room._id, requester: req.user._id, status: "pending"});
+    if (!deletedReq) {
+      return res.json({error: "Unable to find request"});
+    }
+
+    room.creator.id.requests.splice(room.creator.id.requests.indexOf(deletedReq._id), 1);
+    await room.creator.id.save();
+
+    return res.json({success: "Successfully deleted request"});
+
+  })().catch(err => {
+    res.json({error: "Unable to access database"});
   });
 });
 

@@ -17,6 +17,7 @@
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js" integrity="sha384-OgVRvuATP1z7JjHLkuOU7Xw704+h835Lr+6QL9UvYjZE3Ipu6Tp75j7Bh/kR0JKI" crossorigin="anonymous"></script>
 
     <script src="https://kit.fontawesome.com/dccc745c41.js" crossorigin="anonymous"></script>
+    <script src="/javascript/chat/request.js"></script>
 
   </head>
   <body>
@@ -69,9 +70,19 @@
               <% if (room.type == 'private' && !(room.members.includes(currentUser._id)) && room.mutable) { %>
                 <li class="list-group-item list-group-item-action list-group-item-light">
                   <%= room.name %>
-                  <form action="/chat/<%= room._id %>/request-access" method="post" class="float-right">
-                    <button class="btn btn-success btn-sm"><i class="fas fa-hand-paper"></i> Request Access</button></li>
-                  </form>
+                  <% let roomRequested = false;%>
+                  <% for (let request of requests) { %>
+                    <% if (request.room.equals(room._id)) { %>
+                      <% roomRequested = true;%>
+                      <% break; %>
+                    <% } %>
+                  <% } %>
+
+                  <% if (roomRequested) { %>
+                    <button class="btn btn-danger btn-sm float-right" id="cancel-<%=room._id%>" onclick="cancelRequest(this)"><i class="fas fa-window-close"></i> Cancel Request</button></li>
+                  <% } else { %>
+                    <button class="btn btn-success btn-sm float-right" id="request-<%=room._id%>" onclick="request(this)"><i class="fas fa-hand-paper"></i> Request Access</button></li>
+                  <% } %>
               <% } %>
             <% }) %>
           </ul>
