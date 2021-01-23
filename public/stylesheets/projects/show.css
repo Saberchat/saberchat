@@ -25,8 +25,9 @@
   margin-top: -15px;
 }
 
-.edit-button-text {
+.edit-button-text, .edit-button-text:hover {
   color: white;
+  text-decoration: none;
 }
 
 #delete-form {
