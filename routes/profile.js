@@ -10,6 +10,10 @@ const {
   validatePasswordUpdate
 } = require('../middleware/validation');
 
+if(process.env.NODE_ENV !== "production") {
+	require('dotenv').config();
+}
+
 const User = require('../models/user');
 const Email = require('../models/email');
 
@@ -170,48 +174,64 @@ router.put('/change-email', middleware.isLoggedIn, validateEmailUpdate, (req, re
       await req.user.save();
     }
 
-    const emails = await Email.find({address: req.body.email});
+    if (req.user.email == req.body.email) {
+      req.flash('success', "Email sending settings updated");
+      return res.redirect(`/profiles/${req.user._id}`);
 
-    if (!emails) {
-      req.flash('error', "Unable to find emails");
-      return res.redirect('back');
+    } else {
+      const emails = await Email.find({address: req.body.email});
 
-    } else if (emails.length < 1 && req.body.email.split("@")[1] != "alsionschool.org") {
-      req.flash('error', "New email must be an Alsion-verified email");
-      return res.redirect('back');
-    }
+      if (!emails) {
+        req.flash('error', "Unable to find emails");
+        return res.redirect('back');
 
-    const overlap = await User.find({authenticated: true, email: req.body.email, _id: {$ne: req.user._id}});
-
-    if (!overlap) {
-      req.flash('error', "Unable to find users");
-      return res.redirect('back');
-
-    } else if (overlap.length > 0) {
-      req.flash('error', "Another user already has that email.");
-      return res.redirect('back');
-    }
-
-    //Since the user must go to their email to change their email address, the transporter function does not work.
-    let updateEmail = {
-      from: 'noreply.saberchat@gmail.com',
-      to: req.body.email,
-      subject: 'Profile Update Confirmation',
-      html: `<p>Hello ${req.user.firstName},</p><p>You are receiving this email because you recently requested to change your Saberchat email to ${req.body.email}.</p><p>Click <a href="https://alsion-saberchat.herokuapp.com/profiles/confirm-email/${req.user._id}?token=${req.user.authenticationToken}&email=${req.body.email}">this link</a> to confirm your new email address.`
-    };
-
-    transporter.sendMail(updateEmail, (err, info) =>{
-      if (err) {
-        console.log(err);
-      } else {
-        console.log('Email sent: ' + info.response);
+      } else if (emails.length < 1 && req.body.email.split("@")[1] != "alsionschool.org") {
+        req.flash('error', "New email must be an Alsion-verified email");
+        return res.redirect('back');
       }
-    });
 
-    req.flash('success', 'Go to your new email to confirm new address');
-    res.redirect('/profiles/change-login-info');
+      const overlap = await User.find({authenticated: true, email: req.body.email, _id: {$ne: req.user._id}});
+
+      if (!overlap) {
+        req.flash('error', "Unable to find users");
+        return res.redirect('back');
+
+      } else if (overlap.length > 0) {
+        req.flash('error', "Another user already has that email.");
+        return res.redirect('back');
+      }
+
+      //Since the user must go to their email to change their email address, the transporter function does not work.
+
+      const transporter = nodemailer.createTransport({
+        service: 'gmail',
+        auth: {
+          user: process.env.EMAIL_ADDRESS,
+          pass: process.env.EMAIL_PASSWORD
+        }
+      });
+
+      let updateEmail = {
+        from: 'noreply.saberchat@gmail.com',
+        to: req.body.email,
+        subject: 'Profile Update Confirmation',
+        html: `<p>Hello ${req.user.firstName},</p><p>You are receiving this email because you recently requested to change your Saberchat email to ${req.body.email}.</p><p>Click <a href="https://alsion-saberchat.herokuapp.com/profiles/confirm-email/${req.user._id}?token=${req.user.authenticationToken}&email=${req.body.email}">this link</a> to confirm your new email address.`
+      };
+
+      transporter.sendMail(updateEmail, (err, info) =>{
+        if (err) {
+          console.log(err);
+        } else {
+          console.log('Email sent: ' + info.response);
+        }
+      });
+
+      req.flash('success', 'Go to your new email to confirm new address');
+      return res.redirect('/profiles/change-login-info');
+    }
 
   })().catch(err => {
+    console.log(err);
     req.flash('error', "Unable to access database");
     res.redirect('back');
   });

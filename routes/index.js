@@ -119,7 +119,7 @@ router.post("/register", validateNewUser, (req, res) => {
           //redirect to root
           return res.redirect("/");
         }
-        transport_mandatory(transporter, user, 'Verify Saberchat Account', `<p>Hello ${newUser.firstName},</p><p>Welcome to Saberchat! A confirmation of your account:</p><ul><li>Your username is ${newUser.username}.</li><li>Your full name is ${newUser.firstName} ${newUser.lastName}.</li><li>Your linked email is ${newUser.email}</li></ul><p>Click <a href="https://alsion-saberchat.herokuapp.com/authenticate/${newUser._id}?token=${token}">this link</a> to verify your account.</p>`);
+        transport_mandatory(user, 'Verify Saberchat Account', `<p>Hello ${newUser.firstName},</p><p>Welcome to Saberchat! A confirmation of your account:</p><ul><li>Your username is ${newUser.username}.</li><li>Your full name is ${newUser.firstName} ${newUser.lastName}.</li><li>Your linked email is ${newUser.email}</li></ul><p>Click <a href="https://alsion-saberchat.herokuapp.com/authenticate/${newUser._id}?token=${token}">this link</a> to verify your account.</p>`);
         // if registration is successful, login user.
         req.flash("success", "Welcome to Saberchat " + user.firstName + "! Go to your email to verify your account");
         res.redirect("/");
