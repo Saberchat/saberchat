@@ -53,6 +53,7 @@
     </div>
 
     <div class="container mt-5">
+      <% if (lessonCount > 0) { %>
       <ul id="lesson-info-<%=student._id%>" class="list-group">
         <li class="list-group-item list-group-item-success status-header">
           <div class="d-flex w-100 justify-content-between">
@@ -75,6 +76,9 @@
         <% } %>
       <% } %>
       </ul>
+      <% } else { %>
+        <h1 id="no-lessons">No Lessons</h1>
+      <% } %>
     </div>
   </body>
   <script>
