@@ -120,31 +120,31 @@ router.post('/whitelist', middleware.isLoggedIn, middleware.isPrincipal, (req, r
 	});
 });
 
-router.post('/add-permission', (req, res) => {
-  Permission.create({title: req.body.permission}, (err, permission ) => {
-    if (err || !permission) {
-      req.flash('error', "Unable to create permission");
-      res.redirect('back');
-
-    } else {
-      req.flash('success', "Permission created!");
-      res.redirect('/admin/permissions');
-    }
-  });
-});
-
-router.post('/add-status', (req, res) => {
-  Status.create({title: req.body.status, plural: req.body.plural, version: req.body.version}, (err, status) => {
-    if (err || !status) {
-      req.flash('error', "Unable to create status");
-      res.redirect('back');
-
-    } else {
-      req.flash('success', "Status created!");
-      res.redirect('/admin/status');
-    }
-  });
-});
+// router.post('/add-permission', (req, res) => {
+//   Permission.create({title: req.body.permission}, (err, permission ) => {
+//     if (err || !permission) {
+//       req.flash('error', "Unable to create permission");
+//       res.redirect('back');
+//
+//     } else {
+//       req.flash('success', "Permission created!");
+//       res.redirect('/admin/permissions');
+//     }
+//   });
+// });
+//
+// router.post('/add-status', (req, res) => {
+//   Status.create({title: req.body.status, plural: req.body.plural, version: req.body.version}, (err, status) => {
+//     if (err || !status) {
+//       req.flash('error', "Unable to create status");
+//       res.redirect('back');
+//
+//     } else {
+//       req.flash('success', "Status created!");
+//       res.redirect('/admin/status');
+//     }
+//   });
+// });
 
 // router.delete('/whitelist/:id', middleware.isLoggedIn, middleware.isPrincipal, (req, res) => {
 // 	(async() => {
