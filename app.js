@@ -189,9 +189,9 @@ app.use('/projects', projectRoutes);
 app.use('/homework', hwRoutes);
 
 // Catch-all route.
-// app.get('*', (req, res) => {
-// 	res.redirect('/');
-// });
+app.get('*', (req, res) => {
+	res.redirect('/');
+});
 
 // list of responses to bad words
 const curseResponse = [
