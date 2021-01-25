@@ -4,9 +4,9 @@ const { escapeHtmlExtension } = require('./extensions');
 const Joi = BaseJoi.extend(escapeHtmlExtension);
 
 const annSchema = Joi.object({
-    subject: Joi.string().required().max(30).escapeHtml().messages({
+    subject: Joi.string().required().max(50).escapeHtml().messages({
         "string.empty": "Subject is required.",
-        "string.max": "Subject max 30 characters."
+        "string.max": "Subject max 50 characters."
     }),
     message: Joi.string().required().escapeHtml().messages({
         "string.empty": "Message is required."
