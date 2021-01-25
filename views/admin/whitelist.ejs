@@ -76,10 +76,9 @@
 
                         <% if (exists) { %>
                           <a class="badge badge-pill badge-info user-exists" href="../profiles/<%=exists._id%>">User Exists</a>
-                        <% } %>
 
-                        <% if (currentUser.email != email.address) { %>
-                          <!-- <form action="/admin/whitelist/<%=email._id%>?_method=delete" method="post" class="delete-email">
+                        <% } else { %>
+                          <form action="/admin/whitelist/<%=email._id%>?_method=delete" method="post" class="delete-email">
                             <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#modal-<%=email._id%>" id="delete-button"><i class="fas fa-trash-alt"></i> Remove</button>
 
                             <div class="modal fade" id="modal-<%=email._id%>" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
@@ -92,7 +91,7 @@
                                     </button>
                                   </div>
                                   <div class="modal-body">
-                                    Removing <%=email.address%> will delete any accounts which use this email.
+                                    If an account is currently using this email, it cannot be deleted.
                                   </div>
                                   <div class="modal-footer">
                                     <button type="button" class="btn btn-secondary" data-dismiss="modal">No, Go Back</button>
@@ -102,7 +101,7 @@
                               </div>
                             </div>
 
-                          </form> -->
+                          </form>
                         </li>
 
                       <% } %>

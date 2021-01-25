@@ -120,6 +120,40 @@ router.post('/whitelist', middleware.isLoggedIn, middleware.isPrincipal, (req, r
 	});
 });
 
+router.delete('/whitelist/:id', middleware.isLoggedIn, middleware.isPrincipal, (req, res) => {
+	(async() => {
+		const email = await Email.findById(req.params.id);
+		if (!email) {
+			req.flash('error', "Unable to find email");
+			return res.redirect("back");
+		}
+
+		const users = await User.find({authenticated: true, email: email.address});
+		if (!users) {
+			req.flash('error', "Unable to find users");
+			return res.redirect("back");
+		}
+
+		if (users.length == 0) {
+			const deletedEmail = await Email.findByIdAndDelete(email._id);
+			if (!deletedEmail) {
+				req.flash('error', "Unable to delete email");
+				return res.redirect("back");
+			}
+
+			req.flash('success', "Removed Email!");
+			return res.redirect("/admin/whitelist");
+		}
+
+		req.flash('error', "Active user has this email");
+		return res.redirect("back");
+
+	})().catch(err => {
+		req.flash('error', "Unable to access database");
+		res.redirect("back");
+	});
+});
+
 // router.post('/add-permission', (req, res) => {
 //   Permission.create({title: req.body.permission}, (err, permission ) => {
 //     if (err || !permission) {
