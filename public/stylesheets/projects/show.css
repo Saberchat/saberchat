@@ -45,6 +45,7 @@
 .project-description {
   margin-top: 10px;
   white-space: pre-wrap;
+  text-align: left;
 }
 
 .project-image {

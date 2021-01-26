@@ -6,6 +6,7 @@ const middleware = require('../middleware/index');
 const router = express.Router(); //start express router
 const dateFormat = require('dateformat');
 const {transport, transport_mandatory} = require("../transport");
+const convertToLink = require("../convert-to-link");
 
 const multer = require('../middleware/multer');
 const { cloudUpload, cloudDelete } = require('../services/cloudinary');
@@ -96,6 +97,7 @@ router.get('/:id', (req, res) => { //RESTful Routing 'SHOW' route
         req.user.save();
       }
 
+      let convertedText = convertToLink(foundAnn.text)
       res.render('announcements/show', {announcement: foundAnn});
     }
   });

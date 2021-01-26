@@ -49,6 +49,7 @@
 
 .announcement-text {
   white-space: pre-wrap;
+  text-align: left;
 }
 
 .liked-button, .liked-button-show {
