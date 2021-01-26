@@ -29,17 +29,16 @@
                 <h1>Moderator Page</h1>
                 <hr>
 
+                <h4 id="reported-comments-header">
                 <% if (comments.length == 0) { %>
-                  <h4>No Reported Comments</h4>
-
-                <% } else { %>
-                  <h4>Reported Comments</h4>
+                  No
                 <% } %>
+                Reported Comments</h4>
 
                 <hr>
                 <ul class="list-group mt-3">
                     <% comments.forEach(comment => { %>
-                        <li class="list-group-item">
+                        <li class="list-group-item reported-comment">
                             <h4>Room: <%= comment.room.name %></h4>
                             <p>Reported by <b><%= comment.statusBy.username %></b></p>
                             <span><b><%= comment.author.username %>:</b> <%= comment.text %></span>

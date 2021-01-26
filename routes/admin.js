@@ -592,9 +592,10 @@ router.put('/tag', middleware.isLoggedIn, middleware.isMod, (req, res) => {
 
 // route for ignoring reported comments
 router.put('/moderate', middleware.isLoggedIn, middleware.isMod, (req, res) => {
-	Comment.findByIdAndUpdate(req.body.id, {status: 'ignored'}, (err, updatedComment) => {
+	Comment.findByIdAndUpdate(req.body.id, {status: 'ignored'}).populate("sender").exec((err, updatedComment) => {
 		if(err || !updatedComment) {
 			res.json({error: 'Could not update comment'});
+
 		} else {
 			res.json({success: 'Updated comment'});
 		}
@@ -603,10 +604,12 @@ router.put('/moderate', middleware.isLoggedIn, middleware.isMod, (req, res) => {
 
 // route for deleting reported comments
 router.delete('/moderate', middleware.isLoggedIn, middleware.isMod, (req, res) => {
-	Comment.findByIdAndUpdate(req.body.id, {status: 'deleted'}, (err, updatedComment) => {
+	Comment.findByIdAndUpdate(req.body.id, {status: 'deleted'}).populate("author").exec((err, updatedComment) => {
 		if(err || !updatedComment) {
 			res.json({error: 'Could not update comment'});
 		} else {
+			updatedComment.author.reportedCount += 1;
+			updatedComment.author.save();
 			res.json({success: 'Updated comment'});
 		}
 	});
