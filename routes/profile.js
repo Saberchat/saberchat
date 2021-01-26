@@ -2,13 +2,13 @@ const express = require('express')
 const router = express.Router();
 const Filter = require('bad-words');
 const filter = new Filter();
-const nodemailer = require('nodemailer');
 const {transport, transport_mandatory} = require("../transport");
 const {
   validateUserUpdate,
   validateEmailUpdate,
   validatePasswordUpdate
 } = require('../middleware/validation');
+const axios = require('axios');
 
 if(process.env.NODE_ENV !== "production") {
 	require('dotenv').config();
@@ -201,29 +201,42 @@ router.put('/change-email', middleware.isLoggedIn, validateEmailUpdate, (req, re
         return res.redirect('back');
       }
 
-      //Since the user must go to their email to change their email address, the transporter function does not work.
+      const url = process.env.SENDGRID_BASE_URL + '/mail/send';
+      const data = {
+        "personalizations": [
+          {
+            "to": [
+              {
+                "email": req.body.email
+              }
+            ],
+            "subject": 'Profile Update Confirmation'
+          }
+        ],
+        "from": {
+          "email": "noreply.saberchat@gmail.com",
+          "name": "SaberChat"
+        },
+        "content": [
+          {
+            "type": "text/html",
+            "value": `<p>Hello ${req.user.firstName},</p><p>You are receiving this email because you recently requested to change your Saberchat email to ${req.body.email}.</p><p>Click <a href="https://alsion-saberchat.herokuapp.com/profiles/confirm-email/${req.user._id}?token=${req.user.authenticationToken}&email=${req.body.email}">this link</a> to confirm your new email address.`
+          }
+        ]
+      }
 
-      const transporter = nodemailer.createTransport({
-        service: 'gmail',
-        auth: {
-          user: process.env.EMAIL_ADDRESS,
-          pass: process.env.EMAIL_PASSWORD
+      axios({
+        method: 'post',
+        url: url,
+        data: data,
+        headers: {
+          "Authorization": "Bearer " + process.env.SENDGRID_KEY
         }
-      });
-
-      let updateEmail = {
-        from: 'noreply.saberchat@gmail.com',
-        to: req.body.email,
-        subject: 'Profile Update Confirmation',
-        html: `<p>Hello ${req.user.firstName},</p><p>You are receiving this email because you recently requested to change your Saberchat email to ${req.body.email}.</p><p>Click <a href="https://alsion-saberchat.herokuapp.com/profiles/confirm-email/${req.user._id}?token=${req.user.authenticationToken}&email=${req.body.email}">this link</a> to confirm your new email address.`
-      };
-
-      transporter.sendMail(updateEmail, (err, info) =>{
-        if (err) {
-          console.log(err);
-        } else {
-          console.log('Email sent: ' + info.response);
-        }
+      }).then(response => {
+        console.log(`Email Sent with status code: ${response.status}`);
+      }).catch(error => {
+        console.log('\n-- Error Sending Email --\n')
+        console.log(error);
       });
 
       req.flash('success', 'Go to your new email to confirm new address');
@@ -268,22 +281,8 @@ router.get('/confirm-email/:id', (req, res) => {
         user.authenticationToken = token;
         user.save();
 
-        //Since the user must go to their email to change their email address, the transporter function does not work.
-        let updateEmail = {
-          from: 'noreply.saberchat@gmail.com',
-          to: req.body.email,
-          subject: 'Email Update Confirmation',
-          text: `Hello ${user.firstName},\n\nYou are receiving this email because you recently made changes to your Saberchat email. This is a confirmation of your profile.\n\nYour username is ${user.username}.\nYour full name is ${user.firstName} ${user.lastName}.\nYour email is ${user.email}`
-        };
-
-        transporter.sendMail(updateEmail, (err, info) =>{
-          if (err) {
-            console.log(err);
-          } else {
-            console.log('Email sent: ' + info.response);
-          }
-        });
-
+        transport_mandatory(user, 'Email Update Confirmation', `<p>Hello ${user.firstName},</p><p>You are receiving this email because you recently made changes to your Saberchat email. This is a confirmation of your profile.</p><p>Your username is ${user.username}.</p><p>Your full name is ${user.firstName} ${user.lastName}.</p><p>Your email is ${user.email}.</p>`);
+        
         req.flash('success', "Email updated!")
         res.redirect('/');
 
