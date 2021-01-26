@@ -5,7 +5,6 @@ const filter = new Filter();
 const router = express.Router();
 //import passport for authentication
 const passport = require('passport');
-const nodemailer = require('nodemailer');
 const {transport, transport_mandatory} = require("../transport");
 
 const middleware = require('../middleware/index');

@@ -5,7 +5,6 @@ const express = require('express');
 const middleware = require('../middleware');
 const router = express.Router(); //start express router
 const dateFormat = require('dateformat');
-const nodemailer = require('nodemailer');
 const fillers = require('../fillerWords');
 const {transport, transport_mandatory} = require("../transport");
 

@@ -3,7 +3,6 @@ const Filter = require('bad-words');
 const filter = new Filter();
 //create express router
 const router = express.Router();
-const nodemailer = require('nodemailer');
 const {transport, transport_mandatory} = require("../transport");
 
 const { validateRoom } = require('../middleware/validation');

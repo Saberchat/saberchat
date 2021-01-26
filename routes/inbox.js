@@ -7,7 +7,6 @@ const router = express.Router(); //start express router
 const dateFormat = require('dateformat');
 const Filter = require('bad-words');
 const filter = new Filter();
-const nodemailer = require('nodemailer');
 const {transport, transport_mandatory} = require("../transport");
 
 const { validateMsg } = require('../middleware/validation');

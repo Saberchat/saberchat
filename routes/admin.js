@@ -1,7 +1,6 @@
 const express = require('express');
 //start express router
 const router = express.Router();
-const nodemailer = require('nodemailer');
 const {transport, transport_mandatory} = require("../transport");
 
 const User = require('../models/user');

@@ -5,7 +5,6 @@ const express = require('express');
 const middleware = require('../middleware');
 const router = express.Router();
 const dateFormat = require('dateformat');
-const nodemailer = require('nodemailer');
 const {transport, transport_mandatory} = require("../transport");
 const getData = require("../cafe-data");
 
