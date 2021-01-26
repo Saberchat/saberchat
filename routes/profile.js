@@ -282,7 +282,7 @@ router.get('/confirm-email/:id', (req, res) => {
         user.save();
 
         transport_mandatory(user, 'Email Update Confirmation', `<p>Hello ${user.firstName},</p><p>You are receiving this email because you recently made changes to your Saberchat email. This is a confirmation of your profile.</p><p>Your username is ${user.username}.</p><p>Your full name is ${user.firstName} ${user.lastName}.</p><p>Your email is ${user.email}.</p>`);
-        
+
         req.flash('success', "Email updated!")
         res.redirect('/');
 
