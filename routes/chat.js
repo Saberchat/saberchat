@@ -137,7 +137,7 @@ router.post('/', middleware.isLoggedIn, validateRoom, (req, res) => {
 
       await room.save();
 
-      const members = await User.find({_id: {$in: room.members}});
+      const members = await User.find({authenticated: true, _id: {$in: room.members}});
       if (!members) {
         req.flash('error', 'Members could not be found');
         return res.redirect('/chat/new');

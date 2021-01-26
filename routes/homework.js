@@ -189,7 +189,7 @@ router.get('/:id', middleware.isLoggedIn, (req, res) => {
       tutorIds.push(tutor.tutor._id.toString());
     }
 
-    const teachers = await User.find({status: "faculty", _id: {$ne: req.user._id}});
+    const teachers = await User.find({authenticated: true, status: "faculty", _id: {$ne: req.user._id}});
     if (!teachers) {
       req.flash('error', "Unable to find teachers");
       return res.redirect('back');
@@ -488,7 +488,7 @@ router.put('/book/:id', middleware.isLoggedIn, middleware.isStudent, (req, res) 
           tutor.rooms.push(roomObject);
           await course.save();
 
-          const studentIds = await User.find({_id: {$in: tutor.students}});
+          const studentIds = await User.find({authenticated: true, _id: {$in: tutor.students}});
           if (!studentIds) {
             return res.json({error: "Error accessing students"});
           }
@@ -723,7 +723,7 @@ router.get('/tutors/:id', middleware.isLoggedIn, (req, res) => {
         }
 
         //Collect info on the entire schema for each student (necessary to have one array of just ids, and one of the entire object, for FE display)
-        const students = await User.find({_id: {$in: tutor.students}});
+        const students = await User.find({authenticated: true, _id: {$in: tutor.students}});
         if (!students) {
           req.flash('error', "Unable to find students");
           return res.redirect('back');

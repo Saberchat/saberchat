@@ -94,28 +94,32 @@ router.get('/whitelist', middleware.isLoggedIn, middleware.isPrincipal, (req, re
 	});
 });
 
-router.post('/whitelist', middleware.isLoggedIn, middleware.isPrincipal, (req, res) => {
+router.put('/whitelist', middleware.isLoggedIn, middleware.isPrincipal, (req, res) => {
 
 	(async() => {
+		if (req.body.address.split('@')[1] == "alsionschool.org") {
+			return res.json({error: "Alsion emails do not need to be added to the whitelist"});
+		}
+
 		const overlap = await Email.find({address: req.body.address});
 
 		if (!overlap) {
-			req.flash('error', "Unable to find emails");
-			return res.redirect('back');
+			return res.json({error: "Unable to find emails"});
+		}
 
-		} else if (overlap.length > 0) {
-			req.flash('error', "Email already in whitelist");
-			return res.redirect('back');
+		if (overlap.length > 0) {
+			return res.json({error: "Email already in whitelist"});
 		}
 
 		const email = await Email.create({address: req.body.address});
-		req.flash('success', "Email added!");
-		res.redirect('/admin/whitelist');
+		if (!email) {
+			return res.json({error: "Error creating email"});
+		}
 
+		return res.json({success: "Email added", email});
 
 	})().catch(err => {
-		req.flash('error', "Unable to access database");
-		res.redirect('back');
+		res.json({error: "An error occurred"});
 	});
 });
 
@@ -123,33 +127,27 @@ router.delete('/whitelist/:id', middleware.isLoggedIn, middleware.isPrincipal, (
 	(async() => {
 		const email = await Email.findById(req.params.id);
 		if (!email) {
-			req.flash('error', "Unable to find email");
-			return res.redirect("back");
+			return res.json({error: "Unable to find email"});
 		}
 
 		const users = await User.find({authenticated: true, email: email.address});
 		if (!users) {
-			req.flash('error', "Unable to find users");
-			return res.redirect("back");
+			return res.json({error: "Unable to find users"});
 		}
 
 		if (users.length == 0) {
 			const deletedEmail = await Email.findByIdAndDelete(email._id);
 			if (!deletedEmail) {
-				req.flash('error', "Unable to delete email");
-				return res.redirect("back");
+				return res.json({error: "Unable to delete email"});
 			}
 
-			req.flash('success', "Removed Email!");
-			return res.redirect("/admin/whitelist");
+			return res.json({success: "Deleted email"});
 		}
 
-		req.flash('error', "Active user has this email");
-		return res.redirect("back");
+		return res.json({error: "Active user has this email"});
 
 	})().catch(err => {
-		req.flash('error', "Unable to access database");
-		res.redirect("back");
+		res.json({error: "An error occurred"});
 	});
 });
 

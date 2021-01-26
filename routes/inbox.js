@@ -152,7 +152,7 @@ router.post('/messages', middleware.isLoggedIn, validateMsg, (req, res) => {
 
 		let inboxEmail;
 
-		const recipientList = await User.find({ _id: { $in: recipients}});
+		const recipientList = await User.find({authenticated: true, _id: { $in: recipients}});
 
     let imageString = "";
 
