@@ -1,10 +1,11 @@
 let loaded = [];
 
 const ignoreComment = (button => {
-  const listItem = (button.parentNode).parentNode;
   const url = '/admin/moderate?_method=put';
   const commentId = button.id.split('-')[1];
+  const listItem = document.getElementById(`comment-${commentId}`);
   $.post(url, {id: commentId}, function(data) {
+    $(`#modal-ignore-${commentId}`).modal('hide');
     if(data.success) {
       listItem.remove();
       const reportedComments = document.getElementsByClassName("reported-comment");
@@ -16,10 +17,11 @@ const ignoreComment = (button => {
 });
 
 const deleteComment = (button => {
-  const listItem = (button.parentNode).parentNode;
   const url = '/admin/moderate?_method=delete';
   const commentId = button.id.split('-')[1];
+  const listItem = document.getElementById(`comment-${commentId}`);
   $.post(url, {id: commentId}, function(data) {
+    $(`#modal-delete-${commentId}`).modal('hide');
     if(data.success) {
       listItem.remove();
       const reportedComments = document.getElementsByClassName("reported-comment");
