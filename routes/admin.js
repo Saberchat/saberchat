@@ -590,18 +590,69 @@ router.put('/tag', middleware.isLoggedIn, middleware.isMod, (req, res) => {
   });
 });
 
+router.post('/moderate', middleware.isLoggedIn, middleware.isMod, (req, res) => {
+	(async() => {
+		const reportedComment = await Comment.findById(req.body.commentId).populate("author");
+		if (!reportedComment) {
+			return res.json({error: "Unable to find comment"});
+		}
+
+		let commentIndex;
+		let context = [];
+
+		const allComments = await Comment.find({room: reportedComment.room}).populate("author");
+		if (!allComments) {
+			return res.json({error: "Unable to find other comments"});
+		}
+
+		for (let i = 0; i < allComments.length; i ++) {
+			if (allComments[i]._id.equals(reportedComment._id)) {
+				commentIndex = i;
+				break;
+			}
+		}
+
+		for (let i = 1; i <= 5; i ++) {
+			if (commentIndex-i > 0) {
+				if (allComments[commentIndex-i].author) {
+					context.push(allComments[commentIndex-i]);
+				}
+			}
+		}
+
+		context.push(reportedComment);
+
+		for (let i = 1; i <= 5; i ++) {
+			if (commentIndex+i < allComments.length) {
+				if (allComments[commentIndex+i].author) {
+					context.push(allComments[commentIndex+i]);
+				}
+			}
+		}
+
+		return res.json({success: "Succesfully collected data", context});
+
+	})().catch(err => {
+		console.log(err);
+		res.json({error: "An error occurred"});
+	});
+});
+
 // route for ignoring reported comments
 router.put('/moderate', middleware.isLoggedIn, middleware.isMod, (req, res) => {
-	Comment.findById(req.body.id, (err, comment) => {
+	Comment.findById(req.body.id).populate('statusBy').exec((err, comment) => {
 		if (err || !comment) {
 			res.json({error: 'Could not find comment'});
 
-		} else if (comment.author.equals(req.user._id) || comment.statusBy.equals(req.user._id)) {
+		} else if (comment.author.equals(req.user._id) || comment.statusBy._id.equals(req.user._id)) {
 			res.json({error: 'Cannot handle your own comments'});
 
 		} else {
 			comment.status = "ignored";
 			comment.save();
+			comment.statusBy.falseReportCount += 1;
+			comment.statusBy.save();
+
 		 	res.json({success: 'Ignored comment'});
 		}
 	});

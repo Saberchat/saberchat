@@ -1,12 +1,14 @@
 const convertToLink = (text => {
+  const delimeter = new RegExp(/[\"\'\r]/, 'g');
   let deformatted = [];
+  let embedded = false;
   let emails = [];
   let links = [];
   let convertedString = ""
 
   for (let line of text.split('\n')) {
     for (let segment of line.trim().split(' ')) {
-      deformatted.push(segment.split('"').join('').split('\'').join('').split('\r').join(''));
+      deformatted.push(segment.split(delimeter).join(''));
     }
   }
 
@@ -18,8 +20,6 @@ const convertToLink = (text => {
       links.push(text.slice(text.indexOf(line), text.indexOf(line)+line.length));
     }
   }
-
-  let embedded = false;
 
   for (let line of text.split(' ')) {
     embedded = false;

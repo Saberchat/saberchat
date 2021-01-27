@@ -1,7 +1,15 @@
 .mod-actions {
-    float: right;
+  float: right;
 }
 
 .list-group-item {
-    line-height: 38px;
+  line-height: 38px;
+}
+
+.btn-primary, .btn-success {
+  margin-right: 10px;
+}
+
+body {
+  background-color: white;
 }

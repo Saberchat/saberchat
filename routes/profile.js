@@ -89,7 +89,7 @@ router.get('/:id', middleware.isLoggedIn, (req, res) => {
   })().catch(err => {
     req.flash('error', "Unable to access database");
     res.redirect('back');
-  })
+  });
 });
 
 // update user route. Check if current user matches profiles they're trying to edit with middleware.
