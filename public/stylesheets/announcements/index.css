@@ -13,8 +13,9 @@
   margin-right: 10px;
 }
 
-.modal-body, .modal-title, #sender-info {
+.modal-body, .modal-title, #sender-info, #sender-info:hover {
   color: black;
+  text-decoration: none;
 }
 
 .modal-body {

@@ -5,7 +5,7 @@
   padding-bottom: 50px;
 }
 
-.project-info, #exampleModalLabel, .modal-body, .creator-name, .creator-div {
+.project-info, #exampleModalLabel, .modal-body, .creator-name, .creator-div, .project-info:hover {
   color: black;
 }
 

@@ -28,7 +28,7 @@ const convertToLink = (text => {
         embedded = true;
         for (let segment of line.split('\n')) {
           if (segment.includes(email)) {
-            convertedString += `<a href="mailto:${email}">${segment}</a>`;
+            convertedString += `<a class="embedded-link" href="mailto:${email}">${segment}</a>`;
           } else {
             convertedString += `${segment}`;
           }
@@ -44,9 +44,9 @@ const convertToLink = (text => {
         for (let segment of line.split('\r')) {
           if (segment.includes(link)) {
             if (link.slice(0, 4) != "http") {
-              convertedString += `<a href="https://${link}" target="_blank">${segment}</a>`;
+              convertedString += `<a class="embedded-link" href="https://${link}" target="_blank">${segment}</a>`;
             } else {
-              convertedString += `<a href="${link}" target="_blank">${segment}</a>`;
+              convertedString += `<a class="embedded-link" href="${link}" target="_blank">${segment}</a>`;
             }
           } else {
             convertedString += `${segment}`;
