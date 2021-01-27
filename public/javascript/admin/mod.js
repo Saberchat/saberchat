@@ -48,10 +48,10 @@ const getContext = (button => {
           newComment.className = "media mb-2";
 
           if (comment._id.toString() == commentId) {
-            newComment.innerHTML = `<img src="${comment.author.imageUrl}" alt="user" class="user-image"> <div class="media-body ml-3"> <div class="bg-primary rounded py-2 px-3 mb-2 w-65"> <p class="text-small mb-0 text-white"> ${comment.text}</p> </div> <p class="small text-muted msg-info"><span class="username">${comment.author.username}</span>, ${comment.date}</p></div>`;
+            newComment.innerHTML = `<img src="${comment.author.imageUrl}" alt="user" class="user-image"> <div class="media-body ml-3"> <div class="bg-primary rounded py-2 px-3 mb-2 w-75"> <p class="text-small mb-0 text-white"> ${comment.text}</p> </div> <p class="small text-muted msg-info"><span class="username">${comment.author.username}</span>, ${comment.date}</p></div>`;
 
           } else {
-            newComment.innerHTML = `<img src="${comment.author.imageUrl}" alt="user" class="user-image"> <div class="media-body ml-3"> <div class="bg-grey rounded py-2 px-3 mb-2 w-65"> <p class="text-small mb-0 text-dark"> ${comment.text}</p> </div> <p class="small text-muted msg-info"><span class="username">${comment.author.username}</span>, ${comment.date}</p></div>`;
+            newComment.innerHTML = `<img src="${comment.author.imageUrl}" alt="user" class="user-image"> <div class="media-body ml-3"> <div class="bg-grey rounded py-2 px-3 mb-2 w-75"> <p class="text-small mb-0 text-dark"> ${comment.text}</p> </div> <p class="small text-muted msg-info"><span class="username">${comment.author.username}</span>, ${comment.date}</p></div>`;
           }
           contextBody.appendChild(newComment);
         }
