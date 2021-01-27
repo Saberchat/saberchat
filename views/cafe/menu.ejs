@@ -105,7 +105,7 @@
                     <span id="upvoteCount-<%=item._id%>"> <%=item.upvotes.length%></span>
                   </div>
 
-                  <br /><em class="item-description"><%= item.description %></em><br />
+                  <br /><em class="item-description convertible-text"><%= itemDescriptions[item._id.toString()] %></em><br />
                   <img src="<%=item.imgUrl%>" class="item-image"/>
 
                 </span>
@@ -121,4 +121,5 @@
       </div>
     </div>
   </body>
+  <script src="/javascript/embed.js"></script>
 </html>

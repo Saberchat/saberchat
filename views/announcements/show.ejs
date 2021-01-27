@@ -103,7 +103,7 @@
               <% } %>
             </div>
             <div class="ann-body">
-              <p class="announcement-text"><%=announcement.text%></p>
+              <p class="announcement-text convertible-text"><%=convertedText%></p>
               <hr>
               <div class="ann-images">
                 <% announcement.images.forEach(image => { %>
@@ -207,4 +207,5 @@
 </body>
 <script src="/javascript/announcements/like.js"></script>
 <script src="/javascript/announcements/comment.js"></script>
+<script src="/javascript/embed.js"></script>
 </html>

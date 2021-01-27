@@ -592,25 +592,36 @@ router.put('/tag', middleware.isLoggedIn, middleware.isMod, (req, res) => {
 
 // route for ignoring reported comments
 router.put('/moderate', middleware.isLoggedIn, middleware.isMod, (req, res) => {
-	Comment.findByIdAndUpdate(req.body.id, {status: 'ignored'}).populate("sender").exec((err, updatedComment) => {
-		if(err || !updatedComment) {
-			res.json({error: 'Could not update comment'});
+	Comment.findById(req.body.id, (err, comment) => {
+		if (err || !comment) {
+			res.json({error: 'Could not find comment'});
+
+		} else if (comment.author.equals(req.user._id) || comment.statusBy.equals(req.user._id)) {
+			res.json({error: 'Cannot handle your own comments'});
 
 		} else {
-			res.json({success: 'Updated comment'});
+			comment.status = "ignored";
+			comment.save();
+		 	res.json({success: 'Ignored comment'});
 		}
 	});
 });
 
 // route for deleting reported comments
 router.delete('/moderate', middleware.isLoggedIn, middleware.isMod, (req, res) => {
-	Comment.findByIdAndUpdate(req.body.id, {status: 'deleted'}).populate("author").exec((err, updatedComment) => {
-		if(err || !updatedComment) {
-			res.json({error: 'Could not update comment'});
+	Comment.findById(req.body.id).populate("author").exec((err, comment) => {
+		if (err || !comment) {
+			res.json({error: 'Could not find comment'});
+
+		} else if (comment.author._id.equals(req.user._id) || comment.statusBy.equals(req.user._id)) {
+			res.json({error: 'Cannot handle your own comments'});
+
 		} else {
-			updatedComment.author.reportedCount += 1;
-			updatedComment.author.save();
-			res.json({success: 'Updated comment'});
+			comment.status = "deleted";
+			comment.save();
+			comment.author.reportedCount += 1;
+			comment.author.save();
+			res.json({success: 'Deleted comment'});
 		}
 	});
 });

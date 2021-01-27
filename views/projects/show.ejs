@@ -13,8 +13,6 @@
     <link rel="stylesheet" href="/stylesheets/announcements/index.css">
     <link rel="stylesheet" href="/stylesheets/projects/index.css">
     <link rel="stylesheet" href="/stylesheets/projects/show.css">
-    <script src="/javascript/projects/like.js"></script>
-    <script src="/javascript/projects/comment.js"></script>
 
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
@@ -165,7 +163,7 @@
 
             <% } %>
 
-            <p class="project-description"><%=project.text%></p>
+            <p class="project-description convertible-text"><%=convertedText%></p>
 
             <% for (let img of project.images) { %>
               <img class="project-image" src="<%=img%>"/>
@@ -264,4 +262,8 @@
     </div>
   </div>
   </body>
+  <script src="/javascript/projects/like.js"></script>
+  <script src="/javascript/projects/comment.js"></script>
+  <script src="/javascript/embed.js"></script>
+
 </html>

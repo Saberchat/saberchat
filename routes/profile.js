@@ -3,6 +3,8 @@ const router = express.Router();
 const Filter = require('bad-words');
 const filter = new Filter();
 const {transport, transport_mandatory} = require("../transport");
+const convertToLink = require("../convert-to-link");
+
 const {
   validateUserUpdate,
   validateEmailUpdate,
@@ -81,7 +83,8 @@ router.get('/:id', middleware.isLoggedIn, (req, res) => {
       }
     }
 
-    res.render('profile/show', {user, following, followerIds});
+    const convertedDescription = convertToLink(user.description);
+    res.render('profile/show', {user, following, followerIds, convertedDescription});
 
   })().catch(err => {
     req.flash('error', "Unable to access database");

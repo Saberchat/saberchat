@@ -8,7 +8,7 @@ const dateFormat = require('dateformat');
 const Filter = require('bad-words');
 const filter = new Filter();
 const {transport, transport_mandatory} = require("../transport");
-
+const convertToLink = require("../convert-to-link");
 const { validateMsg } = require('../middleware/validation');
 
 const User = require('../models/user');
@@ -333,7 +333,8 @@ router.get('/:id', middleware.isLoggedIn, (req, res) => {
 
 		await message.populate({path: 'sender', select: 'username'}).populate({path:'recipients', select: 'username'}).populate({path: 'read', select: 'username'}).populate({path: 'replies.sender'}).execPopulate();
 
-		res.render('inbox/show', {message: message});
+		const convertedText = convertToLink(message.text);
+		res.render('inbox/show', {message: message, convertedText});
 
   })().catch(err => {
 		req.flash('error','There was an error');

@@ -97,8 +97,8 @@ router.get('/:id', (req, res) => { //RESTful Routing 'SHOW' route
         req.user.save();
       }
 
-      let convertedText = convertToLink(foundAnn.text)
-      res.render('announcements/show', {announcement: foundAnn});
+      const convertedText = convertToLink(foundAnn.text);
+      res.render('announcements/show', {announcement: foundAnn, convertedText});
     }
   });
 });

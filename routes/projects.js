@@ -7,7 +7,7 @@ const router = express.Router(); //start express router
 const dateFormat = require('dateformat');
 const fillers = require('../fillerWords');
 const {transport, transport_mandatory} = require("../transport");
-
+const convertToLink = require("../convert-to-link");
 const { validateProject } = require('../middleware/validation');
 
 //SCHEMA
@@ -277,7 +277,8 @@ router.get('/:id', (req, res) => { //RESTful Routing 'SHOW' route
       res.redirect('back');
 
     } else {
-      res.render('projects/show', {project: foundProject});
+      const convertedText = convertToLink(foundProject.text);
+      res.render('projects/show', {project: foundProject, convertedText});
     }
   });
 });

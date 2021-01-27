@@ -53,7 +53,7 @@
                       <p><%= user.status.charAt(0).toUpperCase() + user.status.slice(1) %></p>
 
                       <h4>Email</h4>
-                      <p><%= user.email %></p>
+                      <p><a href="mailto:<%=user.email%>"><%= user.email %></a></p>
 
                       <% if (currentUser._id.toString() == user._id.toString()) { %>
                         <button class="btn btn-primary edit-button" id="edit-profile"><a class="edit-button-text" href="/profiles/edit">Edit Profile Settings</a></button>
@@ -123,7 +123,7 @@
                       <hr>
                   </div>
                   <div class="desc-body">
-                      <p><%= user.description %></p>
+                      <p class="convertible-text"><%= convertedDescription %></p>
                   </div>
               </section>
           </div>
@@ -225,5 +225,6 @@
         <% } %>
     </div>
 
-</body>
+  </body>
+  <script src="/javascript/embed.js"></script>
 </html>

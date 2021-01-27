@@ -4,6 +4,7 @@ const router = express.Router();
 const middleware = require('../middleware');
 const dateFormat = require('dateformat');
 const {transport, transport_mandatory} = require("../transport");
+const convertToLink = require("../convert-to-link");
 
 //SCHEMA
 const Article = require('../models/article');

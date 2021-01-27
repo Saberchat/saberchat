@@ -31,9 +31,11 @@
 
                 <h4 id="reported-comments-header">
                 <% if (comments.length == 0) { %>
-                  No
+                  No Reported Comments
+                <% } else {%>
+                  Reported Comments: <%=comments.length%>
                 <% } %>
-                Reported Comments</h4>
+                </h4>
 
                 <hr>
                 <ul class="list-group mt-3">

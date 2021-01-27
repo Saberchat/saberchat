@@ -6,6 +6,7 @@ const middleware = require('../middleware');
 const router = express.Router();
 const dateFormat = require('dateformat');
 const {transport, transport_mandatory} = require("../transport");
+const convertToLink = require("../convert-to-link");
 const getData = require("../cafe-data");
 
 //SCHEMA
@@ -40,7 +41,13 @@ router.get('/menu', middleware.isLoggedIn, (req, res) => { //Renders the cafe me
       res.redirect('back');
 
     } else {
-      res.render('cafe/menu', {types: foundTypes});
+      let itemDescriptions = {};
+      for (let type of foundTypes) {
+        for (let item of type.items) {
+          itemDescriptions[item._id] = convertToLink(item.description);
+        }
+      }
+      res.render('cafe/menu', {types: foundTypes, itemDescriptions});
     }
   })
 })
