@@ -78,7 +78,7 @@ router.get('/:id', middleware.isLoggedIn, (req, res) => {
     const users = await User.find({authenticated: true});
 
     for (let u of users) {
-      if (u.followers.includes(req.user._id)) {
+      if (u.followers.includes(user._id)) {
         following.push(u);
       }
     }
