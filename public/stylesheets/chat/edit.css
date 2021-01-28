@@ -10,6 +10,18 @@
   display: none;
 }
 
+.room-name {
+  font-weight: bold;
+}
+
+.latest-message {
+  padding-top: 15px;
+}
+
+.room-created {
+  font-style: italic;
+}
+
 .user-list {
     max-height: 10rem;
     overflow-y: scroll;

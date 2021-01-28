@@ -160,6 +160,7 @@ router.post('/', middleware.isLoggedIn, validateRoom, (req, res) => {
         room.description = filter.clean(req.body.description);
       }
 
+      room.date = dateFormat(room.created_at, "h:MM TT | mmm d");
       await room.save();
 
       const members = await User.find({authenticated: true, _id: {$in: room.members}});

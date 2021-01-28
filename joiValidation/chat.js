@@ -8,8 +8,7 @@ const chatSchema = Joi.object({
         "string.empty": "Room name is required.",
         "string.max": "Room name max 45 characters."
     }),
-    description: Joi.string().required().max(500).escapeHtml().messages({
-        "string.empty": "Descrip. is required.",
+    description: Joi.string().allow('').max(500).escapeHtml().messages({
         "string.max": "Descrip. max 500 characters."
     }),
     moderate: Joi.boolean(),
