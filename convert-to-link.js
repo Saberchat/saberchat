@@ -16,7 +16,7 @@ const convertToLink = (text => {
     if ((line.includes('@'))) {
       emails.push(text.slice(text.indexOf(line), text.indexOf(line)+line.length));
 
-    } else if (line.slice(0, line.length-1).includes('.')) {
+    } else if (line.slice(0, line.length-1).includes('.') && !line.includes('$')) {
       links.push(text.slice(text.indexOf(line), text.indexOf(line)+line.length));
     }
   }
