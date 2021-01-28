@@ -12,7 +12,7 @@ const addImg = (() => { //Adds the image input field
   <button type="button" onclick="deleteImg(this)" class="btn btn-danger"><i class="fas fa-minus"></i></button>`;
     imgContainer.prepend(img);
     i++;
-})
+});
 
 const createImg = (val => { //Creates an image based on value of image input
 
@@ -20,25 +20,25 @@ const createImg = (val => { //Creates an image based on value of image input
     const imageDisplay = document.createElement('img');
     imageDisplay.id = `image-${val.id}`;
 
-    if (val.value.replace(' ', '') != '') {
+    if (val.value.split(' ').join('') != '') {
       imageDisplay.src = val.value;
       imageDisplay.alt = "Image Does Not Exist";
-      imageDisplay.style = "width: 50%; height: 50%; margin-top: 10px; border-radius: 15px;";
+      imageDisplay.style = "width: 50%; height: 50%; margin-top: 10px; border-radius: 15px; float: left; margin-bottom: 20px;";
       document.getElementById(`block-${val.id}`).append(imageDisplay);
     }
 
   } else {
-    if (val.value.replace(' ', '') != '') {
+    if (val.value.split(' ').join('') != '') {
       $(`#block-${val.id}`).find('img')[0].src = val.value;
-      $(`#${$(`#block-${val.id}`).find('img')[0].id}`).hidden = false;
+      $(`#${$(`#block-${val.id}`).find('img')[0].id}`).show();
 
     } else {
-      $(`#${$(`#block-${val.id}`).find('img')[0].id}`).hidden = true;
+      $(`#${$(`#block-${val.id}`).find('img')[0].id}`).hide();
     }
-}
-})
+  }
+});
 
 const deleteImg = (btn => {
     const parent = btn.parentNode;
     parent.remove();
-})
+});
