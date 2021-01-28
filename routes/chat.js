@@ -2,6 +2,7 @@ const express = require('express');
 const Filter = require('bad-words');
 const filter = new Filter();
 //create express router
+const dateFormat = require('dateformat');
 const router = express.Router();
 const {transport, transport_mandatory} = require("../transport");
 const convertToLink = require("../convert-to-link");
@@ -20,11 +21,34 @@ const AccessReq = require('../models/accessRequest');
 router.get('/', middleware.isLoggedIn, (req, res) => {
   (async() => {
 
-    const rooms = await Room.find({});
+    const rooms = await Room.find({}).populate("creator.id");
 
     if (!rooms) {
       req.flash('error', 'Unable to find rooms');
       return res.redirect('back');
+    }
+
+    let commentObject = {};
+    let roomComments;
+
+    for (let room of rooms) {
+      roomComments = await Comment.find({room: room._id, status: {$in: ["none", "ignored"]}}).populate("author");
+      if (!roomComments) {
+        req.flash('error', 'Unable to find comments');
+        return res.redirect('back');
+      }
+
+      if (roomComments.length == 0) {
+        commentObject[room._id.toString()] = null;
+
+      } else {
+        for (let i = roomComments.length-1; i >= 0; i -=1) {
+          if (roomComments[i].author) {
+            commentObject[room._id.toString()] = roomComments[i];
+            break;
+          }
+        }
+      }
     }
 
     const requests = await AccessReq.find({requester: req.user._id, status: "pending"});
@@ -33,9 +57,10 @@ router.get('/', middleware.isLoggedIn, (req, res) => {
       return res.redirect('back');
     }
 
-    return res.render('chat/index', {rooms, requests});
+    return res.render('chat/index', {rooms, requests, commentObject});
 
   })().catch(err => {
+    console.log(err)
     req.flash('error', 'Unable to access Database');
     res.redirect('back');
   });

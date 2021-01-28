@@ -46,10 +46,32 @@
           </li>
           <% rooms.forEach(room => { %>
             <% if (room.type == 'public' || room.members.includes(currentUser._id)) { %>
-              <a href="chat/<%= room._id %>" class="list-group-item list-group-item-action"><%= room.name %>
-              <% if (!(room.confirmed.includes(currentUser._id))) { %>
-                <span class="badge badge-danger float-right">New!</span>
-              <% } %>
+              <a href="chat/<%= room._id %>" class="list-group-item list-group-item-action">
+                <% if (commentObject[room._id.toString()]) { %>
+                  <img src="<%=commentObject[room._id.toString()].author.imageUrl%>" alt="user" class="user-image">
+                <% } else if (room.creator.id) { %>
+                  <img src="<%=room.creator.id.imageUrl%>" alt="user" class="user-image">
+                <% }%>
+
+                <span style="font-weight: bold"><%= room.name %></span>
+                <% if (currentUser.newRoomCount.includes(room._id)) { %>
+                  <span class="badge badge-danger float-right">New!</span>
+                  <% } else {%>
+                    <span class="float-right">
+                      <% if (commentObject[room._id.toString()]) { %>
+                        <%=commentObject[room._id.toString()].date%>
+                      <% } else { %>
+                        <%=room.date%>
+                      <% } %>
+                    </span>
+                  <% } %>
+                  <p style="padding-top: 15px;">
+                    <% if (commentObject[room._id.toString()]) { %>
+                      <%=commentObject[room._id.toString()].text%>
+                    <% } else { %>
+                      <em>Room Was Created</em>
+                    <% } %>
+                  </p>
               </a>
             <% } %>
           <% }) %>

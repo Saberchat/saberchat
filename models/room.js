@@ -5,6 +5,7 @@ var roomSchema = new mongoose.Schema({
   name: String,
   description: { type:String, default: "No description."},
   type: {type: String, default: 'public'},
+  date: String,
 	members: [
     {
 			type: mongoose.Schema.Types.ObjectId,

@@ -19,6 +19,13 @@
     margin-bottom: 1rem;
 }
 
+.user-image {
+    object-fit: cover;
+    border-radius: 50%;
+    height: 30px;
+    width: 30px;
+}
+
 .search-filter {
     margin-bottom: 2rem;
     border-bottom: 1px solid #424651;
