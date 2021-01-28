@@ -64,7 +64,9 @@ router.post('/messages', middleware.isLoggedIn, validateMsg, (req, res) => {
 		if(req.body.images) {
 			message.images = req.body.images;
 		}
+
 		message.sender = req.user._id;
+		message.noReply = (req.body.noreply == "true");
 
 		let recipients = [];
 
@@ -187,7 +189,7 @@ router.post('/messages', middleware.isLoggedIn, validateMsg, (req, res) => {
 		}
 
 		req.flash('success', 'Message sent');
-		res.redirect('back');
+		res.redirect(`/inbox/${newMessage._id}`);
 
 	})().catch(err => {
 		req.flash('error', 'An error occured');

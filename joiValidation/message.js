@@ -15,6 +15,7 @@ const msgSchema = Joi.object({
     recipients: Joi.string().escapeHtml(),
     all: Joi.boolean().valid(true),
     anonymous: Joi.boolean().valid(true),
+    noreply: Joi.boolean().valid(true),
     images: Joi.array().items(Joi.string().pattern(new RegExp(/https:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,4}\b([-a-zA-Z0-9@:%_\+.~#?&//=]*)/))).messages({
         "string.pattern.base": "Image Urls should be https links"
     })
