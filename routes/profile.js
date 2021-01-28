@@ -68,8 +68,9 @@ router.get('/:id', middleware.isLoggedIn, (req, res) => {
         return res.redirect('back');
     }
 
-    let following = [];
     let followerIds = [];
+    let following = [];
+    let currentUserFollowing = [];
 
     for (let follower of user.followers) {
       followerIds.push(follower._id);
@@ -80,6 +81,10 @@ router.get('/:id', middleware.isLoggedIn, (req, res) => {
     for (let u of users) {
       if (u.followers.includes(user._id)) {
         following.push(u);
+      }
+
+      if (u.followers.includes(req.user._id)) {
+        currentUserFollowing.push(u);
       }
     }
 
@@ -599,8 +604,7 @@ router.put('/follow/:id', (req, res) => {
     } else {
       user.followers.push(req.user);
       user.save();
-      res.json({success: "Succesfully followed user"});
-
+      res.json({success: "Succesfully followed user", user: req.user});
     }
   });
 });
@@ -621,7 +625,7 @@ router.put('/unfollow/:id', (req, res) => {
       if (index > -1) {
         user.followers.splice(index, 1);
         user.save();
-        res.json({success: "Unfollowed user"});
+        res.json({success: "Unfollowed user", user: req.user});
 
       } else {
         res.json({error: "You are not following this user"});

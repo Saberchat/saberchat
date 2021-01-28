@@ -23,6 +23,7 @@ const addEmail = ((event) => {
     $("#modal-add-email").modal('hide');
 
     if (data.success) {
+      document.getElementById("address").value = "";
       let newEmail = document.createElement("li");
       newEmail.className = "list-group-item email";
       newEmail.id = `${data.email._id}`;
@@ -31,13 +32,12 @@ const addEmail = ((event) => {
       document.getElementById("email-list").insertBefore(newEmail, document.getElementById("email-list").firstChild)
 
     } else if (data.error) {
-      document.getElementById("loading").style.color = "red";
       document.getElementById("loading").style.display = "block";
       document.getElementById("loading").innerText = data.error;
 
       setTimeout(() => {
         document.getElementById("loading").style.display = "none";
-      }, 2000)
+      }, 1000)
     }
   });
 });
@@ -60,7 +60,7 @@ const removeEmail = (button => {
 
       setTimeout(() => {
         document.getElementById("loading").style.display = "none";
-      }, 2000)
+      }, 1000)
     }
   });
 });

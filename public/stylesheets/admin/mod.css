@@ -13,3 +13,13 @@
 body {
   background-color: white;
 }
+
+#reported-comments-header {
+  display: inline;
+}
+
+#mod-error {
+  color: red;
+  margin-left: 10px;
+  display: none;
+}

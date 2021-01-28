@@ -20,7 +20,7 @@ const createImg = (val => { //Creates an image based on value of image input
     const imageDisplay = document.createElement('img');
     imageDisplay.id = `image-${val.id}`;
 
-    if (val.value.replace(' ', '') != '') {
+    if (val.value.split(' ').join('') != '') {
       imageDisplay.src = val.value;
       imageDisplay.alt = "Image Does Not Exist";
       imageDisplay.style = "width: 40%; height: 40%; margin-top: 10px; border-radius: 15px;";
@@ -28,17 +28,13 @@ const createImg = (val => { //Creates an image based on value of image input
     }
 
   } else {
-    setTimeout(() => {
+    if (val.value.split(' ').join('') != '') {
+      $(`#block-${val.id}`).find('img')[0].src = val.value;
+      $(`#${$(`#block-${val.id}`).find('img')[0].id}`).show();
 
-      if (val.value.replace(' ', '') != '') {
-        $(`#block-${val.id}`).find('img')[0].src = val.value;
-        $(`#${$(`#block-${val.id}`).find('img')[0].id}`).hidden = false;
-
-      } else {
-        $(`#${$(`#block-${val.id}`).find('img')[0].id}`).hidden = true;
-      }
-
-    }, 3);
+    } else {
+      $(`#${$(`#block-${val.id}`).find('img')[0].id}`).hide();
+    }
   }
 });
 

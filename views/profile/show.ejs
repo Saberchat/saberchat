@@ -59,7 +59,7 @@
                         <button class="btn btn-primary edit-button" id="edit-profile"><a class="edit-button-text" href="/profiles/edit">Edit Profile Settings</a></button>
                         <button class="btn btn-info edit-button" id="edit-account"><a class="edit-button-text" href="/profiles/change-login-info">Edit Account Settings</a></button>
 
-                      <% } else if (!(user._id.toString() == currentUser._id.toString())) { %>
+                      <% } else { %>
                         <div id="follow-div-<%=user.id%>">
 
                           <% if (followerIds.toString().includes(currentUser._id.toString())) { %>

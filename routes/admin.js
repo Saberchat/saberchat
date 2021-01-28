@@ -644,8 +644,11 @@ router.put('/moderate', middleware.isLoggedIn, middleware.isMod, (req, res) => {
 		if (err || !comment) {
 			res.json({error: 'Could not find comment'});
 
-		} else if (comment.author.equals(req.user._id) || comment.statusBy._id.equals(req.user._id)) {
-			res.json({error: 'Cannot handle your own comments'});
+		} else if (comment.author.equals(req.user._id)) {
+			res.json({error: "You cannot handle your own comments"});
+
+		} else if (comment.statusBy._id.equals(req.user._id)) {
+			res.json({error: "You cannot handle comments you have reported"});
 
 		} else {
 			comment.status = "ignored";
@@ -664,8 +667,11 @@ router.delete('/moderate', middleware.isLoggedIn, middleware.isMod, (req, res) =
 		if (err || !comment) {
 			res.json({error: 'Could not find comment'});
 
-		} else if (comment.author._id.equals(req.user._id) || comment.statusBy.equals(req.user._id)) {
-			res.json({error: 'Cannot handle your own comments'});
+		} else if (comment.author.equals(req.user._id)) {
+			res.json({error: "You cannot handle your own comments"});
+
+		} else if (comment.statusBy._id.equals(req.user._id)) {
+			res.json({error: "You cannot handle comments you have reported"});
 
 		} else {
 			comment.status = "deleted";

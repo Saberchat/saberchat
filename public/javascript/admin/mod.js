@@ -12,6 +12,14 @@ const ignoreComment = (button => {
       if (reportedComments.length == 0) {
         document.getElementById("reported-comments-header").innerText = "No Reported Comments";
       }
+
+    } else if (data.error) {
+      document.getElementById("mod-error").innerText = data.error;
+      document.getElementById("mod-error").style.display = "inline";
+
+      setTimeout(() => {
+        document.getElementById("mod-error").style.display = "none";
+      }, 1000);
     }
   });
 });
@@ -28,6 +36,14 @@ const deleteComment = (button => {
       if (reportedComments.length == 0) {
         document.getElementById("reported-comments-header").innerText = "No Reported Comments";
       }
+
+    } else if (data.error) {
+      document.getElementById("mod-error").innerText = data.error;
+      document.getElementById("mod-error").style.display = "inline";
+
+      setTimeout(() => {
+        document.getElementById("mod-error").style.display = "none";
+      }, 1000);
     }
   });
 });

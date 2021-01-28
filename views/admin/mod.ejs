@@ -30,14 +30,19 @@
                 <h1>Moderator Page</h1>
                 <hr>
 
-                <h4 id="reported-comments-header">
-                <% if (comments.length == 0) { %>
-                  No Reported Comments
-                <% } else {%>
-                  Reported Comments: <%=comments.length%>
-                <% } %>
-                </h4>
-
+                <div>
+                  <h4 id="reported-comments-header">
+                  <% if (comments.length == 0) { %>
+                    No Reported Comments
+                  <% } else {%>
+                    Reported Comments: <%=comments.length%>
+                  <% } %>
+                  </h4>
+                  <span id="mod-error">
+                    An Error Occurred
+                  </span>
+                </div>
+                
                 <hr>
                 <ul class="list-group mt-3">
                     <% comments.forEach(comment => { %>

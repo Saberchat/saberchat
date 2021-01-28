@@ -6,3 +6,7 @@
 .user-exists {
   margin-left: 10px;
 }
+
+#loading {
+  color: red;
+}
