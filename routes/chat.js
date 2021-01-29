@@ -404,6 +404,7 @@ router.delete('/:id/delete', middleware.isLoggedIn, middleware.checkRoomOwnershi
     for (let member of deletedRoom.members) {
       if (member.newRoomCount.includes(deletedRoom._id)) {
         member.newRoomCount.splice(member.newRoomCount.indexOf(deletedRoom._id), 1);
+        await member.save();
       }
     }
 
