@@ -400,7 +400,6 @@ router.put('/:id', middleware.isLoggedIn, middleware.isMod, multer, validateAnn,
     res.redirect(`/announcements/${updatedAnnouncement._id}`);
 
   })().catch(err => {
-    console.log(err);
     req.flash('error', "Unable To Access Database");
     res.redirect('back');
   });

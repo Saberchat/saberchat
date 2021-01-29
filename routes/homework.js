@@ -909,7 +909,6 @@ router.put('/remove-student/:id', middleware.isLoggedIn, middleware.isFaculty, (
 //For teachers to remove and block a tutor from a course
 router.put('/remove-tutor/:id', middleware.isLoggedIn, middleware.isFaculty, (req, res) => {
   (async() => {
-
     let tutorId;
     if (req.body.show) {
       tutorId = await User.findById(req.body.tutorId);
@@ -1015,7 +1014,6 @@ router.put('/remove-tutor/:id', middleware.isLoggedIn, middleware.isFaculty, (re
     }
 
   })().catch(err => {
-    console.log(err);
     if (req.body.show) {
       res.json({error: "Error removing tutor"});
 

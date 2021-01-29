@@ -243,7 +243,6 @@ router.put('/change-email', middleware.isLoggedIn, validateEmailUpdate, (req, re
       }).then(response => {
         console.log(`Email Sent with status code: ${response.status}`);
       }).catch(error => {
-        console.log('\n-- Error Sending Email --\n')
         console.log(error);
       });
 

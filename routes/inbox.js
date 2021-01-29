@@ -1,6 +1,3 @@
-//Build messaging box inside show.ejs
-//When a reply is sent, if the message is not already in all recipients' inboxes, add it. (if it is already there, it's already a new message)
-
 const express = require('express');
 const middleware = require('../middleware');
 const router = express.Router(); //start express router

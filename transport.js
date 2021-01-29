@@ -41,7 +41,6 @@ const transport = (recipient, subject, html) => {
 		}).then(response => {
 			console.log(`Email Sent with status code: ${response.status}`);
 		}).catch(error => {
-			console.log('\n-- Error Sending Email --\n')
 			console.log(error);
 		});
 	}
@@ -82,7 +81,6 @@ const transport_mandatory = (recipient, subject, html) => {
 	}).then(response => {
 		console.log(`Email Sent with status code: ${response.status}`);
 	}).catch(error => {
-		console.log('\n-- Error Sending Email --\n')
 		console.log(error);
 	});
 };

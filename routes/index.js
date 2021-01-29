@@ -30,7 +30,6 @@ router.post("/register", validateNewUser, (req, res) => {
 
   Email.find({address: req.body.email}, (err, emails) => {
     if (err || !emails) {
-      console.log(err);
       req.flash('error', "Unable to find emails");
       req.flash('error', 'Only members of the Alsion community may sign up');
       res.redirect('/');

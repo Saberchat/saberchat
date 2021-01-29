@@ -60,7 +60,6 @@ router.get('/', middleware.isLoggedIn, (req, res) => {
     return res.render('chat/index', {rooms, requests, commentObject});
 
   })().catch(err => {
-    console.log(err)
     req.flash('error', 'Unable to access Database');
     res.redirect('back');
   });
