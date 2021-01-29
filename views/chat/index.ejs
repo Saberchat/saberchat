@@ -51,7 +51,7 @@
                   <img src="<%=commentObject[room._id.toString()].author.imageUrl%>" alt="user" class="user-image">
                 <% } else if (room.creator.id) { %>
                   <img src="<%=room.creator.id.imageUrl%>" alt="user" class="user-image">
-                <% }%>
+                <% } %>
 
                 <% if (currentUser.newRoomCount.includes(room._id)) { %>
                   <span class="badge badge-danger float-right">New!</span>
@@ -64,7 +64,7 @@
                     <% } %>
                   </span>
                 <% } %>
-                
+
                 <div class="comment-text">
                   <span class="room-name"><%= room.name %></span>
                   <p class="latest-message">

@@ -76,8 +76,8 @@
                   </li>
 
                   <% let statusMatrix = [ ["Faculty", "Faculty", []], ["12th", "Seniors", []], ["11th", "Juniors", []], ["10th", "Sophomores", []], ["9th", "Freshmen", []], ["8th", "8th Graders", []], ["7th", "7th Graders", []], ["Alumnus", "Alumni", []], ["Parent", "Parents", []], ["Guest", "Guests", []] ] %>
-                  <% let permMatrix = [["principal", "Principal"], ["admin", "Administrator"], ["mod", "Moderator"], ["student", "Student"]]; %>
-                  <% let permMap = new Map([["principal", "Principal"], ["admin", "Administrator"], ["mod", "Moderator"], ["student", "Student"]]); %>
+                  <% let permMatrix = [["principal", "Principal"], ["admin", "Administrator"], ["mod", "Moderator"], ["student", "Default"]]; %>
+                  <% let permMap = new Map(permMatrix); %>
                   <% let tagMap = new Map([["Tutor", "warning"], ["Cashier", "success"], ["Editor", "info"]]); %>
 
                   <% for (let status of statusMatrix) { %>

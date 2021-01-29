@@ -41,7 +41,7 @@
                       <span><%= user.title %></span>
 
                       <h4>Role</h4>
-                      <% permMatrix = [["principal", "Principal"], ["admin", "Administrator"], ["mod", "Moderator"], ["student", "Student"]] %>
+                      <% permMatrix = [["principal", "Principal"], ["admin", "Administrator"], ["mod", "Moderator"], ["student", "Default"]] %>
 
                       <% for (let perm of permMatrix) { %>
                         <% if (user.permission.toLowerCase() == perm[0].toLowerCase()) { %>
@@ -83,7 +83,7 @@
                                 </div>
                                 <div class="modal-footer">
                                   <button type="button" class="btn btn-secondary" data-dismiss="modal">No, Go Back</button>
-                                  <button type="button" onclick="unfollow(this)" id="unfollow-confirm-<%=user._id%>" class="btn btn-danger">Yes, Unfollow</a>
+                                  <button type="button" onclick="unfollow(this, 'show')" id="unfollow-confirm-<%=user._id%>" class="btn btn-danger">Yes, Unfollow</a>
                                 </div>
                               </div>
                             </div>
@@ -103,7 +103,7 @@
                                 </div>
                                 <div class="modal-footer">
                                   <button type="button" class="btn btn-secondary" data-dismiss="modal">No, Go Back</button>
-                                  <button type="button" onclick="follow(this)" id="follow-confirm-<%=user._id%>" class="btn btn-primary">Yes, Follow</a>
+                                  <button type="button" onclick="follow(this, 'show')" id="follow-confirm-<%=user._id%>" class="btn btn-primary">Yes, Follow</a>
                                 </div>
                               </div>
                             </div>

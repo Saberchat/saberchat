@@ -106,6 +106,18 @@ router.get('/:id', middleware.isLoggedIn, middleware.checkIfMember, (req, res) =
   });
 });
 
+router.get('/:id/people', middleware.isLoggedIn, middleware.checkIfMember, (req, res) => {
+  Room.findById(req.params.id).populate("creator.id").populate("members").exec((err, room) => {
+    if (!room) {
+      req.flash("error", "Unable to find room");
+      res.redirect("back");
+
+    } else {
+      res.render('chat/people', {room});
+    }
+  });
+});
+
 // display edit form
 router.get('/:id/edit', middleware.isLoggedIn, middleware.checkRoomOwnership, (req, res) => {
   (async() => {

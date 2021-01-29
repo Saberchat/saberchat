@@ -469,7 +469,7 @@ router.put('/book/:id', middleware.isLoggedIn, middleware.isStudent, (req, res) 
           //Create chat room between student and tutor
           const room = await Room.create({
             name: `${req.user.firstName}'s Tutoring Sessions With ${tutor.tutor.firstName} - ${course.name}`,
-            creator: {id: tutor._id, username: tutor.username},
+            creator: {id: tutor.tutor._id, username: tutor.tutor.username},
             members: [req.user._id, tutor.tutor._id],
             type: "private",
             mutable: false
