@@ -135,7 +135,7 @@ router.post('/', middleware.isLoggedIn, validateRoom, (req, res) => {
   (async() => {
 
     const rooms = await Room.find({});
-    if (!room) {
+    if (!rooms) {
       req.flash('error', "Unable to access data");
       return res.redirect('back');
     }
