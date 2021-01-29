@@ -134,6 +134,23 @@ router.get('/:id/edit', middleware.isLoggedIn, middleware.checkRoomOwnership, (r
 router.post('/', middleware.isLoggedIn, validateRoom, (req, res) => {
   (async() => {
 
+    const rooms = await Room.find({});
+    if (!room) {
+      req.flash('error', "Unable to access data");
+      return res.redirect('back');
+    }
+
+    let roomCount = 0;
+    for (let room of rooms) {
+      if (room.creator.id.equals(req.user._id)) {
+        roomCount++;
+      }
+    }
+    if (roomCount >= 3) {
+      req.flash('error', "You have already created 3 rooms");
+      return res.redirect('back');
+    }
+
     const roomObject = {
       name: filter.clean(req.body.name),
       'creator.id': req.user._id,
@@ -143,7 +160,7 @@ router.post('/', middleware.isLoggedIn, validateRoom, (req, res) => {
 
     const room = await Room.create(roomObject);
     if (!room) {
-      req.flash('error', 'Group could not be created');
+      req.flash('error', 'Room could not be created');
       return res.redirect('/chat/new');
 
     } else {
