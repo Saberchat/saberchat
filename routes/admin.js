@@ -590,6 +590,7 @@ router.put('/tag', middleware.isLoggedIn, middleware.isMod, (req, res) => {
   });
 });
 
+//Context
 router.post('/moderate', middleware.isLoggedIn, middleware.isMod, (req, res) => {
 	(async() => {
 		const reportedComment = await Comment.findById(req.body.commentId).populate("author");
@@ -612,7 +613,7 @@ router.post('/moderate', middleware.isLoggedIn, middleware.isMod, (req, res) => 
 			}
 		}
 
-		for (let i = 1; i <= 5; i ++) {
+		for (let i = 5; i >= 1; i --) {
 			if (commentIndex-i > 0) {
 				if (allComments[commentIndex-i].author) {
 					context.push(allComments[commentIndex-i]);
@@ -633,6 +634,7 @@ router.post('/moderate', middleware.isLoggedIn, middleware.isMod, (req, res) => 
 		return res.json({success: "Succesfully collected data", context});
 
 	})().catch(err => {
+		console.log(err);
 		res.json({error: "An error occurred"});
 	});
 });

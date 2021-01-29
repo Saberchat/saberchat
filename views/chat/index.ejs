@@ -53,18 +53,20 @@
                   <img src="<%=room.creator.id.imageUrl%>" alt="user" class="user-image">
                 <% }%>
 
-                <span class="room-name"><%= room.name %></span>
                 <% if (currentUser.newRoomCount.includes(room._id)) { %>
                   <span class="badge badge-danger float-right">New!</span>
-                  <% } else {%>
-                    <span class="float-right">
-                      <% if (commentObject[room._id.toString()]) { %>
-                        <%=commentObject[room._id.toString()].date%>
-                      <% } else { %>
-                        <%=room.date%>
-                      <% } %>
-                    </span>
-                  <% } %>
+                <% } else {%>
+                  <span class="float-right">
+                    <% if (commentObject[room._id.toString()]) { %>
+                      <%=commentObject[room._id.toString()].date%>
+                    <% } else { %>
+                      <%=room.date%>
+                    <% } %>
+                  </span>
+                <% } %>
+                
+                <div class="comment-text">
+                  <span class="room-name"><%= room.name %></span>
                   <p class="latest-message">
                     <% if (commentObject[room._id.toString()]) { %>
                       <%=commentObject[room._id.toString()].text%>
@@ -72,6 +74,7 @@
                       <span class="room-created">Room Was Created</span>
                     <% } %>
                   </p>
+                </div>
               </a>
             <% } %>
           <% }) %>

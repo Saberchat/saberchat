@@ -22,6 +22,11 @@
   font-style: italic;
 }
 
+.comment-text {
+  display: inline-block;
+  margin-left: 10px;
+}
+
 .user-list {
     max-height: 10rem;
     overflow-y: scroll;
@@ -34,8 +39,10 @@
 .user-image {
     object-fit: cover;
     border-radius: 50%;
-    height: 30px;
-    width: 30px;
+    height: 70px;
+    width: 70px;
+    display: inline-block;
+    margin-top: -30px;
 }
 
 .search-filter {
@@ -72,5 +79,10 @@ label, h4 {
 @media only screen and (max-width: 768px) {
   #create-room-button, #create-order-button {
     height: 20%;
+  }
+
+  .user-image {
+    margin-top: 0px;
+    margin-bottom: 10px;
   }
 }

@@ -174,7 +174,7 @@ router.get('/authenticate/:id', (req, res) => {
   });
 });
 
-// Custom login handling so that flash messages can be sent. I'm not entirely sure how it works. Copy pasted from official doc
+// Custom login handling so that flash messages can be sent.
 router.post('/login', validateUserLogin, function(req, res, next) {
 	//authenticate user
     passport.authenticate('local', (err, user, info) => {
