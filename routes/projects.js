@@ -5,9 +5,10 @@ const express = require('express');
 const middleware = require('../middleware');
 const router = express.Router(); //start express router
 const dateFormat = require('dateformat');
-const fillers = require('../fillerWords');
-const {transport, transport_mandatory} = require("../transport");
-const convertToLink = require("../convert-to-link");
+const filter = require('../other_modules/filter');
+const {transport, transport_mandatory} = require("../other_modules/transport");
+const convertToLink = require("../other_modules/convert-to-link");
+const {getPopularityCoefficiant, sortByPopularity} = require("../other_modules/popularity-coefficiant")
 const { validateProject } = require('../middleware/validation');
 
 //SCHEMA
@@ -52,14 +53,10 @@ router.post('/',middleware.isLoggedIn, middleware.isFaculty, validateProject, (r
     let statusGroup; //Group of creators by status
     let individual; //Individual Creator ID
 
-    if (req.body.creatorInput == '') {
-      creators = [];
-
-    } else {
+    if (req.body.creatorInput != '') {
       let statuses = ['7th', '8th', '9th', '10th', '11th', '12th'];
 
       for (let creator of req.body.creatorInput.split(',')) {
-
         if (statuses.indexOf(creator) > -1) {
           statusGroup = await User.find({authenticated: true, status: creator});
 
@@ -76,14 +73,12 @@ router.post('/',middleware.isLoggedIn, middleware.isFaculty, validateProject, (r
           if (!individual) {
             req.flash('error', "Unable to find the users you listed"); return res.redirect('back');
           }
-
           creators.push(individual);
         }
       }
     }
 
     const project = await Project.create({title: req.body.title, text: req.body.text, poster: req.user, creators}); //Create a new project with all the provided data
-
     if (!project) {
       req.flash('error', "Unable to create project"); return res.redirect('back');
     }
@@ -98,7 +93,6 @@ router.post('/',middleware.isLoggedIn, middleware.isFaculty, validateProject, (r
     await project.save();
 
     const followers = await User.find({authenticated: true, _id: {$in: req.user.followers}});
-
     if (!followers) {
       req.flash('error', "Unable to access your followers");
       return res.redirect('back');
@@ -113,16 +107,13 @@ router.post('/',middleware.isLoggedIn, middleware.isFaculty, validateProject, (r
     }
 
     for (let follower of followers) {
-
       notif = await Notification.create({subject: "New Project Post", sender: req.user, noReply: true, recipients: [follower], read: [], toEveryone: false, images: project.images}); //Create a notification to alert the user
-
       if (!notif) {
         req.flash('error', 'Unable to send notification'); return res.redirect('back');
       }
 
       notif.date = dateFormat(notif.created_at, "h:MM TT | mmm d");
       notif.text = `Hello ${follower.firstName},\n\n${req.user.firstName} ${req.user.lastName} recently posted a new project: "${project.title}". Check it out!`;
-
       await notif.save();
 
       transport(follower, `New Project Post - ${project.title}`, `<p>Hello ${follower.firstName},</p><p>${req.user.firstName} ${req.user.lastName} recently posted a new project: <strong>${project.title}</strong>. Check it out!</p>${imageString}`);
@@ -144,94 +135,36 @@ router.post('/',middleware.isLoggedIn, middleware.isFaculty, validateProject, (r
 //COMMENTED OUT FOR NOW, UNTIL WE MAKE FURTHER DECISIONS AT MEETING
 
 // router.get('/data', middleware.isLoggedIn, middleware.isFaculty, (req, res) => {
-//
-//   (async() => {
-//
-//     let projectKeywords = new Map(); //Store keywords
-//     let commentKeywords = new Map(); //Maps positive comments to their respective projects
-//     let popularProjects = [];
-//     const regEx = new RegExp('[^a-zA-Z0-9]');
-//     let projects = await Project.find({poster: req.user._id})
-//
-//     if (!projects) {
-//       req.flash('error', "Unable to find projects"); return res.redirect('back');
+//   Project.find({poster: req.user._id}).populate("comments").exec((err, projects) => {;
+//     if (err || !projects) {
+//       req.flash('error', "Unable to find projects");
+//       return res.redirect('back');
 //     }
 //
-//     let avgLikes = 0;
+//     const popularProjects = sortByPopularity(projects, "likes", "created_at").popular; //Extract and sort popular projects
+//     const unpopularProjects = sortByPopularity(projects, "likes", "created_at").unpopular; //Extract and sort unpopular projects
 //
-//     for (let project of projects) {
-//       avgLikes += project.likes.length;
-//     }
-//
-//     avgLikes /= projects.length;
-//
-//     for (let project of projects) {
-//       if (project.likes.length >= avgLikes) {
-//         popularProjects.push(project);
-//       }
-//     }
-//
-//     //Sort popular projects
-//
-//     let tempProject;
-//     for (let i = 0; i < popularProjects.length - 1; i ++) {
-//       for (let j = 0; j < popularProjects.length - 1; j ++) {
-//         if (popularProjects[j].likes < popularProjects[j+1].likes) {
-//           tempProject = popularProjects[j];
-//           popularProjects[j] = popularProjects[j+1];
-//           popularProjects[j+1] = tempProject;
-//         }
-//       }
-//     }
-//
-//     //Map keywords from popular projects
-//
+//     //Build string of projects and comments text
+//     let projectText = "";
+//     let commentText = "";
 //     for (let project of popularProjects) {
-//       for (let word of `${project.title} ${project.text}`.toLowerCase().split(regEx)) {
-//
-//         if (word.length > 3 && !fillers.includes(word)) {
-//           if (projectKeywords.has(word)) {
-//             projectKeywords.set(word, projectKeywords.get(word) + project.likes.length);
-//
-//           } else {
-//             projectKeywords.set(word, project.likes.length); //Give 'points' based on how many likes the project has. That way, this keyword carries more value
-//           }
-//         }
+//       projectText += `${project.title} ${project.text} `;
+//       for (let comment of project.comments) {
+//         commentText += `${comment.text} `;
 //       }
 //     }
 //
-//     let avgOccurences = 0; //Averages occurences of keywords
-//
-//     for (let [keyword, occurences] of projectKeywords.entries()) {
-//       avgOccurences += occurences;
-//     }
-//
-//     avgOccurences /= projectKeywords.size;
-//
-//     for (let [keyword, occurences] of projectKeywords.entries()) {
-//       if (occurences < avgOccurences) {
-//         projectKeywords.delete(keyword);
-//       }
-//     }
-//
-//     const sortStringValues = (a, b) => (a[1] < b[1] && 1) || (a[1] === b[1] ? 0 : -1) //Sort/switch map algorithm
-//
-//     projectKeywords = new Map([...projectKeywords].sort(sortStringValues)) //Map notation. Got it from MDN
-//
-//     res.render('projects/data', {popularProjects, projectKeywords})
-//
-//   })().catch(err => {
-//     req.flash('error', "Unable to access database");
-//     res.redirect('back');
+//     //Map keywords from popular projects and their comments
+//     const projectKeywords = filter(projectText);
+//     const commentKeywords = filter(commentText);
+//     res.render('projects/data', {popularProjects, projectKeywords, commentKeywords});
 //   });
 // });
 
 router.get('/:id/edit', middleware.isLoggedIn, middleware.isFaculty, (req, res) => { //RESTful Routing 'EDIT' route
 
   (async() => { //Asynchronous functions dictates that processes occur one at a time, reducing excessive callbacks
-
     const project = await Project.findById(req.params.id).populate('poster').populate('creators'); //Find one project based on id provided in form
-
     if (!project) {
       req.flash('error', 'Unable to find project');
       res.redirect('back');

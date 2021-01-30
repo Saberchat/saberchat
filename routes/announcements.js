@@ -5,8 +5,8 @@ const express = require('express');
 const middleware = require('../middleware/index');
 const router = express.Router(); //start express router
 const dateFormat = require('dateformat');
-const {transport, transport_mandatory} = require("../transport");
-const convertToLink = require("../convert-to-link");
+const {transport, transport_mandatory} = require("../other_modules/transport");
+const convertToLink = require("../other_modules/convert-to-link");
 
 const multer = require('../middleware/multer');
 const { cloudUpload, cloudDelete } = require('../services/cloudinary');

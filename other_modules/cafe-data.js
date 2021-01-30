@@ -1,10 +1,12 @@
 const dateFormat = require('dateformat');
+const {getPopularityCoefficiant, sortByPopularity} = require("../other_modules/popularity-coefficiant");
+const filter = require('../other_modules/filter');
 
-const User = require('./models/user');
-const Order = require('./models/order');
-const Item = require('./models/orderItem');
-const Type = require('./models/itemType');
-const Cafe = require('./models/cafe')
+const User = require('../models/user');
+const Order = require('../models/order');
+const Item = require('../models/orderItem');
+const Type = require('../models/itemType');
+const Cafe = require('../models/cafe')
 
 async function getData() {
 

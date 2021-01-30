@@ -5,9 +5,9 @@ const express = require('express');
 const middleware = require('../middleware');
 const router = express.Router();
 const dateFormat = require('dateformat');
-const {transport, transport_mandatory} = require("../transport");
-const convertToLink = require("../convert-to-link");
-const getData = require("../cafe-data");
+const {transport, transport_mandatory} = require("../other_modules/transport");
+const convertToLink = require("../other_modules/convert-to-link");
+const getData = require("../other_modules/cafe-data");
 
 //SCHEMA
 const User = require('../models/user');

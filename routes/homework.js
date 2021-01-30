@@ -5,8 +5,8 @@ const express = require('express');
 const middleware = require('../middleware');
 const router = express.Router(); //start express router
 const dateFormat = require('dateformat');
-const {transport, transport_mandatory} = require("../transport");
-const convertToLink = require("../convert-to-link");
+const {transport, transport_mandatory} = require("../other_modules/transport");
+const convertToLink = require("../other_modules/convert-to-link");
 
 //SCHEMA
 const User = require('../models/user');
@@ -198,18 +198,16 @@ router.get('/:id', middleware.isLoggedIn, (req, res) => {
 
     //If user is a tutor, teacher or student, show the course
     if (course.teacher.equals(req.user._id) || studentIds.includes(req.user._id.toString()) || tutorIds.includes(req.user._id.toString())) {
-      res.render('homework/show', {course, studentIds, tutorIds, teachers});
+      return res.render('homework/show', {course, studentIds, tutorIds, teachers});
 
     } else {
       req.flash('error', "You do not have permission to view that course");
-      res.redirect('back');
+      return res.redirect('back');
     }
 
   })().catch(err => {
-    if (err) {
-      req.flash('error', "Unable to find course");
-      return res.redirect('back');
-    }
+    req.flash('error', "Unable to find course");
+    res.redirect('back');
   });
 });
 

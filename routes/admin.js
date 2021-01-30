@@ -1,7 +1,7 @@
 const express = require('express');
 //start express router
 const router = express.Router();
-const {transport, transport_mandatory} = require("../transport");
+const {transport, transport_mandatory} = require("../other_modules/transport");
 
 const User = require('../models/user');
 const Email = require('../models/email');
