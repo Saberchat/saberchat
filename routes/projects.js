@@ -99,7 +99,6 @@ router.post('/',middleware.isLoggedIn, middleware.isFaculty, validateProject, (r
     }
 
     let notif;
-    let postEmail;
     let imageString = ``;
 
     for (let image of project.images) {
@@ -133,7 +132,7 @@ router.post('/',middleware.isLoggedIn, middleware.isFaculty, validateProject, (r
 });
 
 //COMMENTED OUT FOR NOW, UNTIL WE MAKE FURTHER DECISIONS AT MEETING
-
+// 
 // router.get('/data', middleware.isLoggedIn, middleware.isFaculty, (req, res) => {
 //   Project.find({poster: req.user._id}).populate("comments").exec((err, projects) => {;
 //     if (err || !projects) {
@@ -145,18 +144,28 @@ router.post('/',middleware.isLoggedIn, middleware.isFaculty, validateProject, (r
 //     const unpopularProjects = sortByPopularity(projects, "likes", "created_at").unpopular; //Extract and sort unpopular projects
 //
 //     //Build string of projects and comments text
-//     let projectText = "";
-//     let commentText = "";
+//     let popularProjectText = "";
+//     let popularCommentText = "";
 //     for (let project of popularProjects) {
-//       projectText += `${project.title} ${project.text} `;
+//       popularProjectText += `${project.title} ${project.text} `;
 //       for (let comment of project.comments) {
-//         commentText += `${comment.text} `;
+//         popularCommentText += `${comment.text} `;
+//       }
+//     }
+//
+//     //Build string of projects and comments text
+//     let unpopularProjectText = "";
+//     let unpopularCommentText = "";
+//     for (let project of unpopularProjects) {
+//       unpopularProjectText += `${project.title} ${project.text} `;
+//       for (let comment of project.comments) {
+//         unpopularCommentText += `${comment.text} `;
 //       }
 //     }
 //
 //     //Map keywords from popular projects and their comments
-//     const projectKeywords = filter(projectText);
-//     const commentKeywords = filter(commentText);
+//     const projectKeywords = filter(popularProjectText, unpopularProjectText);
+//     const commentKeywords = filter(popularCommentText, unpopularCommentText);
 //     res.render('projects/data', {popularProjects, projectKeywords, commentKeywords});
 //   });
 // });
@@ -420,8 +429,6 @@ router.put('/:id', middleware.isLoggedIn, middleware.isFaculty, validateProject,
     }
 
     let notif;
-    let postEmail;
-
     let imageString = ``;
 
     for (let image of updatedProject.images) {
