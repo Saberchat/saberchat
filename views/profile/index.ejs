@@ -59,7 +59,7 @@
                       </li>
 
                       <% sortedUsers = [];%>
-                      <% for (let perm of ["Principal", "Admin", "Mod", "Student"]) { %>
+                      <% for (let perm of ["Principal", "Admin", "Mod", "Default"]) { %>
                         <% for (let user of users) { %>
                           <% if (user.permission.toLowerCase() == perm.toLowerCase()) { %>
                             <% sortedUsers.push(user) %>
