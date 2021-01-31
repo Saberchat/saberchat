@@ -54,23 +54,23 @@
                     </div>
                     <div class="block-content">
                       <p>
-                        Alexander Zhou, Kabir Samsi, Siddharth Chavan and Vibhav Darsha are juniors who are all enrolled in Alsion's Early College program. They developed SaberChat over the 2020
+                        Alexander Zhou, Kabir Samsi, Siddharth Chavan and Vibhav Darsha are juniors who are all enrolled in Alsion's Early College program. They developed Saberchat over the 2020
                         Summer Break in an effort to improve Alsion's communication platforms, and to exercise their software development skills.
                       </p>
 
                       <% [["Alexander Zhou", "alexanderz@alsionschool.org"], ["Kabir Samsi", "kabirs@alsionschool.org"], ["Siddharth Chavan", "siddharthc@alsionschool.org"], ["Vibhav Darsha", "vibhavec@alsionschool.org"]].forEach(developer => { %>
-                        <p><span class="developer-info"><%=developer[0]%></span></p>
-                        <p>Email: <a href="mailto: <%=developer[1]%>"><%=developer[1]%></a></p>
+                        <span class="developer-info"><%=developer[0]%></span>
+                        <p><a href="mailto: <%=developer[1]%>"><%=developer[1]%></a></p>
                       <% }); %>
 
                     </div>
                 </article>
             </div>
-            <div class="col-lg-6 block dev-photos">
+            <div class="col-lg-6 block">
               <div class="container">
                 <div class="row">
                 <% [["Alexander Zhou", "alexanderz@alsionschool.org"], ["Kabir Samsi", "kabirs@alsionschool.org"]].forEach(developer => { %>
-                    <div class="col"><img src="https://alsion-saberchat.herokuapp.com/images/<%=developer[0]%>.jpg" class="dev-image" alt="Photo of <%=developer[0]%>"></div>
+                    <div class="col"><img src="/images/<%=developer[0]%>.jpg" class="dev-image" alt="Photo of <%=developer[0]%>"></div>
                 <% }); %>
                 </div>
 
@@ -78,7 +78,7 @@
 
                 <div class="row">
                   <% [["Siddharth Chavan", "siddharthc@alsionschool.org"], ["Vibhav Darsha", "vibhavec@alsionschool.org"]].forEach(developer => { %>
-                    <div class="col"><img src="https://alsion-saberchat.herokuapp.com/images/<%=developer[0]%>.jpg" class="dev-image" alt="Photo of <%=developer[0]%>"></div>
+                    <div class="col"><img src="/images/<%=developer[0]%>.jpg" class="dev-image" alt="Photo of <%=developer[0]%>"></div>
                   <% });%>
                 </div>
               </div>

@@ -25,6 +25,7 @@
   object-fit: cover;
 }
 
-.dev-photos {
+.col {
+  margin-right: -30px;
   border-radius: 15px;
 }
