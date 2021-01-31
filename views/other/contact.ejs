@@ -59,16 +59,29 @@
                       </p>
 
                       <% [["Alexander Zhou", "alexanderz@alsionschool.org"], ["Kabir Samsi", "kabirs@alsionschool.org"], ["Siddharth Chavan", "siddharthc@alsionschool.org"], ["Vibhav Darsha", "vibhavec@alsionschool.org"]].forEach(developer => { %>
-                        <p><span class="developer-info"><%=developer[0]%></span> (<a href="mailto: <%=developer[1]%>"><%=developer[1]%></a>)</p>
-                          <img src="/images/<%=developer[0]%>.jpg" class="dev-image" alt="Photo of <%=developer[0]%>"/>
-                        <br /><br />
-                      <% }) %>
+                        <p><span class="developer-info"><%=developer[0]%></span></p>
+                        <p>Email: <a href="mailto: <%=developer[1]%>"><%=developer[1]%></a></p>
+                      <% }); %>
 
                     </div>
                 </article>
             </div>
-            <div class="col-lg-6 block">
-              <img class="image-block" src="https://i.imgur.com/tkRb6Lz.jpg" alt="Alsion Photograph">
+            <div class="col-lg-6 block dev-photos">
+              <div class="container">
+                <div class="row">
+                <% [["Alexander Zhou", "alexanderz@alsionschool.org"], ["Kabir Samsi", "kabirs@alsionschool.org"]].forEach(developer => { %>
+                    <div class="col"><img src="https://alsion-saberchat.herokuapp.com/images/<%=developer[0]%>.jpg" class="dev-image" alt="Photo of <%=developer[0]%>"></div>
+                <% }); %>
+                </div>
+
+                <div class="w-100"></div>
+
+                <div class="row">
+                  <% [["Siddharth Chavan", "siddharthc@alsionschool.org"], ["Vibhav Darsha", "vibhavec@alsionschool.org"]].forEach(developer => { %>
+                    <div class="col"><img src="https://alsion-saberchat.herokuapp.com/images/<%=developer[0]%>.jpg" class="dev-image" alt="Photo of <%=developer[0]%>"></div>
+                  <% });%>
+                </div>
+              </div>
             </div>
         </div>
 
