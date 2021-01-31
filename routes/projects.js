@@ -132,7 +132,7 @@ router.post('/',middleware.isLoggedIn, middleware.isFaculty, validateProject, (r
 });
 
 //COMMENTED OUT FOR NOW, UNTIL WE MAKE FURTHER DECISIONS AT MEETING
-// 
+//
 // router.get('/data', middleware.isLoggedIn, middleware.isFaculty, (req, res) => {
 //   Project.find({poster: req.user._id}).populate("comments").exec((err, projects) => {;
 //     if (err || !projects) {
