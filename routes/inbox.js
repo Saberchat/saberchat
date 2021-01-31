@@ -52,7 +52,7 @@ router.get('/messages/new', middleware.isLoggedIn, (req, res) => {
 
 //Route to send notification to a group of people
 router.post('/messages', middleware.isLoggedIn, validateMsg, (req, res) => {
-	( async () => {
+	(async () => {
 		let message = {
 			subject: filter.clean(req.body.subject),
 			text: filter.clean(req.body.message)
