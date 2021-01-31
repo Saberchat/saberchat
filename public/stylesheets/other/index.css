@@ -18,3 +18,9 @@
 .developer-info {
   font-weight: bold;
 }
+
+.dev-image {
+  width: 20%;
+  height: 20%;
+  border-radius: 15px;
+}
