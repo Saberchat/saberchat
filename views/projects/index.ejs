@@ -14,6 +14,11 @@
     <link rel="stylesheet" href="/stylesheets/announcements/index.css">
     <link rel="stylesheet" href="/stylesheets/home/index.css">
     <link rel="stylesheet" href="/stylesheets/chat/new.css">
+    <%if (currentUser) {%>
+      <%if (currentUser.darkmode) { %>
+        <link rel="stylesheet" href="/stylesheets/Darkmode.css">
+      <%}%>
+    <%}%>
 
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
@@ -30,12 +35,12 @@
     <%- include('../partials/header') %>
 
   </head>
-  <body>
+  <body class="mode">
 
     <div class="container mt-5">
       <div class="row">
         <div class="col-12">
-          <div class="jumbotron text-center">
+          <div class="jumbotron text-center mode">
             <h1><i class="fas fa-paint-brush"></i> Student Projects </h1>
             <p>Our Students' Artwork, Gardening Projects, Science Projects and More</p>
             <% if (currentUser) { %>
@@ -50,9 +55,9 @@
 
     <div class="projects">
 
-      <div class="search-filter mb-3">
+      <div class="search-filter mb-3 search"
         <i class="fas fa-search"></i>
-        <input id="search-input" oninput="searchFunction()" class="form-control" type="text" placeholder="Search..." title="Type a project segment"/>
+        <input id="search-input" oninput="searchFunction()" class="form-control search" type="text" placeholder="Search..." title="Type a project segment"/>
       </div><br />
 
       <% if (currentUser) { %>
@@ -62,7 +67,7 @@
       <%projects.reverse().forEach(project => { %>
         <div class="row">
           <div class="col-lg-12">
-            <article class="text-block" id="<%=project._id%>">
+            <article class="text-block mode" id="<%=project._id%>">
               <div class="block-header grey">
                 <h5>
                   <a class="project-info" href="projects/<%=project._id%>"><%=project.title%></a>
@@ -72,7 +77,7 @@
                 <div class="project-header">
                   <% if (currentUser) { %>
                     <a class="project-info" href= "../profiles/<%=project.poster._id%>" >
-                      <img src="<%= project.poster.imageUrl %>" alt="profile pic" class="poster-profile">
+                      <img src="<%= project.poster.imageUrl %>" alt="profile pic" class="poster-profile mode">
                       <%=project.poster.firstName%> <%=project.poster.lastName%>
                     </a>
 
@@ -122,7 +127,7 @@
                 </div>
               </div>
 
-              <div class="block-content" >
+              <div class="block-content mode" >
                   <% if (project.images.length > 0) { %>
                     <img class="project-first-image" src="<%=project.images[0]%>"/>
                   <% } %>

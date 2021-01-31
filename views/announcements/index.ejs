@@ -50,16 +50,16 @@
         </div>
       </div>
 
-      <div class="search-filter mb-3">
+      <div class="search-filter mb-3 search">
         <i class="fas fa-search"></i>
-        <input id="search-input" oninput="searchFunction()" class="form-control" type="text" placeholder="Search..." title="Type in announcement segment"/>
+        <input id="search-input" oninput="searchFunction()" class="form-control search" type="text" placeholder="Search..." title="Type in announcement segment"/>
       </div><br />
 
         <% announcements.forEach(announcement => { %>
 
           <div class="row">
             <div class="col-lg-12">
-              <article class="text-block" id="<%=announcement._id%>">
+              <article class="text-block color: black" id="<%=announcement._id%>">
                 <div class="block-header grey">
                   <h5>
 
@@ -145,7 +145,7 @@
                   </div>
                 </div>
 
-                <div class="block-content">
+                <div class="block-content mode">
                   <% if (announcement.text.split(" ").length > 30) { %>
                     <p class="announcement-text"><%=announcement.text.split(" ").slice(0,31).join(" ")%> <a href="/announcements/<%=announcement._id%>">(Read More)</a></p>
                   <% } else { %>

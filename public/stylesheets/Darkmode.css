@@ -1,4 +1,9 @@
 .mode {
   background-color: #343a40;
   color: white;
+
+}
+.search, .search:focus{
+  color: white;
+  background-color: #343a40;
 }
