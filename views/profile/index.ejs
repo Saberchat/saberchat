@@ -30,7 +30,7 @@
     <div class="container">
         <div class="row">
             <div class="col-md-10 offset-md-1 col-12">
-                <h1 class="title">Users</h1>
+                <h1 class="title">Users (<%=users.length%>)</h1>
                 <div class="search-filter">
                     <i class="fas fa-search"></i>
                     <input id="search-input" oninput="searchFunction()" class="form-control" type="text" placeholder="Search..." title="Type in Username">
@@ -49,18 +49,17 @@
                   <% } %>
 
                   <% let sortedUsers = [];%>
-
                   <% for (let status of statuses) { %>
                     <% if (status[2].length > 0) { %>
                       <li class="list-group-item list-group-item-success status-header" id="<%=status[0]%>-header">
                         <div class="d-flex w-100 justify-content-between">
                           <h2 class="mb-1"><%=status[1]%></h2>
+                          <span><%=status[2].length%> user(s)</span>
                         </div>
                       </li>
 
                       <% sortedUsers = [];%>
-
-                      <% for (let perm of ["Principal", "Admin", "Mod", "Student"]) { %>
+                      <% for (let perm of ["Principal", "Admin", "Mod", "Default"]) { %>
                         <% for (let user of users) { %>
                           <% if (user.permission.toLowerCase() == perm.toLowerCase()) { %>
                             <% sortedUsers.push(user) %>
@@ -129,7 +128,7 @@
             </div>
             <div class="modal-footer">
               <button type="button" class="btn btn-secondary" data-dismiss="modal">No, Go Back</button>
-              <button type="button" id="unfollow-confirm-<%=user._id%>" onclick="unfollow(this)" class="btn btn-danger">Yes, Unfollow</button>
+              <button type="button" id="unfollow-confirm-<%=user._id%>" onclick="unfollow(this, 'index')" class="btn btn-danger">Yes, Unfollow</button>
             </div>
           </div>
         </div>
@@ -149,7 +148,7 @@
             </div>
             <div class="modal-footer">
               <button type="button" class="btn btn-secondary" data-dismiss="modal">No, Go Back</button>
-              <button type="button" id="follow-confirm-<%=user._id%>" onclick="follow(this)" class="btn btn-primary">Yes, Follow</button>
+              <button type="button" id="follow-confirm-<%=user._id%>" onclick="follow(this, 'index')" class="btn btn-primary">Yes, Follow</button>
             </div>
           </div>
         </div>

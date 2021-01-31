@@ -6,10 +6,10 @@ label, #image-heading {
   float: left;
 }
 
-#creator-div, .image-group {
+#creator-input-div, .image-group {
   text-align: left;
 }
 
-#title-label, #creator-label, #description-label {
+#title-label, #creator-input-label, #description-label {
   font-weight: bold;
 }

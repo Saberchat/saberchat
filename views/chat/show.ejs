@@ -29,11 +29,13 @@
     <a href="/chat" class="btn btn-primary" class="exit-button"><i class="fas fa-arrow-left"></i> Exit</a>
     <% if (room.mutable) { %>
       <% if (room.creator.id.equals(currentUser._id)) { %>
+        <a class="btn btn-success" href="<%=room._id%>/people"><i class="fas fa-user"></i> People</a>
         <a href="/chat/<%= room._id %>/edit" class="btn btn-secondary"><i class="fas fa-cog"></i> Room Settings</a>
       <% } else if(room.type == 'private') { %>
         <!-- leave button/form with bootstrap modal -->
         <form action="/chat/<%= room._id %>/leave" method="post" id="leave-room">
           <!-- Button trigger modal -->
+          <a class="btn btn-success" href="<%=room._id%>/people"><i class="fas fa-user"></i> People</a>
           <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#leaveModalCenter">
             <i class="fas fa-sign-out-alt"></i> Leave Room
           </button>
@@ -105,10 +107,6 @@
                   <button class="flag" id="<%= comment._id %>" onclick="report(this)"><i class="far fa-flag"></i> <span class="flag-tooltip">Report comment</span></button>
                   <% } %>
                 </div>
-              </div>
-            <% } else { %>
-              <div class="announcement mb-1">
-                <h4><%= comment.text %></h4>
               </div>
             <% } %>
           <% }) %>

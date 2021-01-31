@@ -21,6 +21,7 @@
 
     <script src="https://kit.fontawesome.com/dccc745c41.js" crossorigin="anonymous"></script>
     <script src="/javascript/cafe/search.js"></script>
+    <script src="/javascript/cafe/actions.js"></script>
   </head>
   <body>
     <%- include('../partials/navbar') %>
@@ -30,14 +31,16 @@
       <div class="row">
         <div class="col-12">
           <div class="jumbotron text-center">
-            <h1><i class="fas fa-coffee"></i> Manage EC Cafe</h1><br />
-            <% if (open == true) { %>
-              <a href="/cafe/close" class="btn btn-danger"><i class="fas fa-lock-open"></i> Close Cafe</a>
+            <h1><i class="fas fa-coffee"></i> Manage No Left Turn Cafe</h1><br />
+            <button id="cafe-status-button" onclick="changeCafeStatus()"
+            <% if (open) { %>
+              class="btn btn-danger" ><i class="fas fa-lock-open"></i> Close Cafe
 
             <% } else { %>
-              <a href="/cafe/open" class="btn btn-success"><i class="fas fa-lock"></i> Open Cafe</a>
-
+              class="btn btn-success"><i class="fas fa-lock"></i> Open Cafe
             <% } %>
+            </button>
+
             <a href="/cafe/orders" class="btn btn-primary"><i class="fas fa-coffee"></i> Orders</a>
             <a href="/cafe/item/new" class="btn btn-warning"><i class="fas fa-plus-circle"></i> Add New Item</a>
             <a href="/cafe/type/new" class="btn btn-info"><i class="fas fa-plus-circle"></i> Add New Category</a>
@@ -76,7 +79,7 @@
                 </div>
               </li>
               <% type.items.forEach(item => { %>
-                <% if (item.isAvailable == true) { %>
+                <% if (item.isAvailable) { %>
                   <a href="item/<%= item._id %>" id="item-<%=item.id%>" class="list-group-item list-group-item-action menu-item <%=type.name.replace(' ', '')%>"><span class="item-name"><%= item.name %></span> (<%= item.availableItems%> orders available) <span class="upvote" title="Upvotes (Cafe admins cannot upvote items from here)"></span><span id="upvoteCount-<%=item._id%>" class="upvote-count"> Upvotes: <%=item.upvotes.length%></span></a>
                 <% } else {%>
                   <a href="item/<%= item._id %>" id="item-<%=item.id%>" class="list-group-item list-group-item-action menu-item <%=type.name.replace(' ', '')%>"><span class="item-name"><%= item.name %></span> (Unavailable) <span class="upvote" title="Upvotes (Cafe admins cannot upvote items from here)"></span><span id="upvoteCount-<%=item._id%>" class="upvote-count"> Upvotes: <%=item.upvotes.length%></span></a>

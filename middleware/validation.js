@@ -2,10 +2,10 @@ const { annSchema } = require('../joiValidation/announcement');
 const { projectSchema } = require('../joiValidation/project');
 const { chatSchema } = require('../joiValidation/chat');
 const { msgSchema } = require('../joiValidation/message');
-const { 
-    newUserSchema, 
-    loginUserSchema, 
-    updateUserSchema, 
+const {
+    newUserSchema,
+    loginUserSchema,
+    updateUserSchema,
     resetPasswordSchema,
     updateEmailSchema,
     updatePasswordSchema

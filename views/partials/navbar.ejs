@@ -20,13 +20,13 @@
                         <a class="nav-link" href="/projects"><i class="fas fa-paint-brush"></i> Projects</a>
                     </li>
                     <li class="nav-item"></li>
-                      <a class="nav-link" href="/cafe"><i class="fas fa-coffee"></i> EC Cafe</a>
+                      <a class="nav-link" href="/cafe"><i class="fas fa-coffee"></i> Cafe</a>
                     <li class="nav-item dropdown">
                     <li class="nav-item"></li>
                       <a class="nav-link" target="_blank" href="https://witherlyheights.org/"><i class="far fa-newspaper"></i> Witherly Heights</a>
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                          <i class="fas fa-align-justify"></i> Other
+                          <i class="fas fa-align-justify"></i> More
                           <span <% if (currentUser.annCount.length + currentUser.newRoomCount.length <= 0) {%> hidden <%}%> class="badge badge-pill badge-danger" id="new-count"><%=currentUser.annCount.length + currentUser.newRoomCount.length%></span>
                         </a>
 
@@ -78,24 +78,24 @@
                               <a href="/admin/moderate" class="dropdown-item"><i class="fas fa-flag"></i> Moderate Comments</a>
                           </li>
 
-                        <% } else if (currentUser.permission == 'admin') { %>
+                        <% } else if (currentUser.permission == "admin") { %>
                           <li class="nav-item dropdown">
                             <a class="nav-link dropdown-toggle" href="" id="navbarDropdownMenuLink" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="fas fa-align-justify"></i> Admin</a>
                             <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
                               <a href="/admin/permissions" class="dropdown-item"><i class="fas fa-user"></i> Change Permissions</a>
                               <a href="/admin/status" class="dropdown-item"><i class="fas fa-user"></i> Change Statuses</a>
                               <a href="/admin/moderate" class="dropdown-item"><i class="fas fa-flag"></i> Moderate Comments</a>
-                              <a href="/admin/manageCafe" class="dropdown-item"><i class="fas fa-coffee"></i> Manage EC Cafe</a>
+                              <a href="/admin/manageCafe" class="dropdown-item"><i class="fas fa-coffee"></i> Manage Cafe</a>
                           </li>
 
-                        <% } else if (currentUser.permission == 'principal') {%>
+                        <% } else if (currentUser.permission == "principal") {%>
                           <li class="nav-item dropdown">
                           <a class="nav-link dropdown-toggle" href="" id="navbarDropdownMenuLink" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="fas fa-align-justify"></i> Principal</a>
                           <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
                             <a href="/admin/permissions" class="dropdown-item"><i class="fas fa-user"></i> Change Permissions</a>
                             <a href="/admin/status" class="dropdown-item"><i class="fas fa-user"></i> Change Statuses</a>
                             <a href="/admin/moderate" class="dropdown-item"><i class="fas fa-flag"></i> Moderate Comments</a>
-                            <a href="/admin/manageCafe" class="dropdown-item"><i class="fas fa-coffee"></i> Manage EC Cafe</a>
+                            <a href="/admin/manageCafe" class="dropdown-item"><i class="fas fa-coffee"></i> Manage Cafe</a>
                             <a href="/admin/whitelist" class="dropdown-item"><i class="fas fa-inbox"></i> Email Whitelist</a>
                               <!-- <a href="/admin/balances" class="dropdown-item"><i class="fas fa-money-check"></i> Student Balances</a> -->
                           </li>
@@ -109,10 +109,11 @@
                           </a>
                           <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
                             <a class="dropdown-item" href="/profiles/<%= currentUser._id %>"><i class="fas fa-user"></i> View Profile</a>
+
                             <% if (currentUser.darkmode) { %>
                               <a class="dropdown-item" href="/darkmode"><i class="far fa-lightbulb"></i> Switch to Lightmode</a>
-                            <% } else { %>
-                              <a class="dropdown-item" href="/darkmode"><i class="far fa-moon"></i> Switch to Darkmode</a>
+                            <% // } else {%>
+                              <!-- <a class="dropdown-item" href="/darkmode"><i class="far fa-moon"></i> Switch to Darkmode</a> -->
                             <% }%>
                             <a class="dropdown-item" href="/logout"><i class="fas fa-sign-out-alt"></i> Logout</a>
                           </div>
@@ -136,7 +137,7 @@
         <span class="form-close login"><i class="far fa-window-close"></i></span>
         <div class="form-group mt-3">
             <label for="email-login">Email address</label>
-            <input name="email" type="email" class="form-control" id="email-login" placeholder="enter email">
+            <input name="email" class="form-control" id="email-login" placeholder="enter email">
         </div>
         <div class="form-group">
             <label for="password-login">Password</label>

@@ -157,7 +157,7 @@ middleware.cafeOpen = ((req, res, next) => { //Cafe time restrictions
 				res.redirect('back');
 			}
 		}
-	})
+	});
 });
 
 //export the object with all the functions

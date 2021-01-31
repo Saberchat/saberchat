@@ -40,20 +40,6 @@
           <p>Place an order that will be delivered to you at lunch</p>
           <a class="btn btn-primary" href='/cafe'><i class="fas fa-arrow-left"></i> Back</a>
           <a class="btn btn-info" href='/cafe/menu'><i class="fas fa-bars"></i> Menu </a>
-          <br /><br />
-          <span id="balance-heading">Current Balance:
-
-            <% if (!currentUser.balance.toString().includes('.')) { %>
-              $<span id="balance"><%= currentUser.balance %>.00
-
-            <% } else if (currentUser.balance.toString().split('.')[1].length == 1){ %>
-              $<span id="balance"><%= currentUser.balance %>0
-
-            <% } else { %>
-              $<span id="balance"><%= currentUser.balance %>
-            <% } %>
-
-          </span></span>
         </div>
       </div>
     </div>

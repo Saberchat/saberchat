@@ -1,4 +1,4 @@
-const follow = (button => {
+const follow = ((button, location) => {
   const userId = button.id.split('-')[2];
   const url = `/profiles/follow/${userId}?_method=put`;
   const data = {};
@@ -15,11 +15,20 @@ const follow = (button => {
       unfollowButton.setAttribute("data-target", `#modal-${userId}-unfollow`);
       unfollowButton.innerText = "Unfollow";
       document.getElementById(`follow-div-${userId}`).replaceChild(unfollowButton, document.getElementById(`follow-${userId}`));
+
+      if (location == "show") {
+        let newFollower = document.createElement("span");
+        newFollower.id = `follower-${data.user._id}`;
+        newFollower.className = "follower-block";
+        newFollower.innerHTML = `<a href="../profiles/${data.user._id}" class="follower-link"> <img class="follower-image" src="${data.user.imageUrl}" alt="profile picture"> <span class="follower-name">${data.user.firstName} ${data.user.lastName}</span> ${data.user.username} </a><br><br>`;
+        document.getElementById("followers-list").appendChild(newFollower);
+        document.getElementById('followers-button').innerText = `${parseInt(document.getElementById('followers-button').innerText.split(' ')[0]) + 1} Follower(s)`;
+      }
     }
   });
 });
 
-const unfollow = (button => {
+const unfollow = ((button, location) => {
   const userId = button.id.split('-')[2];
   const url = `/profiles/unfollow/${userId}?_method=put`;
   const data = {};
@@ -36,6 +45,11 @@ const unfollow = (button => {
       followButton.setAttribute("data-target", `#modal-${userId}-follow`);
       followButton.innerText = "Follow";
       document.getElementById(`follow-div-${userId}`).replaceChild(followButton, document.getElementById(`unfollow-${userId}`));
+
+      if (location == "show") {
+        document.getElementById("followers-list").removeChild(document.getElementById(`follower-${data.user._id}`));
+        document.getElementById('followers-button').innerText = `${parseInt(document.getElementById('followers-button').innerText.split(' ')[0]) - 1} Follower(s)`;
+      }
     }
   });
 });

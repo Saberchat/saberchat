@@ -270,7 +270,7 @@
                               <% for (let tutor of course.tutors) { %>
                                 <% if (tutor.tutor._id.equals(currentUser._id)) { %>
                                   <span id="bio-length-error" hidden>Make bio between 100-250 words</span>
-                                  <textarea rows="5" minlength="50" maxlength="250" class="form-control" id="edit-bio-field" placeholder="Enter new bio"><%=tutor.bio%></textarea>
+                                  <textarea rows="5" minlength="50" maxlength="500" class="form-control" id="edit-bio-field" placeholder="Enter new bio"><%=tutor.bio%></textarea>
                                 <% } %>
                               <% } %>
                             </div>
@@ -284,6 +284,7 @@
 
                     </div>
                 </section>
+                <br />
             </div>
 
             <ul class="nav justify-content-center options-bar" id="options-bar">
@@ -293,7 +294,7 @@
 
               <% if (tutor.students.includes(currentUser._id.toString()) || tutor.tutor._id.equals(currentUser._id)) { %>
                 <li class="nav-item tab-header tab" id="students" onclick="changeTab(this)">
-                  <a class="nav-link active">Students (<%=tutor.students.length%>)</a>
+                  <a class="nav-link active">Students (<%=tutor.students.length + tutor.formerStudents.length%>)</a>
                 </li>
               <% } %>
 
@@ -352,7 +353,7 @@
 
           <div class="students" hidden>
             <% if (students.length > 0) { %>
-              <% if (tutor.tutor._id.equals(currentUser._id) || studentIds.includes(currentUser._id.toString())) { %>
+              <% if (tutor.tutor._id.equals(currentUser._id) || studentIds.includes(currentUser._id.toString()) || course.teacher.equals(currentUser._id)) { %>
                 <div class="list-group">
                   <li class="list-group-item list-group-item-success status-header">
                     <div class="d-flex w-100 justify-content-between">
@@ -366,11 +367,9 @@
                         <span class="<%=student.permission%> <%=student.status%> <%=student.tags.join(' ')%> student-block"><span class="span-tag-name"><%=student.firstName%> <%=student.lastName%></span> <span class="span-tag-username"><%=student.username%></span></span>
 
                         <% let lessonCount = 0;%>
-                        <% let timeCount = 0;%>
                         <% for (let lesson of tutor.lessons) { %>
                           <% if (lesson.student.equals(student._id)) { %>
                             <%lessonCount += 1;%>
-                            <%timeCount += lesson.time;%>
                           <% } %>
                         <% } %>
                       </a>
@@ -400,7 +399,7 @@
                           <div class="modal-body">
                             <label for="time-<%=student._id%>">Lesson Time: <span id="time-label-<%=student._id%>">0</span> minutes</label><br />
                             <input type="range" min="0" max="60" value="0" class="slider time" id="time-<%=student._id%>" onchange="setTime(this)">
-                            <textarea minlength="20" maxlength="300" rows="5" class="form-control summary" id="summary-<%=student._id%>" placeholder="Lesson Summary"></textarea>
+                            <textarea minlength="20" maxlength="500" rows="5" class="form-control summary" id="summary-<%=student._id%>" placeholder="Lesson Summary"></textarea>
                           </div>
                           <div class="modal-footer">
                             <button type="button" class="btn btn-secondary" data-dismiss="modal">Back</button>
@@ -417,6 +416,43 @@
             <% } else {%>
               <h1 class="empty-field">No Students</h1>
             <% } %>
+
+            <br /><br />
+            <% if (tutor.formerStudents.length > 0) { %>
+              <% if (tutor.tutor._id.equals(currentUser._id) || studentIds.includes(currentUser._id.toString()) || course.teacher.equals(currentUser._id)) { %>
+                <div class="list-group">
+                  <li class="list-group-item list-group-item-success status-header">
+                    <div class="d-flex w-100 justify-content-between">
+                      <h2 class="mb-1">Former Students</h2>
+                    </div>
+                  </li>
+                  <% for (let student of tutor.formerStudents) { %>
+                    <div class="list-group-item list-group-item-action user-element">
+                      <a href="/profiles/<%=student._id%>" class="student-profile user-element-text">
+                        <img class="student-profile-image" src="<%= student.imageUrl %>" alt="profile picture">
+                        <span class="<%=student.permission%> <%=student.status%> <%=student.tags.join(' ')%> student-block"><span class="span-tag-name"><%=student.firstName%> <%=student.lastName%></span> <span class="span-tag-username"><%=student.username%></span></span>
+
+                        <% let lessonCount = 0;%>
+                        <% for (let lesson of tutor.lessons) { %>
+                          <% if (lesson.student.equals(student._id)) { %>
+                            <%lessonCount += 1;%>
+                          <% } %>
+                        <% } %>
+                      </a>
+                      <% if (tutor.tutor._id.equals(currentUser._id)) { %>
+                        <a class="btn btn-info lesson-button" href="/homework/tutors/<%=course._id%>?tutorId=<%=tutor.tutor._id%>&studentId=<%=student._id%>">Lesson Information</a>
+                      <% } %>
+
+                      <% if (tutor.tutor._id.equals(currentUser._id) || student._id.equals(currentUser._id)) { %>
+                        <span class="lessons-length"><span id="lessons-length-<%=student._id%>"><%=lessonCount%></span> lesson(s)</span>
+                      <% } %>
+                    </div>
+
+                  <% } %>
+                </div>
+              <% } %>
+            <% } %>
+
           </div>
 
           <div class="courses" hidden>
@@ -495,7 +531,7 @@
                                           <input class="form-control" type="text" name="joincode" placeholder="Enter Join Code"/><br />
                                           <label for="slots-<%=c._id%>" id="slots-label-<%=c._id%>">Number of Student Slots: 0 </label><br />
                                           <input type="range" min="0" max="5" value="0" class="slider" id="slots-<%=c._id%>" name="slots" onchange="setStudentsTutorShow(this)">
-                                          <textarea rows="5" minlength="20" maxlength="250" class="form-control" name="bio" placeholder="A Short Bio About Yourself"></textarea>
+                                          <textarea rows="5" minlength="20" maxlength="500" class="form-control" name="bio" placeholder="A Short Bio About Yourself"></textarea>
                                         </div>
                                         <div class="modal-footer">
                                           <button type="button" class="btn btn-secondary" data-dismiss="modal">Back</button>

@@ -37,7 +37,7 @@
           <form action="/announcements/<%= announcement._id %>?_method=put" method="post" enctype="multipart/form-data">
             <div class="form-group">
               <label for="subject">Subject</label>
-              <input type="text" class="form-control" name="subject" placeholder="A short title..." maxlength="30" required value="<%= announcement.subject %>">
+              <input type="text" class="form-control" name="subject" placeholder="A short title..." maxlength="50" required value="<%= announcement.subject %>">
             </div>
             <div class="form-group">
               <label for="message">Message</label>
@@ -78,7 +78,6 @@
                   <button type="button" onclick="deleteImg(this)" class="btn btn-danger"><i class="fas fa-minus"></i></button>
                 </div>
               <% } %>
-              <hr>
             </div>
             <button type="submit" class="btn btn-info btn-block">Save Changes</button>
           </form>

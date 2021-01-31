@@ -5,8 +5,8 @@ const express = require('express');
 const middleware = require('../middleware');
 const router = express.Router(); //start express router
 const dateFormat = require('dateformat');
-const nodemailer = require('nodemailer');
-const {transport, transport_mandatory} = require("../transport");
+const {transport, transport_mandatory} = require("../other_modules/transport");
+const convertToLink = require("../other_modules/convert-to-link");
 
 //SCHEMA
 const User = require('../models/user');
@@ -190,7 +190,7 @@ router.get('/:id', middleware.isLoggedIn, (req, res) => {
       tutorIds.push(tutor.tutor._id.toString());
     }
 
-    const teachers = await User.find({status: "faculty", _id: {$ne: req.user._id}});
+    const teachers = await User.find({authenticated: true, status: "faculty", _id: {$ne: req.user._id}});
     if (!teachers) {
       req.flash('error', "Unable to find teachers");
       return res.redirect('back');
@@ -198,18 +198,16 @@ router.get('/:id', middleware.isLoggedIn, (req, res) => {
 
     //If user is a tutor, teacher or student, show the course
     if (course.teacher.equals(req.user._id) || studentIds.includes(req.user._id.toString()) || tutorIds.includes(req.user._id.toString())) {
-      res.render('homework/show', {course, studentIds, tutorIds, teachers});
+      return res.render('homework/show', {course, studentIds, tutorIds, teachers});
 
     } else {
       req.flash('error', "You do not have permission to view that course");
-      res.redirect('back');
+      return res.redirect('back');
     }
 
   })().catch(err => {
-    if (err) {
-      req.flash('error', "Unable to find course");
-      return res.redirect('back');
-    }
+    req.flash('error', "Unable to find course");
+    res.redirect('back');
   });
 });
 
@@ -311,7 +309,7 @@ router.put("/bio/:id", middleware.isLoggedIn, middleware.isTutor, (req, res) => 
       res.json({error: "Unable to find course"});
 
     } else {
-      //Iterate throguh tutors and search for current user
+      //Iterate through tutors and search for current user
       for (let tutor of course.tutors) {
         if (tutor.tutor.equals(req.user._id)) {
 
@@ -445,7 +443,7 @@ router.put('/book/:id', middleware.isLoggedIn, middleware.isStudent, (req, res) 
       return res.json({error: "Error accessing course"});
 
     } else if (!course.students.includes(req.user._id)) {
-      return res.json({error: "You are not a student of that tutor"});
+      return res.json({error: "You are not a student in that course"});
 
     } else {
       let formerStudent = false;
@@ -469,7 +467,7 @@ router.put('/book/:id', middleware.isLoggedIn, middleware.isStudent, (req, res) 
           //Create chat room between student and tutor
           const room = await Room.create({
             name: `${req.user.firstName}'s Tutoring Sessions With ${tutor.tutor.firstName} - ${course.name}`,
-            creator: {id: tutor._id, username: tutor.username},
+            creator: {id: tutor.tutor._id, username: tutor.tutor.username},
             members: [req.user._id, tutor.tutor._id],
             type: "private",
             mutable: false
@@ -489,7 +487,7 @@ router.put('/book/:id', middleware.isLoggedIn, middleware.isStudent, (req, res) 
           tutor.rooms.push(roomObject);
           await course.save();
 
-          const studentIds = await User.find({_id: {$in: tutor.students}});
+          const studentIds = await User.find({authenticated: true, _id: {$in: tutor.students}});
           if (!studentIds) {
             return res.json({error: "Error accessing students"});
           }
@@ -681,13 +679,24 @@ router.put('/reopen-lessons/:id', middleware.isLoggedIn, (req, res) => {
   });
 });
 
+//HANDLE
 //RESTful routing "tutors/show" page
 router.get('/tutors/:id', middleware.isLoggedIn, (req, res) => {
   (async() => {
-    const course = await Course.findById(req.params.id).populate("tutors.tutor").populate({path: "tutors.reviews.review", populate: {path: "sender"}});
+    const course = await Course.findById(req.params.id).populate("tutors.tutor").populate("tutors.formerStudents").populate({path: "tutors.reviews.review", populate: {path: "sender"}});
     if (!course) {
       req.flash('error', "Unable to find course");
       return res.redirect('back');
+    }
+
+    let tutorIds = [];
+    for (let tutor of course.tutors) {
+      tutorIds.push(tutor.tutor._id.toString());
+    }
+
+    let courseStudents = [];
+    for (let student of course.students) {
+      courseStudents.push(student.toString());
     }
 
     for (let tutor of course.tutors) {
@@ -713,7 +722,7 @@ router.get('/tutors/:id', middleware.isLoggedIn, (req, res) => {
         }
 
         //Collect info on the entire schema for each student (necessary to have one array of just ids, and one of the entire object, for FE display)
-        const students = await User.find({_id: {$in: tutor.students}});
+        const students = await User.find({authenticated: true, _id: {$in: tutor.students}});
         if (!students) {
           req.flash('error', "Unable to find students");
           return res.redirect('back');
@@ -727,10 +736,23 @@ router.get('/tutors/:id', middleware.isLoggedIn, (req, res) => {
             return res.redirect('back');
           }
 
-          res.render('homework/lessons', {course, tutor, student});
+          if (student._id.equals(req.user._id) || tutor.tutor._id.equals(req.user._id)) {
+            return res.render('homework/lessons', {course, tutor, student});
+
+          } else {
+            req.flash('error', "You do not have permission to view that student");
+            return res.redirect('back');
+          }
 
         } else {
-          res.render('homework/tutor-show', {course, tutor, students, studentIds, courses: enrolledCourses});
+
+          if (courseStudents.includes(req.user._id.toString()) || course.teacher.equals(req.user._id) || tutorIds.includes(req.user._id.toString())) {
+            return res.render('homework/tutor-show', {course, tutor, students, studentIds, courses: enrolledCourses});
+
+          } else {
+            req.flash('error', "You do not have permission to view that tutor");
+            return res.redirect('back');
+          }
         }
       }
     }
@@ -764,7 +786,7 @@ router.put('/like-review/:id', middleware.isLoggedIn, middleware.isStudent, (req
 });
 
 //For tutors to set availability on new students
-router.put('/setStudents/:id', (req, res) => {
+router.put('/set-students/:id', (req, res) => {
   Course.findById(req.params.id, (err, course) => {
     if (err || !course) {
       res.json({error: "Error accessing course"});
@@ -777,7 +799,7 @@ router.put('/setStudents/:id', (req, res) => {
           found = true;
 
           //Update slots based on data
-          tutor.slots = parseInt(req.body.slots);
+          tutor.slots = parseInt(req.body.slots)-tutor.students.length;
 
           //Update availability based on new slot info
           if ((parseInt(req.body.slots)-tutor.students.length) == 0) {
@@ -885,7 +907,6 @@ router.put('/remove-student/:id', middleware.isLoggedIn, middleware.isFaculty, (
 //For teachers to remove and block a tutor from a course
 router.put('/remove-tutor/:id', middleware.isLoggedIn, middleware.isFaculty, (req, res) => {
   (async() => {
-
     let tutorId;
     if (req.body.show) {
       tutorId = await User.findById(req.body.tutorId);
@@ -991,7 +1012,6 @@ router.put('/remove-tutor/:id', middleware.isLoggedIn, middleware.isFaculty, (re
     }
 
   })().catch(err => {
-    console.log(err);
     if (req.body.show) {
       res.json({error: "Error removing tutor"});
 

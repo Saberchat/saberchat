@@ -5,8 +5,7 @@ const filter = new Filter();
 const router = express.Router();
 //import passport for authentication
 const passport = require('passport');
-const nodemailer = require('nodemailer');
-const {transport, transport_mandatory} = require("../transport");
+const {transport, transport_mandatory} = require("../other_modules/transport");
 
 const middleware = require('../middleware/index');
 const { validateNewUser, validateUserLogin, validatePasswordReset } = require('../middleware/validation');
@@ -31,7 +30,6 @@ router.post("/register", validateNewUser, (req, res) => {
 
   Email.find({address: req.body.email}, (err, emails) => {
     if (err || !emails) {
-      console.log(err);
       req.flash('error', "Unable to find emails");
       req.flash('error', 'Only members of the Alsion community may sign up');
       res.redirect('/');
@@ -119,7 +117,7 @@ router.post("/register", validateNewUser, (req, res) => {
           //redirect to root
           return res.redirect("/");
         }
-        transport_mandatory(transporter, newUser, 'Verify Saberchat Account', `<p>Hello ${newUser.firstName},</p><p>Welcome to Saberchat! A confirmation of your account:</p><ul><li>Your username is ${newUser.username}.</li><li>Your full name is ${newUser.firstName} ${newUser.lastName}.</li><li>Your linked email is ${newUser.email}</li></ul><p>Click <a href="https://alsion-saberchat.herokuapp.com/authenticate/${newUser._id}?token=${token}">this link</a> to verify your account.</p>`);
+        transport_mandatory(user, 'Verify Saberchat Account', `<p>Hello ${newUser.firstName},</p><p>Welcome to Saberchat! A confirmation of your account:</p><ul><li>Your username is ${newUser.username}.</li><li>Your full name is ${newUser.firstName} ${newUser.lastName}.</li><li>Your linked email is ${newUser.email}</li></ul><p>Click <a href="https://alsion-saberchat.herokuapp.com/authenticate/${newUser._id}?token=${token}">this link</a> to verify your account.</p>`);
         // if registration is successful, login user.
         req.flash("success", "Welcome to Saberchat " + user.firstName + "! Go to your email to verify your account");
         res.redirect("/");
@@ -176,7 +174,7 @@ router.get('/authenticate/:id', (req, res) => {
   });
 });
 
-// Custom login handling so that flash messages can be sent. I'm not entirely sure how it works. Copy pasted from official doc
+// Custom login handling so that flash messages can be sent.
 router.post('/login', validateUserLogin, function(req, res, next) {
 	//authenticate user
     passport.authenticate('local', (err, user, info) => {

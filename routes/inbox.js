@@ -1,15 +1,11 @@
-//Build messaging box inside show.ejs
-//When a reply is sent, if the message is not already in all recipients' inboxes, add it. (if it is already there, it's already a new message)
-
 const express = require('express');
 const middleware = require('../middleware');
 const router = express.Router(); //start express router
 const dateFormat = require('dateformat');
 const Filter = require('bad-words');
 const filter = new Filter();
-const nodemailer = require('nodemailer');
-const {transport, transport_mandatory} = require("../transport");
-
+const {transport, transport_mandatory} = require("../other_modules/transport");
+const convertToLink = require("../other_modules/convert-to-link");
 const { validateMsg } = require('../middleware/validation');
 
 const User = require('../models/user');
@@ -65,7 +61,9 @@ router.post('/messages', middleware.isLoggedIn, validateMsg, (req, res) => {
 		if(req.body.images) {
 			message.images = req.body.images;
 		}
+
 		message.sender = req.user._id;
+		message.noReply = (req.body.noreply == "true");
 
 		let recipients = [];
 
@@ -153,7 +151,7 @@ router.post('/messages', middleware.isLoggedIn, validateMsg, (req, res) => {
 
 		let inboxEmail;
 
-		const recipientList = await User.find({ _id: { $in: recipients}});
+		const recipientList = await User.find({authenticated: true, _id: { $in: recipients}});
 
     let imageString = "";
 
@@ -188,7 +186,7 @@ router.post('/messages', middleware.isLoggedIn, validateMsg, (req, res) => {
 		}
 
 		req.flash('success', 'Message sent');
-		res.redirect('back');
+		res.redirect(`/inbox/${newMessage._id}`);
 
 	})().catch(err => {
 		req.flash('error', 'An error occured');
@@ -334,7 +332,8 @@ router.get('/:id', middleware.isLoggedIn, (req, res) => {
 
 		await message.populate({path: 'sender', select: 'username'}).populate({path:'recipients', select: 'username'}).populate({path: 'read', select: 'username'}).populate({path: 'replies.sender'}).execPopulate();
 
-		res.render('inbox/show', {message: message});
+		const convertedText = convertToLink(message.text);
+		res.render('inbox/show', {message: message, convertedText});
 
   })().catch(err => {
 		req.flash('error','There was an error');

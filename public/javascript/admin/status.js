@@ -2,6 +2,7 @@ const loading = document.getElementById('loading');
 
 // sends put request with data
 const updateStatus = (select => {
+  loading.style.display = 'block';
   loading.style.color = 'gray';
   loading.innerHTML = 'Waiting...';
   const status = select.value;
@@ -16,6 +17,10 @@ const updateStatus = (select => {
         loading.style.color = 'red';
         loading.innerHTML = data.error;
     }
+
+    setTimeout(() => {
+      loading.style.display = "none";
+    }, 1000);
 
     if (data.user) {
       for (let option of select) {

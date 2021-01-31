@@ -64,15 +64,27 @@
 
       <h3>Popular Project Keywords</h3>
       <span>Keywords that generated the best responses from the community</span>
-    </div>
-    <div id="container">
-      <ul hidden>
-      <% for (let [keyword, occurences] of new Map(Array.from(projectKeywords)).entries()) { %>
-        <li>'<span class="keyword" id="word-<%=keyword%>"><%=keyword.charAt(0).toUpperCase()%><%=keyword.slice(1)%></span>': <span class="occurence" id="occurences-<%=keyword%>"><%=occurences%></span> times</li>
-      <% } %>
-      </ul>
+      <div id="container">
+        <br />
+        <ul>
+        <% for (let [keyword, occurences] of new Map(Array.from(projectKeywords)).entries()) { %>
+          <li>"<span class="keyword" id="word-<%=keyword%>"><%=keyword.charAt(0).toUpperCase()%><%=keyword.slice(1)%></span>": <span class="occurence" id="occurences-<%=keyword%>"><%=occurences%></span> times</li>
+        <% } %>
+        </ul>
+        <br />
+      </div>
 
+      <h3>Popular Comment Keywords</h3>
+      <span>Positive Comments</span>
+      <div id="container">
+        <br />
+        <ul>
+        <% for (let [keyword, occurences] of new Map(Array.from(commentKeywords)).entries()) { %>
+          <li>"<span class="keyword" id="word-<%=keyword%>"><%=keyword.charAt(0).toUpperCase()%><%=keyword.slice(1)%></span>": <span class="occurence" id="occurences-<%=keyword%>"><%=occurences%></span> times</li>
+        <% } %>
+        </ul>
+        <br />
+      </div>
     </div>
-
   </body>
 </html>

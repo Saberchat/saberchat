@@ -5,7 +5,7 @@
   padding-bottom: 50px;
 }
 
-.project-info, #exampleModalLabel, .modal-body, .creator-name, .creator-div {
+.project-info, #exampleModalLabel, .modal-body, .creator-name, .creator-div, .project-info:hover {
   color: black;
 }
 
@@ -25,8 +25,9 @@
   margin-top: -15px;
 }
 
-.edit-button-text {
+.edit-button-text, .edit-button-text:hover {
   color: white;
+  text-decoration: none;
 }
 
 #delete-form {
@@ -44,6 +45,7 @@
 .project-description {
   margin-top: 10px;
   white-space: pre-wrap;
+  text-align: left;
 }
 
 .project-image {

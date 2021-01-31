@@ -5,8 +5,8 @@ const express = require('express');
 const middleware = require('../middleware/index');
 const router = express.Router(); //start express router
 const dateFormat = require('dateformat');
-const nodemailer = require('nodemailer');
-const {transport, transport_mandatory} = require("../transport");
+const {transport, transport_mandatory} = require("../other_modules/transport");
+const convertToLink = require("../other_modules/convert-to-link");
 
 const multer = require('../middleware/multer');
 const { cloudUpload, cloudDelete } = require('../services/cloudinary');
@@ -97,7 +97,8 @@ router.get('/:id', (req, res) => { //RESTful Routing 'SHOW' route
         req.user.save();
       }
 
-      res.render('announcements/show', {announcement: foundAnn});
+      const convertedText = convertToLink(foundAnn.text);
+      res.render('announcements/show', {announcement: foundAnn, convertedText});
     }
   });
 });
@@ -388,11 +389,11 @@ router.put('/:id', middleware.isLoggedIn, middleware.isMod, multer, validateAnn,
           break;
         }
       }
-    }
 
-    if (!overlap) {
-      user.annCount.push(announcementObject);
-      await user.save();
+      if (!overlap) {
+        user.annCount.push(announcementObject);
+        await user.save();
+      }
     }
 
     req.flash('success', 'Announcement Updated!');

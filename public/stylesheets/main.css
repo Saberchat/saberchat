@@ -6,6 +6,10 @@ html, body {
     min-width: 100vw;
 }
 
+.embedded-link {
+  text-decoration: underline;
+}
+
 .announcement-bar {
   background-color: white;
   width: 400px;

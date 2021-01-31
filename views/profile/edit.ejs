@@ -66,19 +66,24 @@
                             <small id="titleHelp" class="form-text text-muted">Ex. Ninja Warrior, Guardian of Bread, Champion of the art room</small>
                         <% } %>
                     </div>
+                    <div class="form-group">
                     <% if (currentUser.permission == 'admin' || currentUser.permission == 'principal') { %>
-                      <div class="form-group">
-                          <label for="status">Select Status</label>
-                          <select class="form-control" id="status" name="status">
-                            <option selected value="<%= currentUser.status %>"><%=currentUser.status%></option>
-                              <% ['7th', '8th', '9th', '10th', '11th', '12th', 'alumnus', 'guest', 'parent', 'faculty'].forEach( status => { %>
-                                <% if (currentUser.status.toLowerCase() != status.toLowerCase()) { %>
-                                  <option value="<%=status%>"><%=status%></option>
-                                <% }%>
-                              <% }) %>
-                          </select>
-                      </div>
-                    <% }%>
+                        <label for="status">Select Status</label>
+                        <select class="form-control" id="status" name="status">
+                          <option selected value="<%= currentUser.status %>"><%=currentUser.status%></option>
+                            <% ['7th', '8th', '9th', '10th', '11th', '12th', 'alumnus', 'guest', 'parent', 'faculty'].forEach( status => { %>
+                              <% if (currentUser.status.toLowerCase() != status.toLowerCase()) { %>
+                                <option value="<%=status%>"><%=status%></option>
+                              <% }%>
+                            <% }) %>
+                        </select>
+                    <% } else { %>
+                      <label for="status">Status</label>
+                      <select class="form-control" id="status" name="status">
+                        <option selected value="<%= currentUser.status %>"><%=currentUser.status%></option>
+                      </select>
+                    <% } %>
+                    </div>
 
                     <% if (currentUser.permission == 'admin' || currentUser.permission == 'principal') { %>
                       <% let tagMap = new Map([["Tutor", "warning"], ["Cashier", "success"], ["Editor", "info"]]); %>

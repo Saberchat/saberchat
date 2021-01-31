@@ -272,10 +272,10 @@
 
                       <% if (tutor.tutor._id.equals(currentUser._id)) { %>
                         <br />
-                        <label for="slots" id="slots-label"><span id="slots-heading">Number of Student Slots:</span> <span id="slots-count"><%=tutor.slots%></span></label>
+                        <label for="slots" id="slots-label"><span id="slots-heading">Number of Student Slots:</span> <span id="slots-count"><%=tutor.slots + tutor.students.length%></span></label>
                         <span id="change-message" hidden></span>
                         <br />
-                        <input type="range" min="<%=tutor.students.length%>" max="<%=tutor.slots+tutor.students.length+5%>" value="<%=tutor.slots+tutor.students.length%>" class="slider" id="slots" name="slots" onchange="setStudentsShow('<%=course._id%>')">
+                        <input type="range" min="<%=tutor.students.length%>" max="<%=tutor.slots+tutor.students.length+10%>" value="<%=tutor.slots+tutor.students.length%>" class="slider" id="slots" name="slots" onchange="setStudentsShow('<%=course._id%>')">
                       <% } %>
 
                     <p class="tutor-bio"><%=tutor.bio%></p>

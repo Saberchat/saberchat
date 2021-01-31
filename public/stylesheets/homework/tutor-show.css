@@ -107,6 +107,14 @@ h3, .ratings {
   display: inline;
 }
 
+#no-lessons {
+  text-align: center;
+}
+
+.mark-lesson {
+  float: center;
+}
+
 @media only screen and (max-width: 768px) {
     .profile-desc {
         margin: 1.7rem 0;

@@ -13,8 +13,9 @@
   margin-right: 10px;
 }
 
-.modal-body, .modal-title, #sender-info {
+.modal-body, .modal-title, #sender-info, #sender-info:hover {
   color: black;
+  text-decoration: none;
 }
 
 .modal-body {
@@ -49,6 +50,7 @@
 
 .announcement-text {
   white-space: pre-wrap;
+  text-align: left;
 }
 
 .liked-button, .liked-button-show {

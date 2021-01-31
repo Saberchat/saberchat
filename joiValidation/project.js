@@ -4,13 +4,12 @@ const { escapeHtmlExtension } = require('./extensions');
 const Joi = BaseJoi.extend(escapeHtmlExtension);
 
 const projectSchema = Joi.object({
-    title: Joi.string().required().max(30).escapeHtml().messages({
+    title: Joi.string().required().max(50).escapeHtml().messages({
         "string.empty": "Title is required.",
-        "string.max": "Title max 30 characters."
+        "string.max": "Title max 50 characters."
     }),
-    text: Joi.string().required().max(800).min(50).escapeHtml().messages({
+    text: Joi.string().required().min(50).escapeHtml().messages({
         "string.empty": "Description is required.",
-        "string.max": "Descrip. max 800 characters.",
         "string.min": "Descrip. minimum 50 characters."
     }),
     creatorInput: Joi.string().allow('').required().escapeHtml(),

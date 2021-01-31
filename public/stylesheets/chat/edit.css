@@ -10,6 +10,23 @@
   display: none;
 }
 
+.room-name {
+  font-weight: bold;
+}
+
+.latest-message {
+  padding-top: 15px;
+}
+
+.room-created {
+  font-style: italic;
+}
+
+.comment-text {
+  display: inline-block;
+  margin-left: 10px;
+}
+
 .user-list {
     max-height: 10rem;
     overflow-y: scroll;
@@ -17,6 +34,15 @@
     border-radius: 0.25rem;
     padding: 10px;
     margin-bottom: 1rem;
+}
+
+.user-image {
+    object-fit: cover;
+    border-radius: 50%;
+    height: 70px;
+    width: 70px;
+    display: inline-block;
+    margin-top: -30px;
 }
 
 .search-filter {
@@ -53,5 +79,10 @@ label, h4 {
 @media only screen and (max-width: 768px) {
   #create-room-button, #create-order-button {
     height: 20%;
+  }
+
+  .user-image {
+    margin-top: 0px;
+    margin-bottom: 10px;
   }
 }

@@ -149,7 +149,7 @@ const sessionConfig = {
 if(process.env.NODE_ENV === 'production') {
   // allows cookies to only be accessed over https
   // this wouldn't allow authentication for local dev since local host is http
-  sessionConfig.cookie.secure = true;
+	sessionConfig.cookie.secure = false;
 }
 
 app.use(session(sessionConfig));
@@ -298,22 +298,13 @@ io.on('connect', (socket) => {
             status: notif.status
           }, (err, comment) => {
             if (err) {
-              // sends error msg if comment could not be created
               console.log(err);
             } else {
-              // format the date in the form we want
               comment.date = dateFormat(comment.created_at, "h:MM TT | mmm d");
-              // saves changes
               comment.save();
-              // confirmation log
-              // console.log('Database Comment created: '.cyan);
-              // console.log(comment);
             }
           });
         }
-        // confirmation log
-        // console.log('Database Comment created: '.cyan);
-        // console.log(comment);
       }
     });
   });
@@ -323,29 +314,26 @@ io.on('connect', (socket) => {
     (async() => { //Asynchronous function to control processes one at a time
 
       const cafe = await Cafe.find({}); //Collect data on cafe to figure out whether it's open or not
-
       if (!cafe) {
         return console.log('error accessing cafe');
       }
 
       if (cafe[0].open) { //If the cafe is open, run everything else. Otherwise, nothing matters since orders aren't being accepted
         const user = await User.findById(customerId);
-
         if (!user) {
           return console.log('error accessing user');
         }
 
         const activeOrders = await Order.find({name: `${user.firstName} ${user.lastName}`, present: true}); //Access user's current orders (so we can see if they've passed the order limit)
-
         if (!activeOrders) {
           return console.log('error accessing orders');
+				}
 
-        } else if (activeOrders.length >= 3) { //If you have made three or more orders that are still active (have not been delivered), then you cannot make anymore
+        if (activeOrders.length >= 3) { //If you have made three or more orders that are still active (have not been delivered), then you cannot make anymore
           return console.log("Max orders made");
         }
 
         const orderItems = await Item.find({_id: {$in: itemList}}); //Find all items that are part of the user's order (itemList was generated in cafe-socket FE)
-
         if (!orderItems) {
           return console.log('error accessing order items');
         }
@@ -353,7 +341,6 @@ io.on('connect', (socket) => {
         let unavailable = false; //This variable will track if any items are unavailable in the requested quantities
 
         for (let i = 0; i < orderItems.length; i++) { //Iterate over each item and check if any are unavailable
-
            if (orderItems[i].availableItems < parseInt(itemCount[i])) { //If order asks for more of this item than is available, unavailable is now true, and the checking stops immediately
             unavailable = true;
             break;
@@ -365,7 +352,6 @@ io.on('connect', (socket) => {
         }
 
         let orderItemsObjects = [];
-
         for (let i = 0; i < itemList.length; i += 1) {
           orderItemsObjects.push(
             {
@@ -377,7 +363,6 @@ io.on('connect', (socket) => {
         }
 
         let orderInstructions = "";
-
         if (instructions == "") {
           orderInstructions = "None";
 
@@ -386,20 +371,16 @@ io.on('connect', (socket) => {
         }
 
         let order = await Order.create({customer: customerId, name: `${user.firstName} ${user.lastName}`, present: true, charge: 0, instructions: orderInstructions, payingInPerson: payingInPerson}); //Assuming no setbacks, create the order
-
         if (!order) {
           return console.log('error creating order');
         }
 
         order.date = dateFormat(order.created_at, "mmm d, h:MM TT");
-
         let charge = 0;
         let itemProfile;
 
         for (let i = 0; i < orderItemsObjects.length; i++) { //items[] contains info about individual items (and their prices); itemCount[] says how much of each item is ordered. Multiplication will calculate how much to charge for an item
-
           itemProfile = await Item.findById(orderItemsObjects[i].item);
-
           if (!itemProfile) {
             return console.log('error accessing item');
           }
@@ -410,7 +391,6 @@ io.on('connect', (socket) => {
 
         order.charge = charge; //Set order cost based on the items ordered
         order.items = orderItemsObjects;
-
         await order.save();
 
         if (order.charge > user.balance && !payingInPerson) {
@@ -419,25 +399,20 @@ io.on('connect', (socket) => {
           if (!deletedOrder) {
             console.log('Error deleting order');
           }
-
         }
 
         const displayItems = await Item.find({_id: {$in: itemList}}); //Full versions of the _id signatures sent in order.items
-
         if (!displayItems) {
           return console.log('Error accessing display items');
         }
-
         io.emit('order', order, displayItems); //Send order to cafe admins via socket
-      }
 
+      }
     })().catch(err => { //Execute and catch any error
       return console.log(err);
     });
   });
-
 });
-
 
 // -----------------------
 // Start server
