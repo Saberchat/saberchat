@@ -68,17 +68,17 @@
             </div>
             <div class="col-lg-6 block">
               <div class="container">
-                <div class="row">
+                <div class="row dev-row">
                 <% [["Alexander Zhou", "alexanderz@alsionschool.org"], ["Kabir Samsi", "kabirs@alsionschool.org"]].forEach(developer => { %>
-                    <div class="col"><img src="/images/<%=developer[0]%>.jpg" class="dev-image" alt="Photo of <%=developer[0]%>"></div>
+                    <div class="col col-dev"><img src="https://alsion-saberchat.herokuapp.com/images/<%=developer[0]%>.jpg" class="dev-image" alt="Photo of <%=developer[0]%>"></div>
                 <% }); %>
                 </div>
 
                 <div class="w-100"></div>
 
-                <div class="row">
+                <div class="row dev-row">
                   <% [["Siddharth Chavan", "siddharthc@alsionschool.org"], ["Vibhav Darsha", "vibhavec@alsionschool.org"]].forEach(developer => { %>
-                    <div class="col"><img src="/images/<%=developer[0]%>.jpg" class="dev-image" alt="Photo of <%=developer[0]%>"></div>
+                    <div class="col col-dev"><img src="https://alsion-saberchat.herokuapp.com/images/<%=developer[0]%>.jpg" class="dev-image" alt="Photo of <%=developer[0]%>"></div>
                   <% });%>
                 </div>
               </div>
@@ -88,25 +88,31 @@
         <!-- Block 2 -->
         <div class="row text-element">
           <div class="col-lg-6 block">
-              <img class="image-block" src="https://i.imgur.com/5tnthVM.jpg" alt="fancy pic">
-          </div>
-            <div class="col-lg-6">
-                <article class="text-block">
-                    <div class="block-header green">
-                        <h1>Faculty</h1>
-                    </div>
-                  <div class="block-content">
-                    <p>
-                      Our teachers have helped the Alsion community for years.
-                      They are deeply involved in our student's studies and are devoted to giving students a thorough, interesting and entertaining education.
-                    </p>
-                    <% faculty.forEach(fac => { %>
-                      <span class="developer-info"><%=fac.firstName%> <%=fac.lastName%></span>
-                      <p><a href="mailto: <%=fac.email%>"><%=fac.email%></a></p>
-                    <% }); %>
-                  </div>
-                </article>
+            <% for (let teacher of faculty) { %>
+            <div class="row teacher-row">
+              <div class="col col-teacher"><img src="https://alsion-saberchat.herokuapp.com/images/<%=teacher.firstName%> <%=teacher.lastName%>.jpg" class="teacher-image" alt="Photo of <%=teacher.firstName%> <%=teacher.lastName%>"></div>
+              <div class="w-100"></div>
             </div>
+            <% };%>
+
+        </div>
+          <div class="col-lg-6">
+              <article class="text-block">
+                  <div class="block-header green">
+                      <h1>Faculty</h1>
+                  </div>
+                <div class="block-content">
+                  <p>
+                    Our teachers have helped the Alsion community for years.
+                    They are deeply involved in our student's studies and are devoted to giving students a thorough, interesting and entertaining education.
+                  </p>
+                  <% faculty.forEach(teacher => { %>
+                    <span class="developer-info"><%=teacher.firstName%> <%=teacher.lastName%></span>
+                    <p><a href="mailto: <%=teacher.email%>"><%=teacher.email%></a></p>
+                  <% }); %>
+                </div>
+              </article>
+          </div>
         </div>
 
 </main>
