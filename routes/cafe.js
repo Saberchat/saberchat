@@ -7,6 +7,7 @@ const router = express.Router();
 const dateFormat = require('dateformat');
 const {transport, transport_mandatory} = require("../other_modules/transport");
 const convertToLink = require("../other_modules/convert-to-link");
+const {getPopularityCoefficiant, sortByPopularity} = require("../other_modules/popularity-coefficiant")
 const getData = require("../other_modules/cafe-data");
 
 //SCHEMA

@@ -26,7 +26,6 @@ var messageSchema = new mongoose.Schema({
     anonymous: { type: Boolean, default: false },
     noReply: { type: Boolean, default: false },
     date: String,
-
     replies: [{
       sender: {type: mongoose.Schema.Types.ObjectId, ref: 'User'},
       text: String,
