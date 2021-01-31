@@ -102,12 +102,8 @@
                     </p>
                     <% faculty.forEach(fac => { %>
                       <span class="developer-info"><%=fac.firstName%> <%=fac.lastName%></span>
-                      <ul>
-                        <li>
-                          <span class="developer-info">Email: </span> <a href="mailto: <%=fac.email%>"><%=fac.email%></a>
-                        </li>
-                      </ul>
-                    <% }) %>
+                      <p><a href="mailto: <%=fac.email%>"><%=fac.email%></a></p>
+                    <% }); %>
                   </div>
                 </article>
             </div>
