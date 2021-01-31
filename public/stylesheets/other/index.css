@@ -19,10 +19,14 @@
   font-weight: bold;
 }
 
-.dev-image {
+.dev-image, .teacher-image {
   width: 100%;
   height: 100%;
   object-fit: cover;
+}
+
+.end {
+  width: 35.5%;
 }
 
 .col-dev {

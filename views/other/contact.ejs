@@ -70,7 +70,7 @@
               <div class="container">
                 <div class="row dev-row">
                 <% [["Alexander Zhou", "alexanderz@alsionschool.org"], ["Kabir Samsi", "kabirs@alsionschool.org"]].forEach(developer => { %>
-                    <div class="col col-dev"><img src="https://alsion-saberchat.herokuapp.com/images/<%=developer[0]%>.jpg" class="dev-image" alt="Photo of <%=developer[0]%>"></div>
+                    <div class="col col-dev"><img src="/images/<%=developer[0]%>.jpg" class="dev-image" alt="Photo of <%=developer[0]%>"></div>
                 <% }); %>
                 </div>
 
@@ -78,7 +78,7 @@
 
                 <div class="row dev-row">
                   <% [["Siddharth Chavan", "siddharthc@alsionschool.org"], ["Vibhav Darsha", "vibhavec@alsionschool.org"]].forEach(developer => { %>
-                    <div class="col col-dev"><img src="https://alsion-saberchat.herokuapp.com/images/<%=developer[0]%>.jpg" class="dev-image" alt="Photo of <%=developer[0]%>"></div>
+                    <div class="col col-dev"><img src="/images/<%=developer[0]%>.jpg" class="dev-image" alt="Photo of <%=developer[0]%>"></div>
                   <% });%>
                 </div>
               </div>
@@ -88,11 +88,23 @@
         <!-- Block 2 -->
         <div class="row text-element">
           <div class="col-lg-6 block">
-            <% for (let teacher of faculty) { %>
-            <div class="row teacher-row">
-              <div class="col col-teacher"><img src="https://alsion-saberchat.herokuapp.com/images/<%=teacher.firstName%> <%=teacher.lastName%>.jpg" class="teacher-image" alt="Photo of <%=teacher.firstName%> <%=teacher.lastName%>"></div>
+            <% let counter = 0;%>
+            <% for (let i = 0; i < faculty.length; i += 3) { %>
+              <div class="row teacher-row">
+                <div class="col col-teacher"><img src="/images/<%=faculty[i].firstName%> <%=faculty[i].lastName%>.jpg" class="teacher-image <% if (i+1 >= faculty.length) { %>end<% } %>" alt="Photo of <%=faculty[i].firstName%> <%=faculty[i].lastName%>"></div>
+
+                <% if (i+1 < faculty.length) { %>
+                  <div class="col col-teacher"><img src="/images/<%=faculty[i+1].firstName%> <%=faculty[i+1].lastName%>.jpg" class="teacher-image <% if (i+2 >= faculty.length) { %>end<% } %>"alt="Photo of <%=faculty[i+1].firstName%> <%=faculty[i+1].lastName%>"></div>
+                <% } %>
+
+                <% if (i+2 < faculty.length) { %>
+                  <div class="col col-teacher"><img src="/images/<%=faculty[i+2].firstName%> <%=faculty[i+2].lastName%>.jpg" class="teacher-image" alt="Photo of <%=faculty[i+2].firstName%> <%=faculty[i+2].lastName%>"></div>
+                <% } %>
+              </div>
+
               <div class="w-100"></div>
-            </div>
+            <% } %>
+            <% for (let teacher of faculty) { %>
             <% };%>
 
         </div>
