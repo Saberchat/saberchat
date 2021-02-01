@@ -7,3 +7,14 @@
   color: white;
   background-color: #343a40;
 }
+.header{
+  background-color: grey;
+  color: white;
+}
+.cafe,.cafe:focus,.cafe:active{
+  background-color: #000057;
+  color: #7FFFD4;
+}
+.cafetext{
+  color: #7FFFD4;
+}

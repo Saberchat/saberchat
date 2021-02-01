@@ -11,6 +11,11 @@
     <link rel="stylesheet" href="/stylesheets/components/navbar.css">
     <link rel="stylesheet" href="/stylesheets/chat/edit.css">
     <link rel="stylesheet" href="/stylesheets/cafe/index.css">
+    <%if (currentUser) {%>
+      <%if (currentUser.darkmode) { %>
+        <link rel="stylesheet" href="/stylesheets/Darkmode.css">
+      <%}%>
+    <%}%>
 
     <script src="/javascript/cafe/actions.js"></script>
 
@@ -20,14 +25,14 @@
 
     <script src="https://kit.fontawesome.com/dccc745c41.js" crossorigin="anonymous"></script>
   </head>
-  <body>
+  <body class="mode">
     <%- include('../partials/navbar') %>
     <%- include('../partials/header') %>
 
     <div class="container mt-5">
       <div class="row">
         <div class="col-12">
-          <div class="jumbotron text-center">
+          <div class="jumbotron text-center header">
             <h1><i class="fas fa-coffee"></i> No Left Turn Cafe Preorder System</h1>
           </div>
         </div>
@@ -35,7 +40,7 @@
 
       <div class="row mb-5">
         <div class="col-12">
-          <li class="list-group-item list-group-item-info" id="menu">
+          <li class="list-group-item list-group-item-info cafe" id="menu">
             <div class="d-flex w-100 justify-content-between">
               <h2 class="mb-1"><i class="fas fa-bars"></i> <a href='cafe/menu' class="section-heading">Menu</a></h2>
             </div>
@@ -45,7 +50,7 @@
       </div>
       <div class="row mb-5">
         <div class="col-12">
-          <li class="list-group-item list-group-item-info">
+          <li class="list-group-item list-group-item-info cafe">
             <div class="d-flex w-100 justify-content-between">
               <h2 class="mb-1"><i class="fas fa-hamburger"></i> Current Orders</h2>
                 <a href="cafe/order/new" class="btn btn-info"><i class="fas fa-plus-circle"></i> Order</a>

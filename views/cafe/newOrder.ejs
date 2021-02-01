@@ -14,6 +14,11 @@
   <link rel="stylesheet" href="/stylesheets/chat/new.css">
   <link rel="stylesheet" href="/stylesheets/cafe/new.css">
   <link rel="stylesheet" href="/stylesheets/cafe/menu.css">
+  <%if (currentUser) {%>
+    <%if (currentUser.darkmode) { %>
+      <link rel="stylesheet" href="/stylesheets/Darkmode.css">
+    <%}%>
+  <%}%>
 
   <script src="/socket.io/socket.io.js"></script>
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
@@ -27,7 +32,7 @@
 
 </head>
 
-<body onclick="changeOrderConfirmation()">
+<body class="mode" onclick="changeOrderConfirmation()">
   <!-- include the navbar via ejs -->
   <%- include('../partials/navbar') %>
   <%- include('../partials/header') %>
@@ -35,7 +40,7 @@
   <div class="container mt-5" id="container">
     <div class="row">
       <div class="col-12">
-        <div class="jumbotron text-center">
+        <div class="jumbotron text-center header">
           <h1>New Cafe Order</h1>
           <p>Place an order that will be delivered to you at lunch</p>
           <a class="btn btn-primary" href='/cafe'><i class="fas fa-arrow-left"></i> Back</a>
@@ -48,9 +53,9 @@
         <form id="orderForm" action="/cafe/order" method="post">
           <div id="item-selection">
 
-            <div class="search-filter mb-3">
+            <div class="search-filter mb-3 search">
               <i class="fas fa-search"></i>
-              <input id="search-input" oninput="search()" class="form-control" type="text" placeholder="Search..." title="Type in product" />
+              <input id="search-input" oninput="search()" class="form-control search" type="text" placeholder="Search..." title="Type in product" />
             </div>
           </div>
 
@@ -83,8 +88,8 @@
             <% for (let type of tempTypes) { %>
               <% if (type.items.length > 0) { %>
 
-                <li class="list-group-item list-group-item-success category-header" id="<%=type._id%>-header">
-                  <div class="d-flex w-100 justify-content-between">
+                <li class="list-group-item list-group-item-success category-header cafe" id="<%=type._id%>-header">
+                  <div class="d-flex w-100 justify-content-between cafe">
                     <h2 class="mb-1"><%=type.name%></h2>
                     <span><%=type.items.length%> item(s)</span>
                   </div>
@@ -134,10 +139,10 @@
                     <% } %>
 
                     <% if (popular) { %>
-                      <div class="list-group-item list-group-item-info form-check menu-item <%=type.name%>" id="item-<%=item.id%>" title="You have frequently ordered this item">
+                      <div class="list-group-item list-group-item-info form-check menu-item <%=type.name%> cafe" id="item-<%=item.id%>" title="You have frequently ordered this item">
 
                     <% } else { %>
-                      <div class="list-group-item form-check menu-item <%=type.name.replace(' ', '')%>" id="item-<%=item.id%>">
+                      <div class="list-group-item form-check menu-item <%=type.name.replace(' ', '')%> cafe" id="item-<%=item.id%>">
                     <% } %>
 
                       <!-- Div to put margins on text inside outer div -->
@@ -203,22 +208,22 @@
 
           <div class="form-group mt-3">
             <input type="checkbox" name="payingInPerson" id="payingInPerson" onchange="changeOrderConfirmation()"/>
-            <label for="payingInPerson" title="Paying in person will not subtract money from your online balance">In-Person Payment</label>
+            <label class="cafetext" for="payingInPerson" title="Paying in person will not subtract money from your online balance">In-Person Payment</label>
             <br /><br />
-            <textarea id="descInput" class="form-control" name="instructions" placeholder="Add special instructions for your order" maxlength="100" rows="5" oninput="changeOrderConfirmation()"></textarea>
+            <textarea id="descInput" class="form-control cafe" name="instructions" placeholder="Add special instructions for your order" maxlength="100" rows="5" oninput="changeOrderConfirmation()"></textarea>
             <br />
           </div>
 
           <br />
-          <li class="list-group-item list-group-item-primary">
+          <li class="list-group-item list-group-item-primary cafe">
             <div class="d-flex w-100 justify-content-between">
               <h2 class="mb-1">Order Summary</h2>
             </div>
           </li>
 
           <div>
-            <div id="order-confirm">
-              <span id="extra-instructions" class="list-group-item list-group-item-action form-check"><span class="instructions">Extra Instructions:</span> None</span>
+            <div id="order-confirm" class="cafe">
+              <span id="extra-instructions" class="list-group-item list-group-item-action form-check cafe"><span class="instructions">Extra Instructions:</span> None</span>
               <span id="balance-box" class="list-group-item list-group-item-action form-check">Current Balance:
                 <% if (!currentUser.balance.toString().includes('.')) { %>
                   $<%= currentUser.balance %>.00
