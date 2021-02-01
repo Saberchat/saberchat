@@ -2,6 +2,7 @@
 
 const Room = require("../models/room");
 const Cafe = require('../models/cafe')
+const Course = require('../models/course')
 const user = require("../models/user");
 const accessReq = require('../models/accessRequest');
 
@@ -28,8 +29,7 @@ middleware.checkIfMember = ((req, res, next) => {
 			req.flash('error', 'Room cannot be found or does not exist');
 			res.redirect('/chat')
 		} else {
-			let userId = req.user._id;
-			if(foundRoom.type == 'public' || foundRoom.members.includes(userId)) {
+			if(foundRoom.type == 'public' || foundRoom.members.includes(req.user._id)) {
 				return next();
 			}
 			// stuff for when user is not member of room
@@ -156,6 +156,52 @@ middleware.cafeOpen = ((req, res, next) => { //Cafe time restrictions
 				req.flash('error', "The cafe is currently not taking orders");
 				res.redirect('back');
 			}
+		}
+	});
+});
+
+//checks if user is part of a course
+middleware.memberOfCourse = ((req, res, next) => {
+	Course.findById(req.params.id, (err, course) => {
+		if(err || !course) {
+			req.flash('error', 'Course not found');
+			res.redirect('/homework');
+		} else {
+			if(course.teacher.equals(req.user._id) || course.students.includes(req.user._id)) {
+				return next();
+			}
+
+			for (let tutor of course.tutors) {
+				if (tutor.tutor.equals(req.user._id)) {
+					return next();
+				}
+			}
+
+			req.flash('error', 'You are not a member of this course');
+			res.redirect('/homework');
+		}
+	});
+});
+
+//checks if user is part of a course
+middleware.notMemberOfCourse = ((req, res, next) => {
+	Course.findOne({joinCode: req.body.joincode}, (err, course) => {
+		if(err || !course) {
+			req.flash('error', 'Course not found');
+			res.redirect('/homework')
+		} else {
+			if(course.teacher.equals(req.user._id) || course.students.includes(req.user._id) || course.blocked.includes(req.user._id)) {
+				req.flash('error', 'You are already a member of this course');
+				return res.redirect('/homework');
+			}
+
+			for (let tutor of course.tutors) {
+				if (tutor.tutor.equals(req.user._id)) {
+					req.flash('error', 'You are already a member of this course');
+					return res.redirect('/homework');
+				}
+			}
+			return next();
 		}
 	});
 });

@@ -11,7 +11,6 @@
     <link rel="stylesheet" href="/stylesheets/components/header.css">
     <link rel="stylesheet" href="/stylesheets/components/navbar.css">
     <link rel="stylesheet" href="/stylesheets/home/index.css">
-    <!-- <link rel="stylesheet" href="/stylesheets/profile/index.css"> -->
     <link rel="stylesheet" href="/stylesheets/homework/show.css">
     <link rel="stylesheet" href="/stylesheets/cafe/menu.css">
 
@@ -233,11 +232,11 @@
                         </div>
                       <% } %>
 
-                    <div title="Upvotes" class="upvotes">
+                    <div title="Upvotes" class="upvotes" id="upvote-<%=course._id%>-<%=tutor.tutor._id%>" onclick="upvote(this)">
                       <% if (tutor.upvotes.includes(currentUser._id)) { %>
-                        <span class="upvoted" id="upvote-<%=course._id%>-<%=tutor.tutor._id%>" onclick="upvote(this)"><i class="fas fa-arrow-circle-up"></i></span>
+                        <span class="upvoted"><i class="fas fa-arrow-circle-up"></i></span>
                       <% } else { %>
-                        <span class="not-upvoted" id="upvote-<%=course._id%>-<%=tutor.tutor._id%>" onclick="upvote(this)"><i class="fas fa-arrow-circle-up"></i></span>
+                        <span class="not-upvoted"><i class="fas fa-arrow-circle-up"></i></span>
                       <% }%>
                       <span id="upvoteCount-<%=course._id%>-<%=tutor.tutor._id%>"> <%=tutor.upvotes.length%></span>
                     </div>
@@ -424,7 +423,7 @@
             </div>
             <span id="loading"></span>
 
-            <form id="update-settings">
+            <form id="update-settings" onsubmit="updateSettings('<%=course._id%>', event)">
               <div class="form-group">
                   <label for="newName">Name</label>
                   <input id="newName" class="form-control" type="text" name="newName" value="<%= course.name %>" placeholder="Enter Course Name" oninput="changeName(this)" required>
@@ -441,7 +440,7 @@
                   <label for="thumbnail-input">Thumbnail Image Url</label><br />
                   <input id="thumbnail-input" class="form-control" type="text" oninput="changeThumbnail(this)" name="thumbnailUrl" value="<%= course.thumbnail %>" placeholder="Enter Thumbnail Url">
               </div>
-              <button type="button" onclick="updateSettings('<%=course._id%>', event)" class="btn btn-lg btn-primary btn-block">Confirm Changes</button><br />
+              <button type="submit" class="btn btn-lg btn-primary btn-block">Confirm Changes</button><br />
             </form>
 
             <br />
@@ -479,6 +478,33 @@
                 </div>
               </div>
             </form>
+
+            <button type="button" class="btn btn-lg btn-danger btn-block" data-toggle="modal" data-target="#modal-delete">Delete Course</button><br />
+            <form action="/homework/<%=course._id%>?_method=delete" method="post">
+              <div class="modal fade" id="modal-delete" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+                <div class="modal-dialog">
+                  <div class="modal-content">
+                    <div class="modal-header">
+                      <h5 class="modal-title" id="exampleModalLabel">Delete "<%=course.name%>"?</h5>
+                      <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                      </button>
+                    </div>
+                    <div class="modal-body">
+                      <p>
+                        This action is irreversible. All data on tutors and students will be lost. Are you sure you want to delete this course?
+                      </p>
+                      <input type="text" name="joinCode" class="form-control" placeholder="Enter Course Join Code To Confirm" id="join-code-confirm"/>
+                    </div>
+                    <div class="modal-footer">
+                      <button type="button" class="btn btn-secondary" data-dismiss="modal">Back</button>
+                      <button type="submit" class="btn btn-danger">Yes, Delete</button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </form>
+
           </div>
         </div>
 

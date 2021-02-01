@@ -66,8 +66,20 @@
                           <%}%>
                           ></i>
                         <% } %>
+                      </span>
 
-                      </span><br />
+                      <br />
+                      <span id="upvote-<%=course._id%>-<%=tutor.tutor._id%>" onclick="upvote(this)">
+                        <% if (tutor.upvotes.includes(currentUser._id)) { %>
+                          <span class="upvoted" ><i class="fas fa-arrow-circle-up"></i>
+                        <% } else { %>
+                          <span class="not-upvoted"><i class="fas fa-arrow-circle-up"></i>
+                        <% }%>
+                        <span class="upvote-count" id="upvoteCount-<%=course._id%>-<%=tutor.tutor._id%>"> <%=tutor.upvotes.length%></span>
+                        </span>
+                        <br />
+                      </span>
+
                       <p id="tutor-bio"><%= tutor.bio %></p>
 
                       <h4>Username</h4>

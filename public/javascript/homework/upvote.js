@@ -8,13 +8,11 @@ const upvote = (button => {
     if(data.success) {
 
       if (data.success.includes("Downvoted")) {
-        button.style.color = "grey";
+        button.innerHTML = `<span class="not-upvoted"><i class="fas fa-arrow-circle-up"></i><span id="upvoteCount-<%=course._id%>-${tutorId}"> ${data.upvoteCount}</span><br></span>`;
 
       } else {
-        button.style.color = "red";
+        button.innerHTML = `<span class="upvoted"><i class="fas fa-arrow-circle-up"></i><span id="upvoteCount-<%=course._id%>-${tutorId}"> ${data.upvoteCount}</span><br></span>`;
       }
-
-      document.getElementById(`upvoteCount-${courseId}-${tutorId}`).innerText = data.upvoteCount;
     }
   });
 });
@@ -35,6 +33,9 @@ const likeReview = (button => {
       }
 
       document.getElementById(`like-count-${reviewId}`).innerText = data.likeCount;
+
+    } else {
+      console.log(data.error);
     }
   });
 });

@@ -7,6 +7,16 @@
   background-color: #91393f;
 }
 
+.upvoted {
+  color: red;
+  font-size: 125%;
+}
+
+.not-upvoted {
+  color: grey;
+  font-size: 125%;
+}
+
 h3, .ratings {
   display: inline;
 }

@@ -17,6 +17,4 @@ const annSchema = Joi.object({
     deleteUpload: Joi.boolean()
 });
 
-module.exports = {
-    annSchema
-};
+module.exports = {annSchema};

@@ -18,6 +18,4 @@ const projectSchema = Joi.object({
     })
 });
 
-module.exports = {
-    projectSchema
-};
+module.exports = {projectSchema};

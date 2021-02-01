@@ -18,6 +18,4 @@ const chatSchema = Joi.object({
     checkRemove: Joi.object().pattern(/^[a-f\d]{24}$/, [Joi.string().valid('')])
 });
 
-module.exports = {
-    chatSchema
-};
+module.exports = {chatSchema};

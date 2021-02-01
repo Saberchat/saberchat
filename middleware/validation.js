@@ -2,6 +2,7 @@ const { annSchema } = require('../joiValidation/announcement');
 const { projectSchema } = require('../joiValidation/project');
 const { chatSchema } = require('../joiValidation/chat');
 const { msgSchema } = require('../joiValidation/message');
+const { courseSchema } = require('../joiValidation/course');
 const {
     newUserSchema,
     loginUserSchema,
@@ -36,6 +37,11 @@ module.exports.validateProject = (req, res, next) => {
 // Inbox messages
 module.exports.validateMsg = (req, res, next) => {
     handleValidation(msgSchema, req, res, next);
+};
+
+// Courses
+module.exports.validateCourse = (req, res, next) => {
+    handleValidation(courseSchema, req, res, next);
 };
 
 // Chat room

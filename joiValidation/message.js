@@ -23,6 +23,4 @@ const msgSchema = Joi.object({
     "object.missing": 'Please select recipients or "everyone".'
 });
 
-module.exports = {
-    msgSchema
-};
+module.exports = {msgSchema};
