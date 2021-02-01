@@ -190,8 +190,13 @@ middleware.notMemberOfCourse = ((req, res, next) => {
 			req.flash('error', 'Course not found');
 			res.redirect('/homework')
 		} else {
-			if(course.teacher.equals(req.user._id) || course.students.includes(req.user._id) || course.blocked.includes(req.user._id)) {
+			if(course.teacher.equals(req.user._id) || course.students.includes(req.user._id)) {
 				req.flash('error', 'You are already a member of this course');
+				return res.redirect('/homework');
+			}
+
+			if (course.blocked.includes(req.user._id)) {
+				req.flash('error', 'You are blocked from joining this course');
 				return res.redirect('/homework');
 			}
 

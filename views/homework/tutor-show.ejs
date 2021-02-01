@@ -77,8 +77,8 @@
                         <% }%>
                         <span class="upvote-count" id="upvoteCount-<%=course._id%>-<%=tutor.tutor._id%>"> <%=tutor.upvotes.length%></span>
                         </span>
-                        <br />
                       </span>
+                      <br />
 
                       <p id="tutor-bio"><%= tutor.bio %></p>
 
@@ -281,7 +281,6 @@
                             <div class="modal-body">
                               <% for (let tutor of course.tutors) { %>
                                 <% if (tutor.tutor._id.equals(currentUser._id)) { %>
-                                  <span id="bio-length-error" hidden>Make bio between 100-250 words</span>
                                   <textarea rows="5" minlength="50" maxlength="500" class="form-control" id="edit-bio-field" placeholder="Enter new bio"><%=tutor.bio%></textarea>
                                 <% } %>
                               <% } %>
