@@ -259,7 +259,7 @@ io.on('connect', (socket) => {
     socket.on('chat message', (msg) => {
         let profanity;
         // clean the message
-        if (msg.text != filter.clean(msg.text)) {
+        if (msg.text !== filter.clean(msg.text)) {
             msg.text = filter.clean(msg.text);
             profanity = true;
         }
@@ -363,7 +363,7 @@ io.on('connect', (socket) => {
                 }
 
                 let orderInstructions = "";
-                if (instructions == "") {
+                if (instructions === "") {
                     orderInstructions = "None";
 
                 } else {
