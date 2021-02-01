@@ -1,10 +1,10 @@
-const book = ((button, location) => {
+function book(button, location) {
     const courseId = button.id.split('-')[0];
     const tutorId = button.id.split('-')[1];
     const url = `/homework/book/${courseId}?_method=put`;
     const data = {tutorId};
 
-    $.post(url, data, function(data) {
+    $.post(url, data, data => {
         if (data.success) {
             $(`#modal-book-${tutorId}`).modal('hide');
 
@@ -103,15 +103,15 @@ const book = ((button, location) => {
             }
         }
     });
-});
+}
 
-const leave = ((button, location) => {
+function leave(button, location) {
     const courseId = button.id.split('-')[0];
     const tutorId = button.id.split('-')[1];
     const url = `/homework/leave/${courseId}?_method=put`;
     const data = {tutorId};
 
-    $.post(url, data, function(data) {
+    $.post(url, data, data => {
         if(data.success) {
             $(`#modal-stop-${tutorId}`).modal('hide');
 
@@ -164,15 +164,15 @@ const leave = ((button, location) => {
             }
         }
     });
-});
+}
 
-const closeLessons = ((button, location) => {
+function closeLessons(button, location) {
     const courseId = button.id.split('-')[0];
     const tutorId = button.id.split('-')[1];
     const url = `/homework/close-lessons/${courseId}?_method=put`;
     const data = {tutorId};
 
-    $.post(url, data, function(data) {
+    $.post(url, data, data => {
 
         if (data.success) {
             $(`#modal-close-${tutorId}`).modal('hide');
@@ -191,15 +191,15 @@ const closeLessons = ((button, location) => {
             document.getElementById(`close-${courseId}-${tutorId}`).parentNode.replaceChild(reopenButton, document.getElementById(`close-${courseId}-${tutorId}`));
         }
     });
-});
+}
 
-const reopenLessons = ((button, location) => {
+function reopenLessons(button, location) {
     const courseId = button.id.split('-')[0];
     const tutorId = button.id.split('-')[1];
     const url = `/homework/reopen-lessons/${courseId}?_method=put`;
     const data = {tutorId};
 
-    $.post(url, data, function(data) {
+    $.post(url, data, data => {
 
         if (data.success) {
             $(`#modal-reopen-${tutorId}`).modal('hide');
@@ -219,23 +219,23 @@ const reopenLessons = ((button, location) => {
             document.getElementById(`reopen-${courseId}-${tutorId}`).parentNode.replaceChild(closeButton, document.getElementById(`reopen-${courseId}-${tutorId}`));
         }
     });
-});
+}
 
-const setStudents = (() => {
+function setStudents() {
     document.getElementById("slots-label").innerText = `Number of Student Slots: ${document.getElementById('slots').value}`;
-});
+}
 
-const setStudentsTutorShow = (slider => {
+function setStudentsTutorShow(slider) {
     const courseId = slider.id.split('-')[1];
     document.getElementById(`slots-label-${courseId}`).innerText = `Number of Student Slots: ${slider.value}`;
-});
+}
 
-const setStudentsShow = (courseId => {
+function setStudentsShow(courseId) {
     const url = `/homework/set-students/${courseId}?_method=put`;
     const slots = document.getElementById('slots').value;
     const data = {courseId, slots};
 
-    $.post(url, data, function(data) {
+    $.post(url, data, data => {
         if (data.success) {
             document.getElementById("slots-count").innerText = `${slots}`;
             document.getElementById("change-message").style.color = "green";
@@ -259,16 +259,16 @@ const setStudentsShow = (courseId => {
             document.getElementById("change-message").hidden = true;
         }, 1000);
     });
-});
+}
 
-const removeStudent = ((button, location) => {
+function removeStudent(button, location) {
     const courseId = button.id.split('-')[0];
     const studentId = button.id.split('-')[1];
     const reason = document.getElementById(`reason-${studentId}`).value;
     const url = `/homework/remove-student/${courseId}?_method=put`;
     const data = {studentId, reason};
 
-    $.post(url, data, function(data) {
+    $.post(url, data, data => {
         if (data.success) {
             $(`#modal-index-remove-${studentId}`).modal('hide');
             document.getElementById("students").removeChild(document.getElementById(`item-${studentId}`));
@@ -301,16 +301,16 @@ const removeStudent = ((button, location) => {
             }
         }
     });
-});
+}
 
-const removeTutor = ((button, location) => {
+function removeTutor(button, location) {
     const courseId = button.id.split('-')[0];
     const tutorId = button.id.split('-')[1];
     const reason = document.getElementById(`reason-${tutorId}`).value;
     const url = `/homework/remove-tutor/${courseId}?_method=put`;
     const data = {tutorId, reason, show: true};
 
-    $.post(url, data, function(data) {
+    $.post(url, data, data => {
         if (data.success) {
             $(`#modal-index-remove-${tutorId}`).modal('hide');
             $(`#modal-remove-${tutorId}`).modal('hide');
@@ -347,15 +347,15 @@ const removeTutor = ((button, location) => {
             }
         }
     });
-});
+}
 
-const unblock = (button => {
+function unblock(button) {
     const courseId = button.id.split('-')[0];
     const blockedId = button.id.split('-')[1];
     const url = `/homework/unblock/${courseId}?_method=put`;
     const data = {blockedId};
 
-    $.post(url, data, function(data) {
+    $.post(url, data, data => {
 
         if (data.success) {
             $(`#modal-index-unblock-${blockedId}`).modal('hide');
@@ -366,29 +366,29 @@ const unblock = (button => {
             }
         }
     });
-});
+}
 
-const changeBio = (button => {
+function changeBio(button) {
     const courseId = button.id.split('-')[2];
     const bio = document.getElementById(`edit-bio-field`).value;
     const url = `/homework/bio/${courseId}?_method=put`;
     const data = {bio};
 
-    $.post(url, data, function(data) {
+    $.post(url, data, data => {
 
       if (data.success) {
         $(`#modal-edit-bio`).modal('hide');
         document.getElementById("tutor-bio").innerText = bio;
       }
     });
-});
+}
 
-const setTime = (input => {
+function setTime(input) {
     const studentId = input.id.split('-')[1];
     document.getElementById(`time-label-${studentId}`).innerText = input.value;
-});
+}
 
-const getTime = (experience => {
+function getTime(experience) {
     let result;
     experience = parseInt(experience);
     if (experience < 60) {
@@ -421,9 +421,9 @@ const getTime = (experience => {
         }
     }
     return result;
-});
+}
 
-const mark = (button => {
+function mark(button) {
     const courseId = button.id.split('-')[1];
     const studentId = button.id.split('-')[2];
     const time = parseInt(document.getElementById(`time-${studentId}`).value);
@@ -431,7 +431,7 @@ const mark = (button => {
     const url = `/homework/mark/${courseId}?_method=put`;
     const data = {studentId, time, summary};
 
-    $.post(url, data, function(data) {
+    $.post(url, data, data => {
         if (data.success) {
             document.getElementById(`time-${studentId}`).value = "0";
             document.getElementById("lessons-length").innerText = data.tutor.lessons.length;
@@ -446,4 +446,4 @@ const mark = (button => {
             $(`#modal-${studentId}-mark`).modal('hide');
         }
     });
-});
+}

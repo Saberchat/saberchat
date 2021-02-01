@@ -1,11 +1,10 @@
-// Upvotes a tutor
-const upvote = (button => {
+function upvote(button) {
     const courseId = button.id.split('-')[1];
     const tutorId = button.id.split("-")[2];
     const url = `/homework/upvote/${courseId}?_method=put`;
     const data = {tutorId};
 
-    $.post(url, data, function(data) {
+    $.post(url, data, data => {
         if(data.success) {
 
             if (data.success.includes("Downvoted")) {
@@ -16,14 +15,14 @@ const upvote = (button => {
             }
         }
     });
-});
+}
 
-const likeReview = (button => {
+function likeReview(button) { //Like a tutor's review (restricted to students and former students)
     const reviewId = button.id.split('-')[1];
     const url = `/homework/like-review/${reviewId}?_method=put`;
     const data = {};
 
-    $.post(url, data, function(data) {
+    $.post(url, data, data => {
         if(data.success) {
             if (data.success.includes("Liked")) {
                 button.style.color = "#03a5fc";
@@ -33,4 +32,4 @@ const likeReview = (button => {
             document.getElementById(`like-count-${reviewId}`).innerText = data.likeCount;
         }
     });
-});
+}
