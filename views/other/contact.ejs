@@ -111,7 +111,9 @@
               <% } %>
               <div class="row photo-row">
                 <div class="col col-photo"><img src="/images/<%=sortedFaculty[0].firstName%> <%=sortedFaculty[0].lastName%>.jpg" class="image row-end" alt="Photo of <%=sortedFaculty[0].firstName%> <%=sortedFaculty[0].lastName%>"></div>
-                <div class="col col-photo"><img src="/images/<%=sortedFaculty[1].firstName%> <%=sortedFaculty[1].lastName%>.jpg" class="image row-end" alt="Photo of <%=sortedFaculty[1].firstName%> <%=sortedFaculty[1].lastName%>"></div>
+                <% if (sortedFaculty.length > 1) { %>
+                  <div class="col col-photo"><img src="/images/<%=sortedFaculty[1].firstName%> <%=sortedFaculty[1].lastName%>.jpg" class="image row-end" alt="Photo of <%=sortedFaculty[1].firstName%> <%=sortedFaculty[1].lastName%>"></div>
+                <% } %>
               </div>
               <% counter = 0;%>
               <% for (let i = 2; i < sortedFaculty.length; i += 3) { %>
