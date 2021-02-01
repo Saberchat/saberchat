@@ -19,7 +19,7 @@
   font-weight: bold;
 }
 
-.dev-image, .teacher-image {
+.teacher-image {
   width: 100%;
   height: 100%;
   object-fit: cover;
@@ -27,6 +27,11 @@
 
 .end {
   width: 35.5%;
+}
+
+.row-end {
+  overflow: hidden;
+  width: 100%;
 }
 
 .col-dev {
