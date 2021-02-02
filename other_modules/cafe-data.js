@@ -1,3 +1,5 @@
+//This will be heavily refactored soon
+
 const dateFormat = require('dateformat');
 const {getPopularityCoefficiant, sortByPopularity} = require("../other_modules/popularity-coefficiant");
 const filter = require('../other_modules/filter');
@@ -8,7 +10,7 @@ const Item = require('../models/orderItem');
 const Type = require('../models/itemType');
 const Cafe = require('../models/cafe')
 
-async function getData() {
+const getData = async function() {
 
     const customers = await User.find({authenticated: true});
     if (!customers) {
@@ -415,7 +417,6 @@ async function getData() {
     if (timesObject.maxTime.split(':')[1].length < 2) {
         timesObject.maxTime = `${timesObject.maxTime}0`;
     }
-
 
     return {
         items,

@@ -1,4 +1,4 @@
-function book(button, location) {
+const book = function(button, location) {
     const courseId = button.id.split('-')[0];
     const tutorId = button.id.split('-')[1];
     const url = `/homework/book/${courseId}?_method=put`;
@@ -105,7 +105,7 @@ function book(button, location) {
     });
 }
 
-function leave(button, location) {
+const leave = function(button, location) {
     const courseId = button.id.split('-')[0];
     const tutorId = button.id.split('-')[1];
     const url = `/homework/leave/${courseId}?_method=put`;
@@ -166,7 +166,7 @@ function leave(button, location) {
     });
 }
 
-function closeLessons(button, location) {
+const closeLessons = function(button, location) {
     const courseId = button.id.split('-')[0];
     const tutorId = button.id.split('-')[1];
     const url = `/homework/close-lessons/${courseId}?_method=put`;
@@ -193,7 +193,7 @@ function closeLessons(button, location) {
     });
 }
 
-function reopenLessons(button, location) {
+const reopenLessons = function(button, location) {
     const courseId = button.id.split('-')[0];
     const tutorId = button.id.split('-')[1];
     const url = `/homework/reopen-lessons/${courseId}?_method=put`;
@@ -221,16 +221,16 @@ function reopenLessons(button, location) {
     });
 }
 
-function setStudents() {
+const setStudents = function() {
     document.getElementById("slots-label").innerText = `Number of Student Slots: ${document.getElementById('slots').value}`;
 }
 
-function setStudentsTutorShow(slider) {
+const setStudentsTutorShow = function(slider) {
     const courseId = slider.id.split('-')[1];
     document.getElementById(`slots-label-${courseId}`).innerText = `Number of Student Slots: ${slider.value}`;
 }
 
-function setStudentsShow(courseId) {
+const setStudentsShow = function(courseId) {
     const url = `/homework/set-students/${courseId}?_method=put`;
     const slots = document.getElementById('slots').value;
     const data = {courseId, slots};
@@ -261,7 +261,7 @@ function setStudentsShow(courseId) {
     });
 }
 
-function removeStudent(button, location) {
+const removeStudent = function(button, location) {
     const courseId = button.id.split('-')[0];
     const studentId = button.id.split('-')[1];
     const reason = document.getElementById(`reason-${studentId}`).value;
@@ -303,7 +303,7 @@ function removeStudent(button, location) {
     });
 }
 
-function removeTutor(button, location) {
+const removeTutor = function(button, location) {
     const courseId = button.id.split('-')[0];
     const tutorId = button.id.split('-')[1];
     const reason = document.getElementById(`reason-${tutorId}`).value;
@@ -349,7 +349,7 @@ function removeTutor(button, location) {
     });
 }
 
-function unblock(button) {
+const unblock = function(button) {
     const courseId = button.id.split('-')[0];
     const blockedId = button.id.split('-')[1];
     const url = `/homework/unblock/${courseId}?_method=put`;
@@ -368,7 +368,7 @@ function unblock(button) {
     });
 }
 
-function changeBio(button) {
+const changeBio = function(button) {
     const courseId = button.id.split('-')[2];
     const bio = document.getElementById(`edit-bio-field`).value;
     const url = `/homework/bio/${courseId}?_method=put`;
@@ -383,12 +383,12 @@ function changeBio(button) {
     });
 }
 
-function setTime(input) {
+const setTime = function(input) {
     const studentId = input.id.split('-')[1];
     document.getElementById(`time-label-${studentId}`).innerText = input.value;
 }
 
-function getTime(experience) {
+const getTime = function(experience) {
     let result;
     experience = parseInt(experience);
     if (experience < 60) {
@@ -423,7 +423,7 @@ function getTime(experience) {
     return result;
 }
 
-function mark(button) {
+const mark = function(button) {
     const courseId = button.id.split('-')[1];
     const studentId = button.id.split('-')[2];
     const time = parseInt(document.getElementById(`time-${studentId}`).value);

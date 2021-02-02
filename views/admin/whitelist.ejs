@@ -42,13 +42,12 @@
             </div>
             <br/>
 
-            <ul class="list-group">
-
+            <ul class="list-group" id="email-list">
                 <li class="list-group-item">
                     <span id="modify-header">Email Whitelist</span>
                     <form id="add-email-form" onsubmit="addEmail(event)">
                         <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#modal-add-email"
-                                id="delete-button"><i class="fas fa-inbox"></i> Add Email
+                            id="delete-button"><i class="fas fa-inbox"></i> Add Email
                         </button>
                         <div class="modal fade" id="modal-add-email" tabindex="-1" aria-labelledby="deleteModalLabel"
                              aria-hidden="true">
@@ -74,66 +73,62 @@
                         </div>
                     </form>
                 </li>
+                <% for (let email of emails.reverse()) { %>
 
-                <div id="email-list">
-                    <% for (let email of emails.reverse()) { %>
+                    <li class="list-group-item email" id="<%= email._id %>">
+                        <%= email.address %>
+                        <% let exists = null %>
 
-                        <li class="list-group-item email" id="<%= email._id %>">
-                            <%= email.address %>
-                            <% let exists = null %>
-
-                            <% for (let user of users) { %>
-                                <% if (user.email == email.address) { %>
-                                    <% exists = user; %>
-                                    <% break; %>
-                                <% } %>
+                        <% for (let user of users) { %>
+                            <% if (user.email == email.address) { %>
+                                <% exists = user; %>
+                                <% break; %>
                             <% } %>
+                        <% } %>
 
-                            <% if (exists) { %>
-                                <a class="badge badge-pill badge-info user-exists" href="../profiles/<%= exists._id %>">User
-                                    Exists</a>
+                        <% if (exists) { %>
+                            <a class="badge badge-pill badge-info user-exists" href="../profiles/<%= exists._id %>">User
+                                Exists</a>
 
-                            <% } else { %>
-                                <div class="delete-email">
-                                    <button type="button" class="btn btn-danger" data-toggle="modal"
-                                            data-target="#modal-<%= email._id %>" id="delete-button"><i
-                                                class="fas fa-trash-alt"></i> Remove
-                                    </button>
+                        <% } else { %>
+                            <div class="delete-email">
+                                <button type="button" class="btn btn-danger" data-toggle="modal"
+                                        data-target="#modal-<%= email._id %>" id="delete-button"><i
+                                            class="fas fa-trash-alt"></i> Remove
+                                </button>
 
-                                    <div class="modal fade" id="modal-<%= email._id %>" tabindex="-1"
-                                         aria-labelledby="deleteModalLabel" aria-hidden="true">
-                                        <div class="modal-dialog">
-                                            <div class="modal-content">
-                                                <div class="modal-header">
-                                                    <h5 class="modal-title" id="exampleModalLabel">Remove Email From
-                                                        Whitelist?</h5>
-                                                    <button type="button" class="close" data-dismiss="modal"
-                                                            aria-label="Close">
-                                                        <span aria-hidden="true">&times;</span>
-                                                    </button>
-                                                </div>
-                                                <div class="modal-body">
-                                                    If an account is currently using this email, it cannot be deleted.
-                                                </div>
-                                                <div class="modal-footer">
-                                                    <button type="button" class="btn btn-secondary"
-                                                            data-dismiss="modal">No, Go
-                                                        Back
-                                                    </button>
-                                                    <button type="button" id="remove-<%= email._id %>"
-                                                            onclick="removeEmail(this)" class="btn btn-danger">Yes,
-                                                        Remove Email
-                                                    </button>
-                                                </div>
+                                <div class="modal fade" id="modal-<%= email._id %>" tabindex="-1"
+                                     aria-labelledby="deleteModalLabel" aria-hidden="true">
+                                    <div class="modal-dialog">
+                                        <div class="modal-content">
+                                            <div class="modal-header">
+                                                <h5 class="modal-title" id="exampleModalLabel">Remove Email From
+                                                    Whitelist?</h5>
+                                                <button type="button" class="close" data-dismiss="modal"
+                                                        aria-label="Close">
+                                                    <span aria-hidden="true">&times;</span>
+                                                </button>
+                                            </div>
+                                            <div class="modal-body">
+                                                If an account is currently using this email, it cannot be deleted.
+                                            </div>
+                                            <div class="modal-footer">
+                                                <button type="button" class="btn btn-secondary"
+                                                        data-dismiss="modal">No, Go
+                                                    Back
+                                                </button>
+                                                <button type="button" id="remove-<%= email._id %>"
+                                                        onclick="removeEmail(this)" class="btn btn-danger">Yes,
+                                                    Remove Email
+                                                </button>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
+                            </div>
                         </li>
-
-                        <% } %>
                     <% } %>
-                </div>
+                <% } %>
             </ul>
             <br/>
         </div>

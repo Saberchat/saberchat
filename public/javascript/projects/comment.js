@@ -1,14 +1,11 @@
-// sends put request with data
-const comment = ((form, event) => {
-
+const comment = function(form, event) {
     if (document.getElementById('comment-input').value.split(' ').join('') != '') {
         const projectId = form.id.split("-")[1];
         const url = `/projects/comment?_method=put`;
         const data = {project: projectId, text: document.getElementById('comment-input').value};
         document.getElementById('comment-input').value = ""; //Empty input field
 
-        $.post(url, data, function (data) {
-
+        $.post(url, data, data => {
             if (data.success) {
                 // DOM Elements that change with new comment
                 const comments = document.getElementsByClassName('comment-body');
@@ -39,14 +36,12 @@ const comment = ((form, event) => {
                 // Add the new comment to the top of the list of comments
                 newComment.innerHTML = commentHTML;
                 allComments.insertBefore(newComment, allComments.children[0]);
-
             }
         });
-
         event.preventDefault(); //Prevent page from automatically refreshing
     }
-});
+}
 
-const reply = (comment => {
+const reply = function(comment) {
     document.getElementById('comment-input').value = `@${comment.id.split("comment-")[1]}_ `;
-});
+}

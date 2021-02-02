@@ -100,11 +100,11 @@
                     <% let tagMap = new Map([["Tutor", "warning"], ["Cashier", "success"], ["Editor", "info"]]); %>
                     <div class="form-group">
                         <label for="tags">Select Temporary Statuses
-                            <div id="tag-group">
+                            <span id="tag-group">
                                 <% currentUser.tags.forEach(tag => { %>
                                     <span class="badge badge-pill badge-<%= tagMap.get(tag) %> user-tag"><%= tag %></span>
                                 <% }) %>
-                            </div>
+                            </span>
                         </label>
                         <select class="form-control" id="<%= currentUser.id %>" name="tags" onchange="updateTag(this)">
                             <option value=""></option>

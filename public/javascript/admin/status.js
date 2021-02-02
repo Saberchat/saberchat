@@ -1,7 +1,7 @@
 const loading = document.getElementById('loading');
 
 // sends put request with data
-const updateStatus = (select => {
+const updateStatus = function(select) {
     loading.style.display = 'block';
     loading.style.color = 'gray';
     loading.innerHTML = 'Waiting...';
@@ -9,7 +9,7 @@ const updateStatus = (select => {
     const url = '/admin/status?_method=put';
     const userId = select.id;
     const data = {user: userId, status: status};
-    $.post(url, data, function (data) {
+    $.post(url, data, data => {
         if (data.success) {
             loading.style.color = 'green';
             loading.innerHTML = data.success;
@@ -29,12 +29,11 @@ const updateStatus = (select => {
                 }
             }
         }
-
     });
-});
+}
 
 // sends put request with data
-const updateTag = (select => {
+const updateTag = function(select) {
     loading.style.color = 'gray';
     loading.innerHTML = 'Waiting...';
     const tag = select.value;
@@ -46,7 +45,7 @@ const updateTag = (select => {
 
     // Send out JSON request
     const data = {user: userId, tag: tag};
-    $.post(url, data, function (data) {
+    $.post(url, data, data => {
 
         if (data.success) { //If data is successfully posted
             loading.style.color = 'green';
@@ -78,9 +77,9 @@ const updateTag = (select => {
             }
         }
     });
-});
+}
 
-const searchFunction = (() => {
+const searchFunction = function() {
     const users = document.getElementsByClassName('user');
     const searchInput = document.getElementById('search-input');
     let filter = searchInput.value.toLowerCase();
@@ -93,4 +92,4 @@ const searchFunction = (() => {
             users[i].hidden = false;
         }
     }
-})
+}

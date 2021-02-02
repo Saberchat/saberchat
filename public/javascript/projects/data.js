@@ -1,7 +1,7 @@
 const keywords = document.getElementsByClassName("keyword");
 const occurences = document.getElementsByClassName("occurence");
 
-anychart.onDocumentReady(function () {
+anychart.onDocumentReady(() => {
     var data = [];
 
     for (let i = 0; i < keywords.length; i++) {

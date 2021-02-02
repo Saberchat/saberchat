@@ -25,14 +25,11 @@ const markSelBtn = document.getElementById('mark-sel-btn');
 
 const delSelForm = document.getElementById('del-select-form');
 
-// tracks inbox state
+// tracks inbox and request states
 let inboxDisplay = 'message';
-
-// tracks req inbox state
 let reqDisplay = 'current';
 
-// changes view to messages
-const setMessages = (() => {
+const setMessages = function() { // changes view to messages
     if (inboxDisplay == 'request') {
         messageActions.classList.add('display');
         messageList.classList.add('display');
@@ -46,10 +43,9 @@ const setMessages = (() => {
 
         inboxDisplay = 'message';
     }
-});
+}
 
-//changes view to requests
-const setRequests = (() => {
+const setRequests = function() { //changes view to requests
     if (inboxDisplay == 'message') {
         requestActions.classList.add('display');
         requestList.classList.add('display');
@@ -63,15 +59,13 @@ const setRequests = (() => {
 
         inboxDisplay = 'request';
     }
-});
+}
 
-// sends form info for deleting selected messages
-const submitDelete = (() => {
+const submitDelete = function() { // sends form info for deleting selected messages
     delSelForm.submit();
-});
+}
 
-// changes req inbox to current
-const seeCurrentReq = (() => {
+const seeCurrentReq = function() { // changes req inbox to current
     if (reqDisplay == 'history') {
         currentReq.classList.add('display');
         pastReq.classList.remove('display');
@@ -81,10 +75,9 @@ const seeCurrentReq = (() => {
 
         reqDisplay = 'current';
     }
-});
+}
 
-// changes req inbox to history
-const seePastReq = (() => {
+const seePastReq = function() { // changes req inbox to history
     if (reqDisplay == 'current') {
         pastReq.classList.add('display');
         currentReq.classList.remove('display');
@@ -94,10 +87,9 @@ const seePastReq = (() => {
 
         reqDisplay = 'history';
     }
-});
+}
 
-// switches between delete all to delete selected
-const updateDelete = (() => {
+const updateDelete = function() { // switches between delete all to delete selected
     const inputs = document.getElementsByClassName('del-form-input');
     let selected = false;
     for (let i = 0; i < inputs.length; i++) {
@@ -119,4 +111,4 @@ const updateDelete = (() => {
         markSelBtn.style.display = 'none';
         markAllBtn.style.display = 'block';
     }
-});
+}

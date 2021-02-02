@@ -19,9 +19,8 @@ let payingStyleNew;
 let balanceBox;
 
 //Changes the order confirmation on the form
-const changeOrderConfirmation = (() => {
+const changeOrderConfirmation = function() {
     sum = 0;
-
     while (orderConfirm.firstChild) { //Remove all the items in the 'confirm order' section
         orderConfirm.removeChild(orderConfirm.firstChild);
     }
@@ -57,16 +56,13 @@ const changeOrderConfirmation = (() => {
         }
     }
 
-    //Once this process is finished, create an element to render the extra instructions and total cost
-
-    instructionsNew = document.createElement('span');
+    instructionsNew = document.createElement('span'); //Once this process is finished, create an element to render the extra instructions and total cost
     instructionsNew.style = 'color: blue;';
     instructionsNew.className = "list-group-item list-group-item-action form-check";
     instructionsNew.id = "extra-instructions";
 
     if (extraInstructionsInput.value == '') {
         instructionsNew.innerHTML = `<strong>Extra Instructions:</strong> None`;
-
     } else {
         instructionsNew.innerHTML = `<strong>Extra Instructions:</strong> ${extraInstructionsInput.value}`;
     }
@@ -75,21 +71,16 @@ const changeOrderConfirmation = (() => {
     balanceBox.style = 'color: purple;';
     balanceBox.className = "list-group-item list-group-item-action form-check";
     balanceBox.id = "balance-box";
-
     balanceBox.innerText = balanceString;
-
     totalNew = document.createElement('span');
     totalNew.style = 'color: green;';
     totalNew.className = "list-group-item list-group-item-action form-check";
     totalNew.id = "total-cost";
 
-    //Create cost in full '$dd.cc' format based on what the total is
-    if (!sum.toString().includes('.')) {
+    if (!sum.toString().includes('.')) { //Create cost in full '$dd.cc' format based on what the total is
         totalNew.innerHTML = `<strong>Total: $${sum}.00</strong>`;
-
     } else if (sum.toString().split('.')[1].length == 1) {
         totalNew.innerHTML = `<strong>Total: $${sum}0</strong>`;
-
     } else {
         totalNew.innerHTML = `<strong>Total: $${sum}</strong>`;
     }
@@ -105,19 +96,15 @@ const changeOrderConfirmation = (() => {
 
     if (payingInPerson.checked) {
         payingStyleNew.innerText = "Paying In-Person";
-
     } else {
         payingStyleNew.innerText = "Paying Online";
     }
 
-    //Add the total to the div
-    orderConfirm.appendChild(instructionsNew);
-
+    orderConfirm.appendChild(instructionsNew); //Add the total to the div
     if (!payingInPerson.checked) {
         orderConfirm.appendChild(balanceBox);
     }
 
     orderConfirm.appendChild(totalNew);
     orderConfirm.appendChild(payingStyleNew);
-
-});
+}

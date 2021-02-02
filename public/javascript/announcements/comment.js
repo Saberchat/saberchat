@@ -1,5 +1,5 @@
 // sends put request with data
-const comment = ((form, event) => {
+const comment = function(form, event) {
 
     if (document.getElementById('comment-input').value.split(' ').join('') != '') {
         const announcementId = form.id.split("-")[1];
@@ -7,7 +7,7 @@ const comment = ((form, event) => {
         const data = {announcement: announcementId, text: document.getElementById('comment-input').value};
         document.getElementById('comment-input').value = ""; //Empty input field
 
-        $.post(url, data, function (data) {
+        $.post(url, data, data => {
 
             if (data.success) {
                 // DOM Elements that change with new comment
@@ -45,8 +45,8 @@ const comment = ((form, event) => {
 
         event.preventDefault(); //Prevent page from automatically refreshing
     }
-});
+}
 
-const reply = (comment => {
+const reply = function(comment) {
     document.getElementById('comment-input').value = `@${comment.id.split("comment-")[1]}_ `
-});
+}

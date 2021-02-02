@@ -1,4 +1,4 @@
-function convertToLink(text) {
+const convertToLink = function(text) {
     const delimeter = new RegExp(/[\"\'\r]/, 'g'); //Regex for most troublesome link characters
     let deformatted = []; //Holds words/links from text
     let embedded = false; //Boolean value to check if link/email is embedded in each line of text
@@ -67,12 +67,10 @@ function convertToLink(text) {
                 break;
             }
         }
-
         if (!embedded) { //If there is no link in the line at all, add plain text
             convertedText += `${line} `;
         }
     }
-
     return convertedText;
 }
 

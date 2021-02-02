@@ -1,6 +1,6 @@
 let starCounts = new Map();
 
-function rate(button, tutorId) {
+const rate = function(button, tutorId) {
     if (starCounts.has(tutorId)) {
 
         //If clicked star is already the number of stars, subtract 1 (most out-of-5 review systems I have found work this way)
@@ -21,7 +21,7 @@ function rate(button, tutorId) {
     }
 }
 
-function submitRating(button, location) {
+const submitRating = function(button, location) {
     const courseId = button.id.split('-')[0];
     const tutorId = button.id.split("-")[1];
 

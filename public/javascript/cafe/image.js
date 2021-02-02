@@ -1,4 +1,4 @@
-const createImage = (imageInput => {
+const createImage = function(imageInput) {
     if (imageInput.value.replaceAll(' ', '') != '') {
         document.getElementById("item-image").src = imageInput.value;
         document.getElementById("item-image").hidden = false;
@@ -6,4 +6,4 @@ const createImage = (imageInput => {
     } else {
         document.getElementById("item-image").hidden = true;
     }
-});
+}

@@ -20,7 +20,7 @@ const updateTag = (select => {
 
     // Send out JSON request
     const data = {tag: tag};
-    $.post(url, data, function (data) {
+    $.post(url, data, data => {
 
         if (data.success) { //If data is successfully posted
             for (let option of select) { //Make the option with no value (the top option) the default selected option

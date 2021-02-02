@@ -5,13 +5,13 @@ const messageDisplay = document.getElementById('message-display');
 const scrollBtn = document.getElementsByClassName('btn-scrolldown')[0];
 
 // function for auto scrolling to new messages
-const scrollToElement = (innerElement => {
+const scrollToElement = function(innerElement) {
     var topPos = innerElement.offsetTop;
     messageDisplay.scrollTop = topPos - 10;
-})
+}
 
 // function for reporting messages
-const report = (element => {
+const report = function(element) {
     let id = element.id;
     let url = '/chat/comments/' + id + '/report?_method=put'
     let data = {
@@ -20,14 +20,14 @@ const report = (element => {
     let parent = element.parentNode;
     element.remove();
     $(parent).append(`<p class="flag">Waiting...</p>`);
-    $.post(url, data, function (data) {
+    $.post(url, data, data => {
         parent.getElementsByClassName('flag')[0].remove();
         $(parent).append(`<p class="flag">[${data}]</p>`);
     });
-})
+}
 
 // function for scrolling to very bottom
-const scrollBottom = (() => {
+const scrollBottom = function() {
     let messages = document.getElementsByClassName('media');
     let message = messages[messages.length - 1];
     if (message) {
@@ -35,7 +35,7 @@ const scrollBottom = (() => {
     }
     autoScroll = true;
     scrollBtn.classList.remove('display');
-})
+}
 
 // turn off auto scroll if user is checking previous messages
 messageDisplay.addEventListener('scroll', () => {
@@ -49,7 +49,7 @@ messageDisplay.addEventListener('scroll', () => {
 }, false);
 
 //create function that sets up the socket chat
-function chatInit(username, userId, messageForm, input, chatDisplay, room, userImage) {
+const chatInit = function(username, userId, messageForm, input, chatDisplay, room, userImage) {
 
     var socket = io();
 

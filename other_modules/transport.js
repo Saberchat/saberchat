@@ -2,10 +2,9 @@ if (process.env.NODE_ENV !== "production") {
     require('dotenv').config();
 }
 
-// const nodemailer = require("nodemailer");
 const axios = require('axios');
 
-function transport(recipient, subject, html) {
+const transport = function(recipient, subject, html) {
     if (process.env.SENDING_EMAILS == "true" && recipient.receiving_emails) {
         const url = process.env.SENDGRID_BASE_URL + '/mail/send';
         const data = {

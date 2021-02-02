@@ -1,7 +1,7 @@
 const loading = document.getElementById('loading');
 
 // sends put request with data
-const updateRole = (select => {
+const updateRole = function(select) {
     loading.style.display = 'block';
     loading.style.color = 'gray';
     loading.innerHTML = 'Waiting...';
@@ -9,7 +9,7 @@ const updateRole = (select => {
     const url = '/admin/permissions?_method=put';
     const userId = select.id;
     const data = {user: userId, role: role};
-    $.post(url, data, function (data) {
+    $.post(url, data, data => {
         if (data.success) {
             loading.style.color = 'green';
             loading.innerHTML = data.success;
@@ -31,9 +31,9 @@ const updateRole = (select => {
         }
 
     });
-});
+}
 
-const searchFunction = (() => {
+const searchFunction = function() {
     const users = document.getElementsByClassName('user');
     const searchInput = document.getElementById('search-input');
     let filter = searchInput.value.toLowerCase();
@@ -46,4 +46,4 @@ const searchFunction = (() => {
             users[i].hidden = false;
         }
     }
-});
+}

@@ -7,7 +7,7 @@ const comment = ((form, event) => {
         const data = {article: articleId, text: document.getElementById('comment-input').value};
         document.getElementById('comment-input').value = ""; //Empty input field
 
-        $.post(url, data, function (data) {
+        $.post(url, data, data => {
 
             if (data.success) {
                 // DOM Elements that change with new comment

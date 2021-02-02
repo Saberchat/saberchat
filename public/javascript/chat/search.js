@@ -1,4 +1,4 @@
-const searchFunction = (() => {
+const searchFunction = function() {
     let input = document.getElementById("search-input");
     let filter = input.value.toUpperCase();
     let list = document.getElementById("user-list");
@@ -12,4 +12,4 @@ const searchFunction = (() => {
             users[i].style.display = "none";
         }
     }
-});
+}

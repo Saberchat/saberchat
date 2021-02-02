@@ -1,9 +1,9 @@
 // sends put request with data
-const like = (button => {
+const like = function(button) {
     const announcementId = button.id.split("-")[1];
     const url = `/announcements/like?_method=put`;
     const data = {announcement: announcementId};
-    $.post(url, data, function (data) {
+    $.post(url, data, data => {
         if (data.success) {
 
             if (data.success.includes("Removed a like")) {
@@ -21,15 +21,14 @@ const like = (button => {
 
             document.getElementsByClassName(`likeCount-${announcementId}`)[0].innerText = data.likeCount;
         }
-
     });
-});
+}
 
-const likeComment = (button => {
+const likeComment = function(button) {
     const commentId = button.id.split("-")[1];
     const url = `/announcements/like-comment?_method=put`;
     const data = {commentId};
-    $.post(url, data, function (data) {
+    $.post(url, data, data => {
         if (data.success) {
 
             if (data.success.includes("Removed a like")) {
@@ -43,4 +42,4 @@ const likeComment = (button => {
 
         }
     });
-});
+}

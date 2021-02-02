@@ -1,12 +1,12 @@
-const reply = (() => {
+const reply = function() {
     document.getElementById('reply-box').hidden = false;
-});
+}
 
-const cancelReply = (() => {
+const cancelReply = function() {
     document.getElementById('reply-box').hidden = true;
-});
+}
 
-const sendReply = ((msg, event) => {
+const sendReply = function(msg, event) {
     const msgId = msg.id.split('-')[2];
     const url = `/inbox/reply?_method=put`;
 
@@ -14,14 +14,10 @@ const sendReply = ((msg, event) => {
     for (let image of document.getElementsByClassName('input-container')) {
         images.push(image.getElementsByTagName('input')[0].value);
     }
-    ;
 
-    //Build string of data and post it to server
     const data = {message: msgId, text: document.getElementById('message').value, images: images.reverse()};
-    $.post(url, data, function (data) {
+    $.post(url, data, data => {
         if (data.success) {
-
-            //DOM elements are manipulated when rendering new reply
             const replyContainer = document.getElementById('reply-container');
             const replies = document.getElementsByClassName('replies');
             const imgContainer = document.getElementById('image-block');
@@ -45,6 +41,5 @@ const sendReply = ((msg, event) => {
             document.getElementById('reply-box').hidden = true;
         }
     });
-
     event.preventDefault(); //Prevent page from refreshing
-});
+}

@@ -1,4 +1,4 @@
-const updateDisplayNewRoom = (() => {
+const updateDisplayNewRoom = function() {
     let userSelect = document.getElementById('roomType');
     let display = document.getElementById('user-selection');
     if (userSelect.checked == true) {
@@ -6,9 +6,9 @@ const updateDisplayNewRoom = (() => {
     } else {
         display.style.display = "none";
     }
-});
+}
 
-const searchFunctionNewRoom = (() => {
+const searchFunctionNewRoom = function() {
     let input = document.getElementById("search-input");
     let filter = input.value.toUpperCase();
     let list = document.getElementById("user-list");
@@ -22,4 +22,4 @@ const searchFunctionNewRoom = (() => {
             users[i].style.display = "none";
         }
     }
-});
+}

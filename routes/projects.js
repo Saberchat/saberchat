@@ -144,42 +144,42 @@ router.post('/', middleware.isLoggedIn, middleware.isFaculty, validateProject, (
 });
 
 //COMMENTED OUT FOR NOW, UNTIL WE MAKE FURTHER DECISIONS AT MEETING
-//
+
 // router.get('/data', middleware.isLoggedIn, middleware.isFaculty, (req, res) => {
-//   Project.find({poster: req.user._id}).populate("comments").exec((err, projects) => {;
-//     if (err || !projects) {
-//       req.flash('error', "Unable to find projects");
-//       return res.redirect('back');
-//     }
+//     Project.find({poster: req.user._id}).populate("comments").exec((err, projects) => {;
+//         if (err || !projects) {
+//             req.flash('error', "Unable to find projects");
+//             return res.redirect('back');
+//         }
 //
-//     const popularProjects = sortByPopularity(projects, "likes", "created_at", null).popular; //Extract and sort popular projects
-//     const unpopularProjects = sortByPopularity(projects, "likes", "created_at", null).unpopular; //Extract and sort unpopular projects
+//         const popularProjects = sortByPopularity(projects, "likes", "created_at", null).popular; //Extract and sort popular projects
+//         const unpopularProjects = sortByPopularity(projects, "likes", "created_at", null).unpopular; //Extract and sort unpopular projects
 //
-//     //Build string of projects and comments text
-//     let popularProjectText = "";
-//     let popularCommentText = "";
-//     for (let project of popularProjects) {
-//       popularProjectText += `${project.title} ${project.text} `;
-//       for (let comment of project.comments) {
-//         popularCommentText += `${comment.text} `;
-//       }
-//     }
+//         //Build string of projects and comments text
+//         let popularProjectText = "";
+//         let popularCommentText = "";
+//         for (let project of popularProjects) {
+//             popularProjectText += `${project.title} ${project.text} `;
+//             for (let comment of project.comments) {
+//                 popularCommentText += `${comment.text} `;
+//             }
+//         }
 //
-//     //Build string of projects and comments text
-//     let unpopularProjectText = "";
-//     let unpopularCommentText = "";
-//     for (let project of unpopularProjects) {
-//       unpopularProjectText += `${project.title} ${project.text} `;
-//       for (let comment of project.comments) {
-//         unpopularCommentText += `${comment.text} `;
-//       }
-//     }
+//         //Build string of projects and comments text
+//         let unpopularProjectText = "";
+//         let unpopularCommentText = "";
+//         for (let project of unpopularProjects) {
+//             unpopularProjectText += `${project.title} ${project.text} `;
+//             for (let comment of project.comments) {
+//                 unpopularCommentText += `${comment.text} `;
+//             }
+//         }
 //
-//     //Map keywords from popular projects and their comments
-//     const projectKeywords = filter(popularProjectText, unpopularProjectText);
-//     const commentKeywords = filter(popularCommentText, unpopularCommentText);
-//     res.render('projects/data', {popularProjects, projectKeywords, commentKeywords});
-//   });
+//         //Map keywords from popular projects and their comments
+//         const projectKeywords = filter(popularProjectText, unpopularProjectText);
+//         const commentKeywords = filter(popularCommentText, unpopularCommentText);
+//         res.render('projects/data', {popularProjects, projectKeywords, commentKeywords});
+//     });
 // });
 
 router.get('/:id/edit', middleware.isLoggedIn, middleware.isFaculty, (req, res) => { //RESTful Routing 'EDIT' route

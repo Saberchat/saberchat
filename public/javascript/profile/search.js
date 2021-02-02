@@ -1,4 +1,4 @@
-const changeFollowerTab = (newTab => {
+const changeFollowerTab = function(newTab) {
     const tabMap = new Map([['followers-button', ['following-button', 'following-list']], ['following-button', ['followers-button', 'followers-list']]]);
 
     newTab.classList.add('btn-dark');
@@ -11,9 +11,9 @@ const changeFollowerTab = (newTab => {
     newTab.hidden = false;
 
     document.getElementById(tabMap.get(tabMap.get(newTab.id)[0])[1]).hidden = false;
-});
+}
 
-const searchFunctionFollowers = (() => {
+const searchFunctionFollowers = function() {
     const searchBarFollowers = document.getElementById('search-bar-followers');
     const followerBlocks = document.getElementsByClassName('follower-block');
 
@@ -26,9 +26,9 @@ const searchFunctionFollowers = (() => {
             followerBlocks[b].hidden = false;
         }
     }
-});
+}
 
-const searchFunctionFollowing = (() => {
+const searchFunctionFollowing = function() {
     const searchBarFollowing = document.getElementById('search-bar-following');
     const followingBlocks = document.getElementsByClassName('following-block');
 
@@ -41,9 +41,9 @@ const searchFunctionFollowing = (() => {
             followingBlocks[b].hidden = false;
         }
     }
-});
+}
 
-const searchFunction = (() => {
+const searchFunction = function() {
     let statusHeaders = document.getElementsByClassName('status-header')
     let statusBreaks = document.getElementsByClassName('status-page-break')
     let statuses = [["faculty", "Faculty", []], ["12th", "Seniors", []], ["11th", "Juniors", []], ["10th", "Sophomores", []], ["9th", "Freshmen", []], ["8th", "8th Graders", []], ["7th", "7th Graders", []], ["alumnus", "Alumni", []], ["parent", "Parents", []], ["guest", "Guests", []]]
@@ -65,7 +65,6 @@ const searchFunction = (() => {
     }
 
     let statusIncluded;
-
     for (let status of statuses) {
         statusIncluded = false;
         for (let member of document.getElementsByClassName(status[0])) {
@@ -91,6 +90,5 @@ const searchFunction = (() => {
                 }
             }
         }
-
     }
-});
+}

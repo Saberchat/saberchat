@@ -1,30 +1,24 @@
 const creatorSelect = document.getElementById('creator-select');
 const creatorDiv = document.getElementById('creator-input-div');
 const creatorInput = document.getElementById('creator-input');
-
-$("#project-image").hide();
-
 let creatorList = [];
 
+$("#project-image").hide();
 for (let creator of document.getElementsByClassName('user-tag')) {
     creatorList.push(creator.id)
     creatorInput.value = creatorList.toString()
 }
 
-const addCreator = (user => {
-
+const addCreator = function(user) {
     if ((!creatorList.includes(creatorSelect.value)) && !(creatorList.includes(creatorSelect[creatorSelect.selectedIndex].className))) { //Make sure that if the status has been selected, nothing else is selected
+        creatorList.push(creatorSelect.value);
+        creatorInput.value = creatorList.toString();
 
         let newCreator = document.createElement('div');
         newCreator.classList.add('user-tag');
         newCreator.classList.add(`${creatorSelect[creatorSelect.selectedIndex].className}`); //Put the user status in the tag
         newCreator.id = `${creatorSelect.value}`;
-        creatorList.push(creatorSelect.value);
-        creatorInput.value = creatorList.toString();
-
-        newCreator.innerHTML = `<span name="creators" value="${creatorSelect.value}">${creatorSelect.options[creatorSelect.selectedIndex].text}</span>
-    <button type="button" id="${creatorSelect.value}" onclick="remCreator(this)">&times;</button>`;
-
+        newCreator.innerHTML = `<span name="creators" value="${creatorSelect.value}">${creatorSelect.options[creatorSelect.selectedIndex].text}</span><button type="button" id="${creatorSelect.value}" onclick="remCreator(this)">&times;</button>`;
         creatorDiv.appendChild(newCreator);
 
         let deletes = []; //List of usernames to be removed
@@ -39,9 +33,9 @@ const addCreator = (user => {
             remCreator(document.getElementsByClassName('user-tag')[del].getElementsByTagName('button')[0]);
         }
     }
-})
+}
 
-const remCreator = (btn => {
+const remCreator = function(btn) {
     const id = btn.id;
 
     const userTags = document.getElementsByClassName('user-tag');
@@ -53,4 +47,4 @@ const remCreator = (btn => {
             creatorInput.value = creatorList.toString();
         }
     }
-});
+}

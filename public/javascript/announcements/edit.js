@@ -4,7 +4,7 @@ const reUploadBlock = document.getElementById('replace-upload-block');
 if (delUploadCheck && reUploadBlock) {
     reUploadBlock.style.display = "none";
 
-    function updateUpload() {
+    const updateUpload = function() {
         if (delUploadCheck.checked) {
             reUploadBlock.style.display = "block";
         } else {

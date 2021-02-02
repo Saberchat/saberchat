@@ -1,4 +1,4 @@
-const search = (() => {
+const search = function() {
     const catHeaders = document.getElementsByClassName('category-header'); //Category header
     const catBreaks = document.getElementsByClassName('category-break'); //Category page break
     const menuItems = document.getElementsByClassName('menu-item');
@@ -14,7 +14,7 @@ const search = (() => {
         }
     }
 
-    let catIncluded; //"Category Included"
+    let catIncluded; //Category Included
 
     for (let h = 0; h < catHeaders.length; h += 1) {
         catIncluded = false;
@@ -35,10 +35,10 @@ const search = (() => {
             catBreaks[h].hidden = true;
         }
     }
-});
+}
 
 //Searching for orders works differently from the other cafe search function
-const searchOrders = (() => {
+const searchOrders = function() {
     const orders = document.getElementsByClassName('card');
     const searchInput = document.getElementById('search-input');
     let filter = searchInput.value.toLowerCase();
@@ -51,4 +51,4 @@ const searchOrders = (() => {
             orders[i].hidden = false;
         }
     }
-});
+}

@@ -1,9 +1,9 @@
-const follow = ((button, location) => {
+const follow = function(button, location) {
     const userId = button.id.split('-')[2];
     const url = `/profiles/follow/${userId}?_method=put`;
     const data = {};
 
-    $.post(url, data, function (data) {
+    $.post(url, data, data => {
         if (data.success) {
             $(`#modal-${userId}-follow`).modal('hide');
 
@@ -26,14 +26,14 @@ const follow = ((button, location) => {
             }
         }
     });
-});
+}
 
-const unfollow = ((button, location) => {
+const unfollow = function(button, location) {
     const userId = button.id.split('-')[2];
     const url = `/profiles/unfollow/${userId}?_method=put`;
     const data = {};
 
-    $.post(url, data, function (data) {
+    $.post(url, data, data => {
         if (data.success) {
             $(`#modal-${userId}-unfollow`).modal('hide');
 
@@ -52,32 +52,32 @@ const unfollow = ((button, location) => {
             }
         }
     });
-});
+}
 
-const unfollow_show = (button => {
+const unfollow_show = function(button) {
     const userId = button.id.split('-')[1];
     const url = `/profiles/unfollow/${userId}?_method=put`;
     const data = {};
 
-    $.post(url, data, function (data) {
+    $.post(url, data, data => {
         if (data.success) {
             $(`#modal-${userId}-unfollow`).modal('hide');
             document.getElementById(`following-${userId}`).parentNode.removeChild(document.getElementById(`following-${userId}`));
             document.getElementById('following-button').innerText = `${parseInt(document.getElementById('following-button').innerText.split(' ')[0]) - 1} Following`;
         }
     });
-});
+}
 
-const remove = (button => {
+const remove = function(button) {
     const userId = button.id.split("-")[1];
     const url = `/profiles/remove/${userId}?_method=put`;
     const data = {};
 
-    $.post(url, data, function (data) {
+    $.post(url, data, data => {
         if (data.success) {
             $(`#modal-${userId}-remove`).modal('hide');
             document.getElementById(`follower-${userId}`).parentNode.removeChild(document.getElementById(`follower-${userId}`));
             document.getElementById('followers-button').innerText = `${parseInt(document.getElementById('followers-button').innerText.split(' ')[0]) - 1} Follower(s)`;
         }
     });
-});
+}

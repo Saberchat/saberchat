@@ -114,13 +114,10 @@
             <br/>
 
             <article class="msg-container" id="reply-box" hidden>
-
                 <form id="message-form-<%= message._id %>" onsubmit="sendReply(this, event)">
-
                     <div class="form-group">
-                        <label for="message"><h4>Reply</h4></label><br/>
-                        <textarea name="message" id="message" placeholder="Message text..." rows="5"
-                                  class="form-control"></textarea>
+                        <label for="message" id="reply-header">Reply</label><br/>
+                        <textarea name="message" id="message" placeholder="Message text..." rows="5" class="form-control"></textarea>
                     </div>
 
                     <div id="image-header">

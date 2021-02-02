@@ -1,9 +1,9 @@
-const ready = (button => {
+const ready = function(button) {
     const orderId = button.id.split('-')[0];
     const url = `/cafe/${orderId}/ready`;
     const data = {};
 
-    $.post(url, data, function (data) {
+    $.post(url, data, data => {
 
         if (data.success) {
             $(`#modal-${orderId}-ready`).modal('hide');
@@ -17,15 +17,15 @@ const ready = (button => {
             }
         }
     });
-});
+}
 
-const reject = (button => {
+const reject = function(button) {
     const orderId = button.id.split('-')[0];
     const rejectionReason = document.getElementById(`rejection-reason-${orderId}`).value;
     const url = `/cafe/${orderId}/reject`;
     const data = {rejectionReason};
 
-    $.post(url, data, function (data) {
+    $.post(url, data, data => {
 
         if (data.success) {
             $(`#modal-${orderId}-reject`).modal('hide');
@@ -39,27 +39,27 @@ const reject = (button => {
             }
         }
     });
-});
+}
 
-const cancel = (button => {
+const cancel = function(button) {
     const orderId = button.id.split('-')[0];
     const url = `/cafe/order/${orderId}?_method=delete`;
     const data = {};
 
-    $.post(url, data, function (data) {
+    $.post(url, data, data => {
 
         if (data.success) {
             $(`#modal-${orderId}-cancel`).modal('hide');
             document.getElementById("active-orders").removeChild(document.getElementById(`${orderId}`));
         }
     });
-});
+}
 
-const changeCafeStatus = (() => {
+const changeCafeStatus = function() {
     const url = `/cafe/change-cafe-status?_method=put`;
     const data = {};
 
-    $.post(url, data, function (data) {
+    $.post(url, data, data => {
 
         if (data.success) {
             const change = new Map([[true, ["btn btn-danger", "lock-open", "Close Cafe"]], [false, ["btn btn-success", "lock", "Open Cafe"]]]);
@@ -67,4 +67,4 @@ const changeCafeStatus = (() => {
             document.getElementById("cafe-status-button").innerHTML = `<i class="fas fa-${change.get(data.open)[1]}"></i> ${change.get(data.open)[2]}`;
         }
     });
-});
+}

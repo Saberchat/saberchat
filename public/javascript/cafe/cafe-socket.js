@@ -1,4 +1,4 @@
-const order = ((form, customer) => {
+const order = function(form, customer) {
     let socket = io();
     let items = document.getElementById('item-list');
 
@@ -32,9 +32,9 @@ const order = ((form, customer) => {
             socket.emit('order', itemList, itemCount, instructions, payingInPerson, customer);
         }
     });
-})
+}
 
-const getOrders = (outputStream => {
+const getOrders = function(outputStream) {
     let socket = io();
 
     socket.on('connect', () => {
@@ -44,15 +44,15 @@ const getOrders = (outputStream => {
     socket.on('order', (order, foundItems) => {
         console.log("new order");
 
-        const getInstructions = (() => {
+        const getInstructions = function() {
             if (!order.instructions || order.instructions == "") {
                 return `<p class="card-text">No extra instructions</p>`;
             } else {
                 return `<p class="card-text"><strong>Extra Instructions:</strong> ${order.instructions}</p>`;
             }
-        })
+        }
 
-        const getItems = (() => {
+        const getItems = function() {
             let str = ``;
 
             for (let i = 0; i < order.items.length; i++) {
@@ -60,7 +60,7 @@ const getOrders = (outputStream => {
             }
 
             return str;
-        })
+        }
 
         $(outputStream).prepend(`
       <div class="card mt-3">
@@ -79,4 +79,4 @@ const getOrders = (outputStream => {
       </div>
     `);
     });
-})
+}

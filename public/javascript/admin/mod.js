@@ -1,10 +1,10 @@
 let loaded = [];
 
-const ignoreComment = (button => {
+const ignoreComment = function(button) {
     const url = '/admin/moderate?_method=put';
     const commentId = button.id.split('-')[1];
     const listItem = document.getElementById(`comment-${commentId}`);
-    $.post(url, {id: commentId}, function (data) {
+    $.post(url, {id: commentId}, data => {
         $(`#modal-ignore-${commentId}`).modal('hide');
         if (data.success) {
             listItem.remove();
@@ -22,13 +22,13 @@ const ignoreComment = (button => {
             }, 1000);
         }
     });
-});
+}
 
-const deleteComment = (button => {
+const deleteComment = function(button) {
     const url = '/admin/moderate?_method=delete';
     const commentId = button.id.split('-')[1];
     const listItem = document.getElementById(`comment-${commentId}`);
-    $.post(url, {id: commentId}, function (data) {
+    $.post(url, {id: commentId}, data => {
         $(`#modal-delete-${commentId}`).modal('hide');
         if (data.success) {
             listItem.remove();
@@ -46,9 +46,9 @@ const deleteComment = (button => {
             }, 1000);
         }
     });
-});
+}
 
-const getContext = (button => {
+const getContext = function(button) {
     const url = '/admin/moderate';
     const commentId = button.id.split('-')[1];
     const data = {commentId};
@@ -56,7 +56,7 @@ const getContext = (button => {
     if (!loaded.includes(commentId)) {
         loaded.push(commentId);
 
-        $.post(url, data, function (data) {
+        $.post(url, data, data => {
             if (data.success) {
                 const contextBody = document.getElementById(`context-body-${commentId}`);
                 let newComment;
@@ -79,4 +79,4 @@ const getContext = (button => {
             }
         });
     }
-});
+}

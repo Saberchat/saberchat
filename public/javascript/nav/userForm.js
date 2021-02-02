@@ -20,28 +20,25 @@ $(() => {
 });
 
 // class animations for the signup form
-const next = (() => {
+const next = function() {
     $('.user-info').removeClass('display');
     $('.login-info').addClass('display');
-});
+}
 
-const back = (() => {
+const back = function() {
     $('.user-info').addClass('display');
     $('.login-info').removeClass('display');
-});
+}
 
-// prevents double clicking the form submit
-const disableBtn = (() => {
+const disableBtn = function() { // prevents double clicking the form submit
     document.getElementById('register-button').disabled = true;
-});
+}
 
-// reactivates button on invalid form submit
-const enableBtn = (() => {
+const enableBtn = function() { // reactivates button on invalid form submit
     document.getElementById('register-button').disabled = false;
-});
+}
 
-// validates signup form
-const validateForm = (() => {
+const validateForm = function() { // validates signup form
     let form = document.forms.signup;
     if (form.firstName.value == '') {
         enableBtn();
@@ -80,9 +77,9 @@ const validateForm = (() => {
         form.email.style.border = '2px solid red';
         return false;
     }
-});
+}
 
-const submitActions = (() => {
+const submitActions = function() {
     disableBtn();
     return validateForm();
-});
+}

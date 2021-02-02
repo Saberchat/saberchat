@@ -10,7 +10,7 @@ for (let word of otherFillers) {
     fillers.push(word);
 }
 
-function filter(text, compareTo) {
+const filter = function(text, compareTo) {
     let textKeywords = new Map();
     let compareKeywords = new Map();
     const textSplitter = new RegExp(/[\"\s\'\r\n]/, 'g');
@@ -60,7 +60,6 @@ function filter(text, compareTo) {
     for (let value of compareKeywords) {
         meanValue += value[1] / compareKeywords.size;
     }
-
     return textKeywords;
 }
 

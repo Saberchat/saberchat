@@ -1,21 +1,16 @@
 const imgContainer = document.getElementById('image-block');
-
 let i = 0;
 
-const addImg = (() => {
+const addImg = function() {
     const img = document.createElement('div');
     img.classList.add('image-group');
     img.id = `block-${i}`;
-    img.innerHTML = `<div class="input-container">
-    <input type="text" id="${i}" class="form-control" oninput="createImg(this)" placeholder="Url..." name="images[${i}]" required>
-  </div>
-  <button type="button" onclick="deleteImg(this)" style="display: inline;" class="btn btn-danger"><i class="fas fa-minus"></i></button>`;
+    img.innerHTML = `<div class="input-container"><input type="text" id="${i}" class="form-control" oninput="createImg(this)" placeholder="Url..." name="images[${i}]" required></div><button type="button" onclick="deleteImg(this)" style="display: inline;" class="btn btn-danger"><i class="fas fa-minus"></i></button>`;
     imgContainer.prepend(img);
     i++;
-});
+}
 
-const createImg = (val => { //Creates an image based on value of image input
-
+const createImg = function(val) { //Creates an image based on value of image input
     if ($(`#block-${val.id}`).find('img').length == 0) {
         const imageDisplay = document.createElement('img');
         imageDisplay.id = `image-${val.id}`;
@@ -36,9 +31,9 @@ const createImg = (val => { //Creates an image based on value of image input
             $(`#${$(`#block-${val.id}`).find('img')[0].id}`).hide();
         }
     }
-});
+}
 
-const deleteImg = (btn => {
+const deleteImg = function(btn) {
     const parent = btn.parentNode;
     parent.remove();
-});
+}

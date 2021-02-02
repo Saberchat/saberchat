@@ -42,6 +42,12 @@
     box-shadow: 0px 1px 5px #6d6d6d;
 }
 
+#reply-header {
+    font-size: 140%;
+    font-weight: 3rem;
+    margin-bottom: 10px;
+}
+
 .replies {
     padding: 20px;
 }
