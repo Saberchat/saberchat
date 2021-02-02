@@ -10,7 +10,7 @@ for (let word of otherFillers) {
   fillers.push(word);
 }
 
-const filter = ((text, compareTo) => {
+function filter(text, compareTo) {
   let textKeywords = new Map();
   let compareKeywords = new Map();
   const textSplitter = new RegExp(/[\"\s\'\r\n]/, 'g');
@@ -62,6 +62,6 @@ const filter = ((text, compareTo) => {
   }
 
   return textKeywords;
-});
+}
 
 module.exports = filter;

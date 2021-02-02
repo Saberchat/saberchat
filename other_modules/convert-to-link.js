@@ -1,4 +1,4 @@
-const convertToLink = (text => {
+function convertToLink(text) {
   const delimeter = new RegExp(/[\"\'\r]/, 'g'); //Regex for most troublesome link characters
   let deformatted = []; //Holds words/links from text
   let embedded = false; //Boolean value to check if link/email is embedded in each line of text
@@ -74,6 +74,6 @@ const convertToLink = (text => {
   }
 
   return convertedText;
-});
+}
 
 module.exports = convertToLink;

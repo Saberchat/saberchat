@@ -14,6 +14,6 @@ var orderItemSchema = new mongoose.Schema({
       default: []
     }
   ]
-});
+}, {timestamps: {createdAt: 'created_at'}});
 
 module.exports = mongoose.model('OrderItem', orderItemSchema);

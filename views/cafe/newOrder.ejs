@@ -95,50 +95,9 @@
                   </div>
                 </li>
               <% } %>
+                <% for (let item of type.items) { %>
 
-              <% let newItems = []; %>
-              <% let frequent = false;%>
-
-              <% for (let item of type.items) { %>
-                <% frequent = false;%>
-                <% for (let frequentItem of frequentItems) { %>
-                  <% if (frequentItem.item.equals(item._id) && frequentItem.quantity >= frequentItemsMean) { %>
-                    <% frequent = true;%>
-                  <% } %>
-                <% } %>
-
-                <% if (frequent) { %>
-                  <%newItems.push(item);%>
-                <% } %>
-
-              <% } %>
-
-              <% for (let item of type.items) { %>
-                <% frequent = false;%>
-                <% for (let frequentItem of frequentItems) { %>
-                  <% if (frequentItem.item.equals(item._id) && frequentItem.quantity >= frequentItemsMean) { %>
-                    <% frequent = true;%>
-                  <% } %>
-                <% } %>
-
-                <% if (!frequent) { %>
-                  <%newItems.push(item);%>
-                <% } %>
-
-              <% } %>
-
-                <% for (let item of newItems) { %>
-                  <% popular = false; %>
-                  <% if (item.isAvailable == true) { %>
-
-                    <% for (let itemObj of frequentItems) { %>
-                      <% if (itemObj.item.equals(item._id) && itemObj.quantity >= frequentItemsMean) { %>
-                        <% popular = true;%>
-                        <% break;%>
-                      <% } %>
-                    <% } %>
-
-                    <% if (popular) { %>
+                    <% if (frequentItems.toString().includes(item._id.toString())) { %>
                       <div class="list-group-item list-group-item-info form-check menu-item <%=type.name%> cafe" id="item-<%=item.id%>" title="You have frequently ordered this item">
 
                     <% } else { %>
@@ -175,7 +134,7 @@
                           $<%= item.price %>
                         <% } %>
 
-                        <% if (popular) { %>
+                        <% if (frequentItems.toString().includes(item._id.toString())) { %>
                           <span class="popular">Frequently Ordered</span>
                         <% } %>
 
@@ -198,7 +157,6 @@
                     </div>
 
                   <% } %>
-                <% } %>
 
                 <% if (type.items.length > 0) { %>
                   <br class="category-break" id="<%=type._id%>-break"/>

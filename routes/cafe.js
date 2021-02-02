@@ -104,54 +104,47 @@ router.get('/order/new', middleware.isLoggedIn, middleware.cafeOpen, (req, res) 
       return res.redirect('back');
     }
 
-    let frequentItems = [];
-    let itemObject;
-    let overlap = false;
-    let temp;
-    let frequentItemsMean = 0;
+    let orderedItems = [];
+    let orderedMap = new Map();
 
-    loop1:
     for (let order of allOrders) {
-
-      loop2:
-      for (let item of order.items) {
-        overlap = false;
-
-        loop3:
-        for (let i of frequentItems) {
-          if (i.item.equals(item.item._id)) {
-            i.quantity += item.quantity;
-            overlap = true;
-            break loop3;
-          }
+        for (let item of order.items) {
+            if (orderedMap.has(item.item._id)) {
+                orderedMap.set(item.item._id, orderedMap.get(item.item._id) + item.quantity);
+            } else {
+                orderedMap.set(item.item._id, item.quantity);
+            }
         }
-
-        if (!overlap) {
-          itemObject = {
-            item: item.item._id,
-            quantity: item.quantity
-          };
-          frequentItems.push(itemObject);
-        }
-      }
     }
 
-    //My adaptation of the Mergesort Algorithm sorts array/object matrix from greatest-least frequency
-    for (let i = 0; i < frequentItems.length-1; i ++) {
-      for (let j = 0; j < frequentItems.length-1; j ++) {
-        if (frequentItems[j].quantity < frequentItems[j+1].quantity) {
-          temp = frequentItems[j];
-          frequentItems[j] = frequentItems[j+1];
-          frequentItems[j+1] = temp;
-        }
-      }
+    let orderedItem;
+    let totalOrdered = [];
+    for (let item of orderedMap) {
+         orderedItem = await Item.findById(item[0]);
+         if (!orderedItem) {
+             req.flash('error', "Unable to find orders");
+             return res.redirect('back');
+         }
+
+         totalOrdered = [];
+         for (let i = 0; i < item[1]; i ++) {
+             totalOrdered.push(i);
+         }
+
+         orderedItems.push({
+             item: orderedItem._id,
+             totalOrdered,
+             created_at: orderedItem.created_at
+         });
     }
 
-    for (let itemObj of frequentItems) {
-      frequentItemsMean += itemObj.quantity / frequentItems.length;
+    const frequentItems = sortByPopularity(orderedItems, "totalOrdered", "created_at").popular;
+    let frequentItemsArray = [];
+    for (let item of frequentItems) {
+        frequentItemsArray.push(item.item);
     }
 
-    return res.render('cafe/newOrder', {types, frequentItems, frequentItemsMean});
+    return res.render('cafe/newOrder', {types, frequentItems: frequentItemsArray});
 
   })().catch(err => {
     req.flash('error', "Unable to access database");

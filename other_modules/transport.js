@@ -5,7 +5,7 @@ if(process.env.NODE_ENV !== "production") {
 // const nodemailer = require("nodemailer");
 const axios = require('axios');
 
-const transport = (recipient, subject, html) => {
+function transport(recipient, subject, html) {
 	if(process.env.SENDING_EMAILS == "true" && recipient.receiving_emails) {
 		const url = process.env.SENDGRID_BASE_URL + '/mail/send';
 		const data = {
@@ -44,9 +44,9 @@ const transport = (recipient, subject, html) => {
 			console.log(error);
 		});
 	}
-};
+}
 
-const transport_mandatory = (recipient, subject, html) => {
+function transport_mandatory(recipient, subject, html) {
 	const url = process.env.SENDGRID_BASE_URL + '/mail/send';
 	const data = {
 		"personalizations": [
@@ -83,7 +83,7 @@ const transport_mandatory = (recipient, subject, html) => {
 	}).catch(error => {
 		console.log(error);
 	});
-};
+}
 
 
 module.exports = {transport, transport_mandatory};

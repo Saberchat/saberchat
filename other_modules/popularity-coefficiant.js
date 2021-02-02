@@ -1,18 +1,18 @@
 //Popularity Functions can be used to calculate and sort popularity for projects, cafe items, tutors, etc.
 
 //Takes an array of post objects (must have likes and a date created), and outputs the average popularity coefficient (likes per day)
-const getPopularityCoefficiant = ((posts, likeFactor, dateFactor) => {
+function getPopularityCoefficiant(posts, likeFactor, dateFactor) {
   const now = new Date().getTime();
   const rate = 86400; //Rate of conversion is seconds to days
   let popularityCoefficiant = 0;
   for (let post of posts) {
-    popularityCoefficiant += ((rate*post[likeFactor].length)/(post[dateFactor].getTime() - now))/posts.length;
+    popularityCoefficiant += ((rate*post[likeFactor].length)/(now - post[dateFactor].getTime()))/posts.length;
   }
   return popularityCoefficiant;
-});
+}
 
 //Sort posts by popularity
-const sortByPopularity = ((posts, likeFactor, dateFactor) => {
+function sortByPopularity(posts, likeFactor, dateFactor) {
   let sorted = { //Object holds both popular and unpopular items
     popular: [],
     unpopular: []
@@ -40,6 +40,6 @@ const sortByPopularity = ((posts, likeFactor, dateFactor) => {
     }
   }
   return sorted;
-});
+}
 
 module.exports = {getPopularityCoefficiant, sortByPopularity};
