@@ -2,275 +2,215 @@
 <html>
 
 <head>
-    <title>Saberchat</title>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Saberchat</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
 
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css">
-    <link rel="stylesheet" href="/stylesheets/main.css">
-    <!-- link css for navbar. Don't need to include public/javascript/itemForm.js since item is already logged in and does not need to access login and register forms.  -->
-    <link rel="stylesheet" href="/stylesheets/components/header.css">
-    <link rel="stylesheet" href="/stylesheets/components/navbar.css">
-    <link rel="stylesheet" href="/stylesheets/chat/new.css">
-    <link rel="stylesheet" href="/stylesheets/cafe/new.css">
-    <link rel="stylesheet" href="/stylesheets/cafe/menu.css">
-    <% if (currentUser) { %>
-        <% if (currentUser.darkmode) { %>
-            <link rel="stylesheet" href="/stylesheets/Darkmode.css">
-        <% } %>
-    <% } %>
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css">
+  <link rel="stylesheet" href="/stylesheets/main.css">
+  <!-- link css for navbar. Don't need to include public/javascript/itemForm.js since item is already logged in and does not need to access login and register forms.  -->
+  <link rel="stylesheet" href="/stylesheets/components/header.css">
+  <link rel="stylesheet" href="/stylesheets/components/navbar.css">
+  <link rel="stylesheet" href="/stylesheets/chat/new.css">
+  <link rel="stylesheet" href="/stylesheets/cafe/new.css">
+  <link rel="stylesheet" href="/stylesheets/cafe/menu.css">
+  <%if (currentUser) {%>
+    <%if (currentUser.darkmode) { %>
+      <link rel="stylesheet" href="/stylesheets/Darkmode.css">
+    <%}%>
+  <%}%>
 
-    <script src="/socket.io/socket.io.js"></script>
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js"></script>
-    <script src="/javascript/cafe/cafe-socket.js"></script>
-    <script src="/javascript/cafe/search.js"></script>
+  <script src="/socket.io/socket.io.js"></script>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js"></script>
+  <script src="/javascript/cafe/cafe-socket.js"></script>
+  <script src="/javascript/cafe/search.js"></script>
 
-    <!-- I'm using my fontawesome kit -->
-    <script src="https://kit.fontawesome.com/dccc745c41.js" crossorigin="anonymous"></script>
+  <!-- I'm using my fontawesome kit -->
+  <script src="https://kit.fontawesome.com/dccc745c41.js" crossorigin="anonymous"></script>
 
 </head>
 
 <body class="mode" onclick="changeOrderConfirmation()">
-<!-- include the navbar via ejs -->
-<%- include('../partials/navbar') %>
-<%- include('../partials/header') %>
+  <!-- include the navbar via ejs -->
+  <%- include('../partials/navbar') %>
+  <%- include('../partials/header') %>
 
-<div class="container mt-5" id="container">
+  <div class="container mt-5" id="container">
     <div class="row">
-        <div class="col-12">
-            <div class="jumbotron text-center header">
-                <h1>New Cafe Order</h1>
-                <p>Place an order that will be delivered to you at lunch</p>
-                <a class="btn btn-primary" href='/cafe'><i class="fas fa-arrow-left"></i> Back</a>
-                <a class="btn btn-info" href='/cafe/menu'><i class="fas fa-bars"></i> Menu </a>
-            </div>
+      <div class="col-12">
+        <div class="jumbotron text-center header">
+          <h1>New Cafe Order</h1>
+          <p>Place an order that will be delivered to you at lunch</p>
+          <a class="btn btn-primary" href='/cafe'><i class="fas fa-arrow-left"></i> Back</a>
+          <a class="btn btn-info" href='/cafe/menu'><i class="fas fa-bars"></i> Menu </a>
         </div>
+      </div>
     </div>
     <div class="row">
-        <div class="col-md-8 offset-md-2 col-12">
-            <form id="orderForm" action="/cafe/order" method="post">
-                <div id="item-selection">
+      <div class="col-md-8 offset-md-2 col-12">
+        <form id="orderForm" action="/cafe/order" method="post">
+          <div id="item-selection">
 
-                    <div class="search-filter mb-3 search">
-                        <i class="fas fa-search"></i>
-                        <input id="search-input" oninput="search()" class="form-control search" type="text"
-                               placeholder="Search..." title="Type in product"/>
-                    </div>
-                </div>
+            <div class="search-filter mb-3 search">
+              <i class="fas fa-search"></i>
+              <input id="search-input" oninput="search()" class="form-control search" type="text" placeholder="Search..." title="Type in product" />
+            </div>
+          </div>
 
-                <div id="item-list">
+          <div id="item-list">
 
-                    <% let tempTypes = types; %>
+            <% let tempTypes = types; %>
 
-                    <% for (let type of tempTypes) { %>
-                        <% for (let i = type.items.length - 1; i >= 0; i -= 1) { %>
-                            <% if (!type.items[i].isAvailable) { %>
-                                <% type.items.splice(i, 1); %>
-                            <% } %>
-                        <% } %>
+            <% for (let type of tempTypes) { %>
+              <% for (let i = type.items.length-1; i >= 0; i -=1) { %>
+                <% if (!type.items[i].isAvailable) { %>
+                  <% type.items.splice(i, 1); %>
+                <% } %>
+              <% } %>
+            <% } %>
+
+            <% let temp;%>
+
+            <% for (let type of tempTypes) { %>
+              <% for (let i = 0; i < type.items.length-1; i ++) { %>
+                <% for (let j = 0; j < type.items.length-1; j ++) { %>
+                  <% if (type.items[j].upvotes.length < type.items[j+1].upvotes.length) { %>
+                    <%temp = type.items[j];%>
+                    <%type.items[j] = type.items[j+1];%>
+                    <%type.items[j+1] = temp;%>
+                  <% } %>
+                <% } %>
+              <% } %>
+            <% } %>
+
+            <% for (let type of tempTypes) { %>
+              <% if (type.items.length > 0) { %>
+
+                <li class="list-group-item list-group-item-success category-header cafe" id="<%=type._id%>-header">
+                  <div class="d-flex w-100 justify-content-between cafe">
+                    <h2 class="mb-1"><%=type.name%></h2>
+                    <span><%=type.items.length%> item(s)</span>
+                  </div>
+                </li>
+              <% } %>
+                <% for (let item of type.items) { %>
+
+                    <% if (frequentItems.toString().includes(item._id.toString())) { %>
+                      <div class="list-group-item list-group-item-info form-check menu-item <%=type.name%> cafe" id="item-<%=item.id%>" title="You have frequently ordered this item">
+
+                    <% } else { %>
+                      <div class="list-group-item form-check menu-item <%=type.name.replace(' ', '')%> cafe" id="item-<%=item.id%>">
                     <% } %>
 
-                    <% let temp; %>
+                      <!-- Div to put margins on text inside outer div -->
+                      <div class="style-div">
 
-                    <% for (let type of tempTypes) { %>
-                        <% for (let i = 0; i < type.items.length - 1; i++) { %>
-                            <% for (let j = 0; j < type.items.length - 1; j++) { %>
-                                <% if (type.items[j].upvotes.length < type.items[j + 1].upvotes.length) { %>
-                                    <% temp = type.items[j]; %>
-                                    <% type.items[j] = type.items[j + 1]; %>
-                                    <% type.items[j + 1] = temp; %>
-                                <% } %>
-                            <% } %>
-                        <% } %>
-                    <% } %>
+                        <input name="check[<%= item._id %>]" id="<%= item._id%>" class="form-check-input" type="checkbox" value="">
+                        <select class="num-orders" id="dd_<%=item._id%>" name="<%=item.name%>" onchange="changeOrderConfirmation()">
+                          <% if (item.availableItems > 3) { %>
+                            <% [1, 2, 3].forEach(num => { %>
+                              <option><%=num%></option>
+                            <% }); %>
+                          <% } else { %>
+                            <% let val = 0 %>
+                            <% [...Array(item.availableItems).keys()].forEach(num => { %>
+                              <% val = num + 1 %>
+                              <option><%=val%></option>
+                            <% }); %>
+                          <% } %>
+                        </select>
 
-                    <% for (let type of tempTypes) { %>
-                        <% if (type.items.length > 0) { %>
+                        <label class="form-check-label" for="<%= item._id%>"><span class="item-name"><%= item.name %></span> (<%= item.availableItems %> orders available) -
 
-                            <li class="list-group-item list-group-item-success category-header cafe"
-                                id="<%= type._id %>-header">
-                                <div class="d-flex w-100 justify-content-between cafe">
-                                    <h2 class="mb-1"><%= type.name %></h2>
-                                    <span><%= type.items.length %> item(s)</span>
-                                </div>
-                            </li>
-                        <% } %>
+                        <% if (!item.price.toString().includes('.')) { %>
+                          $<%= item.price %>.00
 
-                        <% let newItems = []; %>
-                        <% let frequent = false; %>
-
-                        <% for (let item of type.items) { %>
-                            <% frequent = false; %>
-                            <% for (let frequentItem of frequentItems) { %>
-                                <% if (frequentItem.item.equals(item._id) && frequentItem.quantity >= frequentItemsMean) { %>
-                                    <% frequent = true; %>
-                                <% } %>
-                            <% } %>
-
-                            <% if (frequent) { %>
-                                <% newItems.push(item); %>
-                            <% } %>
-
-                        <% } %>
-
-                        <% for (let item of type.items) { %>
-                            <% frequent = false; %>
-                            <% for (let frequentItem of frequentItems) { %>
-                                <% if (frequentItem.item.equals(item._id) && frequentItem.quantity >= frequentItemsMean) { %>
-                                    <% frequent = true; %>
-                                <% } %>
-                            <% } %>
-
-                            <% if (!frequent) { %>
-                                <% newItems.push(item); %>
-                            <% } %>
-
-                        <% } %>
-
-                        <% for (let item of newItems) { %>
-                            <% popular = false; %>
-                            <% if (item.isAvailable == true) { %>
-
-                                <% for (let itemObj of frequentItems) { %>
-                                    <% if (itemObj.item.equals(item._id) && itemObj.quantity >= frequentItemsMean) { %>
-                                        <% popular = true; %>
-                                        <% break; %>
-                                    <% } %>
-                                <% } %>
-
-                                <% if (popular) { %>
-                    <div class="list-group-item list-group-item-info form-check menu-item <%= type.name %> cafe"
-                         id="item-<%= item.id %>" title="You have frequently ordered this item">
+                        <% } else if (item.price.toString().split('.')[1].length == 1) { %>
+                          $<%= item.price %>0
 
                         <% } else { %>
-                        <div class="list-group-item form-check menu-item <%= type.name.replace(' ', '') %> cafe"
-                             id="item-<%= item.id %>">
-                            <% } %>
+                          $<%= item.price %>
+                        <% } %>
 
-                            <!-- Div to put margins on text inside outer div -->
-                            <div class="style-div">
+                        <% if (frequentItems.toString().includes(item._id.toString())) { %>
+                          <span class="popular">Frequently Ordered</span>
+                        <% } %>
 
-                                <input name="check[<%= item._id %>]" id="<%= item._id %>" class="form-check-input"
-                                       type="checkbox" value="">
-                                <select class="num-orders" id="dd_<%= item._id %>" name="<%= item.name %>"
-                                        onchange="changeOrderConfirmation()">
-                                    <% if (item.availableItems > 3) { %>
-                                        <% [1, 2, 3].forEach(num => { %>
-                                            <option><%= num %></option>
-                                        <% }); %>
-                                    <% } else { %>
-                                        <% let val = 0 %>
-                                        <% [...Array(item.availableItems).keys()].forEach(num => { %>
-                                            <% val = num + 1 %>
-                                            <option><%= val %></option>
-                                        <% }); %>
-                                    <% } %>
-                                </select>
+                        </label>
 
-                                <label class="form-check-label" for="<%= item._id %>"><span
-                                            class="item-name"><%= item.name %></span> (<%= item.availableItems %> orders
-                                    available) -
+                        <div title="Upvotes" class="upvotes">
 
-                                    <% if (!item.price.toString().includes('.')) { %>
-                                        $<%= item.price %>.00
+                          <% if (item.upvotes.includes(currentUser._id)) { %>
+                            <span class="upvoted" id="upvote-<%=item._id%>" onclick="upvote(this)"><i class="fas fa-arrow-circle-up"></i></span>
 
-                                    <% } else if (item.price.toString().split('.')[1].length == 1) { %>
-                                        $<%= item.price %>0
+                          <% } else { %>
+                            <span class="not-upvoted" id="upvote-<%=item._id%>" onclick="upvote(this)"><i class="fas fa-arrow-circle-up"></i></span>
+                          <% }%>
 
-                                    <% } else { %>
-                                        $<%= item.price %>
-                                    <% } %>
-
-                                    <% if (popular) { %>
-                                        <span class="popular">Frequently Ordered</span>
-                                    <% } %>
-
-                                </label>
-
-                                <div title="Upvotes" class="upvotes">
-
-                                    <% if (item.upvotes.includes(currentUser._id)) { %>
-                                        <span class="upvoted" id="upvote-<%= item._id %>" onclick="upvote(this)"><i
-                                                    class="fas fa-arrow-circle-up"></i></span>
-
-                                    <% } else { %>
-                                        <span class="not-upvoted" id="upvote-<%= item._id %>" onclick="upvote(this)"><i
-                                                    class="fas fa-arrow-circle-up"></i></span>
-                                    <% } %>
-
-                                    <span id="upvoteCount-<%= item._id %>"> <%= item.upvotes.length %></span>
-                                </div>
-
-                                <br/>
-                            </div>
+                          <span id="upvoteCount-<%=item._id%>"> <%=item.upvotes.length%></span>
                         </div>
 
-                        <% } %>
-                        <% } %>
-
-                        <% if (type.items.length > 0) { %>
-                            <br class="category-break" id="<%= type._id %>-break"/>
-                        <% } %>
-                        <% } %>
+                        <br />
+                      </div>
                     </div>
 
-                    <div class="form-group mt-3">
-                        <input type="checkbox" name="payingInPerson" id="payingInPerson"
-                               onchange="changeOrderConfirmation()"/>
-                        <label class="cafetext" for="payingInPerson"
-                               title="Paying in person will not subtract money from your online balance">In-Person
-                            Payment</label>
-                        <br/><br/>
-                        <textarea id="descInput" class="form-control cafe" name="instructions"
-                                  placeholder="Add special instructions for your order" maxlength="100" rows="5"
-                                  oninput="changeOrderConfirmation()"></textarea>
-                        <br/>
-                    </div>
+                  <% } %>
 
-                    <br/>
-                    <li class="list-group-item list-group-item-primary cafe">
-                        <div class="d-flex w-100 justify-content-between">
-                            <h2 class="mb-1">Order Summary</h2>
-                        </div>
-                    </li>
+                <% if (type.items.length > 0) { %>
+                  <br class="category-break" id="<%=type._id%>-break"/>
+                <% } %>
+            <% } %>
+          </div>
 
-                    <div>
-                        <div id="order-confirm" class="cafe">
-                            <span id="extra-instructions"
-                                  class="list-group-item list-group-item-action form-check cafe"><span
-                                        class="instructions">Extra Instructions:</span> None</span>
-                            <span id="balance-box" class="list-group-item list-group-item-action form-check">Current Balance:
-                                <% if (!currentUser.balance.toString().includes('.')) { %>
-                                    $<%= currentUser.balance %>.00
+          <div class="form-group mt-3">
+            <input type="checkbox" name="payingInPerson" id="payingInPerson" onchange="changeOrderConfirmation()"/>
+            <label class="cafetext" for="payingInPerson" title="Paying in person will not subtract money from your online balance">In-Person Payment</label>
+            <br /><br />
+            <textarea id="descInput" class="form-control cafe" name="instructions" placeholder="Add special instructions for your order" maxlength="100" rows="5" oninput="changeOrderConfirmation()"></textarea>
+            <br />
+          </div>
 
-                                <% } else if (currentUser.balance.toString().split('.')[1].length == 1){ %>
-                                    $<%= currentUser.balance %>0
+          <br />
+          <li class="list-group-item list-group-item-primary cafe">
+            <div class="d-flex w-100 justify-content-between">
+              <h2 class="mb-1">Order Summary</h2>
+            </div>
+          </li>
 
-                                <% } else { %>
-                                    $<%= currentUser.balance %>
-                                <% } %>
-                            </span>
-                            <span id="total-cost"
-                                  class="list-group-item list-group-item-action form-check">Total: $0.00</span>
-                            <span id="paying-style" class="list-group-item list-group-item-action form-check">Paying Online</span>
-                        </div>
-                    </div>
+          <div>
+            <div id="order-confirm" class="cafe">
+              <span id="extra-instructions" class="list-group-item list-group-item-action form-check cafe"><span class="instructions">Extra Instructions:</span> None</span>
+              <span id="balance-box" class="list-group-item list-group-item-action form-check">Current Balance:
+                <% if (!currentUser.balance.toString().includes('.')) { %>
+                  $<%= currentUser.balance %>.00
 
-                    <br/>
-                    <button type="submit" class="btn btn-lg btn-primary btn-block">Complete your Order</button>
-            </form>
-            <br/>
-        </div>
+                <% } else if (currentUser.balance.toString().split('.')[1].length == 1){ %>
+                  $<%= currentUser.balance %>0
+
+                <% } else { %>
+                  $<%= currentUser.balance %>
+                <% } %>
+              </span>
+              <span id="total-cost" class="list-group-item list-group-item-action form-check">Total: $0.00</span>
+              <span id="paying-style" class="list-group-item list-group-item-action form-check">Paying Online</span>
+            </div>
+          </div>
+
+          <br />
+          <button type="submit" class="btn btn-lg btn-primary btn-block">Complete your Order</button>
+        </form>
+        <br />
+      </div>
     </div>
-</div>
+  </div>
 </body>
 <!-- Stylistic file. Changes your order summary based on what you are clicking -->
 <script src="/javascript/cafe/newOrder.js"></script>
 <script src="/javascript/cafe/upvote.js"></script>
 
 <script>
-    order(orderForm, '<%= currentUser._id %>');
+  order(orderForm, '<%=currentUser._id%>');
 </script>
 </html>

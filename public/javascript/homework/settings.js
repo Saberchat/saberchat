@@ -1,7 +1,5 @@
-//Change the current tab
-const changeTab = (tab => {
+function changeTab(tab) { //Change the current tab
     const tabs = document.getElementsByClassName("tab-header");
-
     for (let t of tabs) {
         document.getElementsByClassName(t.id)[0].hidden = true;
         t.style.color = "black";
@@ -9,10 +7,9 @@ const changeTab = (tab => {
 
     document.getElementsByClassName(tab.id)[0].hidden = false;
     tab.style.color = "blue";
-});
+}
 
-//Display thumbnail during course initialization
-const changeThumbnailInit = (() => {
+function changeThumbnailInit() { //Display thumbnail during course initialization
     if (document.getElementById('thumbnail').value.replaceAll(' ', '' != "")) {
         document.getElementById('thumbnail-photo').src = document.getElementById('thumbnail').value;
         document.getElementById('thumbnail-photo').hidden = false;
@@ -20,25 +17,21 @@ const changeThumbnailInit = (() => {
     } else {
         document.getElementById('thumbnail-photo').hidden = true;
     }
-});
+}
 
-//Change thumbnail image based on input
-const changeThumbnail = (input => {
+function changeThumbnail(input) { //Change thumbnail image based on input
     document.getElementsByClassName("jumbotron")[0].style.backgroundImage = `url('${input.value}`;
-});
+}
 
-//Change course description based on input
-const changeInfo = (input => {
+function changeInfo(input) { //Change course description based on input
     document.getElementById("courseDescription").innerText = document.getElementById("descInput").value;
-});
+}
 
-//Change course name based on input
-const changeName = (input => {
+function changeName(input) { //Change course name based on input
     document.getElementById("courseName").innerText = document.getElementById("newName").value;
-});
+}
 
-//JSON request to confirm settings updates
-const updateSettings = ((courseID, event) => {
+function updateSettings(courseID, event) {
     const url = `/homework/${courseID}?_method=put`;
     const data = {
         name: document.getElementById('newName').value,
@@ -46,7 +39,7 @@ const updateSettings = ((courseID, event) => {
         thumbnail: document.getElementById('thumbnail-input').value
     };
 
-    $.post(url, data, function (data) {
+    $.post(url, data, data => {
         document.getElementById('loading').style.color = "grey";
         document.getElementById('loading').innerText = "Waiting";
 
@@ -70,10 +63,9 @@ const updateSettings = ((courseID, event) => {
         }
     });
     event.preventDefault(); //Prevent page from automatically refreshing
-});
+}
 
-//JSON request to change course join code (in case security is compromised)
-const changeJoinCode = ((courseID, event) => {
+function changeJoinCode(courseID, event) { //Change course join code (in case security is compromised)
     const url = `/homework/joinCode/${courseID}?_method=put`;
     const data = {};
 
@@ -82,7 +74,6 @@ const changeJoinCode = ((courseID, event) => {
         document.getElementById('loading').innerText = "Waiting";
 
         if (data.success) {
-
             document.getElementById('joinCode').innerText = data.joinCode;
             document.getElementById('loading').hidden = false;
             document.getElementById('loading').style.color = "green";
@@ -103,4 +94,4 @@ const changeJoinCode = ((courseID, event) => {
         }
     });
     event.preventDefault(); //Prevent page from automatically refreshing
-});
+}

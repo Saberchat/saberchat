@@ -1,102 +1,100 @@
 <!DOCTYPE html>
 <html>
-<head>
-    <title>Saberchat</title>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+  <head>
+      <title>Saberchat</title>
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1">
 
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css">
-    <link rel="stylesheet" href="/stylesheets/main.css">
-    <!-- link css for navbar. Don't need to include public/javascript/userForm.js since user is already logged in and does not need to access login and register forms.  -->
-    <link rel="stylesheet" href="/stylesheets/components/navbar.css">
-    <link rel="stylesheet" href="/stylesheets/components/header.css">
-    <link rel="stylesheet" href="/stylesheets/projects/index.css">
-    <link rel="stylesheet" href="/stylesheets/announcements/index.css">
-    <link rel="stylesheet" href="/stylesheets/home/index.css">
-    <link rel="stylesheet" href="/stylesheets/chat/new.css">
+      <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css">
+      <link rel="stylesheet" href="/stylesheets/main.css">
+      <!-- link css for navbar. Don't need to include public/javascript/userForm.js since user is already logged in and does not need to access login and register forms.  -->
+      <link rel="stylesheet" href="/stylesheets/components/navbar.css">
+      <link rel="stylesheet" href="/stylesheets/components/header.css">
+      <link rel="stylesheet" href="/stylesheets/projects/index.css">
+      <link rel="stylesheet" href="/stylesheets/announcements/index.css">
+      <link rel="stylesheet" href="/stylesheets/home/index.css">
+      <link rel="stylesheet" href="/stylesheets/chat/new.css">
 
-    <link rel="stylesheet" href="/stylesheets/profile/index.css">
-    <link rel="stylesheet" href="/stylesheets/profile/show.css">
-    <link rel="stylesheet" href="/stylesheets/homework/show.css">
-    <link rel="stylesheet" href="/stylesheets/homework/tutor-show.css">
+      <link rel="stylesheet" href="/stylesheets/profile/index.css">
+      <link rel="stylesheet" href="/stylesheets/profile/show.css">
+      <link rel="stylesheet" href="/stylesheets/homework/show.css">
+      <link rel="stylesheet" href="/stylesheets/homework/tutor-show.css">
 
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js"></script>
+      <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+      <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js"></script>
 
-    <!-- I'm using my fontawesome kit -->
-    <script src="https://kit.fontawesome.com/dccc745c41.js" crossorigin="anonymous"></script>
-    <script src="/javascript/homework/settings.js"></script>
-    <script src="/javascript/homework/upvote.js"></script>
-    <script src="/javascript/homework/actions.js"></script>
-    <script src="/javascript/homework/rating.js"></script>
-</head>
-<body>
-<!-- include the navbar via ejs -->
-<%- include('../partials/navbar') %>
+      <!-- I'm using my fontawesome kit -->
+      <script src="https://kit.fontawesome.com/dccc745c41.js" crossorigin="anonymous"></script>
+      <script src="/javascript/homework/settings.js"></script>
+      <script src="/javascript/homework/upvote.js"></script>
+      <script src="/javascript/homework/actions.js"></script>
+      <script src="/javascript/homework/rating.js"></script>
+  </head>
+  <body>
+      <!-- include the navbar via ejs -->
+      <%- include('../partials/navbar') %>
 
-<!-- big background image -->
-<div id="banner" style="background-image: url('<%= tutor.tutor.bannerUrl %>');"></div>
-<div class="container mb-5">
-    <div class="tutor-info">
-        <a href="../../profiles/<%= tutor.tutor._id %>"><img src="<%= tutor.tutor.imageUrl %>" alt="profile image"
-                                                             class="profile-image"></a>
-        <h1 class="username"><%= tutor.tutor.firstName %> <%= tutor.tutor.lastName %></h1>
-    </div>
-    <div class="col-md-4 col-12 order-md-2 profile-box">
-        <section class="profile-card">
-            <div class="profile-head">
-                <h1>Profile</h1>
-                <hr>
-            </div>
-            <div class="profile-body">
+      <!-- big background image -->
+      <div id="banner" style="background-image: url('<%= tutor.tutor.bannerUrl %>');"></div>
+      <div class="container mb-5">
+        <div class="tutor-info">
+          <a href="../../profiles/<%=tutor.tutor._id%>"><img src="<%= tutor.tutor.imageUrl %>" alt="profile image" class="profile-image"></a>
+          <h1 class="username"><%= tutor.tutor.firstName %> <%= tutor.tutor.lastName %></h1>
+        </div>
+            <div class="col-md-4 col-12 order-md-2 profile-box">
+                <section class="profile-card">
+                    <div class="profile-head">
+                        <h1>Profile</h1>
+                        <hr>
+                    </div>
+                    <div class="profile-body">
 
                       <span>
-                          <% let averageRating = 0; %>
-                          <% for (let review of tutor.reviews) { %>
-                              <% averageRating += review.rating; %>
-                          <% } %>
-                          <% averageRating = Math.round(averageRating / tutor.reviews.length); %>
+                        <% let averageRating = 0; %>
+                        <% for (let review of tutor.reviews) { %>
+                          <% averageRating += review.rating; %>
+                        <% } %>
+                        <% averageRating = Math.round(averageRating/tutor.reviews.length);%>
 
-                          <% for (let i = 0; i < 5; i += 1) { %>
-                              <i id="<%= i + 1 %>"
-                              <% if (i + 1 <= averageRating) { %>
-                                 class="fas fa-star average-rating-<%= tutor.tutor._id %> average-rating-selected"
-                              <% } else { %>
-                                 class="fas fa-star average-rating-<%= tutor.tutor._id %>"
-                                      <% } %>
-                              ></i>
-                          <% } %>
+                        <% for (let i = 0; i < 5; i+=1) { %>
+                          <i id="<%=i+1%>"
+                          <% if (i+1 <= averageRating) { %>
+                            class="fas fa-star average-rating-<%=tutor.tutor._id%> average-rating-selected"
+                          <%} else { %>
+                            class="fas fa-star average-rating-<%=tutor.tutor._id%>"
+                          <%}%>
+                          ></i>
+                        <% } %>
                       </span>
 
-                <br/>
-                <span id="upvote-<%= course._id %>-<%= tutor.tutor._id %>" onclick="upvote(this)">
-                    <% if (tutor.upvotes.includes(currentUser._id)) { %>
-                    <span class="upvoted"><i class="fas fa-arrow-circle-up"></i>
+                      <br />
+                      <span id="upvote-<%=course._id%>-<%=tutor.tutor._id%>" onclick="upvote(this)">
+                        <% if (tutor.upvotes.includes(currentUser._id)) { %>
+                          <span class="upvoted" ><i class="fas fa-arrow-circle-up"></i>
                         <% } else { %>
-                        <span class="not-upvoted"><i class="fas fa-arrow-circle-up"></i>
-                            <% } %>
-                            <span class="upvote-count"
-                                  id="upvoteCount-<%= course._id %>-<%= tutor.tutor._id %>"> <%= tutor.upvotes.length %></span>
+                          <span class="not-upvoted"><i class="fas fa-arrow-circle-up"></i>
+                        <% }%>
+                        <span class="upvote-count" id="upvoteCount-<%=course._id%>-<%=tutor.tutor._id%>"> <%=tutor.upvotes.length%></span>
                         </span>
-                        <br/>
                       </span>
+                      <br />
 
                       <p id="tutor-bio"><%= tutor.bio %></p>
 
                       <h4>Username</h4>
-                      <p><%= tutor.tutor.username %></p>
+                      <p><%=tutor.tutor.username%></p>
 
                       <h4>Experience</h4>
-                    <% let experience = 0; %>
-                    <% for (let lesson of tutor.lessons) { %>
-                        <% experience += lesson.time; %>
-                    <% } %>
+                      <% let experience = 0; %>
+                      <% for (let lesson of tutor.lessons) { %>
+                        <%experience += lesson.time;%>
+                      <%}%>
 
-                    <p id="experience"><%= experience %> minute(s)</p>
+                      <p id="experience"><%=experience%> minute(s)</p>
 
                       <h4>Lessons</h4>
-                      <p id="lessons-length"><%= tutor.lessons.length %></p>
+                      <p id="lessons-length"><%=tutor.lessons.length%></p>
 
                       <h4>Status</h4>
                       <p><%= tutor.tutor.status.charAt(0).toUpperCase() + tutor.tutor.status.slice(1) %></p>
@@ -104,79 +102,56 @@
                       <h4>Email</h4>
                       <p><%= tutor.tutor.email %></p>
 
-                    <% if (studentIds.includes(currentUser._id.toString())) { %>
-                        <div id="tutor-actions-<%= tutor.tutor._id %>" class="tutor-actions">
-                            <% if (tutor.students.includes(currentUser._id) || tutor.formerStudents.includes(currentUser._id)) { %>
-                                <button class="btn btn-warning action-button" id="review-button-<%= tutor.tutor._id %>"
-                                        data-toggle="modal"
-                                        data-target="#modal-review-<%= tutor.tutor._id %>">Leave A Review</button>
-                                <% if (tutor.students.includes(currentUser._id)) { %>
-                                    <button class="btn btn-danger action-button"
-                                            id="leave-button-<%= tutor.tutor._id %>"
-                                            data-toggle="modal"
-                                            data-target="#modal-stop-<%= tutor.tutor._id %>">Stop Lessons</button>
-                                    <% for (let room of tutor.rooms) { %>
-                                        <% if (room.student.equals(currentUser._id)) { %>
-                                            <a id="chat-button-<%= tutor.tutor._id %>"
-                                               class="btn btn-success action-button"
-                                               href="/chat/<%= room.room._id %>">Chat</a>
-                                        <% } %>
-                                    <% } %>
-                                <% } else { %>
-                                    <% if (tutor.available) { %>
-                                        <button class="btn btn-info action-button"
-                                                id="book-button-<%= tutor.tutor._id %>"
-                                                data-toggle="modal"
-                                                data-target="#modal-book-<%= tutor.tutor._id %>">Book This Tutor</button>
-                                    <% } else { %>
-                                        <span class="unavailable-tutor">Tutor Is Unavailable</span>
-                                    <% } %>
+                      <% if (studentIds.includes(currentUser._id.toString())) { %>
+                        <div id="tutor-actions-<%=tutor.tutor._id%>" class="tutor-actions">
+                          <% if (tutor.students.includes(currentUser._id) || tutor.formerStudents.includes(currentUser._id)) { %>
+                            <button class="btn btn-warning action-button" id="review-button-<%=tutor.tutor._id%>" data-toggle="modal" data-target="#modal-review-<%=tutor.tutor._id%>">Leave A Review</button>
+                            <% if (tutor.students.includes(currentUser._id)) { %>
+                              <button class="btn btn-danger action-button" id="leave-button-<%=tutor.tutor._id%>" data-toggle="modal" data-target="#modal-stop-<%=tutor.tutor._id%>">Stop Lessons</button>
+                              <% for (let room of tutor.rooms) { %>
+                                <% if (room.student.equals(currentUser._id)) { %>
+                                  <a id="chat-button-<%=tutor.tutor._id%>" class="btn btn-success action-button" href="/chat/<%=room.room._id%>">Chat</a>
                                 <% } %>
-
+                              <% } %>
                             <% } else { %>
-                                <% if (tutor.available) { %>
-                                    <button class="btn btn-info action-button" id="book-button-<%= tutor.tutor._id %>"
-                                            data-toggle="modal"
-                                            data-target="#modal-book-<%= tutor.tutor._id %>">Book This Tutor</button>
-                                <% } else { %>
-                                    <span class="unavailable-tutor">Tutor Is Unavailable</span>
-                                <% } %>
+                              <% if (tutor.available) { %>
+                                <button class="btn btn-info action-button" id="book-button-<%=tutor.tutor._id%>" data-toggle="modal" data-target="#modal-book-<%=tutor.tutor._id%>">Book This Tutor</button>
+                              <% } else { %>
+                                <span class="unavailable-tutor">Tutor Is Unavailable</span>
+                              <% } %>
+                            <% }%>
+
+                          <% } else { %>
+                            <% if (tutor.available) { %>
+                              <button class="btn btn-info action-button" id="book-button-<%=tutor.tutor._id%>" data-toggle="modal" data-target="#modal-book-<%=tutor.tutor._id%>">Book This Tutor</button>
+                            <% } else { %>
+                              <span class="unavailable-tutor">Tutor Is Unavailable</span>
                             <% } %>
+                          <% }%>
                         </div>
 
-                    <% } else if (tutor.tutor._id.equals(currentUser._id)) { %>
+                      <% } else if (tutor.tutor._id.equals(currentUser._id)) { %>
                         <% if (tutor.available) { %>
-                            <button class="btn btn-danger action-button"
-                                    id="close-<%= course._id %>-<%= tutor.tutor._id %>"
-                                    data-toggle="modal" data-target="#modal-close-<%= tutor.tutor._id %>">Prevent Further Bookings</button>
+                          <button class="btn btn-danger action-button" id="close-<%=course._id%>-<%=tutor.tutor._id%>" data-toggle="modal" data-target="#modal-close-<%=tutor.tutor._id%>">Prevent Further Bookings</button>
                         <% } else { %>
-                            <button class="btn btn-success action-button"
-                                    id="reopen-<%= course._id %>-<%= tutor.tutor._id %>" data-toggle="modal"
-                                    data-target="#modal-reopen-<%= tutor.tutor._id %>">Reopen Lessons</button>
+                          <button class="btn btn-success action-button" id="reopen-<%=course._id%>-<%=tutor.tutor._id%>" data-toggle="modal" data-target="#modal-reopen-<%=tutor.tutor._id%>">Reopen Lessons</button>
                         <% } %>
-                        <button class="btn btn-info action-button" id="edit-<%= course._id %>-<%= tutor.tutor._id %>"
-                                data-toggle="modal" data-target="#modal-edit-bio">Edit Bio</button>
+                        <button class="btn btn-info action-button" id="edit-<%=course._id%>-<%=tutor.tutor._id%>" data-toggle="modal" data-target="#modal-edit-bio">Edit Bio</button>
 
-                    <% } else if (course.teacher.equals(currentUser._id)) { %>
-                        <form action="/homework/remove-tutor/<%= course._id %>?_method=put&tutorId=<%= tutor.tutor._id %>"
-                              method="post">
-                          <button type="button" class="btn btn-danger action-button" data-toggle="modal"
-                                  data-target="#modal-remove">Remove Tutor</button>
-                          <div class="modal fade" id="modal-remove" tabindex="-1" aria-labelledby="deleteModalLabel"
-                               aria-hidden="true">
+                      <% } else if (course.teacher.equals(currentUser._id)) {%>
+                        <form action="/homework/remove-tutor/<%=course._id%>?_method=put&tutorId=<%=tutor.tutor._id%>" method="post">
+                          <button type="button" class="btn btn-danger action-button" data-toggle="modal" data-target="#modal-remove">Remove Tutor</button>
+                          <div class="modal fade" id="modal-remove" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
                             <div class="modal-dialog">
                               <div class="modal-content">
                                 <div class="modal-header">
-                                  <h5 class="modal-title"
-                                      id="exampleModalLabel">Remove <%= tutor.tutor.firstName %> <%= tutor.tutor.lastName %> From Your Course?</h5>
+                                  <h5 class="modal-title" id="exampleModalLabel">Remove <%=tutor.tutor.firstName%> <%=tutor.tutor.lastName%> From Your Course?</h5>
                                   <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                                     <span aria-hidden="true">&times;</span>
                                   </button>
                                 </div>
                                 <div class="modal-body">
-                                  <textarea rows="5" class="form-control" id="reason-<%= tutor.tutor._id %>"
-                                            name="reason"
-                                            placeholder="Please explain why you wish to remove <%= tutor.tutor.firstName %>."></textarea>
+                                  <textarea rows="5" class="form-control" id="reason-<%=tutor.tutor._id%>" name="reason" placeholder="Please explain why you wish to remove <%=tutor.tutor.firstName%>."></textarea>
                                 </div>
                                 <div class="modal-footer">
                                   <button type="button" class="btn btn-secondary" data-dismiss="modal">Back</button>
@@ -186,90 +161,75 @@
                             </div>
                           </div>
                         </form>
-                    <% } %>
+                      <% } %>
 
-                    <div class="modal fade" id="modal-book-<%= tutor.tutor._id %>" tabindex="-1"
-                         aria-labelledby="deleteModalLabel" aria-hidden="true">
+                      <div class="modal fade" id="modal-book-<%=tutor.tutor._id%>" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
                         <div class="modal-dialog">
                           <div class="modal-content">
                             <div class="modal-header">
-                              <h5 class="modal-title"
-                                  id="exampleModalLabel">Book lessons with <%= tutor.tutor.firstName %> <%= tutor.tutor.lastName %>?</h5>
+                              <h5 class="modal-title" id="exampleModalLabel">Book lessons with <%=tutor.tutor.firstName%> <%=tutor.tutor.lastName%>?</h5>
                               <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                                 <span aria-hidden="true">&times;</span>
                               </button>
                             </div>
                             <div class="modal-body">
-                              You will be able to schedule meeting times and work with <%= tutor.tutor.firstName %> on your classwork.
+                              You will be able to schedule meeting times and work with <%=tutor.tutor.firstName%> on your classwork.
                             </div>
                             <div class="modal-footer">
                               <button type="button" class="btn btn-secondary" data-dismiss="modal">No, Go Back</button>
-                              <button type="button" class="btn btn-info" id="<%= course._id %>-<%= tutor.tutor._id %>"
-                                      onclick="book(this, 'tutor-show')">Yes, Book Lessons</button>
+                              <button type="button" class="btn btn-info" id="<%=course._id%>-<%=tutor.tutor._id%>" onclick="book(this, 'tutor-show')">Yes, Book Lessons</button>
                             </div>
                           </div>
                         </div>
                       </div>
 
-                      <div class="modal fade" id="modal-review-<%= tutor.tutor._id %>" tabindex="-1"
-                           aria-labelledby="deleteModalLabel" aria-hidden="true">
+                      <div class="modal fade" id="modal-review-<%=tutor.tutor._id%>" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
                         <div class="modal-dialog">
                           <div class="modal-content">
                             <div class="modal-header">
-                              <h5 class="modal-title"
-                                  id="exampleModalLabel">Review <%= tutor.tutor.firstName %> <%= tutor.tutor.lastName %>?</h5>
+                              <h5 class="modal-title" id="exampleModalLabel">Review <%=tutor.tutor.firstName%> <%=tutor.tutor.lastName%>?</h5>
                               <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                                 <span aria-hidden="true">&times;</span>
                               </button>
                             </div>
                             <div class="modal-body">
 
-                                <% for (let i = 0; i < 5; i += 1) { %>
-                                    <i class="fas fa-star star-<%= tutor.tutor._id %>"
-                                       onclick="rate(this, '<%= tutor.tutor._id %>')" id="<%= i + 1 %>" name="star"
-                                       value="<%= i + 1 %>"></i>
-                                <% } %>
-                                <span id="rating-label">Rate <%= tutor.tutor.firstName %> out of 5</span><br/>
+                              <% for (let i = 0; i < 5; i += 1) { %>
+                                <i class="fas fa-star star-<%=tutor.tutor._id%>" onclick="rate(this, '<%=tutor.tutor._id%>')" id="<%=i+1%>" name="star" value="<%=i+1%>"></i>
+                              <% } %>
+                              <span id="rating-label">Rate <%=tutor.tutor.firstName%> out of 5</span><br />
 
-                              <textarea rows="5" class="form-control review" id="review-<%= tutor.tutor._id %>"
-                                        name="review"
-                                        placeholder="Write a few sentences about your experience with <%= tutor.tutor.firstName %>"></textarea>
+                              <textarea rows="5" class="form-control review" id="review-<%=tutor.tutor._id%>" name="review" placeholder="Write a few sentences about your experience with <%=tutor.tutor.firstName%>"></textarea>
                             </div>
                             <div class="modal-footer">
                               <button type="button" class="btn btn-secondary" data-dismiss="modal">Back</button>
-                              <button type="button" class="btn btn-primary"
-                                      id="<%= course._id %>-<%= tutor.tutor._id %>"
-                                      onclick="submitRating(this, 'tutor-show')">Submit Review</button>
+                              <button type="button" class="btn btn-primary" id="<%=course._id%>-<%=tutor.tutor._id%>" onclick="submitRating(this, 'tutor-show')">Submit Review</button>
                             </div>
                           </div>
                         </div>
                       </div>
 
-                      <div class="modal fade" id="modal-stop-<%= tutor.tutor._id %>" tabindex="-1"
-                           aria-labelledby="deleteModalLabel" aria-hidden="true">
+                      <div class="modal fade" id="modal-stop-<%=tutor.tutor._id%>" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
                         <div class="modal-dialog">
                           <div class="modal-content">
                             <div class="modal-header">
-                              <h5 class="modal-title"
-                                  id="exampleModalLabel">Stop lessons with <%= tutor.tutor.firstName %> <%= tutor.tutor.lastName %>?</h5>
+                              <h5 class="modal-title" id="exampleModalLabel">Stop lessons with <%=tutor.tutor.firstName%> <%=tutor.tutor.lastName%>?</h5>
                               <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                                 <span aria-hidden="true">&times;</span>
                               </button>
                             </div>
                             <div class="modal-body">
-                              You may not be able to guarantee a slot with <%= tutor.tutor.firstName %> immediately.
+                              You may not be able to guarantee a slot with <%=tutor.tutor.firstName%> immediately.
                             </div>
                             <div class="modal-footer">
                               <button type="button" class="btn btn-secondary" data-dismiss="modal">No, Go Back</button>
-                              <button type="button" class="btn btn-danger" id="<%= course._id %>-<%= tutor.tutor._id %>"
-                                      onclick="leave(this, 'tutor-show')">Yes, Stop Lessons</button>
+                              <button type="button" class="btn btn-danger" id="<%=course._id%>-<%=tutor.tutor._id%>" onclick="leave(this, 'tutor-show')">Yes, Stop Lessons</button>
                             </div>
                           </div>
                         </div>
                       </div>
 
-                      <div class="modal fade" id="modal-close-<%= tutor.tutor._id %>" tabindex="-1"
-                           aria-labelledby="deleteModalLabel" aria-hidden="true">
+                      <div class="modal fade" id="modal-close-<%=tutor.tutor._id%>" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
                         <div class="modal-dialog">
                           <div class="modal-content">
                             <div class="modal-header">
@@ -283,15 +243,13 @@
                             </div>
                             <div class="modal-footer">
                               <button type="button" class="btn btn-secondary" data-dismiss="modal">No, Go Back</button>
-                              <button type="button" class="btn btn-danger" id="<%= course._id %>-<%= tutor.tutor._id %>"
-                                      onclick="closeLessons(this, 'tutor-show')">Yes, Close Lessons</button>
+                              <button type="button" class="btn btn-danger" id="<%=course._id%>-<%=tutor.tutor._id%>" onclick="closeLessons(this, 'tutor-show')">Yes, Close Lessons</button>
                             </div>
                           </div>
                         </div>
                       </div>
 
-                      <div class="modal fade" id="modal-reopen-<%= tutor.tutor._id %>" tabindex="-1"
-                           aria-labelledby="deleteModalLabel" aria-hidden="true">
+                      <div class="modal fade" id="modal-reopen-<%=tutor.tutor._id%>" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
                         <div class="modal-dialog">
                           <div class="modal-content">
                             <div class="modal-header">
@@ -305,16 +263,13 @@
                             </div>
                             <div class="modal-footer">
                               <button type="button" class="btn btn-secondary" data-dismiss="modal">No, Go Back</button>
-                              <button type="button" class="btn btn-success"
-                                      id="<%= course._id %>-<%= tutor.tutor._id %>"
-                                      onclick="reopenLessons(this, 'tutor-show')">Yes, Reopen Lessons</button>
+                              <button type="button" class="btn btn-success" id="<%=course._id%>-<%=tutor.tutor._id%>" onclick="reopenLessons(this, 'tutor-show')">Yes, Reopen Lessons</button>
                             </div>
                           </div>
                         </div>
                       </div>
 
-                      <div class="modal fade" id="modal-edit-bio" tabindex="-1" aria-labelledby="deleteModalLabel"
-                           aria-hidden="true">
+                      <div class="modal fade" id="modal-edit-bio" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
                         <div class="modal-dialog">
                           <div class="modal-content">
                             <div class="modal-header">
@@ -324,266 +279,232 @@
                               </button>
                             </div>
                             <div class="modal-body">
-                                <% for (let tutor of course.tutors) { %>
-                                    <% if (tutor.tutor._id.equals(currentUser._id)) { %>
-                                        <span id="bio-length-error" hidden>Make bio between 100-250 words</span>
-                                        <textarea rows="5" minlength="50" maxlength="500" class="form-control"
-                                                  id="edit-bio-field"
-                                                  placeholder="Enter new bio"><%= tutor.bio %></textarea>
-                                    <% } %>
+                              <% for (let tutor of course.tutors) { %>
+                                <% if (tutor.tutor._id.equals(currentUser._id)) { %>
+                                  <textarea rows="5" minlength="50" maxlength="500" class="form-control" id="edit-bio-field" placeholder="Enter new bio"><%=tutor.bio%></textarea>
                                 <% } %>
+                              <% } %>
                             </div>
                             <div class="modal-footer">
                               <button type="button" class="btn btn-secondary" data-dismiss="modal">Back</button>
-                              <button type="button" class="btn btn-primary" id="edit-bio-<%= course._id %>"
-                                      onclick="changeBio(this)">Submit Changes</button>
+                              <button type="button" class="btn btn-primary" id="edit-bio-<%=course._id%>" onclick="changeBio(this)">Submit Changes</button>
                             </div>
                           </div>
                         </div>
                       </div>
 
-            </div>
-        </section>
-        <br/>
-    </div>
-
-    <ul class="nav justify-content-center options-bar" id="options-bar">
-        <li class="nav-item tab-header tab" id="reviews" onclick="changeTab(this)">
-            <a class="nav-link active reviews-heading">Reviews (<span
-                        id="reviews-length-<%= tutor.tutor._id %>"><%= tutor.reviews.length %></span>)</a>
-        </li>
-
-        <% if (tutor.students.includes(currentUser._id.toString()) || tutor.tutor._id.equals(currentUser._id)) { %>
-            <li class="nav-item tab-header tab" id="students" onclick="changeTab(this)">
-                <a class="nav-link active">Students (<%= tutor.students.length + tutor.formerStudents.length %>)</a>
-            </li>
-        <% } %>
-
-        <li class="nav-item tab-header tab" id="courses" onclick="changeTab(this)">
-            <a class="nav-link active">Other Courses (<%= courses.length %>)</a>
-        </li>
-    </ul>
-    <br/>
-
-    <div class="reviews">
-        <% for (let review of tutor.reviews.reverse()) { %>
-            <div class="col-md-8 col-12">
-                <section class="profile-desc">
-                    <div class="desc-head">
-                        <a href="../../profiles/<%= review.review.sender._id %>" class="user-element-text"><h3><img
-                                        class="follower-image" src="<%= review.review.sender.imageUrl %>"/><span
-                                        class="review-sender"><%= review.review.sender.firstName %> <%= review.review.sender.lastName %></span>
-                            </h3></a>
-                        <% if (review.review.likes.includes(currentUser._id)) { %>
-                            <i id="like-<%= review.review._id %>" class="fas fa-thumbs-up review-liked"
-
-                        <% } else { %>
-                        <i id="like-<%= review.review._id %>" class="fas fa-thumbs-up review-unliked"
-                                <% } %>
-
-                        <% if (tutor.students.includes(currentUser._id) || tutor.formerStudents.includes(currentUser._id)) { %>
-                           onclick="likeReview(this)"
-                                <% } %>
-                        ></i>
-
-                        <span id="like-count-<%= review.review._id %>"
-                              class="like-count"><%= review.review.likes.length %></span>
-                        <div title="Ratings" class="ratings">
-
-                            <% for (let i = 0; i < 5; i += 1) { %>
-                                <i id="<%= i + 1 %>"
-                                <% if (i + 1 <= review.rating) { %>
-                                   class="fas fa-star average-rating-selected"
-                                <% } else { %>
-                                   class="fas fa-star"
-                                        <% } %>
-                                ></i>
-                            <% } %>
-
-                        </div>
-
-                        <div title="date" class="review-date">
-                            <%= review.review.date %>
-                        </div>
-
-                        <hr>
-                    </div>
-                    <div class="desc-body">
-                        <p><%= review.review.text %></p>
                     </div>
                 </section>
+                <br />
             </div>
-            <br/>
-        <% } %>
-    </div>
 
-    <div class="students" hidden>
-        <% if (students.length > 0) { %>
-            <% if (tutor.tutor._id.equals(currentUser._id) || studentIds.includes(currentUser._id.toString()) || course.teacher.equals(currentUser._id)) { %>
-                <div class="list-group">
-                    <li class="list-group-item list-group-item-success status-header">
-                        <div class="d-flex w-100 justify-content-between">
-                            <h2 class="mb-1">Students</h2>
-                        </div>
-                    </li>
-                    <% for (let student of students) { %>
-                        <div class="list-group-item list-group-item-action user-element">
-                            <a href="/profiles/<%= student._id %>" class="student-profile user-element-text">
-                                <img class="student-profile-image" src="<%= student.imageUrl %>" alt="profile picture">
-                                <span class="<%= student.permission %> <%= student.status %> <%= student.tags.join(' ') %> student-block"><span
-                                            class="span-tag-name"><%= student.firstName %> <%= student.lastName %></span> <span
-                                            class="span-tag-username"><%= student.username %></span></span>
+            <ul class="nav justify-content-center options-bar" id="options-bar">
+              <li class="nav-item tab-header tab" id="reviews" onclick="changeTab(this)">
+                <a class="nav-link active reviews-heading">Reviews (<span id="reviews-length-<%=tutor.tutor._id%>"><%=tutor.reviews.length%></span>)</a>
+              </li>
 
-                                <% let lessonCount = 0; %>
-                                <% for (let lesson of tutor.lessons) { %>
-                                    <% if (lesson.student.equals(student._id)) { %>
-                                        <% lessonCount += 1; %>
-                                    <% } %>
-                                <% } %>
-                            </a>
-                            <% if (tutor.tutor._id.equals(currentUser._id) || student._id.equals(currentUser._id)) { %>
-                                <a class="btn btn-info lesson-button"
-                                   href="/homework/tutors/<%= course._id %>?tutorId=<%= tutor.tutor._id %>&studentId=<%= student._id %>">Lesson
-                                    Information</a>
+              <% if (tutor.students.includes(currentUser._id.toString()) || tutor.tutor._id.equals(currentUser._id)) { %>
+                <li class="nav-item tab-header tab" id="students" onclick="changeTab(this)">
+                  <a class="nav-link active">Students (<%=tutor.students.length + tutor.formerStudents.length%>)</a>
+                </li>
+              <% } %>
 
+              <li class="nav-item tab-header tab" id="courses" onclick="changeTab(this)">
+                <a class="nav-link active">Other Courses (<%=courses.length%>)</a>
+              </li>
+            </ul><br />
+
+            <div class="reviews">
+              <% for (let review of tutor.reviews.reverse()) { %>
+                <div class="col-md-8 col-12">
+                    <section class="profile-desc">
+                        <div class="desc-head">
+                            <a href="../../profiles/<%=review.review.sender._id%>" class="user-element-text"><h3><img class="follower-image" src="<%=review.review.sender.imageUrl%>"/><span class="review-sender"><%=review.review.sender.firstName%> <%=review.review.sender.lastName%></span></h3></a>
+                            <% if (review.review.likes.includes(currentUser._id)) { %>
+                              <i id="like-<%=review.review._id%>" class="fas fa-thumbs-up review-liked"
+
+                            <% } else {%>
+                              <i id="like-<%=review.review._id%>" class="fas fa-thumbs-up review-unliked"
                             <% } %>
 
-                            <% if (tutor.tutor._id.equals(currentUser._id)) { %>
-                                <button type="button" data-toggle="modal" data-target="#modal-<%= student._id %>-mark"
-                                        id="mark-<%= student._id %>" class="btn btn-success mark-button">Mark Lesson
-                                </button>
+                            <% if (tutor.students.includes(currentUser._id) || tutor.formerStudents.includes(currentUser._id)) { %>
+                              onclick="likeReview(this)"
                             <% } %>
+                            ></i>
 
-                            <% if (tutor.tutor._id.equals(currentUser._id) || student._id.equals(currentUser._id)) { %>
-                                <span class="lessons-length"><span
-                                            id="lessons-length-<%= student._id %>"><%= lessonCount %></span> lesson(s)</span>
-                            <% } %>
-                        </div>
+                            <span id="like-count-<%=review.review._id%>" class="like-count"><%=review.review.likes.length%></span>
+                            <div title="Ratings" class="ratings">
 
-                        <div class="modal fade" id="modal-<%= student._id %>-mark" tabindex="-1"
-                             aria-labelledby="deleteModalLabel" aria-hidden="true">
-                            <div class="modal-dialog">
-                                <div class="modal-content">
-                                    <div class="modal-header">
-                                        <h5 class="modal-title" id="exampleModalLabel">Mark Lesson
-                                            For <%= student.firstName %> <%= student.lastName %>?</h5>
-                                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                            <span aria-hidden="true">&times;</span>
-                                        </button>
-                                    </div>
-                                    <div class="modal-body">
-                                        <label for="time-<%= student._id %>">Lesson Time: <span
-                                                    id="time-label-<%= student._id %>">0</span> minutes</label><br/>
-                                        <input type="range" min="0" max="60" value="0" class="slider time"
-                                               id="time-<%= student._id %>" onchange="setTime(this)">
-                                        <textarea minlength="20" maxlength="500" rows="5" class="form-control summary"
-                                                  id="summary-<%= student._id %>"
-                                                  placeholder="Lesson Summary"></textarea>
-                                    </div>
-                                    <div class="modal-footer">
-                                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Back
-                                        </button>
-                                        <button type="button" id="mark-<%= course._id %>-<%= student._id %>"
-                                                onclick="mark(this)" class="btn btn-success">Confirm
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                    <% } %>
-                </div>
-            <% } %>
-
-        <% } else { %>
-            <h1 class="empty-field">No Students</h1>
-        <% } %>
-
-        <br/><br/>
-        <% if (tutor.formerStudents.length > 0) { %>
-            <% if (tutor.tutor._id.equals(currentUser._id) || studentIds.includes(currentUser._id.toString()) || course.teacher.equals(currentUser._id)) { %>
-                <div class="list-group">
-                    <li class="list-group-item list-group-item-success status-header">
-                        <div class="d-flex w-100 justify-content-between">
-                            <h2 class="mb-1">Former Students</h2>
-                        </div>
-                    </li>
-                    <% for (let student of tutor.formerStudents) { %>
-                        <div class="list-group-item list-group-item-action user-element">
-                            <a href="/profiles/<%= student._id %>" class="student-profile user-element-text">
-                                <img class="student-profile-image" src="<%= student.imageUrl %>" alt="profile picture">
-                                <span class="<%= student.permission %> <%= student.status %> <%= student.tags.join(' ') %> student-block"><span
-                                            class="span-tag-name"><%= student.firstName %> <%= student.lastName %></span> <span
-                                            class="span-tag-username"><%= student.username %></span></span>
-
-                                <% let lessonCount = 0; %>
-                                <% for (let lesson of tutor.lessons) { %>
-                                    <% if (lesson.student.equals(student._id)) { %>
-                                        <% lessonCount += 1; %>
-                                    <% } %>
-                                <% } %>
-                            </a>
-                            <% if (tutor.tutor._id.equals(currentUser._id)) { %>
-                                <a class="btn btn-info lesson-button"
-                                   href="/homework/tutors/<%= course._id %>?tutorId=<%= tutor.tutor._id %>&studentId=<%= student._id %>">Lesson
-                                    Information</a>
-                            <% } %>
-
-                            <% if (tutor.tutor._id.equals(currentUser._id) || student._id.equals(currentUser._id)) { %>
-                                <span class="lessons-length"><span
-                                            id="lessons-length-<%= student._id %>"><%= lessonCount %></span> lesson(s)</span>
-                            <% } %>
-                        </div>
-
-                    <% } %>
-                </div>
-            <% } %>
-        <% } %>
-
-    </div>
-
-    <div class="courses" hidden>
-        <% if (courses.length > 0) { %>
-            <% for (let c of courses) { %>
-                <div class="row">
-                    <div class="col-lg-12">
-                        <article class="text-block" id="<%= c._id %>">
-                            <div class="block-header grey">
-                                <h5>
-                                    <a class="announcement-button">
-                                        <span class="announcement-subject-header"><%= c.name %></span>
-                                    </a>
-                                    <span class="float-right project-info date">Tutors: <%= c.tutors.length %></span>
-                                    <br/>
-                                    <span class="float-right project-info date">Students: <%= c.students.length %></span>
-                                </h5>
-
-                                <div class="project-header">
-                          <span>
-                            <a class="project-info" href="/profiles/<%= c.teacher._id %>">
-                              <img src="<%= c.teacher.imageUrl %>" alt="profile pic" class="sender-profile-image">
-                              <%= c.teacher.firstName %> <%= c.teacher.lastName %>
-                            </a>
-
-                              <% let included = false; %>
-                              <% for (let tutor of c.tutors) { %>
-                                  <% if (tutor.tutor.equals(currentUser._id)) { %>
-                                      <% included = true; %>
-                                  <% } %>
-
-                                  <% if (c.students.includes(currentUser._id)) { %>
-                                      <% included = true; %>
-                                  <% } %>
+                              <% for (let i = 0; i < 5; i+=1) { %>
+                                <i id="<%=i+1%>"
+                                <% if (i+1 <= review.rating) { %>
+                                  class="fas fa-star average-rating-selected"
+                                <%} else { %>
+                                  class="fas fa-star"
+                                <%}%>
+                                ></i>
                               <% } %>
 
-                              <% if (!included) { %>
-                                  <% if (!c.students.includes(currentUser._id)) { %>
-                                      <form action="/homework/join" method="post" id="join-<%= c._id %>"
-                                            class="join-course-student">
-                                  <button type="button" data-toggle="modal" data-target="#modal-join"
-                                          class="btn btn-primary"><i class="fas fa-chalkboard-teacher"></i> Join Course</button>
-                                  <div class="modal fade" id="modal-join" tabindex="-1"
-                                       aria-labelledby="deleteModalLabel" aria-hidden="true">
+                            </div>
+
+                            <div title="date" class="review-date">
+                              <%=review.review.date%>
+                            </div>
+
+                            <hr>
+                        </div>
+                        <div class="desc-body">
+                            <p><%= review.review.text %></p>
+                        </div>
+                    </section>
+                </div>
+                <br />
+              <% } %>
+          </div>
+
+          <div class="students" hidden>
+            <% if (students.length > 0) { %>
+              <% if (tutor.tutor._id.equals(currentUser._id) || studentIds.includes(currentUser._id.toString()) || course.teacher.equals(currentUser._id)) { %>
+                <div class="list-group">
+                  <li class="list-group-item list-group-item-success status-header">
+                    <div class="d-flex w-100 justify-content-between">
+                      <h2 class="mb-1">Students</h2>
+                    </div>
+                  </li>
+                  <% for (let student of students) { %>
+                    <div class="list-group-item list-group-item-action user-element">
+                      <a href="/profiles/<%=student._id%>" class="student-profile user-element-text">
+                        <img class="student-profile-image" src="<%= student.imageUrl %>" alt="profile picture">
+                        <span class="<%=student.permission%> <%=student.status%> <%=student.tags.join(' ')%> student-block"><span class="span-tag-name"><%=student.firstName%> <%=student.lastName%></span> <span class="span-tag-username"><%=student.username%></span></span>
+
+                        <% let lessonCount = 0;%>
+                        <% for (let lesson of tutor.lessons) { %>
+                          <% if (lesson.student.equals(student._id)) { %>
+                            <%lessonCount += 1;%>
+                          <% } %>
+                        <% } %>
+                      </a>
+                      <% if (tutor.tutor._id.equals(currentUser._id) || student._id.equals(currentUser._id)) { %>
+                        <a class="btn btn-info lesson-button" href="/homework/tutors/<%=course._id%>?tutorId=<%=tutor.tutor._id%>&studentId=<%=student._id%>">Lesson Information</a>
+
+                      <% } %>
+
+                      <% if (tutor.tutor._id.equals(currentUser._id)) { %>
+                        <button type="button" data-toggle="modal" data-target="#modal-<%=student._id%>-mark" id="mark-<%=student._id%>" class="btn btn-success mark-button">Mark Lesson</button>
+                      <% } %>
+
+                      <% if (tutor.tutor._id.equals(currentUser._id) || student._id.equals(currentUser._id)) { %>
+                        <span class="lessons-length"><span id="lessons-length-<%=student._id%>"><%=lessonCount%></span> lesson(s)</span>
+                      <% } %>
+                    </div>
+
+                    <div class="modal fade" id="modal-<%=student._id%>-mark" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+                      <div class="modal-dialog">
+                        <div class="modal-content">
+                          <div class="modal-header">
+                            <h5 class="modal-title" id="exampleModalLabel">Mark Lesson For <%=student.firstName%> <%=student.lastName%>?</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                              <span aria-hidden="true">&times;</span>
+                            </button>
+                          </div>
+                          <div class="modal-body">
+                            <label for="time-<%=student._id%>">Lesson Time: <span id="time-label-<%=student._id%>">0</span> minutes</label><br />
+                            <input type="range" min="0" max="60" value="0" class="slider time" id="time-<%=student._id%>" onchange="setTime(this)">
+                            <textarea minlength="20" maxlength="500" rows="5" class="form-control summary" id="summary-<%=student._id%>" placeholder="Lesson Summary"></textarea>
+                          </div>
+                          <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Back</button>
+                            <button type="button" id="mark-<%=course._id%>-<%=student._id%>" onclick="mark(this)" class="btn btn-success">Confirm</button>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                  <% } %>
+                </div>
+              <% } %>
+
+            <% } else {%>
+              <h1 class="empty-field">No Students</h1>
+            <% } %>
+
+            <br /><br />
+            <% if (tutor.formerStudents.length > 0) { %>
+              <% if (tutor.tutor._id.equals(currentUser._id) || studentIds.includes(currentUser._id.toString()) || course.teacher.equals(currentUser._id)) { %>
+                <div class="list-group">
+                  <li class="list-group-item list-group-item-success status-header">
+                    <div class="d-flex w-100 justify-content-between">
+                      <h2 class="mb-1">Former Students</h2>
+                    </div>
+                  </li>
+                  <% for (let student of tutor.formerStudents) { %>
+                    <div class="list-group-item list-group-item-action user-element">
+                      <a href="/profiles/<%=student._id%>" class="student-profile user-element-text">
+                        <img class="student-profile-image" src="<%= student.imageUrl %>" alt="profile picture">
+                        <span class="<%=student.permission%> <%=student.status%> <%=student.tags.join(' ')%> student-block"><span class="span-tag-name"><%=student.firstName%> <%=student.lastName%></span> <span class="span-tag-username"><%=student.username%></span></span>
+
+                        <% let lessonCount = 0;%>
+                        <% for (let lesson of tutor.lessons) { %>
+                          <% if (lesson.student.equals(student._id)) { %>
+                            <%lessonCount += 1;%>
+                          <% } %>
+                        <% } %>
+                      </a>
+                      <% if (tutor.tutor._id.equals(currentUser._id)) { %>
+                        <a class="btn btn-info lesson-button" href="/homework/tutors/<%=course._id%>?tutorId=<%=tutor.tutor._id%>&studentId=<%=student._id%>">Lesson Information</a>
+                      <% } %>
+
+                      <% if (tutor.tutor._id.equals(currentUser._id) || student._id.equals(currentUser._id)) { %>
+                        <span class="lessons-length"><span id="lessons-length-<%=student._id%>"><%=lessonCount%></span> lesson(s)</span>
+                      <% } %>
+                    </div>
+
+                  <% } %>
+                </div>
+              <% } %>
+            <% } %>
+
+          </div>
+
+          <div class="courses" hidden>
+            <% if (courses.length > 0) { %>
+              <% for (let c of courses) { %>
+                <div class="row">
+                  <div class="col-lg-12">
+                    <article class="text-block" id="<%=c._id%>">
+                      <div class="block-header grey">
+                        <h5>
+                          <a class="announcement-button">
+                            <span class="announcement-subject-header"><%=c.name%></span>
+                          </a>
+                          <span class= "float-right project-info date">Tutors: <%=c.tutors.length%></span>
+                          <br />
+                          <span class= "float-right project-info date">Students: <%=c.students.length%></span>
+                        </h5>
+
+                        <div class="project-header">
+                          <span>
+                            <a class="project-info" href= "/profiles/<%=c.teacher._id%>">
+                              <img src="<%= c.teacher.imageUrl %>" alt="profile pic" class="sender-profile-image">
+                              <%=c.teacher.firstName%> <%=c.teacher.lastName%>
+                            </a>
+
+                            <% let included = false;%>
+                            <% for (let tutor of c.tutors) { %>
+                              <% if (tutor.tutor.equals(currentUser._id)) { %>
+                                <% included = true;%>
+                              <% } %>
+
+                            <% if (c.students.includes(currentUser._id)) { %>
+                                <% included = true;%>
+                              <% } %>
+                            <% } %>
+
+                            <% if (!included) { %>
+                              <% if (!c.students.includes(currentUser._id)) { %>
+                                <form action="/homework/join" method="post" id="join-<%=c._id%>" class="join-course-student">
+                                  <button type="button" data-toggle="modal" data-target="#modal-join" class="btn btn-primary"><i class="fas fa-chalkboard-teacher"></i> Join Course</button>
+                                  <div class="modal fade" id="modal-join" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
                                     <div class="modal-dialog">
                                       <div class="modal-content">
                                         <div class="modal-header">
@@ -593,27 +514,22 @@
                                           </button>
                                         </div>
                                         <div class="modal-body">
-                                          <input class="form-control" type="text" name="joincode"
-                                                 placeholder="Enter Join Code"/>
+                                          <input class="form-control" type="text" name="joincode" placeholder="Enter Join Code"/>
                                         </div>
                                         <div class="modal-footer">
-                                          <button type="button" class="btn btn-secondary"
-                                                  data-dismiss="modal">Back</button>
+                                          <button type="button" class="btn btn-secondary" data-dismiss="modal">Back</button>
                                           <button type="submit" class="btn btn-primary">Join</button>
                                         </div>
                                       </div>
                                     </div>
                                   </div>
                                 </form>
-                                  <% } %>
+                              <% } %>
 
-                                  <% if (currentUser.tags.includes("Tutor")) { %>
-                                      <form action="/homework/join-tutor" method="post" id="join-tutor-<%= c._id %>"
-                                            class="join-course-tutor">
-                                  <button type="button" data-toggle="modal" data-target="#modal-tutor-<%= c._id %>"
-                                          class="btn btn-success"><i class="fas fa-chalkboard-teacher"></i> Join Course As Tutor</button>
-                                  <div class="modal fade" id="modal-tutor-<%= c._id %>" tabindex="-1"
-                                       aria-labelledby="deleteModalLabel" aria-hidden="true">
+                              <% if (currentUser.tags.includes("Tutor")) { %>
+                                <form action="/homework/join-tutor" method="post" id="join-tutor-<%=c._id%>" class="join-course-tutor">
+                                  <button type="button" data-toggle="modal" data-target="#modal-tutor-<%=c._id%>" class="btn btn-success"><i class="fas fa-chalkboard-teacher"></i> Join Course As Tutor</button>
+                                  <div class="modal fade" id="modal-tutor-<%=c._id%>" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
                                     <div class="modal-dialog">
                                       <div class="modal-content">
                                         <div class="modal-header">
@@ -623,47 +539,42 @@
                                           </button>
                                         </div>
                                         <div class="modal-body">
-                                          <input class="form-control" type="text" name="joincode"
-                                                 placeholder="Enter Join Code"/><br/>
-                                          <label for="slots-<%= c._id %>" id="slots-label-<%= c._id %>">Number of Student Slots: 0 </label><br/>
-                                          <input type="range" min="0" max="5" value="0" class="slider"
-                                                 id="slots-<%= c._id %>" name="slots"
-                                                 onchange="setStudentsTutorShow(this)">
-                                          <textarea rows="5" minlength="20" maxlength="500" class="form-control"
-                                                    name="bio" placeholder="A Short Bio About Yourself"></textarea>
+                                          <input class="form-control" type="text" name="joincode" placeholder="Enter Join Code"/><br />
+                                          <label for="slots-<%=c._id%>" id="slots-label-<%=c._id%>">Number of Student Slots: 0 </label><br />
+                                          <input type="range" min="0" max="5" value="0" class="slider" id="slots-<%=c._id%>" name="slots" onchange="setStudentsTutorShow(this)">
+                                          <textarea rows="5" minlength="20" maxlength="500" class="form-control" name="bio" placeholder="A Short Bio About Yourself"></textarea>
                                         </div>
                                         <div class="modal-footer">
-                                          <button type="button" class="btn btn-secondary"
-                                                  data-dismiss="modal">Back</button>
+                                          <button type="button" class="btn btn-secondary" data-dismiss="modal">Back</button>
                                           <button type="submit" class="btn btn-primary">Join</button>
                                         </div>
                                       </div>
                                     </div>
                                   </div>
                                 </form>
-                                  <% } %>
                               <% } %>
+                            <% } %>
                           </span>
-                                </div>
-                            </div>
+                        </div>
+                      </div>
 
-                            <div class="block-content">
-                                <img class="project-first-image" src="<%= c.thumbnail %>"/>
-                                <p class="announcement-text"><%= c.description %></p>
-                            </div>
+                      <div class="block-content">
+                        <img class="project-first-image" src="<%=c.thumbnail%>"/>
+                        <p class="announcement-text"><%=c.description%></p>
+                      </div>
 
-                        </article>
-                    </div>
+                    </article>
+                  </div>
                 </div>
-                <br class="text-break" id="break-<%= c._id %>"/>
+                <br class="text-break" id="break-<%=c._id%>"/>
+              <% } %>
+            <% } else {%>
+              <h1 class="empty-field">No Other Courses</h1>
             <% } %>
-        <% } else { %>
-            <h1 class="empty-field">No Other Courses</h1>
-        <% } %>
+          </div>
     </div>
-</div>
-</body>
-<script>
-    document.getElementById("experience").innerText = getTime(document.getElementById("experience").innerText.split(' ')[0]);
-</script>
+  </body>
+  <script>
+      document.getElementById("experience").innerText = getTime(document.getElementById("experience").innerText.split(' ')[0]);
+  </script>
 </html>

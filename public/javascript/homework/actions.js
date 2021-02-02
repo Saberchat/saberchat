@@ -1,10 +1,10 @@
-const book = ((button, location) => {
+function book(button, location) {
     const courseId = button.id.split('-')[0];
     const tutorId = button.id.split('-')[1];
     const url = `/homework/book/${courseId}?_method=put`;
     const data = {tutorId};
 
-    $.post(url, data, function (data) {
+    $.post(url, data, data => {
         if (data.success) {
             $(`#modal-book-${tutorId}`).modal('hide');
 
@@ -16,14 +16,14 @@ const book = ((button, location) => {
             let chatButton = document.createElement('a');
 
             if (location == "show") {
-                reviewButton.className = "review-button action-button btn btn-warning";
-                leaveButton.className = "leave-button action-button btn btn-danger";
-                chatButton.className = "leave-button action-button btn btn-success";
+                reviewButton.className ="review-button action-button btn btn-warning";
+                leaveButton.className ="leave-button action-button btn btn-danger";
+                chatButton.className ="leave-button action-button btn btn-success";
 
             } else if (location == "tutor-show") {
-                reviewButton.className = "action-button btn btn-warning";
-                leaveButton.className = "action-button btn btn-danger";
-                chatButton.className = "action-button btn btn-success";
+                reviewButton.className ="action-button btn btn-warning";
+                leaveButton.className ="action-button btn btn-danger";
+                chatButton.className ="action-button btn btn-success";
             }
 
             reviewButton.id = `review-button-${tutorId}`;
@@ -36,7 +36,7 @@ const book = ((button, location) => {
             leaveButton.setAttribute("data-target", `#modal-stop-${tutorId}`);
             leaveButton.innerHTML = "Stop Lessons";
 
-            chatButton.id = `leave-button-${tutorId}`;
+            chatButton.id = `chat-button-${tutorId}`;
             chatButton.setAttribute("href", `/chat/${data.room}`);
             chatButton.innerHTML = "Chat";
 
@@ -46,7 +46,6 @@ const book = ((button, location) => {
 
             tutorDiv.appendChild(leaveButton);
             tutorDiv.appendChild(chatButton);
-
 
             document.getElementById("new-count").innerText = `${data.user.newRoomCount.length + data.user.annCount.length}`;
             document.getElementById("new-count").hidden = false;
@@ -79,7 +78,7 @@ const book = ((button, location) => {
                 for (let student of data.students) {
                     userElement = document.createElement("div");
                     userElement.className = "list-group-item list-group-item-action user-element";
-                    userElement.innerHTML = `<a href="/profiles/${student._id}" style="color: black; text-decoration: none;"> <img class="student-profile-image" src="${student.imageUrl}" alt="profile picture"> <span class="${student.permission} ${student.status} ${student.tags.join(' ')} student-block"><span class="span-tag-name">${student.firstName} ${student.lastName}</span> <span class="span-tag-username">${student.username}</span></span></a>`;
+                    userElement.innerHTML = `<a href="/profiles/${student._id}" style="color: black; text-decoration: none;"> <img class="student-profile-image" src="${student.imageUrl }" alt="profile picture"> <span class="${student.permission} ${student.status} ${student.tags.join(' ')} student-block"><span class="span-tag-name">${student.firstName} ${student.lastName}</span> <span class="span-tag-username">${student.username}</span></span></a>`;
 
                     if (student._id == data.user._id) {
                         let lessonInfoButton = document.createElement("a");
@@ -94,29 +93,26 @@ const book = ((button, location) => {
                         userElement.appendChild(lessonInfoButton);
                         userElement.appendChild(lessonsLength);
                     }
-
                     studentsList.appendChild(userElement);
-
                 }
 
                 studentDiv.appendChild(studentsList);
                 studentDiv.hidden = true;
-
                 document.getElementById("options-bar").insertBefore(studentHeading, document.getElementById("courses"));
                 document.getElementsByClassName("courses")[0].parentNode.insertBefore(studentDiv, document.getElementsByClassName("courses")[0]);
             }
         }
     });
-});
+}
 
-const leave = ((button, location) => {
+function leave(button, location) {
     const courseId = button.id.split('-')[0];
     const tutorId = button.id.split('-')[1];
     const url = `/homework/leave/${courseId}?_method=put`;
     const data = {tutorId};
 
-    $.post(url, data, function (data) {
-        if (data.success) {
+    $.post(url, data, data => {
+        if(data.success) {
             $(`#modal-stop-${tutorId}`).modal('hide');
 
             const tutorDiv = document.getElementById(`tutor-actions-${tutorId}`);
@@ -128,12 +124,12 @@ const leave = ((button, location) => {
             let bookButton = document.createElement('button');
 
             if (location == "show") {
-                reviewButton.className = "review-button action-button btn btn-warning";
-                bookButton.className = "book-button action-button btn btn-info";
+                reviewButton.className ="review-button action-button btn btn-warning";
+                bookButton.className ="book-button action-button btn btn-info";
 
             } else if (location == "tutor-show") {
-                reviewButton.className = "action-button btn btn-warning";
-                bookButton.className = "action-button btn btn-info";
+                reviewButton.className ="action-button btn btn-warning";
+                bookButton.className ="action-button btn btn-info";
             }
 
             reviewButton.id = `review-button-${tutorId}`;
@@ -149,7 +145,6 @@ const leave = ((button, location) => {
             tutorDiv.appendChild(bookButton);
 
             document.getElementById("new-count").innerText = `${data.user.newRoomCount.length + data.user.annCount.length}`;
-
             if (data.user.newRoomCount.length + data.user.annCount.length > 0) {
                 document.getElementById("new-count").hidden = false;
             } else {
@@ -159,7 +154,6 @@ const leave = ((button, location) => {
             document.getElementById("new-chat").innerText = `${data.user.newRoomCount.length}`;
             if (data.user.newRoomCount.length > 0) {
                 document.getElementById("new-chat").hidden = false;
-
             } else {
                 document.getElementById("new-chat").hidden = true;
             }
@@ -170,54 +164,51 @@ const leave = ((button, location) => {
             }
         }
     });
-});
+}
 
-const closeLessons = ((button, location) => {
+function closeLessons(button, location) {
     const courseId = button.id.split('-')[0];
     const tutorId = button.id.split('-')[1];
     const url = `/homework/close-lessons/${courseId}?_method=put`;
     const data = {tutorId};
 
-    $.post(url, data, function (data) {
+    $.post(url, data, data => {
 
         if (data.success) {
             $(`#modal-close-${tutorId}`).modal('hide');
-
             let reopenButton = document.createElement('button');
 
             if (location == "show") {
-                reopenButton.className = "reopen-lessons action-button btn btn-success lesson-action";
+                reopenButton.className ="reopen-lessons action-button btn btn-success lesson-action";
             } else if (location == "tutor-show") {
-                reopenButton.className = "action-button btn btn-success";
+                reopenButton.className ="action-button btn btn-success";
             }
 
             reopenButton.id = `reopen-${courseId}-${tutorId}`;
             reopenButton.setAttribute("data-toggle", "modal");
             reopenButton.setAttribute("data-target", `#modal-reopen-${tutorId}`);
             reopenButton.innerHTML = "Reopen Lessons";
-
             document.getElementById(`close-${courseId}-${tutorId}`).parentNode.replaceChild(reopenButton, document.getElementById(`close-${courseId}-${tutorId}`));
         }
     });
-});
+}
 
-const reopenLessons = ((button, location) => {
+function reopenLessons(button, location) {
     const courseId = button.id.split('-')[0];
     const tutorId = button.id.split('-')[1];
     const url = `/homework/reopen-lessons/${courseId}?_method=put`;
     const data = {tutorId};
 
-    $.post(url, data, function (data) {
+    $.post(url, data, data => {
 
         if (data.success) {
             $(`#modal-reopen-${tutorId}`).modal('hide');
-
             let closeButton = document.createElement('button');
 
             if (location == "show") {
-                closeButton.className = "close-lessons action-button btn btn-danger lesson-action";
+                closeButton.className ="close-lessons action-button btn btn-danger lesson-action";
             } else if (location == "tutor-show") {
-                closeButton.className = "action-button btn btn-danger";
+                closeButton.className ="action-button btn btn-danger";
             }
 
             closeButton.id = `close-${courseId}-${tutorId}`;
@@ -228,23 +219,23 @@ const reopenLessons = ((button, location) => {
             document.getElementById(`reopen-${courseId}-${tutorId}`).parentNode.replaceChild(closeButton, document.getElementById(`reopen-${courseId}-${tutorId}`));
         }
     });
-});
+}
 
-const setStudents = (() => {
+function setStudents() {
     document.getElementById("slots-label").innerText = `Number of Student Slots: ${document.getElementById('slots').value}`;
-});
+}
 
-const setStudentsTutorShow = (slider => {
+function setStudentsTutorShow(slider) {
     const courseId = slider.id.split('-')[1];
     document.getElementById(`slots-label-${courseId}`).innerText = `Number of Student Slots: ${slider.value}`;
-});
+}
 
-const setStudentsShow = (courseId => {
+function setStudentsShow(courseId) {
     const url = `/homework/set-students/${courseId}?_method=put`;
     const slots = document.getElementById('slots').value;
     const data = {courseId, slots};
 
-    $.post(url, data, function (data) {
+    $.post(url, data, data => {
         if (data.success) {
             document.getElementById("slots-count").innerText = `${slots}`;
             document.getElementById("change-message").style.color = "green";
@@ -267,22 +258,20 @@ const setStudentsShow = (courseId => {
         setTimeout(() => {
             document.getElementById("change-message").hidden = true;
         }, 1000);
-
     });
-});
+}
 
-const removeStudent = ((button, location) => {
+function removeStudent(button, location) {
     const courseId = button.id.split('-')[0];
     const studentId = button.id.split('-')[1];
     const reason = document.getElementById(`reason-${studentId}`).value;
     const url = `/homework/remove-student/${courseId}?_method=put`;
     const data = {studentId, reason};
 
-    $.post(url, data, function (data) {
+    $.post(url, data, data => {
         if (data.success) {
             $(`#modal-index-remove-${studentId}`).modal('hide');
             document.getElementById("students").removeChild(document.getElementById(`item-${studentId}`));
-
             if (data.course.blocked.length == 1) {
                 let blockedDiv = document.createElement("ul");
                 blockedDiv.className = "list-group";
@@ -302,7 +291,6 @@ const removeStudent = ((button, location) => {
             unblockModal.setAttribute("tabindex", "-1");
             unblockModal.setAttribute("aria-labelledby", "deleteModalLabel");
             unblockModal.setAttribute("aria-hidden", "true");
-
             unblockModal.innerHTML = `<div class="modal-dialog"> <div class="modal-content"> <div class="modal-header"> <h5 class="modal-title" id="exampleModalLabel">Unblock ${data.student.firstName} ${data.student.lastName} From Your Course?</h5> <button type="button" class="close" data-dismiss="modal" aria-label="Close"> <span aria-hidden="true">&times;</span> </button> </div> <div class="modal-body"> <p> ${data.student.firstName} will be able to rejoin the course with the join code. </p> </div> <div class="modal-footer"> <button type="button" class="btn btn-secondary" data-dismiss="modal">Back</button> <button type="button" class="btn btn-danger" id="${data.course._id}-${data.student._id}" onclick="unblock(this)">Yes, Unblock</button> </div> </div></div>`;
 
             document.getElementById("blocked-div").appendChild(blockedElement);
@@ -313,16 +301,16 @@ const removeStudent = ((button, location) => {
             }
         }
     });
-});
+}
 
-const removeTutor = ((button, location) => {
+function removeTutor(button, location) {
     const courseId = button.id.split('-')[0];
     const tutorId = button.id.split('-')[1];
     const reason = document.getElementById(`reason-${tutorId}`).value;
     const url = `/homework/remove-tutor/${courseId}?_method=put`;
     const data = {tutorId, reason, show: true};
 
-    $.post(url, data, function (data) {
+    $.post(url, data, data => {
         if (data.success) {
             $(`#modal-index-remove-${tutorId}`).modal('hide');
             $(`#modal-remove-${tutorId}`).modal('hide');
@@ -348,7 +336,6 @@ const removeTutor = ((button, location) => {
             unblockModal.setAttribute("tabindex", "-1");
             unblockModal.setAttribute("aria-labelledby", "deleteModalLabel");
             unblockModal.setAttribute("aria-hidden", "true");
-
             unblockModal.innerHTML = `<div class="modal-dialog"> <div class="modal-content"> <div class="modal-header"> <h5 class="modal-title" id="exampleModalLabel">Unblock ${data.tutor.firstName} ${data.tutor.lastName} From Your Course?</h5> <button type="button" class="close" data-dismiss="modal" aria-label="Close"> <span aria-hidden="true">&times;</span> </button> </div> <div class="modal-body"> <p> ${data.tutor.firstName} will be able to rejoin the course with the join code. </p> </div> <div class="modal-footer"> <button type="button" class="btn btn-secondary" data-dismiss="modal">Back</button> <button type="button" class="btn btn-danger" id="${data.course._id}-${data.tutor._id}" onclick="unblock(this)">Yes, Unblock</button> </div> </div></div>`;
 
             document.getElementById("blocked-div").appendChild(blockedElement);
@@ -360,15 +347,15 @@ const removeTutor = ((button, location) => {
             }
         }
     });
-});
+}
 
-const unblock = (button => {
+function unblock(button) {
     const courseId = button.id.split('-')[0];
     const blockedId = button.id.split('-')[1];
     const url = `/homework/unblock/${courseId}?_method=put`;
     const data = {blockedId};
 
-    $.post(url, data, function (data) {
+    $.post(url, data, data => {
 
         if (data.success) {
             $(`#modal-index-unblock-${blockedId}`).modal('hide');
@@ -379,42 +366,33 @@ const unblock = (button => {
             }
         }
     });
-});
+}
 
-const changeBio = (button => {
+function changeBio(button) {
     const courseId = button.id.split('-')[2];
     const bio = document.getElementById(`edit-bio-field`).value;
+    const url = `/homework/bio/${courseId}?_method=put`;
+    const data = {bio};
 
-    if (bio.length < 100 || bio.length > 250) {
-        document.getElementById("bio-length-error").hidden = false;
-        setTimeout(() => {
-            document.getElementById("bio-length-error").hidden = true;
-        }, 1000);
+    $.post(url, data, data => {
 
-    } else {
-        const url = `/homework/bio/${courseId}?_method=put`;
-        const data = {bio};
+      if (data.success) {
+        $(`#modal-edit-bio`).modal('hide');
+        document.getElementById("tutor-bio").innerText = bio;
+      }
+    });
+}
 
-        $.post(url, data, function (data) {
-
-            if (data.success) {
-                $(`#modal-edit-bio`).modal('hide');
-                document.getElementById("tutor-bio").innerText = bio;
-            }
-        });
-    }
-});
-
-const setTime = (input => {
+function setTime(input) {
     const studentId = input.id.split('-')[1];
     document.getElementById(`time-label-${studentId}`).innerText = input.value;
-});
+}
 
-const getTime = (experience => {
+function getTime(experience) {
     let result;
     experience = parseInt(experience);
     if (experience < 60) {
-        result = `${Math.round(experience * 100) / 100} minute(s)`;
+        result = `${Math.round(experience * 100)/100} minute(s)`;
 
     } else {
         experience /= 60;
@@ -442,11 +420,10 @@ const getTime = (experience => {
             }
         }
     }
-
     return result;
-});
+}
 
-const mark = (button => {
+function mark(button) {
     const courseId = button.id.split('-')[1];
     const studentId = button.id.split('-')[2];
     const time = parseInt(document.getElementById(`time-${studentId}`).value);
@@ -454,7 +431,7 @@ const mark = (button => {
     const url = `/homework/mark/${courseId}?_method=put`;
     const data = {studentId, time, summary};
 
-    $.post(url, data, function (data) {
+    $.post(url, data, data => {
         if (data.success) {
             document.getElementById(`time-${studentId}`).value = "0";
             document.getElementById("lessons-length").innerText = data.tutor.lessons.length;
@@ -469,4 +446,4 @@ const mark = (button => {
             $(`#modal-${studentId}-mark`).modal('hide');
         }
     });
-});
+}

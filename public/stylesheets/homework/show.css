@@ -58,10 +58,8 @@
 .tutor-profile {
     color: black;
     height: 40%;
-    padding-bottom,
-    padding-top: 10px;
-    padding-left,
-    padding-right: 20px;
+    padding-bottom, padding-top: 10px;
+    padding-left, padding-right: 20px;
 }
 
 .tutor-link, .tutor-link:hover {
@@ -93,6 +91,15 @@
 
 .book-button, .upvoted, .not-upvoted, .review-button, .leave-button, #rating-label {
     margin-left: 10px;
+}
+
+.upvoted, .not-upvoted {
+    display: inline;
+}
+
+.upvote-count {
+    color: black;
+    display: inline;
 }
 
 .review {
@@ -127,14 +134,6 @@
     font-size: 120%;
     font-weight: bold;
     text-decoration: none;
-}
-
-.tutor-experience {
-    font-weight: bold;
-    color: purple;
-    margin-left: 10px;
-    font-style: italic;
-    display: inline;
 }
 
 #rating-label, #join-code-heading, .list-group-item-success {

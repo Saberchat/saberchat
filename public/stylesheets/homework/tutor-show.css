@@ -17,6 +17,10 @@
     font-size: 125%;
 }
 
+.upvote-count {
+    color: black;
+}
+
 h3, .ratings {
     display: inline;
 }
@@ -142,7 +146,7 @@ h3, .ratings {
         font-size: 120%;
     }
 
-    .ratings {
+    .ratings{
         display: block;
         margin-top: 10px;
     }
