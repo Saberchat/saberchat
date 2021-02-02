@@ -5,7 +5,7 @@ function upvote(button) {
     const data = {tutorId};
 
     $.post(url, data, data => {
-        if(data.success) {
+        if (data.success) {
 
             if (data.success.includes("Downvoted")) {
                 button.innerHTML = `<span class="not-upvoted"><i class="fas fa-arrow-circle-up"></i><span class="upvote-count" id="upvoteCount-<%=course._id%>-${tutorId}"> ${data.upvoteCount}</span></span>`;
@@ -23,7 +23,7 @@ function likeReview(button) { //Like a tutor's review (restricted to students an
     const data = {};
 
     $.post(url, data, data => {
-        if(data.success) {
+        if (data.success) {
             if (data.success.includes("Liked")) {
                 button.style.color = "#03a5fc";
             } else {

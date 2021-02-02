@@ -13,7 +13,7 @@ const PostComment = require('../models/postComment');
 const Room = require('../models/room');
 
 router.get('/', middleware.isLoggedIn, (req, res) => { //RESTful routing 'index'
-    (async() => {
+    (async () => {
         const courses = await Course.find({});
         if (!courses) {
             req.flash('error', "Unable to find courses");
@@ -44,7 +44,7 @@ router.get('/', middleware.isLoggedIn, (req, res) => { //RESTful routing 'index'
 });
 
 router.post('/', middleware.isLoggedIn, middleware.isFaculty, validateCourse, (req, res) => { //RESTful routing 'create' (Create course)
-    (async() => {
+    (async () => {
         let charSetMatrix = [];
         charSetMatrix.push('qwertyuiopasdfghjklzxcvbnm'.split(''));
         charSetMatrix.push('QWERTYUIOPASDFGHJKLZXCVBNM'.split(''));
@@ -54,7 +54,7 @@ router.post('/', middleware.isLoggedIn, middleware.isFaculty, validateCourse, (r
         let joinCode = "";
 
         let charSet; //Which character set to choose from
-        for (let i = 0; i < code_length; i ++) {
+        for (let i = 0; i < code_length; i++) {
             charSet = charSetMatrix[Math.floor(Math.random() * 3)];
             joinCode += charSet[Math.floor((Math.random() * charSet.length))];
         }
@@ -82,7 +82,7 @@ router.post('/', middleware.isLoggedIn, middleware.isFaculty, validateCourse, (r
 });
 
 router.post('/join', middleware.isLoggedIn, middleware.isStudent, middleware.notMemberOfCourse, (req, res) => { //Join course as a student
-    (async() => {
+    (async () => {
         const course = await Course.findOne({joinCode: req.body.joincode});
         if (!course) {
             req.flash('error', "No courses matching this join code were found.");
@@ -101,7 +101,7 @@ router.post('/join', middleware.isLoggedIn, middleware.isStudent, middleware.not
 });
 
 router.post('/join-tutor', middleware.isLoggedIn, middleware.isTutor, middleware.notMemberOfCourse, (req, res) => { //Join course as tutor
-    (async() => {
+    (async () => {
         const course = await Course.findOne({joinCode: req.body.joincode});
         if (!course) {
             req.flash('error', "No courses matching this join code were found.");
@@ -126,7 +126,7 @@ router.post('/join-tutor', middleware.isLoggedIn, middleware.isTutor, middleware
 });
 
 router.get('/:id', middleware.isLoggedIn, middleware.memberOfCourse, (req, res) => { //RESTful routing show route
-    (async() => {
+    (async () => {
         const course = await Course.findById(req.params.id).populate('teacher students tutors.tutor tutors.reviews.review blocked');
         if (!course) {
             req.flash('error', "Unable to find course");
@@ -151,14 +151,14 @@ router.get('/:id', middleware.isLoggedIn, middleware.memberOfCourse, (req, res) 
 
         return res.render('homework/show', {course, studentIds, tutorIds, teachers});
 
-      })().catch(err => {
+    })().catch(err => {
         req.flash('error', "Unable to find course");
         res.redirect('back');
-      });
+    });
 });
 
 router.put('/:id', middleware.isLoggedIn, middleware.isFaculty, middleware.memberOfCourse, (req, res) => { //RESTful routing update route
-    (async() => {
+    (async () => {
         const course = await Course.findById(req.params.id);
         if (!course) {
             return res.json({error: "An Error Occurred"});
@@ -173,28 +173,28 @@ router.put('/:id', middleware.isLoggedIn, middleware.isFaculty, middleware.membe
         await course.save();
         return res.json({success: "Succesfully Updated Course Information"});
 
-      })().catch(err => {
-          res.json({error: "An Error Occurred"});
-      });
+    })().catch(err => {
+        res.json({error: "An Error Occurred"});
+    });
 });
 
 router.put('/updateTeacher/:id', middleware.isLoggedIn, middleware.isFaculty, middleware.memberOfCourse, (req, res) => {
-    (async() => {
+    (async () => {
         const course = await Course.findById(req.params.id);
         if (!course) {
-              req.flash("error", "Unable to find course");
-              return res.redirect("back");
+            req.flash("error", "Unable to find course");
+            return res.redirect("back");
         }
 
         if (!(course.joinCode == req.body.joinCodeConfirm)) {
-              req.flash("error", "Join code is invalid");
-              return res.redirect("back");
+            req.flash("error", "Join code is invalid");
+            return res.redirect("back");
         }
 
         const newTeacher = await User.findById(req.body.teacher);
         if (!newTeacher) {
-              req.flash("error", "Error finding teacher");
-              return res.redirect("back");
+            req.flash("error", "Error finding teacher");
+            return res.redirect("back");
         }
 
         course.teacher = newTeacher;
@@ -202,14 +202,14 @@ router.put('/updateTeacher/:id', middleware.isLoggedIn, middleware.isFaculty, mi
         req.flash("success", "Updated course teacher!");
         return res.redirect("/homework")
 
-      })().catch(err => {
-            req.flash("error", "Unable to update teacher");
-            res.redirect("back");
-      });
+    })().catch(err => {
+        req.flash("error", "Unable to update teacher");
+        res.redirect("back");
+    });
 });
 
 router.put('/joinCode/:id', middleware.isLoggedIn, middleware.isFaculty, middleware.memberOfCourse, (req, res) => { //Update course join code
-    (async() => {
+    (async () => {
         let charSetMatrix = [];
         charSetMatrix.push('qwertyuiopasdfghjklzxcvbnm'.split(''));
         charSetMatrix.push('QWERTYUIOPASDFGHJKLZXCVBNM'.split(''));
@@ -219,9 +219,9 @@ router.put('/joinCode/:id', middleware.isLoggedIn, middleware.isFaculty, middlew
         let joinCode = "";
 
         let charSet;
-        for (let i = 0; i < code_length; i ++) {
-              charSet = charSetMatrix[Math.floor(Math.random() * 3)];
-              joinCode += charSet[Math.floor((Math.random() * charSet.length))];
+        for (let i = 0; i < code_length; i++) {
+            charSet = charSetMatrix[Math.floor(Math.random() * 3)];
+            joinCode += charSet[Math.floor((Math.random() * charSet.length))];
         }
 
         const course = await Course.findById(req.params.id);
@@ -239,7 +239,7 @@ router.put('/joinCode/:id', middleware.isLoggedIn, middleware.isFaculty, middlew
 });
 
 router.put("/bio/:id", middleware.isLoggedIn, middleware.isTutor, (req, res) => { //Edit tutor bio
-    (async() => {
+    (async () => {
         const course = await Course.findById(req.params.id);
         if (!course) {
             return res.json({error: "Unable to find course"});
@@ -259,7 +259,7 @@ router.put("/bio/:id", middleware.isLoggedIn, middleware.isTutor, (req, res) => 
 });
 
 router.post('/unenroll-student/:id', middleware.isLoggedIn, middleware.isStudent, middleware.memberOfCourse, (req, res) => { //Leave course as a student
-    (async() => {
+    (async () => {
         const course = await Course.findByIdAndUpdate(req.params.id, {$pull: {students: req.user._id}}).populate("tutors.tutor");
         if (!course) {
             req.flash('error', "Unable to find course");
@@ -272,16 +272,16 @@ router.post('/unenroll-student/:id', middleware.isLoggedIn, middleware.isStudent
             if (tutor.students.includes(req.user._id)) { //Update the tutor's students array
                 tutor.formerStudents.push(req.user._id);
                 tutor.students.splice(tutor.students.indexOf(req.user._id), 1);
-                tutor.slots ++;
+                tutor.slots++;
                 tutor.available = true;
 
-                for (let i = 0; i < tutor.rooms.length; i ++) { //Update the tutor's rooms array
+                for (let i = 0; i < tutor.rooms.length; i++) { //Update the tutor's rooms array
                     if (tutor.rooms[i].student.equals(req.user._id)) {
                         deletedRoom = await Room.findByIdAndDelete(tutor.rooms[i].room);
 
                         if (!deletedRoom) {
-                          req.flash('error', "Unable to find room");
-                          return res.redirect('back');
+                            req.flash('error', "Unable to find room");
+                            return res.redirect('back');
                         }
 
                         if (req.user.newRoomCount.includes(deletedRoom._id)) {
@@ -311,14 +311,14 @@ router.post('/unenroll-student/:id', middleware.isLoggedIn, middleware.isStudent
 });
 
 router.post('/unenroll-tutor/:id', middleware.isLoggedIn, middleware.isTutor, middleware.memberOfCourse, (req, res) => { //Leave course as a tutor
-    (async() => {
+    (async () => {
         const course = await Course.findById(req.params.id).populate('tutors.tutor tutors.rooms.student');
         if (!course) {
             req.flash('error', "Unable to find course");
             return res.redirect('back');
         }
 
-        for (let i = course.tutors.length-1; i >= 0; i --) {
+        for (let i = course.tutors.length - 1; i >= 0; i--) {
             if (course.tutors[i].tutor._id.equals(req.user._id)) { //If the selected tutor is the current user
                 let deletedRoom;
                 for (let room of course.tutors[i].rooms) {
@@ -354,7 +354,7 @@ router.post('/unenroll-tutor/:id', middleware.isLoggedIn, middleware.isTutor, mi
 });
 
 router.put('/book/:id', middleware.isLoggedIn, middleware.isStudent, middleware.memberOfCourse, (req, res) => { //Book a tutor
-    (async() => {
+    (async () => {
         const course = await Course.findById(req.params.id).populate('tutors.tutor');
         if (!course) {
             return res.json({error: "Error accessing course"});
@@ -370,7 +370,7 @@ router.put('/book/:id', middleware.isLoggedIn, middleware.isStudent, middleware.
                     tutor.formerStudents.splice(tutor.formerStudents.indexOf(req.user._id), 1);
                 }
 
-                tutor.slots --;
+                tutor.slots--;
                 if (tutor.slots == 0) {
                     tutor.available = false;
                 }
@@ -404,7 +404,14 @@ router.put('/book/:id', middleware.isLoggedIn, middleware.isStudent, middleware.
                     return res.json({error: "Error accessing students"});
                 }
 
-                return res.json({success: "Succesfully joined tutor", user: req.user, room: roomObject.room, tutor, formerStudent, students: studentIds});
+                return res.json({
+                    success: "Succesfully joined tutor",
+                    user: req.user,
+                    room: roomObject.room,
+                    tutor,
+                    formerStudent,
+                    students: studentIds
+                });
             }
         }
 
@@ -414,7 +421,7 @@ router.put('/book/:id', middleware.isLoggedIn, middleware.isStudent, middleware.
 });
 
 router.put('/upvote/:id', middleware.isLoggedIn, middleware.isStudent, middleware.memberOfCourse, (req, res) => { //Upvote a tutor
-    (async() => {
+    (async () => {
         const course = await Course.findById(req.params.id);
         if (!course) {
             return res.json({error: "Error upvoting tutor"});
@@ -444,7 +451,7 @@ router.put('/upvote/:id', middleware.isLoggedIn, middleware.isStudent, middlewar
 });
 
 router.put('/rate/:id', middleware.isLoggedIn, middleware.isStudent, middleware.memberOfCourse, (req, res) => { //Submit a review for a tutor
-    (async() => {
+    (async () => {
         const course = await Course.findById(req.params.id);
         if (!course) {
             return res.json({error: "Error reviewing tutor"});
@@ -469,8 +476,14 @@ router.put('/rate/:id', middleware.isLoggedIn, middleware.isStudent, middleware.
                         averageRating += review.rating;
                     }
 
-                    averageRating = Math.round(averageRating/tutor.reviews.length);
-                    return res.json({success: "Succesfully upvoted tutor", averageRating, reviews_length: tutor.reviews.length, review: reviewObject, user: req.user});
+                    averageRating = Math.round(averageRating / tutor.reviews.length);
+                    return res.json({
+                        success: "Succesfully upvoted tutor",
+                        averageRating,
+                        reviews_length: tutor.reviews.length,
+                        review: reviewObject,
+                        user: req.user
+                    });
                 }
 
                 return res.json({error: "You are not a student of this tutor"});
@@ -483,7 +496,7 @@ router.put('/rate/:id', middleware.isLoggedIn, middleware.isStudent, middleware.
 });
 
 router.put('/leave/:id', middleware.isLoggedIn, middleware.isStudent, middleware.memberOfCourse, (req, res) => { //Leave Tutor
-    (async() => {
+    (async () => {
         const course = await Course.findById(req.params.id).populate('tutors.tutor');
         if (!course) {
             return res.json({error: "Error leaving course"});
@@ -497,10 +510,10 @@ router.put('/leave/:id', middleware.isLoggedIn, middleware.isStudent, middleware
                         tutor.formerStudents.push(req.user._id);
                     }
 
-                    tutor.slots ++;
+                    tutor.slots++;
                     tutor.available = true;
 
-                    for (let i = 0; i < tutor.rooms.length; i ++) { //Update rooms
+                    for (let i = 0; i < tutor.rooms.length; i++) { //Update rooms
                         if (tutor.rooms[i].student.equals(req.user._id)) {
                             const room = await Room.findByIdAndDelete(tutor.rooms[i].room);
                             if (!room) {
@@ -531,7 +544,7 @@ router.put('/leave/:id', middleware.isLoggedIn, middleware.isStudent, middleware
 });
 
 router.put('/close-lessons/:id', middleware.isLoggedIn, middleware.memberOfCourse, (req, res) => { //For a tutor to make themself unavailable
-    (async() => {
+    (async () => {
         const course = await Course.findById(req.params.id);
         if (!course) {
             return res.json({error: "Error closing lessons"});
@@ -551,7 +564,7 @@ router.put('/close-lessons/:id', middleware.isLoggedIn, middleware.memberOfCours
 });
 
 router.put('/reopen-lessons/:id', middleware.isLoggedIn, middleware.memberOfCourse, (req, res) => { //For a tutor to make themself available to students
-    (async() => {
+    (async () => {
         const course = await Course.findById(req.params.id);
         if (!course) {
             return res.json({error: "Error closing lessons"});
@@ -571,8 +584,11 @@ router.put('/reopen-lessons/:id', middleware.isLoggedIn, middleware.memberOfCour
 });
 
 router.get('/tutors/:id', middleware.isLoggedIn, middleware.memberOfCourse, (req, res) => { //RESTful routing "tutors/show" page
-    (async() => {
-        const course = await Course.findById(req.params.id).populate("tutors.tutor tutors.formerStudents").populate({path: "tutors.reviews.review", populate: {path: "sender"}});
+    (async () => {
+        const course = await Course.findById(req.params.id).populate("tutors.tutor tutors.formerStudents").populate({
+            path: "tutors.reviews.review",
+            populate: {path: "sender"}
+        });
         if (!course) {
             req.flash('error', "Unable to find course");
             return res.redirect('back');
@@ -631,7 +647,13 @@ router.get('/tutors/:id', middleware.isLoggedIn, middleware.memberOfCourse, (req
                     }
                 }
 
-                return res.render('homework/tutor-show', {course, tutor, students, studentIds, courses: enrolledCourses});
+                return res.render('homework/tutor-show', {
+                    course,
+                    tutor,
+                    students,
+                    studentIds,
+                    courses: enrolledCourses
+                });
             }
         }
 
@@ -642,7 +664,7 @@ router.get('/tutors/:id', middleware.isLoggedIn, middleware.memberOfCourse, (req
 });
 
 router.put('/like-review/:id', middleware.isLoggedIn, middleware.isStudent, (req, res) => { //Like a tutor's review
-    (async() => {
+    (async () => {
         const review = await PostComment.findById(req.params.id);
         if (!review) {
             return res.json({error: "Error accessing review"});
@@ -664,7 +686,7 @@ router.put('/like-review/:id', middleware.isLoggedIn, middleware.isStudent, (req
 });
 
 router.put('/set-students/:id', middleware.isTutor, middleware.memberOfCourse, (req, res) => { //For tutors to set student capacity
-    (async() => {
+    (async () => {
         const course = await Course.findById(req.params.id);
         if (!course) {
             return res.json({error: "Error accessing course"});
@@ -674,8 +696,8 @@ router.put('/set-students/:id', middleware.isTutor, middleware.memberOfCourse, (
         for (let tutor of course.tutors) { //Search through tutors to find requested tutor
             if (tutor.tutor.equals(req.user._id)) {
                 found = true;
-                tutor.slots = parseInt(req.body.slots)-tutor.students.length; //Update slots based on data
-                if ((parseInt(req.body.slots)-tutor.students.length) == 0) { //Update availability based on new slot info
+                tutor.slots = parseInt(req.body.slots) - tutor.students.length; //Update slots based on data
+                if ((parseInt(req.body.slots) - tutor.students.length) == 0) { //Update availability based on new slot info
                     tutor.available = false;
                 }
 
@@ -685,7 +707,7 @@ router.put('/set-students/:id', middleware.isTutor, middleware.memberOfCourse, (
         }
 
         if (!found) {
-          return res.json({error: "Unable to find tutor"});
+            return res.json({error: "Unable to find tutor"});
         }
 
     })().catch(err => {
@@ -694,7 +716,7 @@ router.put('/set-students/:id', middleware.isTutor, middleware.memberOfCourse, (
 });
 
 router.put('/remove-student/:id', middleware.isLoggedIn, middleware.isFaculty, middleware.memberOfCourse, (req, res) => { //For teachers to remove students from courses
-    (async() => {
+    (async () => {
         const studentId = await User.findById(req.body.studentId);
         if (!studentId) {
             return res.json({error: "Error removing student"});
@@ -711,7 +733,7 @@ router.put('/remove-student/:id', middleware.isLoggedIn, middleware.isFaculty, m
                 tutor.formerStudents.push(studentId._id);
                 tutor.students.splice(tutor.students.indexOf(studentId._id), 1); //Remove student from tutor
 
-                for (let i = 0; i < tutor.rooms.length; i ++) { //Remove all rooms in this student's name
+                for (let i = 0; i < tutor.rooms.length; i++) { //Remove all rooms in this student's name
                     if (tutor.rooms[i].student._id.equals(studentId._id)) {
                         deletedRoom = await Room.findByIdAndDelete(tutor.rooms[i].room);
                         if (!deletedRoom) {
@@ -752,12 +774,12 @@ router.put('/remove-student/:id', middleware.isLoggedIn, middleware.isFaculty, m
         await notif.save()
 
         studentId.inbox.push(notif);
-        studentId.msgCount ++;
+        studentId.msgCount++;
         await studentId.save();
         transport(studentId, `Removal from ${course.name}`, `<p>Hello ${studentId.firstName},</p><p>${notif.text}</p>`);
 
         course.blocked.push(studentId);
-        for (let i = 0; i < course.students.length; i ++) {
+        for (let i = 0; i < course.students.length; i++) {
             if (course.students[i]._id.equals(studentId._id)) {
                 course.students.splice(i, 1);
                 await course.save();
@@ -771,7 +793,7 @@ router.put('/remove-student/:id', middleware.isLoggedIn, middleware.isFaculty, m
 });
 
 router.put('/remove-tutor/:id', middleware.isLoggedIn, middleware.isFaculty, middleware.memberOfCourse, (req, res) => { //For teachers to remove tutors from courses
-    (async() => {
+    (async () => {
         let tutorId;
         if (req.body.show) {
             tutorId = await User.findById(req.body.tutorId);
@@ -797,7 +819,7 @@ router.put('/remove-tutor/:id', middleware.isLoggedIn, middleware.isFaculty, mid
             }
         }
 
-        for (let i = 0; i < course.tutors.length; i ++) {
+        for (let i = 0; i < course.tutors.length; i++) {
             if (course.tutors[i].tutor._id.equals(tutorId._id)) {
                 let deletedRoom;
                 for (let room of course.tutors[i].rooms) { //For all of the tutor's rooms, remove room and update students' new room counts
@@ -844,7 +866,7 @@ router.put('/remove-tutor/:id', middleware.isLoggedIn, middleware.isFaculty, mid
                 await notif.save();
 
                 tutorId.inbox.push(notif);
-                tutorId.msgCount ++;
+                tutorId.msgCount++;
                 await tutorId.save();
                 transport(tutorId, `Removal from ${course.name}`, `<p>Hello ${tutorId.firstName},</p><p>${notif.text}</p>`);
 
@@ -872,7 +894,7 @@ router.put('/remove-tutor/:id', middleware.isLoggedIn, middleware.isFaculty, mid
 });
 
 router.put('/unblock/:id', middleware.isLoggedIn, middleware.isFaculty, middleware.memberOfCourse, (req, res) => { //Unblock a blocked user
-    (async() => {
+    (async () => {
         const blockedId = await User.findById(req.body.blockedId);
         if (!blockedId) {
             return res.json({error: "Unable to access user"});
@@ -908,7 +930,7 @@ router.put('/unblock/:id', middleware.isLoggedIn, middleware.isFaculty, middlewa
         await notif.save();
 
         blockedId.inbox.push(notif);
-        blockedId.msgCount ++;
+        blockedId.msgCount++;
         await blockedId.save();
         transport(blockedId, `Unblocked from ${course.name}`, `<p>Hello ${blockedId.firstName},</p><p>${notif.text}</p>`);
         return res.json({success: "Succesfully unblocked user", blocked: blockedId, course});
@@ -919,7 +941,7 @@ router.put('/unblock/:id', middleware.isLoggedIn, middleware.isFaculty, middlewa
 });
 
 router.put("/mark/:id", middleware.isLoggedIn, middleware.isTutor, middleware.memberOfCourse, (req, res) => {
-    (async() => {
+    (async () => {
         const course = await Course.findById(req.params.id);
         if (!course) {
             return res.json({error: "Error accessing course"});
@@ -953,8 +975,11 @@ router.put("/mark/:id", middleware.isLoggedIn, middleware.isTutor, middleware.me
 });
 
 router.delete("/:id", middleware.isLoggedIn, middleware.isFaculty, middleware.memberOfCourse, (req, res) => {
-    (async() => {
-        const course = await Course.findOne({_id: req.params.id, joinCode: req.body.joinCode}).populate("tutors.tutor tutors.students tutors.rooms.student");
+    (async () => {
+        const course = await Course.findOne({
+            _id: req.params.id,
+            joinCode: req.body.joinCode
+        }).populate("tutors.tutor tutors.students tutors.rooms.student");
         if (!course) {
             req.flash("error", "Unable to find course");
             return res.redirect("back");
