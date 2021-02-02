@@ -11,6 +11,11 @@
     <link rel="stylesheet" href="/stylesheets/components/navbar.css">
     <link rel="stylesheet" href="/stylesheets/components/header.css">
     <link rel="stylesheet" href="/stylesheets/profile/show.css">
+    <%if (currentUser) {%>
+      <%if (currentUser.darkmode) { %>
+        <link rel="stylesheet" href="/stylesheets/Darkmode.css">
+      <%}%>
+    <%}%>
 
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
@@ -21,23 +26,23 @@
     <script src="/javascript/profile/search.js"></script>
     <script src="/javascript/profile/follow.js"></script>
 </head>
-<body>
+<body class="mode">
     <!-- include the navbar via ejs -->
     <%- include('../partials/navbar') %>
 
     <!-- big background image -->
     <div id="banner" style="background-image: url('<%= user.bannerUrl %>');">
     </div>
-    <div class="container mb-5">
+    <div class="container mb-5 ">
       <img src="<%= user.imageUrl %>" alt="profile image" class="profile-image">
-      <h1 class="username"><%= user.username %></h1>
+      <h1 class="username mode"><%= user.username %></h1>
           <div class="col-md-4 col-12 order-md-2 profile-box">
-              <section class="profile-card">
+              <section class="profile-card cafe">
                   <div class="profile-head">
                       <h1><%= user.firstName %> <%= user.lastName %></h1>
                       <hr>
                   </div>
-                  <div class="profile-body">
+                  <div class="profile-body cafetext">
                       <span><%= user.title %></span>
 
                       <h4>Role</h4>

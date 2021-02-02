@@ -11,6 +11,11 @@
     <link rel="stylesheet" href="/stylesheets/components/navbar.css">
     <link rel="stylesheet" href="/stylesheets/components/header.css">
     <link rel="stylesheet" href="/stylesheets/profile/index.css">
+    <%if (currentUser) {%>
+      <%if (currentUser.darkmode) { %>
+        <link rel="stylesheet" href="/stylesheets/Darkmode.css">
+      <%}%>
+    <%}%>
 
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
@@ -21,7 +26,7 @@
     <script src="/javascript/profile/search.js"></script>
     <script src="/javascript/profile/follow.js"></script>
 </head>
-<body>
+<body class="mode">
     <!-- include the navbar via ejs -->
     <%- include('../partials/navbar') %>
     <!-- include the backdrop for nav -->
@@ -29,13 +34,13 @@
 
     <div class="container">
         <div class="row">
-            <div class="col-md-10 offset-md-1 col-12">
+            <div class="col-md-10 offset-md-1 col-12 cafetext">
                 <h1 class="title">Users (<%=users.length%>)</h1>
-                <div class="search-filter">
+                <div class="search-filter search">
                     <i class="fas fa-search"></i>
-                    <input id="search-input" oninput="searchFunction()" class="form-control" type="text" placeholder="Search..." title="Type in Username">
+                    <input id="search-input" oninput="searchFunction()" class="form-control search" type="text" placeholder="Search..." title="Type in Username">
                 </div>
-                <div class="list-group" id="user-list">
+                <div class="list-group mode" id="user-list">
                   <% let statuses = [ ["faculty", "Faculty", []], ["12th", "Seniors", []], ["11th", "Juniors", []], ["10th", "Sophomores", []], ["9th", "Freshmen", []], ["8th", "8th Graders", []], ["7th", "7th Graders", []], ["alumnus", "Alumni", []], ["parent", "Parents", []], ["guest", "Guests", []] ] %>
                   <% let permMap = new Map([["principal", ["Principal", "info"]], ["admin", ["Administrator", "danger"]], ["mod", ["Moderator", "secondary"]]])%>
                   <% let tagMap = new Map([["Tutor", "warning"], ["Cashier", "success"], ["Editor", "primary"]])%>
@@ -51,7 +56,7 @@
                   <% let sortedUsers = [];%>
                   <% for (let status of statuses) { %>
                     <% if (status[2].length > 0) { %>
-                      <li class="list-group-item list-group-item-success status-header" id="<%=status[0]%>-header">
+                      <li class="list-group-item list-group-item-success status-header mode" id="<%=status[0]%>-header">
                         <div class="d-flex w-100 justify-content-between">
                           <h2 class="mb-1"><%=status[1]%></h2>
                           <span><%=status[2].length%> user(s)</span>
@@ -69,9 +74,9 @@
 
                       <% for (let user of sortedUsers) { %>
                         <% if (user.status.toLowerCase() == status[0]) { %>
-                            <li class="list-group-item list-group-item-action user-element">
+                            <li class="list-group-item list-group-item-action user-element cafe">
 
-                              <a href="../profiles/<%=user._id%>" class="user-element-text">
+                              <a href="../profiles/<%=user._id%>" class="user-element-text cafetext">
                                 <img class="profile-image" src="<%= user.imageUrl %>" alt="profile picture">
                                 <span class="username <%=status[0]%> <%=status[1]%> <%=user.permission%> <%=user.tags.join(' ')%>"><span class="span-tag-name"><%=user.firstName%> <%=user.lastName%></span> <span class="span-tag-username"><%=user.username%></span></span>
 
