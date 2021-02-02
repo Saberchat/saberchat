@@ -12,7 +12,7 @@ function getPopularityCoefficiant(posts, likeFactor, dateFactor) {
 }
 
 //Sort posts by popularity
-function sortByPopularity(posts, likeFactor, dateFactor) {
+function sortByPopularity(posts, likeFactor, dateFactor, fields) {
   let sorted = { //Object holds both popular and unpopular items
     popular: [],
     unpopular: []
@@ -39,6 +39,22 @@ function sortByPopularity(posts, likeFactor, dateFactor) {
       sorted.unpopular.push(post);
     }
   }
+
+  //Return only specific fields
+  if (fields) {
+    let sortedFields = {popular: [], unpopular: []};
+    for (let group in sorted) {
+        for (let post of sorted[group]) {
+            for (let attr in post) {
+                if (fields.includes(attr)) {
+                    sortedFields[group].push(post[attr]);
+                }
+            }
+        }
+    }
+    return sortedFields;
+  }
+
   return sorted;
 }
 

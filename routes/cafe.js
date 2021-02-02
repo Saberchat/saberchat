@@ -138,13 +138,8 @@ router.get('/order/new', middleware.isLoggedIn, middleware.cafeOpen, (req, res) 
          });
     }
 
-    const frequentItems = sortByPopularity(orderedItems, "totalOrdered", "created_at").popular;
-    let frequentItemsArray = [];
-    for (let item of frequentItems) {
-        frequentItemsArray.push(item.item);
-    }
-
-    return res.render('cafe/newOrder', {types, frequentItems: frequentItemsArray});
+    const frequentItems = sortByPopularity(orderedItems, "totalOrdered", "created_at", ["item"]).popular;
+    return res.render('cafe/newOrder', {types, frequentItems});
 
   })().catch(err => {
     req.flash('error', "Unable to access database");
