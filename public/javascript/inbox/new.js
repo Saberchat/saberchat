@@ -16,9 +16,9 @@ let recipients = [];
 
 // processes all the selected recipients into form info
 const process = (() => {
-    if(!recipients.length > 0 && !everyoneCheck.checked) {
+    if (!recipients.length > 0 && !everyoneCheck.checked) {
         return false;
-    } else if(!everyoneCheck.checked) {
+    } else if (!everyoneCheck.checked) {
         const input = document.createElement('input');
         input.type = 'text';
         input.name = 'recipients';
@@ -31,7 +31,7 @@ const process = (() => {
 
 // toggles recipients selection
 const updateTo = (everyoneCheck => {
-    if(everyoneCheck.checked) {
+    if (everyoneCheck.checked) {
         userSelect.required = false;
         facultySelect.required = false;
         defaultMsg.style.display = 'none';
@@ -52,7 +52,7 @@ const updateTo = (everyoneCheck => {
 
 // toggles anonymous messaging
 const setAnonymous = (check => {
-    if(check.checked) {
+    if (check.checked) {
         userSelect.required = false;
         defaultMsg.style.display = 'none';
 
@@ -87,10 +87,10 @@ const clearTags = (() => {
 
 // adds recipients to list
 const addRecipient = (type => {
-    if(type == 'user') {
+    if (type == 'user') {
         const id = userSelect.value;
         addTag(userSelect, id);
-    } else if(type == 'faculty') {
+    } else if (type == 'faculty') {
         const id = facultySelect.value;
         addTag(facultySelect, id);
     }
@@ -99,30 +99,30 @@ const addRecipient = (type => {
 // adds the user tag to the display
 const addTag = ((select, id) => {
 
-  if(!(recipients.includes(id)) && !(recipients.includes(select.options[select.selectedIndex].className)) ) { //Check whether this user is already in the list, or whether their group (status) is already in the list
-    const username = select.options[select.selectedIndex].text;
-    recipients.push(id);
+    if (!(recipients.includes(id)) && !(recipients.includes(select.options[select.selectedIndex].className))) { //Check whether this user is already in the list, or whether their group (status) is already in the list
+        const username = select.options[select.selectedIndex].text;
+        recipients.push(id);
 
-    const tag = document.createElement('div');
-    tag.classList.add('user-tag');
-    tag.classList.add(`${select.options[select.selectedIndex].className}`); //Put the user status in the tag
-    tag.innerHTML = `<span>${username}</span>
+        const tag = document.createElement('div');
+        tag.classList.add('user-tag');
+        tag.classList.add(`${select.options[select.selectedIndex].className}`); //Put the user status in the tag
+        tag.innerHTML = `<span>${username}</span>
     <button type="button" id="${id}" onclick="remRecipient(this)">&times;</button>`;
 
-    userDisplay.appendChild(tag);
+        userDisplay.appendChild(tag);
 
-    let deletes = []; //List of usernames to be removed
+        let deletes = []; //List of usernames to be removed
 
-    for (let t = 0; t < document.getElementsByClassName('user-tag').length; t ++) { //Go through list of creators, remove any users who have this className (if the added 'username' is a status e.g. '12th', it removes any excess 12th graders)
-      if (document.getElementsByClassName('user-tag')[t].classList.contains(select.options[select.selectedIndex].value)) {
-        deletes.push(t);
-      }
+        for (let t = 0; t < document.getElementsByClassName('user-tag').length; t++) { //Go through list of creators, remove any users who have this className (if the added 'username' is a status e.g. '12th', it removes any excess 12th graders)
+            if (document.getElementsByClassName('user-tag')[t].classList.contains(select.options[select.selectedIndex].value)) {
+                deletes.push(t);
+            }
+        }
+
+        for (let del of deletes.reverse()) { //Iterate through list of usernames to remove
+            remRecipient(document.getElementsByClassName('user-tag')[del].getElementsByTagName('button')[0]);
+        }
     }
-
-    for (let del of deletes.reverse()) { //Iterate through list of usernames to remove
-      remRecipient(document.getElementsByClassName('user-tag')[del].getElementsByTagName('button')[0]);
-    }
-  }
 
 });
 
@@ -130,7 +130,7 @@ const addTag = ((select, id) => {
 const remRecipient = (btn => {
     const id = btn.id;
     const i = recipients.indexOf(id);
-    if(i > -1) {
+    if (i > -1) {
         recipients.splice(i, 1);
     }
     const parent = btn.parentNode;

@@ -1,140 +1,140 @@
 .announcement-button, .announcement-button:hover, .announcement-sender, .announcement-sender:hover {
-  color: white;
-  text-decoration: none;
+    color: white;
+    text-decoration: none;
 }
 
 .bottom-text {
-  padding-bottom: 15px;
+    padding-bottom: 15px;
 }
 
 .announcement-subject-header, .announcement-subject-header:hover {
-  text-decoration: none;
-  color: white;
-  margin-right: 10px;
+    text-decoration: none;
+    color: white;
+    margin-right: 10px;
 }
 
 .modal-body, .modal-title, #sender-info, #sender-info:hover {
-  color: black;
-  text-decoration: none;
+    color: black;
+    text-decoration: none;
 }
 
 .modal-body {
-  text-align: left;
+    text-align: left;
 }
 
 .announcement-date {
-  color: white;
-  font-size: 80%;
+    color: white;
+    font-size: 80%;
 }
 
 .sender-profile-image {
-  width: 30px;
-  height: 30px;
-  object-fit: cover;
-  border-radius: 50%;
+    width: 30px;
+    height: 30px;
+    object-fit: cover;
+    border-radius: 50%;
 }
 
 .edit-button, .reply-button {
-  margin-left: 10px;
+    margin-left: 10px;
 }
 
 .delete-announcement {
-  display: inline-block;
+    display: inline-block;
 }
 
 .comment-button, .comment-button:hover {
-  color: white;
-  text-decoration: none;
-  margin-left: 10px;
+    color: white;
+    text-decoration: none;
+    margin-left: 10px;
 }
 
 .announcement-text {
-  white-space: pre-wrap;
-  text-align: left;
+    white-space: pre-wrap;
+    text-align: left;
 }
 
 .liked-button, .liked-button-show {
-  color: #03a5fc;
-  text-decoration: none;
-  margin-left: 10px;
-  font-size: 70%;
+    color: #03a5fc;
+    text-decoration: none;
+    margin-left: 10px;
+    font-size: 70%;
 }
 
 .unliked-button, .unliked-button-show {
-  color: white;
-  text-decoration: none;
-  margin-left: 10px;
-  font-size: 70%;
+    color: white;
+    text-decoration: none;
+    margin-left: 10px;
+    font-size: 70%;
 }
 
 .fa-thumbs-up {
-  margin-left: 0px;
-  font-size: 140%;
-  display: inline;
+    margin-left: 0px;
+    font-size: 140%;
+    display: inline;
 }
 
 .announcement-row {
-  margin-bottom: 15px;
-  margin-top: -15px;
+    margin-bottom: 15px;
+    margin-top: -15px;
 }
 
 #comments-count-icon {
-  color: grey;
-  font-size: 140%;
+    color: grey;
+    font-size: 140%;
 }
 
 #comments-heading {
-  padding-top: 50px;
-  padding-bottom: 20px;
+    padding-top: 50px;
+    padding-bottom: 20px;
 }
 
 #comment-section {
-  text-align: center;
-  padding: 50px;
+    text-align: center;
+    padding: 50px;
 }
 
 #comment-input {
-  background-color: #cdd0d4;
-  border-radius: 15px;
+    background-color: #cdd0d4;
+    border-radius: 15px;
 }
 
 .comment-input-field {
-  border-color: black;
-  border-width: 1px;
+    border-color: black;
+    border-width: 1px;
 }
 
 .receiver-message {
-  text-align: left;
+    text-align: left;
 }
 
 .text-muted {
-  float: left;
+    float: left;
 }
 
 .message-reply {
-  background-color: orange;
+    background-color: orange;
 }
 
 .like-comment {
-  text-decoration: none;
-  float: left;
-  font-size: 80%;
+    text-decoration: none;
+    float: left;
+    font-size: 80%;
 }
 
 .like-comment-active, .liked-announcement {
-  color: #03a5fc;
+    color: #03a5fc;
 }
 
 .like-comment-inactive, .unliked-announcement {
-  color: grey;
+    color: grey;
 }
 
 #announcement-like-row, #like-count {
-  display: inline;
+    display: inline;
 }
 
 #like-count {
-  font-size: 130%;
+    font-size: 130%;
 }
 
 .btn-setting {
@@ -163,7 +163,7 @@
 }
 
 .ann-body {
-    padding:2rem 5rem;
+    padding: 2rem 5rem;
 }
 
 .ann-body hr {
@@ -198,8 +198,8 @@ body::-webkit-scrollbar {
 }
 
 body {
--ms-overflow-style: none;
-scrollbar-width: none;
+    -ms-overflow-style: none;
+    scrollbar-width: none;
 }
 
 .text-small {
@@ -238,7 +238,7 @@ header {
     background-color: rgba(255, 255, 255, 0.8);
     padding: 50px 10px;
     box-shadow: 0px 10px 10px #868686,
-                0px -5px 15px #727272;
+    0px -5px 15px #727272;
 }
 
 #message-display a {
@@ -294,7 +294,7 @@ General msgs and badword response
     text-align: center;
 }
 
-.announcement h4{
+.announcement h4 {
     display: inline-block;
     color: #9f9aa4;
     font-size: 1.3rem;
@@ -392,11 +392,13 @@ Screen customizations
         width: 100%;
     }
 }
+
 @media (min-width: 550px) {
     .w-65 {
         width: 90%;
     }
 }
+
 @media (min-width: 760px) {
     .w-65 {
         width: 50%;

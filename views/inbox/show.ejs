@@ -22,121 +22,126 @@
     <script src="https://kit.fontawesome.com/dccc745c41.js" crossorigin="anonymous"></script>
 </head>
 <body>
-    <!-- include the navbar via ejs -->
-    <%- include('../partials/navbar') %>
-    <!-- include the backdrop for nav -->
-    <%- include('../partials/header') %>
+<!-- include the navbar via ejs -->
+<%- include('../partials/navbar') %>
+<!-- include the backdrop for nav -->
+<%- include('../partials/header') %>
 
-    <div class="container my-5">
-        <div class="row">
-          <div class="col-12">
+<div class="container my-5">
+    <div class="row">
+        <div class="col-12">
             <article class="msg-container">
-              <div class="msg-head">
-                <h1><%= message.subject %></h1>
-                <p>From:
-                  <a href= "/profiles/<%=message.sender._id%>" class="user-link">
+                <div class="msg-head">
+                    <h1><%= message.subject %></h1>
+                    <p>From:
+                        <a href="/profiles/<%= message.sender._id %>" class="user-link">
                     <span class="badge badge-pill badge-primary">
-                      <% if(message.sender._id.equals(currentUser._id)) { %>
-                        me
-                      <% } else { %>
-                        <%= message.sender.username %>
-                      <% } %>
+                        <% if(message.sender._id.equals(currentUser._id)) { %>
+                            me
+                        <% } else { %>
+                            <%= message.sender.username %>
+                        <% } %>
                     </span>
-                  </a>
-                </p>
-                <p>To:
-                  <% if(message.toEveryone) { %>
-                    Everyone
-                  <% } else { %>
-                    <% message.recipients.forEach(user => { %>
-
-                      <% if (!user._id.equals(message.sender._id)) { %>
-                        <a href="/profiles/<%= user._id %>" class="user-link">
-                          <span class="badge badge-pill badge-secondary">
-                            <% if(user._id.equals(currentUser._id)) { %>
-                              me
-                            <% } else { %>
-                              <%= user.username %>
-                            <% } %>
-                          </span>
                         </a>
-                      <% } %>
-                    <% }); %>
-                  <% } %>
-                </p>
-                <span><%=message.date%></span>
-                <a href="/inbox" class="btn btn-primary"><i class="fas fa-arrow-left"></i> Back</a>
-
-                <% if (!message.anonymous && !message.noReply) { %>
-                  <a onclick="reply()" class="btn btn-success" href="#reply-box"><i class="fas fa-reply"></i> Reply</a>
-                <% } %>
-
-              </div>
-              <div class="msg-body">
-                <p class="msg-text convertible-text"><%= convertedText %></p>
-                <hr>
-                <div class="msg-images">
-                  <% message.images.forEach(image => { %>
-                    <img src="<%= image %>" alt="Added Image" class="img-fluid rounded">
-                  <% }) %>
-                </div>
-              </div>
-              </article>
-
-              <br />
-
-              <div id="reply-container">
-
-                <% for (let reply of message.replies) { %>
-                  <article class="msg-container replies">
-                    <h4>
-                      Reply From <a class="reply-sender" href="../../profiles/<%=reply.sender._id%>"><%=reply.sender.username%></a>
-                    </h4>
-
-                    <p>
-                      <%=reply.date%>
                     </p>
-                    <p>
-                      <%=reply.text%>
-                    </p>
+                    <p>To:
+                        <% if(message.toEveryone) { %>
+                            Everyone
+                        <% } else { %>
+                            <% message.recipients.forEach(user => { %>
 
-                    <% for (let image of reply.images) { %>
-                      <img src="<%=image%>" class="reply-image"/>
-                      <br />
+                                <% if (!user._id.equals(message.sender._id)) { %>
+                                    <a href="/profiles/<%= user._id %>" class="user-link">
+                          <span class="badge badge-pill badge-secondary">
+                              <% if(user._id.equals(currentUser._id)) { %>
+                                  me
+                              <% } else { %>
+                                  <%= user.username %>
+                              <% } %>
+                          </span>
+                                    </a>
+                                <% } %>
+                            <% }); %>
+                        <% } %>
+                    </p>
+                    <span><%= message.date %></span>
+                    <a href="/inbox" class="btn btn-primary"><i class="fas fa-arrow-left"></i> Back</a>
+
+                    <% if (!message.anonymous && !message.noReply) { %>
+                        <a onclick="reply()" class="btn btn-success" href="#reply-box"><i class="fas fa-reply"></i>
+                            Reply</a>
                     <% } %>
 
-                  </article>
-                  <br />
+                </div>
+                <div class="msg-body">
+                    <p class="msg-text convertible-text"><%= convertedText %></p>
+                    <hr>
+                    <div class="msg-images">
+                        <% message.images.forEach(image => { %>
+                            <img src="<%= image %>" alt="Added Image" class="img-fluid rounded">
+                        <% }) %>
+                    </div>
+                </div>
+            </article>
+
+            <br/>
+
+            <div id="reply-container">
+
+                <% for (let reply of message.replies) { %>
+                    <article class="msg-container replies">
+                        <h4>
+                            Reply From <a class="reply-sender"
+                                          href="../../profiles/<%= reply.sender._id %>"><%= reply.sender.username %></a>
+                        </h4>
+
+                        <p>
+                            <%= reply.date %>
+                        </p>
+                        <p>
+                            <%= reply.text %>
+                        </p>
+
+                        <% for (let image of reply.images) { %>
+                            <img src="<%= image %>" class="reply-image"/>
+                            <br/>
+                        <% } %>
+
+                    </article>
+                    <br/>
                 <% } %>
-              </div>
-              <br />
+            </div>
+            <br/>
 
-              <article class="msg-container" id="reply-box" hidden>
+            <article class="msg-container" id="reply-box" hidden>
 
-              <form id="message-form-<%=message._id%>" onsubmit="sendReply(this, event)">
+                <form id="message-form-<%= message._id %>" onsubmit="sendReply(this, event)">
 
-                <div class="form-group">
-                  <label for="message"><h4>Reply</h4></label><br />
-                  <textarea name="message" id="message" placeholder="Message text..." rows="5" class="form-control"></textarea>
-                </div>
+                    <div class="form-group">
+                        <label for="message"><h4>Reply</h4></label><br/>
+                        <textarea name="message" id="message" placeholder="Message text..." rows="5"
+                                  class="form-control"></textarea>
+                    </div>
 
-                <div id="image-header">
-                  <h4>Images</h4>
-                  <button type="button" onclick="addImg()" class="btn btn-primary"><i class="fas fa-plus"></i> Image</button>
-                  <hr>
-                </div>
+                    <div id="image-header">
+                        <h4>Images</h4>
+                        <button type="button" onclick="addImg()" class="btn btn-primary"><i class="fas fa-plus"></i>
+                            Image
+                        </button>
+                        <hr>
+                    </div>
 
-                <div id="image-block">
-                </div>
-                <button id="send-reply" type="submit" class="btn btn-primary btn-block">Send Reply</button>
-                <button type="button" class="btn btn-danger btn-block" onclick="cancelReply()" >Cancel</button>
-              </form>
+                    <div id="image-block">
+                    </div>
+                    <button id="send-reply" type="submit" class="btn btn-primary btn-block">Send Reply</button>
+                    <button type="button" class="btn btn-danger btn-block" onclick="cancelReply()">Cancel</button>
+                </form>
 
-              </article>
+            </article>
 
-          </div>
         </div>
     </div>
+</div>
 </body>
 <script src="/javascript/inbox/form.js"></script>
 <script src="/javascript/inbox/new.js"></script>

@@ -6,27 +6,31 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Saberchat</title>
 
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css" integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css"
+          integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk" crossorigin="anonymous">
     <link rel="stylesheet" href="/stylesheets/main.css">
     <link rel="stylesheet" href="/stylesheets/home/index.css">
     <link rel="stylesheet" href="/stylesheets/components/background.css">
     <link rel="stylesheet" href="/stylesheets/components/navbar.css">
     <link rel="stylesheet" href="/stylesheets/components/header.css">
-    <%if (currentUser) {%>
-      <%if (currentUser.darkmode) { %>
-        <link rel="stylesheet" href="/stylesheets/Darkmode.css">
-      <%}%>
-    <%}%>
-    <script src="https://code.jquery.com/jquery-3.5.1.min.js" integrity="sha256-9/aliU8dGd2tb6OSsuzixeV4y/faTqgFtohetphbbj0=" crossorigin="anonymous"></script>
+    <% if (currentUser) { %>
+        <% if (currentUser.darkmode) { %>
+            <link rel="stylesheet" href="/stylesheets/Darkmode.css">
+        <% } %>
+    <% } %>
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"
+            integrity="sha256-9/aliU8dGd2tb6OSsuzixeV4y/faTqgFtohetphbbj0=" crossorigin="anonymous"></script>
     <script src="https://unpkg.com/@popperjs/core@2" crossorigin="anonymous"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js" integrity="sha384-OgVRvuATP1z7JjHLkuOU7Xw704+h835Lr+6QL9UvYjZE3Ipu6Tp75j7Bh/kR0JKI" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js"
+            integrity="sha384-OgVRvuATP1z7JjHLkuOU7Xw704+h835Lr+6QL9UvYjZE3Ipu6Tp75j7Bh/kR0JKI"
+            crossorigin="anonymous"></script>
 
     <script src="https://kit.fontawesome.com/dccc745c41.js" crossorigin="anonymous"></script>
     <script src="/javascript/nav/userForm.js"></script>
     <script src="/javascript/nav/navbar.js"></script>
     <script src="/javascript/home/index.js"></script>
 </head>
-<body class = "mode">
+<body class="mode">
 
 <!-- insert navbar via ejs-->
 <%- include('./partials/navbar') %>
@@ -37,7 +41,8 @@
         <div class="row">
             <div class="col-12 background-title">
                 <h1 style="user-select: none; -moz-user-select: none;">Saberchat</h1>
-                <p style="user-select: none; -moz-user-select: none;">Welcome to Saberchat, Alsion's very own communication platform!</p>
+                <p style="user-select: none; -moz-user-select: none;">Welcome to Saberchat, Alsion's very own
+                    communication platform!</p>
             </div>
         </div>
     </div>
@@ -54,15 +59,21 @@
                         <h1 style="user-select: none; -moz-user-select: none;">About</h1>
                     </div>
                     <div class="block-content mode">
-                        <p>Named after our school mascot, the sabercat, Saberchat is a platform that connects and centralizes Alsion's various communication and notification platforms, streamlining communication between students, faculty, parents and more.</p>
-                        <p>Users can quickly access any important information from faculty, communicate with others, order from the No Left Turn Café, and access some of Alsion's unique projects.</p>
-                        <p>Centralizing our school's content to an inclusive platform serves to improve our school's identity as well as the relationships between students, parents, and faculty across the community.</p>
+                        <p>Named after our school mascot, the sabercat, Saberchat is a platform that connects and
+                            centralizes Alsion's various communication and notification platforms, streamlining
+                            communication between students, faculty, parents and more.</p>
+                        <p>Users can quickly access any important information from faculty, communicate with others,
+                            order from the No Left Turn Café, and access some of Alsion's unique projects.</p>
+                        <p>Centralizing our school's content to an inclusive platform serves to improve our school's
+                            identity as well as the relationships between students, parents, and faculty across the
+                            community.</p>
                         <span id="developers"><span id="developers-heading">Developers: </span>Alexander Zhou, Kabir Samsi, Siddharth Chavan, Vibhav Darsha, Dmitry Pleshkov</span>
                     </div>
                 </article>
             </div>
             <div class="col-lg-6 block">
-                <img class="image-block" src="https://alsionschool.org/images/middle-school/MiddleSchoolMainPage.jpg" alt="fancy pic">
+                <img class="image-block" src="https://alsionschool.org/images/middle-school/MiddleSchoolMainPage.jpg"
+                     alt="fancy pic">
             </div>
         </div>
         <!-- Block 2 -->
@@ -75,11 +86,20 @@
                     <div class="block-content mode">
                         <ul>
                             <li><span class"feature-description" >Chat rooms</span> for students and teachers</li>
-                            <li>An <span class="feature-description">inbox and notification</span> system featuring an <span class="feature-description">anonymous hotline</span></li>
-                            <li>An <span class="feature-description">announcement bulletin</span> where teachers can post important announcements for all users to see</li>
-                            <li>A <span class="feature-description">preorder system</span> for Early College's No Left Turn Cafe, which allows students to order online and receive status updates on their orders</li>
-                            <li>A <span class="feature-description">project bulletin</span>, where teachers can post unique and exceptional student projects from their classes</li>
-                            <li>Access to Alsion's online magazine, <span class="feature-description">Witherly Heights</span></li>
+                            <li>An <span class="feature-description">inbox and notification</span> system featuring an
+                                <span class="feature-description">anonymous hotline</span></li>
+                            <li>An <span class="feature-description">announcement bulletin</span> where teachers can
+                                post important announcements for all users to see
+                            </li>
+                            <li>A <span class="feature-description">preorder system</span> for Early College's No Left
+                                Turn Cafe, which allows students to order online and receive status updates on their
+                                orders
+                            </li>
+                            <li>A <span class="feature-description">project bulletin</span>, where teachers can post
+                                unique and exceptional student projects from their classes
+                            </li>
+                            <li>Access to Alsion's online magazine, <span
+                                        class="feature-description">Witherly Heights</span></li>
                         </ul>
                     </div>
                 </article>
@@ -96,8 +116,10 @@
                         <h1 style="user-select: none; -moz-user-select: none;">Community</h1>
                     </div>
                     <div class="block-content mode">
-                        <p>Saberchat reaches out to all members of Alsion's community - students, teachers and parents in both Early College and Middle School.
-                          As members of a small, tight-knit school, we value our community deeply. Saberchat will strengthen the relationships between every member of the Alsion community.
+                        <p>Saberchat reaches out to all members of Alsion's community - students, teachers and parents
+                            in both Early College and Middle School.
+                            As members of a small, tight-knit school, we value our community deeply. Saberchat will
+                            strengthen the relationships between every member of the Alsion community.
                         </p>
                     </div>
                 </article>

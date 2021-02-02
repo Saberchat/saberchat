@@ -1,129 +1,129 @@
 #body {
-  text-align: center;
+    text-align: center;
 }
 
 .heading {
-  text-align: center;
+    text-align: center;
 }
 
 .button-set {
-  text-align: center;
-  margin-bottom: 30px;
+    text-align: center;
+    margin-bottom: 30px;
 }
 
 .title {
-  border-radius: 25px;
-  padding: 20px;
-  margin-top: 10px;
-  text-align: center;
-  width: auto;
-  color: black;
-  height: 50px;
-  margin-left: 40px;
-  padding-top: 10px;
-  font-size: 25px;
-  color: white;
-  background-color: #db391d;
-  border-color: black;
-  border-width: 2px;
+    border-radius: 25px;
+    padding: 20px;
+    margin-top: 10px;
+    text-align: center;
+    width: auto;
+    color: black;
+    height: 50px;
+    margin-left: 40px;
+    padding-top: 10px;
+    font-size: 25px;
+    color: white;
+    background-color: #db391d;
+    border-color: black;
+    border-width: 2px;
 }
 
 .announcement {
-  border-radius: 25px;
-  padding: 20px;
-  margin-top: 10px;
-  border-color: black;
-  border-width: 2px;
-  background-color: #e9ecef;
+    border-radius: 25px;
+    padding: 20px;
+    margin-top: 10px;
+    border-color: black;
+    border-width: 2px;
+    background-color: #e9ecef;
 }
 
 .msg-info {
-  margin-left: 5px;
-  margin-right: 10px;
-  color: black;
-  font-size: 14px;
+    margin-left: 5px;
+    margin-right: 10px;
+    color: black;
+    font-size: 14px;
 }
 
 .message {
-  color: black;
-  border-color: black;
-  border-width: 2px;
+    color: black;
+    border-color: black;
+    border-width: 2px;
 }
 
 #delete-ann-button {
-  margin-right: 15px;
-  color: white;
+    margin-right: 15px;
+    color: white;
 }
 
 #new-announcement-text {
-  margin-top: 20px;;
-  margin-bottom: 10px;
+    margin-top: 20px;;
+    margin-bottom: 10px;
 }
 
 .announcement-bar {
-  background-color: white;
-  width: 400px;
-  height: 650px;
-  padding-bottom: 10px;
-  margin-right: 200px;
-  margin-left: 50px;
-  margin-top: 50px;
-  float: left;
+    background-color: white;
+    width: 400px;
+    height: 650px;
+    padding-bottom: 10px;
+    margin-right: 200px;
+    margin-left: 50px;
+    margin-top: 50px;
+    float: left;
 }
 
 .announcement-notification {
-  margin-bottom: 5px;
-  font-size: 10px;
+    margin-bottom: 5px;
+    font-size: 10px;
 }
 
 #announcement-bar-header {
-  text-align: center;
-  padding-top: 10px;
-  font-size: 15px;
+    text-align: center;
+    padding-top: 10px;
+    font-size: 15px;
 }
 
 .carousel-item {
-  padding-top: 25px;
-  padding-bottom: 25px;
+    padding-top: 25px;
+    padding-bottom: 25px;
 }
 
 .profile-img {
-  height:30px;
-  width: 30px;
-  margin-left: 5px;
-  margin-top: 5px;
-  border-radius: 50%;
+    height: 30px;
+    width: 30px;
+    margin-left: 5px;
+    margin-top: 5px;
+    border-radius: 50%;
 }
 
 .input-group-mb3 {
-  width: 100%;
-  text-align: center;
-  color: orange;
+    width: 100%;
+    text-align: center;
+    color: orange;
 }
 
 #new-announcement-message, #new-announcement-txt {
-  width: 100%;
-  margin-left: 300px;
-  margin-right: 300px;
+    width: 100%;
+    margin-left: 300px;
+    margin-right: 300px;
 }
 
 #new-announcement-txt {
-  height: 200px;
+    height: 200px;
 }
 
 @media only screen and (max-width: 768px) {
-  #new-announcement-message, #new-announcement-txt {
-    width: 100%;
-    margin-left: 50px;
-    margin-right: 50px;
-  }
+    #new-announcement-message, #new-announcement-txt {
+        width: 100%;
+        margin-left: 50px;
+        margin-right: 50px;
+    }
 
-  #new-announcement-txt {
-    height: 100px;
-  }
+    #new-announcement-txt {
+        height: 100px;
+    }
 
-  #delete-ann-button, #edit-ann-button, #send-ann-button {
-    width: 50%;
-    margin-bottom: 20px;
-  }
+    #delete-ann-button, #edit-ann-button, #send-ann-button {
+        width: 50%;
+        margin-bottom: 20px;
+    }
 }

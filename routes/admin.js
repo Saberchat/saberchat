@@ -25,130 +25,130 @@ const middleware = require('../middleware');
 
 //Function to display user inbox
 router.get('/', middleware.isLoggedIn, middleware.isAdmin, (req, res) => {
-	 res.render('admin/index');
+    res.render('admin/index');
 })
 
 // displays moderator page
 router.get('/moderate', middleware.isLoggedIn, middleware.isMod, (req, res) => {
-	Comment.find({status: 'flagged'})
-	.populate({path: 'author', select:['username','imageUrl']})
-	.populate({path: 'statusBy', select:['username', 'imageUrl']})
-	.populate({path: 'room', select: ['name']})
-	.exec((err, foundComments) => {
-		if(err) {
-			req.flash('error', 'Cannot access DataBase');
-			res.redirect('/admin');
+    Comment.find({status: 'flagged'})
+        .populate({path: 'author', select: ['username', 'imageUrl']})
+        .populate({path: 'statusBy', select: ['username', 'imageUrl']})
+        .populate({path: 'room', select: ['name']})
+        .exec((err, foundComments) => {
+            if (err) {
+                req.flash('error', 'Cannot access DataBase');
+                res.redirect('/admin');
 
-		} else {
-		  res.render('admin/mod', {comments: foundComments});
-		}
-	});
+            } else {
+                res.render('admin/mod', {comments: foundComments});
+            }
+        });
 });
 
 // displays permissions page
 router.get('/permissions', middleware.isLoggedIn, middleware.isAdmin, (req, res) => {
-	User.find({authenticated: true}, (err, foundUsers) => {
-		if(err || !foundUsers) {
-			req.flash('error', 'Cannot access Database');
-			res.redirect('/admin');
+    User.find({authenticated: true}, (err, foundUsers) => {
+        if (err || !foundUsers) {
+            req.flash('error', 'Cannot access Database');
+            res.redirect('/admin');
 
-		} else {
-		  res.render('admin/permission', {users: foundUsers});
-		}
-	});
+        } else {
+            res.render('admin/permission', {users: foundUsers});
+        }
+    });
 });
 
 // displays status page
 router.get('/status', middleware.isLoggedIn, middleware.isMod, (req, res) => {
-	User.find({authenticated: true}, (err, foundUsers) => {
-		if(err || !foundUsers) {
-			req.flash('error', 'Cannot access Database');
-			res.redirect('/admin');
-		} else {
-			res.render('admin/status', {users: foundUsers, tags: ['Cashier', 'Tutor', 'Editor']});
-		}
-	});
+    User.find({authenticated: true}, (err, foundUsers) => {
+        if (err || !foundUsers) {
+            req.flash('error', 'Cannot access Database');
+            res.redirect('/admin');
+        } else {
+            res.render('admin/status', {users: foundUsers, tags: ['Cashier', 'Tutor', 'Editor']});
+        }
+    });
 });
 
 router.get('/whitelist', middleware.isLoggedIn, middleware.isPrincipal, (req, res) => {
-	(async() => {
-		const emails = await Email.find({name: {$ne: req.user.email}});
+    (async () => {
+        const emails = await Email.find({name: {$ne: req.user.email}});
 
-		if (!emails) {
-			req.flash('error', "Unable to find emails");
-			return res.redirect('back');
-		}
+        if (!emails) {
+            req.flash('error', "Unable to find emails");
+            return res.redirect('back');
+        }
 
-		const users = await User.find({authenticated: true});
+        const users = await User.find({authenticated: true});
 
-		if (!users) {
-			req.flash('error', "Unable to find users");
-			return res.redirect('back');
-		}
+        if (!users) {
+            req.flash('error', "Unable to find users");
+            return res.redirect('back');
+        }
 
-		res.render('admin/whitelist', {emails, users});
+        res.render('admin/whitelist', {emails, users});
 
-	})().catch(err => {
-		req.flash('error', "Unable to access database");
-		res.redirect('back');
-	});
+    })().catch(err => {
+        req.flash('error', "Unable to access database");
+        res.redirect('back');
+    });
 });
 
 router.put('/whitelist', middleware.isLoggedIn, middleware.isPrincipal, (req, res) => {
 
-	(async() => {
-		if (req.body.address.split('@')[1] == "alsionschool.org") {
-			return res.json({error: "Alsion emails do not need to be added to the whitelist"});
-		}
+    (async () => {
+        if (req.body.address.split('@')[1] == "alsionschool.org") {
+            return res.json({error: "Alsion emails do not need to be added to the whitelist"});
+        }
 
-		const overlap = await Email.find({address: req.body.address});
+        const overlap = await Email.find({address: req.body.address});
 
-		if (!overlap) {
-			return res.json({error: "Unable to find emails"});
-		}
+        if (!overlap) {
+            return res.json({error: "Unable to find emails"});
+        }
 
-		if (overlap.length > 0) {
-			return res.json({error: "Email already in whitelist"});
-		}
+        if (overlap.length > 0) {
+            return res.json({error: "Email already in whitelist"});
+        }
 
-		const email = await Email.create({address: req.body.address});
-		if (!email) {
-			return res.json({error: "Error creating email"});
-		}
+        const email = await Email.create({address: req.body.address});
+        if (!email) {
+            return res.json({error: "Error creating email"});
+        }
 
-		return res.json({success: "Email added", email});
+        return res.json({success: "Email added", email});
 
-	})().catch(err => {
-		res.json({error: "An error occurred"});
-	});
+    })().catch(err => {
+        res.json({error: "An error occurred"});
+    });
 });
 
 router.delete('/whitelist/:id', middleware.isLoggedIn, middleware.isPrincipal, (req, res) => {
-	(async() => {
-		const email = await Email.findById(req.params.id);
-		if (!email) {
-			return res.json({error: "Unable to find email"});
-		}
+    (async () => {
+        const email = await Email.findById(req.params.id);
+        if (!email) {
+            return res.json({error: "Unable to find email"});
+        }
 
-		const users = await User.find({authenticated: true, email: email.address});
-		if (!users) {
-			return res.json({error: "Unable to find users"});
-		}
+        const users = await User.find({authenticated: true, email: email.address});
+        if (!users) {
+            return res.json({error: "Unable to find users"});
+        }
 
-		if (users.length == 0) {
-			const deletedEmail = await Email.findByIdAndDelete(email._id);
-			if (!deletedEmail) {
-				return res.json({error: "Unable to delete email"});
-			}
+        if (users.length == 0) {
+            const deletedEmail = await Email.findByIdAndDelete(email._id);
+            if (!deletedEmail) {
+                return res.json({error: "Unable to delete email"});
+            }
 
-			return res.json({success: "Deleted email"});
-		}
+            return res.json({success: "Deleted email"});
+        }
 
-		return res.json({error: "Active user has this email"});
+        return res.json({error: "Active user has this email"});
 
-	})().catch(err => {
-		res.json({error: "An error occurred"});
-	});
+    })().catch(err => {
+        res.json({error: "An error occurred"});
+    });
 });
 
 // router.post('/add-permission', (req, res) => {
@@ -463,229 +463,229 @@ router.delete('/whitelist/:id', middleware.isLoggedIn, middleware.isPrincipal, (
 // changes permissions
 router.put('/permissions', middleware.isLoggedIn, middleware.isAdmin, (req, res) => {
 
-	User.findById(req.body.user, (err, user) => {
-		if (err || !user) {
-			res.json({error: "Error. Could not change"});
+    User.findById(req.body.user, (err, user) => {
+        if (err || !user) {
+            res.json({error: "Error. Could not change"});
 
-		} else if (req.body.role == 'admin' || req.body.role == "principal") { //Changing a user to administrator or principal requires specific permissions
+        } else if (req.body.role == 'admin' || req.body.role == "principal") { //Changing a user to administrator or principal requires specific permissions
 
-			if(req.user.permission == 'principal') { // check if current user is the principal
-				user.permission = req.body.role;
-				user.save();
-				res.json({success: "Succesfully changed", user});
+            if (req.user.permission == 'principal') { // check if current user is the principal
+                user.permission = req.body.role;
+                user.save();
+                res.json({success: "Succesfully changed", user});
 
-			} else {
-				res.json({error: "You do not have permissions to do that", user});
-			}
+            } else {
+                res.json({error: "You do not have permissions to do that", user});
+            }
 
-		} else {
-			if ((user.permission == "principal" || user.permission == "admin") && req.user.permission != "principal") {
-				res.json({error: "You do not have permissions to do that", user});
+        } else {
+            if ((user.permission == "principal" || user.permission == "admin") && req.user.permission != "principal") {
+                res.json({error: "You do not have permissions to do that", user});
 
-			} else {
-				user.permission = req.body.role;
-				user.save();
-				res.json({success: 'Succesfully changed', user});
-			}
-		}
-	});
+            } else {
+                user.permission = req.body.role;
+                user.save();
+                res.json({success: 'Succesfully changed', user});
+            }
+        }
+    });
 });
 
 // changes status
 router.put('/status', middleware.isLoggedIn, middleware.isMod, (req, res) => {
-	(async() => {
-		const user = await User.findById(req.body.user);
+    (async () => {
+        const user = await User.findById(req.body.user);
 
-		if(!user) {
-			return res.json({error: 'Error. Could not change'});
-		}
+        if (!user) {
+            return res.json({error: 'Error. Could not change'});
+        }
 
-		if (user.status == "faculty") {
-			let teaching = false;
+        if (user.status == "faculty") {
+            let teaching = false;
 
-			const courses = await Course.find({});
-			if (!courses) {
-				return res.json({error: "Error. Could not change", user});
-			}
+            const courses = await Course.find({});
+            if (!courses) {
+                return res.json({error: "Error. Could not change", user});
+            }
 
-			for (let course of courses) {
-				if (course.teacher.equals(user._id)) {
-					teaching = true;
-					break;
-				}
-			}
+            for (let course of courses) {
+                if (course.teacher.equals(user._id)) {
+                    teaching = true;
+                    break;
+                }
+            }
 
-			if (teaching) {
-				return res.json({error: "User is an active teacher", user});
-			}
+            if (teaching) {
+                return res.json({error: "User is an active teacher", user});
+            }
 
-			user.status = req.body.status;
-			await user.save();
-			return res.json({success: "Succesfully changed", user});
-		}
+            user.status = req.body.status;
+            await user.save();
+            return res.json({success: "Succesfully changed", user});
+        }
 
-		user.status = req.body.status;
-		await user.save();
-		return res.json({success: "Successfully Changed", user});
+        user.status = req.body.status;
+        await user.save();
+        return res.json({success: "Successfully Changed", user});
 
-	})().catch(err => {
-		res.json({error: "Error. Could not change"});
-	});
+    })().catch(err => {
+        res.json({error: "Error. Could not change"});
+    });
 });
 
 router.put('/tag', middleware.isLoggedIn, middleware.isMod, (req, res) => {
 
-  (async() => {
-    const user = await User.findById(req.body.user);
+    (async () => {
+        const user = await User.findById(req.body.user);
 
-    if(!user) {
-      return res.json({error: 'Error. Could not change'});
-    }
-
-    if (user.tags.includes(req.body.tag)) {
-
-      if (req.body.tag == "Tutor") {
-        const courses = await Course.find({});
-
-        if (!courses) {
-          return res.json({error: 'Error. Could not change'});
+        if (!user) {
+            return res.json({error: 'Error. Could not change'});
         }
 
-        let active = false;
+        if (user.tags.includes(req.body.tag)) {
 
-        loop1:
-        for (let course of courses) {
-          loop2:
-          for (let tutor of course.tutors) {
-            if (tutor.tutor.equals(user._id)) {
-              active = true;
-              break loop1;
+            if (req.body.tag == "Tutor") {
+                const courses = await Course.find({});
+
+                if (!courses) {
+                    return res.json({error: 'Error. Could not change'});
+                }
+
+                let active = false;
+
+                loop1:
+                    for (let course of courses) {
+                        loop2:
+                            for (let tutor of course.tutors) {
+                                if (tutor.tutor.equals(user._id)) {
+                                    active = true;
+                                    break loop1;
+                                }
+                            }
+                    }
+
+                if (active) {
+                    return res.json({error: "User is an Active Tutor"});
+
+                } else {
+                    user.tags.splice(user.tags.indexOf(req.body.tag), 1);
+                    user.save();
+                    return res.json({success: "Successfully removed status", tag: req.body.tag})
+                }
+
+            } else {
+                user.tags.splice(user.tags.indexOf(req.body.tag), 1);
+                user.save();
+                return res.json({success: "Successfully removed status", tag: req.body.tag})
             }
-          }
-        }
-
-        if (active) {
-          return res.json({error: "User is an Active Tutor"});
 
         } else {
-          user.tags.splice(user.tags.indexOf(req.body.tag), 1);
-          user.save();
-          return res.json({success: "Successfully removed status", tag: req.body.tag})
+            user.tags.push(req.body.tag);
+            user.save();
+            return res.json({success: "Successfully added status", tag: req.body.tag})
         }
 
-      } else {
-        user.tags.splice(user.tags.indexOf(req.body.tag), 1);
-        user.save();
-        return res.json({success: "Successfully removed status", tag: req.body.tag})
-      }
-
-    } else {
-      user.tags.push(req.body.tag);
-      user.save();
-      return res.json({success: "Successfully added status", tag: req.body.tag})
-    }
-
-  })().catch(err => {
-    res.json({error: 'Error. Could not change'});
-  });
+    })().catch(err => {
+        res.json({error: 'Error. Could not change'});
+    });
 });
 
 //Context
 router.post('/moderate', middleware.isLoggedIn, middleware.isMod, (req, res) => {
-	(async() => {
-		const reportedComment = await Comment.findById(req.body.commentId).populate("author");
-		if (!reportedComment) {
-			return res.json({error: "Unable to find comment"});
-		}
+    (async () => {
+        const reportedComment = await Comment.findById(req.body.commentId).populate("author");
+        if (!reportedComment) {
+            return res.json({error: "Unable to find comment"});
+        }
 
-		let commentIndex;
-		let context = [];
+        let commentIndex;
+        let context = [];
 
-		const allComments = await Comment.find({room: reportedComment.room}).populate("author");
-		if (!allComments) {
-			return res.json({error: "Unable to find other comments"});
-		}
+        const allComments = await Comment.find({room: reportedComment.room}).populate("author");
+        if (!allComments) {
+            return res.json({error: "Unable to find other comments"});
+        }
 
-		for (let i = 0; i < allComments.length; i ++) {
-			if (allComments[i]._id.equals(reportedComment._id)) {
-				commentIndex = i;
-				break;
-			}
-		}
+        for (let i = 0; i < allComments.length; i++) {
+            if (allComments[i]._id.equals(reportedComment._id)) {
+                commentIndex = i;
+                break;
+            }
+        }
 
-		for (let i = 5; i >= 1; i --) {
-			if (commentIndex-i > 0) {
-				if (allComments[commentIndex-i].author) {
-					context.push(allComments[commentIndex-i]);
-				}
-			}
-		}
+        for (let i = 5; i >= 1; i--) {
+            if (commentIndex - i > 0) {
+                if (allComments[commentIndex - i].author) {
+                    context.push(allComments[commentIndex - i]);
+                }
+            }
+        }
 
-		context.push(reportedComment);
+        context.push(reportedComment);
 
-		for (let i = 1; i <= 5; i ++) {
-			if (commentIndex+i < allComments.length) {
-				if (allComments[commentIndex+i].author) {
-					context.push(allComments[commentIndex+i]);
-				}
-			}
-		}
+        for (let i = 1; i <= 5; i++) {
+            if (commentIndex + i < allComments.length) {
+                if (allComments[commentIndex + i].author) {
+                    context.push(allComments[commentIndex + i]);
+                }
+            }
+        }
 
-		return res.json({success: "Succesfully collected data", context});
+        return res.json({success: "Succesfully collected data", context});
 
-	})().catch(err => {
-		console.log(err);
-		res.json({error: "An error occurred"});
-	});
+    })().catch(err => {
+        console.log(err);
+        res.json({error: "An error occurred"});
+    });
 });
 
 // route for ignoring reported comments
 router.put('/moderate', middleware.isLoggedIn, middleware.isMod, (req, res) => {
-	Comment.findById(req.body.id).populate('statusBy').exec((err, comment) => {
-		if (err || !comment) {
-			res.json({error: 'Could not find comment'});
+    Comment.findById(req.body.id).populate('statusBy').exec((err, comment) => {
+        if (err || !comment) {
+            res.json({error: 'Could not find comment'});
 
-		} else if (comment.author.equals(req.user._id)) {
-			res.json({error: "You cannot handle your own comments"});
+        } else if (comment.author.equals(req.user._id)) {
+            res.json({error: "You cannot handle your own comments"});
 
-		} else if (comment.statusBy._id.equals(req.user._id)) {
-			res.json({error: "You cannot handle comments you have reported"});
+        } else if (comment.statusBy._id.equals(req.user._id)) {
+            res.json({error: "You cannot handle comments you have reported"});
 
-		} else {
-			comment.status = "ignored";
-			comment.save();
-			comment.statusBy.falseReportCount += 1;
-			comment.statusBy.save();
+        } else {
+            comment.status = "ignored";
+            comment.save();
+            comment.statusBy.falseReportCount += 1;
+            comment.statusBy.save();
 
-		 	res.json({success: 'Ignored comment'});
-		}
-	});
+            res.json({success: 'Ignored comment'});
+        }
+    });
 });
 
 // route for deleting reported comments
 router.delete('/moderate', middleware.isLoggedIn, middleware.isMod, (req, res) => {
-	Comment.findById(req.body.id).populate("author").exec((err, comment) => {
-		if (err || !comment) {
-			res.json({error: 'Could not find comment'});
+    Comment.findById(req.body.id).populate("author").exec((err, comment) => {
+        if (err || !comment) {
+            res.json({error: 'Could not find comment'});
 
-		} else if (comment.author.equals(req.user._id)) {
-			res.json({error: "You cannot handle your own comments"});
+        } else if (comment.author.equals(req.user._id)) {
+            res.json({error: "You cannot handle your own comments"});
 
-		} else if (comment.statusBy._id.equals(req.user._id)) {
-			res.json({error: "You cannot handle comments you have reported"});
+        } else if (comment.statusBy._id.equals(req.user._id)) {
+            res.json({error: "You cannot handle comments you have reported"});
 
-		} else {
-			comment.status = "deleted";
-			comment.save();
-			comment.author.reportedCount += 1;
-			comment.author.save();
-			res.json({success: 'Deleted comment'});
-		}
-	});
+        } else {
+            comment.status = "deleted";
+            comment.save();
+            comment.author.reportedCount += 1;
+            comment.author.save();
+            res.json({success: 'Deleted comment'});
+        }
+    });
 });
 
 router.get('/manageCafe', middleware.isLoggedIn, middleware.isMod, (req, res) => {
-	res.redirect('/cafe/manage');
+    res.redirect('/cafe/manage');
 });
 
 module.exports = router;

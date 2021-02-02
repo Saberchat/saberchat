@@ -43,39 +43,39 @@ const enableBtn = (() => {
 // validates signup form
 const validateForm = (() => {
     let form = document.forms.signup;
-    if(form.firstName.value == '') {
+    if (form.firstName.value == '') {
         enableBtn();
         back();
         form.firstName.style.border = '2px solid red';
         form.firstName.placeholder = 'Enter first name!';
         return false;
-    } else if(form.lastName.value == '') {
+    } else if (form.lastName.value == '') {
         enableBtn();
         back();
         form.lastName.style.border = '2px solid red';
         form.lastName.placeholder = 'Enter last name!';
         return false;
-    } else if(form.username.value == '') {
+    } else if (form.username.value == '') {
         enableBtn();
         back();
         form.username.style.border = '2px solid red';
         form.username.placeholder = 'Enter username!';
         return false;
-    } else if(form.email.value == '') {
+    } else if (form.email.value == '') {
         enableBtn();
         form.email.style.border = '2px solid red';
         form.email.placeholder = 'Enter email!';
         return false;
-    } else if(form.password.value == '') {
+    } else if (form.password.value == '') {
         enableBtn();
         form.password.style.border = '2px solid red';
         form.password.placeholder = 'Enter password';
         return false;
-    } else if(form.password.value.length <= 8) {
+    } else if (form.password.value.length <= 8) {
         enableBtn();
         form.password.style.border = '2px solid red';
         return false;
-    } else if(!/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test(form.email.value)) {
+    } else if (!/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test(form.email.value)) {
         enableBtn();
         form.email.style.border = '2px solid red';
         return false;

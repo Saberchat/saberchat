@@ -5,7 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Saberchat</title>
 
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css" integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css"
+          integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk" crossorigin="anonymous">
     <link rel="stylesheet" href="/stylesheets/main.css">
     <link rel="stylesheet" href="/stylesheets/components/navbar.css">
     <link rel="stylesheet" href="/stylesheets/components/header.css">
@@ -13,9 +14,12 @@
     <link rel="stylesheet" href="/stylesheets/chat/new.css">
     <link rel="stylesheet" href="/stylesheets/admin/permission.css">
 
-    <script src="https://code.jquery.com/jquery-3.5.1.min.js" integrity="sha256-9/aliU8dGd2tb6OSsuzixeV4y/faTqgFtohetphbbj0=" crossorigin="anonymous"></script>
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"
+            integrity="sha256-9/aliU8dGd2tb6OSsuzixeV4y/faTqgFtohetphbbj0=" crossorigin="anonymous"></script>
     <script src="https://unpkg.com/@popperjs/core@2" crossorigin="anonymous"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js" integrity="sha384-OgVRvuATP1z7JjHLkuOU7Xw704+h835Lr+6QL9UvYjZE3Ipu6Tp75j7Bh/kR0JKI" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js"
+            integrity="sha384-OgVRvuATP1z7JjHLkuOU7Xw704+h835Lr+6QL9UvYjZE3Ipu6Tp75j7Bh/kR0JKI"
+            crossorigin="anonymous"></script>
 
     <script src="https://kit.fontawesome.com/dccc745c41.js" crossorigin="anonymous"></script>
 
@@ -24,24 +28,26 @@
     </style>
 </head>
 <body>
-    <%- include('../partials/navbar') %>
-    <%- include('../partials/header') %>
+<%- include('../partials/navbar') %>
+<%- include('../partials/header') %>
 
-    <div class="container mt-5">
-        <div class="row">
-            <div class="col-12">
-                <h1>Change Statuses</h1>
-                <span id="loading"></span>
-                <hr>
+<div class="container mt-5">
+    <div class="row">
+        <div class="col-12">
+            <h1>Change Statuses</h1>
+            <span id="loading"></span>
+            <hr>
 
-                <div class="search-filter mb-3">
-                  <i class="fas fa-search"></i>
-                  <input id="search-input" oninput="searchFunction()" class="form-control" type="text" placeholder="Search..." title="Type in name"/>
-                </div><br />
+            <div class="search-filter mb-3">
+                <i class="fas fa-search"></i>
+                <input id="search-input" oninput="searchFunction()" class="form-control" type="text"
+                       placeholder="Search..." title="Type in name"/>
+            </div>
+            <br/>
 
-                <ul class="list-group">
+            <ul class="list-group">
 
-                  <li class="list-group-item">
+                <li class="list-group-item">
                     <span id="modify-header">Modify Statuses</span>
                     <!-- <form action="/admin/add-status" method="post" id="add-email-form">
                       <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#modal" id="delete-button"><i class="fas fa-user"></i> Add Status</button>
@@ -73,61 +79,65 @@
                         </div>
                       </div>
                     </form> -->
-                  </li>
+                </li>
 
-                  <% let statusMatrix = [ ["Faculty", "Faculty", []], ["12th", "Seniors", []], ["11th", "Juniors", []], ["10th", "Sophomores", []], ["9th", "Freshmen", []], ["8th", "8th Graders", []], ["7th", "7th Graders", []], ["Alumnus", "Alumni", []], ["Parent", "Parents", []], ["Guest", "Guests", []] ] %>
-                  <% let permMatrix = [["principal", "Principal"], ["admin", "Administrator"], ["mod", "Moderator"], ["default", "Default"]]; %>
-                  <% let permMap = new Map(permMatrix); %>
-                  <% let tagMap = new Map([["Tutor", "warning"], ["Cashier", "success"], ["Editor", "info"]]); %>
+                <% let statusMatrix = [["Faculty", "Faculty", []], ["12th", "Seniors", []], ["11th", "Juniors", []], ["10th", "Sophomores", []], ["9th", "Freshmen", []], ["8th", "8th Graders", []], ["7th", "7th Graders", []], ["Alumnus", "Alumni", []], ["Parent", "Parents", []], ["Guest", "Guests", []]] %>
+                <% let permMatrix = [["principal", "Principal"], ["admin", "Administrator"], ["mod", "Moderator"], ["default", "Default"]]; %>
+                <% let permMap = new Map(permMatrix); %>
+                <% let tagMap = new Map([["Tutor", "warning"], ["Cashier", "success"], ["Editor", "info"]]); %>
 
-                  <% for (let status of statusMatrix) { %>
+                <% for (let status of statusMatrix) { %>
                     <% for (let user of users) { %>
-                      <% if(!user._id.equals(currentUser._id) && user.status.toLowerCase() == status[0].toLowerCase()){ %>
+                        <% if(!user._id.equals(currentUser._id) && user.status.toLowerCase() == status[0].toLowerCase()){ %>
                             <% for (let perm of permMatrix) { %>
-                              <% if (perm[0].toLowerCase() == user.permission.toLowerCase())  { %>
-                                <li class="list-group-item user <%=status[0].toLowerCase()%> <%=status[1].toLowerCase()%> <%=perm[0]%> <%=user.tags.join(' ')%>" id="user-<%=user._id%>">
-                                  <%= user.username %> (<%= user.firstName %> <%= user.lastName %>)
-                              <% } %>
-                            <% } %>
-                          <select name="status" class="role-select" onchange="updateStatus(this)" id="<%= user._id %>">
+                                <% if (perm[0].toLowerCase() == user.permission.toLowerCase())  { %>
+                            <li class="list-group-item user <%= status[0].toLowerCase() %> <%= status[1].toLowerCase() %> <%= perm[0] %> <%= user.tags.join(' ') %>"
+                                id="user-<%= user._id %>">
+                                <%= user.username %> (<%= user.firstName %> <%= user.lastName %>)
+                                <% } %>
+                                <% } %>
+                                <select name="status" class="role-select" onchange="updateStatus(this)"
+                                        id="<%= user._id %>">
 
-                            <% for (let status of statusMatrix) { %>
-                              <% if (user.status.toLowerCase() == status[0].toLowerCase()) { %>
-                                <option value="<%=status[0].toLowerCase()%>" selected><%=status[0]%></option>
+                                    <% for (let status of statusMatrix) { %>
+                                        <% if (user.status.toLowerCase() == status[0].toLowerCase()) { %>
+                                            <option value="<%= status[0].toLowerCase() %>"
+                                                    selected><%= status[0] %></option>
 
-                              <% } else { %>
-                                <option value="<%=status[0].toLowerCase()%>"><%=status[0]%></option>
-                              <% }%>
-                            <% } %>
-                          </select>
-                          <select name="tag" class="role-select" onchange="updateTag(this)" id="<%= user._id %>">
-                            <option value=""></option>
+                                        <% } else { %>
+                                            <option value="<%= status[0].toLowerCase() %>"><%= status[0] %></option>
+                                        <% } %>
+                                    <% } %>
+                                </select>
+                                <select name="tag" class="role-select" onchange="updateTag(this)" id="<%= user._id %>">
+                                    <option value=""></option>
 
-                            <% for (let tag of tags) { %>
+                                    <% for (let tag of tags) { %>
 
-                              <% if (currentUser.tags.includes(tag)) { %>
-                                <option value="<%=tag%>"><%=tag%></option>
-                              <% } else { %>
-                                <option value="<%=tag%>"><%=tag%></option>
-                              <% }%>
+                                        <% if (currentUser.tags.includes(tag)) { %>
+                                            <option value="<%= tag %>"><%= tag %></option>
+                                        <% } else { %>
+                                            <option value="<%= tag %>"><%= tag %></option>
+                                        <% } %>
 
-                            <% } %>
-                          </select>
+                                    <% } %>
+                                </select>
 
-                          <span class="badge badge-secondary user-permission%>"><%=permMap.get(user.permission)%></span>
+                                <span class="badge badge-secondary user-permission%>"><%= permMap.get(user.permission) %></span>
 
-                          <% for (let tag of user.tags) { %>
-                            <span class="badge badge-pill badge-<%=tagMap.get(tag)%> tag-<%=user._id%> user-tag"><%=tag%></span>
-                          <% } %>
-                        </li>
-                      <% } %>
-                  <% }; %>
+                                <% for (let tag of user.tags) { %>
+                                    <span class="badge badge-pill badge-<%= tagMap.get(tag) %> tag-<%= user._id %> user-tag"><%= tag %></span>
+                                <% } %>
+                            </li>
+                        <% } %>
+                    <% }; %>
                 <% } %>
 
-                </ul><br />
-            </div>
+            </ul>
+            <br/>
         </div>
     </div>
-    <script src="/javascript/admin/status.js"></script>
+</div>
+<script src="/javascript/admin/status.js"></script>
 </body>
 </html>

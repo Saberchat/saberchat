@@ -1,22 +1,22 @@
 pre {
-    white-space: pre-wrap;       /* Since CSS 2.1 */
-    white-space: -moz-pre-wrap;  /* Mozilla, since 1999 */
-    white-space: -pre-wrap;      /* Opera 4-6 */
-    white-space: -o-pre-wrap;    /* Opera 7 */
-    word-wrap: break-word;       /* Internet Explorer 5.5+ */
+    white-space: pre-wrap; /* Since CSS 2.1 */
+    white-space: -moz-pre-wrap; /* Mozilla, since 1999 */
+    white-space: -pre-wrap; /* Opera 4-6 */
+    white-space: -o-pre-wrap; /* Opera 7 */
+    word-wrap: break-word; /* Internet Explorer 5.5+ */
 }
 
 .mt-5 {
-  display: flex;
-  justify-content: left;
+    display: flex;
+    justify-content: left;
 }
 
 .article-content {
-  width: 50%;
-  float: left;
+    width: 50%;
+    float: left;
 }
 
 .article-image {
-  width: 50%;
-  height: 50%;
+    width: 50%;
+    height: 50%;
 }

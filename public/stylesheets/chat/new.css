@@ -1,13 +1,13 @@
 .new-room, .new-chat-header {
-  text-align: center;
+    text-align: center;
 }
 
 .new-chat-header {
-  width: 100%;
+    width: 100%;
 }
 
 #user-selection {
-  display: none;
+    display: none;
 }
 
 #user-list {

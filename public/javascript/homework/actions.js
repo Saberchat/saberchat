@@ -16,14 +16,14 @@ function book(button, location) {
             let chatButton = document.createElement('a');
 
             if (location == "show") {
-                reviewButton.className ="review-button action-button btn btn-warning";
-                leaveButton.className ="leave-button action-button btn btn-danger";
-                chatButton.className ="leave-button action-button btn btn-success";
+                reviewButton.className = "review-button action-button btn btn-warning";
+                leaveButton.className = "leave-button action-button btn btn-danger";
+                chatButton.className = "leave-button action-button btn btn-success";
 
             } else if (location == "tutor-show") {
-                reviewButton.className ="action-button btn btn-warning";
-                leaveButton.className ="action-button btn btn-danger";
-                chatButton.className ="action-button btn btn-success";
+                reviewButton.className = "action-button btn btn-warning";
+                leaveButton.className = "action-button btn btn-danger";
+                chatButton.className = "action-button btn btn-success";
             }
 
             reviewButton.id = `review-button-${tutorId}`;
@@ -78,7 +78,7 @@ function book(button, location) {
                 for (let student of data.students) {
                     userElement = document.createElement("div");
                     userElement.className = "list-group-item list-group-item-action user-element";
-                    userElement.innerHTML = `<a href="/profiles/${student._id}" style="color: black; text-decoration: none;"> <img class="student-profile-image" src="${student.imageUrl }" alt="profile picture"> <span class="${student.permission} ${student.status} ${student.tags.join(' ')} student-block"><span class="span-tag-name">${student.firstName} ${student.lastName}</span> <span class="span-tag-username">${student.username}</span></span></a>`;
+                    userElement.innerHTML = `<a href="/profiles/${student._id}" style="color: black; text-decoration: none;"> <img class="student-profile-image" src="${student.imageUrl}" alt="profile picture"> <span class="${student.permission} ${student.status} ${student.tags.join(' ')} student-block"><span class="span-tag-name">${student.firstName} ${student.lastName}</span> <span class="span-tag-username">${student.username}</span></span></a>`;
 
                     if (student._id == data.user._id) {
                         let lessonInfoButton = document.createElement("a");
@@ -112,7 +112,7 @@ function leave(button, location) {
     const data = {tutorId};
 
     $.post(url, data, data => {
-        if(data.success) {
+        if (data.success) {
             $(`#modal-stop-${tutorId}`).modal('hide');
 
             const tutorDiv = document.getElementById(`tutor-actions-${tutorId}`);
@@ -124,12 +124,12 @@ function leave(button, location) {
             let bookButton = document.createElement('button');
 
             if (location == "show") {
-                reviewButton.className ="review-button action-button btn btn-warning";
-                bookButton.className ="book-button action-button btn btn-info";
+                reviewButton.className = "review-button action-button btn btn-warning";
+                bookButton.className = "book-button action-button btn btn-info";
 
             } else if (location == "tutor-show") {
-                reviewButton.className ="action-button btn btn-warning";
-                bookButton.className ="action-button btn btn-info";
+                reviewButton.className = "action-button btn btn-warning";
+                bookButton.className = "action-button btn btn-info";
             }
 
             reviewButton.id = `review-button-${tutorId}`;
@@ -179,9 +179,9 @@ function closeLessons(button, location) {
             let reopenButton = document.createElement('button');
 
             if (location == "show") {
-                reopenButton.className ="reopen-lessons action-button btn btn-success lesson-action";
+                reopenButton.className = "reopen-lessons action-button btn btn-success lesson-action";
             } else if (location == "tutor-show") {
-                reopenButton.className ="action-button btn btn-success";
+                reopenButton.className = "action-button btn btn-success";
             }
 
             reopenButton.id = `reopen-${courseId}-${tutorId}`;
@@ -206,9 +206,9 @@ function reopenLessons(button, location) {
             let closeButton = document.createElement('button');
 
             if (location == "show") {
-                closeButton.className ="close-lessons action-button btn btn-danger lesson-action";
+                closeButton.className = "close-lessons action-button btn btn-danger lesson-action";
             } else if (location == "tutor-show") {
-                closeButton.className ="action-button btn btn-danger";
+                closeButton.className = "action-button btn btn-danger";
             }
 
             closeButton.id = `close-${courseId}-${tutorId}`;
@@ -376,10 +376,10 @@ function changeBio(button) {
 
     $.post(url, data, data => {
 
-      if (data.success) {
-        $(`#modal-edit-bio`).modal('hide');
-        document.getElementById("tutor-bio").innerText = bio;
-      }
+        if (data.success) {
+            $(`#modal-edit-bio`).modal('hide');
+            document.getElementById("tutor-bio").innerText = bio;
+        }
     });
 }
 
@@ -392,7 +392,7 @@ function getTime(experience) {
     let result;
     experience = parseInt(experience);
     if (experience < 60) {
-        result = `${Math.round(experience * 100)/100} minute(s)`;
+        result = `${Math.round(experience * 100) / 100} minute(s)`;
 
     } else {
         experience /= 60;

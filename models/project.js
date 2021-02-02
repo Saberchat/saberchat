@@ -6,25 +6,25 @@ var projectSchema = new mongoose.Schema({
     text: String,
     date: String,
     poster: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: 'User'
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User'
     },
 
     creators: [{
-      type: mongoose.Schema.Types.ObjectId,
-      ref: 'User'
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User'
     }],
 
     likes: [{
-      type: mongoose.Schema.Types.ObjectId,
-      ref: 'User',
-      default: []
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User',
+        default: []
     }],
 
     comments: [{
-      type: mongoose.Schema.Types.ObjectId,
-      ref: 'PostComment',
-      default: []
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'PostComment',
+        default: []
     }]
 
 }, {timestamps: {createdAt: 'created_at'}});

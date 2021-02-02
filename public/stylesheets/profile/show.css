@@ -46,7 +46,7 @@ body {
 ====================
 User banner
 */
-#banner{
+#banner {
     background-position: center;
     background-size: cover;
     height: 35vh;
@@ -88,7 +88,7 @@ Profile card info
 }
 
 .review-sender {
-  margin-left: 10px;
+    margin-left: 10px;
 }
 
 /* - card body */
@@ -187,76 +187,76 @@ Username
     box-shadow: 0 10px 10px #95b4db;
 }
 
-.follower-image{
+.follower-image {
     display: inline-block;
-    border-radius:50%;
-    width:40px;
-    height:40px;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
     object-fit: cover;
 }
 
 .profile-box {
-  float: right;
+    float: right;
 }
 
 .edit-button, .leave-button, .review-button, .action-button {
-  margin-right: 10px;
-  margin-bottom: 10px;
-  width: 100%;
+    margin-right: 10px;
+    margin-bottom: 10px;
+    width: 100%;
 }
 
 #follower-data {
-  margin-top: 50px;
+    margin-top: 50px;
 }
 
 #follower-buttons {
-  text-align: center;
-  padding-top: 15px;
-  padding-bottom: 15px;
+    text-align: center;
+    padding-top: 15px;
+    padding-bottom: 15px;
 }
 
 #following-button, #followers-button {
-  width: 47.5%;
+    width: 47.5%;
 }
 
 #followers-list, #following-list {
-  overflow: hidden;
+    overflow: hidden;
 }
 
 .search-bar-container {
-  text-align: center;
+    text-align: center;
 }
 
 #search-bar-followers, #search-bar-following {
-  width: 95%;
-  margin: 15px;
-  border-radius: 5px;
-  padding-left: 10px;
-  padding-top: 5px;
-  padding-bottom: 5px;
+    width: 95%;
+    margin: 15px;
+    border-radius: 5px;
+    padding-left: 10px;
+    padding-top: 5px;
+    padding-bottom: 5px;
 }
 
 .follower-block, .following-block {
-  margin-left: 20px;
+    margin-left: 20px;
 }
 
 .follower-link, .following-link, .follower-link:hover, .following-link:hover, .remove-follower-text, .remove-follower-text:hover {
-  color: black;
-  text-decoration: none;
+    color: black;
+    text-decoration: none;
 }
 
 .edit-button-text, .edit-button-text:hover, .block-following-text, .block-following-text:hover {
-  color: white;
-  text-decoration: none;
+    color: white;
+    text-decoration: none;
 }
 
 .remove-follower, .block-following {
-  float: right;
-  margin-right: 20px;
+    float: right;
+    margin-right: 20px;
 }
 
 .follower-name {
-  font-weight: bold;
+    font-weight: bold;
 }
 
 
@@ -266,6 +266,6 @@ Username
     }
 
     .profile-box {
-      margin-bottom: 50px;
+        margin-bottom: 50px;
     }
 }

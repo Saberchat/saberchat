@@ -1,41 +1,41 @@
 .submit-button {
-  background-color: green;
-  color: white;
-  margin-bottom: 25px;
-  width: 100%:
+    background-color: green;
+    color: white;
+    margin-bottom: 25px;
+    width: 100%:
 }
 
 .send-notif-type {
-  display: inline-block;
-  margin: 50px;
+    display: inline-block;
+    margin: 50px;
 }
 
 .send-notif-header {
-  color: red;
-  font-family: times;
-  font-size: 20px;
-  font-weight: bold;
+    color: red;
+    font-family: times;
+    font-size: 20px;
+    font-weight: bold;
 }
 
 
 #clear, #clear_anonymous {
-  color: white;
+    color: white;
 }
 
 .notif-options {
-  background-color: lightgrey;
+    background-color: lightgrey;
 }
 
 .send-box {
-  text-align: center;
-  width: 100%
+    text-align: center;
+    width: 100%
 }
 
 @media only screen and (max-width: 768px) {
-  .form-control {
-    text-align: center;
-    display: inline-block;
-    width: 100%;
-    padding-right: 2px;
-  }
+    .form-control {
+        text-align: center;
+        display: inline-block;
+        width: 100%;
+        padding-right: 2px;
+    }
 }

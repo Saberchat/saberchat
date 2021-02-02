@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html>
-  <head>
+<head>
     <title>Saberchat</title>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -22,96 +22,112 @@
     <!-- I'm using my fontawesome kit -->
     <script src="https://kit.fontawesome.com/dccc745c41.js" crossorigin="anonymous"></script>
 
-  </head>
-  <body>
-    <!-- include the navbar via ejs -->
-    <%- include('../partials/navbar') %>
-    <%- include('../partials/header') %>
-    <div class="container mt-5">
-      <div class="row">
-        <div class="col-12">
-          <div class="jumbotron text-center">
-            <h1><i class="fas fa-paint-brush"></i> Edit Project </h1>
-            <p>Modify Projects You Posted Earlier</p>
-            <a class="btn btn-primary" href="/projects"><i class="fas fa-arrow-left"></i> Back</a>
-          </div>
-        </div>
-      </div>
-    </div>
-
+</head>
+<body>
+<!-- include the navbar via ejs -->
+<%- include('../partials/navbar') %>
+<%- include('../partials/header') %>
+<div class="container mt-5">
     <div class="row">
-      <div class="col-md-8 offset-md-2 col-12">
-        <form action="/projects/<%=project._id%>?_method=put" method="post" id="submit-project-edits">
+        <div class="col-12">
+            <div class="jumbotron text-center">
+                <h1><i class="fas fa-paint-brush"></i> Edit Project </h1>
+                <p>Modify Projects You Posted Earlier</p>
+                <a class="btn btn-primary" href="/projects"><i class="fas fa-arrow-left"></i> Back</a>
+            </div>
+        </div>
+    </div>
+</div>
 
-          <div class="form-group">
-            <label for="new-project-message" id="title-label">Title</label>
-            <input id="new-project-title" name="title" maxlength="50" type="text" class="form-control" value = "<%=project.title%>" placeholder="Enter Project Name" aria-label="Username" aria-describedby="basic-addon1" required>
-          </div>
+<div class="row">
+    <div class="col-md-8 offset-md-2 col-12">
+        <form action="/projects/<%= project._id %>?_method=put" method="post" id="submit-project-edits">
 
-          <div class="form-group" id="creator-input-div">
-            <label for="creator-select" id="creator-input-label">Creators</label>
-            <select id="creator-select" class="form-control" onchange="addCreator('user')">
-              <option class="creator-group" value="" selected disabled>Select Students</option>
-              <option class="creator-group" value="7th">7th Graders</option>
-              <option class="creator-group" value="8th">8th Graders</option>
-              <option class="creator-group" value="9th">9th Graders</option>
-              <option class="creator-group" value="10th">EC Sophomores</option>
-              <option class="creator-group" value="11th">EC Juniors</option>
-              <option class="creator-group" value="12th">EC Seniors</option>
+            <div class="form-group">
+                <label for="new-project-message" id="title-label">Title</label>
+                <input id="new-project-title" name="title" maxlength="50" type="text" class="form-control"
+                       value="<%= project.title %>" placeholder="Enter Project Name" aria-label="Username"
+                       aria-describedby="basic-addon1" required>
+            </div>
 
-              <% ['7th', '8th', '9th', '10th', '11th', '12th'].forEach(status => { %>
-                <% students.forEach(student => { %>
-                  <% if (student.status == status) { %>
-                    <option class="<%=student.status%>" value="<%=student._id%>"><%=student.username%> (<%=student.firstName%> <%=student.lastName%>)</option>
-                  <% } %>
-                <% }) %>
-              <% }) %>
+            <div class="form-group" id="creator-input-div">
+                <label for="creator-select" id="creator-input-label">Creators</label>
+                <select id="creator-select" class="form-control" onchange="addCreator('user')">
+                    <option class="creator-group" value="" selected disabled>Select Students</option>
+                    <option class="creator-group" value="7th">7th Graders</option>
+                    <option class="creator-group" value="8th">8th Graders</option>
+                    <option class="creator-group" value="9th">9th Graders</option>
+                    <option class="creator-group" value="10th">EC Sophomores</option>
+                    <option class="creator-group" value="11th">EC Juniors</option>
+                    <option class="creator-group" value="12th">EC Seniors</option>
 
-            </select>
-            <input type="text" id="creator-input" name="creatorInput" hidden />
-            <br />
-            <%for (let creator of project.creators) { %>
-              <div class="user-tag <%=creator.status%>" id="<%=creator._id%>">
-                <span name="creators" value="<%=creator._id%>"><%=creator.username%> (<%=creator.firstName%> <%=creator.lastName%>)</span>
-                <button type="button" id="<%=creator._id%>" onclick="remCreator(this)">&times;</button>
-              </div>
-            <% } %>
-          </div>
+                    <% ['7th', '8th', '9th', '10th', '11th', '12th'].forEach(status => { %>
+                        <% students.forEach(student => { %>
+                            <% if (student.status == status) { %>
+                                <option class="<%= student.status %>" value="<%= student._id %>"><%= student.username %>
+                                    (<%= student.firstName %> <%= student.lastName %>)
+                                </option>
+                            <% } %>
+                        <% }) %>
+                    <% }) %>
 
-          <!-- <input id="creators" class="form-control" autocomplete="off" name="creators" type="text" aria-describedby="basic-addon2" value = "<%=creatornames.join(', ')%>" placeholder="Creators" required/> -->
+                </select>
+                <input type="text" id="creator-input" name="creatorInput" hidden/>
+                <br/>
+                <% for (let creator of project.creators) { %>
+                    <div class="user-tag <%= creator.status %>" id="<%= creator._id %>">
+                    <span name="creators"
+                          value="<%= creator._id %>"><%= creator.username %> (<%= creator.firstName %> <%= creator.lastName %>)</span>
+                        <button type="button" id="<%= creator._id %>" onclick="remCreator(this)">&times;</button>
+                    </div>
+                <% } %>
+            </div>
 
-          <div class="form-group">
-            <label for="new-project-description" id="description-label">Description</label>
-            <textarea id="new-project-description" minlength="50" rows="6" name="text" placeholder="Write a little about the project" class="form-control" aria-label="With textarea" required><%=project.text%></textarea>
-          </div>
+            <!-- <input id="creators" class="form-control" autocomplete="off" name="creators" type="text" aria-describedby="basic-addon2" value = "<%= creatornames.join(', ') %>" placeholder="Creators" required/> -->
 
-          <div id="image-header">
-            <h4 id="image-heading">Images</h4>
-            <button type="button" onclick="addImg()" class="btn btn-primary"><i class="fas fa-plus"></i> Image</button>
-            <br /><br />
-          </div>
+            <div class="form-group">
+                <label for="new-project-description" id="description-label">Description</label>
+                <textarea id="new-project-description" minlength="50" rows="6" name="text"
+                          placeholder="Write a little about the project" class="form-control" aria-label="With textarea"
+                          required><%= project.text %></textarea>
+            </div>
 
-          <div id="image-block">
-            <% let reversedImages = project.images.reverse() %>
-            <% for (let i = 0; i< reversedImages.length; i += 1) { %>
-              <div class="image-group">
-                <div class="input-container" id="block-<%=reversedImages.length - (i+1)%>">
-                  <input type="text" id="<%=reversedImages.length - (i+1)%>" class="form-control" oninput="createImg(this)" placeholder="Url..." name="images[<%= reversedImages.length - (i+1) %>]" required value="<%= reversedImages[i] %>">
-                  <img id="image-<%=reversedImages.length - (i+1)%>" style = "width: 50%; height: 50%; margin-top: 10px; border-radius: 15px;" src="<%= reversedImages[i] %>" alt="Image Does Not Exist"/>
-                </div>
-                <button type="button" onclick="deleteImg(this)" class="btn btn-danger"><i class="fas fa-minus"></i></button>
-              </div>
-            <% } %>
-          </div>
+            <div id="image-header">
+                <h4 id="image-heading">Images</h4>
+                <button type="button" onclick="addImg()" class="btn btn-primary"><i class="fas fa-plus"></i> Image
+                </button>
+                <br/><br/>
+            </div>
 
-          <br /><br />
+            <div id="image-block">
+                <% let reversedImages = project.images.reverse() %>
+                <% for (let i = 0; i < reversedImages.length; i += 1) { %>
+                    <div class="image-group">
+                        <div class="input-container" id="block-<%= reversedImages.length - (i + 1) %>">
+                            <input type="text" id="<%= reversedImages.length - (i + 1) %>" class="form-control"
+                                   oninput="createImg(this)" placeholder="Url..."
+                                   name="images[<%= reversedImages.length - (i + 1) %>]" required
+                                   value="<%= reversedImages[i] %>">
+                            <img id="image-<%= reversedImages.length - (i + 1) %>"
+                                 style="width: 50%; height: 50%; margin-top: 10px; border-radius: 15px;"
+                                 src="<%= reversedImages[i] %>" alt="Image Does Not Exist"/>
+                        </div>
+                        <button type="button" onclick="deleteImg(this)" class="btn btn-danger"><i
+                                    class="fas fa-minus"></i>
+                        </button>
+                    </div>
+                <% } %>
+            </div>
 
-          <button class="btn btn-primary btn-block" type="submit">Submit Changes</button><br />
+            <br/><br/>
+
+            <button class="btn btn-primary btn-block" type="submit">Submit Changes</button>
+            <br/>
         </form>
-      </div>
+    </div>
     </dov>
-  </body>
+</body>
 
-  <script src="/javascript/projects/form.js"></script>
-  <script src="/javascript/projects/creators.js"></script>
+<script src="/javascript/projects/form.js"></script>
+<script src="/javascript/projects/creators.js"></script>
 </html>

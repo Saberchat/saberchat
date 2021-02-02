@@ -1,15 +1,15 @@
 body, #submit-project-edits, #submit-new-project {
-  text-align: center;
+    text-align: center;
 }
 
 label, #image-heading {
-  float: left;
+    float: left;
 }
 
 #creator-input-div, .image-group {
-  text-align: left;
+    text-align: left;
 }
 
 #title-label, #creator-input-label, #description-label {
-  font-weight: bold;
+    font-weight: bold;
 }

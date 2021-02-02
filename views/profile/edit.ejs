@@ -21,112 +21,125 @@
     <script src="https://kit.fontawesome.com/dccc745c41.js" crossorigin="anonymous"></script>
 </head>
 <body>
-    <!-- include the navbar via ejs -->
-    <%- include('../partials/navbar') %>
-    <!-- include the backdrop for nav -->
-    <%- include('../partials/header') %>
+<!-- include the navbar via ejs -->
+<%- include('../partials/navbar') %>
+<!-- include the backdrop for nav -->
+<%- include('../partials/header') %>
 
-    <div class="container mt-5">
-        <div class="row">
-            <div class="col-12" id="edit-settings">
-                <h1 id="settings-header">Edit Profile Settings</h1>
-                <a class="btn btn-primary" href="/profiles/<%= currentUser._id %>"><i class="fas fa-arrow-left"></i> Back</a>
-            </div>
+<div class="container mt-5">
+    <div class="row">
+        <div class="col-12" id="edit-settings">
+            <h1 id="settings-header">Edit Profile Settings</h1>
+            <a class="btn btn-primary" href="/profiles/<%= currentUser._id %>"><i class="fas fa-arrow-left"></i>
+                Back</a>
         </div>
-        <div class="row">
-            <div class="col-md-8 offset-md-2 col-12">
-                <form action="/profiles/profile?_method=put" method="post">
-                    <div class="form-group">
-                        <label for="firstNameInput">First</label>
-                        <input id="firstNameInput" class="form-control" type="text" name="firstName" value="<%= currentUser.firstName %>" placeholder="Enter First Name" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="lastNameInput">Last</label>
-                        <input id="lastNameInput" class="form-control" type="text" name="lastName" value="<%= currentUser.lastName %>" placeholder="Enter Last" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="usernameInput">Username</label>
-                        <input id="usernameInput" class="form-control" type="text" name="username" value="<%= currentUser.username %>" placeholder="(max 23) Enter Username" maxlength="23" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="descInput">Description</label>
-                        <% if(currentUser.description){ %>
-                            <textarea id="descInput" class="form-control" name="description" maxlength="550" placeholder="Enter Description" rows="5"><%= currentUser.description %></textarea>
-                        <% } else { %>
-                            <textarea id="descInput" class="form-control" name="description" placeholder="Enter Description" maxlength="550" rows="5" aria-describedby="descHelp"></textarea>
-                            <small id="descHelp" class="form-text text-muted">Ex. Hobbies: swimming, tennis, searching for bigfoot.</small>
-                        <% } %>
-                    </div>
-                    <div class="form-group">
-                        <label for="titleInput">User Title</label>
-                        <% if(currentUser.title){ %>
-                            <input id="titleInput" class="form-control" type="text" name="title" value="<%= currentUser.title %>" placeholder="Enter Title" maxlength="50">
-                        <% } else { %>
-                            <input id="titleInput" class="form-control" type="text" name="title" aria-describedby="titleHelp" value="" placeholder="Enter Title" maxlength="50">
-                            <small id="titleHelp" class="form-text text-muted">Ex. Ninja Warrior, Guardian of Bread, Champion of the art room</small>
-                        <% } %>
-                    </div>
-                    <div class="form-group">
+    </div>
+    <div class="row">
+        <div class="col-md-8 offset-md-2 col-12">
+            <form action="/profiles/profile?_method=put" method="post">
+                <div class="form-group">
+                    <label for="firstNameInput">First</label>
+                    <input id="firstNameInput" class="form-control" type="text" name="firstName"
+                           value="<%= currentUser.firstName %>" placeholder="Enter First Name" required>
+                </div>
+                <div class="form-group">
+                    <label for="lastNameInput">Last</label>
+                    <input id="lastNameInput" class="form-control" type="text" name="lastName"
+                           value="<%= currentUser.lastName %>" placeholder="Enter Last" required>
+                </div>
+                <div class="form-group">
+                    <label for="usernameInput">Username</label>
+                    <input id="usernameInput" class="form-control" type="text" name="username"
+                           value="<%= currentUser.username %>" placeholder="(max 23) Enter Username" maxlength="23"
+                           required>
+                </div>
+                <div class="form-group">
+                    <label for="descInput">Description</label>
+                    <% if(currentUser.description){ %>
+                        <textarea id="descInput" class="form-control" name="description" maxlength="550"
+                                  placeholder="Enter Description" rows="5"><%= currentUser.description %></textarea>
+                    <% } else { %>
+                        <textarea id="descInput" class="form-control" name="description" placeholder="Enter Description"
+                                  maxlength="550" rows="5" aria-describedby="descHelp"></textarea>
+                        <small id="descHelp" class="form-text text-muted">Ex. Hobbies: swimming, tennis, searching for
+                            bigfoot.</small>
+                    <% } %>
+                </div>
+                <div class="form-group">
+                    <label for="titleInput">User Title</label>
+                    <% if(currentUser.title){ %>
+                        <input id="titleInput" class="form-control" type="text" name="title"
+                               value="<%= currentUser.title %>" placeholder="Enter Title" maxlength="50">
+                    <% } else { %>
+                        <input id="titleInput" class="form-control" type="text" name="title"
+                               aria-describedby="titleHelp" value="" placeholder="Enter Title" maxlength="50">
+                        <small id="titleHelp" class="form-text text-muted">Ex. Ninja Warrior, Guardian of Bread,
+                            Champion of the art room</small>
+                    <% } %>
+                </div>
+                <div class="form-group">
                     <% if (currentUser.permission == 'admin' || currentUser.permission == 'principal') { %>
                         <label for="status">Select Status</label>
                         <select class="form-control" id="status" name="status">
-                          <option selected value="<%= currentUser.status %>"><%=currentUser.status%></option>
+                            <option selected value="<%= currentUser.status %>"><%= currentUser.status %></option>
                             <% ['7th', '8th', '9th', '10th', '11th', '12th', 'alumnus', 'guest', 'parent', 'faculty'].forEach( status => { %>
-                              <% if (currentUser.status.toLowerCase() != status.toLowerCase()) { %>
-                                <option value="<%=status%>"><%=status%></option>
-                              <% }%>
+                                <% if (currentUser.status.toLowerCase() != status.toLowerCase()) { %>
+                                    <option value="<%= status %>"><%= status %></option>
+                                <% } %>
                             <% }) %>
                         </select>
                     <% } else { %>
-                      <label for="status">Status</label>
-                      <select class="form-control" id="status" name="status">
-                        <option selected value="<%= currentUser.status %>"><%=currentUser.status%></option>
-                      </select>
-                    <% } %>
-                    </div>
-
-                    <% if (currentUser.permission == 'admin' || currentUser.permission == 'principal') { %>
-                      <% let tagMap = new Map([["Tutor", "warning"], ["Cashier", "success"], ["Editor", "info"]]); %>
-                      <div class="form-group">
-                        <label for="tags">Select Temporary Statuses
-                          <div id="tag-group">
-                            <% currentUser.tags.forEach(tag => { %>
-                              <span class="badge badge-pill badge-<%=tagMap.get(tag)%> user-tag"><%=tag%></span>
-                            <% }) %>
-                          </div>
-                        </label>
-                        <select class="form-control" id="<%=currentUser.id%>" name="tags" onchange="updateTag(this)">
-                          <option value=""></option>
-                          <% ['Cashier', 'Tutor', 'Editor'].forEach(tag => { %>
-                            <option>
-                              <%=tag%>
-                            </option>
-                          <% }) %>
+                        <label for="status">Status</label>
+                        <select class="form-control" id="status" name="status">
+                            <option selected value="<%= currentUser.status %>"><%= currentUser.status %></option>
                         </select>
-                          <br />
-                      </div>
                     <% } %>
+                </div>
+
+                <% if (currentUser.permission == 'admin' || currentUser.permission == 'principal') { %>
+                    <% let tagMap = new Map([["Tutor", "warning"], ["Cashier", "success"], ["Editor", "info"]]); %>
                     <div class="form-group">
-                      <label for="profile-input">Profile Image URL</label><br />
-                        <!-- <input type="file" id="imageInput" accept="image/*" name="image" required> -->
-                        <div id="profile-image-update">
-                          <input id="profile-input" oninput="updateImage(this)" class="form-control" type="text" name="imageUrl" value="<%= currentUser.imageUrl %>" placeholder="Enter Image Url">
-                          <br />
-                          <img id="profile-image" src="<%=currentUser.imageUrl %>" alt="Image Does Not Exist"/>
-                        </div>
+                        <label for="tags">Select Temporary Statuses
+                            <div id="tag-group">
+                                <% currentUser.tags.forEach(tag => { %>
+                                    <span class="badge badge-pill badge-<%= tagMap.get(tag) %> user-tag"><%= tag %></span>
+                                <% }) %>
+                            </div>
+                        </label>
+                        <select class="form-control" id="<%= currentUser.id %>" name="tags" onchange="updateTag(this)">
+                            <option value=""></option>
+                            <% ['Cashier', 'Tutor', 'Editor'].forEach(tag => { %>
+                                <option>
+                                    <%= tag %>
+                                </option>
+                            <% }) %>
+                        </select>
+                        <br/>
                     </div>
-                    <div class="form-group">
-                        <label for="banner-input">Banner Image Url</label><br />
-                        <!-- <input type="file" id="bannerInput" accept="image/*" name="banner" required> -->
-                        <input id="banner-input" class="form-control" oninput="updateImage(this)" type="text" name="bannerUrl" value="<%= currentUser.bannerUrl %>" placeholder="Enter Banner Url">
-                        <br />
-                        <img id="banner-image" src="<%=currentUser.bannerUrl %>" alt="Image Does Not Exist"/>
+                <% } %>
+                <div class="form-group">
+                    <label for="profile-input">Profile Image URL</label><br/>
+                    <!-- <input type="file" id="imageInput" accept="image/*" name="image" required> -->
+                    <div id="profile-image-update">
+                        <input id="profile-input" oninput="updateImage(this)" class="form-control" type="text"
+                               name="imageUrl" value="<%= currentUser.imageUrl %>" placeholder="Enter Image Url">
+                        <br/>
+                        <img id="profile-image" src="<%= currentUser.imageUrl %>" alt="Image Does Not Exist"/>
                     </div>
-                    <button class="btn btn-lg btn-primary btn-block">Submit Changes</button>
-                </form>
-            </div>
+                </div>
+                <div class="form-group">
+                    <label for="banner-input">Banner Image Url</label><br/>
+                    <!-- <input type="file" id="bannerInput" accept="image/*" name="banner" required> -->
+                    <input id="banner-input" class="form-control" oninput="updateImage(this)" type="text"
+                           name="bannerUrl" value="<%= currentUser.bannerUrl %>" placeholder="Enter Banner Url">
+                    <br/>
+                    <img id="banner-image" src="<%= currentUser.bannerUrl %>" alt="Image Does Not Exist"/>
+                </div>
+                <button class="btn btn-lg btn-primary btn-block">Submit Changes</button>
+            </form>
         </div>
-        <br />
     </div>
+    <br/>
+</div>
 </body>
 </html>

@@ -16,26 +16,26 @@ const addImg = (() => { //Adds the image input field
 
 const createImg = (val => { //Creates an image based on value of image input
 
-  if ($(`#block-${val.id}`).find('img').length == 0) {
-    const imageDisplay = document.createElement('img');
-    imageDisplay.id = `image-${val.id}`;
+    if ($(`#block-${val.id}`).find('img').length == 0) {
+        const imageDisplay = document.createElement('img');
+        imageDisplay.id = `image-${val.id}`;
 
-    if (val.value.split(' ').join('') != '') {
-      imageDisplay.src = val.value;
-      imageDisplay.alt = "Image Does Not Exist";
-      imageDisplay.style = "width: 50%; height: 50%; margin-top: 10px; border-radius: 15px; float: left; margin-bottom: 20px;";
-      document.getElementById(`block-${val.id}`).append(imageDisplay);
-    }
-
-  } else {
-    if (val.value.split(' ').join('') != '') {
-      $(`#block-${val.id}`).find('img')[0].src = val.value;
-      $(`#${$(`#block-${val.id}`).find('img')[0].id}`).show();
+        if (val.value.split(' ').join('') != '') {
+            imageDisplay.src = val.value;
+            imageDisplay.alt = "Image Does Not Exist";
+            imageDisplay.style = "width: 50%; height: 50%; margin-top: 10px; border-radius: 15px; float: left; margin-bottom: 20px;";
+            document.getElementById(`block-${val.id}`).append(imageDisplay);
+        }
 
     } else {
-      $(`#${$(`#block-${val.id}`).find('img')[0].id}`).hide();
+        if (val.value.split(' ').join('') != '') {
+            $(`#block-${val.id}`).find('img')[0].src = val.value;
+            $(`#${$(`#block-${val.id}`).find('img')[0].id}`).show();
+
+        } else {
+            $(`#${$(`#block-${val.id}`).find('img')[0].id}`).hide();
+        }
     }
-  }
 });
 
 const deleteImg = (btn => {

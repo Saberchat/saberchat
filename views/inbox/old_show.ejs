@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html>
-  <head>
+<head>
     <title>Saberchat</title>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -23,130 +23,139 @@
     <!-- I'm using my fontawesome kit -->
     <script src="https://kit.fontawesome.com/dccc745c41.js" crossorigin="anonymous"></script>
 
-    </head>
-    <body>
-      <!-- include the navbar via ejs -->
-      <%- include('../partials/navbar') %>
-      <!-- include the backdrop for nav -->
-      <%- include('../partials/header') %>
-      <div class="container">
-        <div class="row">
-          <div class="col-12">
+</head>
+<body>
+<!-- include the navbar via ejs -->
+<%- include('../partials/navbar') %>
+<!-- include the backdrop for nav -->
+<%- include('../partials/header') %>
+<div class="container">
+    <div class="row">
+        <div class="col-12">
 
             <div class="inbox-container">
-              <!-- navigation between tabs -->
-              <nav class="inbox-nav">
-                <div class="btn-group" role="group" aria-label="inbox navigation">
-                  <button
-                    class="nav-tab active"
-                    id="view-msg"
-                    disabled
-                    >Messages</button>
+                <!-- navigation between tabs -->
+                <nav class="inbox-nav">
+                    <div class="btn-group" role="group" aria-label="inbox navigation">
+                        <button
+                                class="nav-tab active"
+                                id="view-msg"
+                                disabled
+                        >Messages
+                        </button>
 
-                  <!-- <button
-                    class="nav-tab"
-                    id="view-req"
-                    onclick="setRequests()"
-                    >Requests</button> -->
-                </div>
-                <!-- <button id="refresh-btn" onclick="window.location.reload();">Refresh</button> -->
-              </nav>
+                        <!-- <button
+                          class="nav-tab"
+                          id="view-req"
+                          onclick="setRequests()"
+                          >Requests</button> -->
+                    </div>
+                    <!-- <button id="refresh-btn" onclick="window.location.reload();">Refresh</button> -->
+                </nav>
 
                 <!-- actions -->
                 <div class="action-bar">
-                  <!-- message actions -->
-                  <div class="message-actions display">
-                    <a href="/inbox/" class="action-btn">Inbox</a>
-                    <a href="/inbox/new" class="action-btn">Send New</a>
-                    <a href="/inbox/sent" class="action-btn">View Sent</a>
-                  </div>
-                  <!-- request actions -->
-                  <div class="request-actions">
-                    <button id="current-req" class="action-btn" onclick="seeCurrentReq()" disabled>Current</button>
-                    <button id="past-req" class="action-btn" onclick="seePastReq()">History</button>
-                  </div>
+                    <!-- message actions -->
+                    <div class="message-actions display">
+                        <a href="/inbox/" class="action-btn">Inbox</a>
+                        <a href="/inbox/new" class="action-btn">Send New</a>
+                        <a href="/inbox/sent" class="action-btn">View Sent</a>
+                    </div>
+                    <!-- request actions -->
+                    <div class="request-actions">
+                        <button id="current-req" class="action-btn" onclick="seeCurrentReq()" disabled>Current</button>
+                        <button id="past-req" class="action-btn" onclick="seePastReq()">History</button>
+                    </div>
                 </div>
 
                 <div class="main-section">
-                  <h3><%=notif.subject%></h3>
+                    <h3><%= notif.subject %></h3>
 
-                  <p id="notif-date"><%=notif.date.split(', ')[1]%> | <%=notif.date.split(', ')[0]%></p>
+                    <p id="notif-date"><%= notif.date.split(', ')[1] %> | <%= notif.date.split(', ')[0] %></p>
 
-                  <% if (notif.sender == null) { %>
-                    <span class="sender-receiver-info">From</span>: <span>Anonymous</span><br />
+                    <% if (notif.sender == null) { %>
+                        <span class="sender-receiver-info">From</span>: <span>Anonymous</span><br/>
 
-                  <% } else if (currentUser._id.toString() != notif.sender._id.toString()) { %>
-                    <span class="sender-receiver-info">From</span>: <a id="message-from" href="/profiles/<%=notif.sender._id%>"><%=notif.sender.username%></a><br />
-
-                  <% } else { %>
-                    <span class="sender-receiver-info">From</span>: <a id="message-from" href="/profiles/<%=currentUser._id%>">me</a><br />
-                  <% } %>
-
-                  <!-- To everyone  -->
-
-                  <% if (notif.toEveryone == true && notif.sender != null) { %>
-                    <span class="sender-receiver-info">To:</span><span> everyone</span>
-
-                  <!-- To a group including the user  -->
-
-                  <% } else if ((notif.sender != null) && (currentUser._id.toString() != notif.sender._id.toString())) { %>
-                    <span class="sender-receiver-info">To:</span>
-
-                    <% let tempRecipients = recipient_profiles.slice(0, recipient_profiles.length - 1) %>
-
-                    <% tempRecipients.forEach(recipient => { %>
-
-                      <% if (recipient._id.toString() == currentUser._id.toString()) { %>
-                        <a class="recipient" href="/profiles/<%=currentUser._id%>">me, </a>
-
-                      <% } else { %>
-                          <a class="recipient" href="/profiles/<%=recipient._id%>"><%=recipient.username%>, </a>
-                      <% } %>
-
-                    <% }) %>
-
-                    <% if (recipient_profiles[recipient_profiles.length - 1]._id.toString() == currentUser._id.toString()) { %>
-                      <a class="recipient" href="/profiles/<%=currentUser._id%>">me</a>
+                    <% } else if (currentUser._id.toString() != notif.sender._id.toString()) { %>
+                        <span class="sender-receiver-info">From</span>: <a id="message-from"
+                                                                           href="/profiles/<%= notif.sender._id %>"><%= notif.sender.username %></a>
+                        <br/>
 
                     <% } else { %>
-                        <a class="recipient" href="/profiles/<%=recipient_profiles[recipient_profiles.length - 1]._id%>"><%=recipient_profiles[recipient_profiles.length - 1].username%></a>
+                        <span class="sender-receiver-info">From</span>: <a id="message-from"
+                                                                           href="/profiles/<%= currentUser._id %>">me</a>
+                        <br/>
                     <% } %>
 
-                  <!-- To a group not involving the user (a notification the user sent)  -->
+                    <!-- To everyone  -->
 
-                  <% } else { %>
+                    <% if (notif.toEveryone == true && notif.sender != null) { %>
+                        <span class="sender-receiver-info">To:</span><span> everyone</span>
 
-                    <span class="sender-receiver-info">To:</span>
-                    <% let tempRecipients = recipient_profiles.slice(0, recipient_profiles.length - 1) %>
+                        <!-- To a group including the user  -->
 
-                    <% tempRecipients.forEach(recipient => { %>
+                    <% } else if ((notif.sender != null) && (currentUser._id.toString() != notif.sender._id.toString())) { %>
+                        <span class="sender-receiver-info">To:</span>
 
-                      <% if (recipient._id.toString() == currentUser._id.toString()) { %>
-                        <a class="recipient" href="/profiles/<%=currentUser._id%>">me, </a>
+                        <% let tempRecipients = recipient_profiles.slice(0, recipient_profiles.length - 1) %>
 
-                      <% } else { %>
-                          <a class="recipient" href="/profiles/<%=recipient._id%>"><%=recipient.username%>, </a>
-                      <% } %>
+                        <% tempRecipients.forEach(recipient => { %>
 
+                            <% if (recipient._id.toString() == currentUser._id.toString()) { %>
+                                <a class="recipient" href="/profiles/<%= currentUser._id %>">me, </a>
+
+                            <% } else { %>
+                                <a class="recipient" href="/profiles/<%= recipient._id %>"><%= recipient.username %>
+                                    , </a>
+                            <% } %>
+
+                        <% }) %>
+
+                        <% if (recipient_profiles[recipient_profiles.length - 1]._id.toString() == currentUser._id.toString()) { %>
+                            <a class="recipient" href="/profiles/<%= currentUser._id %>">me</a>
+
+                        <% } else { %>
+                            <a class="recipient"
+                               href="/profiles/<%= recipient_profiles[recipient_profiles.length - 1]._id %>"><%= recipient_profiles[recipient_profiles.length - 1].username %></a>
+                        <% } %>
+
+                        <!-- To a group not involving the user (a notification the user sent)  -->
+
+                    <% } else { %>
+
+                        <span class="sender-receiver-info">To:</span>
+                        <% let tempRecipients = recipient_profiles.slice(0, recipient_profiles.length - 1) %>
+
+                        <% tempRecipients.forEach(recipient => { %>
+
+                            <% if (recipient._id.toString() == currentUser._id.toString()) { %>
+                                <a class="recipient" href="/profiles/<%= currentUser._id %>">me, </a>
+
+                            <% } else { %>
+                                <a class="recipient" href="/profiles/<%= recipient._id %>"><%= recipient.username %>
+                                    , </a>
+                            <% } %>
+
+                        <% }) %>
+
+                        <% if (recipient_profiles[recipient_profiles.length - 1]._id.toString() == currentUser._id.toString()) { %>
+                            <a class="recipient" href="/profiles/<%= currentUser._id %>">me</a>
+
+                        <% } else { %>
+
+                            <a class="recipient"
+                               href="/profiles/<%= recipient_profiles[recipient_profiles.length - 1]._id %>"><%= recipient_profiles[recipient_profiles.length - 1].username %></a>
+
+                        <% } %>
+                    <% } %>
+
+                    <p id="notif-text"><%= notif.text %></p>
+                    <% notif.images.forEach(image => { %>
+                        <img class="notif-image" src="<%= image %>"/>
                     <% }) %>
-
-                    <% if (recipient_profiles[recipient_profiles.length - 1]._id.toString() == currentUser._id.toString()) { %>
-                        <a class="recipient" href="/profiles/<%=currentUser._id%>">me</a>
-
-                    <% } else {  %>
-
-                        <a class="recipient" href="/profiles/<%=recipient_profiles[recipient_profiles.length - 1]._id%>"><%=recipient_profiles[recipient_profiles.length - 1].username%></a>
-
-                    <% } %>
-                  <% } %>
-
-                  <p id="notif-text"><%=notif.text%></p>
-                  <%notif.images.forEach(image => { %>
-                    <img class="notif-image" src="<%=image%>"/>
-                  <%})%>
 
                 </div>
             </div>
         </div>
-  </body>
+</body>
 </html>

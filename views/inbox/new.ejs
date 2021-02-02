@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html>
-  <head>
+<head>
     <title>Saberchat</title>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -20,103 +20,115 @@
 
     <!-- I'm using my fontawesome kit -->
     <script src="https://kit.fontawesome.com/dccc745c41.js" crossorigin="anonymous"></script>
-  </head>
-  <body>
-    <!-- include the navbar via ejs -->
-    <%- include('../partials/navbar') %>
-    <!-- include the backdrop for nav -->
-    <%- include('../partials/header') %>
-    <div class="container">
-      <div class="row">
+</head>
+<body>
+<!-- include the navbar via ejs -->
+<%- include('../partials/navbar') %>
+<!-- include the backdrop for nav -->
+<%- include('../partials/header') %>
+<div class="container">
+    <div class="row">
         <div class="col-md-8 offset-md-2 col-12">
-          <div class="form-container">
-            <h1>New Message</h1>
-            <div id="back-button">
-              <a href="/inbox" class="btn btn-primary back-btn"><i class="fas fa-arrow-left"></i> Back</a>
-              <br /><br />
+            <div class="form-container">
+                <h1>New Message</h1>
+                <div id="back-button">
+                    <a href="/inbox" class="btn btn-primary back-btn"><i class="fas fa-arrow-left"></i> Back</a>
+                    <br/><br/>
+                </div>
+                <form action="/inbox/messages" method="post" onsubmit="return process();" id="message-form">
+                    <div id="to-block">
+                        <div id="default-msg">
+                            <div class="form-group">
+                                <label for="user-select" class="label-custom">Recipients</label>
+                                <select id="user-select" class="form-control" onchange="addRecipient('user')" required>
+                                    <option class="recipient-group" value="" selected disabled>Select User/Group
+                                    </option>
+                                    <option class="recipient-group" value="7th">7th Graders</option>
+                                    <option class="recipient-group" value="8th">8th Graders</option>
+                                    <option class="recipient-group" value="9th">9th Graders</option>
+                                    <option class="recipient-group" value="10th">EC Sophomores</option>
+                                    <option class="recipient-group" value="11th">EC Juniors</option>
+                                    <option class="recipient-group" value="12th">EC Seniors</option>
+                                    <option class="recipient-group" value="faculty">Faculty</option>
+                                    <option class="recipient-group" value="parent">Parents</option>
+                                    <option class="recipient-group" value="alumnus">Alumni</option>
+                                    <option class="recipient-group" value="guest">Guests</option>
+                                    <% users.forEach(user => { %>
+                                        <% if(!user._id.equals(currentUser._id)) { %>
+                                            <option class="<%= user.status %>"
+                                                    value="<%= user._id %>"><%= user.username %>
+                                                (<%= user.firstName %> <%= user.lastName %>)
+                                            </option>
+                                        <% } %>
+                                    <% }) %>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div id="anony-msg">
+                            <div class="form-group">
+                                <label for="faculty-select" class="label-custom">Recipients</label>
+                                <select id="faculty-select" class="form-control" onchange="addRecipient('faculty')">
+                                    <option value="" selected disabled>Select Faculty</option>
+                                    <% users.forEach(user => { %>
+                                        <% if(!user._id.equals(currentUser._id) && user.status == 'faculty') { %>
+                                            <option value="<%= user._id %>"><%= user.username %>
+                                                (<%= user.firstName %> <%= user.lastName %>)
+                                            </option>
+                                        <% } %>
+                                    <% }) %>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div id="user-display"></div>
+
+                        <div class="form-check" id="anonymous-control">
+                            <input onchange="setAnonymous(this)" type="checkbox" class="form-check-input"
+                                   name="anonymous" value="true" id="anonymous-check">
+                            <label class="form-check-label" for="anonymous-check">Send Anonymously</label>
+                        </div>
+
+                        <div class="form-check">
+                            <input onchange="updateTo(this)" type="checkbox" class="form-check-input" name="all"
+                                   value="true" id="all-check">
+                            <label class="form-check-label" for="all-check">Send to everyone</label>
+                        </div>
+
+                        <div class="form-check">
+                            <input type="checkbox" class="form-check-input" name="noreply" value="true" id="noreply">
+                            <label class="form-check-label" for="noreply">Disable Replies</label>
+                        </div>
+
+                    </div>
+
+                    <div class="form-group">
+                        <label for="subject">Subject</label>
+                        <input id="subject" placeholder="A short title..." class="form-control" type="text"
+                               name="subject" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="message">Message</label>
+                        <textarea name="message" id="message" placeholder="Message text..." rows="5"
+                                  class="form-control" required></textarea>
+                    </div>
+
+                    <div id="image-header">
+                        <h4>Images</h4>
+                        <button type="button" onclick="addImg()" class="btn btn-primary"><i class="fas fa-plus"></i>
+                            Image
+                        </button>
+                    </div>
+
+                    <div id="image-block">
+                    </div>
+                    <button type="submit" class="btn btn-primary btn-block">Send</button>
+                </form>
             </div>
-            <form action="/inbox/messages" method="post" onsubmit="return process();" id="message-form">
-              <div id="to-block">
-                <div id="default-msg">
-                  <div class="form-group">
-                    <label for="user-select" class="label-custom">Recipients</label>
-                    <select id="user-select" class="form-control" onchange="addRecipient('user')" required>
-                      <option class="recipient-group" value="" selected disabled>Select User/Group</option>
-                      <option class="recipient-group" value="7th">7th Graders</option>
-                      <option class="recipient-group" value="8th">8th Graders</option>
-                      <option class="recipient-group" value="9th">9th Graders</option>
-                      <option class="recipient-group" value="10th">EC Sophomores</option>
-                      <option class="recipient-group" value="11th">EC Juniors</option>
-                      <option class="recipient-group" value="12th">EC Seniors</option>
-                      <option class="recipient-group" value="faculty">Faculty</option>
-                      <option class="recipient-group" value="parent">Parents</option>
-                      <option class="recipient-group" value="alumnus">Alumni</option>
-                      <option class="recipient-group" value="guest">Guests</option>
-                      <% users.forEach(user => { %>
-                        <% if(!user._id.equals(currentUser._id)) { %>
-                          <option class="<%=user.status%>" value="<%= user._id %>"><%= user.username %> (<%= user.firstName%> <%= user.lastName%>)</option>
-                        <% } %>
-                      <% }) %>
-                    </select>
-                  </div>
-                </div>
-
-                <div id="anony-msg">
-                  <div class="form-group">
-                    <label for="faculty-select" class="label-custom">Recipients</label>
-                    <select id="faculty-select" class="form-control" onchange="addRecipient('faculty')">
-                      <option value="" selected disabled>Select Faculty</option>
-                      <% users.forEach(user => { %>
-                        <% if(!user._id.equals(currentUser._id) && user.status == 'faculty') { %>
-                          <option value="<%= user._id %>"><%= user.username %> (<%= user.firstName%> <%= user.lastName%>)</option>
-                        <% } %>
-                      <% }) %>
-                    </select>
-                  </div>
-                </div>
-
-                <div id="user-display"></div>
-
-                <div class="form-check" id="anonymous-control">
-                  <input onchange="setAnonymous(this)" type="checkbox" class="form-check-input" name="anonymous" value="true" id="anonymous-check">
-                  <label class="form-check-label" for="anonymous-check">Send Anonymously</label>
-                </div>
-
-                <div class="form-check">
-                  <input onchange="updateTo(this)" type="checkbox" class="form-check-input" name="all" value="true" id="all-check">
-                  <label class="form-check-label" for="all-check">Send to everyone</label>
-                </div>
-
-                <div class="form-check">
-                  <input type="checkbox" class="form-check-input" name="noreply" value="true" id="noreply">
-                  <label class="form-check-label" for="noreply">Disable Replies</label>
-                </div>
-
-              </div>
-
-              <div class="form-group">
-                <label for="subject">Subject</label>
-                <input id="subject" placeholder="A short title..." class="form-control" type="text" name="subject" required>
-              </div>
-              <div class="form-group">
-                <label for="message">Message</label>
-                <textarea name="message" id="message" placeholder="Message text..." rows="5" class="form-control" required></textarea>
-              </div>
-
-              <div id="image-header">
-                <h4>Images</h4>
-                <button type="button" onclick="addImg()" class="btn btn-primary"><i class="fas fa-plus"></i> Image</button>
-              </div>
-
-              <div id="image-block">
-              </div>
-              <button type="submit" class="btn btn-primary btn-block">Send</button>
-            </form>
-          </div>
         </div>
-      </div>
     </div>
-    <script src="/javascript/inbox/form.js"></script>
-    <script src="/javascript/inbox/new.js"></script>
-  </body>
+</div>
+<script src="/javascript/inbox/form.js"></script>
+<script src="/javascript/inbox/new.js"></script>
+</body>
 </html>

@@ -7,61 +7,61 @@ let otherFillers = ['aboard', 'about', 'above', 'across', 'after', 'against', 'a
 
 //Push all nonincluded prepositions, articles, pronouns, miscellaneous words
 for (let word of otherFillers) {
-  fillers.push(word);
+    fillers.push(word);
 }
 
 function filter(text, compareTo) {
-  let textKeywords = new Map();
-  let compareKeywords = new Map();
-  const textSplitter = new RegExp(/[\"\s\'\r\n]/, 'g');
-  const delimeter = new RegExp(/[^a-zA-z0-9]/, 'g');
+    let textKeywords = new Map();
+    let compareKeywords = new Map();
+    const textSplitter = new RegExp(/[\"\s\'\r\n]/, 'g');
+    const delimeter = new RegExp(/[^a-zA-z0-9]/, 'g');
 
-  let processedWord;
-  for (let word of text.split(textSplitter)) {
-    processedWord = word.split(delimeter).join('').toLowerCase();
-    if (processedWord.length > 3 && !fillers.includes(processedWord)) {
-      if (textKeywords.has(processedWord)) {
-        textKeywords.set(processedWord, textKeywords.get(processedWord) + 1);
-      } else {
-        textKeywords.set(processedWord, 1);
-      }
+    let processedWord;
+    for (let word of text.split(textSplitter)) {
+        processedWord = word.split(delimeter).join('').toLowerCase();
+        if (processedWord.length > 3 && !fillers.includes(processedWord)) {
+            if (textKeywords.has(processedWord)) {
+                textKeywords.set(processedWord, textKeywords.get(processedWord) + 1);
+            } else {
+                textKeywords.set(processedWord, 1);
+            }
+        }
     }
-  }
 
-  for (let word of compareTo.split(textSplitter)) {
-    processedWord = word.split(delimeter).join('').toLowerCase();
-    if (processedWord.length > 3 && !fillers.includes(processedWord)) {
-      if (compareKeywords.has(processedWord)) {
-        compareKeywords.set(processedWord, compareKeywords.get(processedWord) + 1);
-      } else {
-        compareKeywords.set(processedWord, 1);
-      }
+    for (let word of compareTo.split(textSplitter)) {
+        processedWord = word.split(delimeter).join('').toLowerCase();
+        if (processedWord.length > 3 && !fillers.includes(processedWord)) {
+            if (compareKeywords.has(processedWord)) {
+                compareKeywords.set(processedWord, compareKeywords.get(processedWord) + 1);
+            } else {
+                compareKeywords.set(processedWord, 1);
+            }
+        }
     }
-  }
 
-  let meanValue = 0;
-  for (let value of textKeywords) {
-    meanValue += value[1]/textKeywords.size;
-  }
-
-  for (let value of compareKeywords) {
-    if (textKeywords.has(value[0])) {
-      textKeywords.delete(value[0]);
+    let meanValue = 0;
+    for (let value of textKeywords) {
+        meanValue += value[1] / textKeywords.size;
     }
-  }
 
-  for (let value of textKeywords) {
-    if (value[1] < meanValue) {
-      textKeywords.delete(value[0]);
+    for (let value of compareKeywords) {
+        if (textKeywords.has(value[0])) {
+            textKeywords.delete(value[0]);
+        }
     }
-  }
 
-  meanValue = 0;
-  for (let value of compareKeywords) {
-    meanValue += value[1]/compareKeywords.size;
-  }
+    for (let value of textKeywords) {
+        if (value[1] < meanValue) {
+            textKeywords.delete(value[0]);
+        }
+    }
 
-  return textKeywords;
+    meanValue = 0;
+    for (let value of compareKeywords) {
+        meanValue += value[1] / compareKeywords.size;
+    }
+
+    return textKeywords;
 }
 
 module.exports = filter;

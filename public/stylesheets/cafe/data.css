@@ -1,17 +1,17 @@
 #data {
-  text-align: center;
+    text-align: center;
 }
 
 h1 {
-  text-align: center;
-  width: 100%;
+    text-align: center;
+    width: 100%;
 }
 
 .item-name {
-  font-weight: bold;
-  font-style: italic;
+    font-weight: bold;
+    font-style: italic;
 }
 
 .time {
-  font-weight: bold;
+    font-weight: bold;
 }

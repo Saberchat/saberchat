@@ -1,84 +1,84 @@
 #heading, h1, h2 {
-  text-align: center;
+    text-align: center;
 }
 
 h1 {
-  width: 100%;
+    width: 100%;
 }
 
 #category-name {
-  display: inline-block;
+    display: inline-block;
 }
 
 .field {
-  width: 100%;
+    width: 100%;
 }
 
 #type-input-label {
-  padding-top: 20px;
+    padding-top: 20px;
 }
 
 #image-block {
-  text-align: center;
+    text-align: center;
 }
 
 #item-image {
-  width: 30%;
-  border-radius: 15px;
+    width: 30%;
+    border-radius: 15px;
 }
 
 #balance-heading {
-  font-size: 120%;
+    font-size: 120%;
 }
 
 .category-header {
-  margin-top: 40px;
+    margin-top: 40px;
 }
 
 .style-div {
-  margin-left: 2%;
+    margin-left: 2%;
 }
 
 .form-check-label {
-  margin-left: 1%;
-  font-size: 15px;
+    margin-left: 1%;
+    font-size: 15px;
 }
 
 .popular {
-  font-weight: bold;
-  color: green;
-  margin-left: 5px;
+    font-weight: bold;
+    color: green;
+    margin-left: 5px;
 }
 
 .upvotes {
-  margin-left: 10px;
-  display: inline;
+    margin-left: 10px;
+    display: inline;
 }
 
 #order-confirm, #extra-instructions, #balance-box, #total-cost, #paying-style {
-  margin: 0px;
+    margin: 0px;
 }
 
 #extra-instructions {
-  color: blue;
-  font-weight: bold;
+    color: blue;
+    font-weight: bold;
 }
 
 #balance-heading {
-  font-weight: bold;
+    font-weight: bold;
 }
 
 #balance-box {
-  color: purple;
-  font-weight: bold;
+    color: purple;
+    font-weight: bold;
 }
 
 #total-cost {
-  color: green;
-  font-weight: bold;
+    color: green;
+    font-weight: bold;
 }
 
 #paying-style {
-  color: red;
-  font-weight: bold;
+    color: red;
+    font-weight: bold;
 }

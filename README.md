@@ -1,7 +1,6 @@
 # Saberchat
 
-demo on heroku
-Link: https://alsion-saberchat.herokuapp.com/
+demo on heroku Link: https://alsion-saberchat.herokuapp.com/
 
 ToC
 -----------------------------------------
@@ -22,6 +21,7 @@ Procfile: Tells Heroku what command to call on app start
 
 Npm Libraries
 ===================================
+
 - body-parser (parsing form bodies)
 - bad-words (bad words filter)
 - dateformat (date formating library)

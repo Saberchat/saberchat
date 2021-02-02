@@ -1,118 +1,129 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
+<head>
 
     <title>Saberchat</title>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css" integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css"
+          integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk" crossorigin="anonymous">
     <link rel="stylesheet" href="/stylesheets/main.css">
     <link rel="stylesheet" href="/stylesheets/components/navbar.css">
     <link rel="stylesheet" href="/stylesheets/components/header.css">
     <link rel="stylesheet" href="/stylesheets/chat/edit.css">
 
-    <script src="https://code.jquery.com/jquery-3.5.1.min.js" integrity="sha256-9/aliU8dGd2tb6OSsuzixeV4y/faTqgFtohetphbbj0=" crossorigin="anonymous"></script>
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"
+            integrity="sha256-9/aliU8dGd2tb6OSsuzixeV4y/faTqgFtohetphbbj0=" crossorigin="anonymous"></script>
     <script src="https://unpkg.com/@popperjs/core@2" crossorigin="anonymous"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js" integrity="sha384-OgVRvuATP1z7JjHLkuOU7Xw704+h835Lr+6QL9UvYjZE3Ipu6Tp75j7Bh/kR0JKI" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js"
+            integrity="sha384-OgVRvuATP1z7JjHLkuOU7Xw704+h835Lr+6QL9UvYjZE3Ipu6Tp75j7Bh/kR0JKI"
+            crossorigin="anonymous"></script>
 
     <script src="https://kit.fontawesome.com/dccc745c41.js" crossorigin="anonymous"></script>
     <script src="/javascript/chat/request.js"></script>
 
-  </head>
-  <body>
-    <!-- include the navbar via ejs -->
-    <%- include('../partials/navbar') %>
-    <!-- include the backdrop for nav -->
-    <%- include('../partials/header') %>
+</head>
+<body>
+<!-- include the navbar via ejs -->
+<%- include('../partials/navbar') %>
+<!-- include the backdrop for nav -->
+<%- include('../partials/header') %>
 
-    <div class="container mt-5">
-      <div class="row">
+<div class="container mt-5">
+    <div class="row">
         <div class="col-12">
-          <div class="jumbotron text-center">
-            <h1><i class="fas fa-sign-in-alt"></i> Select a room to join</h1>
-            <p>Connect with other members of the Alsion community.</p>
-          </div>
-        </div>
-      </div>
-      <div class="row">
-        <div class="col-12">
-          <li class="list-group-item list-group-item-info">
-            <div class="d-flex w-100 justify-content-between">
-              <h2 class="mb-1"><i class="fas fa-user-friends"></i> Your rooms</h2>
-              <a href="chat/new" id="create-room-button" class="btn btn-info"><i class="fas fa-plus-circle"></i> Create Room</a>
+            <div class="jumbotron text-center">
+                <h1><i class="fas fa-sign-in-alt"></i> Select a room to join</h1>
+                <p>Connect with other members of the Alsion community.</p>
             </div>
-            <p class="mb-1">Rooms you are a member of.</p>
-          </li>
-          <% rooms.forEach(room => { %>
-            <% if (room.type == 'public' || room.members.includes(currentUser._id)) { %>
-              <a href="chat/<%= room._id %>" class="list-group-item list-group-item-action">
-                <% if (commentObject[room._id.toString()]) { %>
-                  <img src="<%=commentObject[room._id.toString()].author.imageUrl%>" alt="user" class="user-image">
-                <% } else if (room.creator.id) { %>
-                  <img src="<%=room.creator.id.imageUrl%>" alt="user" class="user-image">
-                <% } %>
-
-                <% if (currentUser.newRoomCount.includes(room._id)) { %>
-                  <span class="badge badge-danger float-right">New!</span>
-                <% } else {%>
-                  <span class="float-right">
-                    <% if (commentObject[room._id.toString()]) { %>
-                      <%=commentObject[room._id.toString()].date%>
-                    <% } else { %>
-                      <%=room.date%>
-                    <% } %>
-                  </span>
-                <% } %>
-
-                <div class="comment-text">
-                  <span class="room-name"><%= room.name %></span>
-                  <p class="latest-message">
-                    <% if (commentObject[room._id.toString()]) { %>
-                      <%=commentObject[room._id.toString()].text%>
-                    <% } else { %>
-                      <span class="room-created">Room Was Created</span>
-                    <% } %>
-                  </p>
-                </div>
-              </a>
-            <% } %>
-          <% }) %>
         </div>
-      </div>
-
-      <br />
-      <div class="row mb-5">
+    </div>
+    <div class="row">
         <div class="col-12">
-          <ul class="list-group">
             <li class="list-group-item list-group-item-info">
-              <div class="d-flex w-100 justify-content-between">
-                <h2 class="mb-1"><i class="fas fa-door-open"></i> Other rooms to join</h2>
-              </div>
-              <p class="mb-1">Request access to join new rooms.</p>
+                <div class="d-flex w-100 justify-content-between">
+                    <h2 class="mb-1"><i class="fas fa-user-friends"></i> Your rooms</h2>
+                    <a href="chat/new" id="create-room-button" class="btn btn-info"><i class="fas fa-plus-circle"></i>
+                        Create Room</a>
+                </div>
+                <p class="mb-1">Rooms you are a member of.</p>
             </li>
             <% rooms.forEach(room => { %>
-              <% if (room.type == 'private' && !(room.members.includes(currentUser._id)) && room.mutable) { %>
-                <li class="list-group-item list-group-item-action list-group-item-light">
-                  <%= room.name %>
-                  <% let roomRequested = false;%>
-                  <% for (let request of requests) { %>
-                    <% if (request.room.equals(room._id)) { %>
-                      <% roomRequested = true;%>
-                      <% break; %>
-                    <% } %>
-                  <% } %>
+                <% if (room.type == 'public' || room.members.includes(currentUser._id)) { %>
+                    <a href="chat/<%= room._id %>" class="list-group-item list-group-item-action">
+                        <% if (commentObject[room._id.toString()]) { %>
+                            <img src="<%= commentObject[room._id.toString()].author.imageUrl %>" alt="user"
+                                 class="user-image">
+                        <% } else if (room.creator.id) { %>
+                            <img src="<%= room.creator.id.imageUrl %>" alt="user" class="user-image">
+                        <% } %>
 
-                  <% if (roomRequested) { %>
-                    <button class="btn btn-danger btn-sm float-right" id="cancel-<%=room._id%>" onclick="cancelRequest(this)"><i class="fas fa-window-close"></i> Cancel Request</button></li>
-                  <% } else { %>
-                    <button class="btn btn-success btn-sm float-right" id="request-<%=room._id%>" onclick="request(this)"><i class="fas fa-hand-paper"></i> Request Access</button></li>
-                  <% } %>
-              <% } %>
+                        <% if (currentUser.newRoomCount.includes(room._id)) { %>
+                            <span class="badge badge-danger float-right">New!</span>
+                        <% } else { %>
+                            <span class="float-right">
+                                <% if (commentObject[room._id.toString()]) { %>
+                                    <%= commentObject[room._id.toString()].date %>
+                                <% } else { %>
+                                    <%= room.date %>
+                                <% } %>
+                            </span>
+                        <% } %>
+
+                        <div class="comment-text">
+                            <span class="room-name"><%= room.name %></span>
+                            <p class="latest-message">
+                                <% if (commentObject[room._id.toString()]) { %>
+                                    <%= commentObject[room._id.toString()].text %>
+                                <% } else { %>
+                                    <span class="room-created">Room Was Created</span>
+                                <% } %>
+                            </p>
+                        </div>
+                    </a>
+                <% } %>
             <% }) %>
-          </ul>
         </div>
-      </div>
     </div>
-  </body>
+
+    <br/>
+    <div class="row mb-5">
+        <div class="col-12">
+            <ul class="list-group">
+                <li class="list-group-item list-group-item-info">
+                    <div class="d-flex w-100 justify-content-between">
+                        <h2 class="mb-1"><i class="fas fa-door-open"></i> Other rooms to join</h2>
+                    </div>
+                    <p class="mb-1">Request access to join new rooms.</p>
+                </li>
+                <% rooms.forEach(room => { %>
+                    <% if (room.type == 'private' && !(room.members.includes(currentUser._id)) && room.mutable) { %>
+                        <li class="list-group-item list-group-item-action list-group-item-light">
+                            <%= room.name %>
+                            <% let roomRequested = false; %>
+                            <% for (let request of requests) { %>
+                                <% if (request.room.equals(room._id)) { %>
+                                    <% roomRequested = true; %>
+                                    <% break; %>
+                                <% } %>
+                            <% } %>
+
+                            <% if (roomRequested) { %>
+                                <button class="btn btn-danger btn-sm float-right" id="cancel-<%= room._id %>"
+                                        onclick="cancelRequest(this)"><i class="fas fa-window-close"></i> Cancel Request
+                                </button>
+                        </li>
+                        <% } else { %>
+                            <button class="btn btn-success btn-sm float-right" id="request-<%= room._id %>"
+                                    onclick="request(this)"><i class="fas fa-hand-paper"></i> Request Access
+                            </button></li>
+                        <% } %>
+                    <% } %>
+                <% }) %>
+            </ul>
+        </div>
+    </div>
+</div>
+</body>
 </html>

@@ -1,5 +1,5 @@
-if(process.env.NODE_ENV !== "production") {
-  require('dotenv').config();
+if (process.env.NODE_ENV !== "production") {
+    require('dotenv').config();
 }
 
 const parseBuffer = require('./dataUri');
@@ -21,13 +21,17 @@ const cloudUpload = async (file) => {
 
     // upload to cloudinary
     const options = {
-      folder: 'SaberChat'
+        folder: 'SaberChat'
     };
     let error;
     let cResult;
     await cloudUploader(imgFile, options)
-      .then(result => { cResult = result; })
-      .catch(err => { error = err; });
+        .then(result => {
+            cResult = result;
+        })
+        .catch(err => {
+            error = err;
+        });
 
     return [error, cResult];
 };
@@ -37,10 +41,14 @@ const cloudDelete = async (filename) => {
     let error;
     // delete image
     await cloudDestroyer(filename)
-    .catch(err=> {error = err;})
-    .then(result=> {cResult = result;});
+        .catch(err => {
+            error = err;
+        })
+        .then(result => {
+            cResult = result;
+        });
 
-    return [error, cResult];  
+    return [error, cResult];
 };
 
 module.exports = {
