@@ -290,10 +290,18 @@ router.post('/:id/ready', middleware.isLoggedIn, middleware.isMod, middleware.is
     cafes[0].revenue += order.charge;
     await cafes[0].save();
 
-    const notif = await Notification.create({subject: "Cafe Order Ready", sender: req.user, noReply: true, recipients: [order.customer], read: [], toEveryone: false, images: []}); //Create a notification to alert the user
-      if (!notif) {
+    const notif = await Notification.create({
+        subject: "Cafe Order Ready",
+        sender: req.user,
+        noReply: true,
+        recipients: [order.customer],
+        read: [],
+        images: []
+    });
+
+    if (!notif) {
         return res.json({error: 'Unable to send notification'});
-      }
+    }
 
       notif.date = dateFormat(notif.created_at, "h:MM TT | mmm d");
 
@@ -344,7 +352,14 @@ router.post('/:id/reject', middleware.isLoggedIn, middleware.isMod, middleware.i
       await i.item.save();
     }
 
-    const notif = await Notification.create({subject: "Cafe Order Rejected", sender: req.user, noReply: true, recipients: [order.customer], read: [], toEveryone: false, images: []}); //Create a notification to alert the user
+    const notif = await Notification.create({
+        subject: "Cafe Order Rejected",
+        sender: req.user,
+        noReply: true,
+        recipients: [order.customer],
+        read: [],
+        images: []
+    });
     if (!notif) {
       return res.json({error: 'Could not send notification'});
     }
@@ -460,7 +475,12 @@ router.post('/item', middleware.isLoggedIn, middleware.isMod, (req, res) => { //
       req.flash('error', "Item already exists");return res.redirect('back');
     }
 
-    const item = await Item.create({name: req.body.name, availableItems: parseInt(req.body.available), description: req.body.description, imgUrl: req.body.image}); //Create the item
+    const item = await Item.create({
+        name: req.body.name,
+        availableItems: parseInt(req.body.available),
+        description: req.body.description,
+        imgUrl: req.body.image
+    });
     if (!item) {
       req.flash('error', "Unable to create item");return res.redirect('back');
     }
