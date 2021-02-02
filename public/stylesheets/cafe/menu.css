@@ -24,48 +24,48 @@ input#search-input {
     border-bottom: 3px solid rgb(255, 177, 33);
 }
 
-.profile-image{
+.profile-image {
     display: inline-block;
-    border-radius:50%;
-    width:40px;
-    height:40px;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
     object-fit: cover;
 }
 
 strong {
-  font-weight: bold;
+    font-weight: bold;
 }
 
 .category-header {
-  margin-top: 40px;
+    margin-top: 40px;
 }
 
 .upvotes {
-  margin-left: 10px;
-  display: inline;
+    margin-left: 10px;
+    display: inline;
 }
 
 .upvoted {
-  color: red;
-  text-decoration: none;
+    color: red;
+    text-decoration: none;
 }
 
 .not-upvoted {
-  color: grey;
-  text-decoration: none;
+    color: grey;
+    text-decoration: none;
 }
 
 .item-description {
-  font-style: italic;
+    font-style: italic;
 }
 
 .item-image {
-  width: 20%;
-  height: 20%;
-  border-radius: 20px;
-  margin-top: 20px;
+    width: 20%;
+    height: 20%;
+    border-radius: 20px;
+    margin-top: 20px;
 }
 
 .item-name {
-  font-weight: bold;
+    font-weight: bold;
 }

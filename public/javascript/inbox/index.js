@@ -33,7 +33,7 @@ let reqDisplay = 'current';
 
 // changes view to messages
 const setMessages = (() => {
-    if(inboxDisplay == 'request') {
+    if (inboxDisplay == 'request') {
         messageActions.classList.add('display');
         messageList.classList.add('display');
         viewMsg.classList.add('active');
@@ -50,7 +50,7 @@ const setMessages = (() => {
 
 //changes view to requests
 const setRequests = (() => {
-    if(inboxDisplay == 'message') {
+    if (inboxDisplay == 'message') {
         requestActions.classList.add('display');
         requestList.classList.add('display');
         viewReq.classList.add('active');
@@ -72,7 +72,7 @@ const submitDelete = (() => {
 
 // changes req inbox to current
 const seeCurrentReq = (() => {
-    if(reqDisplay == 'history') {
+    if (reqDisplay == 'history') {
         currentReq.classList.add('display');
         pastReq.classList.remove('display');
 
@@ -85,7 +85,7 @@ const seeCurrentReq = (() => {
 
 // changes req inbox to history
 const seePastReq = (() => {
-    if(reqDisplay == 'current') {
+    if (reqDisplay == 'current') {
         pastReq.classList.add('display');
         currentReq.classList.remove('display');
 
@@ -102,13 +102,13 @@ const updateDelete = (() => {
     let selected = false;
     for (let i = 0; i < inputs.length; i++) {
         const input = inputs[i];
-        if(input.checked == true) {
+        if (input.checked == true) {
             selected = true;
             break;
         }
     }
 
-    if(selected) {
+    if (selected) {
         delAllBtn.style.display = 'none';
         delSelBtn.style.display = 'block';
         markAllBtn.style.display = 'none';

@@ -4,10 +4,10 @@ var messageSchema = new mongoose.Schema({
     subject: String,
     images: [{type: String}],
     read: [
-      {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'User'
-      }
+        {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'User'
+        }
     ],
     sender: {
         type: mongoose.Schema.Types.ObjectId,
@@ -15,23 +15,23 @@ var messageSchema = new mongoose.Schema({
     },
 
     recipients: [
-      {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'User'
-      }
+        {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'User'
+        }
     ],
 
     text: String,
-    toEveryone: { type: Boolean, default: false},
-    anonymous: { type: Boolean, default: false },
-    noReply: { type: Boolean, default: false },
+    toEveryone: {type: Boolean, default: false},
+    anonymous: {type: Boolean, default: false},
+    noReply: {type: Boolean, default: false},
     date: String,
     replies: [{
-      sender: {type: mongoose.Schema.Types.ObjectId, ref: 'User'},
-      text: String,
-      images: [{type: String}],
-      date: String,
-      default: []
+        sender: {type: mongoose.Schema.Types.ObjectId, ref: 'User'},
+        text: String,
+        images: [{type: String}],
+        date: String,
+        default: []
     }]
 
 }, {timestamps: {createdAt: 'created_at'}});

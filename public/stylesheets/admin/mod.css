@@ -1,25 +1,25 @@
 .mod-actions {
-  float: right;
+    float: right;
 }
 
 .list-group-item {
-  line-height: 38px;
+    line-height: 38px;
 }
 
 .btn-primary, .btn-success {
-  margin-right: 10px;
+    margin-right: 10px;
 }
 
 body {
-  background-color: white;
+    background-color: white;
 }
 
 #reported-comments-header {
-  display: inline;
+    display: inline;
 }
 
 #mod-error {
-  color: red;
-  margin-left: 10px;
-  display: none;
+    color: red;
+    margin-left: 10px;
+    display: none;
 }

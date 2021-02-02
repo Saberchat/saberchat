@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html>
-  <head>
+<head>
     <title>Saberchat</title>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -14,11 +14,11 @@
     <link rel="stylesheet" href="/stylesheets/announcements/index.css">
     <link rel="stylesheet" href="/stylesheets/home/index.css">
     <link rel="stylesheet" href="/stylesheets/chat/new.css">
-    <%if (currentUser) {%>
-      <%if (currentUser.darkmode) { %>
-        <link rel="stylesheet" href="/stylesheets/Darkmode.css">
-      <%}%>
-    <%}%>
+    <% if (currentUser) { %>
+        <% if (currentUser.darkmode) { %>
+            <link rel="stylesheet" href="/stylesheets/Darkmode.css">
+        <% } %>
+    <% } %>
 
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
@@ -34,178 +34,243 @@
     <%- include('../partials/navbar') %>
     <%- include('../partials/header') %>
 
-  </head>
-  <body class="mode">
+</head>
+<body class="mode">
 
-    <div class="container mt-5">
-      <div class="row">
+<div class="container mt-5">
+    <div class="row">
         <div class="col-12">
-          <div class="jumbotron text-center header">
-            <h1><i class="fas fa-paint-brush"></i> Student Projects </h1>
-            <p>Our Students' Artwork, Gardening Projects, Science Projects and More</p>
-            <% if (currentUser) { %>
-              <% if (currentUser.status == 'faculty') { %>
-                <a class="btn btn-info" href="projects/new"><i class="fas fa-paint-brush"></i> Add Project</a>
-                <!-- <a class="btn btn-secondary" href="projects/data"><i class="fas fa-chart-bar"></i> My Project Data</a> -->
-              <%}%>
-            <% } %>
-          </div>
+            <div class="jumbotron text-center header">
+                <h1><i class="fas fa-paint-brush"></i> Student Projects </h1>
+                <p>Our Students' Artwork, Gardening Projects, Science Projects and More</p>
+                <% if (currentUser) { %>
+                    <% if (currentUser.status == 'faculty') { %>
+                        <a class="btn btn-info" href="projects/new"><i class="fas fa-paint-brush"></i> Add Project</a>
+                        <!-- <a class="btn btn-secondary" href="projects/data"><i class="fas fa-chart-bar"></i> My Project Data</a> -->
+                    <% } %>
+                <% } %>
+            </div>
         </div>
-      </div>
+    </div>
 
     <div class="projects">
 
-      <div class="search-filter mb-3 search">
-        <i class="fas fa-search"></i>
-        <input id="search-input" oninput="searchFunction()" class="form-control search" type="text" placeholder="Search..." title="Type a project segment"/>
-      </div><br />
-
-      <% if (currentUser) { %>
-        <span id="loading"></span>
-      <% } %>
-
-      <%projects.reverse().forEach(project => { %>
-        <div class="row">
-          <div class="col-lg-12">
-            <article class="text-block mode" id="<%=project._id%>">
-              <div class="block-header grey">
-                <h5>
-                  <a class="project-info" href="projects/<%=project._id%>"><%=project.title%></a>
-                  <span class= "float-right project-info date"><%=project.date%></span>
-                </h5>
-
-                <div class="project-header">
-                  <% if (currentUser) { %>
-                    <a class="project-info" href= "../profiles/<%=project.poster._id%>" >
-                      <img src="<%= project.poster.imageUrl %>" alt="profile pic" class="poster-profile mode">
-                      <%=project.poster.firstName%> <%=project.poster.lastName%>
-                    </a>
-
-                    <% } else { %>
-                      <span class="project-info">
-                        <img src="<%= project.poster.imageUrl %>" alt="profile pic" class="poster-profile">
-                        <%=project.poster.firstName%> <%=project.poster.lastName%>
-                      </span>
-                    <% } %>
-
-                    <% if (currentUser) { %>
-                      <% if (currentUser._id.toString() == project.poster._id.toString()) { %>
-                        <button type="button" class="btn btn-info edit-button"><a class="project-info" href="projects/<%=project._id%>/edit"><i class="fas fa-cog"></i> Edit</a></button>
-                        <form action="projects/<%=project._id%>?_method=delete" method="post" class="delete-project">
-                          <button class="btn btn-danger project-info" type="button" data-toggle="modal" data-target="#modal-<%=project._id%>"><i class="far fa-trash-alt"></i> Delete</button>
-                          <div class="modal fade" id="modal-<%=project._id%>" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
-                            <div class="modal-dialog">
-                              <div class="modal-content">
-                                <div class="modal-header">
-                                  <h5 class="modal-title" id="exampleModalLabel">Delete Post?</h5>
-                                  <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                    <span aria-hidden="true">&times;</span>
-                                  </button>
-                                </div>
-                                <div class="modal-body">
-                                  This action is irreversible. You will have to manually recreate this post.
-                                </div>
-                                <div class="modal-footer">
-                                  <button type="button" class="btn btn-secondary" data-dismiss="modal">No, Go Back</button>
-                                  <button type="submit" class="btn btn-danger">Yes, Delete Post</button>
-                                </div>
-                              </div>
-                            </div>
-                          </div>
-                        </form>
-                    <% } %>
-
-                    <% if (project.likes.includes(currentUser._id)) { %>
-                        <span class="liked-button" id="like-<%=project._id%>-index" onclick="like(this)"><i class="fas fa-thumbs-up"></i></span> <span class="likeCount-<%=project._id%>"><%=project.likes.length%></span>
-
-                    <% } else { %>
-                      <span class="unliked-button" id="like-<%=project._id%>-index" onclick="like(this)" ><i class="fas fa-thumbs-up"></i></span> <span class="likeCount-<%=project._id%>"><%=project.likes.length%></span>
-
-                    <% } %>
-                    <a class="comment-button" href="/projects/<%=project._id%>#comment-section"><i class="fas fa-comment-dots"></i> <%=project.comments.length%></a>
-                    <% }%>
-                </div>
-              </div>
-
-              <div class="block-content mode" >
-                  <% if (project.images.length > 0) { %>
-                    <img class="project-first-image" src="<%=project.images[0]%>"/>
-                  <% } %>
-
-                  <span hidden>
-                    <% for (let c of project.creators) {%>
-                      <%=c.firstName %> <%=c.lastName %> <%=c.username%>
-                    <% } %></span>
-
-                  <% if (currentUser) { %>
-
-                    <% if (project.creators.length == 0) { %>
-                      <p class="creator-row"><span class="creator-heading">Creators:</span> <span class="creator-names">None</span></p>
-
-                      <%} else if (project.creators.length == 1){%>
-                        <p class="creator-row"><span class="creator-heading">Creator:</span> <a class="creator-names" href="profiles/<%=project.creators[0]._id%>"><img src="<%= project.creators[0].imageUrl %>" alt="profile pic" class="creator-profile"> <%=project.creators[0].firstName%> <%=project.creators[0].lastName%></a></p>
-
-                    <%} else if (project.creators.length == 2){%>
-                      <p class="creator-row"><span class="creator-heading">Creators:</span> <a class="creator-names" href="profiles/<%=project.creators[0]._id%>"><img src="<%= project.creators[0].imageUrl %>" alt="profile pic" class="creator-profile"> <%=project.creators[0].firstName%> <%=project.creators[0].lastName%></a>, <a class="creator-names" href="profiles/<%=project.creators[1]._id%>"><img src="<%= project.creators[1].imageUrl %>" alt="profile pic" class="creator-profile"> <%=project.creators[1].firstName%> <%=project.creators[1].lastName%></a></p>
-
-                    <% } else if (project.creators.length > 2) {%>
-                      <p class="creator-row"><span class="creator-heading">Creators:</span> <a class="creator-names" href="profiles/<%=project.creators[0]._id%>"><img src="<%= project.creators[0].imageUrl %>" alt="profile pic" class="creator-profile"> <%=project.creators[0].firstName%> <%=project.creators[0].lastName%></a> and <%=project.creators.length - 1%> others</p>
-                    <% } %>
-
-                  <% } else { %>
-                    <% if (project.creators.length == 0) { %>
-                      <p class="creator-row"><span class="creator-heading">Creators:</span> <span class="creator-names">None</span></p>
-
-                    <%} else if (project.creators.length == 1){%>
-                      <p class="creator-row"><span class="creator-heading">Creator:</span> <span class="creator-names"><img src="<%= project.creators[0].imageUrl %>" alt="profile pic" class="creator-profile"> <%=project.creators[0].firstName%> <%=project.creators[0].lastName%></span></p>
-
-                    <%} else if (project.creators.length == 2){%>
-                      <p class="creator-row"><span class="creator-heading">Creators:</span> <span class="creator-names"><img src="<%= project.creators[0].imageUrl %>" alt="profile pic" class="creator-profile"> <%=project.creators[0].firstName%> <%=project.creators[0].lastName%></span>, <span class="creator-names"><img src="<%= project.creators[1].imageUrl %>" alt="profile pic" class="creator-profile"> <%=project.creators[1].firstName%> <%=project.creators[1].lastName%></span></p>
-
-                    <% } else if (project.creators.length > 2) {%>
-                      <p class="creator-row"><span class="creator-heading">Creators:</span> <span class="creator-names"><img src="<%= project.creators[0].imageUrl %>" alt="profile pic" class="creator-profile"> <%=project.creators[0].firstName%> <%=project.creators[0].lastName%></span> and <%=project.creators.length - 1%> others</p>
-                    <% } %>
-                  <% } %>
-
-                  <br /><br />
-
-                <% if (project.text.split(" ").length > 70) { %>
-                  <p class="project-description"><%=project.text.split(" ").slice(0,71).join(" ")%> <a href="/projects/<%=project._id%>">(Read More)</a></p>
-                <% } else { %>
-                  <p class="project-description"><%=project.text%></p>
-                <% } %>
-
-              </div>
-            </article>
-          </div>
+        <div class="search-filter mb-3 search">
+            <i class="fas fa-search"></i>
+            <input id="search-input" oninput="searchFunction()" class="form-control search" type="text"
+                   placeholder="Search..." title="Type a project segment"/>
         </div>
-        <br class="text-break" id="break-<%=project._id%>"/>
+        <br/>
 
-      <% }) %>
+        <% if (currentUser) { %>
+            <span id="loading"></span>
+        <% } %>
+
+        <% projects.reverse().forEach(project => { %>
+            <div class="row">
+                <div class="col-lg-12">
+                    <article class="text-block mode" id="<%= project._id %>">
+                        <div class="block-header grey">
+                            <h5>
+                                <a class="project-info" href="projects/<%= project._id %>"><%= project.title %></a>
+                                <span class="float-right project-info date"><%= project.date %></span>
+                            </h5>
+
+                            <div class="project-header">
+                                <% if (currentUser) { %>
+                                    <a class="project-info" href="../profiles/<%= project.poster._id %>">
+                                        <img src="<%= project.poster.imageUrl %>" alt="profile pic"
+                                             class="poster-profile mode">
+                                        <%= project.poster.firstName %> <%= project.poster.lastName %>
+                                    </a>
+
+                                <% } else { %>
+                                    <span class="project-info">
+                        <img src="<%= project.poster.imageUrl %>" alt="profile pic" class="poster-profile">
+                        <%= project.poster.firstName %> <%= project.poster.lastName %>
+                      </span>
+                                <% } %>
+
+                                <% if (currentUser) { %>
+                                    <% if (currentUser._id.toString() == project.poster._id.toString()) { %>
+                                        <button type="button" class="btn btn-info edit-button"><a class="project-info"
+                                                                                                  href="projects/<%= project._id %>/edit"><i
+                                                        class="fas fa-cog"></i> Edit</a></button>
+                                        <form action="projects/<%= project._id %>?_method=delete" method="post"
+                                              class="delete-project">
+                                            <button class="btn btn-danger project-info" type="button"
+                                                    data-toggle="modal"
+                                                    data-target="#modal-<%= project._id %>"><i
+                                                        class="far fa-trash-alt"></i>
+                                                Delete
+                                            </button>
+                                            <div class="modal fade" id="modal-<%= project._id %>" tabindex="-1"
+                                                 aria-labelledby="deleteModalLabel" aria-hidden="true">
+                                                <div class="modal-dialog">
+                                                    <div class="modal-content">
+                                                        <div class="modal-header">
+                                                            <h5 class="modal-title" id="exampleModalLabel">Delete
+                                                                Post?</h5>
+                                                            <button type="button" class="close" data-dismiss="modal"
+                                                                    aria-label="Close">
+                                                                <span aria-hidden="true">&times;</span>
+                                                            </button>
+                                                        </div>
+                                                        <div class="modal-body">
+                                                            This action is irreversible. You will have to manually
+                                                            recreate this
+                                                            post.
+                                                        </div>
+                                                        <div class="modal-footer">
+                                                            <button type="button" class="btn btn-secondary"
+                                                                    data-dismiss="modal">No, Go Back
+                                                            </button>
+                                                            <button type="submit" class="btn btn-danger">Yes, Delete
+                                                                Post
+                                                            </button>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </form>
+                                    <% } %>
+
+                                    <% if (project.likes.includes(currentUser._id)) { %>
+                                        <span class="liked-button" id="like-<%= project._id %>-index"
+                                              onclick="like(this)"><i
+                                                    class="fas fa-thumbs-up"></i></span> <span
+                                                class="likeCount-<%= project._id %>"><%= project.likes.length %></span>
+
+                                    <% } else { %>
+                                        <span class="unliked-button" id="like-<%= project._id %>-index"
+                                              onclick="like(this)"><i
+                                                    class="fas fa-thumbs-up"></i></span> <span
+                                                class="likeCount-<%= project._id %>"><%= project.likes.length %></span>
+
+                                    <% } %>
+                                    <a class="comment-button" href="/projects/<%= project._id %>#comment-section"><i
+                                                class="fas fa-comment-dots"></i> <%= project.comments.length %></a>
+                                <% } %>
+                            </div>
+                        </div>
+
+                        <div class="block-content mode">
+                            <% if (project.images.length > 0) { %>
+                                <img class="project-first-image" src="<%= project.images[0] %>"/>
+                            <% } %>
+
+                            <span hidden>
+                                <% for (let c of project.creators) { %>
+                                    <%= c.firstName %> <%= c.lastName %> <%= c.username %>
+                                <% } %>
+                            </span>
+
+                            <% if (currentUser) { %>
+
+                                <% if (project.creators.length == 0) { %>
+                                    <p class="creator-row"><span class="creator-heading">Creators:</span> <span
+                                                class="creator-names">None</span></p>
+
+                                <% } else if (project.creators.length == 1){ %>
+                                    <p class="creator-row"><span class="creator-heading">Creator:</span> <a
+                                                class="creator-names"
+                                                href="profiles/<%= project.creators[0]._id %>"><img
+                                                    src="<%= project.creators[0].imageUrl %>" alt="profile pic"
+                                                    class="creator-profile"> <%= project.creators[0].firstName %> <%= project.creators[0].lastName %>
+                                        </a></p>
+
+                                <% } else if (project.creators.length == 2){ %>
+                                    <p class="creator-row"><span class="creator-heading">Creators:</span> <a
+                                                class="creator-names"
+                                                href="profiles/<%= project.creators[0]._id %>"><img
+                                                    src="<%= project.creators[0].imageUrl %>" alt="profile pic"
+                                                    class="creator-profile"> <%= project.creators[0].firstName %> <%= project.creators[0].lastName %>
+                                        </a>, <a class="creator-names"
+                                                 href="profiles/<%= project.creators[1]._id %>"><img
+                                                    src="<%= project.creators[1].imageUrl %>" alt="profile pic"
+                                                    class="creator-profile"> <%= project.creators[1].firstName %> <%= project.creators[1].lastName %>
+                                        </a></p>
+
+                                <% } else if (project.creators.length > 2) { %>
+                                    <p class="creator-row"><span class="creator-heading">Creators:</span> <a
+                                                class="creator-names"
+                                                href="profiles/<%= project.creators[0]._id %>"><img
+                                                    src="<%= project.creators[0].imageUrl %>" alt="profile pic"
+                                                    class="creator-profile"> <%= project.creators[0].firstName %> <%= project.creators[0].lastName %>
+                                        </a> and <%= project.creators.length - 1 %> others</p>
+                                <% } %>
+
+                            <% } else { %>
+                                <% if (project.creators.length == 0) { %>
+                                    <p class="creator-row"><span class="creator-heading">Creators:</span> <span
+                                                class="creator-names">None</span></p>
+
+                                <% } else if (project.creators.length == 1){ %>
+                                    <p class="creator-row"><span class="creator-heading">Creator:</span> <span
+                                                class="creator-names"><img src="<%= project.creators[0].imageUrl %>"
+                                                                           alt="profile pic"
+                                                                           class="creator-profile"> <%= project.creators[0].firstName %> <%= project.creators[0].lastName %></span>
+                                    </p>
+
+                                <% } else if (project.creators.length == 2){ %>
+                                    <p class="creator-row"><span class="creator-heading">Creators:</span> <span
+                                                class="creator-names"><img src="<%= project.creators[0].imageUrl %>"
+                                                                           alt="profile pic"
+                                                                           class="creator-profile"> <%= project.creators[0].firstName %> <%= project.creators[0].lastName %></span>,
+                                        <span class="creator-names"><img src="<%= project.creators[1].imageUrl %>"
+                                                                         alt="profile pic"
+                                                                         class="creator-profile"> <%= project.creators[1].firstName %> <%= project.creators[1].lastName %></span>
+                                    </p>
+
+                                <% } else if (project.creators.length > 2) { %>
+                                    <p class="creator-row"><span class="creator-heading">Creators:</span> <span
+                                                class="creator-names"><img src="<%= project.creators[0].imageUrl %>"
+                                                                           alt="profile pic"
+                                                                           class="creator-profile"> <%= project.creators[0].firstName %> <%= project.creators[0].lastName %></span>
+                                        and <%= project.creators.length - 1 %> others</p>
+                                <% } %>
+                            <% } %>
+
+                            <br/><br/>
+
+                            <% if (project.text.split(" ").length > 70) { %>
+                                <p class="project-description"><%= project.text.split(" ").slice(0, 71).join(" ") %> <a
+                                            href="/projects/<%= project._id %>">(Read More)</a></p>
+                            <% } else { %>
+                                <p class="project-description"><%= project.text %></p>
+                            <% } %>
+
+                        </div>
+                    </article>
+                </div>
+            </div>
+            <br class="text-break" id="break-<%= project._id %>"/>
+
+        <% }) %>
     </div>
-  </div>
+</div>
 </body>
 <script src="/javascript/projects/like.js"></script>
 
 <script>
 
-const searchFunction = (() => {
-  const projects = document.getElementsByClassName('text-block');
-  const breaks = document.getElementsByClassName('text-break');
-  const searchInput = document.getElementById('search-input');
-  let filter = searchInput.value.toLowerCase();
+    const searchFunction = (() => {
+        const projects = document.getElementsByClassName('text-block');
+        const breaks = document.getElementsByClassName('text-break');
+        const searchInput = document.getElementById('search-input');
+        let filter = searchInput.value.toLowerCase();
 
-  for (let i = 0; i < projects.length; i += 1) {
-    if (!projects[i].textContent.replace("(Read More)", "").toLowerCase().includes(filter)) {
-      $(`#${projects[i].id}`).hide();
-      $(`#${breaks[i].id}`).hide();
+        for (let i = 0; i < projects.length; i += 1) {
+            if (!projects[i].textContent.replace("(Read More)", "").toLowerCase().includes(filter)) {
+                $(`#${projects[i].id}`).hide();
+                $(`#${breaks[i].id}`).hide();
 
-    } else {
-      $(`#${projects[i].id}`).show();
-      $(`#${breaks[i].id}`).show();
-    }
-  }
-})
+            } else {
+                $(`#${projects[i].id}`).show();
+                $(`#${breaks[i].id}`).show();
+            }
+        }
+    })
 
 </script>
 

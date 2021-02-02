@@ -1,5 +1,5 @@
 const BaseJoi = require('joi');
-const { escapeHtmlExtension } = require('./extensions');
+const {escapeHtmlExtension} = require('./extensions');
 
 const Joi = BaseJoi.extend(escapeHtmlExtension);
 

@@ -1,9 +1,9 @@
 const createImage = (imageInput => {
-  if (imageInput.value.replaceAll(' ', '') != '') {
-    document.getElementById("item-image").src = imageInput.value;
-    document.getElementById("item-image").hidden = false;
+    if (imageInput.value.replaceAll(' ', '') != '') {
+        document.getElementById("item-image").src = imageInput.value;
+        document.getElementById("item-image").hidden = false;
 
-  } else {
-    document.getElementById("item-image").hidden = true;
-  }
+    } else {
+        document.getElementById("item-image").hidden = true;
+    }
 });

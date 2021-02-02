@@ -8,22 +8,22 @@ var announcementSchema = new mongoose.Schema({
     },
     images: [{type: String}],
     imageFile: {
-      filename: String,
-      url: String
+        filename: String,
+        url: String
     },
     text: String,
     date: String,
 
     likes: [{
-      type: mongoose.Schema.Types.ObjectId,
-      ref: 'User',
-      default: []
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User',
+        default: []
     }],
 
     comments: [{
-      type: mongoose.Schema.Types.ObjectId,
-      ref: 'PostComment',
-      default: []
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'PostComment',
+        default: []
     }]
 
 }, {timestamps: {createdAt: 'created_at'}});

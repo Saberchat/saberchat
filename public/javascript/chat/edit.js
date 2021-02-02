@@ -4,11 +4,11 @@ const updateDisplay = (() => {
     let display2 = document.getElementById('remove-block');
     const removeCount = document.getElementById('remove-user-list').childElementCount;
     const addCount = document.getElementById('add-user-list').childElementCount;
-    if(userSelect.checked == true) {
-        if(addCount > 0) {
+    if (userSelect.checked == true) {
+        if (addCount > 0) {
             display1.style.display = "block";
         }
-        if(removeCount > 0) {
+        if (removeCount > 0) {
             display2.style.display = "block";
         }
     } else {

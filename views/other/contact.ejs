@@ -6,17 +6,21 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Saberchat</title>
 
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css" integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css"
+          integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk" crossorigin="anonymous">
     <link rel="stylesheet" href="/stylesheets/main.css">
     <link rel="stylesheet" href="/stylesheets/home/index.css">
     <link rel="stylesheet" href="/stylesheets/components/background.css">
     <link rel="stylesheet" href="/stylesheets/components/navbar.css">
     <link rel="stylesheet" href="/stylesheets/other/index.css">
 
-    <script src="https://code.jquery.com/jquery-3.5.1.min.js" integrity="sha256-9/aliU8dGd2tb6OSsuzixeV4y/faTqgFtohetphbbj0=" crossorigin="anonymous"></script>
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"
+            integrity="sha256-9/aliU8dGd2tb6OSsuzixeV4y/faTqgFtohetphbbj0=" crossorigin="anonymous"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <script src="https://unpkg.com/@popperjs/core@2" crossorigin="anonymous"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js" integrity="sha384-OgVRvuATP1z7JjHLkuOU7Xw704+h835Lr+6QL9UvYjZE3Ipu6Tp75j7Bh/kR0JKI" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js"
+            integrity="sha384-OgVRvuATP1z7JjHLkuOU7Xw704+h835Lr+6QL9UvYjZE3Ipu6Tp75j7Bh/kR0JKI"
+            crossorigin="anonymous"></script>
 
     <script src="https://kit.fontawesome.com/dccc745c41.js" crossorigin="anonymous"></script>
     <script src="/javascript/nav/userForm.js"></script>
@@ -25,10 +29,10 @@
 </head>
 <body>
 
-  <!-- include the navbar via ejs -->
-  <%- include('../partials/navbar') %>
-  <!-- include the backdrop for nav -->
-  <%- include('../partials/header') %>
+<!-- include the navbar via ejs -->
+<%- include('../partials/navbar') %>
+<!-- include the backdrop for nav -->
+<%- include('../partials/header') %>
 
 <!-- Background image and text -->
 <section id="background">
@@ -54,103 +58,137 @@
                         <h1>Developers</h1>
                     </div>
                     <div class="block-content">
-                      <p>
-                        Alexander Zhou, Kabir Samsi, Siddharth Chavan, Vibhav Darsha and Dmitry Pleshkov are juniors who are all enrolled in Alsion's Early College program. They developed Saberchat over the 2020
-                        Summer Break in an effort to improve the Alsion community by connecting Alsion's communication platforms, and to exercise their software development skills.
-                      </p>
+                        <p>
+                            Alexander Zhou, Kabir Samsi, Siddharth Chavan, Vibhav Darsha and Dmitry Pleshkov are juniors
+                            who are all enrolled in Alsion's Early College program. They developed Saberchat over the
+                            2020
+                            Summer Break in an effort to improve the Alsion community by connecting Alsion's
+                            communication platforms, and to exercise their software development skills.
+                        </p>
 
-                      <% developers.forEach(developer => { %>
-                        <span class="developer-info"><%=developer[0]%></span>
-                        <p><a href="mailto: <%=developer[1]%>"><%=developer[1]%></a></p>
-                      <% }); %>
+                        <% developers.forEach(developer => { %>
+                            <span class="developer-info"><%= developer[0] %></span>
+                            <p><a href="mailto: <%= developer[1] %>"><%= developer[1] %></a></p>
+                        <% }); %>
 
                     </div>
                 </article>
-              </div>
+            </div>
 
-              <div class="col-lg-6 block">
+            <div class="col-lg-6 block">
                 <div class="container photo-div">
-                  <div class="row dev-row">
-                    <div class="row photo-row">
-                      <div class="col col-photo"><img src="/images/<%=developers[0][0]%>.jpg" class="image row-end" alt="Photo of <%=developers[0][0]%>"></div>
-                      <div class="col col-photo"><img src="/images/<%=developers[1][0]%>.jpg" class="image row-end" alt="Photo of <%=developers[1][0]%>"></div>
-                    </div>
-                  <% let counter = 0;%>
-                  <% for (let i = 2; i < developers.length; i += 3) { %>
-                    <div class="row photo-row">
-                      <div class="col col-photo"><img src="/images/<%=developers[i][0]%>.jpg" class="image <% if (i+1 >= developers.length) { %>end<% } %> <% if (i+3 >= developers.length) {%> row-end <% } %>" alt="Photo of <%=developers[i][0]%>"></div>
+                    <div class="row dev-row">
+                        <div class="row photo-row">
+                            <div class="col col-photo"><img src="/images/<%= developers[0][0] %>.jpg"
+                                                            class="image row-end"
+                                                            alt="Photo of <%= developers[0][0] %>"></div>
+                            <div class="col col-photo"><img src="/images/<%= developers[1][0] %>.jpg"
+                                                            class="image row-end"
+                                                            alt="Photo of <%= developers[1][0] %>"></div>
+                        </div>
+                        <% let counter = 0; %>
+                        <% for (let i = 2; i < developers.length; i += 3) { %>
+                            <div class="row photo-row">
+                                <div class="col col-photo"><img src="/images/<%= developers[i][0] %>.jpg"
+                                                                class="image <% if (i + 1 >= developers.length) { %>end<% } %> <% if (i + 3 >= developers.length) { %> row-end <% } %>"
+                                                                alt="Photo of <%= developers[i][0] %>"></div>
 
-                      <% if (i+1 < developers.length) { %>
-                        <div class="col col-photo"><img src="/images/<%=developers[i+1][0]%>.jpg" class="image <% if (i+2 >= developers.length) { %>end row-end<% } %>"alt="Photo of <%=developers[i+1][0]%>"></div>
-                      <% } %>
+                                <% if (i + 1 < developers.length) { %>
+                                    <div class="col col-photo"><img src="/images/<%= developers[i + 1][0] %>.jpg"
+                                                                    class="image <% if (i + 2 >= developers.length) { %>end row-end<% } %>"
+                                                                    alt="Photo of <%= developers[i + 1][0] %>"></div>
+                                <% } %>
 
-                      <% if (i+2 < developers.length) { %>
-                        <div class="col col-photo"><img src="/images/<%=developers[i+2][0]%>.jpg" class="image <% if (i+1 >= developers.length) {%> row-end <% } %>" alt="Photo of <%=developers[i+2][0]%>"></div>
-                      <% } %>
+                                <% if (i + 2 < developers.length) { %>
+                                    <div class="col col-photo"><img src="/images/<%= developers[i + 2][0] %>.jpg"
+                                                                    class="image <% if (i + 1 >= developers.length) { %> row-end <% } %>"
+                                                                    alt="Photo of <%= developers[i + 2][0] %>"></div>
+                                <% } %>
+                            </div>
+                        <% } %>
                     </div>
-                  <% } %>
                 </div>
-              </div>
             </div>
         </div>
 
         <!-- Block 2 -->
         <div class="row text-element">
-          <div class="col-lg-6 block">
-            <div class="container photo-div">
-              <% let sortedFaculty = [];%>
-              <% for (let teacher of faculty) { %>
-                <% if (teacher.permission == "principal") { %>
-                  <% sortedFaculty.push(teacher); %>
-                <% } %>
-              <% } %>
-              <% for (let teacher of faculty) { %>
-                <% if (teacher.permission != "principal") { %>
-                  <% sortedFaculty.push(teacher); %>
-                <% } %>
-              <% } %>
-              <div class="row photo-row">
-                <div class="col col-photo"><img src="/images/<%=sortedFaculty[0].firstName%> <%=sortedFaculty[0].lastName%>.jpg" class="image row-end" alt="Photo of <%=sortedFaculty[0].firstName%> <%=sortedFaculty[0].lastName%>"></div>
-                <% if (sortedFaculty.length > 1) { %>
-                  <div class="col col-photo"><img src="/images/<%=sortedFaculty[1].firstName%> <%=sortedFaculty[1].lastName%>.jpg" class="image row-end" alt="Photo of <%=sortedFaculty[1].firstName%> <%=sortedFaculty[1].lastName%>"></div>
-                <% } %>
-              </div>
-              <% counter = 0;%>
-              <% for (let i = 2; i < sortedFaculty.length; i += 3) { %>
-                <div class="row photo-row">
-                  <div class="col col-photo"><img src="/images/<%=sortedFaculty[i].firstName%> <%=sortedFaculty[i].lastName%>.jpg" class="image <% if (i+1 >= sortedFaculty.length) { %>end<% } %> <% if (i+3 >= developers.length) {%> row-end <% } %>" alt="Photo of <%=sortedFaculty[i].firstName%> <%=sortedFaculty[i].lastName%>"></div>
+            <div class="col-lg-6 block">
+                <div class="container photo-div">
+                    <% let sortedFaculty = []; %>
+                    <% for (let teacher of faculty) { %>
+                        <% if (teacher.permission == "principal") { %>
+                            <% sortedFaculty.push(teacher); %>
+                        <% } %>
+                    <% } %>
+                    <% for (let teacher of faculty) { %>
+                        <% if (teacher.permission != "principal") { %>
+                            <% sortedFaculty.push(teacher); %>
+                        <% } %>
+                    <% } %>
+                    <div class="row photo-row">
+                        <div class="col col-photo"><img
+                                    src="/images/<%= sortedFaculty[0].firstName %> <%= sortedFaculty[0].lastName %>.jpg"
+                                    class="image row-end"
+                                    alt="Photo of <%= sortedFaculty[0].firstName %> <%= sortedFaculty[0].lastName %>">
+                        </div>
+                        <% if (sortedFaculty.length > 1) { %>
+                            <div class="col col-photo"><img
+                                        src="/images/<%= sortedFaculty[1].firstName %> <%= sortedFaculty[1].lastName %>.jpg"
+                                        class="image row-end"
+                                        alt="Photo of <%= sortedFaculty[1].firstName %> <%= sortedFaculty[1].lastName %>">
+                            </div>
+                        <% } %>
+                    </div>
+                    <% counter = 0; %>
+                    <% for (let i = 2; i < sortedFaculty.length; i += 3) { %>
+                        <div class="row photo-row">
+                            <div class="col col-photo"><img
+                                        src="/images/<%= sortedFaculty[i].firstName %> <%= sortedFaculty[i].lastName %>.jpg"
+                                        class="image <% if (i + 1 >= sortedFaculty.length) { %>end<% } %> <% if (i + 3 >= developers.length) { %> row-end <% } %>"
+                                        alt="Photo of <%= sortedFaculty[i].firstName %> <%= sortedFaculty[i].lastName %>">
+                            </div>
 
-                  <% if (i+1 < sortedFaculty.length) { %>
-                    <div class="col col-photo"><img src="/images/<%=sortedFaculty[i+1].firstName%> <%=sortedFaculty[i+1].lastName%>.jpg" class="image <% if (i+2 >= sortedFaculty.length) { %>end row-end<% } %>"alt="Photo of <%=sortedFaculty[i+1].firstName%> <%=sortedFaculty[i+1].lastName%>"></div>
-                  <% } %>
+                            <% if (i + 1 < sortedFaculty.length) { %>
+                                <div class="col col-photo"><img
+                                            src="/images/<%= sortedFaculty[i + 1].firstName %> <%= sortedFaculty[i + 1].lastName %>.jpg"
+                                            class="image <% if (i + 2 >= sortedFaculty.length) { %>end row-end<% } %>"
+                                            alt="Photo of <%= sortedFaculty[i + 1].firstName %> <%= sortedFaculty[i + 1].lastName %>">
+                                </div>
+                            <% } %>
 
-                  <% if (i+2 < sortedFaculty.length) { %>
-                    <div class="col col-photo"><img src="/images/<%=sortedFaculty[i+2].firstName%> <%=sortedFaculty[i+2].lastName%>.jpg" class="image <% if (i+1 >= sortedFaculty.length) {%> row-end <% } %>" alt="Photo of <%=sortedFaculty[i+2].firstName%> <%=sortedFaculty[i+2].lastName%>"></div>
-                  <% } %>
+                            <% if (i + 2 < sortedFaculty.length) { %>
+                                <div class="col col-photo"><img
+                                            src="/images/<%= sortedFaculty[i + 2].firstName %> <%= sortedFaculty[i + 2].lastName %>.jpg"
+                                            class="image <% if (i + 1 >= sortedFaculty.length) { %> row-end <% } %>"
+                                            alt="Photo of <%= sortedFaculty[i + 2].firstName %> <%= sortedFaculty[i + 2].lastName %>">
+                                </div>
+                            <% } %>
+                        </div>
+
+                        <div class="w-100"></div>
+                    <% } %>
                 </div>
-
-                <div class="w-100"></div>
-              <% } %>
             </div>
-          </div>
 
-          <div class="col-lg-6 faculty-info">
-              <article class="text-block">
-                  <div class="block-header green">
-                      <h1>Faculty And Administration</h1>
-                  </div>
-                <div class="block-content">
-                  <p>
-                    Our teachers have helped the Alsion community for years.
-                    They are deeply involved in our student's studies and are devoted to giving students a thorough, interesting and entertaining education.
-                  </p>
-                  <% sortedFaculty.forEach(teacher => { %>
-                    <span class="developer-info"><%=teacher.firstName%> <%=teacher.lastName%></span>
-                    <p><a href="mailto: <%=teacher.email%>"><%=teacher.email%></a></p>
-                  <% }); %>
-                </div>
-              </article>
-          </div>
+            <div class="col-lg-6 faculty-info">
+                <article class="text-block">
+                    <div class="block-header green">
+                        <h1>Faculty And Administration</h1>
+                    </div>
+                    <div class="block-content">
+                        <p>
+                            Our teachers have helped the Alsion community for years.
+                            They are deeply involved in our student's studies and are devoted to giving students a
+                            thorough, interesting and entertaining education.
+                        </p>
+                        <% sortedFaculty.forEach(teacher => { %>
+                            <span class="developer-info"><%= teacher.firstName %> <%= teacher.lastName %></span>
+                            <p><a href="mailto: <%= teacher.email %>"><%= teacher.email %></a></p>
+                        <% }); %>
+                    </div>
+                </article>
+            </div>
         </div>
 
 </main>

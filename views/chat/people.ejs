@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html>
-  <head>
+<head>
     <title>Saberchat</title>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -22,151 +22,174 @@
     <script src="/javascript/profile/search.js"></script>
     <script src="/javascript/profile/follow.js"></script>
 
-  </head>
-  <body>
-    <!-- include the navbar via ejs -->
-    <%- include('../partials/navbar') %>
-    <!-- include the backdrop for nav -->
-    <%- include('../partials/header') %>
+</head>
+<body>
+<!-- include the navbar via ejs -->
+<%- include('../partials/navbar') %>
+<!-- include the backdrop for nav -->
+<%- include('../partials/header') %>
 
-    <div class="container">
-      <div class="row">
+<div class="container">
+    <div class="row">
         <div class="col-md-10 offset-md-1 col-12">
-          <div class="new-room">
-            <h1 class="title">People in "<%= room.name %>" (<%=room.members.length%>)</h1>
+            <div class="new-room">
+                <h1 class="title">People in "<%= room.name %>" (<%= room.members.length %>)</h1>
 
-            <a class="btn btn-primary" href="/chat/<%= room._id %>"><i class="fas fa-arrow-left"></i> Back</a>
-            <% if (room.creator.id._id.equals(currentUser._id)) { %>
-              <a class="btn btn-secondary" href="/chat/<%= room._id %>/edit"><i class="fas fa-cog"></i> Edit Room Settings</a>
-            <% } %>
-          </div><br />
-          <div class="search-filter">
-              <i class="fas fa-search"></i>
-              <input id="search-input" oninput="searchFunction()" class="form-control" type="text" placeholder="Search..." title="Type in Username">
-          </div>
-
-          <div class="list-group" id="user-list">
-            <% let statuses = [ ["faculty", "Faculty", []], ["12th", "Seniors", []], ["11th", "Juniors", []], ["10th", "Sophomores", []], ["9th", "Freshmen", []], ["8th", "8th Graders", []], ["7th", "7th Graders", []], ["alumnus", "Alumni", []], ["parent", "Parents", []], ["guest", "Guests", []] ] %>
-            <% let permMap = new Map([["principal", ["Principal", "info"]], ["admin", ["Administrator", "danger"]], ["mod", ["Moderator", "secondary"]]])%>
-            <% let tagMap = new Map([["Tutor", "warning"], ["Cashier", "success"], ["Editor", "primary"]])%>
-
-            <% for (let status of statuses) { %>
-              <% for (let user of room.members) { %>
-                <% if (user.status.toLowerCase() == status[0]) { %>
-                  <% status[2].push(user) %>
+                <a class="btn btn-primary" href="/chat/<%= room._id %>"><i class="fas fa-arrow-left"></i> Back</a>
+                <% if (room.creator.id._id.equals(currentUser._id)) { %>
+                    <a class="btn btn-secondary" href="/chat/<%= room._id %>/edit"><i class="fas fa-cog"></i> Edit Room
+                        Settings</a>
                 <% } %>
-              <% } %>
-            <% } %>
+            </div>
+            <br/>
+            <div class="search-filter">
+                <i class="fas fa-search"></i>
+                <input id="search-input" oninput="searchFunction()" class="form-control" type="text"
+                       placeholder="Search..." title="Type in Username">
+            </div>
 
-            <% let sortedUsers = [];%>
-            <% for (let status of statuses) { %>
-              <% if (status[2].length > 0) { %>
-                    <li class="list-group-item list-group-item-success status-header" id="<%=status[0]%>-header">
-                      <div class="d-flex w-100 justify-content-between">
-                        <h2 class="mb-1"><%=status[1]%></h2>
-                        <span><%=status[2].length%> user(s)</span>
-                      </div>
-                    </li>
+            <div class="list-group" id="user-list">
+                <% let statuses = [["faculty", "Faculty", []], ["12th", "Seniors", []], ["11th", "Juniors", []], ["10th", "Sophomores", []], ["9th", "Freshmen", []], ["8th", "8th Graders", []], ["7th", "7th Graders", []], ["alumnus", "Alumni", []], ["parent", "Parents", []], ["guest", "Guests", []]] %>
+                <% let permMap = new Map([["principal", ["Principal", "info"]], ["admin", ["Administrator", "danger"]], ["mod", ["Moderator", "secondary"]]]) %>
+                <% let tagMap = new Map([["Tutor", "warning"], ["Cashier", "success"], ["Editor", "primary"]]) %>
 
-                    <% sortedUsers = [];%>
-                    <% for (let perm of ["Principal", "Admin", "Mod", "Default"]) { %>
-                      <% for (let user of room.members) { %>
-                        <% if (user.permission.toLowerCase() == perm.toLowerCase()) { %>
-                          <% sortedUsers.push(user) %>
+                <% for (let status of statuses) { %>
+                    <% for (let user of room.members) { %>
+                        <% if (user.status.toLowerCase() == status[0]) { %>
+                            <% status[2].push(user) %>
                         <% } %>
-                      <% } %>
                     <% } %>
+                <% } %>
 
-                    <% for (let user of sortedUsers) { %>
-                      <% if (user.status.toLowerCase() == status[0]) { %>
-                        <li class="list-group-item list-group-item-action user-element">
+                <% let sortedUsers = []; %>
+                <% for (let status of statuses) { %>
+                    <% if (status[2].length > 0) { %>
+                        <li class="list-group-item list-group-item-success status-header" id="<%= status[0] %>-header">
+                            <div class="d-flex w-100 justify-content-between">
+                                <h2 class="mb-1"><%= status[1] %></h2>
+                                <span><%= status[2].length %> user(s)</span>
+                            </div>
+                        </li>
 
-                          <a href="/profiles/<%=user._id%>" class="user-element-text">
-                            <img class="profile-image" src="<%= user.imageUrl %>" alt="profile picture">
-                            <span class="username <%=status[0]%> <%=status[1]%> <%=user.permission%> <%=user.tags.join(' ')%>"><span class="span-tag-name"><%=user.firstName%> <%=user.lastName%></span> <span class="span-tag-username"><%=user.username%></span></span>
-
-                            <% if (permMap.has(user.permission)) { %>
-                              <span class="badge badge-<%=permMap.get(user.permission)[1]%>"><%=permMap.get(user.permission)[0]%></span>
+                        <% sortedUsers = []; %>
+                        <% for (let perm of ["Principal", "Admin", "Mod", "Default"]) { %>
+                            <% for (let user of room.members) { %>
+                                <% if (user.permission.toLowerCase() == perm.toLowerCase()) { %>
+                                    <% sortedUsers.push(user) %>
+                                <% } %>
                             <% } %>
-
-                            <% if (user._id.toString() == currentUser._id.toString())  { %>
-                              <span class="badge badge-dark">Me</span>
-                            <% } %>
-
-                            <span class="tags"></span>
-
-                            <% for (let tag of user.tags) { %>
-                              <span class="tag badge badge-pill badge-<%=tagMap.get(tag)%>"><%=tag%></span>
-                            <% } %>
-
-                            <% if (room.creator.id._id.equals(user._id)) { %>
-                              <span class="tag badge badge-pill badge-secondary">Owner</span>
-                            <% } %>
-                            </a>
-
-                            <% if (!(user._id.toString() == currentUser._id.toString())) { %>
-                              <div id="follow-div-<%=user._id%>" class="follow-div">
-
-                              <% if (user.followers.includes(currentUser._id)) { %>
-                                <button type="button" data-toggle="modal" data-target="#modal-<%=user._id%>-unfollow" id="unfollow-<%=user._id%>" class="btn btn-danger unfollow-button">Unfollow</button>
-
-                              <% } else { %>
-                                <button type="button" data-toggle="modal" data-target="#modal-<%=user._id%>-follow" id="follow-<%=user._id%>" class="btn btn-primary follow-button">Follow</button>
-                              <% } %>
-
-                              </div>
-                            <% } %>
-                          </li>
                         <% } %>
-                      <% } %>
-                      <span class="status-page-break" id="<%=status[0]%>-break"><br /><br /></span>
+
+                        <% for (let user of sortedUsers) { %>
+                            <% if (user.status.toLowerCase() == status[0]) { %>
+                                <li class="list-group-item list-group-item-action user-element">
+
+                                    <a href="/profiles/<%= user._id %>" class="user-element-text">
+                                        <img class="profile-image" src="<%= user.imageUrl %>" alt="profile picture">
+                                        <span class="username <%= status[0] %> <%= status[1] %> <%= user.permission %> <%= user.tags.join(' ') %>"><span
+                                                    class="span-tag-name"><%= user.firstName %> <%= user.lastName %></span> <span
+                                                    class="span-tag-username"><%= user.username %></span></span>
+
+                                        <% if (permMap.has(user.permission)) { %>
+                                            <span class="badge badge-<%= permMap.get(user.permission)[1] %>"><%= permMap.get(user.permission)[0] %></span>
+                                        <% } %>
+
+                                        <% if (user._id.toString() == currentUser._id.toString())  { %>
+                                            <span class="badge badge-dark">Me</span>
+                                        <% } %>
+
+                                        <span class="tags"></span>
+
+                                        <% for (let tag of user.tags) { %>
+                                            <span class="tag badge badge-pill badge-<%= tagMap.get(tag) %>"><%= tag %></span>
+                                        <% } %>
+
+                                        <% if (room.creator.id._id.equals(user._id)) { %>
+                                            <span class="tag badge badge-pill badge-secondary">Owner</span>
+                                        <% } %>
+                                    </a>
+
+                                    <% if (!(user._id.toString() == currentUser._id.toString())) { %>
+                                        <div id="follow-div-<%= user._id %>" class="follow-div">
+
+                                            <% if (user.followers.includes(currentUser._id)) { %>
+                                                <button type="button" data-toggle="modal"
+                                                        data-target="#modal-<%= user._id %>-unfollow"
+                                                        id="unfollow-<%= user._id %>"
+                                                        class="btn btn-danger unfollow-button">Unfollow
+                                                </button>
+
+                                            <% } else { %>
+                                                <button type="button" data-toggle="modal"
+                                                        data-target="#modal-<%= user._id %>-follow"
+                                                        id="follow-<%= user._id %>"
+                                                        class="btn btn-primary follow-button">Follow
+                                                </button>
+                                            <% } %>
+
+                                        </div>
+                                    <% } %>
+                                </li>
+                            <% } %>
+                        <% } %>
+                        <span class="status-page-break" id="<%= status[0] %>-break"><br/><br/></span>
                     <% } %>
-                  <% } %>
+                <% } %>
+            </div>
+        </div>
+    </div>
+</div>
+
+<% for (let user of room.members) { %>
+    <div class="modal fade" id="modal-<%= user._id %>-unfollow" tabindex="-1" aria-labelledby="deleteModalLabel"
+         aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Unfollow <%= user.firstName %> <%= user.lastName %>
+                        ?</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    You will no longer be notified when <%= user.firstName %> <%= user.lastName %> posts anything new.
+                    %>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">No, Go Back</button>
+                    <button type="button" id="unfollow-confirm-<%= user._id %>" onclick="unfollow(this, 'index')"
+                            class="btn btn-danger">Yes, Unfollow
+                    </button>
                 </div>
             </div>
         </div>
     </div>
 
-    <% for (let user of room.members) { %>
-      <div class="modal fade" id="modal-<%=user._id%>-unfollow" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+    <div class="modal fade" id="modal-<%= user._id %>-follow" tabindex="-1" aria-labelledby="deleteModalLabel"
+         aria-hidden="true">
         <div class="modal-dialog">
-          <div class="modal-content">
-            <div class="modal-header">
-              <h5 class="modal-title" id="exampleModalLabel">Unfollow <%=user.firstName%> <%=user.lastName%>?</h5>
-              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                <span aria-hidden="true">&times;</span>
-              </button>
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Follow <%= user.firstName %> <%= user.lastName %>
+                        ?</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    You will be notified when <%= user.firstName %> <%= user.lastName %> posts anything new.
+                    %>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">No, Go Back</button>
+                    <button type="button" id="follow-confirm-<%= user._id %>" onclick="follow(this, 'index')"
+                            class="btn btn-primary">Yes, Follow
+                    </button>
+                </div>
             </div>
-            <div class="modal-body">
-              You will no longer be notified when <%=user.firstName%> <%=user.lastName%> posts anything new.%>
-            </div>
-            <div class="modal-footer">
-              <button type="button" class="btn btn-secondary" data-dismiss="modal">No, Go Back</button>
-              <button type="button" id="unfollow-confirm-<%=user._id%>" onclick="unfollow(this, 'index')" class="btn btn-danger">Yes, Unfollow</button>
-            </div>
-          </div>
         </div>
-      </div>
-
-      <div class="modal fade" id="modal-<%=user._id%>-follow" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
-          <div class="modal-content">
-            <div class="modal-header">
-              <h5 class="modal-title" id="exampleModalLabel">Follow <%=user.firstName%> <%=user.lastName%>?</h5>
-              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                <span aria-hidden="true">&times;</span>
-              </button>
-            </div>
-            <div class="modal-body">
-              You will be notified when <%=user.firstName%> <%=user.lastName%> posts anything new.%>
-            </div>
-            <div class="modal-footer">
-              <button type="button" class="btn btn-secondary" data-dismiss="modal">No, Go Back</button>
-              <button type="button" id="follow-confirm-<%=user._id%>" onclick="follow(this, 'index')" class="btn btn-primary">Yes, Follow</button>
-            </div>
-          </div>
-        </div>
-      </div>
-    <% } %>
-  </body>
+    </div>
+<% } %>
+</body>
 </html>

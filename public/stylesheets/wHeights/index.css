@@ -3,7 +3,7 @@
 background
 ================================
  */
- #background{
+#background {
     background-image: url("https://witherlyheights.org/wp-content/uploads/2019/09/WH-Banner-300x800.jpeg");
     background-position: center;
     background-size: cover;
@@ -45,54 +45,55 @@ background
 }
 
 .block-header {
-  padding-bottom: 20px;
+    padding-bottom: 20px;
 }
 
 .article-date {
-  color: white;
-  font-size: 80%;
+    color: white;
+    font-size: 80%;
 }
 
 .author-profile {
-  width: 30px;
-  height: 30px;
-  object-fit: cover;
-  border-radius: 50%;
+    width: 30px;
+    height: 30px;
+    object-fit: cover;
+    border-radius: 50%;
 }
 
 .edit-button {
-  margin-left: 10px;
+    margin-left: 10px;
 }
 
 .edit-button-text {
-  color: white;
+    color: white;
 }
 
 .delete-article {
-  display: inline-block;
+    display: inline-block;
 }
 
 #exampleModalLabel, .modal-body {
-  color: black;
+    color: black;
 }
 
 .block-content {
-  text-align: center;
+    text-align: center;
 }
 
 .article-photo {
-  width: 25%;
-  height: 25%;
-  float: left;
-  border-radius: 15px;
-  margin-bottom: 20px;
-  margin-right: 20px;"
+    width: 25%;
+    height: 25%;
+    float: left;
+    border-radius: 15px;
+    margin-bottom: 20px;
+    margin-right: 20px;
+"
 }
 
 .creator-heading {
-  float: left;
+    float: left;
 }
 
 .article-content {
-  text-align: left;
+    text-align: left;
 }

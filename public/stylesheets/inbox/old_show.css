@@ -1,38 +1,38 @@
 .inbox-container {
-  overflow: auto;
+    overflow: auto;
 }
 
 .main-section {
-  overflow: auto;
-  padding: 1.5rem;
+    overflow: auto;
+    padding: 1.5rem;
 }
 
 #message-from {
-  color: inherit;
+    color: inherit;
 }
 
 .recipient {
-  color: black;
+    color: black;
 }
 
 .notif-image {
-  width: 30%;
-  height: 30%;
-  object-fit: contain;
-  margin-bottom: 20px;
-  display: inline-block;
+    width: 30%;
+    height: 30%;
+    object-fit: contain;
+    margin-bottom: 20px;
+    display: inline-block;
 }
 
 #notif-date {
-  font-size: 15px;
+    font-size: 15px;
 }
 
 #notif-text {
-  margin-top: 10px;
-  white-space: pre-wrap;
-  text-align: left;
+    margin-top: 10px;
+    white-space: pre-wrap;
+    text-align: left;
 }
 
 .sender-receiver-info {
-  font-weight: bold;
+    font-weight: bold;
 }

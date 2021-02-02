@@ -20,26 +20,31 @@
     <script src="https://kit.fontawesome.com/dccc745c41.js" crossorigin="anonymous"></script>
 </head>
 <body>
-    <!-- include the navbar via ejs -->
-    <%- include('../partials/navbar') %>
-    <!-- include the backdrop for nav -->
-    <%- include('../partials/header') %>
+<!-- include the navbar via ejs -->
+<%- include('../partials/navbar') %>
+<!-- include the backdrop for nav -->
+<%- include('../partials/header') %>
 
-    <div class="container mt-5">
-        <div class="row">
-            <div class="col-12" id="edit-settings">
-                <h1 id="settings-header">Edit Account Settings</h1>
-                <a class="btn btn-primary" href="/profiles/<%= currentUser._id %>"><i class="fas fa-arrow-left"></i> Back</a>
-            </div>
+<div class="container mt-5">
+    <div class="row">
+        <div class="col-12" id="edit-settings">
+            <h1 id="settings-header">Edit Account Settings</h1>
+            <a class="btn btn-primary" href="/profiles/<%= currentUser._id %>"><i class="fas fa-arrow-left"></i>
+                Back</a>
         </div>
-        <div class="row mt-3">
-            <div class="col-md-8 offset-md-2 col-12">
-                <h4 class="mb-3">Change Email</h1>
+    </div>
+    <div class="row mt-3">
+        <div class="col-md-8 offset-md-2 col-12">
+            <h4 class="mb-3">Change Email</h1>
                 <form action="/profiles/change-email?_method=put" method="post">
                     <div class="form-group">
                         <label for="usernameInput">Email</label>
-                        <input id="usernameInput" class="form-control" type="text" name="email" value="<%= currentUser.email %>" placeholder="Enter New Email" required><br />
-                        <input type="checkbox" name="receiving_emails" id="receiving_emails" <% if (currentUser.receiving_emails) {%> checked <%}%>/>
+                        <input id="usernameInput" class="form-control" type="text" name="email"
+                               value="<%= currentUser.email %>" placeholder="Enter New Email" required><br/>
+                        <input type="checkbox" name="receiving_emails" id="receiving_emails"
+                        <% if (currentUser.receiving_emails) { %> checked
+                                <% } %>
+                        />
                         <label for="receiving_emails">Send Me Emails</label>
                     </div>
 
@@ -49,19 +54,22 @@
                 <form action="/profiles/change-password?_method=put" method="post">
                     <div class="form-group">
                         <label for="usernameInput">Old Password</label>
-                        <input id="usernameInput" class="form-control" type="password" name="oldPassword" placeholder="Enter Old Password" required>
+                        <input id="usernameInput" class="form-control" type="password" name="oldPassword"
+                               placeholder="Enter Old Password" required>
                     </div>
                     <div class="form-group">
                         <label for="usernameInput">New Password</label>
-                        <input id="usernameInput" class="form-control" type="password" name="newPassword" placeholder="Enter New Password" minlength="8" required><br />
+                        <input id="usernameInput" class="form-control" type="password" name="newPassword"
+                               placeholder="Enter New Password" minlength="8" required><br/>
                         <label for="usernameInput">Confirm New Password</label>
-                        <input id="usernameInput" class="form-control" type="password" name="newPasswordConfirm" placeholder="Confirm New Password" minlength="8" required>
+                        <input id="usernameInput" class="form-control" type="password" name="newPasswordConfirm"
+                               placeholder="Confirm New Password" minlength="8" required>
                     </div>
 
                     <button class="btn btn-lg btn-primary btn-block">Change Password</button>
                 </form>
 
-                <br />
+                <br/>
                 <!-- <form action="/profiles/delete-account?_method=delete" method="post" id="delete-account">
                   <button type="button" class="btn btn-lg btn-danger btn-block" data-toggle="modal" data-target="#modal" id="delete-button">Delete Account</button>
                   <div class="modal fade" id="modal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
@@ -84,9 +92,9 @@
                     </div>
                   </div>
                 </form> -->
-                <br />
-            </div>
+                <br/>
         </div>
     </div>
+</div>
 </body>
 </html>

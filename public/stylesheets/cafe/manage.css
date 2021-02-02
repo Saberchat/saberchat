@@ -1,24 +1,24 @@
 .category-header {
-  margin-top: 40px;
+    margin-top: 40px;
 }
 
 .upvote {
-  color: grey;
-  text-decoration: none;
-  display: inline;
+    color: grey;
+    text-decoration: none;
+    display: inline;
 }
 
 .upvote-count {
-  float: right;
-  color: green;
-  font-weight: bold;
+    float: right;
+    color: green;
+    font-weight: bold;
 }
 
 #modify-banned {
-  color: red;
-  font-weight: bold;
+    color: red;
+    font-weight: bold;
 }
 
 .item-name {
-  font-weight: bold;
+    font-weight: bold;
 }
