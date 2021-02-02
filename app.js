@@ -3,8 +3,8 @@ if (process.env.NODE_ENV !== "production") {
     require('dotenv').config();
 }
 
-// Require NodeJS modules
-// set up and start the express server
+//Require NodeJS modules
+//set up and start the express server
 const express = require('express');
 const app = express();
 // mongoose allows us to communicate with mongodb seamlessly through js
