@@ -69,7 +69,7 @@ for (let i = 0; i < count; i++) {
     }
 }
 // function to post data
-const postIt = ((url, data => {
+const postIt = ((url, data) => {
 
     $('body').append($('<form/>', {
         id: 'jQueryPostItForm',
@@ -147,4 +147,4 @@ $('#create-btn').on('click', (() => {
     }
 
     postIt('/articles/new', article);
-});
+}));
