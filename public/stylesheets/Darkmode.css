@@ -1,4 +1,4 @@
-.mode {
+.mode, .mode:focus, .mode:hover{
   background-color: #343a40;
   color: white;
 
@@ -11,7 +11,7 @@
   background-color: grey;
   color: white;
 }
-.cafe,.cafe:focus,.cafe:active{
+.cafe,.cafe:focus,.cafe:hover{
   background-color: #000057;
   color: #7FFFD4;
 }

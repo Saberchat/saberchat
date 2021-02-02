@@ -60,7 +60,7 @@
           <ul class="list-group" id="active-orders">
             <% orders.reverse().forEach(order => { %>
               <% if (order.present == true) { %>
-                <li class="list-group-item" id="<%=order._id%>">
+                <li class="list-group-item cafe" id="<%=order._id%>">
 
                   <% if (!order.charge.toString().includes('.')) { %>
                     <h4 class="order-heading">Order - $<%= order.charge %>.00</h4>

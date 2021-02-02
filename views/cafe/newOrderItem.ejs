@@ -12,6 +12,11 @@
       <link rel="stylesheet" href="/stylesheets/components/navbar.css">
       <link rel="stylesheet" href="/stylesheets/chat/new.css">
       <link rel="stylesheet" href="/stylesheets/cafe/new.css">
+      <%if (currentUser) {%>
+        <%if (currentUser.darkmode) { %>
+          <link rel="stylesheet" href="/stylesheets/Darkmode.css">
+        <%}%>
+      <%}%>
 
       <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
       <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
@@ -21,7 +26,7 @@
       <script src="https://kit.fontawesome.com/dccc745c41.js" crossorigin="anonymous"></script>
       <script src="/javascript/cafe/image.js"></script>
   </head>
-  <body>
+  <body class="mode">
     <!-- include the navbar via ejs -->
     <%- include('../partials/navbar') %>
     <%- include('../partials/header') %>
@@ -38,22 +43,22 @@
           <form action="/cafe/item" method="post">
             <div class="form-group">
               <div class="row">
-                <div class="col">
+                <div class="col mode">
                   <label for="usernameInput">Name</label>
-                  <input id="usernameInput" class="form-control" type="text" name="name" placeholder="Enter Item Name" maxlength="45" required>
+                  <input id="usernameInput" class="form-control mode" type="text" name="name" placeholder="Enter Item Name" maxlength="45" required>
                 </div>
-                <div class="col">
+                <div class="col mode">
                   <label for="priceInput">Price</label>
                   <div class="input-group">
                     <div class="input-group-prepend">
                       <div class="input-group-text">$</div>
                     </div>
-                    <input id="priceInput" class="form-control" type="text" name="price" placeholder="Enter Price" maxlength="10" required>
+                    <input id="priceInput" class="form-control mode" type="text" name="price" placeholder="Enter Price" maxlength="10" required>
                   </div>
                 </div>
                 <div class="col">
                   <label for="usernameInput">Available</label>
-                  <input id="usernameInput" class="form-control" type="text" name="available" placeholder="Enter Number Available" maxlength="45" required>
+                  <input id="usernameInput" class="form-control mode" type="text" name="available" placeholder="Enter Number Available" maxlength="45" required>
                 </div>
               </div>
 
@@ -61,7 +66,7 @@
                 <div class="col">
                   <div class="input-group mb-3 field">
                     <label id="type-input-label" for="typeInput">Type</label>
-                    <select id="typeInput" name="type" class="field">
+                    <select id="typeInput" name="type" class="field mode">
                       <option disabled selected required >Meal Type</option>
                       <% types.forEach(type => { %>
                         <option><%=type.name%></option>
@@ -75,7 +80,7 @@
                 <div class="col">
                   <label for="usernameInput">Image</label>
                   <div id="image-block">
-                    <input id="image-input" oninput="createImage(this)" class="form-control" type="text" name="image" placeholder="Enter URL for Item Image">
+                    <input id="image-input" oninput="createImage(this)" class="form-control mode" type="text" name="image" placeholder="Enter URL for Item Image">
                     <br />
                     <img id="item-image" src="" alt="Image Does Not Exist" hidden/>
                   </div>
@@ -84,7 +89,7 @@
             </div>
             <div class="form-group">
               <label for="descInput">Description</label>
-              <textarea id="descInput" class="form-control" name="description" placeholder="Enter a short description about the item" maxlength="300" rows="5" required></textarea>
+              <textarea id="descInput" class="form-control mode" name="description" placeholder="Enter a short description about the item" maxlength="300" rows="5" required></textarea>
             </div>
             <button class="btn btn-lg btn-primary btn-block">Submit</button>
           </form>
