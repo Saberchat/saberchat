@@ -39,7 +39,24 @@ function sortByPopularity(posts, likeFactor, dateFactor) {
             sorted.unpopular.push(post);
         }
     }
-    return sorted;
+  }
+
+  //Return only specific fields
+  if (fields) {
+    let sortedFields = {popular: [], unpopular: []};
+    for (let group in sorted) {
+        for (let post of sorted[group]) {
+            for (let attr in post) {
+                if (fields.includes(attr)) {
+                    sortedFields[group].push(post[attr]);
+                }
+            }
+        }
+    }
+    return sortedFields;
+  }
+
+  return sorted;
 }
 
 module.exports = {getPopularityCoefficiant, sortByPopularity};

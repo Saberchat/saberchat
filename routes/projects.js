@@ -152,8 +152,8 @@ router.post('/', middleware.isLoggedIn, middleware.isFaculty, validateProject, (
 //       return res.redirect('back');
 //     }
 //
-//     const popularProjects = sortByPopularity(projects, "likes", "created_at").popular; //Extract and sort popular projects
-//     const unpopularProjects = sortByPopularity(projects, "likes", "created_at").unpopular; //Extract and sort unpopular projects
+//     const popularProjects = sortByPopularity(projects, "likes", "created_at", null).popular; //Extract and sort popular projects
+//     const unpopularProjects = sortByPopularity(projects, "likes", "created_at", null).unpopular; //Extract and sort unpopular projects
 //
 //     //Build string of projects and comments text
 //     let popularProjectText = "";
