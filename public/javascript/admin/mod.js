@@ -1,6 +1,6 @@
 let loaded = [];
 
-const ignoreComment = function(button) {
+const ignoreComment = function (button) {
     const url = '/admin/moderate?_method=put';
     const commentId = button.id.split('-')[1];
     const listItem = document.getElementById(`comment-${commentId}`);
@@ -24,7 +24,7 @@ const ignoreComment = function(button) {
     });
 }
 
-const deleteComment = function(button) {
+const deleteComment = function (button) {
     const url = '/admin/moderate?_method=delete';
     const commentId = button.id.split('-')[1];
     const listItem = document.getElementById(`comment-${commentId}`);
@@ -48,7 +48,7 @@ const deleteComment = function(button) {
     });
 }
 
-const getContext = function(button) {
+const getContext = function (button) {
     const url = '/admin/moderate';
     const commentId = button.id.split('-')[1];
     const data = {commentId};

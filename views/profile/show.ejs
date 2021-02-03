@@ -74,7 +74,8 @@
                         <% } else { %>
                             <button type="button" class="btn btn-primary edit-button follow-button" data-toggle="modal"
                                     data-target="#modal-<%= user._id %>-follow" id="follow-<%= user._id %>">
-                                Follow</button>
+                                Follow
+                            </button>
                         <% } %>
 
                         <div class="modal fade" id="modal-<%= user._id %>-unfollow" tabindex="-1"
@@ -99,7 +100,8 @@
                                         </button>
                                         <button type="button" onclick="unfollow(this, 'show')"
                                                 id="unfollow-confirm-<%= user._id %>" class="btn btn-danger">Yes,
-                                            Unfollow</button>
+                                            Unfollow
+                                        </button>
                                     </div>
                                 </div>
                             </div>
@@ -127,7 +129,8 @@
                                         </button>
                                         <button type="button" onclick="follow(this, 'show')"
                                                 id="follow-confirm-<%= user._id %>" class="btn btn-primary">Yes,
-                                            Follow</button>
+                                            Follow
+                                        </button>
                                     </div>
                                 </div>
                             </div>

@@ -1,4 +1,4 @@
-const request = function(button) {
+const request = function (button) {
     const roomId = button.id.split('-')[1];
     const url = `/chat/${roomId}/request-access`;
     const data = {};
@@ -12,7 +12,7 @@ const request = function(button) {
     });
 }
 
-const cancelRequest = function(button) {
+const cancelRequest = function (button) {
     const roomId = button.id.split('-')[1];
     const url = `/chat/${roomId}/cancel-request?_method=delete`;
     const data = {};

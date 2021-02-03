@@ -10,7 +10,7 @@ const Item = require('../models/orderItem');
 const Type = require('../models/itemType');
 const Cafe = require('../models/cafe')
 
-const getData = async function() {
+const getData = async function () {
 
     const customers = await User.find({authenticated: true});
     if (!customers) {

@@ -282,13 +282,13 @@ router.post('/:id/ready', middleware.isLoggedIn, middleware.isMod, middleware.is
         }
 
         //Formats the charge in money format
-        const formattedCharge = `$${(order.charge*100).toString().slice(0, (order.charge*100).toString().length-2)}.${(order.charge*100).toString().slice((order.charge*100).toString().length-2)}`;
+        const formattedCharge = `$${(order.charge * 100).toString().slice(0, (order.charge * 100).toString().length - 2)}.${(order.charge * 100).toString().slice((order.charge * 100).toString().length - 2)}`;
         notif.text = `Your order is ready to pick up:\n ${itemText.join("\n")} \n\nExtra Instructions: ${order.instructions} \nTotal Cost: ${formattedCharge}`;
         await notif.save();
         transport(order.customer, 'Cafe Order Ready', `<p>Hello ${order.customer.firstName},</p><p>${notif.text}</p>`);
 
         order.customer.inbox.push(notif); //Add notif to user's inbox
-        order.customer.msgCount ++;
+        order.customer.msgCount++;
         await order.customer.save();
 
         order.present = false; //Order is not active anymore
@@ -342,7 +342,7 @@ router.post('/:id/reject', middleware.isLoggedIn, middleware.isMod, middleware.i
         }
 
         //Formats the charge in money format
-        const formattedCharge = `$${(order.charge*100).toString().slice(0, (order.charge*100).toString().length-2)}.${(order.charge*100).toString().slice((order.charge*100).toString().length-2)}`;
+        const formattedCharge = `$${(order.charge * 100).toString().slice(0, (order.charge * 100).toString().length - 2)}.${(order.charge * 100).toString().slice((order.charge * 100).toString().length - 2)}`;
 
         if (req.body.rejectionReason == "") {
             notif.text = `Your order was rejected. This is most likely because we suspect your order is not genuine. Contact us if you think there has been a mistake. No reason was provided for rejection.\n ${itemText.join("\n")} \n\nExtra Instructions: ${order.instructions} \nTotal Cost: ${formattedCharge}`;
@@ -361,7 +361,7 @@ router.post('/:id/reject', middleware.isLoggedIn, middleware.isMod, middleware.i
         }
 
         order.customer.inbox.push(notif); //Add notif to user's inbox
-        order.customer.msgCount ++;
+        order.customer.msgCount++;
         await order.customer.save();
 
         const deletedOrder = await Order.findByIdAndDelete(order._id).populate('items.item').populate('customer');
@@ -544,7 +544,7 @@ router.put('/item/:id', middleware.isLoggedIn, middleware.isMod, (req, res) => {
         for (let order of activeOrders) {
             order.charge = 0; //Reset the order's charge, we will have to recalculate
 
-            for (let i = 0; i < order.items.length; i ++) { //Iterate over each order, and change its price to match the new item prices
+            for (let i = 0; i < order.items.length; i++) { //Iterate over each order, and change its price to match the new item prices
                 order.charge += order.items[i].item.price * order.items[i].quantity;
                 order.items[i].price = item.price;
             }
@@ -678,7 +678,7 @@ router.post('/type', middleware.isLoggedIn, middleware.isMod, (req, res) => { //
         }
 
         for (let t of types) { //Now that we've created the type, we have to remove the newly selected items from all other types
-            for (let i = 0; i < t.items.length; i ++) {
+            for (let i = 0; i < t.items.length; i++) {
                 if (req.body[t.items[i].toString()]) {
                     t.items.splice(i, 1);
                 }

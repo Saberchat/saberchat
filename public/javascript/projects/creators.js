@@ -9,7 +9,7 @@ for (let creator of document.getElementsByClassName('user-tag')) {
     creatorInput.value = creatorList.toString()
 }
 
-const addCreator = function(user) {
+const addCreator = function (user) {
     if ((!creatorList.includes(creatorSelect.value)) && !(creatorList.includes(creatorSelect[creatorSelect.selectedIndex].className))) { //Make sure that if the status has been selected, nothing else is selected
         creatorList.push(creatorSelect.value);
         creatorInput.value = creatorList.toString();
@@ -35,7 +35,7 @@ const addCreator = function(user) {
     }
 }
 
-const remCreator = function(btn) {
+const remCreator = function (btn) {
     const id = btn.id;
 
     const userTags = document.getElementsByClassName('user-tag');

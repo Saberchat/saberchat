@@ -1,4 +1,4 @@
-const upvote = function(button) {
+const upvote = function (button) {
     const courseId = button.id.split('-')[1];
     const tutorId = button.id.split("-")[2];
     const url = `/homework/upvote/${courseId}?_method=put`;
@@ -17,7 +17,7 @@ const upvote = function(button) {
     });
 }
 
-const likeReview = function(button) { //Like a tutor's review (restricted to students and former students)
+const likeReview = function (button) { //Like a tutor's review (restricted to students and former students)
     const reviewId = button.id.split('-')[1];
     const url = `/homework/like-review/${reviewId}?_method=put`;
     const data = {};

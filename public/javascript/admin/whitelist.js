@@ -1,4 +1,4 @@
-const searchFunction = function() {
+const searchFunction = function () {
     const emails = document.getElementsByClassName('email');
     const searchInput = document.getElementById('search-input');
     let filter = searchInput.value.toLowerCase();
@@ -42,7 +42,7 @@ const addEmail = function(event, version) {
     });
 }
 
-const removeEmail = function(button) {
+const removeEmail = function (button) {
     const emailId = button.id.split('-')[1];
     const url = `/admin/whitelist/${emailId}?_method=delete`;
     const data = {};

@@ -1,7 +1,7 @@
 const loading = document.getElementById('loading');
 
 // sends put request with data
-const updateStatus = function(select) {
+const updateStatus = function (select) {
     loading.style.display = 'block';
     loading.style.color = 'gray';
     loading.innerHTML = 'Waiting...';
@@ -33,7 +33,7 @@ const updateStatus = function(select) {
 }
 
 // sends put request with data
-const updateTag = function(select) {
+const updateTag = function (select) {
     loading.style.color = 'gray';
     loading.innerHTML = 'Waiting...';
     const tag = select.value;
@@ -79,7 +79,7 @@ const updateTag = function(select) {
     });
 }
 
-const searchFunction = function() {
+const searchFunction = function () {
     const users = document.getElementsByClassName('user');
     const searchInput = document.getElementById('search-input');
     let filter = searchInput.value.toLowerCase();

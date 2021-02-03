@@ -1,4 +1,4 @@
-const book = function(button, location) {
+const book = function (button, location) {
     const courseId = button.id.split('-')[0];
     const tutorId = button.id.split('-')[1];
     const url = `/homework/book/${courseId}?_method=put`;
@@ -105,7 +105,7 @@ const book = function(button, location) {
     });
 }
 
-const leave = function(button, location) {
+const leave = function (button, location) {
     const courseId = button.id.split('-')[0];
     const tutorId = button.id.split('-')[1];
     const url = `/homework/leave/${courseId}?_method=put`;
@@ -166,7 +166,7 @@ const leave = function(button, location) {
     });
 }
 
-const closeLessons = function(button, location) {
+const closeLessons = function (button, location) {
     const courseId = button.id.split('-')[0];
     const tutorId = button.id.split('-')[1];
     const url = `/homework/close-lessons/${courseId}?_method=put`;
@@ -193,7 +193,7 @@ const closeLessons = function(button, location) {
     });
 }
 
-const reopenLessons = function(button, location) {
+const reopenLessons = function (button, location) {
     const courseId = button.id.split('-')[0];
     const tutorId = button.id.split('-')[1];
     const url = `/homework/reopen-lessons/${courseId}?_method=put`;
@@ -221,16 +221,16 @@ const reopenLessons = function(button, location) {
     });
 }
 
-const setStudents = function() {
+const setStudents = function () {
     document.getElementById("slots-label").innerText = `Number of Student Slots: ${document.getElementById('slots').value}`;
 }
 
-const setStudentsTutorShow = function(slider) {
+const setStudentsTutorShow = function (slider) {
     const courseId = slider.id.split('-')[1];
     document.getElementById(`slots-label-${courseId}`).innerText = `Number of Student Slots: ${slider.value}`;
 }
 
-const setStudentsShow = function(courseId) {
+const setStudentsShow = function (courseId) {
     const url = `/homework/set-students/${courseId}?_method=put`;
     const slots = document.getElementById('slots').value;
     const data = {courseId, slots};
@@ -261,7 +261,7 @@ const setStudentsShow = function(courseId) {
     });
 }
 
-const removeStudent = function(button, location) {
+const removeStudent = function (button, location) {
     const courseId = button.id.split('-')[0];
     const studentId = button.id.split('-')[1];
     const reason = document.getElementById(`reason-${studentId}`).value;
@@ -303,7 +303,7 @@ const removeStudent = function(button, location) {
     });
 }
 
-const removeTutor = function(button, location) {
+const removeTutor = function (button, location) {
     const courseId = button.id.split('-')[0];
     const tutorId = button.id.split('-')[1];
     const reason = document.getElementById(`reason-${tutorId}`).value;
@@ -349,7 +349,7 @@ const removeTutor = function(button, location) {
     });
 }
 
-const unblock = function(button) {
+const unblock = function (button) {
     const courseId = button.id.split('-')[0];
     const blockedId = button.id.split('-')[1];
     const url = `/homework/unblock/${courseId}?_method=put`;
@@ -368,7 +368,7 @@ const unblock = function(button) {
     });
 }
 
-const changeBio = function(button) {
+const changeBio = function (button) {
     const courseId = button.id.split('-')[2];
     const bio = document.getElementById(`edit-bio-field`).value;
     const url = `/homework/bio/${courseId}?_method=put`;
@@ -383,12 +383,12 @@ const changeBio = function(button) {
     });
 }
 
-const setTime = function(input) {
+const setTime = function (input) {
     const studentId = input.id.split('-')[1];
     document.getElementById(`time-label-${studentId}`).innerText = input.value;
 }
 
-const getTime = function(experience) {
+const getTime = function (experience) {
     let result;
     experience = parseInt(experience);
     if (experience < 60) {
@@ -423,7 +423,7 @@ const getTime = function(experience) {
     return result;
 }
 
-const mark = function(button) {
+const mark = function (button) {
     const courseId = button.id.split('-')[1];
     const studentId = button.id.split('-')[2];
     const time = parseInt(document.getElementById(`time-${studentId}`).value);

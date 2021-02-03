@@ -15,9 +15,9 @@
     <link rel="stylesheet" href="/stylesheets/cafe/new.css">
     <link rel="stylesheet" href="/stylesheets/cafe/menu.css">
     <% if (currentUser) { %>
-    <% if (currentUser.darkmode) { %>
-        <link rel="stylesheet" href="/stylesheets/Darkmode.css">
-    <% } %>
+        <% if (currentUser.darkmode) { %>
+            <link rel="stylesheet" href="/stylesheets/Darkmode.css">
+        <% } %>
     <% } %>
 
     <script src="/socket.io/socket.io.js"></script>
@@ -78,9 +78,9 @@
                         <% for (let i = 0; i < type.items.length - 1; i++) { %>
                             <% for (let j = 0; j < type.items.length - 1; j++) { %>
                                 <% if (type.items[j].upvotes.length < type.items[j + 1].upvotes.length) { %>
-                                <% temp = type.items[j]; %>
-                                <% type.items[j] = type.items[j + 1]; %>
-                                <% type.items[j + 1] = temp; %>
+                                    <% temp = type.items[j]; %>
+                                    <% type.items[j] = type.items[j + 1]; %>
+                                    <% type.items[j + 1] = temp; %>
                                 <% } %>
                             <% } %>
                         <% } %>
@@ -89,74 +89,77 @@
                     <% for (let type of tempTypes) { %>
                         <% if (type.items.length > 0) { %>
 
-                        <li class="list-group-item list-group-item-success category-header cafe"
-                            id="<%= type._id %>-header">
-                            <div class="d-flex w-100 justify-content-between cafe">
-                                <h2 class="mb-1"><%= type.name %></h2>
-                                <span><%= type.items.length %> item(s)</span>
-                            </div>
-                        </li>
+                            <li class="list-group-item list-group-item-success category-header cafe"
+                                id="<%= type._id %>-header">
+                                <div class="d-flex w-100 justify-content-between cafe">
+                                    <h2 class="mb-1"><%= type.name %></h2>
+                                    <span><%= type.items.length %> item(s)</span>
+                                </div>
+                            </li>
                         <% } %>
                         <% for (let item of type.items) { %>
                             <% if (frequentItems.toString().includes(item._id.toString())) { %>
-                                <div class="list-group-item list-group-item-info form-check menu-item <%= type.name %> cafe" id="item-<%= item.id %>" title="You have frequently ordered this item">
+                    <div class="list-group-item list-group-item-info form-check menu-item <%= type.name %> cafe"
+                         id="item-<%= item.id %>" title="You have frequently ordered this item">
 
-                            <% } else { %>
-                                <div class="list-group-item form-check menu-item <%= type.name.replace(' ', '') %> cafe" id="item-<%= item.id %>">
+                        <% } else { %>
+                        <div class="list-group-item form-check menu-item <%= type.name.replace(' ', '') %> cafe"
+                             id="item-<%= item.id %>">
                             <% } %>
 
-                                <!-- Div to put margins on text inside outer div -->
-                                <div class="style-div">
+                            <!-- Div to put margins on text inside outer div -->
+                            <div class="style-div">
 
-                                    <input name="check[<%= item._id %>]" id="<%= item._id %>" class="form-check-input"
-                                           type="checkbox" value="">
-                                    <select class="num-orders" id="dd_<%= item._id %>" name="<%= item.name %>"
-                                            onchange="changeOrderConfirmation()">
-                                        <% let val = 1 %>
-                                        <% if (item.availableItems > 3) { %>
-                                            <% while (val <= 3) { %>
-                                                <option><%= val %></option>
-                                                <% val ++;%>
-                                            <% } %>
-                                        <% } else { %>
-                                            <% while (val <= item.availableItems) { %>
-                                                <option><%= val %></option>
-                                                <% val ++;%>
-                                            <% } %>
+                                <input name="check[<%= item._id %>]" id="<%= item._id %>" class="form-check-input"
+                                       type="checkbox" value="">
+                                <select class="num-orders" id="dd_<%= item._id %>" name="<%= item.name %>"
+                                        onchange="changeOrderConfirmation()">
+                                    <% let val = 1 %>
+                                    <% if (item.availableItems > 3) { %>
+                                        <% while (val <= 3) { %>
+                                            <option><%= val %></option>
+                                            <% val++; %>
                                         <% } %>
-                                    </select>
-
-                                    <label class="form-check-label" for="<%= item._id %>">
-                                        <span class="item-name"><%= item.name %></span>
-                                        (<%= item.availableItems %> orders available) - $<%= `${(item.price*100).toString().slice(0, (item.price*100).toString().length-2)}.${(item.price*100).toString().slice((item.price*100).toString().length-2)}`%>
-
-                                        <% if (frequentItems.toString().includes(item._id.toString())) { %>
-                                            <span class="popular">Frequently Ordered</span>
+                                    <% } else { %>
+                                        <% while (val <= item.availableItems) { %>
+                                            <option><%= val %></option>
+                                            <% val++; %>
                                         <% } %>
-                                    </label>
+                                    <% } %>
+                                </select>
 
-                                    <div title="Upvotes" class="upvotes">
+                                <label class="form-check-label" for="<%= item._id %>">
+                                    <span class="item-name"><%= item.name %></span>
+                                    (<%= item.availableItems %> orders available) -
+                                    $<%= `${(item.price * 100).toString().slice(0, (item.price * 100).toString().length - 2)}.${(item.price * 100).toString().slice((item.price * 100).toString().length - 2)}` %>
 
-                                        <% if (item.upvotes.includes(currentUser._id)) { %>
+                                    <% if (frequentItems.toString().includes(item._id.toString())) { %>
+                                        <span class="popular">Frequently Ordered</span>
+                                    <% } %>
+                                </label>
+
+                                <div title="Upvotes" class="upvotes">
+
+                                    <% if (item.upvotes.includes(currentUser._id)) { %>
                                         <span class="upvoted" id="upvote-<%= item._id %>" onclick="upvote(this)"><i
                                                     class="fas fa-arrow-circle-up"></i></span>
 
-                                        <% } else { %>
+                                    <% } else { %>
                                         <span class="not-upvoted" id="upvote-<%= item._id %>" onclick="upvote(this)"><i
                                                     class="fas fa-arrow-circle-up"></i></span>
-                                        <% } %>
+                                    <% } %>
 
-                                        <span id="upvoteCount-<%= item._id %>"> <%= item.upvotes.length %></span>
-                                    </div>
-
-                                    <br/>
+                                    <span id="upvoteCount-<%= item._id %>"> <%= item.upvotes.length %></span>
                                 </div>
+
+                                <br/>
                             </div>
+                        </div>
 
                         <% } %>
 
                         <% if (type.items.length > 0) { %>
-                        <br class="category-break" id="<%= type._id %>-break"/>
+                            <br class="category-break" id="<%= type._id %>-break"/>
                         <% } %>
                         <% } %>
                     </div>
@@ -187,7 +190,7 @@
                                   class="list-group-item list-group-item-action form-check cafe"><span
                                         class="instructions">Extra Instructions:</span> None</span>
                             <span id="balance-box" class="list-group-item list-group-item-action form-check">Current Balance:
-                                $<%= `${(currentUser.balance*100).toString().slice(0, (currentUser.balance*100).toString().length-2)}.${(currentUser.balance*100).toString().slice((currentUser.balance*100).toString().length-2)}`%>
+                                $<%= `${(currentUser.balance * 100).toString().slice(0, (currentUser.balance * 100).toString().length - 2)}.${(currentUser.balance * 100).toString().slice((currentUser.balance * 100).toString().length - 2)}` %>
                             </span>
                             <span id="total-cost"
                                   class="list-group-item list-group-item-action form-check">Total: $0.00</span>

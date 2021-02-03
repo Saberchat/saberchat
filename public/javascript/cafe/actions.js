@@ -1,4 +1,4 @@
-const ready = function(button) {
+const ready = function (button) {
     const orderId = button.id.split('-')[0];
     const url = `/cafe/${orderId}/ready`;
     const data = {};
@@ -19,7 +19,7 @@ const ready = function(button) {
     });
 }
 
-const reject = function(button) {
+const reject = function (button) {
     const orderId = button.id.split('-')[0];
     const rejectionReason = document.getElementById(`rejection-reason-${orderId}`).value;
     const url = `/cafe/${orderId}/reject`;
@@ -41,7 +41,7 @@ const reject = function(button) {
     });
 }
 
-const cancel = function(button) {
+const cancel = function (button) {
     const orderId = button.id.split('-')[0];
     const url = `/cafe/order/${orderId}?_method=delete`;
     const data = {};
@@ -55,7 +55,7 @@ const cancel = function(button) {
     });
 }
 
-const changeCafeStatus = function() {
+const changeCafeStatus = function () {
     const url = `/cafe/change-cafe-status?_method=put`;
     const data = {};
 

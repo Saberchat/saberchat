@@ -1,7 +1,7 @@
 const loading = document.getElementById('loading');
 
 // sends put request with data
-const updateRole = function(select) {
+const updateRole = function (select) {
     loading.style.display = 'block';
     loading.style.color = 'gray';
     loading.innerHTML = 'Waiting...';
@@ -33,7 +33,7 @@ const updateRole = function(select) {
     });
 }
 
-const searchFunction = function() {
+const searchFunction = function () {
     const users = document.getElementsByClassName('user');
     const searchInput = document.getElementById('search-input');
     let filter = searchInput.value.toLowerCase();

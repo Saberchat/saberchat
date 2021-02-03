@@ -90,9 +90,10 @@
                     <% type.items.forEach(item => { %>
 
                         <% if (item.isAvailable) { %>
-                            <span class="list-group-item list-group-item-action menu-item <%= type.name.split(' ').join('') %>  cafe" id="item-<%= item.id %>">
+                            <span class="list-group-item list-group-item-action menu-item <%= type.name.split(' ').join('') %>  cafe"
+                                  id="item-<%= item.id %>">
                                   <span class="item-name"><%= item.name %> (<%= item.availableItems %> orders available)</span>
-                                  - $<%= `${(item.price*100).toString().slice(0, (item.price*100).toString().length-2)}.${(item.price*100).toString().slice((item.price*100).toString().length-2)}`%>
+                                  - $<%= `${(item.price * 100).toString().slice(0, (item.price * 100).toString().length - 2)}.${(item.price * 100).toString().slice((item.price * 100).toString().length - 2)}` %>
 
                                 <div title="Upvotes" class="upvotes">
 

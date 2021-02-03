@@ -1,5 +1,5 @@
 // sends put request with data
-const like = function(button) {
+const like = function (button) {
     const projectId = button.id.split("-")[1];
     const url = `/projects/like?_method=put`;
     const data = {project: projectId};
@@ -19,7 +19,7 @@ const like = function(button) {
     });
 }
 
-const likeComment = function(button) {
+const likeComment = function (button) {
     const commentId = button.id.split("-")[1];
     const url = `/projects/like-comment?_method=put`;
     const data = {commentId};

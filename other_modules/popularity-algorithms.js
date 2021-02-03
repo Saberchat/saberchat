@@ -7,7 +7,7 @@
 // likeType = the datatype of like factor (can be a list of likes or a uniform int)
 // dateFactor = the variable to evaluate the date each post was created at
 
-const getPopularityCoefficiant = function(posts, likeFactor, likeType, dateFactor) {
+const getPopularityCoefficiant = function (posts, likeFactor, likeType, dateFactor) {
     const now = new Date().getTime();
     const rate = 86400; //Rate of conversion is seconds to days
     let popularityCoefficiant = 0;
@@ -21,7 +21,7 @@ const getPopularityCoefficiant = function(posts, likeFactor, likeType, dateFacto
     return popularityCoefficiant;
 }
 
-const sortByPopularity = function(posts, likeFactor, likeType, dateFactor, fields) { //Sort posts by popularity coefficiant
+const sortByPopularity = function (posts, likeFactor, likeType, dateFactor, fields) { //Sort posts by popularity coefficiant
     let sorted = {popular: [], unpopular: []}; //Object holds both popular and unpopular items
 
     let temp; //Sort posts by order of popularity coefficiant
