@@ -112,37 +112,27 @@
                                            type="checkbox" value="">
                                     <select class="num-orders" id="dd_<%= item._id %>" name="<%= item.name %>"
                                             onchange="changeOrderConfirmation()">
+                                        <% let val = 1 %>
                                         <% if (item.availableItems > 3) { %>
-                                            <% [1, 2, 3].forEach(num => { %>
-                                            <option><%= num %></option>
-                                            <% }); %>
-                                        <% } else { %>
-                                            <% let val = 0 %>
-                                            <% [...Array(item.availableItems).keys()].forEach(num => { %>
-                                                <% val = num + 1 %>
+                                            <% while (val <= 3) { %>
                                                 <option><%= val %></option>
-                                            <% }); %>
+                                                <% val ++;%>
+                                            <% } %>
+                                        <% } else { %>
+                                            <% while (val <= item.availableItems) { %>
+                                                <option><%= val %></option>
+                                                <% val ++;%>
+                                            <% } %>
                                         <% } %>
                                     </select>
 
-                                    <label class="form-check-label" for="<%= item._id %>"><span
-                                                class="item-name"><%= item.name %></span> (<%= item.availableItems %> orders
-                                        available) -
-
-                                        <% if (!item.price.toString().includes('.')) { %>
-                                            $<%= item.price %>.00
-
-                                        <% } else if (item.price.toString().split('.')[1].length == 1) { %>
-                                            $<%= item.price %>0
-
-                                        <% } else { %>
-                                            $<%= item.price %>
-                                        <% } %>
+                                    <label class="form-check-label" for="<%= item._id %>">
+                                        <span class="item-name"><%= item.name %></span>
+                                        (<%= item.availableItems %> orders available) - $<%= `${(item.price*100).toString().slice(0, (item.price*100).toString().length-2)}.${(item.price*100).toString().slice((item.price*100).toString().length-2)}`%>
 
                                         <% if (frequentItems.toString().includes(item._id.toString())) { %>
                                             <span class="popular">Frequently Ordered</span>
                                         <% } %>
-
                                     </label>
 
                                     <div title="Upvotes" class="upvotes">
@@ -197,15 +187,7 @@
                                   class="list-group-item list-group-item-action form-check cafe"><span
                                         class="instructions">Extra Instructions:</span> None</span>
                             <span id="balance-box" class="list-group-item list-group-item-action form-check">Current Balance:
-                                <% if (!currentUser.balance.toString().includes('.')) { %>
-                                    $<%= currentUser.balance %>.00
-
-                                <% } else if (currentUser.balance.toString().split('.')[1].length == 1){ %>
-                                    $<%= currentUser.balance %>0
-
-                                <% } else { %>
-                                    $<%= currentUser.balance %>
-                                <% } %>
+                                $<%= `${(currentUser.balance*100).toString().slice(0, (currentUser.balance*100).toString().length-2)}.${(currentUser.balance*100).toString().slice((currentUser.balance*100).toString().length-2)}`%>
                             </span>
                             <span id="total-cost"
                                   class="list-group-item list-group-item-action form-check">Total: $0.00</span>

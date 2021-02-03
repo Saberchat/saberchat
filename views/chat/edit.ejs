@@ -116,7 +116,7 @@
             </form>
             <div class="container mt-2"></div>
             <!-- delete button and form with bootstrap modal -->
-            <form action="/chat/<%= room._id %>/delete?_method=delete" method="post" id="delete-form">
+            <form action="/chat/<%= room._id %>?_method=delete" method="post" id="delete-form">
                 <button type="button" class="btn btn-lg btn-danger btn-block" data-toggle="modal"
                         data-target="#deleteModal" id="delete-button">Delete this room
                 </button>

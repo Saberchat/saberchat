@@ -70,7 +70,7 @@ const getOrders = function(outputStream) {
           <ul class="list-group">
             ${getItems()}
           </ul>
-          <p class="card-text mt-3"><strong>Cost:</strong> $${order.charge}</p>
+          <p class="card-text mt-3"><strong>Cost:</strong>$${(order.charge*100).toString().slice(0, (order.charge*100).toString().length-2)}.${(order.charge*100).toString().slice((order.charge*100).toString().length-2)}</p>
           <p class="card-text">${order.date}</p>
           <form class="ready-form" action="${order._id}/ready" method="post">
             <button type="submit" class="btn btn-primary" name="button">Order Ready</button>

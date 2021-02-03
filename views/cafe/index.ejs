@@ -66,31 +66,12 @@
                 <% orders.reverse().forEach(order => { %>
                     <% if (order.present == true) { %>
                         <li class="list-group-item" id="<%= order._id %>">
-
-                            <% if (!order.charge.toString().includes('.')) { %>
-                                <h4 class="order-heading">Order - $<%= order.charge %>.00</h4>
-
-                            <% } else if (order.charge.toString().split('.')[1].length == 1){ %>
-                                <h4 class="order-heading">Order - $<%= order.charge %>0</h4>
-
-                            <% } else { %>
-                                <h4 class="order-heading">Order - $<%= order.charge %></h4>
-                            <% } %>
-
+                            <h4 class="order-heading">Order - $<%= `${(order.charge*100).toString().slice(0, (order.charge*100).toString().length-2)}.${(order.charge*100).toString().slice((order.charge*100).toString().length-2)}`%></h4>
                             <ul>
-                                <% for (var i = 0; i < order.items.length; i++) { %>
+                                <% for (let item of order.items) { %>
                                     <li>
-
-                                        <% if (!(order.items[i].quantity * order.items[i].item.price).toString().includes('.')) { %>
-                                            <%= order.items[i].item.name + " (" + order.items[i].quantity + " orders) - $" + order.items[i].quantity * order.items[i].item.price + ".00" %>
-
-                                        <% } else if ((order.items[i].quantity * order.items[i].item.price).toString().split('.')[1].length == 1){ %>
-                                            <%= order.items[i].item.name + " (" + order.items[i].quantity + " orders) - $" + order.items[i].quantity * order.items[i].item.price + "0" %>
-
-                                        <% } else { %>
-                                            <%= order.items[i].item.name + " (" + order.items[i].quantity + " orders) - $" + order.items[i].quantity * order.items[i].item.price %>
-                                        <% } %>
-
+                                        <% let itemCharge = (item.quantity * item.item.price).toString(); %>
+                                        <%= item.item.name%> (<%=item.quantity%> order(s)) - $<%=`${(itemCharge*100).toString().slice(0, (itemCharge*100).toString().length-2)}.${(itemCharge*100).toString().slice((itemCharge*100).toString().length-2)}`%>
                                     </li>
                                 <% } %>
                             </ul>
@@ -163,31 +144,13 @@
           <% orders.forEach(order => { %>
             <% if (order.present == false) { %>
               <li class="list-group-item">
-
-                <% if (!order.charge.toString().includes('.')) { %>
-                  <h4 class="order-heading">Order - $<%= order.charge %>.00</h4>
-
-                <% } else if (order.charge.toString().split('.')[1].length == 1){ %>
-                  <h4 class="order-heading">Order - $<%= order.charge %>0</h4>
-
-                <% } else { %>
-                  <h4 class="order-heading">Order - $<%= order.charge %></h4>
-                <% } %>
+                <h4 class="order-heading">Order - $<%= `${(order.charge*100).toString().slice(0, (order.charge*100).toString().length-2)}.${(order.charge*100).toString().slice((order.charge*100).toString().length-2)}`%></h4>
 
                 <ul>
-                  <% for (var i = 0; i < order.items.length; i++) { %>
+                  <% for (let item of order.items) { %>
                     <li>
-
-                      <% if (!(order.items[i].quantity * order.items[i].item.price).toString().includes('.')) { %>
-                        <%= order.items[i].item.name + " (" + order.items[i].quantity + " orders) - $" + order.items[i].quantity * order.items[i].item.price + ".00" %>
-
-                      <% } else if ((order.items[i].quantity * order.items[i].item.price).toString().split('.')[1].length == 1){ %>
-                        <%= order.items[i].item.name + " (" + order.items[i].quantity + " orders) - $" + order.items[i].quantity * order.items[i].item.price + "0" %>
-
-                      <% } else { %>
-                        <%= order.items[i].item.name + " (" + order.items[i].quantity + " orders) - $" + order.items[i].quantity * order.items[i].item.price %>
-                      <% } %>
-
+                        <% let itemCharge = (item.quantity * item.item.price).toString(); %>
+                        <%= item.item.name%> (<%=item.quantity%> order(s)) - $<%=`${(itemCharge*100).toString().slice(0, (itemCharge*100).toString().length-2)}.${(itemCharge*100).toString().slice((itemCharge*100).toString().length-2)}`%>
                     </li>
                   <% } %>
                 </ul>

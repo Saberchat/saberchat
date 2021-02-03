@@ -397,12 +397,12 @@ router.put('/:id', middleware.isLoggedIn, middleware.checkRoomOwnership, validat
 });
 
 // delete room
-router.delete('/:id/delete', middleware.isLoggedIn, middleware.checkRoomOwnership, (req, res) => {
+router.delete('/:id', middleware.isLoggedIn, middleware.checkRoomOwnership, (req, res) => {
     (async () => {
 
-        const room = await Room.findById(req.params.id);
+        const room = await Room.findById(req.params.id).populate("creator.id");
         if (!room) {
-            req.flash('error', 'A problem occured');
+            req.flash('error', 'An error occured');
             return res.redirect('back');
         }
 
@@ -411,16 +411,38 @@ router.delete('/:id/delete', middleware.isLoggedIn, middleware.checkRoomOwnershi
             return res.redirect('back');
         }
 
+        const deletedComments = await Comment.deleteMany({room: room._id});
+        if (!deletedComments) {
+            req.flash('error', 'Unable to delete comments');
+            return res.redirect('back');
+        }
+
+        const requests = await AccessReq.find({room: room._id});
+        if (!requests) {
+            req.flash('error', 'Unable to find requests');
+            return res.redirect('back');
+        }
+
+        let deletedRequest;
+        for (let request of requests) {
+            if (room.creator.id.requests.includes(request._id)) {
+                room.creator.id.requests.splice(room.creator.id.requests.indexOf(request._id), 1);
+            }
+
+            deletedRequest = await AccessReq.findByIdAndDelete(request._id);
+            if (!deletedRequest) {
+                req.flash('error', 'Unable to delete requests');
+                return res.redirect('back');
+            }
+        }
+
+        await room.creator.id.save();
+
         const deletedRoom = await Room.findByIdAndDelete(req.params.id).populate("members");
         if (!deletedRoom) {
             req.flash('error', 'A problem occured');
             return res.redirect('back');
         }
-
-        await Promise.all([
-            Comment.deleteMany({room: deletedRoom._id}),
-            AccessReq.deleteMany({room: deletedRoom._id})
-        ]);
 
         for (let member of deletedRoom.members) {
             if (member.newRoomCount.includes(deletedRoom._id)) {
@@ -428,10 +450,11 @@ router.delete('/:id/delete', middleware.isLoggedIn, middleware.checkRoomOwnershi
                 await member.save();
             }
         }
-
         req.flash('success', 'Deleted room');
         res.redirect('/chat');
+
     })().catch(err => {
+        console.log(err);
         req.flash('error', 'An error occured');
         res.redirect('back');
     });

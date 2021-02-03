@@ -67,41 +67,17 @@
                     <p class="card-text"><span class="instructions">Extra Instructions:</span> <%= order.instructions %>
                     </p>
                     <ul class="list-group">
-                        <% for (let i = 0; i < order.items.length; i++) { %>
-
-                            <% if (!(order.items[i].quantity * order.items[i].item.price).toString().includes('.')) { %>
-                                <li class="list-group-item"><%= order.items[i].item.name %>
-                                    (<%= order.items[i].quantity %>
-                                    orders) - $<%= order.items[i].quantity * order.items[i].item.price %>.00
-                                </li>
-
-                            <% } else if ((order.items[i].quantity * order.items[i].item.price).toString().split('.')[1].length == 1){ %>
-                                <li class="list-group-item"><%= order.items[i].item.name %>
-                                    (<%= order.items[i].quantity %>
-                                    orders) - $<%= order.items[i].quantity * order.items[i].item.price %>0
-                                </li>
-
-                            <% } else { %>
-                                <li class="list-group-item"><%= order.items[i].item.name %>
-                                    (<%= order.items[i].quantity %>
-                                    orders) - $<%= order.items[i].quantity * order.items[i].item.price %></li>
-                            <% } %>
-
+                        <% for (let item of order.items) { %>
+                            <li class="list-group-item"><%= item.item.name %>
+                                <% let itemCharge = (item.quantity * item.item.price).toString(); %>
+                                <%= item.item.name%> (<%=item.quantity%> order(s)) - $<%=`${(itemCharge*100).toString().slice(0, (itemCharge*100).toString().length-2)}.${(itemCharge*100).toString().slice((itemCharge*100).toString().length-2)}`%>
+                            </li>
                         <% } %>
                     </ul>
 
-                    <% if (!order.charge.toString().includes('.')) { %>
-                        <p class="card-text mt-3"><span class="cost">Cost:</span> $<%= order.charge %>.00</p>
-
-                    <% } else if (order.charge.toString().split('.')[1].length == 1){ %>
-                        <p class="card-text mt-3"><span class="cost">Cost:</span> $<%= order.charge %>0</p>
-
-                    <% } else { %>
-                        <p class="card-text mt-3"><span class="cost">Cost:</span> $<%= order.charge %></p>
-                    <% } %>
+                    <p class="card-text mt-3"><span class="cost">Cost:</span> $<%= `${(order.charge*100).toString().slice(0, (order.charge*100).toString().length-2)}.${(order.charge*100).toString().slice((order.charge*100).toString().length-2)}`%></p>
 
                     <p class="paying-in-person">
-
                         <% if (order.payingInPerson) { %>
                             Paying In-Person
                         <% } else { %>

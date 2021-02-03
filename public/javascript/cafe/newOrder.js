@@ -17,6 +17,7 @@ let instructionsNew;
 let totalNew;
 let payingStyleNew;
 let balanceBox;
+let formattedCost;
 
 //Changes the order confirmation on the form
 const changeOrderConfirmation = function() {
@@ -37,17 +38,8 @@ const changeOrderConfirmation = function() {
                             orderedItem = document.createElement('strong'); //Create the item confirmation
                             orderedItem.className = "list-group-item list-group-item-action form-check"; //Give it the boostrap class that will style it
 
-                            //Decide its text based on what the total cost is
-                            if (!(parseInt(no.value) * parseFloat(l.innerText.split('$')[1])).toString().includes('.')) {
-                                orderedItem.innerText = `${no.name} (${no.value} orders) - \$${parseInt(no.value) * parseFloat(l.innerText.split('$')[1])}.00`;
-
-                            } else if ((parseInt(no.value) * parseFloat(l.innerText.split('$')[1])).toString().split('.')[1].length == 1) {
-                                orderedItem.innerText = `${no.name} (${no.value} orders) - \$${parseInt(no.value) * parseFloat(l.innerText.split('$')[1])}0`;
-
-                            } else {
-                                orderedItem.innerText = `${no.name} (${no.value} orders) - \$${parseInt(no.value) * parseFloat(l.innerText.split('$')[1])}`;
-                            }
-
+                            formattedCost = (parseInt(no.value) * parseFloat(l.innerText.split('$')[1]));
+                            orderedItem.innerText = `${no.name} (${no.value} orders) - $${(formattedCost*100).toString().slice(0, (formattedCost*100).toString().length-2)}.${(formattedCost*100).toString().slice((formattedCost*100).toString().length-2)}`;
                             orderConfirm.appendChild(orderedItem); //Add the order to the list of orders
                         }
                     }
@@ -77,12 +69,10 @@ const changeOrderConfirmation = function() {
     totalNew.className = "list-group-item list-group-item-action form-check";
     totalNew.id = "total-cost";
 
-    if (!sum.toString().includes('.')) { //Create cost in full '$dd.cc' format based on what the total is
-        totalNew.innerHTML = `<strong>Total: $${sum}.00</strong>`;
-    } else if (sum.toString().split('.')[1].length == 1) {
-        totalNew.innerHTML = `<strong>Total: $${sum}0</strong>`;
+    if (sum == 0) {
+        totalNew.innerHTML = `<strong>Total: $0.00`;
     } else {
-        totalNew.innerHTML = `<strong>Total: $${sum}</strong>`;
+        totalNew.innerHTML = `<strong>Total: $${(sum*100).toString().slice(0, (sum*100).toString().length-2)}.${(sum*100).toString().slice((sum*100).toString().length-2)}</strong>`;
     }
 
     if (sum > parseFloat(balanceString.split("$")[1]) && !payingInPerson.checked) {

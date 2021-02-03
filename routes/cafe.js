@@ -20,7 +20,7 @@ const Cafe = require('../models/cafe')
 
 //ROUTES
 router.get('/', middleware.isLoggedIn, (req, res) => { //RESTful routing 'order/index' route
-    (async() => {
+    (async () => {
         const orders = await Order.find({customer: req.user._id}).populate('items.item'); //Find all of the orders that you have ordered, and populate info on their items
         if (!orders) {
             req.flash('error', "Could not find your orders");
@@ -36,7 +36,7 @@ router.get('/', middleware.isLoggedIn, (req, res) => { //RESTful routing 'order/
 });
 
 router.get('/menu', middleware.isLoggedIn, (req, res) => { //Renders the cafe menu with info on all the items
-    (async() => {
+    (async () => {
         const types = await Type.find({}).populate('items'); //Collects info on every item type, to render (in frontend, the ejs checks each item inside type, and only shows it if it's available)
         if (!types) {
             req.flash('error', "An Error Occurred");
@@ -59,7 +59,7 @@ router.get('/menu', middleware.isLoggedIn, (req, res) => { //Renders the cafe me
 });
 
 router.put('/upvote', middleware.isLoggedIn, (req, res) => {
-    (async() => {
+    (async () => {
         const item = await Item.findById(req.body.item);
         if (!item) {
             return res.json({error: "Error upvoting item"});
@@ -135,6 +135,7 @@ router.get('/order/new', middleware.isLoggedIn, middleware.cafeOpen, (req, res) 
                 }
             }
         }
+
         const frequentItems = sortByPopularity(orderedItems, "totalOrdered", "int", "created_at", ["item"]).popular;
         return res.render('cafe/newOrder', {types, frequentItems});
 
@@ -180,7 +181,7 @@ router.post('/order', middleware.isLoggedIn, middleware.cafeOpen, (req, res) => 
             item.availableItems -= parseInt(req.body[item.name]);
             charge += (item.price * parseInt(req.body[item.name])); //Increment charge
             item.isAvailable = (item.availableItems > 0);
-            await item.save(); //Update item's status
+            await item.save();
         }
 
         if (!req.body.payingInPerson) {
@@ -204,7 +205,7 @@ router.post('/order', middleware.isLoggedIn, middleware.cafeOpen, (req, res) => 
 });
 
 router.get('/orders', middleware.isLoggedIn, middleware.isMod, middleware.isCashier, (req, res) => { //This is for EC Cafe Workers to check all the available orders
-    (async() => {
+    (async () => {
         const orders = await Order.find({present: true}).populate('items.item');
         if (!orders) {
             req.flash('error', 'Could not find orders');
@@ -260,17 +261,6 @@ router.post('/:id/ready', middleware.isLoggedIn, middleware.isMod, middleware.is
             return res.json({error: 'Could not find order'});
         }
 
-        order.present = false; //Order is not active anymore
-        await order.save();
-
-        const cafes = await Cafe.find({});
-        if (!cafes) {
-            return res.json({error: 'Could not find cafe info'});
-        }
-
-        cafes[0].revenue += order.charge;
-        await cafes[0].save();
-
         const notif = await Notification.create({
             subject: "Cafe Order Ready",
             sender: req.user,
@@ -291,26 +281,30 @@ router.post('/:id/ready', middleware.isLoggedIn, middleware.isMod, middleware.is
             itemText.push(` - ${order.items[i].item.name}: ${order.items[i].quantity} order(s)`);
         }
 
-        //Render the item's charge in '$dd.cc' pattern, based on what the actual charge is
-        if (!order.charge.toString().includes('.')) {
-            notif.text = "Your order is ready to pick up:\n" + itemText.join("\n") + "\n\nExtra Instructions: " + order.instructions + "\nTotal Cost: $" + order.charge + ".00";
-
-        } else if (order.charge.toString().split('.')[1].length == 1) {
-            notif.text = "Your order is ready to pick up:\n" + itemText.join("\n") + "\n\nExtra Instructions: " + order.instructions + "\nTotal Cost: $" + order.charge + "0";
-
-        } else {
-            notif.text = "Your order is ready to pick up:\n" + itemText.join("\n") + "\n\nExtra Instructions: " + order.instructions + "\nTotal Cost: $" + order.charge + "";
-        }
-
+        //Formats the charge in money format
+        const formattedCharge = `$${(order.charge*100).toString().slice(0, (order.charge*100).toString().length-2)}.${(order.charge*100).toString().slice((order.charge*100).toString().length-2)}`;
+        notif.text = `Your order is ready to pick up:\n ${itemText.join("\n")} \n\nExtra Instructions: ${order.instructions} \nTotal Cost: ${formattedCharge}`;
         await notif.save();
         transport(order.customer, 'Cafe Order Ready', `<p>Hello ${order.customer.firstName},</p><p>${notif.text}</p>`);
 
         order.customer.inbox.push(notif); //Add notif to user's inbox
         order.customer.msgCount ++;
         await order.customer.save();
+
+        order.present = false; //Order is not active anymore
+        await order.save();
+
+        const cafes = await Cafe.find({});
+        if (!cafes) {
+            return res.json({error: 'Could not find cafe info'});
+        }
+
+        cafes[0].revenue += order.charge;
+        await cafes[0].save();
         return res.json({success: 'Successfully confirmed order'});
 
     })().catch(err => {
+        console.log(err);
         res.json({error: "An Error Occurred"});
     });
 });
@@ -320,11 +314,6 @@ router.post('/:id/reject', middleware.isLoggedIn, middleware.isMod, middleware.i
         const order = await Order.findById(req.params.id).populate('items.item').populate('customer');
         if (!order) {
             return res.json({error: 'Could not find order'});
-        }
-
-        const deletedOrder = await Order.findByIdAndDelete(order._id).populate('items.item').populate('customer');
-        if (!deletedOrder) {
-            return res.json({error: 'Could not delete order'});
         }
 
         for (let i of order.items) { //Iterate over each item/quantity object
@@ -352,40 +341,33 @@ router.post('/:id/reject', middleware.isLoggedIn, middleware.isMod, middleware.i
             itemText.push(` - ${order.items[i].item.name}: ${order.items[i].quantity} order(s)`);
         }
 
+        //Formats the charge in money format
+        const formattedCharge = `$${(order.charge*100).toString().slice(0, (order.charge*100).toString().length-2)}.${(order.charge*100).toString().slice((order.charge*100).toString().length-2)}`;
+
         if (req.body.rejectionReason == "") {
-            if (!order.charge.toString().includes('.')) {
-                notif.text = "Your order was rejected. This is most likely because we suspect your order is not genuine. Contact us if you think there has been a mistake. No reason was provided for rejection.\n" + itemText.join("\n") + "\n\nExtra Instructions: " + order.instructions + "\nTotal Cost: $" + order.charge + ".00";
-
-            } else if (order.charge.toString().split('.')[1].length == 1) {
-                notif.text = "Your order was rejected. This is most likely because we suspect your order is not genuine. Contact us if you think there has been a mistake. No reason was provided for rejection.\n" + itemText.join("\n") + "\n\nExtra Instructions: " + order.instructions + "\nTotal Cost: $" + order.charge + "0";
-
-            } else {
-                notif.text = "Your order was rejected. This is most likely because we suspect your order is not genuine. Contact us if you think there has been a mistake. No reason was provided for rejection.\n" + itemText.join("\n") + "\n\nExtra Instructions: " + order.instructions + "\nTotal Cost: $" + order.charge + "";
-            }
+            notif.text = `Your order was rejected. This is most likely because we suspect your order is not genuine. Contact us if you think there has been a mistake. No reason was provided for rejection.\n ${itemText.join("\n")} \n\nExtra Instructions: ${order.instructions} \nTotal Cost: ${formattedCharge}`;
 
         } else {
-            if (!order.charge.toString().includes('.')) {
-                notif.text = "Your order was rejected. This is most likely because we suspect your order is not genuine. Contact us if you think there has been a mistake. The reason was provided for rejection was the following: \"" + req.body.rejectionReason + "\"\n" + itemText.join("\n") + "\n\nExtra Instructions: " + order.instructions + "\nTotal Cost: $" + order.charge + ".00";
-
-            } else if (order.charge.toString().split('.')[1].length == 1) {
-                notif.text = "Your order was rejected. This is most likely because we suspect your order is not genuine. Contact us if you think there has been a mistake. The reason was provided for rejection was the following: \"" + req.body.rejectionReason + "\"\n" + itemText.join("\n") + "\n\nExtra Instructions: " + order.instructions + "\nTotal Cost: $" + order.charge + "0";
-
-            } else {
-                notif.text = "Your order was rejected. This is most likely because we suspect your order is not genuine. Contact us if you think there has been a mistake. The reason was provided for rejection was the following: \"" + req.body.rejectionReason + "\"\n" + itemText.join("\n") + "\n\nExtra Instructions: " + order.instructions + "\nTotal Cost: $" + order.charge + "";
-            }
+            notif.text = `Your order was rejected. This is most likely because we suspect your order is not genuine. Contact us if you think there has been a mistake. The reason was provided for rejection was the following: \"${req.body.rejectionReason}\"\n ${itemText.join("\n")} \n\nExtra Instructions: ${order.instructions} \nTotal Cost: ${formattedCharge}`;
         }
 
         await notif.save();
         transport(order.customer, 'Cafe Order Rejected', `<p>Hello ${order.customer.firstName},</p><p>${notif.text}</p>`);
 
+        //Refund if the transaction is via online balance
         if (!order.payingInPerson) {
-            order.customer.balance += order.charge; //Refund
+            order.customer.balance += order.charge;
             order.customer.debt -= order.charge;
         }
 
         order.customer.inbox.push(notif); //Add notif to user's inbox
         order.customer.msgCount ++;
         await order.customer.save();
+
+        const deletedOrder = await Order.findByIdAndDelete(order._id).populate('items.item').populate('customer');
+        if (!deletedOrder) {
+            return res.json({error: 'Could not delete order'});
+        }
 
         return res.json({success: 'Successfully rejected order'});
 
@@ -395,7 +377,7 @@ router.post('/:id/reject', middleware.isLoggedIn, middleware.isMod, middleware.i
 });
 
 router.get('/manage', middleware.isLoggedIn, middleware.isMod, (req, res) => { //Route to manage cafe
-    (async() => {
+    (async () => {
         const types = await Type.find({}).populate('items'); //Collect info on all the item types
         if (!types) {
             req.flash('error', 'An Error Occurred');
@@ -417,7 +399,7 @@ router.get('/manage', middleware.isLoggedIn, middleware.isMod, (req, res) => { /
 });
 
 router.put('/change-cafe-status', middleware.isLoggedIn, middleware.isMod, (req, res) => { //Open/close cafe
-    (async() => {
+    (async () => {
         const cafes = await Cafe.find({});
         if (!cafes) {
             return res.json({error: "An error occurred"});
@@ -437,7 +419,7 @@ router.put('/change-cafe-status', middleware.isLoggedIn, middleware.isMod, (req,
 });
 
 router.get('/item/new', middleware.isLoggedIn, middleware.isMod, (req, res) => { //RESTFUL routing 'item/new'
-    (async() => {
+    (async () => {
         const types = await Type.find({});
         if (!types) {
             req.flash('error', "An Error Occurred");
@@ -507,13 +489,13 @@ router.post('/item', middleware.isLoggedIn, middleware.isMod, (req, res) => { //
 
 router.get('/item/:id', middleware.isLoggedIn, middleware.isMod, (req, res) => { //View an item's profile
     (async () => {
-        const item = await Item.findById(req.params.id); //Find item based on specified id
+        const item = await Item.findById(req.params.id);
         if (!item) {
             req.flash('error', "Unable to find item");
             return res.redirect('back')
         }
 
-        const types = await Type.find({}); //Find all types
+        const types = await Type.find({});
         if (!types) {
             req.flash('error', "Unable to find item categories");
             return res.redirect('back');
@@ -540,8 +522,7 @@ router.put('/item/:id', middleware.isLoggedIn, middleware.isMod, (req, res) => {
             return res.redirect('back');
         }
 
-        const item = await Item.findByIdAndUpdate(req.params.id, { //Find item based on specified ID
-            //Update all of these properties
+        const item = await Item.findByIdAndUpdate(req.params.id, {
             name: req.body.name,
             price: parseFloat(req.body.price),
             availableItems: parseInt(req.body.available),
@@ -632,7 +613,7 @@ router.delete('/item/:id', middleware.isLoggedIn, middleware.isMod, (req, res) =
             return res.redirect('back');
         }
 
-        for (let order of orders) {//If the order includes this item, remove the item from that order's item list
+        for (let order of orders) { //If the order includes this item, remove the item from that order's item list
             for (let i of order.items) {
                 if (!i.item) {
                     order.items.splice(i, 1);
@@ -656,7 +637,7 @@ router.delete('/item/:id', middleware.isLoggedIn, middleware.isMod, (req, res) =
 });
 
 router.get('/type/new', middleware.isLoggedIn, middleware.isMod, (req, res) => { // RESTful route "New" for type
-    (async() => {
+    (async () => {
         const types = await Type.find({}).populate('items'); //Collect info on all the items, so that we can give the user the option to add them to that type
         if (!types) {
             req.flash('error', "Unable to find categories");
@@ -807,8 +788,7 @@ router.put('/type/:id', middleware.isLoggedIn, middleware.isMod, (req, res) => {
         }
         await other.save();
 
-        //Empty type and push new items to its items[] array, based on the latest changes
-        type.items = [];
+        type.items = []; //Empty type and push new items to its items[] array, based on the latest changes
         for (let item of items) {
             if (req.body[item._id.toString()]) {
                 type.items.push(item);
