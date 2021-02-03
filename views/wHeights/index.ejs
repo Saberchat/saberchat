@@ -128,10 +128,12 @@
                             <span hidden>
                       <%= article.author.firstName %> <%= article.author.lastName %> <%= article.author.username %>
                     </span>
-                            <p class="creator-heading"><span class="creator-head">Creator:</span><span><img
-                                            src="<%= article.author.imageUrl %>" alt="profile pic"
-                                            class="author-profile"> <span
-                                            class="author-name"><%= article.author.firstName %> <%= article.author.lastName %></span>
+                            <p class="creator-heading">
+                                <span class="creator-head">Creator:</span>
+                                <span>
+                                    <img src="<%= article.author.imageUrl %>" alt="profile pic" class="author-profile">
+                                </span>
+                                <span class="author-name"><%= article.author.firstName %> <%= article.author.lastName %></span>
                             </p>
                             <br/><br/>
 

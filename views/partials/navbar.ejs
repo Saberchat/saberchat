@@ -92,6 +92,7 @@
                                         Statuses</a>
                                     <a href="/admin/moderate" class="dropdown-item"><i class="fas fa-flag"></i> Moderate
                                         Comments</a>
+                                </div>
                             </li>
 
                         <% } else if (currentUser.permission == "admin") { %>
@@ -108,6 +109,7 @@
                                         Comments</a>
                                     <a href="/admin/manageCafe" class="dropdown-item"><i class="fas fa-coffee"></i>
                                         Manage Cafe</a>
+                                </div>
                             </li>
 
                         <% } else if (currentUser.permission == "principal") { %>
@@ -127,6 +129,7 @@
                                     <a href="/admin/whitelist" class="dropdown-item"><i class="fas fa-inbox"></i> Email
                                         Whitelist</a>
                                     <!-- <a href="/admin/balances" class="dropdown-item"><i class="fas fa-money-check"></i> Student Balances</a> -->
+                                </div>
                             </li>
                         <% } %>
 
