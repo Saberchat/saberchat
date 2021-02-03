@@ -45,7 +45,7 @@
                   <div class="profile-body">
                       <span><%= user.title %></span>
                       <div class="mode">
-                        <h4 class="mode">Role</h4>
+                        <h4 id="role-header" class="mode">Role</h4>
                       </div>
                       <% permMatrix = [["principal", "Principal"], ["admin", "Administrator"], ["mod", "Moderator"], ["default", "Default"]] %>
 
@@ -55,10 +55,10 @@
                         <% } %>
                       <% } %>
 
-                      <h4 class="cafetext">Status</h4>
+                      <h4 id="status-header" class="cafetext">Status</h4>
                       <p><%= user.status.charAt(0).toUpperCase() + user.status.slice(1) %></p>
 
-                      <h4>Email</h4>
+                      <h4 id="email-header">Email</h4>
                       <p class="embedded-link"><a href="mailto:<%=user.email%>"><%= user.email %></a></p>
 
                       <% if (currentUser._id.toString() == user._id.toString()) { %>

@@ -18,3 +18,7 @@
 .cafetext{
   color: #7FFFD4;
 }
+
+#role-header, #status-header, #email-header {
+    color: turquoise;
+}
