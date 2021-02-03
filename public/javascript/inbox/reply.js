@@ -1,12 +1,12 @@
-const reply = function() {
+const reply = function () {
     document.getElementById('reply-box').hidden = false;
 }
 
-const cancelReply = function() {
+const cancelReply = function () {
     document.getElementById('reply-box').hidden = true;
 }
 
-const sendReply = function(msg, event) {
+const sendReply = function (msg, event) {
     const msgId = msg.id.split('-')[2];
     const url = `/inbox/reply?_method=put`;
 

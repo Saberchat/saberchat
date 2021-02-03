@@ -1,4 +1,4 @@
-const order = function(form, customer) {
+const order = function (form, customer) {
     let socket = io();
     let items = document.getElementById('item-list');
 
@@ -34,7 +34,7 @@ const order = function(form, customer) {
     });
 }
 
-const getOrders = function(outputStream) {
+const getOrders = function (outputStream) {
     let socket = io();
 
     socket.on('connect', () => {
@@ -44,7 +44,7 @@ const getOrders = function(outputStream) {
     socket.on('order', (order, foundItems) => {
         console.log("new order");
 
-        const getInstructions = function() {
+        const getInstructions = function () {
             if (!order.instructions || order.instructions == "") {
                 return `<p class="card-text">No extra instructions</p>`;
             } else {
@@ -52,7 +52,7 @@ const getOrders = function(outputStream) {
             }
         }
 
-        const getItems = function() {
+        const getItems = function () {
             let str = ``;
 
             for (let i = 0; i < order.items.length; i++) {
@@ -70,7 +70,7 @@ const getOrders = function(outputStream) {
           <ul class="list-group">
             ${getItems()}
           </ul>
-          <p class="card-text mt-3"><strong>Cost:</strong>$${(order.charge*100).toString().slice(0, (order.charge*100).toString().length-2)}.${(order.charge*100).toString().slice((order.charge*100).toString().length-2)}</p>
+          <p class="card-text mt-3"><strong>Cost:</strong>$${(order.charge * 100).toString().slice(0, (order.charge * 100).toString().length - 2)}.${(order.charge * 100).toString().slice((order.charge * 100).toString().length - 2)}</p>
           <p class="card-text">${order.date}</p>
           <form class="ready-form" action="${order._id}/ready" method="post">
             <button type="submit" class="btn btn-primary" name="button">Order Ready</button>

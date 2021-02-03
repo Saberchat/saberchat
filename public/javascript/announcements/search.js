@@ -1,4 +1,4 @@
-const searchFunction = function() {
+const searchFunction = function () {
     const announcements = document.getElementsByClassName('text-block');
     const breaks = document.getElementsByClassName('text-break');
     const searchInput = document.getElementById('search-input');

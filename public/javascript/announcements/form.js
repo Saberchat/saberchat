@@ -2,7 +2,7 @@ const imgContainer = document.getElementById('image-block');
 
 let i = document.getElementsByClassName('input-container').length;
 
-const addImg = function() { //Adds the image input field
+const addImg = function () { //Adds the image input field
     const img = document.createElement('div');
     img.classList.add('image-group');
     img.id = `block-${i}`;
@@ -14,7 +14,7 @@ const addImg = function() { //Adds the image input field
     i++;
 }
 
-const createImg = function(val) { //Creates an image based on value of image input
+const createImg = function (val) { //Creates an image based on value of image input
 
     if ($(`#block-${val.id}`).find('img').length == 0) {
         const imageDisplay = document.createElement('img');
@@ -38,7 +38,7 @@ const createImg = function(val) { //Creates an image based on value of image inp
     }
 }
 
-const deleteImg = function(btn) {
+const deleteImg = function (btn) {
     const parent = btn.parentNode;
     parent.remove();
 }

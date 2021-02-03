@@ -14,7 +14,7 @@ const anonymousControl = document.getElementById('anonymous-control');
 
 let recipients = [];
 
-const process = function() { // processes all the selected recipients into form info
+const process = function () { // processes all the selected recipients into form info
     if (!recipients.length > 0 && !everyoneCheck.checked) {
         return false;
     } else if (!everyoneCheck.checked) {
@@ -28,7 +28,7 @@ const process = function() { // processes all the selected recipients into form 
     return true;
 }
 
-const updateTo = function(everyoneCheck) { // toggles recipients selection
+const updateTo = function (everyoneCheck) { // toggles recipients selection
     if (everyoneCheck.checked) {
         userSelect.required = false;
         facultySelect.required = false;
@@ -48,7 +48,7 @@ const updateTo = function(everyoneCheck) { // toggles recipients selection
     }
 }
 
-const setAnonymous = function(check) { // toggles anonymous messaging
+const setAnonymous = function (check) { // toggles anonymous messaging
     if (check.checked) {
         userSelect.required = false;
         defaultMsg.style.display = 'none';
@@ -73,7 +73,7 @@ const setAnonymous = function(check) { // toggles anonymous messaging
     }
 }
 
-const clearTags = function() { // clears user tags
+const clearTags = function () { // clears user tags
     const tags = document.getElementsByClassName('user-tag');
 
     while (tags[0]) {
@@ -81,7 +81,7 @@ const clearTags = function() { // clears user tags
     }
 }
 
-const addRecipient = function(type) { // adds recipients to list
+const addRecipient = function (type) { // adds recipients to list
     if (type == 'user') {
         const id = userSelect.value;
         addTag(userSelect, id);
@@ -91,7 +91,7 @@ const addRecipient = function(type) { // adds recipients to list
     }
 }
 
-const addTag = function(select, id) { // adds the user tag to the display
+const addTag = function (select, id) { // adds the user tag to the display
 
     if (!(recipients.includes(id)) && !(recipients.includes(select.options[select.selectedIndex].className))) { //Check whether this user is already in the list, or whether their group (status) is already in the list
         const username = select.options[select.selectedIndex].text;
@@ -116,7 +116,7 @@ const addTag = function(select, id) { // adds the user tag to the display
     }
 }
 
-const remRecipient = function(btn) { // remove recipients
+const remRecipient = function (btn) { // remove recipients
     const id = btn.id;
     const i = recipients.indexOf(id);
     if (i > -1) {

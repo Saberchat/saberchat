@@ -135,27 +135,27 @@
         </div>
     </div>
 </div>
-    <!-- script for socket io chat -->
-    <script src="/javascript/chat/socket.js"></script>
-    <script>
-        const moderate = '<%= room.moderate %>';
-        //scroll to the last chat message
-        let messages = document.getElementsByClassName('media');
-        let message = messages[messages.length - 1];
-        if (message) {
-            scrollToElement(message);
-        }
+<!-- script for socket io chat -->
+<script src="/javascript/chat/socket.js"></script>
+<script>
+    const moderate = '<%= room.moderate %>';
+    //scroll to the last chat message
+    let messages = document.getElementsByClassName('media');
+    let message = messages[messages.length - 1];
+    if (message) {
+        scrollToElement(message);
+    }
 
-        //set all the variables for the chatInit function
-        const userId = '<%= currentUser._id %>';
-        const username = '<%= currentUser.username %>';
-        const userImage = '<%= currentUser.imageUrl %>';
-        const messageForm = '#message-form';
-        const input = '#m';
-        const chatDisplay = '#message-display';
-        const room = '<%= room._id %>';
-        // call the chatInit function from public/javascript/socket.js
-        chatInit(username, userId, messageForm, input, chatDisplay, room, userImage);
-    </script>
+    //set all the variables for the chatInit function
+    const userId = '<%= currentUser._id %>';
+    const username = '<%= currentUser.username %>';
+    const userImage = '<%= currentUser.imageUrl %>';
+    const messageForm = '#message-form';
+    const input = '#m';
+    const chatDisplay = '#message-display';
+    const room = '<%= room._id %>';
+    // call the chatInit function from public/javascript/socket.js
+    chatInit(username, userId, messageForm, input, chatDisplay, room, userImage);
+</script>
 </body>
 </html>

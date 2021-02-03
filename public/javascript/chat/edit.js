@@ -1,4 +1,4 @@
-const updateDisplay = function() {
+const updateDisplay = function () {
     let userSelect = document.getElementById('roomType');
     let display1 = document.getElementById('add-block');
     let display2 = document.getElementById('remove-block');
@@ -17,7 +17,7 @@ const updateDisplay = function() {
     }
 }
 
-const searchFunction = function(mode) {
+const searchFunction = function (mode) {
     let input = document.getElementById(mode + "-search-input");
     let filter = input.value.toUpperCase();
     let list = document.getElementById(mode + "-user-list");

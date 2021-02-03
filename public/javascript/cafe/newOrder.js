@@ -20,7 +20,7 @@ let balanceBox;
 let formattedCost;
 
 //Changes the order confirmation on the form
-const changeOrderConfirmation = function() {
+const changeOrderConfirmation = function () {
     sum = 0;
     while (orderConfirm.firstChild) { //Remove all the items in the 'confirm order' section
         orderConfirm.removeChild(orderConfirm.firstChild);
@@ -39,7 +39,7 @@ const changeOrderConfirmation = function() {
                             orderedItem.className = "list-group-item list-group-item-action form-check"; //Give it the boostrap class that will style it
 
                             formattedCost = (parseInt(no.value) * parseFloat(l.innerText.split('$')[1]));
-                            orderedItem.innerText = `${no.name} (${no.value} orders) - $${(formattedCost*100).toString().slice(0, (formattedCost*100).toString().length-2)}.${(formattedCost*100).toString().slice((formattedCost*100).toString().length-2)}`;
+                            orderedItem.innerText = `${no.name} (${no.value} orders) - $${(formattedCost * 100).toString().slice(0, (formattedCost * 100).toString().length - 2)}.${(formattedCost * 100).toString().slice((formattedCost * 100).toString().length - 2)}`;
                             orderConfirm.appendChild(orderedItem); //Add the order to the list of orders
                         }
                     }
@@ -72,7 +72,7 @@ const changeOrderConfirmation = function() {
     if (sum == 0) {
         totalNew.innerHTML = `<strong>Total: $0.00`;
     } else {
-        totalNew.innerHTML = `<strong>Total: $${(sum*100).toString().slice(0, (sum*100).toString().length-2)}.${(sum*100).toString().slice((sum*100).toString().length-2)}</strong>`;
+        totalNew.innerHTML = `<strong>Total: $${(sum * 100).toString().slice(0, (sum * 100).toString().length - 2)}.${(sum * 100).toString().slice((sum * 100).toString().length - 2)}</strong>`;
     }
 
     if (sum > parseFloat(balanceString.split("$")[1]) && !payingInPerson.checked) {

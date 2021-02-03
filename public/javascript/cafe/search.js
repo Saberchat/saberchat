@@ -1,4 +1,4 @@
-const search = function() {
+const search = function () {
     const catHeaders = document.getElementsByClassName('category-header'); //Category header
     const catBreaks = document.getElementsByClassName('category-break'); //Category page break
     const menuItems = document.getElementsByClassName('menu-item');
@@ -38,7 +38,7 @@ const search = function() {
 }
 
 //Searching for orders works differently from the other cafe search function
-const searchOrders = function() {
+const searchOrders = function () {
     const orders = document.getElementsByClassName('card');
     const searchInput = document.getElementById('search-input');
     let filter = searchInput.value.toLowerCase();

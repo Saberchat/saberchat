@@ -1,5 +1,5 @@
 // sends put request with data
-const comment = function(form, event) {
+const comment = function (form, event) {
 
     if (document.getElementById('comment-input').value.split(' ').join('') != '') {
         const announcementId = form.id.split("-")[1];
@@ -47,6 +47,6 @@ const comment = function(form, event) {
     }
 }
 
-const reply = function(comment) {
+const reply = function (comment) {
     document.getElementById('comment-input').value = `@${comment.id.split("comment-")[1]}_ `
 }

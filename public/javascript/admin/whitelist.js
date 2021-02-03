@@ -1,4 +1,4 @@
-const searchFunction = function() {
+const searchFunction = function () {
     const emails = document.getElementsByClassName('email');
     const searchInput = document.getElementById('search-input');
     let filter = searchInput.value.toLowerCase();
@@ -13,7 +13,7 @@ const searchFunction = function() {
     }
 }
 
-const addEmail = function(event) {
+const addEmail = function (event) {
     event.preventDefault();
     const url = '/admin/whitelist?_method=put';
     const address = document.getElementById("address").value;
@@ -42,7 +42,7 @@ const addEmail = function(event) {
     });
 }
 
-const removeEmail = function(button) {
+const removeEmail = function (button) {
     const emailId = button.id.split('-')[1];
     const url = `/admin/whitelist/${emailId}?_method=delete`;
     const data = {};

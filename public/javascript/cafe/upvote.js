@@ -1,5 +1,5 @@
 // sends put request with data
-const upvote = function(button) {
+const upvote = function (button) {
     const itemId = button.id.split("-")[1];
     const url = `/cafe/upvote?_method=put`;
     const data = {item: itemId};

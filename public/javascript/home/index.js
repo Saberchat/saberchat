@@ -1,4 +1,4 @@
-const animateDisplay = function() {
+const animateDisplay = function () {
     const container = document.getElementById('main-container');
     const block2 = document.getElementById('block-2');
     const block3 = document.getElementById('block-3');
