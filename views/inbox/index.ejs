@@ -108,33 +108,34 @@
                                             <div class="message-head">
 
                                                 <% if (msg.read.includes(currentUser._id)) { %>
-                                                <div class="message-from">
-
-                                                    <% } else { %>
-                                                    <div class="message-from unread">
-                                                        <% } %>
+                                                    <div class="message-from">
                                                         (<%= 1 + msg.replies.length %>) <%= msg.sender.username %>
                                                     </div>
+                                                <% } else { %>
+                                                    <div class="message-from unread">
+                                                        (<%= 1 + msg.replies.length %>) <%= msg.sender.username %>
+                                                    </div>
+                                                <% } %>
 
-                                                    <% if (msg.read.includes(currentUser._id)) { %>
-                                                        <div class="message-subject">
-                                                            <span><%= msg.subject %></span>
-                                                        </div>
+                                                <% if (msg.read.includes(currentUser._id)) { %>
+                                                    <div class="message-subject">
+                                                        <span><%= msg.subject %></span>
+                                                    </div>
 
-                                                    <% } else { %>
-                                                        <div class="message-subject unread">
-                                                            <span><%= msg.subject %></span>
-                                                        </div>
-                                                    <% } %>
+                                                <% } else { %>
+                                                    <div class="message-subject unread">
+                                                        <span><%= msg.subject %></span>
+                                                    </div>
+                                                <% } %>
 
-                                                </div>
-                                                <div class="message-text">
-                                                    <% if (msg.replies.length > 0) { %>
-                                                        <%= msg.replies[msg.replies.length - 1].text %>
-                                                    <% } else { %>
-                                                        <%= msg.text %>
-                                                    <% } %>
-                                                </div>
+                                            </div>
+                                            <div class="message-text">
+                                                <% if (msg.replies.length > 0) { %>
+                                                    <%= msg.replies[msg.replies.length - 1].text %>
+                                                <% } else { %>
+                                                    <%= msg.text %>
+                                                <% } %>
+                                            </div>
                                         </a>
                                         <span class="message-date">
 
