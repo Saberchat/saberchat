@@ -287,10 +287,15 @@ const getData = async function () {
     let times = [];
     let timeCount = []; //Using matrix instead of map to count number of repetitions of a time so it can be sortable
     let time;
+    let actual;
+    let realtime;
     let index; //Index of overlapping time in the matrix of times
 
     for (let order of orders) { //Orders already declared from earlier
         index = -1;
+        actual = ((new Date(order.created_at).getTime()/3600000)% 24);
+        realtime = `${Math.floor(actual)}:${Math.round((actual-Math.floor(actual)) * 60)}`
+        console.log(realtime)
         time = order.date.split(', ')[1];
 
         if (time.split(' ')[1] == "AM") {
