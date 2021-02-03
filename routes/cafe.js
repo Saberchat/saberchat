@@ -5,10 +5,10 @@ const express = require('express');
 const middleware = require('../middleware');
 const router = express.Router();
 const dateFormat = require('dateformat');
-const {transport, transport_mandatory} = require("../other_modules/transport");
-const convertToLink = require("../other_modules/convert-to-link");
-const {getPopularityCoefficiant, sortByPopularity} = require("../other_modules/popularity-algorithms");
-const getData = require("../other_modules/cafe-data");
+const {transport, transport_mandatory} = require("../utils/transport");
+const convertToLink = require("../utils/convert-to-link");
+const {getPopularityCoefficiant, sortByPopularity} = require("../utils/popularity-algorithms");
+const getData = require("../utils/cafe-data");
 
 //SCHEMA
 const User = require('../models/user');
@@ -136,7 +136,7 @@ router.get('/order/new', middleware.isLoggedIn, middleware.cafeOpen, (req, res) 
             }
         }
 
-        const frequentItems = sortByPopularity(orderedItems, "totalOrdered", "int", "created_at", ["item"]).popular;
+        const frequentItems = sortByPopularity(orderedItems, "totalOrdered", "created_at", ["item"]).popular;
         return res.render('cafe/newOrder', {types, frequentItems});
 
     })().catch(err => {

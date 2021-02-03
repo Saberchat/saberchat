@@ -1,8 +1,8 @@
 //This will be heavily refactored soon
 
 const dateFormat = require('dateformat');
-const {getPopularityCoefficiant, sortByPopularity} = require("../other_modules/popularity-algorithms");
-const filter = require('../other_modules/filter');
+const {getPopularityCoefficiant, sortByPopularity} = require("../utils/popularity-algorithms");
+const filter = require('../utils/filter');
 
 const User = require('../models/user');
 const Order = require('../models/order');
