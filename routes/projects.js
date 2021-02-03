@@ -8,7 +8,7 @@ const dateFormat = require('dateformat');
 const filter = require('../other_modules/filter');
 const {transport, transport_mandatory} = require("../other_modules/transport");
 const convertToLink = require("../other_modules/convert-to-link");
-const {getPopularityCoefficiant, sortByPopularity} = require("../other_modules/popularity-coefficiant")
+const {getPopularityCoefficiant, sortByPopularity} = require("../other_modules/popularity-algorithms");
 const {validateProject} = require('../middleware/validation');
 
 //SCHEMA

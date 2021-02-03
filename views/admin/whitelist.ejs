@@ -31,7 +31,8 @@
 <div class="container mt-5">
     <div class="row">
         <div class="col-12">
-            <h1>Email Whitelist</h1>
+
+            <h1>Email<% if (version == "whitelist") { %> Whitelist<% } else { %> Blacklist<% } %></h1>
             <span id="loading"></span>
             <hr>
 
@@ -44,8 +45,8 @@
 
             <ul class="list-group" id="email-list">
                 <li class="list-group-item">
-                    <span id="modify-header">Email Whitelist</span>
-                    <form id="add-email-form" onsubmit="addEmail(event)">
+                    <span id="modify-header">Email <% if (version == "whitelist") { %> Whitelist<% } else { %> Blacklist<% } %></span>
+                    <form id="add-email-form" onsubmit="addEmail(event, '<%=version%>')">
                         <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#modal-add-email"
                             id="delete-button"><i class="fas fa-inbox"></i> Add Email
                         </button>
@@ -54,7 +55,7 @@
                             <div class="modal-dialog">
                                 <div class="modal-content">
                                     <div class="modal-header">
-                                        <h5 class="modal-title" id="exampleModalLabel">Add Email To Whitelist</h5>
+                                        <h5 class="modal-title" id="exampleModalLabel">Add Email To <% if (version == "whitelist") { %> Whitelist<% } else { %> Blacklist<% } %></h5>
                                         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                                             <span aria-hidden="true">&times;</span>
                                         </button>

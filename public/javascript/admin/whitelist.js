@@ -13,11 +13,11 @@ const searchFunction = function() {
     }
 }
 
-const addEmail = function(event) {
+const addEmail = function(event, version) {
     event.preventDefault();
     const url = '/admin/whitelist?_method=put';
     const address = document.getElementById("address").value;
-    const data = {address};
+    const data = {address, version};
 
     $.post(url, data, data => {
         $("#modal-add-email").modal('hide');

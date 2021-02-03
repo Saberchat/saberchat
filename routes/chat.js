@@ -202,7 +202,7 @@ router.post('/', middleware.isLoggedIn, validateRoom, (req, res) => {
 
             for (let member of members) {
                 member.newRoomCount.push(room._id);
-                member.save();
+                await member.save();
             }
 
             return res.redirect('/chat/' + room._id);

@@ -127,7 +127,8 @@ router.post('/join-tutor', middleware.isLoggedIn, middleware.isTutor, middleware
 
 router.get('/:id', middleware.isLoggedIn, middleware.memberOfCourse, (req, res) => { //RESTful routing show route
     (async () => {
-        const course = await Course.findById(req.params.id).populate('teacher students tutors.tutor tutors.reviews.review blocked');
+        const course = await Course.findById(req.params.id)
+        .populate('teacher students tutors.tutor tutors.reviews.review blocked');
         if (!course) {
             req.flash('error', "Unable to find course");
             return res.redirect('back');
@@ -772,13 +773,12 @@ router.put('/remove-student/:id', middleware.isLoggedIn, middleware.isFaculty, m
 
         notif.date = dateFormat(notif.created_at, "h:MM TT | mmm d");
         await notif.save()
-
         studentId.inbox.push(notif);
         studentId.msgCount++;
         await studentId.save();
         transport(studentId, `Removal from ${course.name}`, `<p>Hello ${studentId.firstName},</p><p>${notif.text}</p>`);
-
         course.blocked.push(studentId);
+
         for (let i = 0; i < course.students.length; i++) {
             if (course.students[i]._id.equals(studentId._id)) {
                 course.students.splice(i, 1);
@@ -976,10 +976,8 @@ router.put("/mark/:id", middleware.isLoggedIn, middleware.isTutor, middleware.me
 
 router.delete("/:id", middleware.isLoggedIn, middleware.isFaculty, middleware.memberOfCourse, (req, res) => {
     (async () => {
-        const course = await Course.findOne({
-            _id: req.params.id,
-            joinCode: req.body.joinCode
-        }).populate("tutors.tutor tutors.students tutors.rooms.student");
+        const course = await Course.findOne({_id: req.params.id, joinCode: req.body.joinCode})
+        .populate("tutors.tutor tutors.students tutors.rooms.student");
         if (!course) {
             req.flash("error", "Unable to find course");
             return res.redirect("back");

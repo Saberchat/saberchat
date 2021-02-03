@@ -72,7 +72,17 @@ router.get('/status', middleware.isLoggedIn, middleware.isMod, (req, res) => {
 
 router.get('/whitelist', middleware.isLoggedIn, middleware.isPrincipal, (req, res) => {
     (async () => {
-        const emails = await Email.find({name: {$ne: req.user.email}});
+        let emails;
+
+        if (req.query.version) {
+            if (["whitelist", "blacklist"].includes(req.query.version)) {
+                emails = await Email.find({name: {$ne: req.user.email}, version: req.query.version});
+            } else {
+                emails = await Email.find({name: {$ne: req.user.email}, version: "whitelist"});
+            }
+        } else {
+            emails = await Email.find({name: {$ne: req.user.email}, version: "whitelist"});
+        }
 
         if (!emails) {
             req.flash('error', "Unable to find emails");
@@ -80,13 +90,18 @@ router.get('/whitelist', middleware.isLoggedIn, middleware.isPrincipal, (req, re
         }
 
         const users = await User.find({authenticated: true});
-
         if (!users) {
             req.flash('error', "Unable to find users");
             return res.redirect('back');
         }
 
-        res.render('admin/whitelist', {emails, users});
+        if (req.query.version) {
+            if (["whitelist", "blacklist"].includes(req.query.version)) {
+                return res.render('admin/whitelist', {emails, users, version: req.query.version});
+            }
+        }
+
+        return res.render('admin/whitelist', {emails, users, version: "whitelist"});
 
     })().catch(err => {
         req.flash('error', "An Error Occurred");
@@ -95,23 +110,17 @@ router.get('/whitelist', middleware.isLoggedIn, middleware.isPrincipal, (req, re
 });
 
 router.put('/whitelist', middleware.isLoggedIn, middleware.isPrincipal, (req, res) => {
-
     (async () => {
-        if (req.body.address.split('@')[1] == "alsionschool.org") {
+        if (req.body.version == "whitelist" && req.body.address.split('@')[1] == "alsionschool.org") {
             return res.json({error: "Alsion emails do not need to be added to the whitelist"});
         }
 
-        const overlap = await Email.find({address: req.body.address});
-
-        if (!overlap) {
-            return res.json({error: "Unable to find emails"});
+        const overlap = await Email.findOne({address: req.body.address});
+        if (overlap) { //If any emails overlap, don't create the new email
+            return res.json({error: "Email is already either in whitelist or blacklist"});
         }
 
-        if (overlap.length > 0) {
-            return res.json({error: "Email already in whitelist"});
-        }
-
-        const email = await Email.create({address: req.body.address});
+        const email = await Email.create({address: req.body.address, version: req.body.version});
         if (!email) {
             return res.json({error: "Error creating email"});
         }

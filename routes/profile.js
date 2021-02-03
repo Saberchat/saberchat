@@ -100,13 +100,11 @@ router.get('/:id', middleware.isLoggedIn, (req, res) => {
 // update user route. Check if current user matches profiles they're trying to edit with middleware.
 router.put('/profile', middleware.isLoggedIn, validateUserUpdate, (req, res) => {
     (async () => {
-
         const overlap = await User.find({
             authenticated: true,
             username: filter.clean(req.body.username),
             _id: {$ne: req.user._id}
         });
-
         if (!overlap) {
             req.flash('error', "Unable to find users");
             return res.redirect('back');
@@ -117,10 +115,8 @@ router.put('/profile', middleware.isLoggedIn, validateUserUpdate, (req, res) => 
         }
 
         let status;
-
         if (req.body.status == '') {
             status = req.user.status;
-
         } else {
             status = req.body.status;
         }
@@ -141,10 +137,7 @@ router.put('/profile', middleware.isLoggedIn, validateUserUpdate, (req, res) => 
             user.bannerUrl = req.body.bannerUrl;
         }
 
-
-        //find and update the user with new info
-        const updatedUser = await User.findByIdAndUpdate(req.user._id, user);
-
+        const updatedUser = await User.findByIdAndUpdate(req.user._id, user); //find and update the user with new info
         if (!updatedUser) {
             req.flash('error', 'There was an error updating your profile');
             return res.redirect('back');
@@ -191,13 +184,13 @@ router.put('/change-email', middleware.isLoggedIn, validateEmailUpdate, (req, re
             return res.redirect(`/profiles/${req.user._id}`);
 
         } else {
-            const emails = await Email.find({address: req.body.email});
+            const emails = await Email.find({address: req.body.email, version: "whitelist"});
 
             if (!emails) {
                 req.flash('error', "Unable to find emails");
                 return res.redirect('back');
 
-            } else if (emails.length < 1 && req.body.email.split("@")[1] != "alsionschool.org") {
+            } else if (emails.length == 0 && req.body.email.split("@")[1] != "alsionschool.org") {
                 req.flash('error', "New email must be an Alsion-verified email");
                 return res.redirect('back');
             }
