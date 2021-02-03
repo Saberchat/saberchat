@@ -10,7 +10,6 @@ const convertToLink = require("../other_modules/convert-to-link");
 
 const multer = require('../middleware/multer');
 const {cloudUpload, cloudDelete} = require('../services/cloudinary');
-
 const {validateAnn} = require('../middleware/validation');
 
 //SCHEMA
@@ -23,14 +22,14 @@ const PostComment = require('../models/postComment');
 router.get('/', (req, res) => { //RESTful Routing 'INDEX' route
     Announcement.find({}).populate('sender').exec((err, foundAnns) => { //Collects data about all announcements
         if (err || !foundAnns) {
-            req.flash('error', "Unable To Access Database");
+            req.flash('error', "An Error Occurred");
             res.redirect('back');
 
         } else {
             res.render('announcements/index', {announcements: foundAnns.reverse()}); //Render announcement page with data on all announcements
         }
-    })
-})
+    });
+});
 
 router.get('/new', middleware.isLoggedIn, middleware.isMod, (req, res) => { //RESTful Routing 'NEW' route
     res.render('announcements/new');
@@ -75,7 +74,7 @@ router.get('/:id', (req, res) => { //RESTful Routing 'SHOW' route
         })
         .exec((err, foundAnn) => { //Get info about the announcement's sender and comments, and then release it to user
             if (err || !foundAnn) {
-                req.flash('error', 'Unable To Access Database');
+                req.flash('error', 'An Error Occurred');
                 res.redirect('back');
 
             } else {
@@ -98,7 +97,10 @@ router.get('/:id', (req, res) => { //RESTful Routing 'SHOW' route
                 }
 
                 const convertedText = convertToLink(foundAnn.text);
-                res.render('announcements/show', {announcement: foundAnn, convertedText});
+                res.render('announcements/show', {
+                    announcement: foundAnn,
+                    convertedText
+                });
             }
         });
 });
@@ -106,13 +108,15 @@ router.get('/:id', (req, res) => { //RESTful Routing 'SHOW' route
 router.get('/:id/edit', middleware.isLoggedIn, middleware.isMod, (req, res) => { //RESTful Routing 'EDIT' route
     Announcement.findById(req.params.id, (err, foundAnn) => { //Find only the announcement specified from form
         if (err || !foundAnn) {
-            req.flash('error', "Unable To Access Database");
+            req.flash('error', "An Error Occurred");
             res.redirect('back');
         } else if (!foundAnn.sender._id.equals(req.user._id)) { //If you did not send the announcement, you cannot edit it (the 'edit' button does not show up if you did not create the announcement, but this is a double-check)
             req.flash('error', 'You do not have permission to do that');
             res.redirect('back');
         } else {
-            res.render('announcements/edit', {announcement: foundAnn}); //If no problems, allow the user to edit announcement
+            res.render('announcements/edit', {
+                announcement: foundAnn
+            }); //If no problems, allow the user to edit announcement
         }
     });
 });
@@ -152,7 +156,12 @@ router.post('/', middleware.isLoggedIn, middleware.isMod, multer, validateAnn, (
         announcement.date = dateFormat(announcement.created_at, "h:MM TT | mmm d");
         await announcement.save();
 
-        const users = await User.find({authenticated: true, _id: {$ne: req.user._id}});
+        const users = await User.find({
+            authenticated: true,
+            _id: {
+                $ne: req.user._id
+            }
+        });
         let announcementEmail;
 
         let imageString = "";
@@ -162,7 +171,7 @@ router.post('/', middleware.isLoggedIn, middleware.isMod, multer, validateAnn, (
         }
 
         if (!users) {
-            req.flash('error', "Unable To Access Database");
+            req.flash('error', "An Error Occurred");
             res.rediect('back');
         }
 
@@ -181,7 +190,7 @@ router.post('/', middleware.isLoggedIn, middleware.isMod, multer, validateAnn, (
         res.redirect(`/announcements/${announcement._id}`);
 
     })().catch(err => {
-        req.flash('error', "Unable To Access Database");
+        req.flash('error', "An Error Occurred");
         return res.redirect('back');
     });
 });
@@ -189,7 +198,9 @@ router.post('/', middleware.isLoggedIn, middleware.isMod, multer, validateAnn, (
 router.put('/like', middleware.isLoggedIn, (req, res) => {
     Announcement.findById(req.body.announcement, (err, announcement) => {
         if (err || !announcement) {
-            res.json({error: 'Error updating announcement'});
+            res.json({
+                error: 'Error updating announcement'
+            });
 
         } else {
             if (announcement.likes.includes(req.user._id)) { //Remove like
@@ -217,7 +228,9 @@ router.put('/like', middleware.isLoggedIn, (req, res) => {
 router.put('/like-comment', middleware.isLoggedIn, (req, res) => {
     PostComment.findById(req.body.commentId, (err, comment) => {
         if (err || !comment) {
-            res.json({error: 'Error updating comment'});
+            res.json({
+                error: 'Error updating comment'
+            });
 
         } else {
 
@@ -255,12 +268,19 @@ router.put('/comment', middleware.isLoggedIn, (req, res) => {
             });
 
         if (!announcement) {
-            return res.json({error: 'Error commenting'});
+            return res.json({
+                error: 'Error commenting'
+            });
         }
 
-        const comment = await PostComment.create({text: req.body.text, sender: req.user});
+        const comment = await PostComment.create({
+            text: req.body.text,
+            sender: req.user
+        });
         if (!comment) {
-            return res.json({error: 'Error commenting'});
+            return res.json({
+                error: 'Error commenting'
+            });
         }
 
         comment.date = dateFormat(comment.created_at, "h:MM TT | mmm d");
@@ -277,7 +297,9 @@ router.put('/comment', middleware.isLoggedIn, (req, res) => {
                 user = await User.findById(line.split("#")[1].split("_")[0]);
 
                 if (!user) {
-                    return res.json({error: "Error accessing user"});
+                    return res.json({
+                        error: "Error accessing user"
+                    });
                 }
                 users.push(user);
             }
@@ -297,7 +319,9 @@ router.put('/comment', middleware.isLoggedIn, (req, res) => {
             }); //Create a notification to alert the user
 
             if (!notif) {
-                return res.json({error: "Error creating notification"});
+                return res.json({
+                    error: "Error creating notification"
+                });
             }
 
             notif.date = dateFormat(notif.created_at, "h:MM TT | mmm d");
@@ -316,7 +340,9 @@ router.put('/comment', middleware.isLoggedIn, (req, res) => {
         });
 
     })().catch(err => {
-        res.json({error: 'Error Commenting'});
+        res.json({
+            error: 'Error Commenting'
+        });
     })
 
 })
@@ -378,7 +404,12 @@ router.put('/:id', middleware.isLoggedIn, middleware.isMod, multer, validateAnn,
 
         await updatedAnnouncement.save();
 
-        const users = await User.find({authenticated: true, _id: {$ne: req.user._id}});
+        const users = await User.find({
+            authenticated: true,
+            _id: {
+                $ne: req.user._id
+            }
+        });
 
         let announcementEmail;
 
@@ -389,7 +420,7 @@ router.put('/:id', middleware.isLoggedIn, middleware.isMod, multer, validateAnn,
         }
 
         if (!users) {
-            req.flash('error', "Unable To Access Database");
+            req.flash('error', "An Error Occurred");
             return res.rediect('back');
         }
 
@@ -421,7 +452,7 @@ router.put('/:id', middleware.isLoggedIn, middleware.isMod, multer, validateAnn,
         res.redirect(`/announcements/${updatedAnnouncement._id}`);
 
     })().catch(err => {
-        req.flash('error', "Unable To Access Database");
+        req.flash('error', "An Error Occurred");
         res.redirect('back');
     });
 });
@@ -458,7 +489,9 @@ router.delete('/:id', middleware.isLoggedIn, middleware.isMod, (req, res) => { /
             return res.redirect('back');
         }
 
-        const users = await User.find({authenticated: true});
+        const users = await User.find({
+            authenticated: true
+        });
         if (!users) {
             req.flash('error', "Unable to find users");
             return res.redirect('back');
@@ -483,7 +516,7 @@ router.delete('/:id', middleware.isLoggedIn, middleware.isMod, (req, res) => { /
         res.redirect('/announcements/');
 
     })().catch(err => {
-        req.flash('error', "Unable To Access Database");
+        req.flash('error', "An Error Occurred");
         res.redirect('back');
     });
 });

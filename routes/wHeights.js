@@ -23,7 +23,7 @@ router.get('/', middleware.isLoggedIn, (req, res) => {
         res.render('wHeights/index', {articles: articles});
 
     })().catch(err => {
-        req.flash('error', "Unable to access database");
+        req.flash('error', "An Error Occurred");
         res.redirect('back');
     });
 });
@@ -51,7 +51,7 @@ router.get('/new', middleware.isLoggedIn, (req, res) => {
         res.render('wHeights/new', {students, types});
 
     })().catch(err => {
-        req.flash('error', "Unable to access database");
+        req.flash('error', "An Error Occurred");
         res.redirect('back');
     })
 });
@@ -118,7 +118,7 @@ router.post('/new', middleware.isLoggedIn, (req, res) => {
         res.redirect('/articles');
 
     })().catch(err => {
-        req.flash('error', "Unable to access database");
+        req.flash('error', "An Error Occurred");
         res.redirect('back');
     });
 });

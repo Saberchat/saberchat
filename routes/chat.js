@@ -60,7 +60,7 @@ router.get('/', middleware.isLoggedIn, (req, res) => {
         return res.render('chat/index', {rooms, requests, commentObject});
 
     })().catch(err => {
-        req.flash('error', 'Unable to access Database');
+        req.flash('error', 'An Error Occurred');
         res.redirect('back');
     });
 });
@@ -69,7 +69,7 @@ router.get('/', middleware.isLoggedIn, (req, res) => {
 router.get('/new', middleware.isLoggedIn, (req, res) => {
     User.find({authenticated: true}, (err, foundUsers) => {
         if (err || !foundUsers) {
-            req.flash('error', 'Unable to access Database');
+            req.flash('error', 'An Error Occurred');
             res.redirect('back');
         } else {
             res.render('chat/new', {users: foundUsers});
@@ -132,14 +132,14 @@ router.get('/:id/edit', middleware.isLoggedIn, middleware.checkRoomOwnership, (r
         const users = await User.find({authenticated: true});
 
         if (!users) {
-            req.flash('error', 'Unable to access Database');
+            req.flash('error', 'An Error Occurred');
             return res.redirect('back');
         }
 
         res.render('chat/edit', {users, room});
 
     })().catch(err => {
-        req.flash('error', "Unable to access database");
+        req.flash('error', "An Error Occurred");
         res.redirect('back');
     });
 });
@@ -330,7 +330,7 @@ router.delete('/:id/cancel-request', (req, res) => {
         return res.json({success: "Successfully deleted request"});
 
     })().catch(err => {
-        res.json({error: "Unable to access database"});
+        res.json({error: "An Error Occurred"});
     });
 });
 
@@ -365,7 +365,7 @@ router.put('/:id', middleware.isLoggedIn, middleware.checkRoomOwnership, validat
         description: filter.clean(req.body.description)
     }, (err, room) => {
         if (err || !room) {
-            req.flash('error', 'Unable to access Database');
+            req.flash('error', 'An Error Occurred');
             res.redirect('back');
         } else {
             if (req.body.type == 'true') {

@@ -89,7 +89,7 @@ router.get('/whitelist', middleware.isLoggedIn, middleware.isPrincipal, (req, re
         res.render('admin/whitelist', {emails, users});
 
     })().catch(err => {
-        req.flash('error', "Unable to access database");
+        req.flash('error', "An Error Occurred");
         res.redirect('back');
     });
 });
@@ -455,7 +455,7 @@ router.delete('/whitelist/:id', middleware.isLoggedIn, middleware.isPrincipal, (
 // 	res.redirect('/admin/whitelist');
 //
 // 	})().catch(err => {
-// 		req.flash('error', "Unable to access database");
+// 		req.flash('error', "An Error Occurred");
 // 		res.redirect('back');
 // 	});
 // });

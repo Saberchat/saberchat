@@ -35,7 +35,7 @@ router.get('/', middleware.isLoggedIn, (req, res) => { //RESTful routing 'order/
 router.get('/menu', middleware.isLoggedIn, (req, res) => { //Renders the cafe menu with info on all the items
     Type.find({}).populate('items').exec((err, types) => { //Collects info on every item type, to render (in frontend, the ejs checks each item inside type, and only shows it if it's available)
         if (err || !types) {
-            req.flash('error', "Unable to access database");
+            req.flash('error', "An Error Occurred");
             res.redirect('back');
 
         } else {
@@ -75,7 +75,7 @@ router.put('/upvote', middleware.isLoggedIn, (req, res) => {
 //   getData().then(data => {
 //     res.render("cafe/data", data);
 //   }).catch(err => {
-//     req.flash("error", "Unable to access database");
+//     req.flash("error", "An Error Occurred");
 //     res.redirect("back");
 //   });
 // });
@@ -104,124 +104,94 @@ router.get('/order/new', middleware.isLoggedIn, middleware.cafeOpen, (req, res) 
             return res.redirect('back');
         }
 
-        let orderedItems = [];
-        let orderedMap = new Map();
-
+        let orderedItems = []; //Array of ordered item objects to sort by popularity
+        let overlap = false;
         for (let order of allOrders) {
             for (let item of order.items) {
-                if (orderedMap.has(item.item._id)) {
-                    orderedMap.set(item.item._id, orderedMap.get(item.item._id) + item.quantity);
-                } else {
-                    orderedMap.set(item.item._id, item.quantity);
+                overlap = false;
+                for (let itemObject of orderedItems) {
+                    if (itemObject.item.equals(item.item._id)) {
+                        itemObject.totalOrdered += item.quantity;
+                        overlap = true;
+                        break;
+                    }
+                }
+                if (!overlap) {
+                    orderedItems.push({
+                        item: item.item._id,
+                        totalOrdered: item.quantity,
+                        created_at: item.item.created_at
+                    });
                 }
             }
         }
-
-        let orderedItem;
-        let totalOrdered = [];
-        for (let item of orderedMap) {
-            orderedItem = await Item.findById(item[0]);
-            if (!orderedItem) {
-                req.flash('error', "Unable to find orders");
-                return res.redirect('back');
-            }
-
-            totalOrdered = [];
-            for (let i = 0; i < item[1]; i++) {
-                totalOrdered.push(i);
-            }
-
-            orderedItems.push({
-                item: orderedItem._id,
-                totalOrdered,
-                created_at: orderedItem.created_at
-            });
-        }
-
-        const frequentItems = sortByPopularity(orderedItems, "totalOrdered", "created_at", ["item"]).popular;
+        const frequentItems = sortByPopularity(orderedItems, "totalOrdered", "int", "created_at", ["item"]).popular;
         return res.render('cafe/newOrder', {types, frequentItems});
 
     })().catch(err => {
-        req.flash('error', "Unable to access database");
+        req.flash('error', "An Error Occurred");
         res.redirect('back');
     });
 });
 
 router.post('/order', middleware.isLoggedIn, middleware.cafeOpen, (req, res) => { //RESTful routing 'order/create'
-    (async () => { //Asynchronous function controls user ordering
-        const sentOrders = await Order.find({name: `${req.user.firstName} ${req.user.lastName}`, present: true}); //Find all of this user's orders that are currently active
+    (async () => {
+        if (!req.body.check) { //If any items are selected
+            req.flash('error', "Cannot send empty order"); //If no items were checked
+            return res.redirect('back');
+        }
 
+        const sentOrders = await Order.find({name: `${req.user.firstName} ${req.user.lastName}`, present: true});
         if (!sentOrders) {
             req.flash('error', "Unable to find orders");
             return res.redirect('back');
+        }
 
-        } else if (sentOrders.length > 2) { //If more than two orders are already made, you cannot order again
+        if (sentOrders.length > 2) { //If more than two orders are already made, you cannot order again
             req.flash('error', "You have made the maximum number of orders for the day");
             return res.redirect('back');
         }
 
-        if (req.body.check) { //If any items are selected
-            let orderCharge = 0; //Track to compare w/ balance
-            const items = await Item.find({}); //Find all items
-            if (!items) {
-                req.flash('error', 'No items found');
-                return res.redirect('back');
-            }
-
-            let unavailable = false; //The unavailable variable will determine if any items are unavailable in the quantities that the user requests (for an unlikely scenario where someone orders WHILE the user is ordering)
-
-            for (let i = 0; i < items.length; i++) { //Iterate through each item and check if it has less available then the user's order
-                if (Object.keys(req.body.check).includes(items[i]._id.toString())) { //If item is selected to be ordered
-
-                    if (items[i].availableItems < parseInt(req.body[items[i].name])) { //First test to see if all items are available
-                        unavailable = true;
-                        break;
-
-                    } else { //If all items are available, perform these operations
-                        items[i].availableItems -= parseInt(req.body[items[i].name]);
-                        orderCharge += (items[i].price * parseInt(req.body[items[i].name])); //Increment charge
-
-                        if (items[i].availableItems == 0) {
-                            items[i].isAvailable = false;
-                        }
-
-                        await items[i].save(); //If we find that the item has lost orders out now, change the item's status
-                    }
-                }
-            }
-
-            if (orderCharge > req.user.balance && req.body.payingInPerson == undefined) { //Check to see if you are ordering more than you can
-                req.flash("error", "You do not have enough money in your account to pay for this order. Contact the principal to update your balance.");
-                return res.redirect('/cafe');
-
-            } else if (unavailable) { //This should not be necessary for the most part, since if an item is unavailable, it doesn't show up in the menu. But if the user starts ordering before someone else submits their order, this is a possibility
-                req.flash("error", "Some items are unavailable in the quantities you requested. Please order again.");
-                return res.redirect('/cafe/order/new');
-
-            } else {
-                //Update balance here because if done in socket framework, this will process after balance has changed
-
-                if (!req.body.payingInPerson) {
-                    req.user.balance -= orderCharge;
-                    req.user.debt += orderCharge;
-                    await req.user.save();
-                }
-
-                req.flash("success", "Order Sent!");
-                return res.redirect('/cafe');
-            }
-
-        } else { //If no items were checked
-            req.flash('error', "Cannot send empty order");
-            return res.redirect('/cafe/order/new');
+        const orderedItems = await Item.find({_id: {$in: Object.keys(req.body.check)}}); //Find all ordered items
+        if (!orderedItems) {
+            req.flash('error', 'No items found');
+            return res.redirect('back');
         }
 
+        for (let item of orderedItems) { //Search for unavailable items
+            if (item.availableItems < parseInt(req.body[item.name])) {
+                req.flash("error", "Some items are unavailable in the quantities you requested. Please order again.");
+                return res.redirect('back');
+            }
+        }
+
+        let charge = 0; //Track order charge to compare with balance
+        for (let item of orderedItems) {
+            item.availableItems -= parseInt(req.body[item.name]);
+            charge += (item.price * parseInt(req.body[item.name])); //Increment charge
+            item.isAvailable = (item.availableItems > 0);
+            await item.save(); //Update item's status
+        }
+
+        if (!req.body.payingInPerson) {
+            if (charge > req.user.balance) { //Check to see if you are ordering more than you can
+                req.flash("error", "You do not have enough money in your account to pay for this order. Contact the principal to update your balance.");
+                return res.redirect('/cafe');
+            }
+            req.user.balance -= charge;
+            req.user.debt += charge;
+            await req.user.save();
+        }
+
+        req.flash("success", "Order Sent!");
+        return res.redirect('/cafe');
+
     })().catch(err => {
-        req.flash('error', "Unable to access database");
+        console.log(err);
+        req.flash('error', "An Error Occurred");
         res.redirect('back');
     });
 });
-
 
 router.get('/orders', middleware.isLoggedIn, middleware.isMod, middleware.isCashier, (req, res) => { //This is for EC Cafe Workers to check all the available orders
     Order.find({present: true}).populate('items.item').exec((err, orders) => { //Collect all orders which are currently active, and get all info on their items
@@ -251,16 +221,16 @@ router.delete('/order/:id', middleware.isLoggedIn, middleware.cafeOpen, (req, re
             return res.json({error: 'Could not find order'});
         }
 
-        if (!deletedOrder.payingInPerson) {
-            req.user.balance += deletedOrder.charge; //Refund
+        if (!deletedOrder.payingInPerson) { //Refund balance
+            req.user.balance += deletedOrder.charge;
             req.user.debt -= deletedOrder.charge;
             await req.user.save();
         }
 
-        for (let i = 0; i < deletedOrder.items.length; i += 1) { //For each of the order's items, add the number ordered back to that item. (If there are 12 available quesadillas and the  user ordered 3, there are now 15)
-            deletedOrder.items[i].item.availableItems += deletedOrder.items[i].quantity;
-            deletedOrder.items[i].item.isAvailable = true;
-            await deletedOrder.items[i].item.save();
+        for (let item of deletedOrder.items) { //For each of the order's items, add the number ordered back to that item. (If there are 12 available quesadillas and the  user ordered 3, there are now 15)
+            item.item.availableItems += item.quantity;
+            item.item.isAvailable = true;
+            await item.item.save();
         }
 
         return res.json({success: 'Successfully canceled'});
@@ -323,12 +293,12 @@ router.post('/:id/ready', middleware.isLoggedIn, middleware.isMod, middleware.is
         transport(order.customer, 'Cafe Order Ready', `<p>Hello ${order.customer.firstName},</p><p>${notif.text}</p>`);
 
         order.customer.inbox.push(notif); //Add notif to user's inbox
-        order.customer.msgCount += 1;
+        order.customer.msgCount ++;
         await order.customer.save();
         return res.json({success: 'Successfully confirmed order'});
 
     })().catch(err => {
-        res.json({error: "Unable to access database"});
+        res.json({error: "An Error Occurred"});
     });
 });
 
@@ -401,26 +371,26 @@ router.post('/:id/reject', middleware.isLoggedIn, middleware.isMod, middleware.i
         }
 
         order.customer.inbox.push(notif); //Add notif to user's inbox
-        order.customer.msgCount += 1;
+        order.customer.msgCount ++;
         await order.customer.save();
 
         return res.json({success: 'Successfully rejected order'});
 
     })().catch(err => {
-        res.json({error: "Unable to access database"});
+        res.json({error: "An Error Occurred"});
     });
 });
 
 router.get('/manage', middleware.isLoggedIn, middleware.isMod, (req, res) => { //Route to manage cafe
     Type.find({}).populate('items').exec((err, types) => { //Collect info on all the item types
         if (err || !types) {
-            req.flash('error', 'Unable to access Database');
+            req.flash('error', 'An Error Occurred');
             res.redirect('/cafe');
 
         } else {
             Cafe.find({}, (err, cafe) => { //Collect info on whether or not the cafe is open
                 if (err || !cafe) {
-                    req.flash('error', "Unable to access database");
+                    req.flash('error', "An Error Occurred");
                     res.redirect('back');
 
                 } else {
@@ -452,7 +422,7 @@ router.put('/change-cafe-status', middleware.isLoggedIn, middleware.isMod, (req,
 router.get('/item/new', middleware.isLoggedIn, middleware.isMod, (req, res) => { //RESTFUL routing 'item/new'
     Type.find({}, (err, types) => { //Find all possible item types
         if (err || !types) {
-            req.flash('error', "Unable to access database");
+            req.flash('error', "An Error Occurred");
 
         } else {
             res.render('cafe/newOrderItem', {types});
@@ -510,7 +480,7 @@ router.post('/item', middleware.isLoggedIn, middleware.isMod, (req, res) => { //
         return res.redirect('/cafe/manage');
 
     })().catch(err => {
-        req.flash('error', "Unable to access database");
+        req.flash('error', "An Error Occurred");
         res.redirect('back');
     });
 });
@@ -534,7 +504,7 @@ router.get('/item/:id', middleware.isLoggedIn, middleware.isMod, (req, res) => {
         return res.render('cafe/show', {types, item});
 
     })().catch(err => {
-        req.flash('error', "Unable to access database");
+        req.flash('error', "An Error Occurred");
         res.redirect('back');
     });
 });
@@ -578,7 +548,7 @@ router.put('/item/:id', middleware.isLoggedIn, middleware.isMod, (req, res) => {
         for (let order of activeOrders) {
             order.charge = 0; //Reset the order's charge, we will have to recalculate
 
-            for (let i = 0; i < order.items.length; i += 1) { //Iterate over each order, and change its price to match the new item prices
+            for (let i = 0; i < order.items.length; i ++) { //Iterate over each order, and change its price to match the new item prices
                 order.charge += order.items[i].item.price * order.items[i].quantity;
                 order.items[i].price = item.price;
             }
@@ -615,7 +585,7 @@ router.put('/item/:id', middleware.isLoggedIn, middleware.isMod, (req, res) => {
         return res.redirect('/cafe/manage');
 
     })().catch(err => {
-        req.flash('error', "Unable to access database");
+        req.flash('error', "An Error Occurred");
         res.redirect('back');
     });
 });
@@ -666,7 +636,7 @@ router.delete('/item/:id', middleware.isLoggedIn, middleware.isMod, (req, res) =
         return res.redirect('/cafe/manage');
 
     })().catch(err => {
-        req.flash('error', "Unable to access database");
+        req.flash('error', "An Error Occurred");
         res.redirect('back');
     });
 });
@@ -709,7 +679,7 @@ router.post('/type', middleware.isLoggedIn, middleware.isMod, (req, res) => { //
         }
 
         for (let t of types) { //Now that we've created the type, we have to remove the newly selected items from all other types
-            for (let i = 0; i < t.items.length; i += 1) {
+            for (let i = 0; i < t.items.length; i ++) {
                 if (req.body[t.items[i].toString()]) {
                     t.items.splice(i, 1);
                 }
@@ -734,7 +704,7 @@ router.post('/type', middleware.isLoggedIn, middleware.isMod, (req, res) => { //
         return res.redirect('/cafe/manage');
 
     })().catch(err => {
-        req.flash('error', "Unable to access database");
+        req.flash('error', "An Error Occurred");
         res.redirect('back');
     });
 });
@@ -744,7 +714,7 @@ router.get('/type/:id', middleware.isLoggedIn, middleware.isMod, (req, res) => {
         const type = await Type.findById(req.params.id).populate('items'); //Find the specified type
 
         if (!type) {
-            req.flash('error', "Unable to access database");
+            req.flash('error', "An Error Occurred");
             return res.redirect('back');
 
         } else if (type.name == "Other") {
@@ -753,16 +723,15 @@ router.get('/type/:id', middleware.isLoggedIn, middleware.isMod, (req, res) => {
         }
 
         const types = await Type.find({_id: {$ne: type._id}}).populate('items'); //Find all items
-
         if (!types) {
-            req.flash('error', "Unable to access database");
+            req.flash('error', "An Error Occurred");
             return res.redirect('back');
         }
 
         return res.render('cafe/editItemType', {type, types});
 
     })().catch(err => {
-        req.flash('error', "Unable to access database");
+        req.flash('error', "An Error Occurred");
         res.redirect('back');
     });
 });
@@ -771,7 +740,7 @@ router.put('/type/:id', middleware.isLoggedIn, middleware.isMod, (req, res) => {
     (async () => {
         const overlap = await Type.find({_id: {$ne: req.params.id}, name: req.body.name}); //Find all types besides the one we are editing with the same name
         if (!overlap) {
-            req.flash('error', "Unable to access database");
+            req.flash('error', "An Error Occurred");
             return res.redirect('back');
         }
 
@@ -833,7 +802,7 @@ router.put('/type/:id', middleware.isLoggedIn, middleware.isMod, (req, res) => {
         return res.redirect('/cafe/manage');
 
     })().catch(err => {
-        req.flash('error', "Unable to access database");
+        req.flash('error', "An Error Occurred");
         res.redirect('back');
     });
 });
@@ -861,7 +830,7 @@ router.delete('/type/:id', middleware.isLoggedIn, middleware.isMod, (req, res) =
         return res.redirect('/cafe/manage');
 
     })().catch(err => {
-        req.flash('error', "Unable to access database");
+        req.flash('error', "An Error Occurred");
         res.redirect('back');
     });
 });

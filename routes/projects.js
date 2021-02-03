@@ -25,7 +25,7 @@ router.get('/', (req, res) => { //RESTful Routing 'INDEX' route
         .populate('poster')
         .exec((err, foundProjects) => { //Find all projects, collect info on their creators and posters (part of the 'User' schema)
             if (err || !foundProjects) {
-                req.flash('error', 'Unable to access database');
+                req.flash('error', 'An Error Occurred');
                 res.redirect('back');
 
             } else {
@@ -37,7 +37,7 @@ router.get('/', (req, res) => { //RESTful Routing 'INDEX' route
 router.get('/new', middleware.isLoggedIn, middleware.isFaculty, (req, res) => { ////RESTful Routing 'NEW' route
     User.find({authenticated: true, status: {$nin: ['alumnus', 'guest', 'parent', 'faculty']}}, (err, foundUsers) => { //Find all students, so that when teachers post a project, they can select which students created it
         if (err || !foundUsers) {
-            req.flash('error', 'Unable to access database');
+            req.flash('error', 'An Error Occurred');
             res.redirect('back');
 
         } else {
@@ -138,7 +138,7 @@ router.post('/', middleware.isLoggedIn, middleware.isFaculty, validateProject, (
         res.redirect(`/projects/${project._id}`);
 
     })().catch(err => {
-        req.flash('error', "Unable to access database");
+        req.flash('error', "An Error Occurred");
         res.redirect('back');
     });
 });
@@ -152,8 +152,8 @@ router.post('/', middleware.isLoggedIn, middleware.isFaculty, validateProject, (
 //             return res.redirect('back');
 //         }
 //
-//         const popularProjects = sortByPopularity(projects, "likes", "created_at", null).popular; //Extract and sort popular projects
-//         const unpopularProjects = sortByPopularity(projects, "likes", "created_at", null).unpopular; //Extract and sort unpopular projects
+//         const popularProjects = sortByPopularity(projects, "likes", "arr", "created_at", null).popular; //Extract and sort popular projects
+//         const unpopularProjects = sortByPopularity(projects, "likes", "arr", "created_at", null).unpopular; //Extract and sort unpopular projects
 //
 //         //Build string of projects and comments text
 //         let popularProjectText = "";
@@ -214,7 +214,7 @@ router.get('/:id/edit', middleware.isLoggedIn, middleware.isFaculty, (req, res) 
         res.render('projects/edit', {project, students, creatornames});
 
     })().catch(err => {
-        req.flash('error', "Unable to access database");
+        req.flash('error', "An Error Occurred");
         res.redirect('back');
     });
 });
@@ -232,7 +232,7 @@ router.get('/:id', (req, res) => { //RESTful Routing 'SHOW' route
         })
         .exec((err, foundProject) => { //Find the project specified in the form, get info about its poster and creators (part of the User schema)
             if (err || !foundProject) {
-                req.flash('error', "Unable to access database");
+                req.flash('error', "An Error Occurred");
                 res.redirect('back');
 
             } else {
@@ -505,7 +505,7 @@ router.put('/:id', middleware.isLoggedIn, middleware.isFaculty, validateProject,
         res.redirect(`/projects/${project._id}`);
 
     })().catch(err => {
-        req.flash('error', "Unable to access database");
+        req.flash('error', "An Error Occurred");
         res.redirect('back');
     });
 });
@@ -535,7 +535,7 @@ router.delete('/:id', middleware.isLoggedIn, middleware.isFaculty, (req, res) =>
         res.redirect('/projects');
 
     })().catch(err => {
-        req.flash('error', "Unable to access database");
+        req.flash('error', "An Error Occurred");
         res.redirect('back');
     });
 });

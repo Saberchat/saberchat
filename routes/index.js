@@ -291,7 +291,7 @@ router.get("/logout", (req, res) => {
 router.get('/contact', middleware.isLoggedIn, (req, res) => {
     User.find({authenticated: true, authenticated: true, status: 'faculty'}, (err, faculty) => {
         if (err || !faculty) {
-            req.flash('error', "Unable to access database");
+            req.flash('error', "An Error Occurred");
             res.redirect('back');
 
         } else {
@@ -303,7 +303,7 @@ router.get('/contact', middleware.isLoggedIn, (req, res) => {
 router.get('/alsion', (req, res) => {
     User.find({authenticated: true, status: 'faculty'}, (err, faculty) => {
         if (err || !faculty) {
-            req.flash('error', "Unable to access database");
+            req.flash('error', "An Error Occurred");
             res.redirect('back');
 
         } else {

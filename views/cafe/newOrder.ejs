@@ -98,73 +98,70 @@
                         </li>
                         <% } %>
                         <% for (let item of type.items) { %>
-
                             <% if (frequentItems.toString().includes(item._id.toString())) { %>
-                    <div class="list-group-item list-group-item-info form-check menu-item <%= type.name %> cafe"
-                         id="item-<%= item.id %>" title="You have frequently ordered this item">
+                                <div class="list-group-item list-group-item-info form-check menu-item <%= type.name %> cafe" id="item-<%= item.id %>" title="You have frequently ordered this item">
 
-                        <% } else { %>
-                        <div class="list-group-item form-check menu-item <%= type.name.replace(' ', '') %> cafe"
-                             id="item-<%= item.id %>">
+                            <% } else { %>
+                                <div class="list-group-item form-check menu-item <%= type.name.replace(' ', '') %> cafe" id="item-<%= item.id %>">
                             <% } %>
 
-                            <!-- Div to put margins on text inside outer div -->
-                            <div class="style-div">
+                                <!-- Div to put margins on text inside outer div -->
+                                <div class="style-div">
 
-                                <input name="check[<%= item._id %>]" id="<%= item._id %>" class="form-check-input"
-                                       type="checkbox" value="">
-                                <select class="num-orders" id="dd_<%= item._id %>" name="<%= item.name %>"
-                                        onchange="changeOrderConfirmation()">
-                                    <% if (item.availableItems > 3) { %>
-                                        <% [1, 2, 3].forEach(num => { %>
-                                        <option><%= num %></option>
-                                        <% }); %>
-                                    <% } else { %>
-                                        <% let val = 0 %>
-                                        <% [...Array(item.availableItems).keys()].forEach(num => { %>
-                                            <% val = num + 1 %>
-                                            <option><%= val %></option>
-                                        <% }); %>
-                                    <% } %>
-                                </select>
+                                    <input name="check[<%= item._id %>]" id="<%= item._id %>" class="form-check-input"
+                                           type="checkbox" value="">
+                                    <select class="num-orders" id="dd_<%= item._id %>" name="<%= item.name %>"
+                                            onchange="changeOrderConfirmation()">
+                                        <% if (item.availableItems > 3) { %>
+                                            <% [1, 2, 3].forEach(num => { %>
+                                            <option><%= num %></option>
+                                            <% }); %>
+                                        <% } else { %>
+                                            <% let val = 0 %>
+                                            <% [...Array(item.availableItems).keys()].forEach(num => { %>
+                                                <% val = num + 1 %>
+                                                <option><%= val %></option>
+                                            <% }); %>
+                                        <% } %>
+                                    </select>
 
-                                <label class="form-check-label" for="<%= item._id %>"><span
-                                            class="item-name"><%= item.name %></span> (<%= item.availableItems %> orders
-                                    available) -
+                                    <label class="form-check-label" for="<%= item._id %>"><span
+                                                class="item-name"><%= item.name %></span> (<%= item.availableItems %> orders
+                                        available) -
 
-                                    <% if (!item.price.toString().includes('.')) { %>
-                                        $<%= item.price %>.00
+                                        <% if (!item.price.toString().includes('.')) { %>
+                                            $<%= item.price %>.00
 
-                                    <% } else if (item.price.toString().split('.')[1].length == 1) { %>
-                                        $<%= item.price %>0
+                                        <% } else if (item.price.toString().split('.')[1].length == 1) { %>
+                                            $<%= item.price %>0
 
-                                    <% } else { %>
-                                        $<%= item.price %>
-                                    <% } %>
+                                        <% } else { %>
+                                            $<%= item.price %>
+                                        <% } %>
 
-                                    <% if (frequentItems.toString().includes(item._id.toString())) { %>
-                                        <span class="popular">Frequently Ordered</span>
-                                    <% } %>
+                                        <% if (frequentItems.toString().includes(item._id.toString())) { %>
+                                            <span class="popular">Frequently Ordered</span>
+                                        <% } %>
 
-                                </label>
+                                    </label>
 
-                                <div title="Upvotes" class="upvotes">
+                                    <div title="Upvotes" class="upvotes">
 
-                                    <% if (item.upvotes.includes(currentUser._id)) { %>
-                                    <span class="upvoted" id="upvote-<%= item._id %>" onclick="upvote(this)"><i
-                                                class="fas fa-arrow-circle-up"></i></span>
+                                        <% if (item.upvotes.includes(currentUser._id)) { %>
+                                        <span class="upvoted" id="upvote-<%= item._id %>" onclick="upvote(this)"><i
+                                                    class="fas fa-arrow-circle-up"></i></span>
 
-                                    <% } else { %>
-                                    <span class="not-upvoted" id="upvote-<%= item._id %>" onclick="upvote(this)"><i
-                                                class="fas fa-arrow-circle-up"></i></span>
-                                    <% } %>
+                                        <% } else { %>
+                                        <span class="not-upvoted" id="upvote-<%= item._id %>" onclick="upvote(this)"><i
+                                                    class="fas fa-arrow-circle-up"></i></span>
+                                        <% } %>
 
-                                    <span id="upvoteCount-<%= item._id %>"> <%= item.upvotes.length %></span>
+                                        <span id="upvoteCount-<%= item._id %>"> <%= item.upvotes.length %></span>
+                                    </div>
+
+                                    <br/>
                                 </div>
-
-                                <br/>
                             </div>
-                        </div>
 
                         <% } %>
 

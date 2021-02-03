@@ -44,7 +44,7 @@ router.get('/', middleware.isLoggedIn, (req, res) => {
 router.get('/messages/new', middleware.isLoggedIn, (req, res) => {
     User.find({authenticated: true}, (err, foundUsers) => {
         if (err || !foundUsers) {
-            req.flash('error', 'Unable to access Database');
+            req.flash('error', 'An Error Occurred');
             res.redirect('back');
 
         } else {
@@ -210,7 +210,7 @@ router.get('/sent', middleware.isLoggedIn, (req, res) => {
 
     Message.find({}, (err, messages) => {
         if (err || !messages) {
-            req.flash('error', 'Unable to access database');
+            req.flash('error', 'An Error Occurred');
             res.redirect('/inbox');
 
         } else {
@@ -451,7 +451,7 @@ router.get('/requests/:id', middleware.isLoggedIn, (req, res) => {
         .populate({path: 'requester', select: 'username'})
         .populate({path: 'room', select: ['creator', 'name']}).exec((err, foundReq) => {
         if (err || !foundReq) {
-            req.flash("error", "Unable to access database");
+            req.flash("error", "An Error Occurred");
             res.redirect('back');
         } else {
             res.render('inbox/requests/show', {request: foundReq});
@@ -466,7 +466,7 @@ router.post('/requests/:id/accept', middleware.isLoggedIn, (req, res) => {
             .populate({path: 'room', select: ['creator']}).populate('requester');
 
         if (!Req) {
-            req.flash("error", "Unable to access database");
+            req.flash("error", "An Error Occurred");
             return res.redirect('back');
 
         } else if (!Req.room.creator.id.equals(req.user._id)) {
@@ -482,7 +482,7 @@ router.post('/requests/:id/accept', middleware.isLoggedIn, (req, res) => {
             const foundRoom = await Room.findById(Req.room._id);
 
             if (!foundRoom) {
-                req.flash("error", "Unable to access database");
+                req.flash("error", "An Error Occurred");
                 return res.redirect('back');
             }
 
@@ -510,7 +510,7 @@ router.post('/requests/:id/accept', middleware.isLoggedIn, (req, res) => {
         }
 
     })().catch(err => {
-        req.flash("error", "Unable to access database");
+        req.flash("error", "An Error Occurred");
         res.redirect('back');
     });
 });
@@ -522,7 +522,7 @@ router.post('/requests/:id/reject', middleware.isLoggedIn, (req, res) => {
             .populate('room').populate('requester')
 
         if (!Req) {
-            req.flash("error", "Unable to access database");
+            req.flash("error", "An Error Occurred");
             return res.redirect('back');
 
         } else if (!Req.room.creator.id.equals(req.user._id)) {
@@ -557,7 +557,7 @@ router.post('/requests/:id/reject', middleware.isLoggedIn, (req, res) => {
         }
 
     })().catch(err => {
-        req.flash("error", "Unable to access database");
+        req.flash("error", "An Error Occurred");
         res.redirect('back');
     });
 });

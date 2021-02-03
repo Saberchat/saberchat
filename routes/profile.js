@@ -37,7 +37,7 @@ router.get('/', middleware.isLoggedIn, (req, res) => {
 
     User.find({authenticated: true}, (err, foundUsers) => {
         if (err || !foundUsers) {
-            req.flash('error', 'Unable to access Database');
+            req.flash('error', 'An Error Occurred');
             res.redirect('back');
 
         } else {
@@ -92,7 +92,7 @@ router.get('/:id', middleware.isLoggedIn, (req, res) => {
         res.render('profile/show', {user, following, followerIds, convertedDescription});
 
     })().catch(err => {
-        req.flash('error', "Unable to access database");
+        req.flash('error', "An Error Occurred");
         res.redirect('back');
     });
 });
@@ -155,7 +155,7 @@ router.put('/profile', middleware.isLoggedIn, validateUserUpdate, (req, res) => 
         res.redirect('/profiles/' + req.user._id);
 
     })().catch(err => {
-        req.flash('error', "Unable to access database");
+        req.flash('error', "An Error Occurred");
         res.redirect('back');
     });
 });
@@ -256,7 +256,7 @@ router.put('/change-email', middleware.isLoggedIn, validateEmailUpdate, (req, re
 
     })().catch(err => {
         console.log(err);
-        req.flash('error', "Unable to access database");
+        req.flash('error', "An Error Occurred");
         res.redirect('back');
     });
 });
@@ -588,7 +588,7 @@ router.put('/change-password', middleware.isLoggedIn, validatePasswordUpdate, (r
 //     res.redirect('/');
 //
 //   })().catch(err => {
-//     req.flash('error', "Unable to access database");
+//     req.flash('error', "An Error Occurred");
 //     res.redirect('back');
 //   });
 // });

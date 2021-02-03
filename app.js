@@ -377,7 +377,7 @@ io.on('connect', (socket) => {
                     charge: 0,
                     instructions: orderInstructions,
                     payingInPerson: payingInPerson
-                }); //Assuming no setbacks, create the order
+                });
                 if (!order) {
                     return console.log('error creating order');
                 }

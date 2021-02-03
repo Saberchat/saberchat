@@ -145,7 +145,7 @@ middleware.cafeOpen = ((req, res, next) => { //Cafe time restrictions
 
     Cafe.find({}, (err, foundCafe) => {
         if (err || !foundCafe) {
-            req.flash('error', "Unable to access database")
+            req.flash('error', "An Error Occurred")
             res.redirect('back')
 
         } else {
