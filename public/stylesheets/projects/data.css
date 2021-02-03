@@ -3,9 +3,9 @@ html, body, #container {
     height: 50%;
 }
 
-#container {
+/* #container {
     float: center;
-}
+} */
 
 .keyword {
     font-weight: bold;
