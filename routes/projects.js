@@ -5,10 +5,10 @@ const express = require('express');
 const middleware = require('../middleware');
 const router = express.Router(); //start express router
 const dateFormat = require('dateformat');
-const filter = require('../other_modules/filter');
-const {transport, transport_mandatory} = require("../other_modules/transport");
-const convertToLink = require("../other_modules/convert-to-link");
-const {getPopularityCoefficiant, sortByPopularity} = require("../other_modules/popularity-algorithms");
+const filter = require('../utils/filter');
+const {transport, transport_mandatory} = require("../utils/transport");
+const convertToLink = require("../utils/convert-to-link");
+const {getPopularityCoefficiant, sortByPopularity} = require("../utils/popularity-algorithms");
 const {validateProject} = require('../middleware/validation');
 
 //SCHEMA
@@ -152,8 +152,8 @@ router.post('/', middleware.isLoggedIn, middleware.isFaculty, validateProject, (
 //             return res.redirect('back');
 //         }
 //
-//         const popularProjects = sortByPopularity(projects, "likes", "arr", "created_at", null).popular; //Extract and sort popular projects
-//         const unpopularProjects = sortByPopularity(projects, "likes", "arr", "created_at", null).unpopular; //Extract and sort unpopular projects
+//         const popularProjects = sortByPopularity(projects, "likes", "created_at", null).popular; //Extract and sort popular projects
+//         const unpopularProjects = sortByPopularity(projects, "likes", "created_at", null).unpopular; //Extract and sort unpopular projects
 //
 //         //Build string of projects and comments text
 //         let popularProjectText = "";

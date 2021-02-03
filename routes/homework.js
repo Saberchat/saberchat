@@ -2,8 +2,8 @@ const express = require('express');
 const middleware = require('../middleware');
 const router = express.Router(); //start express router
 const dateFormat = require('dateformat');
-const {transport, transport_mandatory} = require("../other_modules/transport");
-const convertToLink = require("../other_modules/convert-to-link");
+const {transport, transport_mandatory} = require("../utils/transport");
+const convertToLink = require("../utils/convert-to-link");
 const {validateCourse} = require('../middleware/validation');
 
 const User = require('../models/user');

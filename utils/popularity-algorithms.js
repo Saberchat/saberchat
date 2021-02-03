@@ -4,24 +4,24 @@
 // PARAMS
 // posts = posts to evaluate avg. popularity coefficiant
 // likeFactor = the popularity characteristic which is being evaluated (upvotes/likes/etc.)
-// likeType = the datatype of like factor (can be a list of likes or a uniform int)
 // dateFactor = the variable to evaluate the date each post was created at
 
-const getPopularityCoefficiant = function (posts, likeFactor, likeType, dateFactor) {
+const getPopularityCoefficiant = function (posts, likeFactor, dateFactor) {
     const now = new Date().getTime();
     const rate = 86400; //Rate of conversion is seconds to days
     let popularityCoefficiant = 0;
     for (let post of posts) {
-        if (likeType == "int") {
+        //Check datatype of likeFactor (can be a list of likes or a uniform int)
+        if (typeof post[likeFactor] == "number") {
             popularityCoefficiant += ((rate * post[likeFactor]) / (now - post[dateFactor].getTime())) / posts.length;
-        } else if (likeType == "arr") {
+        } else {
             popularityCoefficiant += ((rate * post[likeFactor].length) / (now - post[dateFactor].getTime())) / posts.length;
         }
     }
     return popularityCoefficiant;
 }
 
-const sortByPopularity = function (posts, likeFactor, likeType, dateFactor, fields) { //Sort posts by popularity coefficiant
+const sortByPopularity = function (posts, likeFactor, dateFactor, fields) { //Sort posts by popularity coefficiant
     let sorted = {popular: [], unpopular: []}; //Object holds both popular and unpopular items
 
     let temp; //Sort posts by order of popularity coefficiant
@@ -36,7 +36,7 @@ const sortByPopularity = function (posts, likeFactor, likeType, dateFactor, fiel
     }
 
     for (let post of posts) { //Uses popularity coefficiant to sort posts into popular and unpopular
-        if (getPopularityCoefficiant([post], likeFactor, likeType, dateFactor) >= getPopularityCoefficiant(posts, likeFactor, likeType, dateFactor)) {
+        if (getPopularityCoefficiant([post], likeFactor, dateFactor) >= getPopularityCoefficiant(posts, likeFactor, dateFactor)) {
             sorted.popular.push(post);
         } else {
             sorted.unpopular.push(post);
