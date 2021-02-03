@@ -72,12 +72,11 @@
                 <br/>
                 <span id="upvote-<%= course._id %>-<%= tutor.tutor._id %>" onclick="upvote(this)">
                     <% if (tutor.upvotes.includes(currentUser._id)) { %>
-                    <span class="upvoted"><i class="fas fa-arrow-circle-up"></i>
+                        <span class="upvoted"><i class="fas fa-arrow-circle-up"></i></span>
                         <% } else { %>
                         <span class="not-upvoted"><i class="fas fa-arrow-circle-up"></i>
                             <% } %>
-                            <span class="upvote-count"
-                                  id="upvoteCount-<%= course._id %>-<%= tutor.tutor._id %>"> <%= tutor.upvotes.length %></span>
+                            <span class="upvote-count" id="upvoteCount-<%= course._id %>-<%= tutor.tutor._id %>"> <%= tutor.upvotes.length %></span>
                         </span>
                       </span>
                       <br/>
@@ -370,7 +369,7 @@
                                     class="review-sender"><%= review.review.sender.firstName %> <%= review.review.sender.lastName %></span>
                         </h3></a>
                     <% if (review.review.likes.includes(currentUser._id)) { %>
-                    <i id="like-<%= review.review._id %>" class="fas fa-thumbs-up review-liked"
+                    <i id="like-<%= review.review._id %>" class="fas fa-thumbs-up review-liked"></i>
 
                     <% } else { %>
                     <i id="like-<%= review.review._id %>" class="fas fa-thumbs-up review-unliked"
