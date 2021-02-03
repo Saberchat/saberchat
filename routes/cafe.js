@@ -20,53 +20,63 @@ const Cafe = require('../models/cafe')
 
 //ROUTES
 router.get('/', middleware.isLoggedIn, (req, res) => { //RESTful routing 'order/index' route
-    Order.find({customer: req.user._id})
-        .populate('items.item').exec((err, orders) => { //Find all of the orders that you have ordered, and populate info on their items
-        if (err || !orders) {
+    (async() => {
+        const orders = await Order.find({customer: req.user._id}).populate('items.item'); //Find all of the orders that you have ordered, and populate info on their items
+        if (!orders) {
             req.flash('error', "Could not find your orders");
-            res.redirect('back');
-
-        } else {
-            res.render('cafe/index', {orders});
+            return res.redirect('back');
         }
+
+        return res.render('cafe/index', {orders});
+
+    })().catch(err => {
+        req.flash('error', "Could not find your orders");
+        res.redirect('back');
     });
 });
 
 router.get('/menu', middleware.isLoggedIn, (req, res) => { //Renders the cafe menu with info on all the items
-    Type.find({}).populate('items').exec((err, types) => { //Collects info on every item type, to render (in frontend, the ejs checks each item inside type, and only shows it if it's available)
-        if (err || !types) {
+    (async() => {
+        const types = await Type.find({}).populate('items'); //Collects info on every item type, to render (in frontend, the ejs checks each item inside type, and only shows it if it's available)
+        if (!types) {
             req.flash('error', "An Error Occurred");
-            res.redirect('back');
-
-        } else {
-            let itemDescriptions = {};
-            for (let type of types) {
-                for (let item of type.items) {
-                    itemDescriptions[item._id] = convertToLink(item.description);
-                }
-            }
-            res.render('cafe/menu', {types, itemDescriptions});
+            return res.redirect('back');
         }
+
+        let itemDescriptions = {}; //Object of items and their link-embedded descriptions
+        for (let type of types) {
+            for (let item of type.items) {
+                itemDescriptions[item._id] = convertToLink(item.description);
+            }
+        }
+
+        return res.render('cafe/menu', {types, itemDescriptions});
+
+    })().catch(err => {
+        req.flash('error', "An Error Occurred");
+        res.redirect('back');
     });
 });
 
 router.put('/upvote', middleware.isLoggedIn, (req, res) => {
-    Item.findById(req.body.item, (err, item) => {
-        if (err || !item) {
-            res.json({error: "Error upvoting item"});
-
-        } else {
-            if (item.upvotes.includes(req.user._id)) {
-                item.upvotes.splice(item.upvotes.indexOf(req.user._id), 1);
-                item.save();
-                res.json({success: `Downvoted ${item.name}`, upvoteCount: item.upvotes.length})
-
-            } else {
-                item.upvotes.push(req.user._id);
-                item.save();
-                res.json({success: `Upvoted ${item.name}`, upvoteCount: item.upvotes.length})
-            }
+    (async() => {
+        const item = await Item.findById(req.body.item);
+        if (!item) {
+            return res.json({error: "Error upvoting item"});
         }
+
+        if (item.upvotes.includes(req.user._id)) {
+            item.upvotes.splice(item.upvotes.indexOf(req.user._id), 1);
+            await item.save();
+            return res.json({success: `Downvoted ${item.name}`, upvoteCount: item.upvotes.length})
+        }
+
+        item.upvotes.push(req.user._id);
+        await item.save();
+        return res.json({success: `Upvoted ${item.name}`, upvoteCount: item.upvotes.length})
+
+    })().catch(err => {
+        res.json({error: "An error occurred"});
     });
 });
 
@@ -194,14 +204,17 @@ router.post('/order', middleware.isLoggedIn, middleware.cafeOpen, (req, res) => 
 });
 
 router.get('/orders', middleware.isLoggedIn, middleware.isMod, middleware.isCashier, (req, res) => { //This is for EC Cafe Workers to check all the available orders
-    Order.find({present: true}).populate('items.item').exec((err, orders) => { //Collect all orders which are currently active, and get all info on their items
-        if (err) {
+    (async() => {
+        const orders = await Order.find({present: true}).populate('items.item');
+        if (!orders) {
             req.flash('error', 'Could not find orders');
-            res.redirect('back');
-
-        } else {
-            res.render('cafe/orderDisplay', {orders});
+            return res.redirect('back');
         }
+        return res.render('cafe/orderDisplay', {orders});
+
+    })().catch(err => {
+        req.flash('error', 'An error occurred');
+        res.redirect('back');
     });
 });
 
@@ -382,58 +395,65 @@ router.post('/:id/reject', middleware.isLoggedIn, middleware.isMod, middleware.i
 });
 
 router.get('/manage', middleware.isLoggedIn, middleware.isMod, (req, res) => { //Route to manage cafe
-    Type.find({}).populate('items').exec((err, types) => { //Collect info on all the item types
-        if (err || !types) {
+    (async() => {
+        const types = await Type.find({}).populate('items'); //Collect info on all the item types
+        if (!types) {
             req.flash('error', 'An Error Occurred');
-            res.redirect('/cafe');
-
-        } else {
-            Cafe.find({}, (err, cafe) => { //Collect info on whether or not the cafe is open
-                if (err || !cafe) {
-                    req.flash('error', "An Error Occurred");
-                    res.redirect('back');
-
-                } else {
-                    res.render('cafe/manage', {types, open: cafe[0].open});
-                }
-            });
+            return res.redirect('back');
         }
+
+        const cafes = await Cafe.find({});
+        if (!cafes) {
+            req.flash('error', "An Error Occurred");
+            return res.redirect('back');
+        }
+
+        return res.render('cafe/manage', {types, open: cafes[0].open});
+
+    })().catch(err => {
+        req.flash('error', 'An Error Occurred');
+        res.redirect('back');
     });
 });
 
 router.put('/change-cafe-status', middleware.isLoggedIn, middleware.isMod, (req, res) => { //Open/close cafe
-    Cafe.find({}, (err, cafes) => {
-        if (err || !cafes) {
-            res.json({error: "An error occurred"});
-
-        } else {
-            if (cafes[0].open) {
-                cafes[0].open = false;
-            } else {
-                cafes[0].open = true;
-            }
-
-            cafes[0].save();
-            res.json({success: "Succesfully updated cafe", open: cafes[0].open});
+    (async() => {
+        const cafes = await Cafe.find({});
+        if (!cafes) {
+            return res.json({error: "An error occurred"});
         }
+
+        if (cafes[0].open) {
+            cafes[0].open = false;
+        } else {
+            cafes[0].open = true;
+        }
+        await cafes[0].save();
+        return res.json({success: "Succesfully updated cafe", open: cafes[0].open});
+
+    })().catch(err => {
+        res.json({error: "An error occurred"});
     });
 });
 
 router.get('/item/new', middleware.isLoggedIn, middleware.isMod, (req, res) => { //RESTFUL routing 'item/new'
-    Type.find({}, (err, types) => { //Find all possible item types
-        if (err || !types) {
+    (async() => {
+        const types = await Type.find({});
+        if (!types) {
             req.flash('error', "An Error Occurred");
-
-        } else {
-            res.render('cafe/newOrderItem', {types});
+            return res.redirect("back");
         }
+
+        return res.render('cafe/newOrderItem', {types});
+
+    })().catch(err => {
+        req.flash('error', "An Error Occurred");
+        res.redirect("back");
     });
 });
 
 router.post('/item', middleware.isLoggedIn, middleware.isMod, (req, res) => { //RESTFUL routing 'item/create'
-
     (async () => {
-
         const overlap = await Item.find({name: req.body.name});
         if (!overlap) {
             req.flash('error', "Unable to find items");
@@ -456,7 +476,7 @@ router.post('/item', middleware.isLoggedIn, middleware.isMod, (req, res) => { //
             return res.redirect('back');
         }
 
-        //Algorithm to create charge; once created, add to item's info
+        //Create charge; once created, add to item's info
         if (parseFloat(req.body.price)) {
             item.price = parseFloat(req.body.price);
 
@@ -486,9 +506,7 @@ router.post('/item', middleware.isLoggedIn, middleware.isMod, (req, res) => { //
 });
 
 router.get('/item/:id', middleware.isLoggedIn, middleware.isMod, (req, res) => { //View an item's profile
-
     (async () => {
-
         const item = await Item.findById(req.params.id); //Find item based on specified id
         if (!item) {
             req.flash('error', "Unable to find item");
@@ -510,9 +528,7 @@ router.get('/item/:id', middleware.isLoggedIn, middleware.isMod, (req, res) => {
 });
 
 router.put('/item/:id', middleware.isLoggedIn, middleware.isMod, (req, res) => { //Update an item
-
     (async () => {
-
         const overlap = await Item.find({_id: {$ne: req.params.id}, name: req.body.name});
         if (!overlap) {
             req.flash('error', 'Item Not Found');
@@ -533,7 +549,6 @@ router.put('/item/:id', middleware.isLoggedIn, middleware.isMod, (req, res) => {
             description: req.body.description,
             imgUrl: req.body.image
         });
-
         if (!item) {
             req.flash('error', 'item not found');
             return res.redirect('back');
@@ -591,7 +606,6 @@ router.put('/item/:id', middleware.isLoggedIn, middleware.isMod, (req, res) => {
 });
 
 router.delete('/item/:id', middleware.isLoggedIn, middleware.isMod, (req, res) => { //Delete order item
-
     (async () => {
         const item = await Item.findByIdAndDelete(req.params.id); //Delete item based on specified ID
         if (!item) {
@@ -642,14 +656,18 @@ router.delete('/item/:id', middleware.isLoggedIn, middleware.isMod, (req, res) =
 });
 
 router.get('/type/new', middleware.isLoggedIn, middleware.isMod, (req, res) => { // RESTful route "New" for type
-    Type.find({}).populate('items').exec((err, types) => { //Collect info on all the items, so that we can give the user the option to add them to that type
-        if (err || !types) {
+    (async() => {
+        const types = await Type.find({}).populate('items'); //Collect info on all the items, so that we can give the user the option to add them to that type
+        if (!types) {
             req.flash('error', "Unable to find categories");
-            res.redirect('back');
-
-        } else {
-            res.render('cafe/newItemType', {types});
+            return res.redirect('back');
         }
+
+        return res.render('cafe/newItemType', {types});
+
+    })().catch(err => {
+        req.flash('error', "An error occurred");
+        res.redirect('back');
     });
 });
 
@@ -712,12 +730,12 @@ router.post('/type', middleware.isLoggedIn, middleware.isMod, (req, res) => { //
 router.get('/type/:id', middleware.isLoggedIn, middleware.isMod, (req, res) => { // RESTful route "Show/Edit" for type
     (async () => {
         const type = await Type.findById(req.params.id).populate('items'); //Find the specified type
-
         if (!type) {
             req.flash('error', "An Error Occurred");
             return res.redirect('back');
+        }
 
-        } else if (type.name == "Other") {
+        if (type.name == "Other") {
             req.flash('error', "You cannot modify that category");
             return res.redirect('/cafe/manage');
         }
