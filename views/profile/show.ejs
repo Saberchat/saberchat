@@ -37,15 +37,16 @@
       <img src="<%= user.imageUrl %>" alt="profile image" class="profile-image">
       <h1 class="username mode"><%= user.username %></h1>
           <div class="col-md-4 col-12 order-md-2 profile-box">
-              <section class="profile-card cafe">
+              <section class="profile-card mode">
                   <div class="profile-head">
                       <h1><%= user.firstName %> <%= user.lastName %></h1>
                       <hr>
                   </div>
-                  <div class="profile-body cafetext">
+                  <div class="profile-body text-white">
                       <span><%= user.title %></span>
-
-                      <h4>Role</h4>
+                      <div class="mode">
+                        <h4 class="mode">Role</h4>
+                      </div>
                       <% permMatrix = [["principal", "Principal"], ["admin", "Administrator"], ["mod", "Moderator"], ["default", "Default"]] %>
 
                       <% for (let perm of permMatrix) { %>
@@ -54,7 +55,7 @@
                         <% } %>
                       <% } %>
 
-                      <h4>Status</h4>
+                      <h4 class="cafetext">Status</h4>
                       <p><%= user.status.charAt(0).toUpperCase() + user.status.slice(1) %></p>
 
                       <h4>Email</h4>
