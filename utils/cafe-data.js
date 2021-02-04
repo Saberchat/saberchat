@@ -120,20 +120,15 @@ const getData = async function() {
         times.push(new Date(order.created_at));
     }
 
-    let formattedTimes = getHours(times).finalTimes;
-    let unformattedTimes = getHours(times).finalTimesUnformatted;
-
-    let sortedTimes = sortTimes(unformattedTimes, formattedTimes);
-    formattedTimes = sortedTimes.formattedTimes;
-    unformattedTimes = sortedTimes.times;
-
-    let stats = getStats(unformattedTimes);
+    let formattedTimes = sortTimes(getHours(times).finalTimesUnformatted, getHours(times).finalTimes).formattedTimes;
+    let unformattedTimes = sortTimes(getHours(times).finalTimesUnformatted, getHours(times).finalTimes).times;
+    let timeStats = getStats(unformattedTimes);
 
     return {
         items, popularCustomers, longestOrderCustomers,
         lucrativeCustomers, popularOrderedItems, upvotedItems,
         orderedQuantities, combinations: populatedCombinations,
-        pricepoints, times: formattedTimes, timeStats: stats
+        pricepoints, times: formattedTimes, timeStats
     }
 }
 

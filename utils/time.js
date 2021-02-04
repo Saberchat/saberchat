@@ -14,7 +14,11 @@ const formatTime = function(time) {
         timeInHours = `${hourComponent}:${Math.round((time-Math.floor(time)) * 60)}`;
     }
 
-    if (parseInt(timeInHours.split(':')[0]) < 12) {
+    if (parseInt(timeInHours.split(':')[0]) == 0) {
+        timeInHours = `${12+parseInt(timeInHours.split(':'[0]))}:${timeInHours.split(':')[1]} AM`;
+    } else if (parseInt(timeInHours.split(':')[0]) == 12) {
+        timeInHours = `${timeInHours} PM`;
+    } else if (parseInt(timeInHours.split(':')[0]) < 12) {
         timeInHours = `${timeInHours} AM`;
     } else {
         timeInHours = `${parseInt(timeInHours.split(':')[0])-12}:${timeInHours.split(':')[1]} PM`;

@@ -21,6 +21,11 @@ const Cafe = require('../models/cafe')
 //ROUTES
 router.get('/', middleware.isLoggedIn, async (req, res) => { //RESTful routing 'order/index' route
     try {
+        const allOrders = await Order.find({});
+        for (let order of allOrders) {
+            console.log(order.date);
+        }
+
         const orders = await Order.find({customer: req.user._id}).populate('items.item'); //Find all of the orders that you have ordered, and populate info on their items
         if (!orders) {
             req.flash('error', "Could not find your orders");
@@ -80,14 +85,14 @@ router.put('/upvote', middleware.isLoggedIn, async (req, res) => {
 });
 
 //Track cafe statistics (Commented out for now)
-// router.get('/data', middleware.isLoggedIn, middleware.isAdmin, (req, res) => {
-//     getData().then(data => {
-//         res.render("cafe/data", data);
-//     }).catch(err => {
-//         req.flash("error", "An Error Occurred");
-//         res.redirect("back");
-//     });
-// });
+router.get('/data', middleware.isLoggedIn, middleware.isAdmin, (req, res) => {
+    getData().then(data => {
+        res.render("cafe/data", data);
+    }).catch(err => {
+        req.flash("error", "An Error Occurred");
+        res.redirect("back");
+    });
+});
 
 router.get('/order/new', middleware.isLoggedIn, middleware.cafeOpen, async (req, res) => { //RESTFUL routing 'order/new' route
     try {
