@@ -80,15 +80,14 @@ router.put('/upvote', middleware.isLoggedIn, async (req, res) => {
 });
 
 //Track cafe statistics (Commented out for now)
-router.get('/data', middleware.isLoggedIn, middleware.isAdmin, (req, res) => {
-    getData().then(data => {
-        res.render("cafe/data", data);
-    }).catch(err => {
-        console.log(err)
-        req.flash("error", "An Error Occurred");
-        res.redirect("back");
-    });
-});
+// router.get('/data', middleware.isLoggedIn, middleware.isAdmin, (req, res) => {
+//     getData().then(data => {
+//         res.render("cafe/data", data);
+//     }).catch(err => {
+//         req.flash("error", "An Error Occurred");
+//         res.redirect("back");
+//     });
+// });
 
 router.get('/order/new', middleware.isLoggedIn, middleware.cafeOpen, async (req, res) => { //RESTFUL routing 'order/new' route
     try {
