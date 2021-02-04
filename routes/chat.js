@@ -18,8 +18,8 @@ const Room = require('../models/room');
 const AccessReq = require('../models/accessRequest');
 
 //route for displaying room list
-router.get('/', middleware.isLoggedIn, (req, res) => {
-    (async () => {
+router.get('/', middleware.isLoggedIn, async (req, res) => {
+    try {
 
         const rooms = await Room.find({}).populate("creator.id");
 
@@ -59,22 +59,26 @@ router.get('/', middleware.isLoggedIn, (req, res) => {
 
         return res.render('chat/index', {rooms, requests, commentObject});
 
-    })().catch(err => {
+    } catch (err) {
         req.flash('error', 'An Error Occurred');
         res.redirect('back');
-    });
+    }
 });
 
-//route for displaying new room form
-router.get('/new', middleware.isLoggedIn, (req, res) => {
-    User.find({authenticated: true}, (err, foundUsers) => {
-        if (err || !foundUsers) {
-            req.flash('error', 'An Error Occurred');
-            res.redirect('back');
-        } else {
-            res.render('chat/new', {users: foundUsers});
+router.get('/new', middleware.isLoggedIn, async (req, res) => {
+    try {
+        const users = await User.find({authenticated: true});
+
+        if (!users) {
+            req.flash('error', "An Error Occurred");
+            return res.redirect('back');
         }
-    });
+
+        return res.render('chat/new', {users: users});
+    } catch (err) {
+         req.flash('error', "An Error Occurred");
+         res.redirect('back');
+    }
 });
 
 // display chat of certain room
@@ -107,16 +111,20 @@ router.get('/:id', middleware.isLoggedIn, middleware.checkIfMember, (req, res) =
     });
 });
 
-router.get('/:id/people', middleware.isLoggedIn, middleware.checkIfMember, (req, res) => {
-    Room.findById(req.params.id).populate("creator.id").populate("members").exec((err, room) => {
-        if (!room) {
-            req.flash("error", "Unable to find room");
-            res.redirect("back");
+router.get('/:id/people', middleware.isLoggedIn, middleware.checkIfMember, async (req, res) => {
+    try {
+        const room = await Room.findById(req.params.id).populate('creator.id').populate('members');
 
-        } else {
-            res.render('chat/people', {room});
+        if (!room) {
+            req.flash('error', "Unable to find room");
+            return res.redirect('back');
         }
-    });
+
+        return res.render('chat/people', {room});
+    } catch (err) {
+        req.flash('error', "An Error Occurred");
+        res.redirect('back');
+    }
 });
 
 // display edit form
