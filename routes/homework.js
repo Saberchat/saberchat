@@ -12,8 +12,8 @@ const Course = require('../models/course');
 const PostComment = require('../models/postComment');
 const Room = require('../models/room');
 
-router.get('/', middleware.isLoggedIn, (req, res) => { //RESTful routing 'index'
-    (async () => {
+router.get('/', middleware.isLoggedIn, async (req, res) => { //RESTful routing 'index'
+    try {
         const courses = await Course.find({});
         if (!courses) {
             req.flash('error', "Unable to find courses");
@@ -37,14 +37,14 @@ router.get('/', middleware.isLoggedIn, (req, res) => { //RESTful routing 'index'
 
         return res.render('homework/index', {courses: courseList});
 
-    })().catch(err => {
+    } catch (err) {
         req.flash('error', "An error occurred");
         res.redirect('back');
-    });
+    }
 });
 
-router.post('/', middleware.isLoggedIn, middleware.isFaculty, validateCourse, (req, res) => { //RESTful routing 'create' (Create course)
-    (async () => {
+router.post('/', middleware.isLoggedIn, middleware.isFaculty, validateCourse, async (req, res) => { //RESTful routing 'create' (Create course)
+    try {
         let charSetMatrix = [];
         charSetMatrix.push('qwertyuiopasdfghjklzxcvbnm'.split(''));
         charSetMatrix.push('QWERTYUIOPASDFGHJKLZXCVBNM'.split(''));
@@ -75,14 +75,14 @@ router.post('/', middleware.isLoggedIn, middleware.isFaculty, validateCourse, (r
         req.flash('success', "Successfully created course");
         return res.redirect('/homework');
 
-    })().catch(err => {
+    } catch (err) {
         req.flash('error', "An error occurred");
         res.redirect('back');
-    });
+    }
 });
 
-router.post('/join', middleware.isLoggedIn, middleware.isStudent, middleware.notMemberOfCourse, (req, res) => { //Join course as a student
-    (async () => {
+router.post('/join', middleware.isLoggedIn, middleware.isStudent, middleware.notMemberOfCourse, async (req, res) => { //Join course as a student
+    try {
         const course = await Course.findOne({joinCode: req.body.joincode});
         if (!course) {
             req.flash('error', "No courses matching this join code were found.");
@@ -94,14 +94,14 @@ router.post('/join', middleware.isLoggedIn, middleware.isStudent, middleware.not
         req.flash('success', `Successfully joined ${course.name}!`);
         return res.redirect(`/homework/${course._id}`);
 
-    })().catch(err => {
+    } catch (err) {
         req.flash('error', "An error occurred");
         res.redirect('back');
-    });
+    }
 });
 
-router.post('/join-tutor', middleware.isLoggedIn, middleware.isTutor, middleware.notMemberOfCourse, (req, res) => { //Join course as tutor
-    (async () => {
+router.post('/join-tutor', middleware.isLoggedIn, middleware.isTutor, middleware.notMemberOfCourse, async (req, res) => { //Join course as tutor
+    try {
         const course = await Course.findOne({joinCode: req.body.joincode});
         if (!course) {
             req.flash('error', "No courses matching this join code were found.");
@@ -119,14 +119,14 @@ router.post('/join-tutor', middleware.isLoggedIn, middleware.isTutor, middleware
         req.flash('success', `Successfully joined ${course.name} as a tutor!`);
         return res.redirect(`/homework/${course._id}`);
 
-    })().catch(err => {
+    } catch (err) {
         req.flash('error', "An error occurred");
         res.redirect('back');
-    });
+    }
 });
 
-router.get('/:id', middleware.isLoggedIn, middleware.memberOfCourse, (req, res) => { //RESTful routing show route
-    (async () => {
+router.get('/:id', middleware.isLoggedIn, middleware.memberOfCourse, async (req, res) => { //RESTful routing show route
+    try {
         const course = await Course.findById(req.params.id)
         .populate('teacher students tutors.tutor tutors.reviews.review blocked');
         if (!course) {
@@ -152,14 +152,14 @@ router.get('/:id', middleware.isLoggedIn, middleware.memberOfCourse, (req, res) 
 
         return res.render('homework/show', {course, studentIds, tutorIds, teachers});
 
-    })().catch(err => {
+    } catch (err) {
         req.flash('error', "Unable to find course");
         res.redirect('back');
-    });
+    }
 });
 
-router.put('/:id', middleware.isLoggedIn, middleware.isFaculty, middleware.memberOfCourse, (req, res) => { //RESTful routing update route
-    (async () => {
+router.put('/:id', middleware.isLoggedIn, middleware.isFaculty, middleware.memberOfCourse, async (req, res) => { //RESTful routing update route
+    try {
         const course = await Course.findById(req.params.id);
         if (!course) {
             return res.json({error: "An Error Occurred"});
@@ -174,13 +174,13 @@ router.put('/:id', middleware.isLoggedIn, middleware.isFaculty, middleware.membe
         await course.save();
         return res.json({success: "Succesfully Updated Course Information"});
 
-    })().catch(err => {
+    } catch (err) {
         res.json({error: "An Error Occurred"});
-    });
+    }
 });
 
-router.put('/updateTeacher/:id', middleware.isLoggedIn, middleware.isFaculty, middleware.memberOfCourse, (req, res) => {
-    (async () => {
+router.put('/updateTeacher/:id', middleware.isLoggedIn, middleware.isFaculty, middleware.memberOfCourse, async (req, res) => {
+    try {
         const course = await Course.findById(req.params.id);
         if (!course) {
             req.flash("error", "Unable to find course");
@@ -203,14 +203,14 @@ router.put('/updateTeacher/:id', middleware.isLoggedIn, middleware.isFaculty, mi
         req.flash("success", "Updated course teacher!");
         return res.redirect("/homework")
 
-    })().catch(err => {
+    } catch (err) {
         req.flash("error", "Unable to update teacher");
         res.redirect("back");
-    });
+    }
 });
 
-router.put('/joinCode/:id', middleware.isLoggedIn, middleware.isFaculty, middleware.memberOfCourse, (req, res) => { //Update course join code
-    (async () => {
+router.put('/joinCode/:id', middleware.isLoggedIn, middleware.isFaculty, middleware.memberOfCourse, async (req, res) => { //Update course join code
+    try {
         let charSetMatrix = [];
         charSetMatrix.push('qwertyuiopasdfghjklzxcvbnm'.split(''));
         charSetMatrix.push('QWERTYUIOPASDFGHJKLZXCVBNM'.split(''));
@@ -234,13 +234,13 @@ router.put('/joinCode/:id', middleware.isLoggedIn, middleware.isFaculty, middlew
         await course.save();
         return res.json({success: "Succesfully Updated Join Code", joinCode});
 
-    })().catch(err => {
+    } catch (err) {
         res.json({error: "An Error Occurred"});
-    });
+    }
 });
 
-router.put("/bio/:id", middleware.isLoggedIn, middleware.isTutor, (req, res) => { //Edit tutor bio
-    (async () => {
+router.put("/bio/:id", middleware.isLoggedIn, middleware.isTutor, async (req, res) => { //Edit tutor bio
+    try {
         const course = await Course.findById(req.params.id);
         if (!course) {
             return res.json({error: "Unable to find course"});
@@ -254,13 +254,13 @@ router.put("/bio/:id", middleware.isLoggedIn, middleware.isTutor, (req, res) => 
             }
         }
 
-    })().catch(err => {
+    } catch (err) {
         res.json({error: "An error occurred"});
-    });
+    }
 });
 
-router.post('/unenroll-student/:id', middleware.isLoggedIn, middleware.isStudent, middleware.memberOfCourse, (req, res) => { //Leave course as a student
-    (async () => {
+router.post('/unenroll-student/:id', middleware.isLoggedIn, middleware.isStudent, middleware.memberOfCourse, async (req, res) => { //Leave course as a student
+    try {
         const course = await Course.findByIdAndUpdate(req.params.id, {$pull: {students: req.user._id}}).populate("tutors.tutor");
         if (!course) {
             req.flash('error', "Unable to find course");
@@ -305,14 +305,14 @@ router.post('/unenroll-student/:id', middleware.isLoggedIn, middleware.isStudent
         req.flash('success', `Unenrolled from ${course.name}!`);
         return res.redirect('/homework');
 
-    })().catch(err => {
+    } catch (err) {
         req.flash('error', "Unable to unenroll from course");
         res.redirect('back');
-    });
+    }
 });
 
-router.post('/unenroll-tutor/:id', middleware.isLoggedIn, middleware.isTutor, middleware.memberOfCourse, (req, res) => { //Leave course as a tutor
-    (async () => {
+router.post('/unenroll-tutor/:id', middleware.isLoggedIn, middleware.isTutor, middleware.memberOfCourse, async (req, res) => { //Leave course as a tutor
+    try {
         const course = await Course.findById(req.params.id).populate('tutors.tutor tutors.rooms.student');
         if (!course) {
             req.flash('error', "Unable to find course");
@@ -348,14 +348,14 @@ router.post('/unenroll-tutor/:id', middleware.isLoggedIn, middleware.isTutor, mi
         req.flash('success', `Unenrolled from ${course.name}!`);
         return res.redirect('/homework');
 
-    })().catch(err => {
+    } catch (err) {
         req.flash("error", "Unable to unenroll");
         res.redirect("back");
-    });
+    }
 });
 
-router.put('/book/:id', middleware.isLoggedIn, middleware.isStudent, middleware.memberOfCourse, (req, res) => { //Book a tutor
-    (async () => {
+router.put('/book/:id', middleware.isLoggedIn, middleware.isStudent, middleware.memberOfCourse, async (req, res) => { //Book a tutor
+    try {
         const course = await Course.findById(req.params.id).populate('tutors.tutor');
         if (!course) {
             return res.json({error: "Error accessing course"});
@@ -416,13 +416,13 @@ router.put('/book/:id', middleware.isLoggedIn, middleware.isStudent, middleware.
             }
         }
 
-    })().catch(err => {
+    } catch (err) {
         res.json({error: "Error accessing course"});
-    });
+    }
 });
 
-router.put('/upvote/:id', middleware.isLoggedIn, middleware.isStudent, middleware.memberOfCourse, (req, res) => { //Upvote a tutor
-    (async () => {
+router.put('/upvote/:id', middleware.isLoggedIn, middleware.isStudent, middleware.memberOfCourse, async (req, res) => { //Upvote a tutor
+    try {
         const course = await Course.findById(req.params.id);
         if (!course) {
             return res.json({error: "Error upvoting tutor"});
@@ -446,13 +446,13 @@ router.put('/upvote/:id', middleware.isLoggedIn, middleware.isStudent, middlewar
             }
         }
 
-    })().catch(err => {
+    } catch (err) {
         res.json({error: "An error occurred"});
-    });
+    }
 });
 
-router.put('/rate/:id', middleware.isLoggedIn, middleware.isStudent, middleware.memberOfCourse, (req, res) => { //Submit a review for a tutor
-    (async () => {
+router.put('/rate/:id', middleware.isLoggedIn, middleware.isStudent, middleware.memberOfCourse, async (req, res) => { //Submit a review for a tutor
+    try {
         const course = await Course.findById(req.params.id);
         if (!course) {
             return res.json({error: "Error reviewing tutor"});
@@ -491,13 +491,13 @@ router.put('/rate/:id', middleware.isLoggedIn, middleware.isStudent, middleware.
             }
         }
 
-    })().catch(err => {
+    } catch (err) {
         res.json({error: "Error rating tutor"});
-    });
+    }
 });
 
-router.put('/leave/:id', middleware.isLoggedIn, middleware.isStudent, middleware.memberOfCourse, (req, res) => { //Leave Tutor
-    (async () => {
+router.put('/leave/:id', middleware.isLoggedIn, middleware.isStudent, middleware.memberOfCourse, async (req, res) => { //Leave Tutor
+    try {
         const course = await Course.findById(req.params.id).populate('tutors.tutor');
         if (!course) {
             return res.json({error: "Error leaving course"});
@@ -539,13 +539,13 @@ router.put('/leave/:id', middleware.isLoggedIn, middleware.isStudent, middleware
             }
         }
 
-    })().catch(err => {
+    } catch (err) {
         res.json({error: "Error accessing course"});
-    });
+    }
 });
 
-router.put('/close-lessons/:id', middleware.isLoggedIn, middleware.memberOfCourse, (req, res) => { //For a tutor to make themself unavailable
-    (async () => {
+router.put('/close-lessons/:id', middleware.isLoggedIn, middleware.memberOfCourse, async (req, res) => { //For a tutor to make themself unavailable
+    try {
         const course = await Course.findById(req.params.id);
         if (!course) {
             return res.json({error: "Error closing lessons"});
@@ -559,13 +559,13 @@ router.put('/close-lessons/:id', middleware.isLoggedIn, middleware.memberOfCours
             }
         }
 
-    })().catch(err => {
+    } catch (err) {
         res.json({error: "Error accessing course"});
-    });
+    }
 });
 
-router.put('/reopen-lessons/:id', middleware.isLoggedIn, middleware.memberOfCourse, (req, res) => { //For a tutor to make themself available to students
-    (async () => {
+router.put('/reopen-lessons/:id', middleware.isLoggedIn, middleware.memberOfCourse, async (req, res) => { //For a tutor to make themself available to students
+    try {
         const course = await Course.findById(req.params.id);
         if (!course) {
             return res.json({error: "Error closing lessons"});
@@ -579,13 +579,13 @@ router.put('/reopen-lessons/:id', middleware.isLoggedIn, middleware.memberOfCour
             }
         }
 
-    })().catch(err => {
+    } catch (err) {
         return res.json({error: "An error occurred"});
-    });
+    }
 });
 
-router.get('/tutors/:id', middleware.isLoggedIn, middleware.memberOfCourse, (req, res) => { //RESTful routing "tutors/show" page
-    (async () => {
+router.get('/tutors/:id', middleware.isLoggedIn, middleware.memberOfCourse, async (req, res) => { //RESTful routing "tutors/show" page
+    try {
         const course = await Course.findById(req.params.id).populate("tutors.tutor tutors.formerStudents").populate({
             path: "tutors.reviews.review",
             populate: {path: "sender"}
@@ -640,7 +640,7 @@ router.get('/tutors/:id', middleware.isLoggedIn, middleware.memberOfCourse, (req
                         return res.redirect('back');
                     }
 
-                    if (student._id.equals(req.user._id) || tutor.tutor._id.equals(req.user._id)) {
+                    if (student._id.equals(req.user._id) || tutor.tutor._id.equals(req.user._id) || course.teacher._id.equals(req.user._id)) {
                         return res.render('homework/lessons', {course, tutor, student});
                     } else {
                         req.flash('error', "You do not have permission to view that student");
@@ -658,14 +658,15 @@ router.get('/tutors/:id', middleware.isLoggedIn, middleware.memberOfCourse, (req
             }
         }
 
-    })().catch(err => {
-        req.flash('error', "Unable to find course");
+    } catch (err) {
+        console.log(err);
+        req.flash('error', "An error occurred");
         res.redirect('back');
-    });
+    }
 });
 
-router.put('/like-review/:id', middleware.isLoggedIn, middleware.isStudent, (req, res) => { //Like a tutor's review
-    (async () => {
+router.put('/like-review/:id', middleware.isLoggedIn, middleware.isStudent, async (req, res) => { //Like a tutor's review
+    try {
         const review = await PostComment.findById(req.params.id);
         if (!review) {
             return res.json({error: "Error accessing review"});
@@ -681,13 +682,13 @@ router.put('/like-review/:id', middleware.isLoggedIn, middleware.isStudent, (req
         await review.save();
         return res.json({success: "Liked", likeCount: review.likes.length});
 
-    })().catch(err => {
+    } catch (err) {
         res.json({error: "An error occurred"});
-    });
+    }
 });
 
-router.put('/set-students/:id', middleware.isTutor, middleware.memberOfCourse, (req, res) => { //For tutors to set student capacity
-    (async () => {
+router.put('/set-students/:id', middleware.isTutor, middleware.memberOfCourse, async (req, res) => { //For tutors to set student capacity
+    try {
         const course = await Course.findById(req.params.id);
         if (!course) {
             return res.json({error: "Error accessing course"});
@@ -711,13 +712,13 @@ router.put('/set-students/:id', middleware.isTutor, middleware.memberOfCourse, (
             return res.json({error: "Unable to find tutor"});
         }
 
-    })().catch(err => {
+    } catch (err) {
         res.json({error: "An error occurred"});
-    });
+    }
 });
 
-router.put('/remove-student/:id', middleware.isLoggedIn, middleware.isFaculty, middleware.memberOfCourse, (req, res) => { //For teachers to remove students from courses
-    (async () => {
+router.put('/remove-student/:id', middleware.isLoggedIn, middleware.isFaculty, middleware.memberOfCourse, async (req, res) => { //For teachers to remove students from courses
+    try {
         const studentId = await User.findById(req.body.studentId);
         if (!studentId) {
             return res.json({error: "Error removing student"});
@@ -787,13 +788,13 @@ router.put('/remove-student/:id', middleware.isLoggedIn, middleware.isFaculty, m
             }
         }
 
-    })().catch(err => {
+    } catch (err) {
         res.json({error: "Error removing student"});
-    });
+    }
 });
 
-router.put('/remove-tutor/:id', middleware.isLoggedIn, middleware.isFaculty, middleware.memberOfCourse, (req, res) => { //For teachers to remove tutors from courses
-    (async () => {
+router.put('/remove-tutor/:id', middleware.isLoggedIn, middleware.isFaculty, middleware.memberOfCourse, async (req, res) => { //For teachers to remove tutors from courses
+    try {
         let tutorId;
         if (req.body.show) {
             tutorId = await User.findById(req.body.tutorId);
@@ -883,18 +884,18 @@ router.put('/remove-tutor/:id', middleware.isLoggedIn, middleware.isFaculty, mid
             }
         }
 
-    })().catch(err => {
+    } catch (err) {
         if (req.body.show) {
             res.json({error: "Error removing tutor"});
         } else {
             req.flash("error", "Error removing tutor");
             res.redirect("back");
         }
-    });
+    }
 });
 
-router.put('/unblock/:id', middleware.isLoggedIn, middleware.isFaculty, middleware.memberOfCourse, (req, res) => { //Unblock a blocked user
-    (async () => {
+router.put('/unblock/:id', middleware.isLoggedIn, middleware.isFaculty, middleware.memberOfCourse, async (req, res) => { //Unblock a blocked user
+    try {
         const blockedId = await User.findById(req.body.blockedId);
         if (!blockedId) {
             return res.json({error: "Unable to access user"});
@@ -935,13 +936,13 @@ router.put('/unblock/:id', middleware.isLoggedIn, middleware.isFaculty, middlewa
         transport(blockedId, `Unblocked from ${course.name}`, `<p>Hello ${blockedId.firstName},</p><p>${notif.text}</p>`);
         return res.json({success: "Succesfully unblocked user", blocked: blockedId, course});
 
-    })().catch(err => {
+    } catch (err) {
         res.json({error: "Unable to unblock user"});
-    });
+    }
 });
 
-router.put("/mark/:id", middleware.isLoggedIn, middleware.isTutor, middleware.memberOfCourse, (req, res) => {
-    (async () => {
+router.put("/mark/:id", middleware.isLoggedIn, middleware.isTutor, middleware.memberOfCourse, async (req, res) => {
+    try {
         const course = await Course.findById(req.params.id);
         if (!course) {
             return res.json({error: "Error accessing course"});
@@ -969,13 +970,13 @@ router.put("/mark/:id", middleware.isLoggedIn, middleware.isTutor, middleware.me
             }
         }
 
-    })().catch(err => {
+    } catch (err) {
         res.json({error: "Error marking lesson"});
-    });
+    }
 });
 
-router.delete("/:id", middleware.isLoggedIn, middleware.isFaculty, middleware.memberOfCourse, (req, res) => {
-    (async () => {
+router.delete("/:id", middleware.isLoggedIn, middleware.isFaculty, middleware.memberOfCourse, async (req, res) => {
+    try {
         const course = await Course.findOne({_id: req.params.id, joinCode: req.body.joinCode})
         .populate("tutors.tutor tutors.students tutors.rooms.student");
         if (!course) {
@@ -1013,10 +1014,10 @@ router.delete("/:id", middleware.isLoggedIn, middleware.isFaculty, middleware.me
         req.flash("success", `Deleted ${course.name}!`);
         return res.redirect("/homework");
 
-    })().catch(err => {
+    } catch (err) {
         req.flash("error", "An error occurred");
         res.redirect("back");
-    });
+    }
 });
 
 module.exports = router;

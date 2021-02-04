@@ -70,16 +70,15 @@
                       </span>
 
                 <br/>
-                <span id="upvote-<%= course._id %>-<%= tutor.tutor._id %>" onclick="upvote(this)">
+                <span id="upvote-<%= course._id %>-<%= tutor.tutor._id %>" onclick="upvote(this)"><span
                     <% if (tutor.upvotes.includes(currentUser._id)) { %>
-                        <span class="upvoted"><i class="fas fa-arrow-circle-up"></i></span>
+                        class="upvoted"><i class="fas fa-arrow-circle-up"></i>
                     <% } else { %>
-                    <span class="not-upvoted"><i class="fas fa-arrow-circle-up"></i>
-                        <% } %>
-                        <span class="upvote-count"
-                              id="upvoteCount-<%= course._id %>-<%= tutor.tutor._id %>"> <%= tutor.upvotes.length %></span>
-                        </span>
+                        class="not-upvoted"><i class="fas fa-arrow-circle-up"></i>
+                    <% } %>
+                        <span class="upvote-count" id="upvoteCount-<%= course._id %>-<%= tutor.tutor._id %>"><%= tutor.upvotes.length %></span>
                       </span>
+                  </span>
                 <br/>
 
                 <p id="tutor-bio"><%= tutor.bio %></p>
@@ -376,7 +375,7 @@
                         id="reviews-length-<%= tutor.tutor._id %>"><%= tutor.reviews.length %></span>)</a>
         </li>
 
-        <% if (tutor.students.includes(currentUser._id.toString()) || tutor.tutor._id.equals(currentUser._id)) { %>
+        <% if (tutor.students.includes(currentUser._id.toString()) || tutor.tutor._id.equals(currentUser._id) || course.teacher.equals(currentUser._id)) { %>
             <li class="nav-item tab-header tab" id="students" onclick="changeTab(this)">
                 <a class="nav-link active">Students (<%= tutor.students.length + tutor.formerStudents.length %>)</a>
             </li>
@@ -397,16 +396,16 @@
                                         class="follower-image" src="<%= review.review.sender.imageUrl %>"/><span
                                         class="review-sender"><%= review.review.sender.firstName %> <%= review.review.sender.lastName %></span>
                             </h3></a>
+
+                        <i id="like-<%= review.review._id %>" class="fas fa-thumbs-up
                         <% if (review.review.likes.includes(currentUser._id)) { %>
-                            <i id="like-<%= review.review._id %>" class="fas fa-thumbs-up review-liked"></i>
-
+                            review-liked
                         <% } else { %>
-                        <i id="like-<%= review.review._id %>" class="fas fa-thumbs-up review-unliked"
-                                <% } %>
-
-                        <% if (tutor.students.includes(currentUser._id) || tutor.formerStudents.includes(currentUser._id)) { %>
+                            review-unliked
+                        <% } %>
+                        "<% if (tutor.students.includes(currentUser._id) || tutor.formerStudents.includes(currentUser._id)) { %>
                            onclick="likeReview(this)"
-                                <% } %>
+                        <% } %>
                         ></i>
 
                         <span id="like-count-<%= review.review._id %>"
@@ -464,7 +463,7 @@
                                     <% } %>
                                 <% } %>
                             </a>
-                            <% if (tutor.tutor._id.equals(currentUser._id) || student._id.equals(currentUser._id)) { %>
+                            <% if (tutor.tutor._id.equals(currentUser._id) || student._id.equals(currentUser._id) || course.teacher._id.equals(currentUser._id)) { %>
                                 <a class="btn btn-info lesson-button"
                                    href="/homework/tutors/<%= course._id %>?tutorId=<%= tutor.tutor._id %>&studentId=<%= student._id %>">Lesson
                                     Information</a>
@@ -477,9 +476,10 @@
                                 </button>
                             <% } %>
 
-                            <% if (tutor.tutor._id.equals(currentUser._id) || student._id.equals(currentUser._id)) { %>
-                                <span class="lessons-length"><span
-                                            id="lessons-length-<%= student._id %>"><%= lessonCount %></span> lesson(s)</span>
+                            <% if (tutor.tutor._id.equals(currentUser._id) || student._id.equals(currentUser._id) || course.teacher._id.equals(currentUser._id)) { %>
+                                <span class="lessons-length">
+                                    <span id="lessons-length-<%= student._id %>"><%= lessonCount %></span>
+                                lesson(s)</span>
                             <% } %>
                         </div>
 
@@ -546,13 +546,13 @@
                                     <% } %>
                                 <% } %>
                             </a>
-                            <% if (tutor.tutor._id.equals(currentUser._id)) { %>
+                            <% if (tutor.tutor._id.equals(currentUser._id) || course.teacher._id.equals(currentUser._id)) { %>
                                 <a class="btn btn-info lesson-button"
                                    href="/homework/tutors/<%= course._id %>?tutorId=<%= tutor.tutor._id %>&studentId=<%= student._id %>">Lesson
                                     Information</a>
                             <% } %>
 
-                            <% if (tutor.tutor._id.equals(currentUser._id) || student._id.equals(currentUser._id)) { %>
+                            <% if (tutor.tutor._id.equals(currentUser._id) || student._id.equals(currentUser._id) || course.teacher._id.equals(currentUser._id)) { %>
                                 <span class="lessons-length"><span
                                             id="lessons-length-<%= student._id %>"><%= lessonCount %></span> lesson(s)</span>
                             <% } %>
