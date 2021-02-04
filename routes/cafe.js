@@ -18,21 +18,28 @@ const Notification = require('../models/message');
 const Type = require('../models/itemType');
 const Cafe = require('../models/cafe')
 
+router.get('/', async (req, res) => {
+  try {
+    //do whatever
+  } catch (err) {
+    //handle error
+  }
+});
+
 //ROUTES
-router.get('/', middleware.isLoggedIn, (req, res) => { //RESTful routing 'order/index' route
-    (async () => {
+router.get('/', middleware.isLoggedIn, async(req, res) => { //RESTful routing 'order/index' route
+    try {
         const orders = await Order.find({customer: req.user._id}).populate('items.item'); //Find all of the orders that you have ordered, and populate info on their items
         if (!orders) {
             req.flash('error', "Could not find your orders");
             return res.redirect('back');
         }
-
         return res.render('cafe/index', {orders});
 
-    })().catch(err => {
+    } catch (err) {
         req.flash('error', "Could not find your orders");
         res.redirect('back');
-    });
+    }
 });
 
 router.get('/menu', middleware.isLoggedIn, (req, res) => { //Renders the cafe menu with info on all the items
