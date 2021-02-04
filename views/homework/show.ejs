@@ -227,8 +227,7 @@
     </div>
 
     <div class="row tutors" hidden><br/>
-        <div class="col-12">
-
+        <div class="col-12" id="tutor-column">
             <% if (course.tutors.length > 0) { %>
                 <ul class="list-group" id="tutor-div">
                     <li class="list-group-item list-group-item-success">
@@ -545,6 +544,12 @@
 
                     <% } %>
                 </ul>
+
+            <% } else { %>
+                <div class="empty-field" id="no-tutors">
+                    <br />
+                    <h2>No Tutors</h2>
+                </div>
             <% } %>
 
         </div>
@@ -720,6 +725,11 @@
                         <% } %>
                     </ul>
                     <br/>
+                <% } else { %>
+                    <div class="empty-field" id="no-blocked">
+                        <br />
+                        <h2>No Blocked</h2>
+                    </div>
                 <% } %>
             </div>
         </div>

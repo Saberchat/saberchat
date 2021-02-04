@@ -323,6 +323,7 @@ const removeTutor = function (button, location) {
                 blockedDiv.id = "blocked-div";
                 blockedDiv.innerHTML = `<li class="list-group-item list-group-item-success">Blocked</li>`;
                 document.getElementById("blocked-column").appendChild(blockedDiv);
+                document.getElementById("blocked-column").removeChild(document.getElementById("no-blocked"));
             }
 
             let blockedElement = document.createElement("li");
@@ -344,6 +345,11 @@ const removeTutor = function (button, location) {
             if (data.course.tutors.length == 0) {
                 document.getElementById("tutor-index").parentNode.removeChild(document.getElementById("tutor-index"));
                 document.getElementById("tutor-div").parentNode.removeChild(document.getElementById("tutor-div"));
+                let noTutors = document.createElement("div");
+                noTutors.className = "empty-field";
+                noTutors.id = "no-tutors";
+                noTutors.innerHTML = `<br /><h2>No Tutors</h2>`;
+                document.getElementById("tutor-column").appendChild(noTutors);
             }
         }
     });
@@ -363,6 +369,11 @@ const unblock = function (button) {
 
             if (data.course.blocked.length == 0) {
                 document.getElementById("blocked-div").parentNode.removeChild(document.getElementById("blocked-div"));
+                let noBlocked = document.createElement("div");
+                noBlocked.className = "empty-field";
+                noBlocked.id = "no-blocked";
+                noBlocked.innerHTML = `<br /><h2>No Blocked</h2>`;
+                document.getElementById("blocked-column").appendChild(noBlocked);
             }
         }
     });

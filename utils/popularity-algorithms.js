@@ -1,11 +1,6 @@
 //Popularity Functions can be used to calculate and sort popularity for projects, cafe items, tutors, etc.
 
 // Takes an array of post objects and outputs the average popularity coefficient (likes per day)
-// PARAMS
-// posts = posts to evaluate avg. popularity coefficiant
-// likeFactor = the popularity characteristic which is being evaluated (upvotes/likes/etc.)
-// dateFactor = the variable to evaluate the date each post was created at
-
 const getPopularityCoefficiant = function (posts, likeFactor, dateFactor) {
     const now = new Date().getTime();
     const rate = 86400; //Rate of conversion is seconds to days
