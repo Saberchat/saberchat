@@ -39,57 +39,46 @@
 
         <% for (let customer of popularCustomers) { %>
             <li>
-                <%= customer.customer.firstName %> <%= customer.customer.lastName %>: <%= customer.orderCount %> orders
+                <%= customer.customer.firstName %> <%= customer.customer.lastName %>: <%= customer.orderCount %> order(s)
             </li>
         <% } %>
 
     </ol>
 
     <h3>Most Lucrative Customers (Bar Graph)</h3>
-
     <ol>
-
         <% for (let customer of lucrativeCustomers) { %>
             <li>
                 <%= customer.customer.firstName %> <%= customer.customer.lastName %>: $<%= customer.spent %> spent (Avg.
                 $<%= Math.round(customer.avgCharge * 100) / 100 %> per order)
             </li>
         <% } %>
-
     </ol>
 
     <h3>Customers With Largest Orders (Bar Graph)</h3>
-
     <ol>
-
         <% for (let customer of longestOrderCustomers) { %>
             <li>
                 <%= customer.customer.firstName %> <%= customer.customer.lastName %>
-                (Avg. <%= Math.round(customer.orderLength * 100) / 100 %> items per order)
+                (Avg. <%= Math.round(customer.orderLength * 100) / 100 %> item(s) per order)
             </li>
         <% } %>
-
     </ol>
 
     <h3>Most Popular Items BY ORDERS (Pie Chart/Bar Graph)</h3>
-
     <ol>
-
-        <% for (let item of popularItems) { %>
+        <% for (let item of popularOrderedItems) { %>
             <li>
-                <%= item.item.name %>: <%= item.orderCount %> orders
+                <%= item.item.name %>: <%= item.orderCount%> order(s)
             </li>
         <% } %>
-
     </ol>
 
     <h3>Most Popular Items BY UPVOTES (Pie Chart/Bar Graph)</h3>
-
     <ol>
-
         <% for (let item of upvotedItems) { %>
             <li>
-                <%= item.name %>: <%= item.upvotes.length %> upvotes
+                <%= item.name %>: <%= item.upvotes.length %> upvote(s)
             </li>
         <% } %>
 
@@ -120,7 +109,7 @@
                 <% nameArr.push(item.name) %>
             <% } %>
 
-            <li>The combination of the following has been ordered <%= combo.instances %> times:</li>
+            <li>The combination of the following has been ordered <%= combo.instances %> time(s):</li>
             <ul>
                 <% for (let name of nameArr) { %>
                     <li>
@@ -145,7 +134,7 @@
 
             <ul>
                 <% for (let point of pricepoints.get(item).keys()) { %>
-                    <li>At price $<%= point %>, this item was ordered <%= pricepoints.get(item).get(point) %> times <em>(Total
+                    <li>At price $<%= point %>, this item was ordered <%= pricepoints.get(item).get(point) %> time(s) <em>(Total
                             Revenue At This Price: $<%= point * pricepoints.get(item).get(point) %>)</em></li>
                 <% } %>
             </ul>
@@ -156,106 +145,36 @@
     <h3>Common Ordering Timeframes (Boxplot)</h3>
 
     <ul>
-        <% for (let time of times.timeCount) { %>
+        <% for (let time of times) { %>
             <li>
-            <span class="time">
-                <% if (parseInt(time[0].split(':')[0]) > 12) { %>
-                    <%= parseInt(time[0].split(':')[0]) - 12 %>:<%= time[0].split(':')[1] %> PM
-
-                <% } else if (parseInt(time[0].split(':')[0]) == 12) { %>
-                    12:<%= time[0].split(':')[1] %> PM
-
-                <% } else if (parseInt(time[0].split(':')[0]) == 0) { %>
-                    12:<%= time[0].split(':')[1] %> AM
-
-                <% } else { %>
-                    <%= time[0] %> AM
-                <% } %>
-            </span>
-
-                (<%= time[1] %> times)
+                <span class="time"><%=time%></span>
             </li>
         <% } %>
-
     </ul>
 
     <p>
-
         The average ordering time is
-
         <span class="time">
-            <% if (parseInt(times.meanTime.split(':')[0]) > 12) { %>
-                <%= parseInt(times.meanTime.split(':')[0]) - 12 %>:<%= times.meanTime.split(':')[1] %> PM
-
-            <% } else if (parseInt(times.meanTime.split(':')[0]) == 12) { %>
-                12:<%= times.meanTime.split(':')[1] %> PM
-
-            <% } else if (parseInt(times.meanTime.split(':')[0]) == 0) { %>
-                12:<%= times.meanTime.split(':')[1] %> AM
-
-            <% } else { %>
-                <%= times.meanTime %> AM
-            <% } %>
+            <%=timeStats.avgTime%>
         </span>
-
     </p>
 
     <p>
-
         The median ordering time is
-
         <span class="time">
-            <% if (parseInt(times.medianTime.split(':')[0]) > 12) { %>
-                <%= parseInt(times.medianTime.split(':')[0]) - 12 %>:<%= times.medianTime.split(':')[1] %> PM
-
-            <% } else if (parseInt(times.medianTime.split(':')[0]) == 12) { %>
-                12:<%= times.medianTime.split(':')[1] %> PM
-
-            <% } else if (parseInt(times.medianTime.split(':')[0]) == 0) { %>
-                12:<%= times.medianTime.split(':')[1] %> AM
-
-            <% } else { %>
-                <%= times.medianTime %> AM
-            <% } %>
+            <%=timeStats.medianTime%>
         </span>
-
     </p>
 
     <p>
         Most orders will be placed between
-
         <span class="time">
-            <% if (parseInt(times.minTime.split(':')[0]) > 12) { %>
-                <%= parseInt(times.minTime.split(':')[0]) - 12 %>:<%= times.minTime.split(':')[1] %> PM
-
-            <% } else if (parseInt(times.minTime.split(':')[0]) == 12) { %>
-                12:<%= times.minTime.split(':')[1] %> PM
-
-            <% } else if (parseInt(times.minTime.split(':')[0]) == 0) { %>
-                12:<%= times.minTime.split(':')[1] %> AM
-
-            <% } else { %>
-                <%= times.minTime %> AM
-            <% } %>
+            <%=timeStats.minTime%>
         </span>
-
         and
-
         <span class="time">
-            <% if (parseInt(times.maxTime.split(':')[0]) > 12) { %>
-                <%= parseInt(times.maxTime.split(':')[0]) - 12 %>:<%= times.maxTime.split(':')[1] %> PM
-
-            <% } else if (parseInt(times.maxTime.split(':')[0]) == 12) { %>
-                12:<%= times.maxTime.split(':')[1] %> PM
-
-            <% } else if (parseInt(times.maxTime.split(':')[0]) == 0) { %>
-                12:<%= times.maxTime.split(':')[1] %> AM
-
-            <% } else { %>
-                <%= times.maxTime %> AM
-            <% } %>
+            <%=timeStats.maxTime%>
         </span>
-
     </p>
 </div>
 <br/>
