@@ -11,6 +11,11 @@
     <link rel="stylesheet" href="/stylesheets/components/navbar.css">
     <link rel="stylesheet" href="/stylesheets/components/header.css">
     <link rel="stylesheet" href="/stylesheets/profile/edit.css">
+    <%if (currentUser) {%>
+      <%if (currentUser.darkmode) { %>
+        <link rel="stylesheet" href="/stylesheets/Darkmode.css">
+      <%}%>
+    <%}%>
 
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
@@ -20,7 +25,7 @@
     <!-- I'm using my fontawesome kit -->
     <script src="https://kit.fontawesome.com/dccc745c41.js" crossorigin="anonymous"></script>
 </head>
-<body>
+<body class="mode">
     <!-- include the navbar via ejs -->
     <%- include('../partials/navbar') %>
     <!-- include the backdrop for nav -->
@@ -38,22 +43,22 @@
                 <form action="/profiles/profile?_method=put" method="post">
                     <div class="form-group">
                         <label for="firstNameInput">First</label>
-                        <input id="firstNameInput" class="form-control" type="text" name="firstName" value="<%= currentUser.firstName %>" placeholder="Enter First Name" required>
+                        <input id="firstNameInput" class="form-control mode" type="text" name="firstName" value="<%= currentUser.firstName %>" placeholder="Enter First Name" required>
                     </div>
                     <div class="form-group">
                         <label for="lastNameInput">Last</label>
-                        <input id="lastNameInput" class="form-control" type="text" name="lastName" value="<%= currentUser.lastName %>" placeholder="Enter Last" required>
+                        <input id="lastNameInput" class="form-control mode" type="text" name="lastName" value="<%= currentUser.lastName %>" placeholder="Enter Last" required>
                     </div>
                     <div class="form-group">
                         <label for="usernameInput">Username</label>
-                        <input id="usernameInput" class="form-control" type="text" name="username" value="<%= currentUser.username %>" placeholder="(max 23) Enter Username" maxlength="23" required>
+                        <input id="usernameInput" class="form-control mode" type="text" name="username" value="<%= currentUser.username %>" placeholder="(max 23) Enter Username" maxlength="23" required>
                     </div>
                     <div class="form-group">
                         <label for="descInput">Description</label>
                         <% if(currentUser.description){ %>
-                            <textarea id="descInput" class="form-control" name="description" maxlength="550" placeholder="Enter Description" rows="5"><%= currentUser.description %></textarea>
+                            <textarea id="descInput" class="form-control mode" name="description" maxlength="550" placeholder="Enter Description" rows="5"><%= currentUser.description %></textarea>
                         <% } else { %>
-                            <textarea id="descInput" class="form-control" name="description" placeholder="Enter Description" maxlength="550" rows="5" aria-describedby="descHelp"></textarea>
+                            <textarea id="descInput" class="form-control mode" name="description" placeholder="Enter Description" maxlength="550" rows="5" aria-describedby="descHelp"></textarea>
                             <small id="descHelp" class="form-text text-muted">Ex. Hobbies: swimming, tennis, searching for bigfoot.</small>
                         <% } %>
                     </div>
@@ -79,7 +84,7 @@
                         </select>
                     <% } else { %>
                       <label for="status">Status</label>
-                      <select class="form-control" id="status" name="status">
+                      <select class="form-control mode" id="status" name="status">
                         <option selected value="<%= currentUser.status %>"><%=currentUser.status%></option>
                       </select>
                     <% } %>

@@ -1,6 +1,7 @@
 .mode, .mode:focus, .mode:hover{
   background-color: #343a40;
   color: white;
+  overflow: hidden;
 
 }
 .search, .search:focus{
