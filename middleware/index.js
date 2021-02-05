@@ -143,13 +143,13 @@ middleware.isCashier = ((req, res, next) => {
 
 middleware.cafeOpen = ((req, res, next) => { //Cafe time restrictions
 
-    Cafe.find({}, (err, foundCafe) => {
-        if (err || !foundCafe) {
+    Cafe.find({}, (err, cafes) => {
+        if (err || !cafes) {
             req.flash('error', "An Error Occurred")
             res.redirect('back')
 
         } else {
-            if (foundCafe[0].open) {
+            if (cafes[0].open) {
                 next();
 
             } else {

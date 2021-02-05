@@ -18,7 +18,7 @@ const filter = require('../utils/filter');
 const {getHours, sortTimes, getStats} = require('../utils/time');
 const getData = require("../utils/cafe-data");
 
-//-----------CUSTOMER ROUTES-----------//
+//-----------GENERAL ROUTES-----------//
 
 //SHOW CAFE HOMEPAGE
 module.exports.index = async function(req, res) {
@@ -100,6 +100,9 @@ module.exports.index = async function(req, res) {
     }
 }
 
+//-----------GENERAL ORDER ROUTES-----------//
+
+//CREATE ORDER
 module.exports.order = async function(req, res) {
     try {
         if (!req.body.check) { //If any items are selected
@@ -158,29 +161,7 @@ module.exports.order = async function(req, res) {
     }
 }
 
-module.exports.upvote = async function(req, res) {
-    try {
-        const item = await Item.findById(req.body.item);
-        if (!item) {
-            return res.json({error: "Error upvoting item"});
-        }
-
-        if (item.upvotes.includes(req.user._id)) {
-            item.upvotes.splice(item.upvotes.indexOf(req.user._id), 1);
-            await item.save();
-            return res.json({success: `Downvoted ${item.name}`, upvoteCount: item.upvotes.length})
-        }
-
-        item.upvotes.push(req.user._id);
-        await item.save();
-        return res.json({success: `Upvoted ${item.name}`, upvoteCount: item.upvotes.length})
-
-    } catch (err) {
-        res.json({error: "An error occurred"});
-    }
-}
-
-//-----------ROUTES FOR HANDLING ORDERS-------------//
+//-----------ROUTES FOR SPECIFIC ORDERS-------------//
 
 //PROCESS AND CONFIRM ORDER
 module.exports.processOrder = async function(req, res) {
@@ -241,7 +222,12 @@ module.exports.processOrder = async function(req, res) {
 //REJECT OR CANCEL ORDER
 module.exports.deleteOrder = async function(req, res) {
     try {
-        if (req.body.rejectionReason && req.user.tags.toString().toLowerCase().includes('cashier')) {
+        if (req.body.rejectionReason) {
+            if (!req.user.tags.toString().toLowerCase().includes("cashier")) {
+                req.flash('error', 'You do not have permission to do that');
+                return res.redirect('back');
+            }
+
             const order = await Order.findById(req.params.id).populate('items.item').populate('customer');
             if (!order) {
                 return res.json({error: 'Could not find order'});
@@ -305,6 +291,15 @@ module.exports.deleteOrder = async function(req, res) {
 
         //Cancellation starts here
 
+        const cafes = await Cafe.find({});
+        if (!cafes[0]) {
+            return res.json({error: 'Could not access cafe'});
+        }
+
+        if (!cafes[0].open) {
+            return res.json({error: 'The cafe is currently not taking orders'});
+        }
+        
         const order = await Order.findById(req.params.id);
         if (!order) {
             return res.json({error: 'Could not find order'});
@@ -439,78 +434,104 @@ module.exports.viewItem = async function(req, res) {
 //UPDATE ITEM
 module.exports.updateItem = async function(req, res) {
     try {
-        const overlap = await Item.find({_id: {$ne: req.params.id}, name: req.body.name});
-        if (!overlap) {
-            req.flash('error', 'Item Not Found');
-            return res.redirect('back');
+        if (req.body.name) {
+            if (!req.user.tags.toString().toLowerCase().includes("cashier")) {
+                req.flash('error', 'You do not have permission to do that');
+                return res.redirect('back');
+            }
+
+            const overlap = await Item.find({_id: {$ne: req.params.id}, name: req.body.name});
+            if (!overlap) {
+                req.flash('error', 'Item Not Found');
+                return res.redirect('back');
+            }
+
+            if (overlap.length > 0) {
+                req.flash('error', 'Item With This Name Exists');
+                return res.redirect('back');
+            }
+
+            const item = await Item.findByIdAndUpdate(req.params.id, {
+                name: req.body.name,
+                price: parseFloat(req.body.price),
+                availableItems: parseInt(req.body.available),
+                isAvailable: (parseInt(req.body.available) > 0),
+                description: req.body.description,
+                imgUrl: req.body.image
+            });
+            if (!item) {
+                req.flash('error', 'item not found');
+                return res.redirect('back');
+            }
+
+            const activeOrders = await Order.find({present: true}).populate('items.item'); //Any orders that are active will need to change, to accomodate the item changes.
+            if (!activeOrders) {
+                req.flash('error', "Unable to find active orders");
+                return res.redirect('back');
+            }
+
+            for (let order of activeOrders) {
+                order.charge = 0; //Reset the order's charge, we will have to recalculate
+
+                for (let i = 0; i < order.items.length; i++) { //Iterate over each order, and change its price to match the new item prices
+                    order.charge += order.items[i].item.price * order.items[i].quantity;
+                    order.items[i].price = item.price;
+                }
+                await order.save();
+            }
+
+            const types = await Type.find({name: {$ne: req.body.type}}); //Collect all item types
+            if (!types) {
+                req.flash('error', "Unable to find item categories");
+                return res.redirect('back');
+            }
+
+            for (let t of types) { //Remove this item from its old item type (if the type has not changed, it's fine because we' add it back in a moment anyway)
+                if (t.items.includes(item._id)) {
+                    t.items.splice(t.items.indexOf(item._id), 1);
+                }
+                await t.save();
+            }
+
+            const type = await Type.findOne({name: req.body.type});  //Add the item to the type which is now specified
+            if (!type) {
+                req.flash('error', 'Unable to find item category');
+                return res.redirect("back");
+            }
+
+            if (type.items.includes(item._id)) { //If item is already in type, remove it so you can put the updated type back (we don't know whether the type will be there or not, so it's better to just cover all bases)
+                type.items.splice(type.items.indexOf(item._id), 1);
+            }
+
+            type.items.push(item);
+            await type.save();
+
+            req.flash('success', "Item updated!");
+            return res.redirect('/cafe/manage');
         }
 
-        if (overlap.length > 0) {
-            req.flash('error', 'Item With This Name Exists');
-            return res.redirect('back');
-        }
-
-        const item = await Item.findByIdAndUpdate(req.params.id, {
-            name: req.body.name,
-            price: parseFloat(req.body.price),
-            availableItems: parseInt(req.body.available),
-            isAvailable: (parseInt(req.body.available) > 0),
-            description: req.body.description,
-            imgUrl: req.body.image
-        });
+        const item = await Item.findById(req.params.id);
         if (!item) {
-            req.flash('error', 'item not found');
-            return res.redirect('back');
+            return res.json({error: "Error upvoting item"});
         }
 
-        const activeOrders = await Order.find({present: true}).populate('items.item'); //Any orders that are active will need to change, to accomodate the item changes.
-        if (!activeOrders) {
-            req.flash('error', "Unable to find active orders");
-            return res.redirect('back');
+        if (item.upvotes.includes(req.user._id)) {
+            item.upvotes.splice(item.upvotes.indexOf(req.user._id), 1);
+            await item.save();
+            return res.json({success: `Downvoted ${item.name}`, upvoteCount: item.upvotes.length});
         }
 
-        for (let order of activeOrders) {
-            order.charge = 0; //Reset the order's charge, we will have to recalculate
-
-            for (let i = 0; i < order.items.length; i++) { //Iterate over each order, and change its price to match the new item prices
-                order.charge += order.items[i].item.price * order.items[i].quantity;
-                order.items[i].price = item.price;
-            }
-            await order.save();
-        }
-
-        const types = await Type.find({name: {$ne: req.body.type}}); //Collect all item types
-        if (!types) {
-            req.flash('error', "Unable to find item categories");
-            return res.redirect('back');
-        }
-
-        for (let t of types) { //Remove this item from its old item type (if the type has not changed, it's fine because we' add it back in a moment anyway)
-            if (t.items.includes(item._id)) {
-                t.items.splice(t.items.indexOf(item._id), 1);
-            }
-            await t.save();
-        }
-
-        const type = await Type.findOne({name: req.body.type});  //Add the item to the type which is now specified
-        if (!type) {
-            req.flash('error', 'Unable to find item category');
-            return res.redirect("back");
-        }
-
-        if (type.items.includes(item._id)) { //If item is already in type, remove it so you can put the updated type back (we don't know whether the type will be there or not, so it's better to just cover all bases)
-            type.items.splice(type.items.indexOf(item._id), 1);
-        }
-
-        type.items.push(item);
-        await type.save();
-
-        req.flash('success', "Item updated!");
-        return res.redirect('/cafe/manage');
+        item.upvotes.push(req.user._id);
+        await item.save();
+        return res.json({success: `Upvoted ${item.name}`, upvoteCount: item.upvotes.length});
 
     } catch (err) {
-        req.flash('error', "An Error Occurred");
-        res.redirect('back');
+        if (req.body.name) {
+            req.flash('error', "An Error Occurred");
+            res.redirect('back');
+        } else {
+            res.json({error: "An error occurred"});
+        }
     }
 }
 
