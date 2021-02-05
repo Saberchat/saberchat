@@ -1,16 +1,16 @@
+//SCHEMA
+const User = require('../models/user');
+const Order = require('../models/order');
+const Item = require('../models/orderItem');
+
+//LIBRARIES
+const express = require('express');
 const dateFormat = require('dateformat');
 const {getPopularityCoefficiant, sortByPopularity, equateObjects} = require("../utils/popularity-algorithms");
 const filter = require('../utils/filter');
 const {getHours, sortTimes, getStats} = require('../utils/time');
 
-const User = require('../models/user');
-const Order = require('../models/order');
-const Item = require('../models/orderItem');
-const Type = require('../models/itemType');
-const Cafe = require('../models/cafe')
-
 const getData = async function() {
-    //Main data
     const customers = await User.find({authenticated: true}); if (!customers) {return false;}
     const items = await Item.find({}); if (!items) {return false;}
     const orders = await Order.find({}); if (!orders) {return false;}

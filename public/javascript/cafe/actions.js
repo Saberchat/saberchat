@@ -1,6 +1,6 @@
 const ready = function (button) {
     const orderId = button.id.split('-')[0];
-    const url = `/cafe/${orderId}/ready`;
+    const url = `/cafe/order/${orderId}?_method=put`;
     const data = {};
 
     $.post(url, data, data => {
@@ -22,7 +22,7 @@ const ready = function (button) {
 const reject = function (button) {
     const orderId = button.id.split('-')[0];
     const rejectionReason = document.getElementById(`rejection-reason-${orderId}`).value;
-    const url = `/cafe/${orderId}/reject`;
+    const url = `/cafe/order/${orderId}?_method=delete`;
     const data = {rejectionReason};
 
     $.post(url, data, data => {
@@ -56,7 +56,7 @@ const cancel = function (button) {
 }
 
 const changeCafeStatus = function () {
-    const url = `/cafe/change-cafe-status?_method=put`;
+    const url = `/cafe/manage?_method=put`;
     const data = {};
 
     $.post(url, data, data => {

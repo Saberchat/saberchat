@@ -46,10 +46,10 @@
                     <% } %>
                 </button>
 
-                <a href="/cafe/orders" class="btn btn-primary"><i class="fas fa-coffee"></i> Orders</a>
-                <a href="/cafe/item/new" class="btn btn-warning"><i class="fas fa-plus-circle"></i> Add New Item</a>
-                <a href="/cafe/type/new" class="btn btn-info"><i class="fas fa-plus-circle"></i> Add New Category</a>
-                <!-- <a href="/cafe/data" class="btn btn-secondary"><i class="fas fa-chart-bar"></i> Cafe Data Analytics</a> -->
+                <a href="/cafe/manage?orders=true" class="btn btn-primary"><i class="fas fa-coffee"></i> Orders</a>
+                <a href="/cafe/item" class="btn btn-warning"><i class="fas fa-plus-circle"></i> Add New Item</a>
+                <a href="/cafe/type" class="btn btn-info"><i class="fas fa-plus-circle"></i> Add New Category</a>
+                <!-- <a href="/cafe/manage?data=true" class="btn btn-secondary"><i class="fas fa-chart-bar"></i> Cafe Data Analytics</a> -->
             </div>
         </div>
     </div>
@@ -86,7 +86,7 @@
                     </li>
                     <% type.items.forEach(item => { %>
                         <% if (item.isAvailable) { %>
-                            <a href="item/<%= item._id %>" id="item-<%= item.id %>"
+                            <a href="/cafe/item/<%= item._id %>" id="item-<%= item.id %>"
                                class="list-group-item list-group-item-action menu-item <%= type.name.replace(' ', '') %>"><span
                                         class="item-name"><%= item.name %></span> (<%= item.availableItems %> orders
                                 available) <span class="upvote"
@@ -94,7 +94,7 @@
                                         id="upvoteCount-<%= item._id %>"
                                         class="upvote-count"> Upvotes: <%= item.upvotes.length %></span></a>
                         <% } else { %>
-                            <a href="item/<%= item._id %>" id="item-<%= item.id %>"
+                            <a href="/cafe/item/<%= item._id %>" id="item-<%= item.id %>"
                                class="list-group-item list-group-item-action menu-item <%= type.name.replace(' ', '') %>"><span
                                         class="item-name"><%= item.name %></span> (Unavailable) <span class="upvote"
                                                                                                       title="Upvotes (Cafe admins cannot upvote items from here)"></span><span
@@ -122,7 +122,7 @@
                     <% for (let item of type.items) { %>
                         <% upvoteCount += item.upvotes.length %>
                     <% } %>
-                    <a href="type/<%= type._id %>" id="type-<%= type.id %>"
+                    <a href="/cafe/type/<%= type._id %>" id="type-<%= type.id %>"
                        class="list-group-item list-group-item-action menu-item ItemOrderCategories"><span
                                 class="item-name"><%= type.name %></span> (<%= type.items.length %> items) <span
                                 class="upvote"

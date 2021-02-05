@@ -44,13 +44,13 @@
                 <h1>New Cafe Order</h1>
                 <p>Place an order that will be delivered to you at lunch</p>
                 <a class="btn btn-primary" href='/cafe'><i class="fas fa-arrow-left"></i> Back</a>
-                <a class="btn btn-info" href='/cafe/menu'><i class="fas fa-bars"></i> Menu </a>
+                <a class="btn btn-info" href='/cafe?menu=true'><i class="fas fa-bars"></i> Menu </a>
             </div>
         </div>
     </div>
     <div class="row">
         <div class="col-md-8 offset-md-2 col-12">
-            <form id="orderForm" action="/cafe/order" method="post">
+            <form id="orderForm" action="/cafe" method="post">
                 <div id="item-selection">
 
                     <div class="search-filter mb-3 search">
