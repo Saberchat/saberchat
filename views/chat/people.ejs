@@ -12,6 +12,11 @@
     <link rel="stylesheet" href="/stylesheets/components/header.css">
     <link rel="stylesheet" href="/stylesheets/chat/edit.css">
     <link rel="stylesheet" href="/stylesheets/profile/index.css">
+    <%if (currentUser) {%>
+      <%if (currentUser.darkmode) { %>
+        <link rel="stylesheet" href="/stylesheets/darkmode.css">
+      <%}%>
+    <%}%>
 
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
@@ -23,7 +28,7 @@
     <script src="/javascript/profile/follow.js"></script>
 
   </head>
-  <body>
+  <body class="mode">
     <!-- include the navbar via ejs -->
     <%- include('../partials/navbar') %>
     <!-- include the backdrop for nav -->
@@ -33,7 +38,7 @@
       <div class="row">
         <div class="col-md-10 offset-md-1 col-12">
           <div class="new-room">
-            <h1 class="title">People in "<%= room.name %>" (<%=room.members.length%>)</h1>
+            <h1 class="title" style="color:white;">People in "<%= room.name %>" (<%=room.members.length%>)</h1>
 
             <a class="btn btn-primary" href="/chat/<%= room._id %>"><i class="fas fa-arrow-left"></i> Back</a>
             <% if (room.creator.id._id.equals(currentUser._id)) { %>
@@ -41,8 +46,8 @@
             <% } %>
           </div><br />
           <div class="search-filter">
-              <i class="fas fa-search"></i>
-              <input id="search-input" oninput="searchFunction()" class="form-control" type="text" placeholder="Search..." title="Type in Username">
+              <i class="fas fa-search search"></i>
+              <input id="search-input" oninput="searchFunction()" class="form-control search" type="text" placeholder="Search..." title="Type in Username">
           </div>
 
           <div class="list-group" id="user-list">
@@ -61,7 +66,7 @@
             <% let sortedUsers = [];%>
             <% for (let status of statuses) { %>
               <% if (status[2].length > 0) { %>
-                    <li class="list-group-item list-group-item-success status-header" id="<%=status[0]%>-header">
+                    <li class="list-group-item list-group-item-success status-header cafe" id="<%=status[0]%>-header">
                       <div class="d-flex w-100 justify-content-between">
                         <h2 class="mb-1"><%=status[1]%></h2>
                         <span><%=status[2].length%> user(s)</span>
@@ -79,9 +84,9 @@
 
                     <% for (let user of sortedUsers) { %>
                       <% if (user.status.toLowerCase() == status[0]) { %>
-                        <li class="list-group-item list-group-item-action user-element">
+                        <li class="list-group-item list-group-item-action user-element chat">
 
-                          <a href="/profiles/<%=user._id%>" class="user-element-text">
+                          <a href="/profiles/<%=user._id%>" class="user-element-text cafetext">
                             <img class="profile-image" src="<%= user.imageUrl %>" alt="profile picture">
                             <span class="username <%=status[0]%> <%=status[1]%> <%=user.permission%> <%=user.tags.join(' ')%>"><span class="span-tag-name"><%=user.firstName%> <%=user.lastName%></span> <span class="span-tag-username"><%=user.username%></span></span>
 

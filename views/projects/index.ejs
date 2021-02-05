@@ -16,7 +16,7 @@
     <link rel="stylesheet" href="/stylesheets/chat/new.css">
     <%if (currentUser) {%>
       <%if (currentUser.darkmode) { %>
-        <link rel="stylesheet" href="/stylesheets/Darkmode.css">
+        <link rel="stylesheet" href="/stylesheets/projects/dark.css">
       <%}%>
     <%}%>
 
@@ -67,7 +67,7 @@
       <%projects.reverse().forEach(project => { %>
         <div class="row">
           <div class="col-lg-12">
-            <article class="text-block mode" style="overflow: hidden;" id="<%=project._id%>">
+            <article class="text-block mode" id="<%=project._id%>">
               <div class="block-header grey">
                 <h5>
                   <a class="project-info" href="projects/<%=project._id%>"><%=project.title%></a>
@@ -83,7 +83,7 @@
 
                     <% } else { %>
                       <span class="project-info">
-                        <img src="<%= project.poster.imageUrl %>" alt="profile pic" class="poster-profile">
+                        <img src="<%= project.poster.imageUrl %>" alt="profile pic" class="poster-profile mode">
                         <%=project.poster.firstName%> <%=project.poster.lastName%>
                       </span>
                     <% } %>
@@ -94,15 +94,15 @@
                         <form action="projects/<%=project._id%>?_method=delete" method="post" class="delete-project">
                           <button class="btn btn-danger project-info" type="button" data-toggle="modal" data-target="#modal-<%=project._id%>"><i class="far fa-trash-alt"></i> Delete</button>
                           <div class="modal fade" id="modal-<%=project._id%>" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
-                            <div class="modal-dialog">
-                              <div class="modal-content">
-                                <div class="modal-header">
+                            <div class="modal-dialog mode">
+                              <div class="modal-content mode">
+                                <div class="modal-header mode">
                                   <h5 class="modal-title" id="exampleModalLabel">Delete Post?</h5>
                                   <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                                     <span aria-hidden="true">&times;</span>
                                   </button>
                                 </div>
-                                <div class="modal-body">
+                                <div class="modal-body mode">
                                   This action is irreversible. You will have to manually recreate this post.
                                 </div>
                                 <div class="modal-footer">
@@ -140,16 +140,16 @@
                   <% if (currentUser) { %>
 
                     <% if (project.creators.length == 0) { %>
-                      <p class="creator-row"><span class="creator-heading">Creators:</span> <span class="creator-names">None</span></p>
+                      <p class="creator-row"><span class="creator-heading mode">Creators:</span> <span class="creator-names mode">None</span></p>
 
                       <%} else if (project.creators.length == 1){%>
-                        <p class="creator-row"><span class="creator-heading">Creator:</span> <a class="creator-names" href="profiles/<%=project.creators[0]._id%>"><img src="<%= project.creators[0].imageUrl %>" alt="profile pic" class="creator-profile"> <%=project.creators[0].firstName%> <%=project.creators[0].lastName%></a></p>
+                        <p class="creator-row"><span class="creator-heading mode">Creator:</span> <a class="creator-names mode" href="profiles/<%=project.creators[0]._id%>"><img src="<%= project.creators[0].imageUrl %>" alt="profile pic" class="creator-profile"> <%=project.creators[0].firstName%> <%=project.creators[0].lastName%></a></p>
 
                     <%} else if (project.creators.length == 2){%>
-                      <p class="creator-row"><span class="creator-heading">Creators:</span> <a class="creator-names" href="profiles/<%=project.creators[0]._id%>"><img src="<%= project.creators[0].imageUrl %>" alt="profile pic" class="creator-profile"> <%=project.creators[0].firstName%> <%=project.creators[0].lastName%></a>, <a class="creator-names" href="profiles/<%=project.creators[1]._id%>"><img src="<%= project.creators[1].imageUrl %>" alt="profile pic" class="creator-profile"> <%=project.creators[1].firstName%> <%=project.creators[1].lastName%></a></p>
+                      <p class="creator-row"><span class="creator-heading mode">Creators:</span> <a class="creator-names mode" href="profiles/<%=project.creators[0]._id%>"><img src="<%= project.creators[0].imageUrl %>" alt="profile pic" class="creator-profile"> <%=project.creators[0].firstName%> <%=project.creators[0].lastName%></a>, <a class="creator-names" href="profiles/<%=project.creators[1]._id%>"><img src="<%= project.creators[1].imageUrl %>" alt="profile pic" class="creator-profile"> <%=project.creators[1].firstName%> <%=project.creators[1].lastName%></a></p>
 
                     <% } else if (project.creators.length > 2) {%>
-                      <p class="creator-row"><span class="creator-heading">Creators:</span> <a class="creator-names" href="profiles/<%=project.creators[0]._id%>"><img src="<%= project.creators[0].imageUrl %>" alt="profile pic" class="creator-profile"> <%=project.creators[0].firstName%> <%=project.creators[0].lastName%></a> and <%=project.creators.length - 1%> others</p>
+                      <p class="creator-row"><span class="creator-heading mode">Creators:</span> <a class="creator-names mode" href="profiles/<%=project.creators[0]._id%>"><img src="<%= project.creators[0].imageUrl %>" alt="profile pic" class="creator-profile"> <%=project.creators[0].firstName%> <%=project.creators[0].lastName%></a> and <%=project.creators.length - 1%> others</p>
                     <% } %>
 
                   <% } else { %>

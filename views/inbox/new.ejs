@@ -13,6 +13,11 @@
     <link rel="stylesheet" href="/stylesheets/inbox/form.css">
     <link rel="stylesheet" href="/stylesheets/inbox/new.css">
     <link rel="stylesheet" href="/stylesheets/inbox/show.css">
+    <%if (currentUser) {%>
+      <%if (currentUser.darkmode) { %>
+        <link rel="stylesheet" href="/stylesheets/projects/dark.css">
+      <%}%>
+    <%}%>
 
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
@@ -21,7 +26,7 @@
     <!-- I'm using my fontawesome kit -->
     <script src="https://kit.fontawesome.com/dccc745c41.js" crossorigin="anonymous"></script>
   </head>
-  <body>
+  <body class="mode">
     <!-- include the navbar via ejs -->
     <%- include('../partials/navbar') %>
     <!-- include the backdrop for nav -->
@@ -38,9 +43,9 @@
             <form action="/inbox/messages" method="post" onsubmit="return process();" id="message-form">
               <div id="to-block">
                 <div id="default-msg">
-                  <div class="form-group">
+                  <div class="form-group mode">
                     <label for="user-select" class="label-custom">Recipients</label>
-                    <select id="user-select" class="form-control" onchange="addRecipient('user')" required>
+                    <select id="user-select" class="form-control mode" onchange="addRecipient('user')" required>
                       <option class="recipient-group" value="" selected disabled>Select User/Group</option>
                       <option class="recipient-group" value="7th">7th Graders</option>
                       <option class="recipient-group" value="8th">8th Graders</option>
@@ -62,9 +67,9 @@
                 </div>
 
                 <div id="anony-msg">
-                  <div class="form-group">
+                  <div class="form-group mode">
                     <label for="faculty-select" class="label-custom">Recipients</label>
-                    <select id="faculty-select" class="form-control" onchange="addRecipient('faculty')">
+                    <select id="faculty-select" class="form-control mode" onchange="addRecipient('faculty')">
                       <option value="" selected disabled>Select Faculty</option>
                       <% users.forEach(user => { %>
                         <% if(!user._id.equals(currentUser._id) && user.status == 'faculty') { %>
@@ -94,13 +99,13 @@
 
               </div>
 
-              <div class="form-group">
+              <div class="form-group mode">
                 <label for="subject">Subject</label>
-                <input id="subject" placeholder="A short title..." class="form-control" type="text" name="subject" required>
+                <input id="subject" placeholder="A short title..." class="form-control mode" type="text" name="subject" required>
               </div>
-              <div class="form-group">
+              <div class="form-group mode">
                 <label for="message">Message</label>
-                <textarea name="message" id="message" placeholder="Message text..." rows="5" class="form-control" required></textarea>
+                <textarea name="message" id="message" placeholder="Message text..." rows="5" class="form-control mode" required></textarea>
               </div>
 
               <div id="image-header">

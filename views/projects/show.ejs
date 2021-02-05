@@ -13,6 +13,11 @@
     <link rel="stylesheet" href="/stylesheets/announcements/index.css">
     <link rel="stylesheet" href="/stylesheets/projects/index.css">
     <link rel="stylesheet" href="/stylesheets/projects/show.css">
+    <%if (currentUser) {%>
+      <%if (currentUser.darkmode) { %>
+        <link rel="stylesheet" href="/stylesheets/projects/dark.css">
+      <%}%>
+    <%}%>
 
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
@@ -26,14 +31,14 @@
     <script src="https://kit.fontawesome.com/dccc745c41.js" crossorigin="anonymous"></script>
 
   </head>
-  <body>
+  <body class="mode">
     <%- include('../partials/navbar') %>
     <%- include('../partials/header') %>
 
     <div class="container mt-5">
       <div class="row">
         <div class="col-12">
-          <div class="jumbotron text-center">
+          <div class="jumbotron text-center header">
             <h1><i class="fas fa-paint-brush"></i> Student Projects </h1>
             <p>Our Students' Artwork, Gardening Projects, Science Projects and More</p>
             <a class="btn btn-primary" href="/projects"><i class="fas fa-arrow-left"></i> Back</a>
@@ -43,7 +48,7 @@
 
       <div class="row">
         <div class="col-12">
-          <article class="ann-container">
+          <article class="ann-container chat">
             <div class="ann-head">
               <h1><%=project.title%></h1>
 
@@ -71,15 +76,15 @@
                     <form action="<%=project._id%>?_method=delete" method="post" id="delete-form">
                       <button class="btn btn-danger edit-button-text" type="button" data-toggle="modal" data-target="#modal-<%=project._id%>"><i class="far fa-trash-alt"></i> Delete</button>
                       <div class="modal fade" id="modal-<%=project._id%>" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
-                        <div class="modal-dialog">
-                          <div class="modal-content">
-                            <div class="modal-header">
+                        <div class="modal-dialog mode">
+                          <div class="modal-content mode">
+                            <div class="modal-header mode">
                               <h5 class="modal-title" id="exampleModalLabel">Delete Post?</h5>
                               <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                                 <p aria-hidden="true">&times;</p>
                               </button>
                             </div>
-                            <div class="modal-body">
+                            <div class="modal-body mode">
                               This action is irreversible. You will have to manually recreate this post.
                             </div>
                             <div class="modal-footer">
@@ -174,7 +179,7 @@
           <br />
 
           <% if (currentUser) { %>
-            <article class="ann-container" id="comment-section">
+            <article class="ann-container chat" id="comment-section">
               <h3 id="comments-heading">Comments (<%=project.comments.length%>)</h3>
 
               <form id="form-<%=project._id%>" onsubmit="comment(this, event)">

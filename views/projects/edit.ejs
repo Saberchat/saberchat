@@ -13,6 +13,11 @@
     <link rel="stylesheet" href="/stylesheets/projects/index.css">
     <link rel="stylesheet" href="/stylesheets/projects/edit.css">
     <link rel="stylesheet" href="/stylesheets/announcements/form.css">
+    <%if (currentUser) {%>
+      <%if (currentUser.darkmode) { %>
+        <link rel="stylesheet" href="/stylesheets/projects/dark.css">
+      <%}%>
+    <%}%>
 
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
@@ -23,14 +28,14 @@
     <script src="https://kit.fontawesome.com/dccc745c41.js" crossorigin="anonymous"></script>
 
   </head>
-  <body>
+  <body class="mode">
     <!-- include the navbar via ejs -->
     <%- include('../partials/navbar') %>
     <%- include('../partials/header') %>
     <div class="container mt-5">
       <div class="row">
         <div class="col-12">
-          <div class="jumbotron text-center">
+          <div class="jumbotron text-center header">
             <h1><i class="fas fa-paint-brush"></i> Edit Project </h1>
             <p>Modify Projects You Posted Earlier</p>
             <a class="btn btn-primary" href="/projects"><i class="fas fa-arrow-left"></i> Back</a>
@@ -43,14 +48,14 @@
       <div class="col-md-8 offset-md-2 col-12">
         <form action="/projects/<%=project._id%>?_method=put" method="post" id="submit-project-edits">
 
-          <div class="form-group">
+          <div class="form-group mode">
             <label for="new-project-message" id="title-label">Title</label>
-            <input id="new-project-title" name="title" maxlength="50" type="text" class="form-control" value = "<%=project.title%>" placeholder="Enter Project Name" aria-label="Username" aria-describedby="basic-addon1" required>
+            <input id="new-project-title" name="title" maxlength="50" type="text" class="form-control mode" value = "<%=project.title%>" placeholder="Enter Project Name" aria-label="Username" aria-describedby="basic-addon1" required>
           </div>
 
-          <div class="form-group" id="creator-input-div">
+          <div class="form-group mode" id="creator-input-div">
             <label for="creator-select" id="creator-input-label">Creators</label>
-            <select id="creator-select" class="form-control" onchange="addCreator('user')">
+            <select id="creator-select" class="form-control mode" onchange="addCreator('user')">
               <option class="creator-group" value="" selected disabled>Select Students</option>
               <option class="creator-group" value="7th">7th Graders</option>
               <option class="creator-group" value="8th">8th Graders</option>
@@ -80,9 +85,9 @@
 
           <!-- <input id="creators" class="form-control" autocomplete="off" name="creators" type="text" aria-describedby="basic-addon2" value = "<%=creatornames.join(', ')%>" placeholder="Creators" required/> -->
 
-          <div class="form-group">
+          <div class="form-group mode">
             <label for="new-project-description" id="description-label">Description</label>
-            <textarea id="new-project-description" minlength="50" rows="6" name="text" placeholder="Write a little about the project" class="form-control" aria-label="With textarea" required><%=project.text%></textarea>
+            <textarea id="new-project-description" minlength="50" rows="6" name="text" placeholder="Write a little about the project" class="form-control mode" aria-label="With textarea" required><%=project.text%></textarea>
           </div>
 
           <div id="image-header">

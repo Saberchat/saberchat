@@ -15,12 +15,17 @@
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js"></script>
+    <%if (currentUser) {%>
+      <%if (currentUser.darkmode) { %>
+        <link rel="stylesheet" href="/stylesheets/projects/dark.css">
+      <%}%>
+    <%}%>
 
     <!-- I'm using my fontawesome kit -->
     <script src="https://kit.fontawesome.com/dccc745c41.js" crossorigin="anonymous"></script>
 
     </head>
-    <body>
+    <body class="mode">
       <!-- include the navbar via ejs -->
       <%- include('../partials/navbar') %>
       <!-- include the backdrop for nav -->
@@ -78,25 +83,25 @@
                 <div class="inbox-display">
 
                   <!-- messages -->
-                  <div class="message-list display">
+                  <div class="message-list display mode">
 
-                    <ul class="list-group">
+                    <ul class="list-group mode">
 
                       <% inbox.forEach((msg) => { %>
                         <% if(msg.read.includes(currentUser._id)) { %>
-                          <li class="list-group-item list-group-item-action read">
+                          <li class="list-group-item list-group-item-action read mode">
                         <% } else { %>
-                          <li class="list-group-item list-group-item-action">
+                          <li class="list-group-item list-group-item-action mode">
                         <% } %>
-                          <div class="message-check">
+                          <div class="message-check mode">
                             <input class="del-form-input" type="checkbox" name="<%= msg._id %>" value="" onchange="updateDelete()">
                           </div>
 
-                          <a href="/inbox/<%= msg._id %>" class="message-body">
-                            <div class="message-head">
+                          <a href="/inbox/<%= msg._id %>" class="message-body mode" style="color:turquoise;">
+                            <div class="message-head mode">
 
                               <% if (msg.read.includes(currentUser._id)) { %>
-                                <div class="message-from">
+                                <div class="message-from mode">
 
                                 <% } else { %>
                                   <div class="message-from unread">

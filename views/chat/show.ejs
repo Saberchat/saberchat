@@ -10,6 +10,8 @@
   <%if (currentUser) {%>
     <%if (currentUser.darkmode) { %>
       <link rel="stylesheet" href="/stylesheets/Darkmode.css">
+    <%} else {%>
+      <link rel="stylesheet" href="/stylesheets/chat/chat.css">
     <%}%>
   <%}%>
 
@@ -48,9 +50,9 @@
           <!-- Modal -->
           <div class="modal fade" id="leaveModalCenter" tabindex="-1" role="dialog" aria-labelledby="leaveModalCenterTitle" aria-hidden="true">
             <div class="modal-dialog modal-dialog-centered" role="document">
-              <div class="modal-content">
-                <div class="modal-header">
-                  <h5 class="modal-title" id="leaveModalCenterTitle"><i class="fas fa-sign-out-alt"></i> Leave <%= room.name %>?</h5>
+              <div class="modal-content mode">
+                <div class="modal-header mode">
+                  <h5 class="modal-title mode" id="leaveModalCenterTitle"><i class="fas fa-sign-out-alt"></i> Leave <%= room.name %>?</h5>
                   <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                   </button>
@@ -75,7 +77,7 @@
       <!-- Chat Box-->
       <div class="col-12 px-0">
         <button class="btn-scrolldown" onclick="scrollBottom()">Scroll To <i class="fas fa-arrow-down"></i></button>
-        <div class="px-4 chat-box bg-white" id="message-display">
+        <div class="px-4 chat-box chat" id="message-display">
           <!-- reverse it to get correct order -->
           <% comments.reverse().forEach(comment => { %>
             <% if (comment.author && comment.author._id.equals(currentUser._id)) { %>
@@ -118,9 +120,9 @@
           <% }) %>
       </div>
       <!-- Typing area -->
-      <form class="bg-light" id="message-form">
-        <div class="input-group">
-          <input id="m" type="text" placeholder="Type a message..." aria-describedby="send-button" class="form-control rounded-0 border-0 py-4 bg-light" autocomplete="off">
+      <form class="chat" id="message-form">
+        <div class="input-group chat">
+          <input id="m" type="text" placeholder="Type a message..." aria-describedby="send-button" class="form-control rounded-0 border-0 py-4 chatbar" autocomplete="off">
           <div class="input-group-append">
             <button id="send-button" class="btn btn-link"> <i class="fa fa-paper-plane send-icon"></i></button>
           </div>
