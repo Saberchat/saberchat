@@ -11,6 +11,11 @@
     <link rel="stylesheet" href="/stylesheets/components/navbar.css">
     <link rel="stylesheet" href="/stylesheets/components/header.css">
     <link rel="stylesheet" href="/stylesheets/profile/edit.css">
+    <%if (currentUser) {%>
+      <%if (currentUser.darkmode) { %>
+        <link rel="stylesheet" href="/stylesheets/Darkmode.css">
+      <%}%>
+    <%}%>
 
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
@@ -19,7 +24,7 @@
     <!-- I'm using my fontawesome kit -->
     <script src="https://kit.fontawesome.com/dccc745c41.js" crossorigin="anonymous"></script>
 </head>
-<body>
+<body class="mode">
     <!-- include the navbar via ejs -->
     <%- include('../partials/navbar') %>
     <!-- include the backdrop for nav -->
@@ -36,9 +41,9 @@
             <div class="col-md-8 offset-md-2 col-12">
                 <h4 class="mb-3">Change Email</h1>
                 <form action="/profiles/change-email?_method=put" method="post">
-                    <div class="form-group">
+                    <div class="form-group mode">
                         <label for="usernameInput">Email</label>
-                        <input id="usernameInput" class="form-control" type="text" name="email" value="<%= currentUser.email %>" placeholder="Enter New Email" required><br />
+                        <input id="usernameInput" class="form-control mode" type="text" name="email" value="<%= currentUser.email %>" placeholder="Enter New Email" required><br />
                         <input type="checkbox" name="receiving_emails" id="receiving_emails" <% if (currentUser.receiving_emails) {%> checked <%}%>/>
                         <label for="receiving_emails">Send Me Emails</label>
                     </div>
@@ -47,15 +52,15 @@
                 </form>
                 <h4 class="mt-5 mb-3">Change Password</h4>
                 <form action="/profiles/change-password?_method=put" method="post">
-                    <div class="form-group">
+                    <div class="form-group mode">
                         <label for="usernameInput">Old Password</label>
-                        <input id="usernameInput" class="form-control" type="password" name="oldPassword" placeholder="Enter Old Password" required>
+                        <input id="usernameInput" class="form-control mode" type="password" name="oldPassword" placeholder="Enter Old Password" required>
                     </div>
-                    <div class="form-group">
+                    <div class="form-group mode">
                         <label for="usernameInput">New Password</label>
-                        <input id="usernameInput" class="form-control" type="password" name="newPassword" placeholder="Enter New Password" minlength="8" required><br />
+                        <input id="usernameInput" class="form-control mode" type="password" name="newPassword" placeholder="Enter New Password" minlength="8" required><br />
                         <label for="usernameInput">Confirm New Password</label>
-                        <input id="usernameInput" class="form-control" type="password" name="newPasswordConfirm" placeholder="Confirm New Password" minlength="8" required>
+                        <input id="usernameInput" class="form-control mode" type="password" name="newPasswordConfirm" placeholder="Confirm New Password" minlength="8" required>
                     </div>
 
                     <button class="btn btn-lg btn-primary btn-block">Change Password</button>

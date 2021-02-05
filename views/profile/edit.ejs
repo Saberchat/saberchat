@@ -62,19 +62,19 @@
                             <small id="descHelp" class="form-text text-muted">Ex. Hobbies: swimming, tennis, searching for bigfoot.</small>
                         <% } %>
                     </div>
-                    <div class="form-group">
+                    <div class="form-group mode">
                         <label for="titleInput">User Title</label>
                         <% if(currentUser.title){ %>
-                            <input id="titleInput" class="form-control" type="text" name="title" value="<%= currentUser.title %>" placeholder="Enter Title" maxlength="50">
+                            <input id="titleInput" class="form-control mode" type="text" name="title" value="<%= currentUser.title %>" placeholder="Enter Title" maxlength="50">
                         <% } else { %>
-                            <input id="titleInput" class="form-control" type="text" name="title" aria-describedby="titleHelp" value="" placeholder="Enter Title" maxlength="50">
+                            <input id="titleInput" class="form-control mode" type="text" name="title" aria-describedby="titleHelp" value="" placeholder="Enter Title" maxlength="50">
                             <small id="titleHelp" class="form-text text-muted">Ex. Ninja Warrior, Guardian of Bread, Champion of the art room</small>
                         <% } %>
                     </div>
                     <div class="form-group">
                     <% if (currentUser.permission == 'admin' || currentUser.permission == 'principal') { %>
                         <label for="status">Select Status</label>
-                        <select class="form-control" id="status" name="status">
+                        <select class="form-control mode" id="status" name="status">
                           <option selected value="<%= currentUser.status %>"><%=currentUser.status%></option>
                             <% ['7th', '8th', '9th', '10th', '11th', '12th', 'alumnus', 'guest', 'parent', 'faculty'].forEach( status => { %>
                               <% if (currentUser.status.toLowerCase() != status.toLowerCase()) { %>
@@ -92,7 +92,7 @@
 
                     <% if (currentUser.permission == 'admin' || currentUser.permission == 'principal') { %>
                       <% let tagMap = new Map([["Tutor", "warning"], ["Cashier", "success"], ["Editor", "info"]]); %>
-                      <div class="form-group">
+                      <div class="form-group mode">
                         <label for="tags">Select Temporary Statuses
                           <div id="tag-group">
                             <% currentUser.tags.forEach(tag => { %>
@@ -100,7 +100,7 @@
                             <% }) %>
                           </div>
                         </label>
-                        <select class="form-control" id="<%=currentUser.id%>" name="tags" onchange="updateTag(this)">
+                        <select class="form-control mode" id="<%=currentUser.id%>" name="tags" onchange="updateTag(this)">
                           <option value=""></option>
                           <% ['Cashier', 'Tutor', 'Editor'].forEach(tag => { %>
                             <option>
@@ -111,19 +111,19 @@
                           <br />
                       </div>
                     <% } %>
-                    <div class="form-group">
+                    <div class="form-group mode">
                       <label for="profile-input">Profile Image URL</label><br />
                         <!-- <input type="file" id="imageInput" accept="image/*" name="image" required> -->
                         <div id="profile-image-update">
-                          <input id="profile-input" oninput="updateImage(this)" class="form-control" type="text" name="imageUrl" value="<%= currentUser.imageUrl %>" placeholder="Enter Image Url">
+                          <input id="profile-input" oninput="updateImage(this)" class="form-control mode" type="text" name="imageUrl" value="<%= currentUser.imageUrl %>" placeholder="Enter Image Url">
                           <br />
                           <img id="profile-image" src="<%=currentUser.imageUrl %>" alt="Image Does Not Exist"/>
                         </div>
                     </div>
-                    <div class="form-group">
+                    <div class="form-group mode">
                         <label for="banner-input">Banner Image Url</label><br />
                         <!-- <input type="file" id="bannerInput" accept="image/*" name="banner" required> -->
-                        <input id="banner-input" class="form-control" oninput="updateImage(this)" type="text" name="bannerUrl" value="<%= currentUser.bannerUrl %>" placeholder="Enter Banner Url">
+                        <input id="banner-input" class="form-control mode" oninput="updateImage(this)" type="text" name="bannerUrl" value="<%= currentUser.bannerUrl %>" placeholder="Enter Banner Url">
                         <br />
                         <img id="banner-image" src="<%=currentUser.bannerUrl %>" alt="Image Does Not Exist"/>
                     </div>
