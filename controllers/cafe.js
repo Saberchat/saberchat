@@ -299,7 +299,7 @@ module.exports.deleteOrder = async function(req, res) {
         if (!cafes[0].open) {
             return res.json({error: 'The cafe is currently not taking orders'});
         }
-        
+
         const order = await Order.findById(req.params.id);
         if (!order) {
             return res.json({error: 'Could not find order'});
