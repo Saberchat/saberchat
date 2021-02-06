@@ -52,32 +52,7 @@
     <div class="row">
         <div class="col-12">
 
-            <% let tempTypes = types; %>
-
-            <% for (let type of tempTypes) { %>
-                <% for (let i = type.items.length - 1; i >= 0; i -= 1) { %>
-                    <% if (!type.items[i].isAvailable) { %>
-                        <% type.items.splice(i, 1); %>
-                    <% } %>
-                <% } %>
-            <% } %>
-
-            <% let temp; %>
-
-            <% for (let type of tempTypes) { %>
-                <% for (let i = 0; i < type.items.length - 1; i++) { %>
-                    <% for (let j = 0; j < type.items.length - 1; j++) { %>
-                        <% if (type.items[j].upvotes.length < type.items[j + 1].upvotes.length) { %>
-                            <% temp = type.items[j]; %>
-                            <% type.items[j] = type.items[j + 1]; %>
-                            <% type.items[j + 1] = temp; %>
-                        <% } %>
-                    <% } %>
-                <% } %>
-            <% } %>
-
-            <% tempTypes.forEach(type => { %>
-                <% if (type.items.length > 0) { %>
+            <% types.forEach(type => { %>
 
                     <li class="list-group-item list-group-item-success category-header cafe"
                         id="<%= type._id %>-header">
@@ -90,8 +65,16 @@
                     <% type.items.forEach(item => { %>
 
                         <% if (item.isAvailable) { %>
-                            <span class="list-group-item list-group-item-action menu-item <%= type.name.split(' ').join('') %>  cafe"
-                                  id="item-<%= item.id %>">
+                            <% if (frequentItems.toString().includes(item._id.toString())) { %>
+                                <span class="list-group-item list-group-item-info menu-item <%= type.name.split(' ').join('') %>  cafe"
+                                      id="item-<%= item.id %>">
+
+                            <% } else { %>
+                                <span class="list-group-item list-group-item-action menu-item <%= type.name.split(' ').join('') %>  cafe"
+                                      id="item-<%= item.id %>">
+                            <% } %>
+
+
                                   <span class="item-name"><%= item.name %> (<%= item.availableItems %> orders available)</span>
                                   - $<%= `${(item.price * 100).toString().slice(0, (item.price * 100).toString().length - 2)}.${(item.price * 100).toString().slice((item.price * 100).toString().length - 2)}` %>
 
@@ -107,18 +90,19 @@
                                     <% } %>
 
                                     <span id="upvoteCount-<%= item._id %>"> <%= item.upvotes.length %></span>
-                  </div>
+                                </div>
+
+                                <% if (frequentItems.toString().includes(item._id.toString())) { %>
+                                    <span class="popular">Frequently Ordered</span>
+                                <% } %>
 
                   <br/><em class="item-description convertible-text"><%= itemDescriptions[item._id.toString()] %></em><br/>
                   <img src="<%= item.imgUrl %>" class="item-image"/>
 
                 </span>
-
                         <% } %>
                     <% }) %>
                     <br class="category-break" id="<%= type._id %>-break"/>
-                <% } %>
-
             <% }) %>
             <br/>
         </div>

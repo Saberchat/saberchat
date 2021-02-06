@@ -23,6 +23,56 @@ const getData = require("../utils/cafe-data");
 //SHOW CAFE HOMEPAGE
 module.exports.index = async function(req, res) {
     try {
+        const types = await Type.find({}).populate('items');
+        if (!types) {
+            req.flash('error', "Unable to find categories");
+            return res.redirect('back');
+        }
+
+        const allOrders = await Order.find({customer: req.user._id}).populate('items.item'); //Find all of the orders that you have ordered, and populate info on their items
+        if (!allOrders) {
+            req.flash('error', "Unable to find orders");
+            return res.redirect('back');
+        }
+
+        let sortedTypes = [];
+        let sortedType;
+        for (let type of types) {
+            if (type.items.length > 0) {
+                sortedType = type;
+                sortedType.items = sortByPopularity(type.items, "upvotes", "created_at").popular.concat(sortByPopularity(type.items, "upvotes", "created_at").unpopular);
+                for (let i = sortedType.items.length-1; i > 0; i--) {
+                    if (!sortedType.items[i].isAvailable) {
+                        sortedType.items.splice(i, 1);
+                    }
+                }
+                sortedTypes.push(sortedType);
+            }
+        }
+
+        let orderedItems = []; //Array of ordered item objects to sort by popularity
+        let overlap = false;
+        for (let order of allOrders) {
+            for (let item of order.items) {
+                overlap = false;
+                for (let itemObject of orderedItems) {
+                    if (itemObject.item.equals(item.item._id)) {
+                        itemObject.totalOrdered += item.quantity;
+                        overlap = true;
+                        break;
+                    }
+                }
+                if (!overlap) {
+                    orderedItems.push({
+                        item: item.item._id,
+                        totalOrdered: item.quantity,
+                        created_at: item.item.created_at
+                    });
+                }
+            }
+        }
+        const frequentItems = sortByPopularity(orderedItems, "totalOrdered", "created_at", ["item"]).popular;
+
         if (req.query.order) { //SHOW NEW ORDER FORM
             const sentOrders = await Order.find({name: `${req.user.firstName} ${req.user.lastName}`, present: true}); //Find all of this user's orders that are currently active
             if (!sentOrders) {
@@ -34,42 +84,7 @@ module.exports.index = async function(req, res) {
                 return res.redirect('back');
             }
 
-            const types = await Type.find({}).populate('items');
-            if (!types) {
-                req.flash('error', "Unable to find categories");
-                return res.redirect('back');
-            }
-
-            const allOrders = await Order.find({customer: req.user._id}).populate('items.item'); //Find all of the orders that you have ordered, and populate info on their items
-            if (!allOrders) {
-                req.flash('error', "Unable to find orders");
-                return res.redirect('back');
-            }
-
-            let orderedItems = []; //Array of ordered item objects to sort by popularity
-            let overlap = false;
-            for (let order of allOrders) {
-                for (let item of order.items) {
-                    overlap = false;
-                    for (let itemObject of orderedItems) {
-                        if (itemObject.item.equals(item.item._id)) {
-                            itemObject.totalOrdered += item.quantity;
-                            overlap = true;
-                            break;
-                        }
-                    }
-                    if (!overlap) {
-                        orderedItems.push({
-                            item: item.item._id,
-                            totalOrdered: item.quantity,
-                            created_at: item.item.created_at
-                        });
-                    }
-                }
-            }
-
-            const frequentItems = sortByPopularity(orderedItems, "totalOrdered", "created_at", ["item"]).popular;
-            return res.render('cafe/newOrder', {types, frequentItems});
+            return res.render('cafe/newOrder', {types: sortedTypes, frequentItems});
         }
 
         if (req.query.menu) { //SHOW MENU
@@ -84,15 +99,9 @@ module.exports.index = async function(req, res) {
                     itemDescriptions[item._id] = convertToLink(item.description);
                 }
             }
-            return res.render('cafe/menu', {types, itemDescriptions});
+            return res.render('cafe/menu', {types: sortedTypes, itemDescriptions, frequentItems});
         }
-
-        const orders = await Order.find({customer: req.user._id}).populate('items.item'); //Find all of the orders that you have ordered, and populate info on their items
-        if (!orders) {
-            req.flash('error', "Could not find your orders");
-            return res.redirect('back');
-        }
-        return res.render('cafe/index', {orders});
+        return res.render('cafe/index', {orders: allOrders});
 
     } catch (err) {
         req.flash('error', "Could not find your orders");
@@ -223,7 +232,7 @@ module.exports.processOrder = async function(req, res) {
 module.exports.deleteOrder = async function(req, res) {
     try {
         if (req.body.rejectionReason) {
-            if (!req.user.tags.toString().toLowerCase().includes("cashier")) {
+            if (!req.user.tags.includes("Cashier")) {
                 req.flash('error', 'You do not have permission to do that');
                 return res.redirect('back');
             }
@@ -435,7 +444,7 @@ module.exports.viewItem = async function(req, res) {
 module.exports.updateItem = async function(req, res) {
     try {
         if (req.body.name) {
-            if (!req.user.tags.toString().toLowerCase().includes("cashier")) {
+            if (!req.user.tags.includes("Cashier")) {
                 req.flash('error', 'You do not have permission to do that');
                 return res.redirect('back');
             }

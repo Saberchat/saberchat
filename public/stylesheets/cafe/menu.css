@@ -69,3 +69,9 @@ strong {
 .item-name {
     font-weight: bold;
 }
+
+.popular {
+    float: right;
+    color: green;
+    font-weight: bold;
+}
