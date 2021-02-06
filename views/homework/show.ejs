@@ -185,9 +185,7 @@
                             </a>
                             <% if (course.teacher._id.equals(currentUser._id)) { %>
                                 <button class="btn btn-danger leave-button" id="remove-button-<%= tutor.tutor._id %>"
-                                        data-toggle="modal" data-target="#modal-index-remove-<%= tutor.tutor._id %>">
-                                    Remove
-                                    Tutor
+                                    data-toggle="modal" data-target="#modal-index-remove-<%= tutor.tutor._id %>">Remove Tutor
                                 </button>
                             <% } %>
                         </li>
@@ -198,8 +196,7 @@
                                 <div class="modal-content">
                                     <div class="modal-header">
                                         <h5 class="modal-title" id="exampleModalLabel">
-                                            Remove <%= tutor.tutor.firstName %> <%= tutor.tutor.lastName %> From Your
-                                            Course?</h5>
+                                            Remove <%= tutor.tutor.firstName %> <%= tutor.tutor.lastName %> From Your Course?</h5>
                                         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                                             <span aria-hidden="true">&times;</span>
                                         </button>
@@ -250,9 +247,7 @@
                                     <% if (tutor.students.includes(currentUser._id) || tutor.formerStudents.includes(currentUser._id)) { %>
                                         <button class="btn btn-warning review-button"
                                                 id="review-button-<%= tutor.tutor._id %>"
-                                                data-toggle="modal" data-target="#modal-review-<%= tutor.tutor._id %>">
-                                            Leave A
-                                            Review
+                                                data-toggle="modal" data-target="#modal-review-<%= tutor.tutor._id %>">Leave A Review
                                         </button>
                                         <% if (tutor.students.includes(currentUser._id)) { %>
                                             <button class="btn btn-danger leave-button"
@@ -272,8 +267,7 @@
                                                 <button class="btn btn-info book-button"
                                                         id="book-button-<%= tutor.tutor._id %>"
                                                         data-toggle="modal"
-                                                        data-target="#modal-book-<%= tutor.tutor._id %>">Book This
-                                                    Tutor
+                                                        data-target="#modal-book-<%= tutor.tutor._id %>">Book This Tutor
                                                 </button>
                                             <% } else { %>
                                                 <span class="unavailable-tutor">Tutor Is Unavailable</span>
@@ -284,8 +278,7 @@
                                             <button class="btn btn-info book-button"
                                                     id="book-button-<%= tutor.tutor._id %>"
                                                     data-toggle="modal"
-                                                    data-target="#modal-book-<%= tutor.tutor._id %>">Book This
-                                                Tutor
+                                                    data-target="#modal-book-<%= tutor.tutor._id %>">Book This Tutor
                                             </button>
                                         <% } else { %>
                                             <span class="unavailable-tutor">Tutor Is Unavailable</span>
@@ -296,8 +289,7 @@
                                 <div id="tutor-actions-<%= tutor.tutor._id %>" class="tutor-actions">
                                     <button class="btn btn-danger leave-button"
                                             id="remove-button-<%= tutor.tutor._id %>"
-                                            data-toggle="modal" data-target="#modal-remove-<%= tutor.tutor._id %>">
-                                        Remove Tutor
+                                            data-toggle="modal" data-target="#modal-remove-<%= tutor.tutor._id %>">Remove Tutor
                                     </button>
                                 </div>
                             <% } %>
@@ -314,15 +306,9 @@
                             </div>
 
                             <div title="Ratings" class="ratings">
-                                <% let averageRating = 0; %>
-                                <% for (let review of tutor.reviews) { %>
-                                    <% averageRating += review.rating; %>
-                                <% } %>
-                                <% averageRating = Math.round(averageRating / tutor.reviews.length); %>
-
                                 <% for (let i = 0; i < 5; i += 1) { %>
-                                    <i id="<%= i + 1 %>"
-                                    <% if (i + 1 <= averageRating) { %>
+                                    <i id="<%=i+1%>"
+                                    <% if (i + 1 <= tutorRatings.get(tutor._id.toString())) { %>
                                        class="fas fa-star average-rating-<%= tutor.tutor._id %> average-rating-selected"
                                     <% } else { %>
                                        class="fas fa-star average-rating-<%= tutor.tutor._id %>"
@@ -721,7 +707,6 @@
                                     </div>
                                 </div>
                             </div>
-
                         <% } %>
                     </ul>
                     <br/>

@@ -1,4 +1,4 @@
-//Cafe routes control the creation of orders, management of the cafe, and the creation an modification of items and items types
+//Cafe routes control the creation of orders, management of the cafe, and the creation an modification of items and item categories
 
 const express = require('express');
 const middleware = require('../middleware');

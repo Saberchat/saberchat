@@ -62,20 +62,6 @@
                        title="Type in itemname"/>
             </div>
 
-            <% let temp; %>
-
-            <% for (let type of types) { %>
-                <% for (let i = 0; i < type.items.length - 1; i++) { %>
-                    <% for (let j = 0; j < type.items.length - 1; j++) { %>
-                        <% if (type.items[j].upvotes.length < type.items[j + 1].upvotes.length) { %>
-                            <% temp = type.items[j]; %>
-                            <% type.items[j] = type.items[j + 1]; %>
-                            <% type.items[j + 1] = temp; %>
-                        <% } %>
-                    <% } %>
-                <% } %>
-            <% } %>
-
             <% types.forEach(type => { %>
                 <% if (type.items.length > 0) { %>
                     <li class="list-group-item list-group-item-success category-header" id="<%= type._id %>-header">

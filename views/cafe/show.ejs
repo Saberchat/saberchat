@@ -54,19 +54,9 @@
                                 <div class="input-group-prepend">
                                     <div class="input-group-text">$</div>
                                 </div>
-
-                                <% if (!item.price.toString().includes('.')) { %>
-                                    <input id="priceInput" class="form-control" type="text" name="price"
-                                           placeholder="price" value="<%= item.price %>.00" maxlength="10" required>
-
-                                <% } else if (item.price.toString().split('.')[1].length == 1){ %>
-                                    <input id="priceInput" class="form-control" type="text" name="price"
-                                           placeholder="price" value="<%= item.price %>0" maxlength="10" required>
-
-                                <% } else { %>
-                                    <input id="priceInput" class="form-control" type="text" name="price"
-                                           placeholder="price" value="<%= item.price %>" maxlength="10" required>
-                                <% } %>
+                                <input id="priceInput" class="form-control" type="text" name="price"
+                                       placeholder="price" value="<%= `${(item.price * 100).toString().slice(0, (item.price * 100).toString().length - 2)}.${(item.price * 100).toString().slice((item.price * 100).toString().length - 2)}` %>"
+                                       maxlength="10" required>
 
                             </div>
                         </div>

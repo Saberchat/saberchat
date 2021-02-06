@@ -609,20 +609,35 @@ module.exports.manage = async function(req, res) {
             return res.render('cafe/orderDisplay', {orders});
         }
 
-        // if (req.query.data) { //If page calls to display data
-        //     const data = await getData();
-        //     if (!data) {
-        //         req.flash("error", "An Error Occurred");
-        //         return res.redirect("back")
-        //     }
-        //
-        //     return res.render("cafe/data", data);
-        // }
+        if (req.query.data) { //If page calls to display data, commented out for now
+            const data = await getData();
+            if (!data) {
+                req.flash("error", "An Error Occurred");
+                return res.redirect("back")
+            }
+
+            return res.render("cafe/data", data);
+        }
 
         const types = await Type.find({}).populate('items'); //Collect info on all the item types
         if (!types) {
             req.flash('error', 'An Error Occurred');
             return res.redirect('back');
+        }
+
+        let sortedTypes = [];
+        let sortedType;
+        for (let type of types) {
+            if (type.items.length > 0) {
+                sortedType = type;
+                sortedType.items = sortByPopularity(type.items, "upvotes", "created_at").popular.concat(sortByPopularity(type.items, "upvotes", "created_at").unpopular);
+                for (let i = sortedType.items.length-1; i > 0; i--) {
+                    if (!sortedType.items[i].isAvailable) {
+                        sortedType.items.splice(i, 1);
+                    }
+                }
+                sortedTypes.push(sortedType);
+            }
         }
 
         const cafes = await Cafe.find({});
@@ -631,7 +646,7 @@ module.exports.manage = async function(req, res) {
             return res.redirect('back');
         }
 
-        return res.render('cafe/manage', {types, open: cafes[0].open});
+        return res.render('cafe/manage', {types: sortedTypes, open: cafes[0].open});
 
     } catch (err) {
         console.log(err);

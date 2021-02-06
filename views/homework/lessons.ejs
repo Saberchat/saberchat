@@ -35,15 +35,6 @@
 <!-- include the navbar via ejs -->
 <%- include('../partials/navbar') %>
 
-<% let lessonCount = 0; %>
-<% let timeCount = 0; %>
-<% for (let lesson of tutor.lessons) { %>
-    <% if (lesson.student.equals(student._id)) { %>
-        <% lessonCount += 1; %>
-        <% timeCount += lesson.time; %>
-    <% } %>
-<% } %>
-
 <div id="banner" style="background-image: url('<%= tutor.tutor.bannerUrl %>');"></div>
 
 <div class="container mb-5 tutor-info">
@@ -56,27 +47,25 @@
 </div>
 
 <div class="container mt-5">
-    <% if (lessonCount > 0) { %>
+    <% if (lessons.length > 0) { %>
         <ul id="lesson-info-<%= student._id %>" class="list-group">
             <li class="list-group-item list-group-item-success status-header">
                 <div class="d-flex w-100 justify-content-between">
-                    <h2 class="mb-1">Lessons (<%= lessonCount %>)</h2>
+                    <h2 class="mb-1">Lessons (<%= lessons.length %>)</h2>
 
                     <p id="time-count">
-                        <%= timeCount %> minutes
+                        <%=time%> minutes
                     </p>
                 </div>
             </li>
 
-            <% for (let lesson of tutor.lessons.reverse()) { %>
-                <% if (lesson.student.equals(student._id)) { %>
-                    <li class="list-group-item list-group-item-action tutor-profile menu-item">
-                        <span class="lesson-info"><%= lesson.date %> | <%= lesson.time %> minute(s)</span><br/>
-                        <p>
-                            <%= lesson.summary %>
-                        </p>
-                    </li>
-                <% } %>
+            <% for (let lesson of lessons) { %>
+                <li class="list-group-item list-group-item-action tutor-profile menu-item">
+                    <span class="lesson-info"><%= lesson.date %> | <%= lesson.time %> minute(s)</span><br/>
+                    <p>
+                        <%= lesson.summary %>
+                    </p>
+                </li>
             <% } %>
         </ul>
     <% } else { %>

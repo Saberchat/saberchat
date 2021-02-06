@@ -50,27 +50,19 @@
                 <hr>
             </div>
             <div class="profile-body">
-
-                      <span>
-                          <% let averageRating = 0; %>
-                          <% for (let review of tutor.reviews) { %>
-                              <% averageRating += review.rating; %>
-                          <% } %>
-                          <% averageRating = Math.round(averageRating / tutor.reviews.length); %>
-
-                          <% for (let i = 0; i < 5; i += 1) { %>
-                              <i id="<%= i + 1 %>"
-                              <% if (i + 1 <= averageRating) { %>
-                                 class="fas fa-star average-rating-<%= tutor.tutor._id %> average-rating-selected"
-                              <% } else { %>
-                                 class="fas fa-star average-rating-<%= tutor.tutor._id %>"
-                                      <% } %>
-                              ></i>
-                          <% } %>
-                      </span>
-
-                <br/>
-                <span id="upvote-<%= course._id %>-<%= tutor.tutor._id %>" onclick="upvote(this)"><span
+              <span>
+                  <% for (let i = 0; i < 5; i += 1) { %>
+                      <i id="<%= i + 1 %>"
+                      <% if (i + 1 <= averageRating) { %>
+                         class="fas fa-star average-rating-<%= tutor.tutor._id %> average-rating-selected"
+                      <% } else { %>
+                         class="fas fa-star average-rating-<%= tutor.tutor._id %>"
+                              <% } %>
+                      ></i>
+                  <% } %>
+              </span>
+              <br/>
+              <span id="upvote-<%= course._id %>-<%= tutor.tutor._id %>" onclick="upvote(this)"><span
                     <% if (tutor.upvotes.includes(currentUser._id)) { %>
                         class="upvoted"><i class="fas fa-arrow-circle-up"></i>
                     <% } else { %>
@@ -455,13 +447,6 @@
                                 <span class="<%= student.permission %> <%= student.status %> <%= student.tags.join(' ') %> student-block"><span
                                             class="span-tag-name"><%= student.firstName %> <%= student.lastName %></span> <span
                                             class="span-tag-username"><%= student.username %></span></span>
-
-                                <% let lessonCount = 0; %>
-                                <% for (let lesson of tutor.lessons) { %>
-                                    <% if (lesson.student.equals(student._id)) { %>
-                                        <% lessonCount += 1; %>
-                                    <% } %>
-                                <% } %>
                             </a>
                             <% if (tutor.tutor._id.equals(currentUser._id) || student._id.equals(currentUser._id) || course.teacher._id.equals(currentUser._id)) { %>
                                 <a class="btn btn-info lesson-button"
@@ -478,7 +463,7 @@
 
                             <% if (tutor.tutor._id.equals(currentUser._id) || student._id.equals(currentUser._id) || course.teacher._id.equals(currentUser._id)) { %>
                                 <span class="lessons-length">
-                                    <span id="lessons-length-<%= student._id %>"><%= lessonCount %></span>
+                                    <span id="lessons-length-<%= student._id %>"><%= lessons.get(student._id.toString())[0].length%></span>
                                 lesson(s)</span>
                             <% } %>
                         </div>
@@ -538,13 +523,6 @@
                                 <span class="<%= student.permission %> <%= student.status %> <%= student.tags.join(' ') %> student-block"><span
                                             class="span-tag-name"><%= student.firstName %> <%= student.lastName %></span> <span
                                             class="span-tag-username"><%= student.username %></span></span>
-
-                                <% let lessonCount = 0; %>
-                                <% for (let lesson of tutor.lessons) { %>
-                                    <% if (lesson.student.equals(student._id)) { %>
-                                        <% lessonCount += 1; %>
-                                    <% } %>
-                                <% } %>
                             </a>
                             <% if (tutor.tutor._id.equals(currentUser._id) || course.teacher._id.equals(currentUser._id)) { %>
                                 <a class="btn btn-info lesson-button"
@@ -554,7 +532,7 @@
 
                             <% if (tutor.tutor._id.equals(currentUser._id) || student._id.equals(currentUser._id) || course.teacher._id.equals(currentUser._id)) { %>
                                 <span class="lessons-length"><span
-                                            id="lessons-length-<%= student._id %>"><%= lessonCount %></span> lesson(s)</span>
+                                            id="lessons-length-<%= student._id %>"><%= lessons.get(student._id.toString())[0].length %></span> lesson(s)</span>
                             <% } %>
                         </div>
 

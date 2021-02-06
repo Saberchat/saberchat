@@ -121,8 +121,7 @@ const getData = async function() {
     }
 
     let formattedTimes = sortTimes(getHours(times).finalTimesUnformatted, getHours(times).finalTimes).formattedTimes;
-    let unformattedTimes = sortTimes(getHours(times).finalTimesUnformatted, getHours(times).finalTimes).times;
-    let timeStats = getStats(unformattedTimes);
+    let timeStats = getStats(sortTimes(getHours(times).finalTimesUnformatted, getHours(times).finalTimes).times);
 
     return {
         items, popularCustomers, longestOrderCustomers,

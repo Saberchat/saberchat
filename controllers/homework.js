@@ -141,12 +141,20 @@ module.exports.showCourse = async function(req, res) {
 
         let studentIds = []; //Collect info on the ids of all students and tutors in the course
         let tutorIds = [];
+        let tutorRatings = new Map();
         for (let student of course.students) {
             studentIds.push(student._id.toString());
         }
 
+        let averageRating = 0;
         for (let tutor of course.tutors) {
+            averageRating = 0;
             tutorIds.push(tutor.tutor._id.toString());
+            for (let review of tutor.reviews) {
+                averageRating += review.rating;
+            }
+            averageRating = Math.round(averageRating / tutor.reviews.length);
+            tutorRatings.set(tutor._id.toString(), averageRating);
         }
 
         const teachers = await User.find({authenticated: true, status: "faculty", _id: {$ne: req.user._id}});
@@ -155,7 +163,7 @@ module.exports.showCourse = async function(req, res) {
             return res.redirect('back');
         }
 
-        return res.render('homework/show', {course, studentIds, tutorIds, teachers});
+        return res.render('homework/show', {course, studentIds, tutorIds, tutorRatings, teachers});
 
     } catch (err) {
         req.flash('error', "Unable to find course");
@@ -995,10 +1003,31 @@ module.exports.showTutor = async function(req, res) {
                     }
                 }
 
+                let averageRating = 0;
+                for (let review of tutor.reviews) {
+                    averageRating += review.rating;
+                }
+                averageRating = Math.round(averageRating / tutor.reviews.length);
+
                 const students = await User.find({authenticated: true, _id: {$in: tutor.students}});
                 if (!students) {
                     req.flash('error', "Unable to find students");
                     return res.redirect('back');
+                }
+
+                let lessonMap = new Map();
+                let lessons = [];
+                let time = 0;
+                for (let student of tutor.students.concat(tutor.formerStudents)) {
+                    lessons = [];
+                    time = 0;
+                    for (let lesson of tutor.lessons) {
+                        if (lesson.student.equals(student._id)) {
+                            lessons.push(lesson);
+                            time += lesson.time;
+                        }
+                    }
+                    lessonMap.set(student._id.toString(), [lessons, time]);
                 }
 
                 if (req.query.studentId) {
@@ -1009,7 +1038,7 @@ module.exports.showTutor = async function(req, res) {
                     }
 
                     if (student._id.equals(req.user._id) || tutor.tutor._id.equals(req.user._id) || course.teacher._id.equals(req.user._id)) {
-                        return res.render('homework/lessons', {course, tutor, student});
+                        return res.render('homework/lessons', {course, tutor, student, lessons: lessonMap.get(student._id.toString())[0].reverse(), time: lessonMap.get(student._id.toString())[1]});
                     } else {
                         req.flash('error', "You do not have permission to view that student");
                         return res.redirect('back');
@@ -1021,13 +1050,14 @@ module.exports.showTutor = async function(req, res) {
                     tutor,
                     students,
                     studentIds,
+                    averageRating,
+                    lessons: lessonMap,
                     courses: enrolledCourses
                 });
             }
         }
 
     } catch (err) {
-        console.log(err);
         req.flash('error', "An error occurred");
         res.redirect('back');
     }

@@ -1,3 +1,5 @@
+//Homework routes control the creation and management of courses, as well as tutors-student relations
+
 const express = require('express');
 const middleware = require('../middleware');
 const router = express.Router(); //start express router
