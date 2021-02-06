@@ -144,7 +144,7 @@
                       <button id="following-button" class="btn btn-secondary" onclick="changeFollowerTab(this)"><%=following.length%> Following</button>
                     </div>
                   </div>
-                  <div class="desc-body cafe">
+                  <div class="desc-body mode">
 
                       <div id="followers-list">
                         <div class="search-bar-container search">
@@ -154,17 +154,17 @@
                         <% for (let follower of user.followers) { %>
                           <span id="follower-<%=follower._id%>" class="follower-block">
 
-                            <a href="../profiles/<%=follower._id%>" class="follower-link">
+                            <a href="../profiles/<%=follower._id%>" class="follower-link mode">
                               <img class="follower-image" src="<%= follower.imageUrl %>" alt="profile picture">
-                              <span class="follower-name"><%=follower.firstName%> <%=follower.lastName%></span> <%=follower.username%>
+                              <span class="follower-name mode"><%=follower.firstName%> <%=follower.lastName%></span> <%=follower.username%>
                             </a>
 
                             <% if (currentUser._id.equals(user._id)) { %>
                               <button type="button" class="btn btn-warning remove-follower" data-toggle="modal" data-target="#modal-<%=follower._id%>-remove">Remove</button>
                               <div class="modal fade" id="modal-<%=follower._id%>-remove" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
-                                <div class="modal-dialog">
-                                  <div class="modal-content">
-                                    <div class="modal-header">
+                                <div class="modal-dialog mode">
+                                  <div class="modal-content mode">
+                                    <div class="modal-header mode">
                                       <h5 class="modal-title" id="exampleModalLabel">Remove <%=follower.firstName%> <%=follower.lastName%>?</h5>
                                       <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                                         <span aria-hidden="true">&times;</span>
@@ -187,14 +187,14 @@
                       </div>
 
                       <div id="following-list" hidden>
-                        <div class="search-bar-container">
-                          <input id="search-bar-following" type="text" placeholder="&#x1F50D; Search following" oninput="searchFunctionFollowing()"/>
+                        <div class="search-bar-container search">
+                          <input class="mode" id="search-bar-following" type="text" placeholder="&#x1F50D; Search following" oninput="searchFunctionFollowing()"/>
                         </div>
 
                         <% for (let f of following) { %>
                           <span id="following-<%=f._id%>" class="following-block">
 
-                            <a href="../profiles/<%=f._id%>" class="following-link">
+                            <a href="../profiles/<%=f._id%>" class="following-link mode">
                               <img class="follower-image" src="<%= f.imageUrl %>" alt="profile picture">
                               <span class="follower-name"><%=f.firstName%> <%=f.lastName%></span> <%=f.username%>
                             </a>
@@ -202,9 +202,9 @@
                             <% if (currentUser._id.equals(user._id)) { %>
                               <button type="button" class="btn btn-danger block-following" data-toggle="modal" data-target="#modal-<%=f._id%>-unfollow">Unfollow</button>
                               <div class="modal fade" id="modal-<%=f._id%>-unfollow" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
-                                <div class="modal-dialog">
-                                  <div class="modal-content">
-                                    <div class="modal-header">
+                                <div class="modal-dialog mode">
+                                  <div class="modal-content mode">
+                                    <div class="modal-header mode">
                                       <h5 class="modal-title" id="exampleModalLabel">Unfollow <%=f.firstName%> <%=f.lastName%>?</h5>
                                       <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                                         <span aria-hidden="true">&times;</span>
