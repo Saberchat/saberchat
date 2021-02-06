@@ -1027,7 +1027,6 @@ module.exports.showTutor = async function(req, res) {
         }
 
     } catch (err) {
-        console.log(err);
         req.flash('error', "An error occurred");
         res.redirect('back');
     }
