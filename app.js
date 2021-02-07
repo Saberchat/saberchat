@@ -27,6 +27,8 @@ const mongoSanitize = require('express-mongo-sanitize');
 
 const {scriptUrls, styleUrls} = require('./srcUrls');
 
+const wrapAsync = require('./utils/wrapAsync');
+
 //pretty up the console
 // const colors = require('colors');
 // add favicon

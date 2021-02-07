@@ -7,55 +7,51 @@ const filter = new Filter();
 const {transport, transport_mandatory} = require("../utils/transport");
 const convertToLink = require("../utils/convert-to-link");
 const { validateMsg } = require('../middleware/validation');
+const wrapAsync = require('../utils/wrapAsync');
 
 const User = require('../models/user');
 const Message = require('../models/message');
 const AccessReq = require('../models/accessRequest');
 const Room = require('../models/room');
+const user = require('../models/user');
 
 //Route to display user inbox
-router.get('/', middleware.isLoggedIn, (req, res) => {
-	(async () => {
-
-		await req.user.populate({path: 'inbox', populate: { path: 'sender', select: ['username', 'imageUrl']}}).execPopulate();
-
-		await req.user.populate(
-			{
-				path: 'requests',
-				populate: [
-					{ path: 'requester', select: ['username', 'imageUrl']},
-					{ path: 'room', select: 'name'}
-				]
-			}).execPopulate();
-
-		let activeRequests = [];
-		for (let request of req.user.requests) {
-			if (request.status == "pending") {
-				activeRequests.push(request);
+router.get('/', middleware.isLoggedIn, wrapAsync(async (req, res) => {
+	await req.user.populate(
+		{
+			path: 'inbox', 
+			populate: { 
+				path: 'sender', 
+				select: ['username', 'imageUrl']
 			}
+		}).execPopulate();
+
+	await req.user.populate(
+		{
+			path: 'requests',
+			populate: [
+				{ path: 'requester', select: ['username', 'imageUrl']},
+				{ path: 'room', select: 'name'}
+			]
+		}).execPopulate();
+
+	let activeRequests = [];
+	for (let request of req.user.requests) {
+		if (request.status == "pending") {
+			activeRequests.push(request);
 		}
+	}
 
-		res.render('inbox/index', {inbox: req.user.inbox.reverse(), requests: req.user.requests.reverse(), activeRequests});
-
-	})().catch(err => {
-		req.flash('error', 'An error occured');
-		res.redirect('back');
-	});
-});
+	res.render('inbox/index', {inbox: req.user.inbox.reverse(), requests: req.user.requests.reverse(), activeRequests});
+}));
 
 
 //Access sendNotification file
-router.get('/messages/new', middleware.isLoggedIn, (req, res) => {
-	User.find({authenticated: true}, (err, foundUsers) => {
-		if(err || !foundUsers) {
-			req.flash('error', 'Unable to access Database');
-			res.redirect('back');
-
-		} else {
-			res.render('inbox/new', {users: foundUsers});
-		}
-	});
-});
+router.get('/messages/new', middleware.isLoggedIn, wrapAsync(async (req, res) => {
+	const users = await User.find({authenticated: true});
+	if(!users) { req.flash('error', 'Unable to access Database.'); return res.redirect('back'); }
+	res.render('inbox/new', {users: users});
+}));
 
 //Route to send notification to a group of people
 router.post('/messages', middleware.isLoggedIn, validateMsg, (req, res) => {
