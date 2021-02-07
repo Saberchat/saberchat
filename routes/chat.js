@@ -82,8 +82,8 @@ router.get('/new', middleware.isLoggedIn, async (req, res) => {
 });
 
 // display chat of certain room
-router.get('/:id', middleware.isLoggedIn, middleware.checkIfMember, (req, res) => {
-    (async () => {
+router.get('/:id', middleware.isLoggedIn, middleware.checkIfMember, async (req, res) => {
+    try {
         const room = await Room.findById(req.params.id);
         if (!room) {
             req.flash('error', 'Could not find room');
@@ -105,10 +105,10 @@ router.get('/:id', middleware.isLoggedIn, middleware.checkIfMember, (req, res) =
 
         res.render('chat/show', {comments: comments, room: room});
 
-    })().catch(err => {
+    } catch (err) {
         req.flash('error', 'An error occured');
         res.redirect('/chat');
-    });
+    }
 });
 
 router.get('/:id/people', middleware.isLoggedIn, middleware.checkIfMember, async (req, res) => {
@@ -128,8 +128,8 @@ router.get('/:id/people', middleware.isLoggedIn, middleware.checkIfMember, async
 });
 
 // display edit form
-router.get('/:id/edit', middleware.isLoggedIn, middleware.checkRoomOwnership, (req, res) => {
-    (async () => {
+router.get('/:id/edit', middleware.isLoggedIn, middleware.checkRoomOwnership, async (req, res) => {
+    try {
         const room = await Room.findById(req.params.id);
 
         if (!room) {
@@ -146,15 +146,15 @@ router.get('/:id/edit', middleware.isLoggedIn, middleware.checkRoomOwnership, (r
 
         res.render('chat/edit', {users, room});
 
-    })().catch(err => {
+    } catch (err) {
         req.flash('error', "An Error Occurred");
         res.redirect('back');
-    });
+    }
 });
 
 // create new rooms
-router.post('/', middleware.isLoggedIn, validateRoom, (req, res) => {
-    (async () => {
+router.post('/', middleware.isLoggedIn, validateRoom, async (req, res) => {
+    try {
 
         const rooms = await Room.find({});
         if (!rooms) {
@@ -215,15 +215,15 @@ router.post('/', middleware.isLoggedIn, validateRoom, (req, res) => {
 
             return res.redirect('/chat/' + room._id);
         }
-    })().catch(err => {
+    } catch (err) {
         req.flash('error', 'Group could not be created');
         res.redirect('/chat/new');
-    });
+    }
 });
 
 // leave a room
-router.post('/:id/leave', middleware.isLoggedIn, middleware.checkForLeave, (req, res) => {
-    (async () => {
+router.post('/:id/leave', middleware.isLoggedIn, middleware.checkForLeave, async (req, res) => {
+    try {
         const room = await Room.findById(req.params.id);
         if (!room) {
             req.flash('error', 'Room does not exist');
@@ -257,15 +257,15 @@ router.post('/:id/leave', middleware.isLoggedIn, middleware.checkForLeave, (req,
         req.flash('success', 'You have left ' + room.name);
         res.redirect('/chat');
 
-    })().catch(err => {
+    } catch (err) {
         req.flash('Error accessing Database');
         res.redirect('back');
-    });
+    }
 });
 
 // handles access requests
-router.post('/:id/request-access', middleware.isLoggedIn, (req, res) => {
-    (async () => {
+router.post('/:id/request-access', middleware.isLoggedIn, async (req, res) => {
+    try {
         // find the room
         const foundRoom = await Room.findById(req.params.id);
         // if no found room, exit
@@ -315,13 +315,13 @@ router.post('/:id/request-access', middleware.isLoggedIn, (req, res) => {
             return res.json({success: 'Request for access sent'});
         }
 
-    })().catch(err => {
+    } catch (err) {
         req.json({error: 'Cannot access Database'});
-    });
+    }
 });
 
-router.delete('/:id/cancel-request', (req, res) => {
-    (async () => {
+router.delete('/:id/cancel-request', async (req, res) => {
+    try {
         const room = await Room.findById(req.params.id).populate("creator.id");
         if (!room) {
             return res.json({error: "Unable to find room"});
@@ -337,76 +337,84 @@ router.delete('/:id/cancel-request', (req, res) => {
 
         return res.json({success: "Successfully deleted request"});
 
-    })().catch(err => {
+    } catch (err) {
         res.json({error: "An Error Occurred"});
-    });
+    }
 });
 
 // handles reports on comments from users
-router.put('/comments/:id/report', middleware.isLoggedIn, (req, res) => {
-    Comment.findById(req.params.id)
-        .populate({path: 'room', select: 'moderate'})
-        .exec((err, comment) => {
-            if (err || !comment) {
-                res.json('Error');
-            } else if (!comment.room.moderate) {
-                res.json('Reporting Is Disabled');
-            } else if (comment.status == 'flagged') {
-                res.json('Already Reported');
-            } else if (comment.status == 'ignored') {
-                res.json('Report Ignored by Mod');
-            } else {
-                // set status to flagged
-                comment.status = 'flagged';
-                // remember who flagged it
-                comment.statusBy = req.body.user;
-                comment.save();
-                res.json('Reported');
-            }
-        });
+router.put('/comments/:id/report', middleware.isLoggedIn, async (req, res) => {
+    try {
+        const comment = await Comment.findById(req.params.id).populate({path: 'room', select: 'moderate'});
+
+        if (!comment) {
+            return res.json('Error');
+        } else if (!comment.room.moderate) {
+            return res.json('Reporting Is Disabled');
+        } else if (comment.status == 'flagged') {
+            return res.json('Already Reported');
+        } else if (comment.status == 'ignored') {
+            return res.json('Report Ignored by Mod');
+        } else {
+            // set status to flagged
+            comment.status = 'flagged';
+            // remember who flagged it
+            comment.statusBy = req.body.user;
+            comment.save();
+            return res.json('Reported');
+        }
+    } catch (err) {
+        res.json({error: "An Error Occurred"});
+    }
 });
 
 // edit room
-router.put('/:id', middleware.isLoggedIn, middleware.checkRoomOwnership, validateRoom, (req, res) => {
-    Room.findByIdAndUpdate(req.params.id, {
-        name: filter.clean(req.body.name),
-        description: filter.clean(req.body.description)
-    }, (err, room) => {
-        if (err || !room) {
+router.put('/:id', middleware.isLoggedIn, middleware.checkRoomOwnership, validateRoom, async (req, res) => {
+    try {
+        const room = await Room.findByIdAndUpdate(req.params.id, {
+            name: filter.clean(req.body.name),
+            description: filter.clean(req.body.description)
+        });
+
+        if (!room) {
             req.flash('error', 'An Error Occurred');
-            res.redirect('back');
-        } else {
-            if (req.body.type == 'true') {
-                for (const rUser in req.body.checkRemove) {
-                    let index = room.members.indexOf(rUser);
-                    room.members.splice(index, 1);
-                    index = room.confirmed.indexOf(rUser);
-                    room.confirmed.splice(index, 1);
-                }
-                for (const aUser in req.body.checkAdd) {
-                    room.members.push(aUser);
-                }
-                room.type = 'private';
-            } else {
-                room.type = 'public';
-            }
-
-            if (req.body.moderate == 'false') {
-                room.moderate = false;
-            } else {
-                room.moderate = true;
-            }
-
-            room.save();
-            req.flash('success', 'Updated your group');
-            res.redirect('/chat/' + room._id);
+            return res.redirect('back');
         }
-    });
+
+        if (req.body.type == 'true') {
+            for (const rUser in req.body.checkRemove) {
+                let index = room.members.indexOf(rUser);
+                room.members.splice(index, 1);
+                index = room.confirmed.indexOf(rUser);
+                room.confirmed.splice(index, 1);
+            }
+            for (const aUser in req.body.checkAdd) {
+                room.members.push(aUser);
+            }
+            room.type = 'private';
+        } else {
+            room.type = 'public';
+        }
+
+        if (req.body.moderate == 'false') {
+            room.moderate = false;
+        } else {
+            room.moderate = true;
+        }
+
+        room.save();
+        req.flash('success', 'Updated your group');
+        return res.redirect('/chat/' + room._id);
+
+    } catch (err) {
+        req.flash('error', 'An Error Occurred');
+        res.redirect('back');
+    }
 });
 
 // delete room
-router.delete('/:id', middleware.isLoggedIn, middleware.checkRoomOwnership, (req, res) => {
-    (async () => {
+router.delete('/:id', middleware.isLoggedIn, middleware.checkRoomOwnership, async (req, res) => {
+    try {
 
         const room = await Room.findById(req.params.id).populate("creator.id");
         if (!room) {
@@ -461,11 +469,11 @@ router.delete('/:id', middleware.isLoggedIn, middleware.checkRoomOwnership, (req
         req.flash('success', 'Deleted room');
         res.redirect('/chat');
 
-    })().catch(err => {
+    } catch (err) {
         console.log(err);
         req.flash('error', 'An error occured');
         res.redirect('back');
-    });
+    }
 });
 
 //export the router with all the routes connected
