@@ -1,11 +1,22 @@
 const changeFollowerTab = (newTab => {
   const tabMap = new Map([['followers-button', ['following-button', 'following-list']], ['following-button', ['followers-button', 'followers-list']]]);
 
-  newTab.classList.add('btn-dark');
-  newTab.classList.remove('btn-secondary');
+  if (newTab.className.includes("btn-dark")) {
+      newTab.classList.add('btn-secondary');
+      newTab.classList.remove('btn-dark');
+  } else {
+      newTab.classList.add('btn-dark');
+      newTab.classList.remove('btn-secondary');
+  }
 
-  document.getElementById(tabMap.get(newTab.id)[0]).classList.add('btn-secondary');
-  document.getElementById(tabMap.get(newTab.id)[0]).classList.remove('btn-dark');
+  if (document.getElementById(tabMap.get(newTab.id)[0]).className.includes("btn-secondary")) {
+      document.getElementById(tabMap.get(newTab.id)[0]).classList.add('btn-dark');
+      document.getElementById(tabMap.get(newTab.id)[0]).classList.remove('btn-secondary');
+
+  } else {
+      document.getElementById(tabMap.get(newTab.id)[0]).classList.add('btn-secondary');
+      document.getElementById(tabMap.get(newTab.id)[0]).classList.remove('btn-dark');  
+  }
 
   document.getElementById(tabMap.get(newTab.id)[1]).hidden = true;
   newTab.hidden = false;

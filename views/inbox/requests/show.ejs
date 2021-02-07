@@ -12,6 +12,11 @@
         <link rel="stylesheet" href="/stylesheets/components/header.css">
         <link rel="stylesheet" href="/stylesheets/inbox/show.css">
         <link rel="stylesheet" href="/stylesheets/inbox/request_show.css">
+        <%if (currentUser) {%>
+          <%if (currentUser.darkmode) { %>
+            <link rel="stylesheet" href="/stylesheets/inbox/darkinbox.css">
+          <%}%>
+        <%}%>
 
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
@@ -20,11 +25,6 @@
 
         <!-- I'm using my fontawesome kit -->
         <script src="https://kit.fontawesome.com/dccc745c41.js" crossorigin="anonymous"></script>
-        <%if (currentUser) {%>
-          <%if (currentUser.darkmode) { %>
-            <link rel="stylesheet" href="/stylesheets/inbox/darkinbox.css">
-          <%}%>
-        <%}%>
 
     </head>
     <body class="mode">

@@ -19,6 +19,11 @@
       <link rel="stylesheet" href="/stylesheets/profile/show.css">
       <link rel="stylesheet" href="/stylesheets/homework/show.css">
       <link rel="stylesheet" href="/stylesheets/homework/tutor-show.css">
+      <%if (currentUser) {%>
+        <%if (currentUser.darkmode) { %>
+          <link rel="stylesheet" href="/stylesheets/Darkmode.css">
+        <%}%>
+      <%}%>
 
       <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
       <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
@@ -31,7 +36,7 @@
       <script src="/javascript/homework/actions.js"></script>
       <script src="/javascript/homework/rating.js"></script>
   </head>
-  <body>
+  <body class="mode">
     <!-- include the navbar via ejs -->
     <%- include('../partials/navbar') %>
 
@@ -49,13 +54,13 @@
     <div class="container mb-5 tutor-info">
       <a href="../../profiles/<%=tutor.tutor._id%>"><img src="<%= tutor.tutor.imageUrl %>" alt="profile image" class="profile-image"></a>
       <a href="../../profiles/<%=student._id%>"><img src="<%= student.imageUrl %>" alt="profile image" class="profile-image"></a>
-      <h1 class="username"><%=student.firstName%>'s Lessons with <%= tutor.tutor.firstName %> <%=tutor.tutor.lastName%></h1>
+      <h1 class="username mode"><%=student.firstName%>'s Lessons with <%= tutor.tutor.firstName %> <%=tutor.tutor.lastName%></h1>
     </div>
 
     <div class="container mt-5">
       <% if (lessonCount > 0) { %>
       <ul id="lesson-info-<%=student._id%>" class="list-group">
-        <li class="list-group-item list-group-item-success status-header">
+        <li class="list-group-item list-group-item-success status-header mode">
           <div class="d-flex w-100 justify-content-between">
             <h2 class="mb-1">Lessons (<%=lessonCount%>)</h2>
 
@@ -67,8 +72,8 @@
 
       <% for (let lesson of tutor.lessons.reverse()) { %>
         <% if (lesson.student.equals(student._id)) { %>
-          <li class="list-group-item list-group-item-action tutor-profile menu-item">
-            <span class="lesson-info"><%=lesson.date%> | <%=lesson.time%> minute(s)</span><br />
+          <li class="list-group-item list-group-item-action tutor-profile menu-item cafe">
+            <span class="lesson-info cafe"><%=lesson.date%> | <%=lesson.time%> minute(s)</span><br />
             <p>
               <%=lesson.summary%>
             </p>

@@ -137,11 +137,16 @@
           <div class="col-md-8 col-12" id="follower-data">
 
               <section class="profile-desc">
-                  <div class="desc-head mode">
+                  <div class="desc-head cafe">
 
                     <div id="follower-buttons">
-                      <button id="followers-button" class="btn btn-dark" onclick="changeFollowerTab(this)"><%=user.followers.length%> Follower(s)</button>
-                      <button id="following-button" class="btn btn-secondary" onclick="changeFollowerTab(this)"><%=following.length%> Following</button>
+                        <% if (currentUser.darkmode) { %>
+                            <button id="followers-button" class="btn btn-secondary" onclick="changeFollowerTab(this)"><%=user.followers.length%> Follower(s)</button>
+                            <button id="following-button" class="btn btn-dark" onclick="changeFollowerTab(this)"><%=following.length%> Following</button>
+                        <% } else { %>
+                            <button id="followers-button" class="btn btn-dark" onclick="changeFollowerTab(this)"><%=user.followers.length%> Follower(s)</button>
+                            <button id="following-button" class="btn btn-secondary" onclick="changeFollowerTab(this)"><%=following.length%> Following</button>
+                        <% } %>
                     </div>
                   </div>
                   <div class="desc-body mode">

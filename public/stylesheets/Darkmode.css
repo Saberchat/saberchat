@@ -1,8 +1,8 @@
-.mode, .mode:focus, .mode:hover{
+.mode, .mode:focus, .mode:hover {
   background-color: #343a40;
   color: white;
-
 }
+
 .search, .search:focus{
   color: white;
   background-color: #343a40;

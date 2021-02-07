@@ -13,6 +13,11 @@
     <link rel="stylesheet" href="/stylesheets/home/index.css">
     <link rel="stylesheet" href="/stylesheets/homework/show.css">
     <link rel="stylesheet" href="/stylesheets/cafe/menu.css">
+    <%if (currentUser) {%>
+      <%if (currentUser.darkmode) { %>
+        <link rel="stylesheet" href="/stylesheets/Darkmode.css">
+      <%}%>
+    <%}%>
 
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
@@ -30,7 +35,7 @@
     <%- include('../partials/header') %>
 
   </head>
-  <body>
+  <body class="mode">
 
     <div class="container mt-5">
       <div class="header-section">
@@ -46,7 +51,7 @@
                   <button class="btn btn-danger" type="button" data-toggle="modal" data-target="#modal-<%=course._id%>"><i class="fas fa-minus"></i> Unenroll</button>
                   <div class="modal fade" id="modal-<%=course._id%>" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
                     <div class="modal-dialog">
-                      <div class="modal-content">
+                      <div class="mode modal-content">
                         <div class="modal-header">
                           <h5 class="modal-title" id="exampleModalLabel">Unenroll from <%=course.name%>?</h5>
                           <button type="button" class="close" data-dismiss="modal" aria-label="Close">
@@ -94,9 +99,9 @@
         <div class="col-12">
 
           <ul class="list-group">
-            <li class="list-group-item list-group-item-success">Teacher</li>
-            <li class="list-group-item">
-              <a href="/profiles/<%=course.teacher._id%>" class="user-element-text">
+            <li class="list-group-item list-group-item-success mode">Teacher</li>
+            <li class="list-group-item cafe">
+              <a href="/profiles/<%=course.teacher._id%>" class="user-element-text cafe">
                 <img class="profile-image" src="<%= course.teacher.imageUrl %>" alt="profile picture">
                 <span class="username <%=course.teacher.status%> <%=course.teacher.permission%> <%=course.teacher.tags.join(' ')%>"><span class="enrolled-name"><%=course.teacher.firstName%> <%=course.teacher.lastName%></span> <span class="enrolled-username"><%=course.teacher.username%></span></span>
               </a>
@@ -106,10 +111,10 @@
 
           <% if (course.students.length > 0) { %>
             <ul class="list-group" id="students">
-              <li class="list-group-item list-group-item-success" id="students-heading">Students</li>
+              <li class="list-group-item list-group-item-success mode" id="students-heading">Students</li>
               <% for (let student of course.students) { %>
-                <li class="list-group-item" id="item-<%=student._id%>">
-                  <a href="../profiles/<%=student._id%>"class="user-element-text">
+                <li class="list-group-item cafe" id="item-<%=student._id%>">
+                  <a href="../profiles/<%=student._id%>"class="user-element-text cafe">
                     <img class="profile-image" src="<%= student.imageUrl %>" alt="profile picture">
                     <span class="username <%=student.status%> <%=student.permission%> <%=student.tags.join(' ')%>"><span class="enrolled-name"><%=student.firstName%> <%=student.lastName%></span> <span class="enrolled-username"><%=student.username%></span></span>
                   </a>
@@ -120,7 +125,7 @@
 
                 <div class="modal fade" id="modal-index-remove-<%=student._id%>" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
                   <div class="modal-dialog">
-                    <div class="modal-content">
+                    <div class="mode modal-content">
                       <div class="modal-header">
                         <h5 class="modal-title" id="exampleModalLabel">Remove <%=student.firstName%> <%=student.lastName%> From Your Course?</h5>
                         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
@@ -128,7 +133,7 @@
                         </button>
                       </div>
                       <div class="modal-body">
-                        <textarea rows="5" class="form-control" id="reason-<%=student._id%>" name="review" placeholder="Please explain why you wish to remove <%=student.firstName%>."></textarea>
+                        <textarea rows="5" class="form-control mode" id="reason-<%=student._id%>" name="review" placeholder="Please explain why you wish to remove <%=student.firstName%>."></textarea>
                       </div>
                       <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-dismiss="modal">Back</button>
@@ -145,10 +150,10 @@
 
           <% if (course.tutors.length > 0) { %>
             <ul class="list-group" id="tutor-index">
-              <li class="list-group-item list-group-item-success" id="tutor-heading-index">Tutors</li>
+              <li class="list-group-item list-group-item-success mode" id="tutor-heading-index">Tutors</li>
               <% for (let tutor of course.tutors) { %>
-                <li class="list-group-item list-group-item-action tutor-profile menu-item" id="item-<%=tutor.tutor._id%>">
-                  <a href="/homework/tutors/<%=course._id%>?tutorId=<%=tutor.tutor._id%>" class="user-element-text">
+                <li class="list-group-item list-group-item-action tutor-profile menu-item cafe" id="item-<%=tutor.tutor._id%>">
+                  <a href="/homework/tutors/<%=course._id%>?tutorId=<%=tutor.tutor._id%>" class="user-element-text cafe">
                     <img class="profile-image" src="<%= tutor.tutor.imageUrl %>" alt="profile picture">
                     <span class="username <%=tutor.tutor.status%> <%=tutor.tutor.permission%> <%=tutor.tutor.tags.join(' ')%>"><span class="enrolled-name"><%=tutor.tutor.firstName%> <%=tutor.tutor.lastName%></span> <span class="enrolled-username"><%=tutor.tutor.username%></span></span>
                   </a>
@@ -159,7 +164,7 @@
 
                 <div class="modal fade" id="modal-index-remove-<%=tutor.tutor._id%>" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
                   <div class="modal-dialog">
-                    <div class="modal-content">
+                    <div class="mode modal-content">
                       <div class="modal-header">
                         <h5 class="modal-title" id="exampleModalLabel">Remove <%=tutor.tutor.firstName%> <%=tutor.tutor.lastName%> From Your Course?</h5>
                         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
@@ -167,7 +172,7 @@
                         </button>
                       </div>
                       <div class="modal-body">
-                        <textarea rows="5" class="form-control" id="reason-<%=tutor.tutor._id%>" name="review" placeholder="Please explain why you wish to remove <%=tutor.tutor.firstName%>."></textarea>
+                        <textarea rows="5" class="form-control mode" id="reason-<%=tutor.tutor._id%>" name="review" placeholder="Please explain why you wish to remove <%=tutor.tutor.firstName%>."></textarea>
                       </div>
                       <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-dismiss="modal">Back</button>
@@ -187,15 +192,15 @@
 
           <% if (course.tutors.length > 0) { %>
             <ul class="list-group" id="tutor-div">
-              <li class="list-group-item list-group-item-success">
+              <li class="list-group-item list-group-item-success mode">
                 <div class="d-flex w-100 justify-content-between">
                   <span class="mb-1">Tutors</span>
                 </div>
               </li>
 
               <% for (let tutor of course.tutors) { %>
-                  <li class="list-group-item list-group-item-action tutor-profile menu-item" id="tutor-<%=tutor.tutor._id%>">
-                    <a href="/homework/tutors/<%=course._id%>?tutorId=<%=tutor.tutor._id%>" class="tutor-link">
+                  <li class="list-group-item list-group-item-action tutor-profile menu-item cafe" id="tutor-<%=tutor.tutor._id%>">
+                    <a href="/homework/tutors/<%=course._id%>?tutorId=<%=tutor.tutor._id%>" class="tutor-link cafe">
                       <img class="profile-image" src="<%= tutor.tutor.imageUrl %>" alt="profile picture">
                       <span class="tutor-name <%=tutor.tutor.status%> <%=tutor.tutor.permission%> <%=tutor.tutor.tags.join(' ')%>"><%=tutor.tutor.firstName%> <%=tutor.tutor.lastName%></span>
                     </a>
@@ -282,7 +287,7 @@
 
                 <div class="modal fade" id="modal-book-<%=tutor.tutor._id%>" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
                   <div class="modal-dialog">
-                    <div class="modal-content">
+                    <div class="mode modal-content">
                       <div class="modal-header">
                         <h5 class="modal-title" id="exampleModalLabel">Book lessons with <%=tutor.tutor.firstName%> <%=tutor.tutor.lastName%>?</h5>
                         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
@@ -302,7 +307,7 @@
 
                 <div class="modal fade" id="modal-review-<%=tutor.tutor._id%>" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
                   <div class="modal-dialog">
-                    <div class="modal-content">
+                    <div class="mode modal-content">
                       <div class="modal-header">
                         <h5 class="modal-title" id="exampleModalLabel">Review <%=tutor.tutor.firstName%> <%=tutor.tutor.lastName%>?</h5>
                         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
@@ -316,7 +321,7 @@
                         <% } %>
                         <span id="rating-label">Rate <%=tutor.tutor.firstName%> out of 5</span><br />
 
-                        <textarea rows="5" class="form-control review" id="review-<%=tutor.tutor._id%>" name="review" placeholder="Write a few sentences about your experience with <%=tutor.tutor.firstName%>"></textarea>
+                        <textarea rows="5" class="form-control mode review" id="review-<%=tutor.tutor._id%>" name="review" placeholder="Write a few sentences about your experience with <%=tutor.tutor.firstName%>"></textarea>
                       </div>
                       <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-dismiss="modal">Back</button>
@@ -328,7 +333,7 @@
 
                 <div class="modal fade" id="modal-stop-<%=tutor.tutor._id%>" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
                   <div class="modal-dialog">
-                    <div class="modal-content">
+                    <div class="mode modal-content">
                       <div class="modal-header">
                         <h5 class="modal-title" id="exampleModalLabel">Stop lessons with <%=tutor.tutor.firstName%> <%=tutor.tutor.lastName%>?</h5>
                         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
@@ -348,7 +353,7 @@
 
                 <div class="modal fade" id="modal-close-<%=tutor.tutor._id%>" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
                   <div class="modal-dialog">
-                    <div class="modal-content">
+                    <div class="mode modal-content">
                       <div class="modal-header">
                         <h5 class="modal-title" id="exampleModalLabel">Close all new lesson bookings?</h5>
                         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
@@ -368,7 +373,7 @@
 
                 <div class="modal fade" id="modal-reopen-<%=tutor.tutor._id%>" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
                   <div class="modal-dialog">
-                    <div class="modal-content">
+                    <div class="mode modal-content">
                       <div class="modal-header">
                         <h5 class="modal-title" id="exampleModalLabel">Reopen lesson bookings?</h5>
                         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
@@ -388,7 +393,7 @@
 
                 <div class="modal fade" id="modal-remove-<%=tutor.tutor._id%>" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
                   <div class="modal-dialog">
-                    <div class="modal-content">
+                    <div class="mode modal-content">
                       <div class="modal-header">
                         <h5 class="modal-title" id="exampleModalLabel">Remove <%=tutor.tutor.firstName%> <%=tutor.tutor.lastName%> From Your Course?</h5>
                         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
@@ -396,7 +401,7 @@
                         </button>
                       </div>
                       <div class="modal-body">
-                        <textarea rows="5" class="form-control" id="reason-<%=tutor.tutor._id%>" name="review" placeholder="Please explain why you wish to remove <%=tutor.tutor.firstName%>."></textarea>
+                        <textarea rows="5" class="form-control mode" id="reason-<%=tutor.tutor._id%>" name="review" placeholder="Please explain why you wish to remove <%=tutor.tutor.firstName%>."></textarea>
                       </div>
                       <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-dismiss="modal">Back</button>
@@ -426,19 +431,19 @@
             <form id="update-settings" onsubmit="updateSettings('<%=course._id%>', event)">
               <div class="form-group">
                   <label for="newName">Name</label>
-                  <input id="newName" class="form-control" type="text" name="newName" value="<%= course.name %>" placeholder="Enter Course Name" oninput="changeName(this)" required>
+                  <input id="newName" class="form-control mode mode" type="text" name="newName" value="<%= course.name %>" placeholder="Enter Course Name" oninput="changeName(this)" required>
               </div>
               <div class="form-group">
                   <label for="descInput">Description</label>
                   <% if(course.description){ %>
-                      <textarea id="descInput" class="form-control" name="description" placeholder="Enter Course Description" rows="5" oninput="changeInfo(this)"><%= course.description %></textarea>
+                      <textarea id="descInput" class="form-control mode mode" name="description" placeholder="Enter Course Description" rows="5" oninput="changeInfo(this)"><%= course.description %></textarea>
                   <% } else { %>
-                      <textarea id="descInput" class="form-control" name="description" placeholder="Enter Course Description" rows="5" oninput="changeInfo(this)" aria-describedby="descHelp"></textarea>
+                      <textarea id="descInput" class="form-control mode mode" name="description" placeholder="Enter Course Description" rows="5" oninput="changeInfo(this)" aria-describedby="descHelp"></textarea>
                   <% } %>
               </div>
               <div class="form-group">
                   <label for="thumbnail-input">Thumbnail Image Url</label><br />
-                  <input id="thumbnail-input" class="form-control" type="text" oninput="changeThumbnail(this)" name="thumbnailUrl" value="<%= course.thumbnail %>" placeholder="Enter Thumbnail Url">
+                  <input id="thumbnail-input" class="form-control mode mode" type="text" oninput="changeThumbnail(this)" name="thumbnailUrl" value="<%= course.thumbnail %>" placeholder="Enter Thumbnail Url">
               </div>
               <button type="submit" class="btn btn-lg btn-primary btn-block">Confirm Changes</button><br />
             </form>
@@ -447,7 +452,7 @@
             <form id="update-teacher" action="/homework/updateTeacher/<%=course._id%>?_method=put" method="post">
               <h4>Change Teacher</h4>
               <div class="form-group">
-                <select class="form-control" name="teacher" >
+                <select class="form-control mode mode" name="teacher" >
                   <% for (let teacher of teachers) { %>
                     <option value="<%=teacher._id%>"><%=teacher.firstName%> <%=teacher.lastName%> (<%=teacher.username%>)</option>
                   <% } %>
@@ -457,7 +462,7 @@
 
               <div class="modal fade" id="modal-change-teacher" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
                 <div class="modal-dialog">
-                  <div class="modal-content">
+                  <div class="mode modal-content">
                     <div class="modal-header">
                       <h5 class="modal-title" id="exampleModalLabel">Update Teacher?</h5>
                       <button type="button" class="close" data-dismiss="modal" aria-label="Close">
@@ -468,7 +473,7 @@
                       <p>
                         You will be unable to rejoin this course as a teacher until the new teacher gives you permission.
                       </p>
-                      <input type="text" name="joinCodeConfirm" class="form-control" placeholder="Enter Course Join Code To Confirm" id="join-code-confirm"/>
+                      <input type="text" name="joinCodeConfirm" class="form-control mode" placeholder="Enter Course Join Code To Confirm" id="join-code-confirm"/>
                     </div>
                     <div class="modal-footer">
                       <button type="button" class="btn btn-secondary" data-dismiss="modal">Back</button>
@@ -483,7 +488,7 @@
             <form action="/homework/<%=course._id%>?_method=delete" method="post">
               <div class="modal fade" id="modal-delete" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
                 <div class="modal-dialog">
-                  <div class="modal-content">
+                  <div class="mode modal-content">
                     <div class="modal-header">
                       <h5 class="modal-title" id="exampleModalLabel">Delete "<%=course.name%>"?</h5>
                       <button type="button" class="close" data-dismiss="modal" aria-label="Close">
@@ -494,7 +499,7 @@
                       <p>
                         This action is irreversible. All data on tutors and students will be lost. Are you sure you want to delete this course?
                       </p>
-                      <input type="text" name="joinCode" class="form-control" placeholder="Enter Course Join Code To Confirm" id="join-code-confirm"/>
+                      <input type="text" name="joinCode" class="form-control mode" placeholder="Enter Course Join Code To Confirm" id="join-code-confirm"/>
                     </div>
                     <div class="modal-footer">
                       <button type="button" class="btn btn-secondary" data-dismiss="modal">Back</button>
@@ -512,10 +517,10 @@
           <div class="col-12" id="blocked-column">
             <% if (course.blocked.length > 0) { %>
               <ul class="list-group" id="blocked-div">
-                <li class="list-group-item list-group-item-success">Blocked</li>
+                <li class="list-group-item list-group-item-success mode">Blocked</li>
                 <% for (let b of course.blocked) { %>
-                  <li class="list-group-item" id="item-<%=b._id%>">
-                    <a href="../profiles/<%=b._id%>"class="user-element-text">
+                  <li class="list-group-item cafe" id="item-<%=b._id%>">
+                    <a href="../profiles/<%=b._id%>"class="user-element-text cafe">
                       <img class="profile-image" src="<%=b.imageUrl %>" alt="profile picture">
                       <span class="username <%=b.status%> <%=b.permission%> <%=b.tags.join(' ')%>"><span class="enrolled-name"><%=b.firstName%> <%=b.lastName%></span> <span class="enrolled-username"><%=b.username%></span></span>
                     </a>
@@ -524,7 +529,7 @@
 
                   <div class="modal fade" id="modal-index-unblock-<%=b._id%>" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
                     <div class="modal-dialog">
-                      <div class="modal-content">
+                      <div class="mode modal-content">
                         <div class="modal-header">
                           <h5 class="modal-title" id="exampleModalLabel">Unblock <%=b.firstName%> <%=b.lastName%> From Your Course?</h5>
                           <button type="button" class="close" data-dismiss="modal" aria-label="Close">
