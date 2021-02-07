@@ -78,16 +78,16 @@
               <form action="/homework/join" method="post" id="join-course-student">
                 <button type="button" data-toggle="modal" data-target="#modal-join" class="btn btn-primary"><i class="fas fa-chalkboard-teacher"></i> Join Course</button>
                 <div class="modal fade" id="modal-join" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
-                  <div class="modal-dialog">
-                    <div class="modal-content">
-                      <div class="modal-header">
-                        <h5 class="modal-title" id="exampleModalLabel">Join Course</h5>
+                  <div class="modal-dialog mode">
+                    <div class="modal-content mode">
+                      <div class="modal-header mode">
+                        <h5 style="color:turquoise;" class="modal-title" id="exampleModalLabel">Join Course</h5>
                         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                           <span aria-hidden="true">&times;</span>
                         </button>
                       </div>
                       <div class="modal-body">
-                        <input class="form-control" type="text" name="joincode" placeholder="Enter Join Code"/>
+                        <input class="form-control search" type="text" name="joincode" placeholder="Enter Join Code"/>
                       </div>
                       <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-dismiss="modal">Back</button>
@@ -102,19 +102,19 @@
                 <form action="/homework/join-tutor" method="post" id="join-course-tutor">
                   <button type="button" data-toggle="modal" data-target="#modal-tutor" class="btn btn-success"><i class="fas fa-chalkboard-teacher"></i> Join Course As Tutor</button>
                   <div class="modal fade" id="modal-tutor" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
-                    <div class="modal-dialog">
-                      <div class="modal-content">
-                        <div class="modal-header">
-                          <h5 class="modal-title" id="exampleModalLabel">Join Course As Tutor</h5>
+                    <div class="modal-dialog mode">
+                      <div class="modal-content mode">
+                        <div class="modal-header mode">
+                          <h5 style="color:turquoise;" class="modal-title" id="exampleModalLabel">Join Course As Tutor</h5>
                           <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                             <span aria-hidden="true">&times;</span>
                           </button>
                         </div>
                         <div class="modal-body">
-                          <input class="form-control" type="text" name="joincode" placeholder="Enter Join Code"/><br />
-                          <label for="slots" id="slots-label">Number of Student Slots: 0</label><br />
-                          <input type="range" min="0" max="10" value="0" class="slider" id="slots" name="slots" onchange="setStudents()">
-                          <textarea rows="5" minlength="50" maxlength="500" class="form-control" name="bio" placeholder="A Short Bio About Yourself"></textarea>
+                          <input class="form-control search" type="text" name="joincode" placeholder="Enter Join Code"/><br />
+                          <label style="color:turquoise;" for="slots" id="slots-label">Number of Student Slots: 0</label><br />
+                          <input type="range" min="0" max="10" value="0" class="slider search" id="slots" name="slots" onchange="setStudents()">
+                          <textarea rows="5" minlength="50" maxlength="500" class="form-control mode" name="bio" placeholder="A Short Bio About Yourself"></textarea>
                         </div>
                         <div class="modal-footer">
                           <button type="button" class="btn btn-secondary" data-dismiss="modal">Back</button>
