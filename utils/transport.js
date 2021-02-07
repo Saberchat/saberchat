@@ -84,5 +84,43 @@ function transport_mandatory(recipient, subject, html) {
     });
 }
 
+async function sendGridEmail(email, subject, content, mandatory=false) {
+    if(process.env.SENDING_EMAILS === 'true' || mandatory) {
+        const url = process.env.SENDGRID_BASE_URL + '/mail/send';
+        const data = {
+            "personalizations": [
+                {
+                    "to": [
+                        {
+                            "email": 'alexzhou3999@gmail.com'
+                        }
+                    ],
+                    "subject": subject
+                }
+            ],
+            "from": {
+                "email": "noreply.saberchat@gmail.com",
+                "name": "SaberChat"
+            },
+            "content": [
+                {
+                    "type": "text/html",
+                    "value": content
+                }
+            ]
+        }
 
-module.exports = {transport, transport_mandatory};
+        const response = await axios({
+            method: 'post',
+            url: url,
+            data: data,
+            headers: {
+                "Authorization": "Bearer " + process.env.SENDGRID_KEY
+            }
+        });
+        console.log(`Email Sent with status code: ${response.status}`);
+    }
+}
+
+
+module.exports = {transport, transport_mandatory, sendGridEmail};
