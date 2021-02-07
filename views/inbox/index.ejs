@@ -17,7 +17,7 @@
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js"></script>
     <%if (currentUser) {%>
       <%if (currentUser.darkmode) { %>
-        <link rel="stylesheet" href="/stylesheets/projects/dark.css">
+        <link rel="stylesheet" href="/stylesheets/inbox/darkinbox.css">
       <%}%>
     <%}%>
 
@@ -54,15 +54,15 @@
                 <button id="refresh-btn" onclick="window.location.reload();">Refresh</button>
               </nav>
 
-              <form method="post" id="del-select-form">
+              <form method="post" id="del-select-form" >
 
                 <!-- actions -->
-                <div class="action-bar">
+                <div class="action-bar inboxback">
                   <!-- message actions -->
                   <div class="message-actions display">
                     <a href="/inbox/messages/new" class="action-btn">Send New</a>
                     <a href="/inbox/sent" class="action-btn">View Sent</a>
-                    <hr>
+                    <hr style="color:turquoise;">
                     <!-- <a href="/inbox/clear?_method=delete" class="action-btn" id="del-all-btn">Clear All</a> -->
                     <button class="action-btn" formAction="/inbox/clear?_method=delete" id="del-all-btn">Clear All</button>
                     <button class="action-btn" formAction="/inbox/delete?_method=delete" id="del-sel-btn">Clear Selected</button>
@@ -80,7 +80,7 @@
                 </div>
 
                 <!-- main inbox list -->
-                <div class="inbox-display">
+                <div class="inbox-display inboxback">
 
                   <!-- messages -->
                   <div class="message-list display mode">
@@ -97,7 +97,7 @@
                             <input class="del-form-input" type="checkbox" name="<%= msg._id %>" value="" onchange="updateDelete()">
                           </div>
 
-                          <a href="/inbox/<%= msg._id %>" class="message-body mode" style="color:turquoise;">
+                          <a href="/inbox/<%= msg._id %>" class="message-body inboxtext mode" >
                             <div class="message-head mode">
 
                               <% if (msg.read.includes(currentUser._id)) { %>

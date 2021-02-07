@@ -12,6 +12,11 @@
       <link rel="stylesheet" href="/stylesheets/components/navbar.css">
       <link rel="stylesheet" href="/stylesheets/chat/new.css">
       <link rel="stylesheet" href="/stylesheets/cafe/edit.css">
+      <%if (currentUser) {%>
+        <%if (currentUser.darkmode) { %>
+          <link rel="stylesheet" href="/stylesheets/Darkmode.css">
+        <%}%>
+      <%}%>
 
       <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
       <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
@@ -20,7 +25,7 @@
       <!-- I'm using my fontawesome kit -->
       <script src="https://kit.fontawesome.com/dccc745c41.js" crossorigin="anonymous"></script>
   </head>
-  <body>
+  <body class = "mode">
     <!-- include the navbar via ejs -->
     <%- include('../partials/navbar') %>
     <%- include('../partials/header') %>
@@ -40,10 +45,10 @@
         <h2 class="element">Name</h2>
         <div class="row">
           <div class="col-md-8 offset-md-2 col-12">
-              <div class="form-group">
+              <div class="form-group search">
                 <div class="row">
                   <div class="input-group mb-3">
-                    <input id="itemInput" class="form-control" type="text" name="name" value="<%=type.name%>" placeholder="Enter Item Name" maxlength="45" required/>
+                    <input id="itemInput" class="form-control search" type="text" name="name" value="<%=type.name%>" placeholder="Enter Item Name" maxlength="45" required/>
                   </div>
                 </div>
               </div>
