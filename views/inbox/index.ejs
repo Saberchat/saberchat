@@ -43,13 +43,17 @@
                     id="view-msg"
                     onclick="setMessages()"
                     disabled
-                    >Messages</button>
+                    >Messages <% if (currentUser.inbox.length > 0) { %>
+                        <span class="badge badge-pill badge-danger"><%=currentUser.inbox.length%></span>
+                    <%} %></button>
 
                   <button
                     class="nav-tab"
                     id="view-req"
                     onclick="setRequests()"
-                    >Requests</button>
+                    >Requests  <% if (activeRequests.length > 0) { %>
+                        <span class="badge badge-pill badge-danger"><%=activeRequests.length%></span>
+                    <%} %></button>
                 </div>
                 <button id="refresh-btn" onclick="window.location.reload();">Refresh</button>
               </nav>
@@ -62,8 +66,7 @@
                   <div class="message-actions display">
                     <a href="/inbox/messages/new" class="action-btn">Send New</a>
                     <a href="/inbox/sent" class="action-btn">View Sent</a>
-                    <hr style="color:turquoise;">
-                    <!-- <a href="/inbox/clear?_method=delete" class="action-btn" id="del-all-btn">Clear All</a> -->
+                    <hr id="inbox-nav-break">
                     <button class="action-btn" formAction="/inbox/clear?_method=delete" id="del-all-btn">Clear All</button>
                     <button class="action-btn" formAction="/inbox/delete?_method=delete" id="del-sel-btn">Clear Selected</button>
 
@@ -97,31 +100,21 @@
                             <input class="del-form-input" type="checkbox" name="<%= msg._id %>" value="" onchange="updateDelete()">
                           </div>
 
-                          <a href="/inbox/<%= msg._id %>" class="message-body inboxtext mode" >
+                          <a href="/inbox/<%= msg._id %>" class="message-body mode" >
                             <div class="message-head mode">
-
                               <% if (msg.read.includes(currentUser._id)) { %>
-                                <div class="message-from mode">
-
-                                <% } else { %>
-                                  <div class="message-from unread">
-                                <% } %>
-                                  (<%=1+msg.replies.length%>) <%= msg.sender.username %>
-                              </div>
-
-                              <% if (msg.read.includes(currentUser._id)) { %>
-                                <div class="message-subject">
-                                <span><%= msg.subject %></span>
-                                </div>
-
+                                  <div class="message-from mode">(<%=1+msg.replies.length%>) <%= msg.sender.username %></div>
                               <% } else { %>
-                                <div class="message-subject unread">
-                                  <span><%= msg.subject %></span>
-                                </div>
+                                  <div class="message-from unread">(<%=1+msg.replies.length%>) <%= msg.sender.username %></div>
                               <% } %>
-
+                              <% if (msg.read.includes(currentUser._id)) { %>
+                                <div class="message-subject"><span><%= msg.subject %></span></div>
+                              <% } else { %>
+                                <div class="message-subject unread"><span><%= msg.subject %></span></div>
+                              <% } %>
                             </div>
-                            <div class="message-text">
+
+                            <div class="message-text mode">
                               <% if (msg.replies.length > 0) { %>
                                 <%= msg.replies[msg.replies.length - 1].text%>
                               <% } else { %>
@@ -129,16 +122,17 @@
                               <% } %>
                             </div>
                           </a>
-                          <span class="message-date">
 
-                            <% if (msg.replies.length > 0) { %>
-                              <%= msg.replies[msg.replies.length - 1].date.split(',')[0].split('|')[1] %>
+                          <div class="date-container mode">
+                              <span class="message-date">
+                                <% if (msg.replies.length > 0) { %>
+                                  <%= msg.replies[msg.replies.length - 1].date.split(',')[0].split('|')[1] %>
 
-                            <% } else { %>
-                              <%= msg.date.split(',')[0].split('|')[1] %>
-                            <% } %>
-
-                          </span>
+                                <% } else { %>
+                                  <%= msg.date.split(',')[0].split('|')[1] %>
+                                <% } %>
+                            </span>
+                        </div>
                         </li>
                       <% }); %>
                     </ul>
@@ -152,12 +146,12 @@
                   <div class="list-group current display" id="current-req-list">
                     <% requests.forEach((request) => { %>
                       <% if(request.status == 'pending') { %>
-                      <li class="list-group-item list-group-item-action">
-                        <a href="/inbox/requests/<%= request._id %>" class="request-body">
-                          <div class="request-room">
+                      <li class="list-group-item list-group-item-action mode">
+                        <a href="/inbox/requests/<%= request._id %>" class="request-body mode">
+                          <div class="request-room mode">
                             <%= request.room.name %>
                           </div>
-                          <div class="request-from">
+                          <div class="request-from mode">
                             <%= request.requester.username %>
                           </div>
                         </a>
@@ -165,18 +159,18 @@
                       <% } %>
                     <% }); %>
                   </div>
-                  <div class="list-group history" id="past-req-list">
+                  <div class="list-group history mode" id="past-req-list">
                     <% requests.forEach((request) => { %>
                       <% if(request.status != 'pending') { %>
-                      <li class="list-group-item list-group-item-action">
-                        <a href="/inbox/requests/<%= request._id %>" class="request-body">
-                          <div class="request-room">
+                      <li class="list-group-item list-group-item-action mode">
+                        <a href="/inbox/requests/<%= request._id %>" class="request-body mode">
+                          <div class="request-room mode">
                             <%= request.room.name %>
                           </div>
-                          <div class="request-from">
+                          <div class="request-from mode">
                             <%= request.requester.username %>
                           </div>
-                          <div class="request-status">
+                          <div class="request-status mode">
                             <%= request.status %>
                           </div>
                         </a>

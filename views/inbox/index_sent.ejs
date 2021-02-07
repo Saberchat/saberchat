@@ -7,13 +7,14 @@
 
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css">
     <link rel="stylesheet" href="/stylesheets/main.css">
+    <link rel="stylesheet" href="/stylesheets/inbox/index.css">
     <link rel="stylesheet" href="/stylesheets/inbox/index_sent.css">
     <!-- link css for navbar. Don't need to include public/javascript/userForm.js since user is already logged in and does not need to access login and register forms.  -->
     <link rel="stylesheet" href="/stylesheets/components/navbar.css">
     <link rel="stylesheet" href="/stylesheets/components/header.css">
     <%if (currentUser) {%>
       <%if (currentUser.darkmode) { %>
-        <link rel="stylesheet" href="/stylesheets/projects/dark.css">
+        <link rel="stylesheet" href="/stylesheets/inbox/darkinbox.css">
       <%}%>
     <%}%>
 
@@ -33,7 +34,7 @@
         <div class="row">
           <div class="col-12">
 
-            <div class="inbox-container">
+            <div class="inbox-container inboxtext">
               <!-- navigation between tabs -->
               <nav class="inbox-nav">
                 <div class="btn-group" role="group" aria-label="inbox navigation">
@@ -50,7 +51,7 @@
               <form method="post" id="del-select-form">
 
                 <!-- actions -->
-                <div class="action-bar">
+                <div class="action-bar inboxback">
                   <!-- message actions -->
                   <div class="message-actions display">
                     <a href="/inbox" class="action-btn">Inbox</a>
@@ -63,7 +64,7 @@
                 <div class="inbox-display mode">
 
                   <!-- messages -->
-                  <div class="message-list display">
+                  <div class="message-list display mode">
 
                     <ul class="list-group mode">
 
@@ -71,36 +72,36 @@
                         <li class="list-group-item list-group-item-action read mode">
 
                           <% if (notif.sender == null) { %>
-                            <div class="message-check">
+                            <div class="message-check mode">
                               <input class="del-form-input" type="checkbox" name="<%= notif._id %>" value="" onchange="updateDelete()">
                             </div>
-                            <a href="/inbox/<%= notif._id %>" class="message-body">
-                              <div class="message-head">
-                                <div class="message-from">
+                            <a href="/inbox/<%= notif._id %>" class="message-body mode">
+                              <div class="message-head mode mode">
+                                <div class="message-from mode">
                                   (<%=1 + notif.replies.length%>) <%= notif.subject %>
                                 </div>
-                                <div class="message-from">
+                                <div class="message-from mode">
                                   Anonymous
                                 </div>
                               </div>
 
-                              <div class="message-text">
+                              <div class="message-text mode">
                                 <%= notif.text %>
                               </div>
                             </a>
 
                           <% } else if (notif.sender._id.toString() == currentUser._id.toString()) { %>
 
-                            <a href="/inbox/<%= notif._id %>" class="message-body">
-                              <div class="message-head">
-                                <div class="message-from">
+                            <a href="/inbox/<%= notif._id %>" class="message-body mode">
+                              <div class="message-head mode">
+                                <div class="message-from mode">
                                 (<%=1 + notif.replies.length%>) <%= notif.subject %>
                                 </div>
-                                <div class="message-from">
+                                <div class="message-from mode">
                                   <%= notif.sender.username %>
                                 </div>
                               </div>
-                              <div class="message-text">
+                              <div class="message-text mode">
                                 <% let replied = false;%>
 
                                 <% for (let reply of notif.replies.reverse()) { %>
@@ -119,21 +120,21 @@
                             </a>
 
                           <% } else { %>
-                            <div class="message-check">
+                            <div class="message-check mode">
                               <input class="del-form-input" type="checkbox" name="<%= notif._id %>" value="" onchange="updateDelete()">
                             </div>
                             <% if (notif.read[notif.recipients.indexOf(currentUser._id)] == true) { %>
 
-                              <a href="/inbox/<%= notif._id %>" class="message-body">
-                                <div class="message-head">
-                                  <div class="message-from">
+                              <a href="/inbox/<%= notif._id %>" class="message-body moe">
+                                <div class="message-head mode">
+                                  <div class="message-from mode">
                                     (<%=1 + notif.replies.length%>) <%= notif.subject %>
                                   </div>
-                                  <div class="message-from">
+                                  <div class="message-from mode">
                                     <%= notif.sender.username %>
                                   </div>
                                 </div>
-                                <div class="message-text">
+                                <div class="message-text mode">
                                   <% let replied = false;%>
 
                                   <% for (let reply  of notif.replies.reverse()) { %>
@@ -153,16 +154,16 @@
 
                             <% } else { %>
 
-                              <a href="/inbox/<%= notif._id %>" class="message-body">
-                                <div class="message-head">
-                                  <div class="message-subject">
+                              <a href="/inbox/<%= notif._id %>" class="message-body mode">
+                                <div class="message-head mode">
+                                  <div class="message-subject mode">
                                     (<%=1 + notif.replies.length%>) <%= notif.subject %>
                                   </div>
-                                  <div class="message-from">
+                                  <div class="message-from mode">
                                     <%= notif.sender.username %>
                                   </div>
                                 </div>
-                                <div class="message-text">
+                                <div class="message-text mode">
                                   <% let replied = false;%>
 
                                   <% for (let reply  of notif.replies.reverse()) { %>

@@ -1,8 +1,12 @@
-.mode, .mode:focus, .mode:hover{
+.mode, .mode:focus, .mode:hover, .list-group-item.list-group-item-action.read, .list-group-item.list-group-item-action.read:hover {
   background-color: #343a40;
   color: white;
-
 }
+
+#inbox-nav-break {
+    color:#d1ecff;;
+}
+
 .search, .search:focus{
   color: white;
   background-color: #343a40;

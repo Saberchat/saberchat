@@ -28,7 +28,14 @@ router.get('/', middleware.isLoggedIn, (req, res) => {
 				]
 			}).execPopulate();
 
-		res.render('inbox/index', {inbox: req.user.inbox.reverse(), requests: req.user.requests.reverse()});
+		let activeRequests = [];
+		for (let request of req.user.requests) {
+			if (request.status == "pending") {
+				activeRequests.push(request);
+			}
+		}
+
+		res.render('inbox/index', {inbox: req.user.inbox.reverse(), requests: req.user.requests.reverse(), activeRequests});
 
 	})().catch(err => {
 		req.flash('error', 'An error occured');
@@ -452,34 +459,16 @@ router.post('/requests/:id/accept', middleware.isLoggedIn, (req, res) => {
 			return res.redirect('back');
 
 		} else {
-
 			const foundRoom = await Room.findById(Req.room._id);
-
-			if(!foundRoom) {
-        req.flash("error", "Unable to access database");return res.redirect('back');
-      }
-
+			if(!foundRoom) { req.flash("error", "Unable to access database");return res.redirect('back'); }
 			foundRoom.members.push(Req.requester);
 			Req.status = 'accepted';
-
 			await foundRoom.save();
 			await Req.save();
 
-      let index = -1;
-      for (let i = 0; i < req.user.requests.length; i ++) {
-        if (req.user.requests[i].equals(Req._id)) {
-          index = i;
-        }
-      }
-
-      if (index != -1) {
-        req.user.requests.splice(index, 1);
-        await req.user.save();
-      }
-
-      transport(Req.requester, `Room Request Accepted - ${foundRoom.name}`, `<p>Hello ${Req.requester.firstName},</p><p>Your request to join chat room <strong>${foundRoom.name}</strong> has been accepted!<p><p>You can access the room at https://alsion-saberchat.herokuapp.com</p>`);
+      		transport(Req.requester, `Room Request Accepted - ${foundRoom.name}`, `<p>Hello ${Req.requester.firstName},</p><p>Your request to join chat room <strong>${foundRoom.name}</strong> has been accepted!<p><p>You can access the room at https://alsion-saberchat.herokuapp.com</p>`);
 			req.flash('success', 'Request accepted');
-			res.redirect('/inbox');
+			return res.redirect('/inbox');
 		}
 
 	})().catch(err => {
@@ -509,24 +498,11 @@ router.post('/requests/:id/reject', middleware.isLoggedIn, (req, res) => {
 		} else {
 
 			Req.status = 'rejected';
-
 			await Req.save();
 
-      let index = -1;
-      for (let i = 0; i < req.user.requests.length; i ++) {
-        if (req.user.requests[i].equals(Req._id)) {
-          index = i;
-        }
-      }
-
-      if (index != -1) {
-        req.user.requests.splice(index, 1);
-        await req.user.save();
-      }
-
-      transport(Req.requester, `Room Request Rejected - ${Req.room.name}`, `<p>Hello ${Req.requester.firstName},</p><p>Your request to join chat room <strong>${Req.room.name}</strong> has been rejected. Contact the room creator, <strong>${Req.room.creator.username}</strong>, if  you think there has been a mistake.</p>`);
+      		transport(Req.requester, `Room Request Rejected - ${Req.room.name}`, `<p>Hello ${Req.requester.firstName},</p><p>Your request to join chat room <strong>${Req.room.name}</strong> has been rejected. Contact the room creator, <strong>${Req.room.creator.username}</strong>, if  you think there has been a mistake.</p>`);
 			req.flash('success', 'Request rejected');
-			res.redirect('/inbox');
+			return res.redirect('/inbox');
 		}
 
 	})().catch(err => {
