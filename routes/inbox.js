@@ -19,9 +19,9 @@ const user = require('../models/user');
 router.get('/', middleware.isLoggedIn, wrapAsync(async (req, res) => {
 	await req.user.populate(
 		{
-			path: 'inbox', 
-			populate: { 
-				path: 'sender', 
+			path: 'inbox',
+			populate: {
+				path: 'sender',
 				select: ['username', 'imageUrl']
 			}
 		}).execPopulate();
