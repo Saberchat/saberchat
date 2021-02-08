@@ -1,0 +1,11 @@
+.average-rating-unselected {
+    color: white;
+}
+
+.tab {
+    color: white;
+}
+
+.active-tab, .user-position {
+    color: turquoise;
+}

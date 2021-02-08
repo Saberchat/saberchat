@@ -16,6 +16,7 @@
     <%if (currentUser) {%>
       <%if (currentUser.darkmode) { %>
         <link rel="stylesheet" href="/stylesheets/Darkmode.css">
+        <link rel="stylesheet" href="/stylesheets/homework/homework-dark.css">
       <%}%>
     <%}%>
 
@@ -76,8 +77,8 @@
       </div>
 
         <ul class="nav justify-content-center options-bar">
-          <li class="nav-item tab-header tab" id="people" onclick="changeTab(this)" style="color:turquoise !important;">
-            <a class="nav-link active cafetext" >People</a>
+          <li class="nav-item tab-header tab active-tab" id="people" onclick="changeTab(this)">
+            <a class="nav-link active" >People</a>
           </li>
 
           <li class="nav-item tab-header tab" id="tutors" onclick="changeTab(this)">
@@ -258,7 +259,7 @@
                         <% if (i+1 <= averageRating) { %>
                           class="fas fa-star average-rating-<%=tutor.tutor._id%> average-rating-selected"
                         <%} else { %>
-                          class="fas fa-star average-rating-<%=tutor.tutor._id%>"
+                          class="fas fa-star average-rating-<%=tutor.tutor._id%> average-rating-unselected"
                         <%}%>
                         ></i>
                       <% } %>
@@ -317,7 +318,7 @@
                       <div class="modal-body">
 
                         <% for (let i = 0; i < 5; i += 1) { %>
-                          <i class="fas fa-star star-<%=tutor.tutor._id%>" onclick="rate(this, '<%=tutor.tutor._id%>')" id="<%=i+1%>" name="star" value="<%=i+1%>"></i>
+                          <i class="fas fa-star average-rating-unselected star-<%=tutor.tutor._id%>" onclick="rate(this, '<%=tutor.tutor._id%>')" id="<%=i+1%>" name="star" value="<%=i+1%>"></i>
                         <% } %>
                         <span id="rating-label">Rate <%=tutor.tutor.firstName%> out of 5</span><br />
 

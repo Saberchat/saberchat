@@ -46,8 +46,8 @@ h3, .ratings {
   margin-bottom: 30px;
 }
 
-#reviews {
-  color: blue;
+.active-tab {
+    color: blue;
 }
 
 #bio-length-error {

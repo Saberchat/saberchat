@@ -3,12 +3,12 @@ const changeTab = (tab => {
   const tabs = document.getElementsByClassName("tab-header");
 
   for (let t of tabs) {
-    document.getElementsByClassName(t.id)[0].hidden = true;
-    t.style.color = "black";
+      t.classList.remove("active-tab");
+      document.getElementsByClassName(t.id)[0].hidden = true;
   }
 
   document.getElementsByClassName(tab.id)[0].hidden = false;
-  tab.style.color = "blue";
+  tab.classList.add("active-tab");
 });
 
 //Display thumbnail during course initialization
@@ -96,7 +96,7 @@ const changeJoinCode = ((courseID, event) => {
       document.getElementById('loading').hidden = false;
       document.getElementById('loading').style.color = "red";
       document.getElementById('loading').innerText = data.error;
-      
+
       setTimeout(() => {
         document.getElementById('loading').hidden = true;
       }, 1000);

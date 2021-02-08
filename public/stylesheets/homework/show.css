@@ -34,8 +34,8 @@
   font-weight: bold;
 }
 
-#people {
-  color: blue;
+.active-tab {
+    color: blue;
 }
 
 .people, .tutors, .settings, .blocked {

@@ -22,6 +22,7 @@
       <%if (currentUser) {%>
         <%if (currentUser.darkmode) { %>
           <link rel="stylesheet" href="/stylesheets/Darkmode.css">
+          <link rel="stylesheet" href="/stylesheets/homework/homework-dark.css">
         <%}%>
       <%}%>
 
@@ -305,7 +306,7 @@
             </div>
 
             <ul class="nav justify-content-center options-bar" id="options-bar">
-              <li class="nav-item tab-header tab" id="reviews" onclick="changeTab(this)">
+              <li class="nav-item tab-header active-tab tab" id="reviews" onclick="changeTab(this)">
                 <a class="nav-link active reviews-heading">Reviews (<span id="reviews-length-<%=tutor.tutor._id%>"><%=tutor.reviews.length%></span>)</a>
               </li>
 
@@ -346,7 +347,7 @@
                                 <% if (i+1 <= review.rating) { %>
                                   class="fas fa-star average-rating-selected"
                                 <%} else { %>
-                                  class="fas fa-star"
+                                  class="fas fa-star average-rating-unselected"
                                 <%}%>
                                 ></i>
                               <% } %>

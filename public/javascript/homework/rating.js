@@ -14,9 +14,11 @@ const rate = ((button, tutorId) => {
   }
 
   for (let star of document.getElementsByClassName(`star-${tutorId}`)) {
-    star.style.color = "black";
+    star.classList.add("average-rating-unselected");
+    star.classList.remove("average-rating-selected");
     if (parseInt(star.id) <= starCounts.get(tutorId)) {
-      star.style.color = "#cc9537";
+        star.classList.remove("average-rating-unselected");
+        star.classList.add("average-rating-selected");
     }
   }
 });

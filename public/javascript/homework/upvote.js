@@ -8,10 +8,10 @@ const upvote = (button => {
     if(data.success) {
 
       if (data.success.includes("Downvoted")) {
-        button.innerHTML = `<span class="not-upvoted"><i class="fas fa-arrow-circle-up"></i><span id="upvoteCount-<%=course._id%>-${tutorId}"> ${data.upvoteCount}</span><br></span>`;
+        button.innerHTML = `<span class="not-upvoted"><i class="fas fa-arrow-circle-up"></i><span id="upvoteCount-<%=course._id%>-${tutorId}"> ${data.upvoteCount}</span></span>`;
 
       } else {
-        button.innerHTML = `<span class="upvoted"><i class="fas fa-arrow-circle-up"></i><span id="upvoteCount-<%=course._id%>-${tutorId}"> ${data.upvoteCount}</span><br></span>`;
+        button.innerHTML = `<span class="upvoted"><i class="fas fa-arrow-circle-up"></i><span id="upvoteCount-<%=course._id%>-${tutorId}"> ${data.upvoteCount}</span></span>`;
       }
     }
   });
