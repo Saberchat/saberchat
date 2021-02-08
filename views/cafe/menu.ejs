@@ -52,25 +52,25 @@
     <div class="row">
         <div class="col-12">
 
-            <% types.forEach(type => { %>
+            <% categories.forEach(category => { %>
 
                     <li class="list-group-item list-group-item-success category-header cafe"
-                        id="<%= type._id %>-header">
+                        id="<%= category._id %>-header">
                         <div class="d-flex w-100 justify-content-between">
-                            <h2 class="mb-1"><%= type.name %></h2>
-                            <span><%= type.items.length %> item(s)</span>
+                            <h2 class="mb-1"><%= category.name %></h2>
+                            <span><%= category.items.length %> item(s)</span>
                         </div>
                     </li>
 
-                    <% type.items.forEach(item => { %>
+                    <% category.items.forEach(item => { %>
 
                         <% if (item.isAvailable) { %>
                             <% if (frequentItems.toString().includes(item._id.toString())) { %>
-                                <span class="list-group-item list-group-item-info menu-item <%= type.name.split(' ').join('') %>  cafe"
+                                <span class="list-group-item list-group-item-info menu-item <%= category.name.split(' ').join('') %>  cafe"
                                       id="item-<%= item.id %>">
 
                             <% } else { %>
-                                <span class="list-group-item list-group-item-action menu-item <%= type.name.split(' ').join('') %>  cafe"
+                                <span class="list-group-item list-group-item-action menu-item <%= category.name.split(' ').join('') %>  cafe"
                                       id="item-<%= item.id %>">
                             <% } %>
 
@@ -102,7 +102,7 @@
                 </span>
                         <% } %>
                     <% }) %>
-                    <br class="category-break" id="<%= type._id %>-break"/>
+                    <br class="category-break" id="<%= category._id %>-break"/>
             <% }) %>
             <br/>
         </div>

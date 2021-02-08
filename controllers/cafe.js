@@ -3,7 +3,7 @@ const User = require('../models/user');
 const Order = require('../models/order');
 const Item = require('../models/orderItem');
 const Notification = require('../models/message');
-const Type = require('../models/itemType');
+const Category = require('../models/itemType');
 const Cafe = require('../models/cafe')
 
 //LIBRARIES
@@ -22,8 +22,8 @@ const getData = require("../utils/cafe-data");
 
 //SHOW CAFE HOMEPAGE
 module.exports.index = async function(req, res) {
-    const types = await Type.find({}).populate('items');
-    if (!types) {
+    const categories = await Category.find({}).populate('items');
+    if (!categories) {
         req.flash('error', "Unable to find categories");
         return res.redirect('back');
     }
@@ -34,18 +34,18 @@ module.exports.index = async function(req, res) {
         return res.redirect('back');
     }
 
-    let sortedTypes = [];
-    let sortedType;
-    for (let type of types) {
-        if (type.items.length > 0) {
-            sortedType = type;
-            sortedType.items = sortByPopularity(type.items, "upvotes", "created_at").popular.concat(sortByPopularity(type.items, "upvotes", "created_at").unpopular);
-            for (let i = sortedType.items.length-1; i > 0; i--) {
-                if (!sortedType.items[i].isAvailable) {
-                    sortedType.items.splice(i, 1);
+    let sortedCategories = [];
+    let sortedCategory;
+    for (let category of categories) {
+        if (category.items.length > 0) {
+            sortedCategory = category;
+            sortedCategory.items = sortByPopularity(category.items, "upvotes", "created_at").popular.concat(sortByPopularity(category.items, "upvotes", "created_at").unpopular);
+            for (let i = sortedCategory.items.length-1; i > 0; i--) {
+                if (!sortedCategory.items[i].isAvailable) {
+                    sortedCategory.items.splice(i, 1);
                 }
             }
-            sortedTypes.push(sortedType);
+            sortedCategories.push(sortedCategory);
         }
     }
 
@@ -83,22 +83,22 @@ module.exports.index = async function(req, res) {
             return res.redirect('back');
         }
 
-        return res.render('cafe/newOrder', {types: sortedTypes, frequentItems});
+        return res.render('cafe/newOrder', {categories: sortedCategories, frequentItems});
     }
 
     if (req.query.menu) { //SHOW MENU
-        const types = await Type.find({}).populate('items'); //Collects info on every item type, to render (in frontend, the ejs checks each item inside type, and only shows it if it's available)
-        if (!types) {
+        const categories = await Category.find({}).populate('items'); //Collects info on every item category, to render (in frontend, the ejs checks each item inside category, and only shows it if it's available)
+        if (!categories) {
             req.flash('error', "An Error Occurred");
             return res.redirect('back');
         }
         let itemDescriptions = {}; //Object of items and their link-embedded descriptions
-        for (let type of types) {
-            for (let item of type.items) {
+        for (let category of categories) {
+            for (let item of category.items) {
                 itemDescriptions[item._id] = convertToLink(item.description);
             }
         }
-        return res.render('cafe/menu', {types: sortedTypes, itemDescriptions, frequentItems});
+        return res.render('cafe/menu', {categories: sortedCategories, itemDescriptions, frequentItems});
     }
     return res.render('cafe/index', {orders: allOrders});
 }
@@ -323,13 +323,13 @@ module.exports.deleteOrder = async function(req, res) {
 
 //FORM TO CREATE NEW ITEM
 module.exports.newItem = async function(req, res) {
-    const types = await Type.find({});
-    if (!types) {
+    const categories = await Category.find({});
+    if (!categories) {
         req.flash('error', "An Error Occurred");
         return res.redirect("back");
     }
 
-    return res.render('cafe/newOrderItem', {types});
+    return res.render('cafe/newOrderItem', {categories});
 }
 
 //CREATE NEW ITEM
@@ -364,19 +364,19 @@ module.exports.createItem = async function(req, res) {
         item.price = 0.00;
     }
 
-    if (parseInt(req.body.available) > 0) { //Determine is type is available based on whether or not its availability more than 0
+    if (parseInt(req.body.available) > 0) { //Determine is category is available based on whether or not its availability more than 0
         item.isAvailable = true;
     }
 
-    const type = await Type.findOne({name: req.body.type}); //Find the type specified in the form
-    if (!type) {
-        req.flash('error', "Unable to find correct item type");
+    const category = await Category.findOne({name: req.body.category}); //Find the category specified in the form
+    if (!category) {
+        req.flash('error', "Unable to find correct item category");
         return res.redirect('back');
     }
 
     await item.save();
-    type.items.push(item); //Push this item to that type's item list
-    await type.save();
+    category.items.push(item); //Push this item to that category's item list
+    await category.save();
     return res.redirect('/cafe/manage');
 }
 
@@ -390,13 +390,13 @@ module.exports.viewItem = async function(req, res) {
         return res.redirect('back')
     }
 
-    const types = await Type.find({});
-    if (!types) {
+    const categories = await Category.find({});
+    if (!categories) {
         req.flash('error', "Unable to find item categories");
         return res.redirect('back');
     }
 
-    return res.render('cafe/show', {types, item});
+    return res.render('cafe/show', {categories, item});
 }
 
 //UPDATE ITEM
@@ -447,31 +447,31 @@ module.exports.updateItem = async function(req, res) {
             await order.save();
         }
 
-        const types = await Type.find({name: {$ne: req.body.type}}); //Collect all item types
-        if (!types) {
+        const categories = await Category.find({name: {$ne: req.body.category}}); //Collect all item categories
+        if (!categories) {
             req.flash('error', "Unable to find item categories");
             return res.redirect('back');
         }
 
-        for (let t of types) { //Remove this item from its old item type (if the type has not changed, it's fine because we' add it back in a moment anyway)
+        for (let t of categories) { //Remove this item from its old item category (if the category has not changed, it's fine because we' add it back in a moment anyway)
             if (t.items.includes(item._id)) {
                 t.items.splice(t.items.indexOf(item._id), 1);
             }
             await t.save();
         }
 
-        const type = await Type.findOne({name: req.body.type});  //Add the item to the type which is now specified
-        if (!type) {
+        const category = await Category.findOne({name: req.body.category});  //Add the item to the category which is now specified
+        if (!category) {
             req.flash('error', 'Unable to find item category');
             return res.redirect("back");
         }
 
-        if (type.items.includes(item._id)) { //If item is already in type, remove it so you can put the updated type back (we don't know whether the type will be there or not, so it's better to just cover all bases)
-            type.items.splice(type.items.indexOf(item._id), 1);
+        if (category.items.includes(item._id)) { //If item is already in category, remove it so you can put the updated category back (we don't know whether the category will be there or not, so it's better to just cover all bases)
+            category.items.splice(category.items.indexOf(item._id), 1);
         }
 
-        type.items.push(item);
-        await type.save();
+        category.items.push(item);
+        await category.save();
 
         req.flash('success', "Item updated!");
         return res.redirect('/cafe/manage');
@@ -501,16 +501,16 @@ module.exports.deleteItem = async function(req, res) {
         return res.redirect('back');
     }
 
-    const types = await Type.find({}); //Find all possible types
-    if (!types) {
+    const categories = await Category.find({}); //Find all possible categories
+    if (!categories) {
         req.flash('error', "Could not remove item from list of item categories");
         return res.redirect('back');
     }
 
-    for (let type of types) { //If the type includes this item, remove the item from that type's item list
-        if (type.items.includes(item._id)) {
-            type.items.splice(type.items.indexOf(item._id), 1);
-            await type.save();
+    for (let category of categories) { //If the category includes this item, remove the item from that category's item list
+        if (category.items.includes(item._id)) {
+            category.items.splice(category.items.indexOf(item._id), 1);
+            await category.save();
         }
     }
 
@@ -561,25 +561,18 @@ module.exports.manage = async function(req, res) {
         return res.render("cafe/data", data);
     }
 
-    const types = await Type.find({}).populate('items'); //Collect info on all the item types
-    if (!types) {
+    const categories = await Category.find({}).populate('items'); //Collect info on all the item categories
+    if (!categories) {
         req.flash('error', 'An Error Occurred');
         return res.redirect('back');
     }
 
-    let sortedTypes = [];
-    let sortedType;
-    for (let type of types) {
-        if (type.items.length > 0) {
-            sortedType = type;
-            sortedType.items = sortByPopularity(type.items, "upvotes", "created_at").popular.concat(sortByPopularity(type.items, "upvotes", "created_at").unpopular);
-            for (let i = sortedType.items.length-1; i > 0; i--) {
-                if (!sortedType.items[i].isAvailable) {
-                    sortedType.items.splice(i, 1);
-                }
-            }
-            sortedTypes.push(sortedType);
-        }
+    let sortedCategories = [];
+    let sortedCategory;
+    for (let category of categories) {
+        sortedCategory = category;
+        sortedCategory.items = sortByPopularity(category.items, "upvotes", "created_at").popular.concat(sortByPopularity(category.items, "upvotes", "created_at").unpopular);
+        sortedCategories.push(sortedCategory);
     }
 
     const cafes = await Cafe.find({});
@@ -588,7 +581,7 @@ module.exports.manage = async function(req, res) {
         return res.redirect('back');
     }
 
-    return res.render('cafe/manage', {types: sortedTypes, open: cafes[0].open});
+    return res.render('cafe/manage', {categories: sortedCategories, open: cafes[0].open});
 }
 
 //OPEN/CLOSE CAFE
@@ -610,19 +603,19 @@ module.exports.changeStatus = async function(req, res) {
 //-----------ROUTES FOR GENERAL ITEM CATEGORIES-------------//
 
 //FORM TO CREATE NEW ITEM CATEGORY
-module.exports.newType = async function(req, res) {
-    const types = await Type.find({}).populate('items'); //Collect info on all the items, so that we can give the user the option to add them to that type
-    if (!types) {
+module.exports.newCategory = async function(req, res) {
+    const categories = await Category.find({}).populate('items'); //Collect info on all the items, so that we can give the user the option to add them to that category
+    if (!categories) {
         req.flash('error', "Unable to find categories");
         return res.redirect('back');
     }
 
-    return res.render('cafe/newItemType', {types});
+    return res.render('cafe/newItemCategory', {categories});
 }
 
 //CREATE NEW ITEM CATEGORY
-module.exports.createType = async function(req, res) {
-    const overlap = await Type.find({name: req.body.name}); //Find all item types with this name that already exist
+module.exports.createCategory = async function(req, res) {
+    const overlap = await Category.find({name: req.body.name}); //Find all item categories with this name that already exist
     if (!overlap) {
         req.flash('error', "Unable to find item categories");
         return res.redirect('back');
@@ -633,19 +626,19 @@ module.exports.createType = async function(req, res) {
         return res.redirect('back');
     }
 
-    const type = await Type.create({name: req.body.name, items: []});
-    if (!type) {
+    const category = await Category.create({name: req.body.name, items: []});
+    if (!category) {
         req.flash('error', "Item Category could not be created");
         return res.redirect('back');
     }
 
-    const types = await Type.find({}); //Found types, but represents all item types
-    if (!types) {
+    const categories = await Category.find({}); //Found categories, but represents all item categories
+    if (!categories) {
         req.flash('error', "Could not find item categories");
         return res.redirect('back');
     }
 
-    for (let t of types) { //Now that we've created the type, we have to remove the newly selected items from all other types
+    for (let t of categories) { //Now that we've created the category, we have to remove the newly selected items from all other categories
         for (let i = 0; i < t.items.length; i++) {
             if (req.body[t.items[i].toString()]) {
                 t.items.splice(i, 1);
@@ -660,13 +653,13 @@ module.exports.createType = async function(req, res) {
         return res.redirect('back');
     }
 
-    for (let item of items) { //If the item is selected, add it to this type (now that we've removed it from all other types)
+    for (let item of items) { //If the item is selected, add it to this category (now that we've removed it from all other categories)
         if (req.body[item._id.toString()]) {
-            type.items.push(item);
+            category.items.push(item);
         }
     }
 
-    await type.save();
+    await category.save();
     req.flash('success', "Item Category Created!");
     return res.redirect('/cafe/manage');
 }
@@ -674,30 +667,30 @@ module.exports.createType = async function(req, res) {
 //-----------ROUTES FOR SPECIFIC ITEM CATEGORIES-------------//
 
 //VIEW/EDIT ITEM CATEGORY
-module.exports.viewType = async function(req, res) {
-    const type = await Type.findById(req.params.id).populate('items'); //Find the specified type
-    if (!type) {
+module.exports.viewCategory = async function(req, res) {
+    const category = await Category.findById(req.params.id).populate('items'); //Find the specified category
+    if (!category) {
         req.flash('error', "An Error Occurred");
         return res.redirect('back');
     }
 
-    if (type.name == "Other") {
+    if (category.name == "Other") {
         req.flash('error', "You cannot modify that category");
         return res.redirect('/cafe/manage');
     }
 
-    const types = await Type.find({_id: {$ne: type._id}}).populate('items'); //Find all items
-    if (!types) {
+    const categories = await Category.find({_id: {$ne: category._id}}).populate('items'); //Find all items
+    if (!categories) {
         req.flash('error', "An Error Occurred");
         return res.redirect('back');
     }
 
-    return res.render('cafe/editItemType', {type, types});
+    return res.render('cafe/editItemCategory', {category, categories});
 }
 
 //UPDATE ITEM CATEGORY
-module.exports.updateType = async function(req, res) {
-    const overlap = await Type.find({_id: {$ne: req.params.id}, name: req.body.name}); //Find all types besides the one we are editing with the same name
+module.exports.updateCategory = async function(req, res) {
+    const overlap = await Category.find({_id: {$ne: req.params.id}, name: req.body.name}); //Find all categories besides the one we are editing with the same name
     if (!overlap) {
         req.flash('error', "An Error Occurred");
         return res.redirect('back');
@@ -708,14 +701,14 @@ module.exports.updateType = async function(req, res) {
         return res.redirect('back');
     }
 
-    const type = await Type.findByIdAndUpdate(req.params.id, {name: req.body.name}); //Update this item type based on the id
-    if (!type) {
+    const category = await Category.findByIdAndUpdate(req.params.id, {name: req.body.name}); //Update this item category based on the id
+    if (!category) {
         req.flash('error', "Unable to update item category");
         return res.redirect('back');
     }
 
-    const otherTypes = await Type.find({_id: {$ne: type._id}}); //Find all other types
-    if (!otherTypes) {
+    const otherCategories = await Category.find({_id: {$ne: category._id}}); //Find all other categories
+    if (!otherCategories) {
         req.flash('error', "Unable to find item categories");
         return res.redirect('back');
     }
@@ -726,55 +719,55 @@ module.exports.updateType = async function(req, res) {
         return res.redirect('back');
     }
 
-    for (let otherType of otherTypes) { //Iterate over other types
+    for (let otherCategory of otherCategories) { //Iterate over other categories
         for (let item of items) {
-            if (otherType.items.includes(item._id) && req.body[item._id.toString()] == "on") {
-                otherType.items.splice(otherType.items.indexOf(item._id), 1);
+            if (otherCategory.items.includes(item._id) && req.body[item._id.toString()] == "on") {
+                otherCategory.items.splice(otherCategory.items.indexOf(item._id), 1);
             }
         }
-        await otherType.save();
+        await otherCategory.save();
     }
 
-    const other = await Type.findOne({name: "Other"}); //Find type 'other'
+    const other = await Category.findOne({name: "Other"}); //Find category 'other'
     if (!other) {
         req.flash('error', "Unable to find item category 'Other', please add it'");
-        res.redirect('back'); //There's nowhere for the type-less items to go unless 'Other' exists
+        res.redirect('back'); //There's nowhere for the category-less items to go unless 'Other' exists
     }
 
-    for (let item of type.items) {
+    for (let item of category.items) {
         if (!req.body[item._id.toString()]) { //Item is no longer checked
             other.items.push(item); //Move that item to 'Other'
         }
     }
     await other.save();
 
-    type.items = []; //Empty type and push new items to its items[] array, based on the latest changes
+    category.items = []; //Empty category and push new items to its items[] array, based on the latest changes
     for (let item of items) {
         if (req.body[item._id.toString()]) {
-            type.items.push(item);
+            category.items.push(item);
         }
     }
 
-    await type.save();
+    await category.save();
     req.flash('success', "Item category updated!");
     return res.redirect('/cafe/manage');
 }
 
 //DELETE ITEM CATEGORY
-module.exports.deleteType = async function(req, res) {
-    const other = await Type.findOne({name: "Other"}); //Find the type with name 'Other' - we've created this type so that any unselected items go here
+module.exports.deleteCategory = async function(req, res) {
+    const other = await Category.findOne({name: "Other"}); //Find the category with name 'Other' - we've created this category so that any unselected items go here
     if (!other) {
         req.flash('error', "Unable to find item category 'Other', please add it");
         return res.redirect('back');
     }
 
-    const type = await Type.findByIdAndDelete(req.params.id); //Delete type based on specified ID
-    if (!type) {
+    const category = await Category.findByIdAndDelete(req.params.id); //Delete category based on specified ID
+    if (!category) {
         req.flash('error', "Unable to find item category");
         return res.redirect('back');
     }
 
-    for (let item of type.items) {
+    for (let item of category.items) {
         other.items.push(item);
     }
 

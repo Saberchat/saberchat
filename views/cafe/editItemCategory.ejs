@@ -29,13 +29,13 @@
     <div class="row">
         <div class="col-12">
             <div class="col-12 main">
-                <h1 id="heading">Edit Cafe Category - "<%= type.name %>"</h1>
+                <h1 id="heading">Edit Cafe Category - "<%= category.name %>"</h1>
                 <a class="btn btn-primary" href="/cafe/manage"><i class="fas fa-arrow-left"></i> Back</a><br/><br/>
             </div>
         </div>
     </div>
 
-    <form action="/cafe/type/<%= type._id %>?_method=put" method="post">
+    <form action="/cafe/category/<%= category._id %>?_method=put" method="post">
 
         <h2 class="element">Name</h2>
         <div class="row">
@@ -43,7 +43,7 @@
                 <div class="form-group">
                     <div class="row">
                         <div class="input-group mb-3">
-                            <input id="itemInput" class="form-control" type="text" name="name" value="<%= type.name %>"
+                            <input id="itemInput" class="form-control" type="text" name="name" value="<%= category.name %>"
                                    placeholder="Enter Item Name" maxlength="45" required/>
                         </div>
                     </div>
@@ -56,9 +56,9 @@
             <div class="col-md-8 offset-md-2 col-12">
                 <div class="form-group">
 
-                    <h5><%= type.name %></h5>
-                    <% if (type.items.length > 0) { %>
-                        <% type.items.forEach(item => { %>
+                    <h5><%= category.name %></h5>
+                    <% if (category.items.length > 0) { %>
+                        <% category.items.forEach(item => { %>
                             <input id="item<%= item._id %>" type="checkbox" name="<%= item._id %>" checked/>
                             <label for="item<%= item._id %>"><%= item.name %></label>
                             <br/>
@@ -72,7 +72,7 @@
 
                     <br/>
 
-                    <% types.forEach(t => { %>
+                    <% categories.forEach(t => { %>
 
                         <% if (t.name != "Other") { %>
                             <% if (t.items.length > 0) { %>
@@ -87,7 +87,7 @@
                         <% } %>
                     <% }) %>
 
-                    <% types.forEach(t => { %>
+                    <% categories.forEach(t => { %>
 
                         <% if (t.name == "Other") { %>
                             <% if (t.items.length > 0) { %>
@@ -131,7 +131,7 @@
                             </div>
                             <div class="modal-footer">
                                 <button type="button" class="btn btn-secondary" data-dismiss="modal">Back</button>
-                                <button type="submit" formaction="<%= type._id %>?_method=delete"
+                                <button type="submit" formaction="<%= category._id %>?_method=delete"
                                         class="btn btn-danger">Delete
                                 </button>
                             </div>

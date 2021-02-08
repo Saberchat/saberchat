@@ -28,12 +28,12 @@
 <div class="container mt-5">
     <div class="row">
         <div class="col-12" id="heading">
-            <h1 id="new-heading">New Cafe Item Type</h1>
+            <h1 id="new-heading">New Cafe Item Category</h1>
             <a class="btn btn-primary" href="/cafe/manage"><i class="fas fa-arrow-left"></i> Back</a><br/><br/>
         </div>
     </div>
 
-    <form action="/cafe/type" method="post">
+    <form action="/cafe/category" method="post">
 
         <h2>Name</h2>
         <div class="row">
@@ -53,11 +53,11 @@
         <div class="row">
             <div class="col-md-8 offset-md-2 col-12">
                 <div class="form-group">
-                    <% types.forEach(type => { %>
+                    <% categories.forEach(category => { %>
 
-                        <% if (type.items.length > 0) { %>
-                            <h5><%= type.name %></h5>
-                            <% type.items.forEach(item => { %>
+                        <% if (category.items.length > 0) { %>
+                            <h5><%= category.name %></h5>
+                            <% category.items.forEach(item => { %>
                                 <input id="item<%= item._id %>" type="checkbox" name="<%= item._id %>"/>
                                 <label for="item<%= item._id %>"><%= item.name %></label>
                                 <br/>

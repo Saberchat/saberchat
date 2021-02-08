@@ -33,14 +33,14 @@ router.route('/item/:id')
     .delete(middleware.isLoggedIn, middleware.isCashier, wrapAsync(cafeController.deleteItem)); //Delete item
 
 //GENERAL ITEM CATEGORY ROUTES
-router.route('/type')
-    .get(middleware.isLoggedIn, middleware.isCashier, wrapAsync(cafeController.newType)) //Page to create category
-    .post(middleware.isLoggedIn, middleware.isCashier, wrapAsync(cafeController.createType)); //Create category
+router.route('/category')
+    .get(middleware.isLoggedIn, middleware.isCashier, wrapAsync(cafeController.newCategory)) //Page to create category
+    .post(middleware.isLoggedIn, middleware.isCashier, wrapAsync(cafeController.createCategory)); //Create category
 
 //SPECIFIC ITEM CATEGORY ROUTES
-router.route('/type/:id')
-    .get(middleware.isLoggedIn, middleware.isCashier, wrapAsync(cafeController.viewType)) //View category
-    .put(middleware.isLoggedIn, middleware.isCashier, wrapAsync(cafeController.updateType)) //Update category
-    .delete(middleware.isLoggedIn, middleware.isMod, wrapAsync(cafeController.deleteType)); //Delete category
+router.route('/category/:id')
+    .get(middleware.isLoggedIn, middleware.isCashier, wrapAsync(cafeController.viewCategory)) //View category
+    .put(middleware.isLoggedIn, middleware.isCashier, wrapAsync(cafeController.updateCategory)) //Update category
+    .delete(middleware.isLoggedIn, middleware.isMod, wrapAsync(cafeController.deleteCategory)); //Delete category
 
 module.exports = router;

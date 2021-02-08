@@ -13,9 +13,9 @@ const Room = require('../models/room');
 module.exports.index = async function(req, res) {
     await req.user.populate(
 		{
-			path: 'inbox', 
-			populate: { 
-				path: 'sender', 
+			path: 'inbox',
+			populate: {
+				path: 'sender',
 				select: ['username', 'imageUrl']
 			}
 		}
@@ -85,7 +85,7 @@ module.exports.sent = async function(req, res) {
         if(message.sender.equals(req.user._id)) {
             sent_msgs.push(message);
             continue;
-        } 
+        }
 
         // else check for user's replies by most recent
         for(const reply of message.replies.reverse()) {
@@ -228,7 +228,7 @@ module.exports.createMsg = async function(req, res) {
         } else {
             email_text = `<p>Hello ${r.firstName},</p><p>You have a new Saberchat inbox notification from <strong>${req.user.username}</strong>!</p><p><strong>To</strong>: ${recipientArr.join(', ')}</p><p>${newMessage.text}</p><p>You can access the full message at https://alsion-saberchat.herokuapp.com</p> ${imageString}`;
         }
-        
+
         if(r.receiving_emails) {
             await sendGridEmail(r.email, `New Inbox Notification - ${newMessage.subject}`, email_text);
         }
@@ -242,9 +242,9 @@ module.exports.createMsg = async function(req, res) {
 module.exports.markReadAll = async function(req, res) {
     const result = await Message.updateMany(
         {
-            _id: {$in: req.user.inbox}, 
+            _id: {$in: req.user.inbox},
             read: {$ne: req.user._id}
-        }, 
+        },
         {
             $push: {read: req.user._id}
         });
@@ -262,9 +262,9 @@ module.exports.markReadSelected = async function(req, res) {
 	}
     const result = await Message.updateMany(
         {
-            _id: {$in: ids}, 
+            _id: {$in: ids},
             read: {$ne: req.user._id}
-        }, 
+        },
         {
             $push: {read: req.user._id}
         });
@@ -294,7 +294,7 @@ module.exports.reply = async function(req, res) {
 
     let reply = {sender: req.user, text: req.body.text, images: req.body.images, date: dateFormat(new Date(), "h:MM TT | mmm d")};
     message.replies.push(reply); //Add reply to message thread
-    
+
     //Create string to track reply's images
     let imageString = "";
 
@@ -305,7 +305,7 @@ module.exports.reply = async function(req, res) {
     }
 
     let readRecipients = message.read; //Users who have read the original message will need to have their msgCount incremented again
-    
+
     //Iterates through the recipients and sees if the sender is part of them. If not, then no reply has been sent yet, but since the sender has sent the message, they have 'read' it. Hence, they are added to the readRecipients array.
 
     let senderIncluded = false; //Checks whether the sender is part of the thread
@@ -315,35 +315,35 @@ module.exports.reply = async function(req, res) {
             break;
         }
     }
-    
+
 
 
     Message.findById(req.body.message).populate('recipients').populate('sender').exec((err, message) => {
         if (err || !message) {
           res.json({error: "Error accessing message"});
-    
+
         } else if (message.anonymous || message.noReply) {
           res.json({error: "Cannot reply to this message"});
-    
+
         } else {
           let reply = {sender: req.user, text: req.body.text, images: req.body.images, date: dateFormat(new Date(), "h:MM TT | mmm d")};
           message.replies.push(reply); //Add reply to message thread
-    
+
           let replyEmail;
-    
+
           //Create string to track reply's images
           let imageString = "";
-    
+
           if (reply.images) {
             for (let image of reply.images) {
               imageString += `<img src="${image}">`;
             }
           }
-    
+
           let readRecipients = message.read; //Users who have read the original message will need to have their msgCount incremented again
-    
+
           //Iterates through the recipients and sees if the sender is part of them. If not, then no reply has been sent yet, but since the sender has sent the message, they have 'read' it. Hence, they are added to the readRecipients array.
-    
+
           senderIncluded = false; //Checks whether the sender is part of the thread
           for (let recipient of message.recipients) {
             if (recipient._id.equals(message.sender._id)) {
@@ -351,46 +351,46 @@ module.exports.reply = async function(req, res) {
               break;
             }
           }
-    
+
           if (!senderIncluded) {
             readRecipients.push(message.sender);
           }
-    
+
           for (let i = message.recipients.length-1; i >= 0; i--) { //If the original sender is already part of the recipients, remove them just in case
             if (message.recipients[i]._id.equals(message.sender._id)) {
               message.recipients.splice(i, 1);
             }
           }
-    
+
           message.recipients.push(message.sender); //Add original sender to recipient list (code above ensures that they are not added multiple times)
           message.read = [req.user]; //Since the current user replied to this message, they've seen the completely updated message. Nobody else has
           message.save();
-    
+
           for (let recipient of message.recipients) { //Remove original message and add it back so that it appears 'new'
-    
+
             //Remove message from recipient's inbox
             for (let i = recipient.inbox.length - 1; i >= 0; i --) {
               if (recipient.inbox[i].equals(message._id)) {
                 recipient.inbox.splice(i, 1);
               }
             }
-    
+
             //Add it to the front of the recipient's inbox
             recipient.inbox.push(message._id);
-    
+
             //If the recipient has already read this message and it is not the person sending the reply (or the recipient is the original message sender), increment their message count again
             if ((readRecipients.includes(recipient._id)) && (!(recipient._id.equals(req.user._id)))) {
               recipient.msgCount += 1;
             }
-    
+
             recipient.save();
-    
+
             //Send email notifying about the reply to everyone except person who posted the reply
             if (!(recipient._id.equals(req.user._id))) {
               transport(recipient, `New Reply On ${message.subject}`, `<p>Hello ${recipient.firstName},</p><p><strong>${req.user.username}</strong> replied to <strong>${message.subject}</strong>.<p>${reply.text}</p><p>You can access the full message at https://alsion-saberchat.herokuapp.com</p> ${imageString}`);
             }
           }
-    
+
           res.json({ //Send JSON response to front-end
             success: `Replied to ${message._id}`,
             message: message

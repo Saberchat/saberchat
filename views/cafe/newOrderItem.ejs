@@ -63,11 +63,11 @@
                     <div class="row">
                         <div class="col">
                             <div class="input-group mb-3 field">
-                                <label id="type-input-label" for="typeInput">Type</label>
-                                <select id="typeInput" name="type" class="field">
-                                    <option disabled selected required>Meal Type</option>
-                                    <% types.forEach(type => { %>
-                                        <option><%= type.name %></option>
+                                <label id="category-input-label" for="categoryInput">Category</label>
+                                <select id="categoryInput" name="category" class="field">
+                                    <option disabled selected required>Meal Category</option>
+                                    <% categories.forEach(category => { %>
+                                        <option><%= category.name %></option>
                                     <% }) %>
                                 </select>
                             </div>
