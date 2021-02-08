@@ -23,9 +23,10 @@
   color: #7FFFD4;
 }
 
-#role-header, #status-header, #email-header {
+#role-header, #status-header, #email-header, #message-date {
     color: turquoise;
 }
+
 .chat, .chat:hover, .chat:focus{
   background-color: #404040;
   color: white;

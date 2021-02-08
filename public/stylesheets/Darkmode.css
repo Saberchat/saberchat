@@ -1,7 +1,6 @@
 .mode, .mode:focus, .mode:hover {
   background-color: #343a40;
   color: white;
-
 }
 
 .search, .search:focus{
@@ -16,6 +15,7 @@
   background-color: #000057;
   color: #7FFFD4;
 }
+
 .cafetext !important{
   color: #7FFFD4;
 }
