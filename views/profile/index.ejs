@@ -36,7 +36,7 @@
     <div class="container">
         <div class="row">
             <div class="col-md-10 offset-md-1 col-12 cafetext">
-                <h1 class="title">Users (<%=users.length%>)</h1>
+                <h1 class="title" id="darkmode-header">Users (<%=users.length%>)</h1>
                 <div class="search-filter search">
                     <i class="fas fa-search"></i>
                     <input id="search-input" oninput="searchFunction()" class="form-control search" type="text" placeholder="Search..." title="Type in Username">
@@ -57,7 +57,7 @@
                   <% let sortedUsers = [];%>
                   <% for (let status of statuses) { %>
                     <% if (status[2].length > 0) { %>
-                      <li class="list-group-item list-group-item-success status-header mode" id="<%=status[0]%>-header">
+                      <li class="list-group-item list-group-item-success status-header mode darkmode-outline" id="<%=status[0]%>-header">
                         <div class="d-flex w-100 justify-content-between">
                           <h2 class="mb-1"><%=status[1]%></h2>
                           <span><%=status[2].length%> user(s)</span>
@@ -122,7 +122,7 @@
     <% for (let user of users) { %>
       <div class="modal fade" id="modal-<%=user._id%>-unfollow" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
         <div class="modal-dialog">
-          <div class="modal-content">
+          <div class="modal-content mode">
             <div class="modal-header">
               <h5 class="modal-title" id="exampleModalLabel">Unfollow <%=user.firstName%> <%=user.lastName%>?</h5>
               <button type="button" class="close" data-dismiss="modal" aria-label="Close">
@@ -142,7 +142,7 @@
 
       <div class="modal fade" id="modal-<%=user._id%>-follow" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
         <div class="modal-dialog">
-          <div class="modal-content">
+          <div class="modal-content mode">
             <div class="modal-header">
               <h5 class="modal-title" id="exampleModalLabel">Follow <%=user.firstName%> <%=user.lastName%>?</h5>
               <button type="button" class="close" data-dismiss="modal" aria-label="Close">

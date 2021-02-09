@@ -82,11 +82,15 @@ const changeJoinCode = ((courseID, event) => {
     document.getElementById('loading').innerText = "Waiting";
 
     if (data.success) {
-
       document.getElementById('joinCode').innerText = data.joinCode;
       document.getElementById('loading').hidden = false;
-      document.getElementById('loading').style.color = "green";
       document.getElementById('loading').innerText = data.success;
+
+      if (document.getElementById('loading').className == "darkmode-true") {
+        document.getElementById('loading').style.color = "#03fc45";
+      } else {
+        document.getElementById('loading').style.color = "green";
+      }
 
       setTimeout(() => {
         document.getElementById('loading').hidden = true;
@@ -94,8 +98,8 @@ const changeJoinCode = ((courseID, event) => {
 
     } else {
       document.getElementById('loading').hidden = false;
-      document.getElementById('loading').style.color = "red";
       document.getElementById('loading').innerText = data.error;
+      document.getElementById('loading').style.color = "red";
 
       setTimeout(() => {
         document.getElementById('loading').hidden = true;

@@ -54,13 +54,13 @@
     <div class="container mb-5 tutor-info">
       <a href="../../profiles/<%=tutor.tutor._id%>"><img src="<%= tutor.tutor.imageUrl %>" alt="profile image" class="profile-image"></a>
       <a href="../../profiles/<%=student._id%>"><img src="<%= student.imageUrl %>" alt="profile image" class="profile-image"></a>
-      <h1 class="username mode"><%=student.firstName%>'s Lessons with <%= tutor.tutor.firstName %> <%=tutor.tutor.lastName%></h1>
+      <h1 class="username mode darkmode-outline"><%=student.firstName%>'s Lessons with <%= tutor.tutor.firstName %> <%=tutor.tutor.lastName%></h1>
     </div>
 
     <div class="container mt-5">
       <% if (lessonCount > 0) { %>
       <ul id="lesson-info-<%=student._id%>" class="list-group">
-        <li class="list-group-item list-group-item-success status-header mode">
+        <li class="list-group-item list-group-item-success status-header mode darkmode-outline">
           <div class="d-flex w-100 justify-content-between">
             <h2 class="mb-1">Lessons (<%=lessonCount%>)</h2>
 

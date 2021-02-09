@@ -247,8 +247,14 @@ const setStudentsShow = (courseId => {
   $.post(url, data, function(data) {
     if (data.success) {
       document.getElementById("slots-count").innerText = `${slots}`;
-      document.getElementById("change-message").style.color = "green";
+
       document.getElementById("change-message").innerText = "Succesfully Changed";
+
+      if (document.getElementById("change-message").className == "darkmode-true") {
+        document.getElementById("change-message").style.color = "#03fc45";
+      } else {
+        document.getElementById("change-message").style.color = "green";
+      }
 
       if (!data.tutor.available) {
         const lessonButton = document.getElementsByClassName("lesson-action")[0];
@@ -259,8 +265,8 @@ const setStudentsShow = (courseId => {
       }
 
     } else if (data.error) {
-      document.getElementById("change-message").style.color = "red";
       document.getElementById("change-message").innerText = "An Error Occurred";
+      document.getElementById("change-message").style.color = "red";
     }
 
     document.getElementById("change-message").hidden = false;

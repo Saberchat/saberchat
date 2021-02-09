@@ -21,8 +21,8 @@
       <link rel="stylesheet" href="/stylesheets/homework/tutor-show.css">
       <%if (currentUser) {%>
         <%if (currentUser.darkmode) { %>
-          <link rel="stylesheet" href="/stylesheets/Darkmode.css">
           <link rel="stylesheet" href="/stylesheets/homework/homework-dark.css">
+          <link rel="stylesheet" href="/stylesheets/Darkmode.css">
         <%}%>
       <%}%>
 
@@ -88,10 +88,10 @@
 
                       <p id="tutor-bio"><%= tutor.bio %></p>
 
-                      <h4 class="mode">Username</h4>
+                      <h4 id="darkmode-header">Username</h4>
                       <p><%=tutor.tutor.username%></p>
 
-                      <h4 class="mode">Experience</h4>
+                      <h4 id="darkmode-header">Experience</h4>
                       <% let experience = 0; %>
                       <% for (let lesson of tutor.lessons) { %>
                         <%experience += lesson.time;%>
@@ -99,13 +99,13 @@
 
                       <p id="experience" ><%=experience%> minute(s)</p>
 
-                      <h4 class="mode">Lessons</h4>
+                      <h4 id="darkmode-header">Lessons</h4>
                       <p id="lessons-length"><%=tutor.lessons.length%></p>
 
-                      <h4 class="mode">Status</h4>
+                      <h4 id="darkmode-header">Status</h4>
                       <p><%= tutor.tutor.status.charAt(0).toUpperCase() + tutor.tutor.status.slice(1) %></p>
 
-                      <h4 class="mode">Email</h4>
+                      <h4 id="darkmode-header">Email</h4>
                       <p><%= tutor.tutor.email %></p>
 
                       <% if (studentIds.includes(currentUser._id.toString())) { %>
@@ -148,15 +148,15 @@
                         <form action="/homework/remove-tutor/<%=course._id%>?_method=put&tutorId=<%=tutor.tutor._id%>" method="post">
                           <button type="button" class="btn btn-danger action-button" data-toggle="modal" data-target="#modal-remove">Remove Tutor</button>
                           <div class="modal fade" id="modal-remove" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
-                            <div class="modal-dialog">
+                            <div class="modal-dialog mode">
                               <div class="modal-content mode">
-                                <div class="modal-header">
+                                <div class="modal-header mode">
                                   <h5 class="modal-title" id="exampleModalLabel">Remove <%=tutor.tutor.firstName%> <%=tutor.tutor.lastName%> From Your Course?</h5>
                                   <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                                     <span aria-hidden="true">&times;</span>
                                   </button>
                                 </div>
-                                <div class="modal-body">
+                                <div class="modal-body mode">
                                   <textarea rows="5" class="form-control mode" id="reason-<%=tutor.tutor._id%>" name="reason" placeholder="Please explain why you wish to remove <%=tutor.tutor.firstName%>."></textarea>
                                 </div>
                                 <div class="modal-footer">
@@ -170,15 +170,15 @@
                       <% } %>
 
                       <div class="modal fade" id="modal-book-<%=tutor.tutor._id%>" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
-                        <div class="modal-dialog">
+                        <div class="modal-dialog mode">
                           <div class="modal-content mode">
-                            <div class="modal-header">
+                            <div class="modal-header mode">
                               <h5 class="modal-title" id="exampleModalLabel">Book lessons with <%=tutor.tutor.firstName%> <%=tutor.tutor.lastName%>?</h5>
                               <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                                 <span aria-hidden="true">&times;</span>
                               </button>
                             </div>
-                            <div class="modal-body">
+                            <div class="modal-body mode">
                               You will be able to schedule meeting times and work with <%=tutor.tutor.firstName%> on your classwork.
                             </div>
                             <div class="modal-footer">
@@ -190,15 +190,15 @@
                       </div>
 
                       <div class="modal fade" id="modal-review-<%=tutor.tutor._id%>" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
-                        <div class="modal-dialog">
+                        <div class="modal-dialog mode">
                           <div class="modal-content mode">
-                            <div class="modal-header">
+                            <div class="modal-header mode">
                               <h5 class="modal-title" id="exampleModalLabel">Review <%=tutor.tutor.firstName%> <%=tutor.tutor.lastName%>?</h5>
                               <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                                 <span aria-hidden="true">&times;</span>
                               </button>
                             </div>
-                            <div class="modal-body">
+                            <div class="modal-body mode">
 
                               <% for (let i = 0; i < 5; i += 1) { %>
                                 <i class="fas fa-star star-<%=tutor.tutor._id%>" onclick="rate(this, '<%=tutor.tutor._id%>')" id="<%=i+1%>" name="star" value="<%=i+1%>"></i>
@@ -216,15 +216,15 @@
                       </div>
 
                       <div class="modal fade" id="modal-stop-<%=tutor.tutor._id%>" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
-                        <div class="modal-dialog">
+                        <div class="modal-dialog mode">
                           <div class="modal-content mode">
-                            <div class="modal-header">
+                            <div class="modal-header mode">
                               <h5 class="modal-title" id="exampleModalLabel">Stop lessons with <%=tutor.tutor.firstName%> <%=tutor.tutor.lastName%>?</h5>
                               <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                                 <span aria-hidden="true">&times;</span>
                               </button>
                             </div>
-                            <div class="modal-body">
+                            <div class="modal-body mode">
                               You may not be able to guarantee a slot with <%=tutor.tutor.firstName%> immediately.
                             </div>
                             <div class="modal-footer">
@@ -236,15 +236,15 @@
                       </div>
 
                       <div class="modal fade" id="modal-close-<%=tutor.tutor._id%>" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
-                        <div class="modal-dialog">
+                        <div class="modal-dialog mode">
                           <div class="modal-content mode">
-                            <div class="modal-header">
+                            <div class="modal-header mode">
                               <h5 class="modal-title" id="exampleModalLabel">Close all new lesson bookings?</h5>
                               <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                                 <span aria-hidden="true">&times;</span>
                               </button>
                             </div>
-                            <div class="modal-body">
+                            <div class="modal-body mode">
                               No new students will be able to sign up with you until you reopen availability.
                             </div>
                             <div class="modal-footer">
@@ -256,15 +256,15 @@
                       </div>
 
                       <div class="modal fade" id="modal-reopen-<%=tutor.tutor._id%>" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
-                        <div class="modal-dialog">
+                        <div class="modal-dialog mode">
                           <div class="modal-content mode">
-                            <div class="modal-header">
+                            <div class="modal-header mode">
                               <h5 class="modal-title" id="exampleModalLabel">Reopen lesson bookings?</h5>
                               <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                                 <span aria-hidden="true">&times;</span>
                               </button>
                             </div>
-                            <div class="modal-body">
+                            <div class="modal-body mode">
                               New students will be able to sign up with you until you until you close availability.
                             </div>
                             <div class="modal-footer">
@@ -276,15 +276,15 @@
                       </div>
 
                       <div class="modal fade" id="modal-edit-bio" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
-                        <div class="modal-dialog">
+                        <div class="modal-dialog mode">
                           <div class="modal-content mode">
-                            <div class="modal-header">
+                            <div class="modal-header mode">
                               <h5 class="modal-title" id="exampleModalLabel">Edit Bio?</h5>
                               <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                                 <span aria-hidden="true">&times;</span>
                               </button>
                             </div>
-                            <div class="modal-body">
+                            <div class="modal-body mode">
                               <% for (let tutor of course.tutors) { %>
                                 <% if (tutor.tutor._id.equals(currentUser._id)) { %>
                                   <span id="bio-length-error" hidden>Make bio between 100-250 words</span>
@@ -406,15 +406,15 @@
                     </div>
 
                     <div class="modal fade" id="modal-<%=student._id%>-mark" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
-                      <div class="modal-dialog">
+                      <div class="modal-dialog mode">
                         <div class="modal-content mode">
-                          <div class="modal-header">
+                          <div class="modal-header mode">
                             <h5 class="modal-title" id="exampleModalLabel">Mark Lesson For <%=student.firstName%> <%=student.lastName%>?</h5>
                             <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                               <span aria-hidden="true">&times;</span>
                             </button>
                           </div>
-                          <div class="modal-body">
+                          <div class="modal-body mode">
                             <label for="time-<%=student._id%>">Lesson Time: <span id="time-label-<%=student._id%>">0</span> minutes</label><br />
                             <input type="range" min="0" max="60" value="0" class="slider time" id="time-<%=student._id%>" onchange="setTime(this)">
                             <textarea minlength="20" maxlength="500" rows="5" class="form-control mode summary" id="summary-<%=student._id%>" placeholder="Lesson Summary"></textarea>
@@ -512,15 +512,15 @@
                                 <form action="/homework/join" method="post" id="join-<%=c._id%>" class="join-course-student">
                                   <button type="button" data-toggle="modal" data-target="#modal-join" class="btn btn-primary"><i class="fas fa-chalkboard-teacher"></i> Join Course</button>
                                   <div class="modal fade" id="modal-join" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
-                                    <div class="modal-dialog">
+                                    <div class="modal-dialog mode">
                                       <div class="modal-content mode">
-                                        <div class="modal-header">
+                                        <div class="modal-header mode">
                                           <h5 class="modal-title" id="exampleModalLabel">Join Course</h5>
                                           <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                                             <span aria-hidden="true">&times;</span>
                                           </button>
                                         </div>
-                                        <div class="modal-body">
+                                        <div class="modal-body mode">
                                           <input class="form-control mode" type="text" name="joincode" placeholder="Enter Join Code"/>
                                         </div>
                                         <div class="modal-footer">
@@ -537,15 +537,15 @@
                                 <form action="/homework/join-tutor" method="post" id="join-tutor-<%=c._id%>" class="join-course-tutor">
                                   <button type="button" data-toggle="modal" data-target="#modal-tutor-<%=c._id%>" class="btn btn-success"><i class="fas fa-chalkboard-teacher"></i> Join Course As Tutor</button>
                                   <div class="modal fade" id="modal-tutor-<%=c._id%>" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
-                                    <div class="modal-dialog">
+                                    <div class="modal-dialog mode">
                                       <div class="modal-content mode">
-                                        <div class="modal-header">
+                                        <div class="modal-header mode">
                                           <h5 class="modal-title" id="exampleModalLabel">Join Course As Tutor</h5>
                                           <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                                             <span aria-hidden="true">&times;</span>
                                           </button>
                                         </div>
-                                        <div class="modal-body">
+                                        <div class="modal-body mode">
                                           <input class="form-control mode" type="text" name="joincode" placeholder="Enter Join Code"/><br />
                                           <label for="slots-<%=c._id%>" id="slots-label-<%=c._id%>">Number of Student Slots: 0 </label><br />
                                           <input type="range" min="0" max="5" value="0" class="slider" id="slots-<%=c._id%>" name="slots" onchange="setStudentsTutorShow(this)">

@@ -43,7 +43,7 @@
 
                 <ul class="list-group mode">
 
-                  <li class="list-group-item mode">
+                  <li class="list-group-item mode darkmode-outline">
                     <span id="modify-header">Email Whitelist</span>
                     <form id="add-email-form" onsubmit="addEmail(event)">
                       <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#modal-add-email" id="delete-button"><i class="fas fa-inbox"></i> Add Email</button>
@@ -72,7 +72,7 @@
                   <div id="email-list">
                   <% for (let email of emails.reverse()) { %>
 
-                    <li class="list-group-item email mode" id="<%=email._id%>">
+                    <li class="list-group-item email mode cafe" id="<%=email._id%>">
                       <%=email.address%>
                       <% let exists = null %>
 
@@ -84,7 +84,7 @@
                       <% } %>
 
                       <% if (exists) { %>
-                        <a class="badge badge-pill badge-info user-exists" href="../profiles/<%=exists._id%>">User Exists</a>
+                        <a class="badge badge-pill user-exists badge-<% if (currentUser.darkmode) { %>success<% } else { %>info<% } %>"href="../profiles/<%=exists._id%>">User Exists</a>
 
                       <% } else { %>
                         <div class="delete-email">

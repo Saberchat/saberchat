@@ -3,35 +3,47 @@
   color: white;
 }
 
-.search, .search:focus{
+.darkmode-outline, .darkmode-outline:focus, .darkmode-outline:hover {
+    background-color: #1f2326;
+}
+
+.search, .search:focus {
   color: white;
   background-color: #343a40;
 }
-.header{
+
+.header {
   background-color: grey;
   color: white;
 }
-.cafe,.cafe:focus,.cafe:hover{
+
+.cafe,.cafe:focus,.cafe:hover {
   background-color: #000057;
   color: #7FFFD4;
 }
 
-.cafetext !important{
+.cafetext {
   color: #7FFFD4;
 }
 
 #role-header, #status-header, #email-header {
     color: turquoise;
 }
-.chat, .chat:hover, .chat:focus{
+
+.chat, .chat:hover, .chat:focus {
   background-color: #404040;
   color: white;
 }
-.chatbar, .chatbar:focus, .chatbar:hover{
+
+.chatbar, .chatbar:focus, .chatbar:hover {
   background-color: darkgrey;
   color: white;
-
 }
-.shadow{
+
+.shadow {
   box-shadow: 0px 10px 20px darkblue;
+}
+
+#darkmode-header, .darkmode-header {
+    color: white;
 }
