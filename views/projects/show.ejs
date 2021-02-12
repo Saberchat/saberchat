@@ -109,19 +109,17 @@
                         <div id="like-div">
                             <% if (project.likes.includes(currentUser._id)) { %>
                                 <span id="project-like-row"><i id="like-<%= project._id %>-show" onclick="like(this)"
-                                                               class="fas fa-thumbs-up liked-project"></i></span> <span
-                                        id="like-count"
-                                        class="likeCount-<%= project._id %>"><%= project.likes.length %></span>
+                                  class="fas fa-thumbs-up liked-project"></i></span>
+                                  <span id="like-count" class="likeCount-<%= project._id %>"><%= project.likes.length %></span>
 
                             <% } else { %>
                                 <span id="project-like-row"><i id="like-<%= project._id %>-show" onclick="like(this)"
-                                                               class="fas fa-thumbs-up unliked-project"></i></span><span
-                                        id="like-count"
-                                        class="likeCount-<%= project._id %>"><%= project.likes.length %></span>
+                                  class="fas fa-thumbs-up unliked-project"></i></span>
+                                  <span id="like-count" class="likeCount-<%= project._id %>"><%= project.likes.length %></span>
 
                             <% } %>
-                            <a id="comments-count-icon" href="#comment-section"><i
-                                        class="fas fa-comment-dots"></i> <%= project.comments.length %></a>
+                            <a id="comments-count-icon" href="#comment-section">
+                              <i class="fas fa-comment-dots"></i> <%= project.comments.length %></a>
                         </div>
 
                     <% } %>
@@ -220,6 +218,10 @@
 
                     <% for (let img of project.images) { %>
                         <img class="project-image" src="<%= img %>"/>
+                        <br/><br/>
+                    <% } %>
+                    <% for (let img of project.imageFiles) { %>
+                        <img class="project-image" src="<%= img.url %>"/>
                         <br/><br/>
                     <% } %>
                 </div>

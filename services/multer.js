@@ -19,8 +19,7 @@ const multerConfig = {
     }
 };
 
-// const multerUpload = util.promisify(multer(multerConfig).single('imageFile'));
+const uploadSingle = util.promisify(multer(multerConfig).single("imageFile"));
+const uploadMultiple = util.promisify(multer(multerConfig).array("imageFile", 3)); //Max 3 uploads (might change, discuss as a team)
 
-// module.exports = multerUpload;
-
-module.exports = multer(multerConfig).single('imageFile');
+module.exports = {uploadSingle, uploadMultiple};

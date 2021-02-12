@@ -156,6 +156,8 @@
                         <div class="block-content mode">
                             <% if (project.images.length > 0) { %>
                                 <img class="project-first-image" src="<%= project.images[0] %>"/>
+                            <% } else if (project.imageFiles.length > 0) { %>
+                                <img class="project-first-image" src="<%= project.imageFiles[0].url%>"/>
                             <% } %>
 
                             <span hidden>

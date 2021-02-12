@@ -4,6 +4,7 @@ const express = require('express');
 const middleware = require('../middleware');
 const router = express.Router();
 const wrapAsync = require('../utils/wrapAsync');
+const {singleUpload, multipleUpload} = require('../middleware/multer');
 const cafeController = require('../controllers/cafe');
 
 //GENERAL ROUTES
@@ -24,12 +25,12 @@ router.route('/manage')
 //GENERAL ITEM ROUTES
 router.route('/item')
     .get(middleware.isLoggedIn, middleware.isCashier, wrapAsync(cafeController.newItem)) //Page to create item
-    .post(middleware.isLoggedIn, middleware.isCashier, wrapAsync(cafeController.createItem)); //Create item
+    .post(middleware.isLoggedIn, middleware.isCashier, singleUpload, wrapAsync(cafeController.createItem)); //Create item
 
 //SPECIFIC ITEM ROUTES
 router.route('/item/:id')
     .get(middleware.isLoggedIn, middleware.isCashier, wrapAsync(cafeController.viewItem)) //View item
-    .put(middleware.isLoggedIn, wrapAsync(cafeController.updateItem)) //Update/upvote item
+    .put(middleware.isLoggedIn, singleUpload, wrapAsync(cafeController.updateItem)) //Update/upvote item
     .delete(middleware.isLoggedIn, middleware.isCashier, wrapAsync(cafeController.deleteItem)); //Delete item
 
 //GENERAL ITEM CATEGORY ROUTES

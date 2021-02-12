@@ -5,10 +5,13 @@ const express = require('express');
 const middleware = require('../middleware');
 const router = express.Router(); //start express router
 const dateFormat = require('dateformat');
-const filter = require('../utils/filter');
 const {transport, transport_mandatory} = require("../utils/transport");
 const convertToLink = require("../utils/convert-to-link");
+const filter = require('../utils/filter');
 const {getPopularityCoefficiant, sortByPopularity} = require("../utils/popularity-algorithms");
+
+const {singleUpload, multipleUpload} = require('../middleware/multer');
+const {cloudUpload, cloudDelete} = require('../services/cloudinary');
 const {validateProject} = require('../middleware/validation');
 
 //SCHEMA
@@ -46,7 +49,7 @@ router.get('/new', middleware.isLoggedIn, middleware.isFaculty, (req, res) => { 
     });
 });
 
-router.post('/', middleware.isLoggedIn, middleware.isFaculty, validateProject, (req, res) => { //RESTful Routing 'CREATE' route
+router.post('/', middleware.isLoggedIn, middleware.isFaculty, multipleUpload, validateProject, (req, res) => { //RESTful Routing 'CREATE' route
     (async () => { //Asynchronous functions dictates that processes occur one at a time, reducing excessive callbacks
 
         let creators = [];
@@ -57,7 +60,7 @@ router.post('/', middleware.isLoggedIn, middleware.isFaculty, validateProject, (
             let statuses = ['7th', '8th', '9th', '10th', '11th', '12th'];
 
             for (let creator of req.body.creatorInput.split(',')) {
-                if (statuses.indexOf(creator) > -1) {
+                if (statuses.includes(creator)) {
                     statusGroup = await User.find({authenticated: true, status: creator});
 
                     if (!statusGroup) {
@@ -89,6 +92,21 @@ router.post('/', middleware.isLoggedIn, middleware.isFaculty, validateProject, (
         if (req.body.images) { //If any images were added (if not, the 'images' property is null)
             for (const image in req.body.images) {
                 project.images.push(req.body.images[image]);
+            }
+        }
+
+        if (req.files) {
+            for (let file of req.files) {
+                let [cloudErr, cloudResult] = await cloudUpload(file);
+                if (cloudErr || !cloudResult) {
+                    req.flash('error', 'Upload failed');
+                    return res.redirect('back');
+                }
+
+                project.imageFiles.push({
+                    filename: cloudResult.public_id,
+                    url: cloudResult.secure_url
+                });
             }
         }
 
@@ -375,7 +393,7 @@ router.put('/comment', middleware.isLoggedIn, (req, res) => {
             await user.save();
         }
 
-        res.json({
+        return res.json({
             success: 'Successful comment',
             comments: project.comments
         });
@@ -385,7 +403,7 @@ router.put('/comment', middleware.isLoggedIn, (req, res) => {
     });
 });
 
-router.put('/:id', middleware.isLoggedIn, middleware.isFaculty, validateProject, (req, res) => {
+router.put('/:id', middleware.isLoggedIn, middleware.isFaculty, multipleUpload, (req, res) => {
     (async () => { //Asynchronous functions dictates that processes occur one at a time, reducing excessive callbacks
 
         let creators = [];
@@ -402,7 +420,7 @@ router.put('/:id', middleware.isLoggedIn, middleware.isFaculty, validateProject,
 
             for (let creator of creatorInputArray) {
 
-                if (statuses.indexOf(creator) > -1) {
+                if (statuses.includes(creator)) {
                     statusGroup = await User.find({authenticated: true, status: creator});
 
                     if (!statusGroup) {
@@ -456,10 +474,36 @@ router.put('/:id', middleware.isLoggedIn, middleware.isFaculty, validateProject,
             }
         }
 
-        updatedProject.save();
+        for (let i = updatedProject.imageFiles.length-1; i >= 0; i--) {
+            if (req.body[`deleteUpload-${updatedProject.imageFiles[i].url}`] && updatedProject.imageFiles[i].filename) {
+                let [cloudError, cloudResult] = await cloudDelete(updatedProject.imageFiles[i].filename);
+                // check for failure
+                if (cloudError || !cloudResult || cloudResult.result !== 'ok') {
+                    req.flash('error', 'Error deleting uploaded image');
+                    return res.redirect('back');
+                }
+                updatedProject.imageFiles.splice(i, 1);
+            }
+        }
 
+        // if files were uploaded
+        if (req.files) {
+            for (let file of req.files) {
+                let [cloudErr, cloudResult] = await cloudUpload(file);
+                if (cloudErr || !cloudResult) {
+                    req.flash('error', 'Upload failed');
+                    return res.redirect('back');
+                }
+
+                updatedProject.imageFiles.push({
+                    filename: cloudResult.public_id,
+                    url: cloudResult.secure_url
+                });
+            }
+        }
+
+        await updatedProject.save();
         const followers = await User.find({authenticated: true, _id: {$in: req.user.followers}});
-
         if (!followers) {
             req.flash('error', "Umable to access your followers");
             return res.redirect('back');
@@ -502,7 +546,7 @@ router.put('/:id', middleware.isLoggedIn, middleware.isFaculty, validateProject,
         }
 
         req.flash("success", "Project Updated!");
-        res.redirect(`/projects/${project._id}`);
+        return res.redirect(`/projects/${project._id}`);
 
     })().catch(err => {
         req.flash('error', "An Error Occurred");
@@ -531,8 +575,20 @@ router.delete('/:id', middleware.isLoggedIn, middleware.isFaculty, (req, res) =>
             return res.redirect('back');
         }
 
+        // delete any uploads
+        for (let file of project.imageFiles) {
+            if (file.filename) {
+                let [cloudError, cloudResult] = await cloudDelete(file.filename);
+                // check for failure
+                if (cloudError || !cloudResult || cloudResult.result !== 'ok') {
+                    req.flash('error', 'Error deleting uploaded image');
+                    return res.redirect('back');
+                }
+            }
+        }
+
         req.flash("success", "Project Deleted!");
-        res.redirect('/projects');
+        return res.redirect('/projects');
 
     })().catch(err => {
         req.flash('error', "An Error Occurred");

@@ -17,6 +17,7 @@ const convertToLink = require("../utils/convert-to-link");
 const filter = require('../utils/filter');
 const {getHours, sortTimes, getStats} = require('../utils/time');
 const getData = require("../utils/cafe-data");
+const {cloudUpload, cloudDelete} = require('../services/cloudinary');
 
 //-----------GENERAL ROUTES-----------//
 
@@ -351,9 +352,24 @@ module.exports.createItem = async function(req, res) {
         description: req.body.description,
         imgUrl: req.body.image
     });
+
     if (!item) {
         req.flash('error', "Unable to create item");
         return res.redirect('back');
+    }
+
+    if (req.file) {
+        const [cloudErr, cloudResult] = await cloudUpload(req.file);
+        if (cloudErr || !cloudResult) {
+            req.flash('error', 'Upload failed');
+            return res.redirect('back');
+        }
+
+        // Add info to image file
+        item.imageFile = {
+            filename: cloudResult.public_id,
+            url: cloudResult.secure_url
+        };
     }
 
     //Create charge; once created, add to item's info
@@ -431,6 +447,20 @@ module.exports.updateItem = async function(req, res) {
             return res.redirect('back');
         }
 
+        if (req.file) {
+            const [cloudErr, cloudResult] = await cloudUpload(req.file);
+            if (cloudErr || !cloudResult) {
+                req.flash('error', 'Upload failed');
+                return res.redirect('back');
+            }
+
+            item.imageFile = {
+                filename: cloudResult.public_id,
+                url: cloudResult.secure_url
+            };
+            await item.save();
+        }
+
         const activeOrders = await Order.find({present: true}).populate('items.item'); //Any orders that are active will need to change, to accomodate the item changes.
         if (!activeOrders) {
             req.flash('error', "Unable to find active orders");
@@ -499,6 +529,16 @@ module.exports.deleteItem = async function(req, res) {
     if (!item) {
         req.flash('error', 'Could not delete item');
         return res.redirect('back');
+    }
+
+    // delete any uploads
+    if (item.imageFile && item.imageFile.filename) {
+        let [cloudError, cloudResult] = await cloudDelete(item.imageFile.filename);
+        // check for failure
+        if (cloudError || !cloudResult || cloudResult.result !== 'ok') {
+            req.flash('error', 'Error deleting uploaded image');
+            return res.redirect('back');
+        }
     }
 
     const categories = await Category.find({}); //Find all possible categories

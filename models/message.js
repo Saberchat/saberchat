@@ -3,6 +3,10 @@ const mongoose = require('mongoose');
 var messageSchema = new mongoose.Schema({
     subject: String,
     images: [{type: String}],
+    imageFiles: [{
+        filename: String,
+        url: String
+    }],
     read: [
         {
             type: mongoose.Schema.Types.ObjectId,

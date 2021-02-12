@@ -41,7 +41,7 @@
 
 <div class="row">
     <div class="col-md-8 offset-md-2 col-12">
-        <form action="/projects" method="post" id="submit-new-project">
+        <form action="/projects" method="post" id="submit-new-project" enctype="multipart/form-data">
             <div class="form-group">
                 <label for="new-project-title" id="title-label">Title</label>
                 <input id="new-project-title" type="text" class="form-control" name="title" placeholder="Project Title"
@@ -82,6 +82,10 @@
                           required></textarea>
             </div>
 
+            <div class="form-group">
+                <label for="imageFile">Image Upload</label>
+                <input type="file" name="imageFile" class="image-upload form-control-file" multiple>
+            </div>
 
             <div id="image-header">
                 <h4 id="image-heading">Images</h4>

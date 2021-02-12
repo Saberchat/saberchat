@@ -135,9 +135,9 @@
                         <% announcement.images.forEach(image => { %>
                             <img src="<%= image %>" alt="Attached Image" class="img-fluid rounded">
                         <% }) %>
-                        <% if(announcement.imageFile.filename) { %>
-                            <img src="<%= announcement.imageFile.url %>" alt="Attached Image" class="img-fluid rounded">
-                        <% } %>
+                        <% announcement.imageFiles.forEach(image => { %>
+                            <img src="<%= image.url %>" alt="Attached Image" class="img-fluid rounded">
+                        <% }) %>
                     </div>
                 </div>
             </article>

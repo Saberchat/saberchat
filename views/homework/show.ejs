@@ -170,10 +170,10 @@
                 <br/>
             <% } %>
 
-            <% if (course.tutors.length > 0) { %>
+            <% if (tutors.length > 0) { %>
                 <ul class="list-group" id="tutor-index">
                     <li class="list-group-item list-group-item-success" id="tutor-heading-index">Tutors</li>
-                    <% for (let tutor of course.tutors) { %>
+                    <% for (let tutor of tutors) { %>
                         <li class="list-group-item list-group-item-action tutor-profile menu-item"
                             id="item-<%= tutor.tutor._id %>">
                             <a href="/homework/tutors/<%= course._id %>?tutorId=<%= tutor.tutor._id %>"
@@ -225,7 +225,7 @@
 
     <div class="row tutors" hidden><br/>
         <div class="col-12" id="tutor-column">
-            <% if (course.tutors.length > 0) { %>
+            <% if (tutors.length > 0) { %>
                 <ul class="list-group" id="tutor-div">
                     <li class="list-group-item list-group-item-success">
                         <div class="d-flex w-100 justify-content-between">
@@ -233,7 +233,7 @@
                         </div>
                     </li>
 
-                    <% for (let tutor of course.tutors) { %>
+                    <% for (let tutor of tutors) { %>
                         <li class="list-group-item list-group-item-action tutor-profile menu-item"
                             id="tutor-<%= tutor.tutor._id %>">
                             <a href="/homework/tutors/<%= course._id %>?tutorId=<%= tutor.tutor._id %>"
@@ -308,7 +308,7 @@
                             <div title="Ratings" class="ratings">
                                 <% for (let i = 0; i < 5; i += 1) { %>
                                     <i id="<%=i+1%>"
-                                    <% if (i + 1 <= tutorRatings.get(tutor._id.toString())) { %>
+                                    <% if (i + 1 <= tutor.averageRating) { %>
                                        class="fas fa-star average-rating-<%= tutor.tutor._id %> average-rating-selected"
                                     <% } else { %>
                                        class="fas fa-star average-rating-<%= tutor.tutor._id %>"
@@ -534,7 +534,8 @@
             <% } else { %>
                 <div class="empty-field" id="no-tutors">
                     <br />
-                    <h2>No Tutors</h2>
+                    <%=tutors.length%>
+                    <h2>No Tutors, <%=tutors.length%></h2>
                 </div>
             <% } %>
 

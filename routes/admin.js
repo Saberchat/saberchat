@@ -643,7 +643,6 @@ router.post('/moderate', middleware.isLoggedIn, middleware.isMod, (req, res) => 
         return res.json({success: "Succesfully collected data", context});
 
     })().catch(err => {
-        console.log(err);
         res.json({error: "An error occurred"});
     });
 });

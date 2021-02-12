@@ -8,7 +8,7 @@ const dateFormat = require('dateformat');
 const {transport, transport_mandatory} = require("../utils/transport");
 const convertToLink = require("../utils/convert-to-link");
 
-const multer = require('../middleware/multer');
+const {singleUpload, multipleUpload} = require('../middleware/multer');
 const {cloudUpload, cloudDelete} = require('../services/cloudinary');
 const {validateAnn} = require('../middleware/validation');
 
@@ -121,7 +121,7 @@ router.get('/:id/edit', middleware.isLoggedIn, middleware.isMod, (req, res) => {
     });
 });
 
-router.post('/', middleware.isLoggedIn, middleware.isMod, multer, validateAnn, (req, res) => { //RESTful Routing 'CREATE' route
+router.post('/', middleware.isLoggedIn, middleware.isMod, multipleUpload, validateAnn, (req, res) => { //RESTful Routing 'CREATE' route
     (async () => {
 
         const announcement = await Announcement.create({
@@ -140,17 +140,21 @@ router.post('/', middleware.isLoggedIn, middleware.isMod, multer, validateAnn, (
                 announcement.images.push(req.body.images[image]);
             }
         }
-        // if a file was uploaded
-        if (req.file) {
-            const [cloudErr, cloudResult] = await cloudUpload(req.file);
-            if (cloudErr || !cloudResult) {
-                req.flash('error', 'Upload failed');
-                return res.redirect('back');
-            }
 
-            // set upload info
-            announcement.imageFile.url = cloudResult.secure_url;
-            announcement.imageFile.filename = cloudResult.public_id;
+        // if files were uploaded
+        if (req.files) {
+            for (let file of req.files) {
+                let [cloudErr, cloudResult] = await cloudUpload(file);
+                if (cloudErr || !cloudResult) {
+                    req.flash('error', 'Upload failed');
+                    return res.redirect('back');
+                }
+
+                announcement.imageFiles.push({
+                    filename: cloudResult.public_id,
+                    url: cloudResult.secure_url
+                });
+            }
         }
 
         announcement.date = dateFormat(announcement.created_at, "h:MM TT | mmm d");
@@ -347,11 +351,9 @@ router.put('/comment', middleware.isLoggedIn, (req, res) => {
 
 })
 
-router.put('/:id', middleware.isLoggedIn, middleware.isMod, multer, validateAnn, (req, res) => { //RESTful Routing 'UPDATE' route
+router.put('/:id', middleware.isLoggedIn, middleware.isMod, multipleUpload, (req, res) => { //RESTful Routing 'UPDATE' route
     (async () => {
-
         const announcement = await Announcement.findById(req.params.id).populate('sender');
-
         if (!announcement) {
             req.flash('error', "Unable to access announcement");
             return res.redirect('back');
@@ -378,32 +380,35 @@ router.put('/:id', middleware.isLoggedIn, middleware.isMod, multer, validateAnn,
             }
         }
 
-        // delete image if delete upload check is checked
-        if (req.body.deleteUpload === "true" && updatedAnnouncement.imageFile.filename) {
-            const filename = updatedAnnouncement.imageFile.filename;
-            const [cloudError, cloudResult] = await cloudDelete(filename);
-            // check for failure
-            if (cloudError || !cloudResult || cloudResult.result !== 'ok') {
-                req.flash('error', 'Could not delete image');
-                return res.redirect('back');
+        for (let i = updatedAnnouncement.imageFiles.length-1; i >= 0; i--) {
+            if (req.body[`deleteUpload-${updatedAnnouncement.imageFiles[i].url}`] && updatedAnnouncement.imageFiles[i].filename) {
+                let [cloudError, cloudResult] = await cloudDelete(updatedAnnouncement.imageFiles[i].filename);
+                // check for failure
+                if (cloudError || !cloudResult || cloudResult.result !== 'ok') {
+                    req.flash('error', 'Error deleting uploaded image');
+                    return res.redirect('back');
+                }
+                updatedAnnouncement.imageFiles.splice(i, 1);
             }
-            updatedAnnouncement.imageFile = {};
         }
-        // Replace image if there is an upload
-        if (req.file) {
-            const [cloudErr, cloudResult] = await cloudUpload(req.file);
-            if (cloudErr || !cloudResult) {
-                req.flash('error', 'Re-upload failed');
-                return res.redirect('back');
-            }
 
-            // set upload info
-            updatedAnnouncement.imageFile.url = cloudResult.secure_url;
-            updatedAnnouncement.imageFile.filename = cloudResult.public_id;
+        // if files were uploaded
+        if (req.files) {
+            for (let file of req.files) {
+                let [cloudErr, cloudResult] = await cloudUpload(file);
+                if (cloudErr || !cloudResult) {
+                    req.flash('error', 'Upload failed');
+                    return res.redirect('back');
+                }
+
+                updatedAnnouncement.imageFiles.push({
+                    filename: cloudResult.public_id,
+                    url: cloudResult.secure_url
+                });
+            }
         }
 
         await updatedAnnouncement.save();
-
         const users = await User.find({
             authenticated: true,
             _id: {
@@ -472,13 +477,14 @@ router.delete('/:id', middleware.isLoggedIn, middleware.isMod, (req, res) => { /
 
         }
         // delete any uploads
-        if (announcement.imageFile && announcement.imageFile.filename) {
-            const filename = announcement.imageFile.filename;
-            const [cloudError, cloudResult] = await cloudDelete(filename);
-            // check for failure
-            if (cloudError || !cloudResult || cloudResult.result !== 'ok') {
-                req.flash('error', 'Error deleting uploaded image');
-                return res.redirect('back');
+        for (let file of announcement.imageFiles) {
+            if (file.filename) {
+                let [cloudError, cloudResult] = await cloudDelete(file.filename);
+                // check for failure
+                if (cloudError || !cloudResult || cloudResult.result !== 'ok') {
+                    req.flash('error', 'Error deleting uploaded image');
+                    return res.redirect('back');
+                }
             }
         }
 

@@ -35,7 +35,7 @@
                     <a href="/inbox" class="btn btn-primary back-btn"><i class="fas fa-arrow-left"></i> Back</a>
                     <br/><br/>
                 </div>
-                <form action="/inbox/messages" method="post" onsubmit="return process();" id="message-form">
+                <form action="/inbox/messages" method="post" onsubmit="return process();" id="message-form" enctype="multipart/form-data">
                     <div id="to-block">
                         <div id="default-msg">
                             <div class="form-group">
@@ -111,6 +111,11 @@
                         <label for="message">Message</label>
                         <textarea name="message" id="message" placeholder="Message text..." rows="5"
                                   class="form-control" required></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="imageFile">Image Upload</label>
+                        <input type="file" name="imageFile" class="image-upload form-control-file" multiple>
                     </div>
 
                     <div id="image-header">

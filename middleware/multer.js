@@ -1,7 +1,7 @@
-const multerUpload = require('../services/multer');
+const {uploadSingle, uploadMultiple} = require('../services/multer');
 
-module.exports = (req, res, next) => {
-    multerUpload(req, res, (err) => {
+const singleUpload = function(req, res, next) {
+    uploadSingle(req, res, (err) => {
         if (err) {
             req.flash('error', err.message);
             res.redirect('back');
@@ -9,4 +9,17 @@ module.exports = (req, res, next) => {
             next();
         }
     });
-};
+}
+
+const multipleUpload = function(req, res, next) {
+    uploadMultiple(req, res, (err) => {
+        if (err) {
+            req.flash('error', err.message);
+            res.redirect('back');
+        } else {
+            next();
+        }
+    });
+}
+
+module.exports = {singleUpload, multipleUpload};

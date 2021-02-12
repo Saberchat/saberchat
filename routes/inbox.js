@@ -3,6 +3,7 @@ const middleware = require('../middleware');
 const router = express.Router(); //start express router
 const { validateMsg } = require('../middleware/validation');
 const wrapAsync = require('../utils/wrapAsync');
+const {singleUpload, multipleUpload} = require('../middleware/multer');
 
 // controller
 const inbox = require('../controllers/inbox');
@@ -20,7 +21,7 @@ router.get('/messages/new', middleware.isLoggedIn, wrapAsync(inbox.newMsgForm));
 router.get('/sent', middleware.isLoggedIn, wrapAsync(inbox.sent));
 
 // Create messsage
-router.post('/messages', middleware.isLoggedIn, validateMsg, wrapAsync(inbox.createMsg));
+router.post('/messages', middleware.isLoggedIn, multipleUpload, validateMsg, wrapAsync(inbox.createMsg));
 
 //User can reply to notifications sent to them
 router.put('/reply', middleware.isLoggedIn, wrapAsync(inbox.reply));

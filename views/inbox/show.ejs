@@ -80,6 +80,9 @@
                         <% message.images.forEach(image => { %>
                             <img src="<%= image %>" alt="Added Image" class="img-fluid rounded">
                         <% }) %>
+                        <% message.imageFiles.forEach(image => { %>
+                            <img src="<%= image.url %>" alt="Added Image" class="img-fluid rounded">
+                        <% }) %>
                     </div>
                 </div>
             </article>

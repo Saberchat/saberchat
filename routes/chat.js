@@ -470,7 +470,6 @@ router.delete('/:id', middleware.isLoggedIn, middleware.checkRoomOwnership, asyn
         res.redirect('/chat');
 
     } catch (err) {
-        console.log(err);
         req.flash('error', 'An error occured');
         res.redirect('back');
     }

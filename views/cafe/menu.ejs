@@ -97,7 +97,13 @@
                                 <% } %>
 
                   <br/><em class="item-description convertible-text"><%= itemDescriptions[item._id.toString()] %></em><br/>
-                  <img src="<%= item.imgUrl %>" class="item-image"/>
+                  <img src=
+                  <% if (item.imgUrl == '') { %>
+                      "<%= item.imageFile.url %>"      
+                  <% } else { %>
+                      "<%= item.imgUrl %>"
+                  <% } %>
+                  class="item-image"/>
 
                 </span>
                         <% } %>

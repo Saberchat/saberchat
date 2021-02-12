@@ -3,6 +3,7 @@ const Filter = require('bad-words');
 const filter = new Filter();
 const { sendGridEmail } = require("../utils/transport");
 const convertToLink = require("../utils/convert-to-link");
+const {cloudUpload, cloudDelete} = require('../services/cloudinary');
 
 const User = require('../models/user');
 const Message = require('../models/message');
@@ -100,11 +101,28 @@ module.exports.sent = async function(req, res) {
 module.exports.createMsg = async function(req, res) {
     let message = {
         subject: filter.clean(req.body.subject),
-        text: filter.clean(req.body.message)
+        text: filter.clean(req.body.message),
+        imageFiles: []
     };
 
     if(req.body.images) {
         message.images = req.body.images;
+    }
+
+    // if files were uploaded
+    if (req.files) {
+        for (let file of req.files) {
+            let [cloudErr, cloudResult] = await cloudUpload(file);
+            if (cloudErr || !cloudResult) {
+                req.flash('error', 'Upload failed');
+                return res.redirect('back');
+            }
+
+            message.imageFiles.push({
+                filename: cloudResult.public_id,
+                url: cloudResult.secure_url
+            });
+        }
     }
 
     message.sender = req.user._id;
@@ -289,9 +307,9 @@ module.exports.reply = async function(req, res) {
     }
 
     let reply = {
-        sender: req.user, 
-        text: req.body.text, 
-        images: req.body.images, 
+        sender: req.user,
+        text: req.body.text,
+        images: req.body.images,
         date: dateFormat(new Date(), "h:MM TT | mmm d")
     };
     message.replies.push(reply); //Add reply to message thread
@@ -324,7 +342,7 @@ module.exports.reply = async function(req, res) {
           message.recipients.splice(i, 1);
         }
     }
-    
+
     message.recipients.push(message.sender); //Add original sender to recipient list (code above ensures that they are not added multiple times)
     message.read = [req.user]; //Since the current user replied to this message, they've seen the completely updated message. Nobody else has
     await message.save();
@@ -373,8 +391,7 @@ module.exports.delete = async function(req, res) {
     if(!messages) {req.flash('error', 'Could not find messages'); return res.redirect('back');}
 
     messages.forEach( message => {
-        const index = req.user.inbox.indexOf(message._id);
-        if(index > -1) {
+        if(req.user.inbox.includes(message._id)) {
             req.user.inbox.splice(index, 1);
             if(!message.read.includes(req.user._id)) {
                 req.user.msgCount -= 1;
@@ -429,7 +446,7 @@ module.exports.acceptReq = async function(req, res) {
 
         await sendGridEmail(Req.requester.email, `Room Request Accepted - ${foundRoom.name}`, email_text);
     }
-    
+
     req.flash('success', 'Request accepted');
     res.redirect('/inbox');
 };

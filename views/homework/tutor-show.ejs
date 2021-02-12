@@ -110,7 +110,7 @@
                                 <% for (let room of tutor.rooms) { %>
                                     <% if (room.student.equals(currentUser._id)) { %>
                                         <a id="chat-button-<%= tutor.tutor._id %>" class="btn btn-success action-button"
-                                           href="/chat/<%= room.room._id %>">Chat</a>
+                                           href="/chat/<%= room.room._id %>" target="_blank">Chat</a>
                                     <% } %>
                                 <% } %>
                             <% } else { %>
@@ -449,7 +449,7 @@
                                             class="span-tag-username"><%= student.username %></span></span>
                             </a>
                             <% if (tutor.tutor._id.equals(currentUser._id) || student._id.equals(currentUser._id) || course.teacher._id.equals(currentUser._id)) { %>
-                                <a class="btn btn-info lesson-button"
+                                <a class="btn btn-info lesson-button" target="_blank"
                                    href="/homework/tutors/<%= course._id %>?tutorId=<%= tutor.tutor._id %>&studentId=<%= student._id %>">Lesson
                                     Information</a>
 
@@ -578,7 +578,7 @@
                               <% } %>
 
                               <% if (!included) { %>
-                                  <% if (!c.students.includes(currentUser._id)) { %>
+                                  <% if (!c.students.includes(currentUser._id) && !currentUser.status == "faculty") { %>
                                       <form action="/homework/join" method="post" id="join-<%= c._id %>"
                                             class="join-course-student">
                                   <button type="button" data-toggle="modal" data-target="#modal-join"
@@ -608,7 +608,7 @@
                                 </form>
                                   <% } %>
 
-                                  <% if (currentUser.tags.includes("Tutor")) { %>
+                                  <% if (currentUser.tags.includes("Tutor") && !currentUser.status == "faculty") { %>
                                       <form action="/homework/join" method="post" id="join-tutor-<%= c._id %>"
                                             class="join-course-tutor">
                                   <button type="button" data-toggle="modal" data-target="#modal-tutor-<%= c._id %>"
