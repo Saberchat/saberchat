@@ -1,11 +1,6 @@
-const express = require('express');
-const middleware = require('../middleware');
-const router = express.Router(); //start express router
 const dateFormat = require('dateformat');
-const {transport, transport_mandatory} = require("../utils/transport");
-const convertToLink = require("../utils/convert-to-link");
-const {getPopularityCoefficiant, sortByPopularity, equateObjects} = require("../utils/popularity-algorithms");
-const {validateCourse} = require('../middleware/validation');
+const {transport} = require("../utils/transport");
+const { sortByPopularity } = require("../utils/popularity-algorithms");
 
 const User = require('../models/user');
 const Notification = require('../models/message');
