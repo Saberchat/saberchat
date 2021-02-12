@@ -23,13 +23,17 @@ const Status = require('../models/status');
 
 const middleware = require('../middleware');
 
+const admin = require("../controllers/admin");
+const wrapAsync = require('../utils/wrapAsync');
+
 //Function to display user inbox
-router.get('/', middleware.isLoggedIn, middleware.isAdmin, (req, res) => {
+/*router.get('/', middleware.isLoggedIn, middleware.isAdmin, (req, res) => {
     res.render('admin/index');
-})
+})*/
+router.get("/", middleware.isLoggedIn, middleware.isAdmin, wrapAsync(admin.index));
 
 // displays moderator page
-router.get('/moderate', middleware.isLoggedIn, middleware.isMod, (req, res) => {
+/*router.get('/moderate', middleware.isLoggedIn, middleware.isMod, (req, res) => {
     Comment.find({status: 'flagged'})
         .populate({path: 'author', select: ['username', 'imageUrl']})
         .populate({path: 'statusBy', select: ['username', 'imageUrl']})
@@ -43,7 +47,8 @@ router.get('/moderate', middleware.isLoggedIn, middleware.isMod, (req, res) => {
                 res.render('admin/mod', {comments: foundComments});
             }
         });
-});
+});*/
+router.get("/moderate", middleware.isLoggedIn, middleware.isMod, wrapAsync(admin.moderate))
 
 // displays permissions page
 router.get('/permissions', middleware.isLoggedIn, middleware.isAdmin, (req, res) => {
