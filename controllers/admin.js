@@ -9,14 +9,13 @@ module.exports.moderate = async function(req, res) {
         .populate({path: 'author', select: ['username', 'imageUrl']})
         .populate({path: 'statusBy', select: ['username', 'imageUrl']})
         .populate({path: 'room', select: ['name']})
-        .exec((err, foundComments) => {
+        .exec((err, comments) => {
             if (err) {
                 req.flash('error', 'Cannot access DataBase');
                 res.redirect('/admin');
 
             } else {
-                res.render('admin/mod', {comments: foundComments});
+                res.render('admin/mod', {comments});
             }
         });
 }
-

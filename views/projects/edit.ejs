@@ -93,27 +93,25 @@
                           required><%= project.text %></textarea>
             </div>
 
-            <% for (let image of project.imageFiles) { %>
-                <% if(!image.filename) { %>
-                    <div class="form-group">
-                        <label for="imageFile">Image Upload</label>
-                        <input type="file" name="imageFile" class="image-upload form-control-file">
-                    </div>
-                <% } else { %>
-                    <img src="<%= image.url %>" alt="attached image"
-                         class="img-fluid rounded past-upload">
+            <% for (let media of project.imageFiles) { %>
+                <% if(media.filename) { %>
+                    <% if (media.url.split("SaberChat/")[1].split('.')[1].toLowerCase() == "mp4") { %>
+                        <video width="400px" height="250px" src="<%=media.url%>" type="video/mp4" controls autoplay></video>
+                    <% } else { %>
+                        <img src="<%= media.url %>" alt="attached image" class="img-fluid rounded past-upload">
+                    <% } %>
                     <div class="form-check">
-                        <input type="checkbox" name="deleteUpload-<%=image.url%>" id="deleteUpload-<%=image.url%>" class="form-check-input"
+                        <input type="checkbox" name="deleteUpload-<%=media.url%>" id="deleteUpload-<%=media.url%>" class="form-check-input"
                                value="true">
-                        <label class="form-check-label" for="deleteUpload-<%=image.url%>">Remove uploaded image</label>
+                        <label class="form-check-label" for="deleteUpload-<%=media.url%>">Remove uploaded media</label>
                     </div>
                     <br />
                 <% } %>
             <% } %>
 
             <div class="form-group">
-                <label for="imageFile">New Image Uploads</label>
-                <input type="file" name="imageFile" class="image-upload form-control-file" multiple>
+                <label for="imageFile">New Media Uploads</label>
+                <input type="file" name="imageFile" class="image-upload form-control-file" multiple accept="image/png, image/jpg, image/jpeg, video/mp4">
             </div>
 
             <div id="image-header">

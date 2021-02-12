@@ -66,14 +66,14 @@ router.get('/:id', middleware.isLoggedIn, (req, res) => {
                 path: 'sender'
             }
         })
-        .exec((err, foundArticle) => {
+        .exec((err, article) => {
             if (err) {
                 req.flash('error', 'Cannot find article');
                 res.redirect('/articles');
             } else {
                 res.render('wHeights/show', {
-                    article: foundArticle,
-                    date: dateFormat(foundArticle.created_at, "mmm d, yyyy - h:MM TT")
+                    article: article,
+                    date: dateFormat(article.created_at, "mmm d, yyyy - h:MM TT")
                 });
             }
         });

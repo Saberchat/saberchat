@@ -267,40 +267,40 @@ router.post('/:id/leave', middleware.isLoggedIn, middleware.checkForLeave, async
 router.post('/:id/request-access', middleware.isLoggedIn, async (req, res) => {
     try {
         // find the room
-        const foundRoom = await Room.findById(req.params.id);
+        const room = await Room.findById(req.params.id);
         // if no found room, exit
-        if (!foundRoom) {
+        if (!room) {
             return res.json({error: 'Room does not Exist'});
         }
 
-        if (foundRoom.type == 'public') {
+        if (room.type == 'public') {
             return res.json({error: 'Room is public'});
 
-        } else if (!foundRoom.mutable) {
+        } else if (!room.mutable) {
             return res.json({error: 'Room does not accept access requests'});
         }
 
         // find if the request already exists to prevent spam
-        const foundReq = await AccessReq.findOne({requester: req.user._id, room: foundRoom._id});
+        const request = await AccessReq.findOne({requester: req.user._id, room: room._id});
 
-        if (foundReq && foundReq.status != 'pending') {
-            return res.json({error: `Request has already been ${foundReq.status}`});
+        if (request && request.status != 'pending') {
+            return res.json({error: `Request has already been ${request.status}`});
 
-        } else if (foundReq) {
+        } else if (request) {
             return res.json({error: 'Identical request has already been sent'});
 
         } else {
 
             const request = {
                 requester: req.user._id,
-                room: foundRoom._id,
-                receiver: foundRoom.creator.id
+                room: room._id,
+                receiver: room.creator.id
             };
 
             // create the request and find the room creator
             const [createdReq, roomCreator] = await Promise.all([
                 AccessReq.create(request),
-                User.findById(foundRoom.creator.id)
+                User.findById(room.creator.id)
             ]);
 
             if (!createdReq || !roomCreator) {
@@ -310,7 +310,7 @@ router.post('/:id/request-access', middleware.isLoggedIn, async (req, res) => {
             await roomCreator.requests.push(createdReq._id);
             roomCreator.save();
 
-            transport(roomCreator, 'New Room Access Request', `<p>Hello ${roomCreator.firstName},</p><p><strong>${req.user.username}</strong> is requesting to join your room, <strong>${foundRoom.name}.</strong></p><p>You can access the full request at https://alsion-saberchat.herokuapp.com</p>`);
+            transport(roomCreator, 'New Room Access Request', `<p>Hello ${roomCreator.firstName},</p><p><strong>${req.user.username}</strong> is requesting to join your room, <strong>${room.name}.</strong></p><p>You can access the full request at https://alsion-saberchat.herokuapp.com</p>`);
 
             return res.json({success: 'Request for access sent'});
         }

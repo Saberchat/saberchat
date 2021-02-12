@@ -1,6 +1,7 @@
 const dateFormat = require('dateformat');
 const Filter = require('bad-words');
 const filter = new Filter();
+const path = require('path');
 const { sendGridEmail } = require("../utils/transport");
 const convertToLink = require("../utils/convert-to-link");
 const {cloudUpload, cloudDelete} = require('../services/cloudinary');
@@ -59,8 +60,12 @@ module.exports.showMsg = async function(req, res) {
         .populate({path: 'replies.sender'})
         .execPopulate();
 
+    let fileExtensions = new Map();
+    for (let media of message.imageFiles) {
+        fileExtensions.set(media.url, path.extname(media.url.split("SaberChat/")[1]));
+    }
     const convertedText = convertToLink(message.text);
-    res.render('inbox/show', {message: message, convertedText});
+    res.render('inbox/show', {message: message, convertedText, fileExtensions});
 };
 
 // Inbox GET new message form
@@ -111,8 +116,14 @@ module.exports.createMsg = async function(req, res) {
 
     // if files were uploaded
     if (req.files) {
+        let cloudErr;
+        let cloudResult;
         for (let file of req.files) {
-            let [cloudErr, cloudResult] = await cloudUpload(file);
+            if (path.extname(file.originalname).toLowerCase() == ".mp4") {
+                [cloudErr, cloudResult] = await cloudUpload(file, "video");
+            } else {
+                [cloudErr, cloudResult] = await cloudUpload(file, "image");
+            }
             if (cloudErr || !cloudResult) {
                 req.flash('error', 'Upload failed');
                 return res.redirect('back');
@@ -407,12 +418,12 @@ module.exports.delete = async function(req, res) {
 // Access Request Routes
 
 module.exports.showReq = async function(req, res) {
-    const foundReq = await AccessReq.findById(req.params.id)
+    const request = await AccessReq.findById(req.params.id)
     .populate({path: 'requester', select: 'username'})
     .populate({path: 'room', select: ['creator', 'name']}).exec();
-    if(!foundReq) {req.flash('error', 'Unable to access Database.'); return res.redirect('back');}
+    if(!request) {req.flash('error', 'Unable to access Database.'); return res.redirect('back');}
 
-    res.render('inbox/requests/show', {request: foundReq});
+    res.render('inbox/requests/show', {request});
 };
 
 module.exports.acceptReq = async function(req, res) {
@@ -433,18 +444,18 @@ module.exports.acceptReq = async function(req, res) {
 
     }
 
-    const foundRoom = await Room.findById(Req.room._id);
-    if(!foundRoom) { req.flash("error", "Unable to access database");return res.redirect('back'); }
+    const room = await Room.findById(Req.room._id);
+    if(!room) { req.flash("error", "Unable to access database");return res.redirect('back'); }
 
-    foundRoom.members.push(Req.requester);
+    room.members.push(Req.requester);
     Req.status = 'accepted';
-    await foundRoom.save();
+    await room.save();
     await Req.save();
 
     if(Req.requester.receiving_emails) {
-        const email_text = `<p>Hello ${Req.requester.firstName},</p><p>Your request to join chat room <strong>${foundRoom.name}</strong> has been accepted!<p><p>You can access the room at https://alsion-saberchat.herokuapp.com</p>`;
+        const email_text = `<p>Hello ${Req.requester.firstName},</p><p>Your request to join chat room <strong>${room.name}</strong> has been accepted!<p><p>You can access the room at https://alsion-saberchat.herokuapp.com</p>`;
 
-        await sendGridEmail(Req.requester.email, `Room Request Accepted - ${foundRoom.name}`, email_text);
+        await sendGridEmail(Req.requester.email, `Room Request Accepted - ${room.name}`, email_text);
     }
 
     req.flash('success', 'Request accepted');

@@ -5,6 +5,7 @@ const express = require('express');
 const middleware = require('../middleware/index');
 const router = express.Router(); //start express router
 const dateFormat = require('dateformat');
+const path = require('path');
 const {transport, transport_mandatory} = require("../utils/transport");
 const convertToLink = require("../utils/convert-to-link");
 
@@ -20,13 +21,13 @@ const PostComment = require('../models/postComment');
 
 //ROUTES
 router.get('/', (req, res) => { //RESTful Routing 'INDEX' route
-    Announcement.find({}).populate('sender').exec((err, foundAnns) => { //Collects data about all announcements
-        if (err || !foundAnns) {
+    Announcement.find({}).populate('sender').exec((err, anns) => { //Collects data about all announcements
+        if (err || !anns) {
             req.flash('error', "An Error Occurred");
             res.redirect('back');
 
         } else {
-            res.render('announcements/index', {announcements: foundAnns.reverse()}); //Render announcement page with data on all announcements
+            res.render('announcements/index', {announcements: anns.reverse()}); //Render announcement page with data on all announcements
         }
     });
 });
@@ -72,50 +73,48 @@ router.get('/:id', (req, res) => { //RESTful Routing 'SHOW' route
                 path: "sender"
             }
         })
-        .exec((err, foundAnn) => { //Get info about the announcement's sender and comments, and then release it to user
-            if (err || !foundAnn) {
+        .exec((err, ann) => { //Get info about the announcement's sender and comments, and then release it to user
+            if (err || !ann) {
                 req.flash('error', 'An Error Occurred');
                 res.redirect('back');
 
             } else {
-
                 if (req.user) { //If user is logged in, remove this announcement from their announcement count
-
                     let index = -1;
                     for (let i = 0; i < req.user.annCount.length; i += 1) {
 
-                        if (foundAnn._id.toString() == req.user.annCount[i].announcement._id.toString()) {
+                        if (ann._id.toString() == req.user.annCount[i].announcement._id.toString()) {
                             index = i;
                         }
                     }
-
                     if (index != -1) {
                         req.user.annCount.splice(index, 1);
                     }
-
                     req.user.save();
                 }
 
-                const convertedText = convertToLink(foundAnn.text);
-                res.render('announcements/show', {
-                    announcement: foundAnn,
-                    convertedText
-                });
+                let fileExtensions = new Map();
+                for (let media of ann.imageFiles) {
+                    fileExtensions.set(media.url, path.extname(media.url.split("SaberChat/")[1]));
+                }
+
+                const convertedText = convertToLink(ann.text);
+                res.render('announcements/show', {announcement: ann, convertedText, fileExtensions});
             }
         });
 });
 
 router.get('/:id/edit', middleware.isLoggedIn, middleware.isMod, (req, res) => { //RESTful Routing 'EDIT' route
-    Announcement.findById(req.params.id, (err, foundAnn) => { //Find only the announcement specified from form
-        if (err || !foundAnn) {
+    Announcement.findById(req.params.id, (err, ann) => { //Find only the announcement specified from form
+        if (err || !ann) {
             req.flash('error', "An Error Occurred");
             res.redirect('back');
-        } else if (!foundAnn.sender._id.equals(req.user._id)) { //If you did not send the announcement, you cannot edit it (the 'edit' button does not show up if you did not create the announcement, but this is a double-check)
+        } else if (!ann.sender._id.equals(req.user._id)) { //If you did not send the announcement, you cannot edit it (the 'edit' button does not show up if you did not create the announcement, but this is a double-check)
             req.flash('error', 'You do not have permission to do that');
             res.redirect('back');
         } else {
             res.render('announcements/edit', {
-                announcement: foundAnn
+                announcement: ann
             }); //If no problems, allow the user to edit announcement
         }
     });
@@ -143,8 +142,14 @@ router.post('/', middleware.isLoggedIn, middleware.isMod, multipleUpload, valida
 
         // if files were uploaded
         if (req.files) {
+            let cloudErr;
+            let cloudResult;
             for (let file of req.files) {
-                let [cloudErr, cloudResult] = await cloudUpload(file);
+                if (path.extname(file.originalname).toLowerCase() == ".mp4") {
+                    [cloudErr, cloudResult] = await cloudUpload(file, "video");
+                } else {
+                    [cloudErr, cloudResult] = await cloudUpload(file, "image");
+                }
                 if (cloudErr || !cloudResult) {
                     req.flash('error', 'Upload failed');
                     return res.redirect('back');
@@ -380,9 +385,15 @@ router.put('/:id', middleware.isLoggedIn, middleware.isMod, multipleUpload, (req
             }
         }
 
+        let cloudError;
+        let cloudResult;
         for (let i = updatedAnnouncement.imageFiles.length-1; i >= 0; i--) {
-            if (req.body[`deleteUpload-${updatedAnnouncement.imageFiles[i].url}`] && updatedAnnouncement.imageFiles[i].filename) {
-                let [cloudError, cloudResult] = await cloudDelete(updatedAnnouncement.imageFiles[i].filename);
+            if (req.body[`deleteUpload-${updatedAnnouncement.imageFiles[i].url}`] && updatedAnnouncement.imageFiles[i] && updatedAnnouncement.imageFiles[i].filename) {
+                if (path.extname(updatedAnnouncement.imageFiles[i].url.split("SaberChat/")[1]).toLowerCase() == ".mp4") {
+                    [cloudErr, cloudResult] = await cloudDelete(updatedProject.imageFiles[i].filename, "video");
+                } else {
+                    [cloudErr, cloudResult] = await cloudDelete(updatedProject.imageFiles[i].filename, "image");
+                }
                 // check for failure
                 if (cloudError || !cloudResult || cloudResult.result !== 'ok') {
                     req.flash('error', 'Error deleting uploaded image');
@@ -394,8 +405,14 @@ router.put('/:id', middleware.isLoggedIn, middleware.isMod, multipleUpload, (req
 
         // if files were uploaded
         if (req.files) {
+            let cloudErr;
+            let cloudResult;
             for (let file of req.files) {
-                let [cloudErr, cloudResult] = await cloudUpload(file);
+                if (path.extname(file.originalname).toLowerCase() == ".mp4") {
+                    [cloudErr, cloudResult] = await cloudUpload(file, "video");
+                } else {
+                    [cloudErr, cloudResult] = await cloudUpload(file, "image");
+                }
                 if (cloudErr || !cloudResult) {
                     req.flash('error', 'Upload failed');
                     return res.redirect('back');
@@ -477,9 +494,15 @@ router.delete('/:id', middleware.isLoggedIn, middleware.isMod, (req, res) => { /
 
         }
         // delete any uploads
+        let cloudError;
+        let cloudResult;
         for (let file of announcement.imageFiles) {
-            if (file.filename) {
-                let [cloudError, cloudResult] = await cloudDelete(file.filename);
+            if (file && file.filename) {
+                if (path.extname(file.url.split("SaberChat/")[1]).toLowerCase() == ".mp4") {
+                    [cloudErr, cloudResult] = await cloudDelete(file.filename, "video");
+                } else {
+                    [cloudErr, cloudResult] = await cloudDelete(file.filename, "image");
+                }
                 // check for failure
                 if (cloudError || !cloudResult || cloudResult.result !== 'ok') {
                     req.flash('error', 'Error deleting uploaded image');

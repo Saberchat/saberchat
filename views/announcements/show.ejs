@@ -132,12 +132,17 @@
                     <p class="announcement-text convertible-text"><%= convertedText %></p>
                     <hr>
                     <div class="ann-images">
-                        <% announcement.images.forEach(image => { %>
+                        <% for (let img of announcement.images) { %>
                             <img src="<%= image %>" alt="Attached Image" class="img-fluid rounded">
-                        <% }) %>
-                        <% announcement.imageFiles.forEach(image => { %>
-                            <img src="<%= image.url %>" alt="Attached Image" class="img-fluid rounded">
-                        <% }) %>
+                        <% } %>
+                        <% for (let media of announcement.imageFiles) { %>
+                            <% if ([".jpg", ".png", ".jpeg"].includes(fileExtensions.get(media.url).toLowerCase())) { %>
+                                <img src="<%= media.url %>" alt="Attached Image" class="img-fluid rounded">
+                            <% } else { %>
+                                <video width="400px" height="250px" src="<%=media.url%>" type="video/mp4" controls autoplay></video>
+                            <% } %>
+                            <br/><br/>
+                        <% } %>
                     </div>
                 </div>
             </article>

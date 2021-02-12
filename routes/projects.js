@@ -5,6 +5,7 @@ const express = require('express');
 const middleware = require('../middleware');
 const router = express.Router(); //start express router
 const dateFormat = require('dateformat');
+const path = require('path');
 const {transport, transport_mandatory} = require("../utils/transport");
 const convertToLink = require("../utils/convert-to-link");
 const filter = require('../utils/filter');
@@ -26,25 +27,25 @@ router.get('/', (req, res) => { //RESTful Routing 'INDEX' route
     Project.find({})
         .populate('creators')
         .populate('poster')
-        .exec((err, foundProjects) => { //Find all projects, collect info on their creators and posters (part of the 'User' schema)
-            if (err || !foundProjects) {
+        .exec((err, projects) => { //Find all projects, collect info on their creators and posters (part of the 'User' schema)
+            if (err || !projects) {
                 req.flash('error', 'An Error Occurred');
                 res.redirect('back');
 
             } else {
-                res.render('projects/index', {projects: foundProjects}); //Post the project data to HTML page, which formats the data
+                res.render('projects/index', {projects: projects}); //Post the project data to HTML page, which formats the data
             }
         });
 });
 
 router.get('/new', middleware.isLoggedIn, middleware.isFaculty, (req, res) => { ////RESTful Routing 'NEW' route
-    User.find({authenticated: true, status: {$nin: ['alumnus', 'guest', 'parent', 'faculty']}}, (err, foundUsers) => { //Find all students, so that when teachers post a project, they can select which students created it
-        if (err || !foundUsers) {
+    User.find({authenticated: true, status: {$nin: ['alumnus', 'guest', 'parent', 'faculty']}}, (err, users) => { //Find all students, so that when teachers post a project, they can select which students created it
+        if (err || !users) {
             req.flash('error', 'An Error Occurred');
             res.redirect('back');
 
         } else {
-            res.render('projects/new', {students: foundUsers});
+            res.render('projects/new', {students: users});
         }
     });
 });
@@ -96,8 +97,15 @@ router.post('/', middleware.isLoggedIn, middleware.isFaculty, multipleUpload, va
         }
 
         if (req.files) {
+            let cloudErr;
+            let cloudResult;
             for (let file of req.files) {
-                let [cloudErr, cloudResult] = await cloudUpload(file);
+                if (path.extname(file.originalname).toLowerCase() == ".mp4") {
+                    [cloudErr, cloudResult] = await cloudUpload(file, "video");
+                } else {
+                    [cloudErr, cloudResult] = await cloudUpload(file, "image");
+                }
+
                 if (cloudErr || !cloudResult) {
                     req.flash('error', 'Upload failed');
                     return res.redirect('back');
@@ -248,14 +256,18 @@ router.get('/:id', (req, res) => { //RESTful Routing 'SHOW' route
                 path: "sender"
             }
         })
-        .exec((err, foundProject) => { //Find the project specified in the form, get info about its poster and creators (part of the User schema)
-            if (err || !foundProject) {
+        .exec((err, project) => { //Find the project specified in the form, get info about its poster and creators (part of the User schema)
+            if (err || !project) {
                 req.flash('error', "An Error Occurred");
                 res.redirect('back');
 
             } else {
-                const convertedText = convertToLink(foundProject.text);
-                res.render('projects/show', {project: foundProject, convertedText});
+                let fileExtensions = new Map();
+                for (let media of project.imageFiles) {
+                    fileExtensions.set(media.url, path.extname(media.url.split("SaberChat/")[1]));
+                }
+                const convertedText = convertToLink(project.text);
+                res.render('projects/show', {project, convertedText, fileExtensions});
             }
         });
 });
@@ -474,9 +486,15 @@ router.put('/:id', middleware.isLoggedIn, middleware.isFaculty, multipleUpload, 
             }
         }
 
+        let cloudError;
+        let cloudResult;
         for (let i = updatedProject.imageFiles.length-1; i >= 0; i--) {
-            if (req.body[`deleteUpload-${updatedProject.imageFiles[i].url}`] && updatedProject.imageFiles[i].filename) {
-                let [cloudError, cloudResult] = await cloudDelete(updatedProject.imageFiles[i].filename);
+            if (req.body[`deleteUpload-${updatedProject.imageFiles[i].url}`] && updatedProject.imageFiles[i] && updatedProject.imageFiles[i].filename) {
+                if (path.extname(updatedProject.imageFiles[i].url.split("SaberChat/")[1]).toLowerCase() == ".mp4") {
+                    [cloudErr, cloudResult] = await cloudDelete(updatedProject.imageFiles[i].filename, "video");
+                } else {
+                    [cloudErr, cloudResult] = await cloudDelete(updatedProject.imageFiles[i].filename, "image");
+                }
                 // check for failure
                 if (cloudError || !cloudResult || cloudResult.result !== 'ok') {
                     req.flash('error', 'Error deleting uploaded image');
@@ -488,8 +506,14 @@ router.put('/:id', middleware.isLoggedIn, middleware.isFaculty, multipleUpload, 
 
         // if files were uploaded
         if (req.files) {
+            let cloudErr;
+            let cloudResult;
             for (let file of req.files) {
-                let [cloudErr, cloudResult] = await cloudUpload(file);
+                if (path.extname(file.originalname).toLowerCase() == ".mp4") {
+                    [cloudErr, cloudResult] = await cloudUpload(file, "video");
+                } else {
+                    [cloudErr, cloudResult] = await cloudUpload(file, "image");
+                }
                 if (cloudErr || !cloudResult) {
                     req.flash('error', 'Upload failed');
                     return res.redirect('back');
@@ -576,9 +600,15 @@ router.delete('/:id', middleware.isLoggedIn, middleware.isFaculty, (req, res) =>
         }
 
         // delete any uploads
+        let cloudError;
+        let cloudResult;
         for (let file of project.imageFiles) {
-            if (file.filename) {
-                let [cloudError, cloudResult] = await cloudDelete(file.filename);
+            if (file && file.filename) {
+                if (path.extname(file.url.split("SaberChat/")[1]).toLowerCase() == ".mp4") {
+                    [cloudErr, cloudResult] = await cloudDelete(file.filename, "video");
+                } else {
+                    [cloudErr, cloudResult] = await cloudDelete(file.filename, "image");
+                }
                 // check for failure
                 if (cloudError || !cloudResult || cloudResult.result !== 'ok') {
                     req.flash('error', 'Error deleting uploaded image');

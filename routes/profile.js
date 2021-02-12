@@ -35,13 +35,13 @@ const middleware = require('../middleware');
 // renders the list of users page
 router.get('/', middleware.isLoggedIn, (req, res) => {
 
-    User.find({authenticated: true}, (err, foundUsers) => {
-        if (err || !foundUsers) {
+    User.find({authenticated: true}, (err, users) => {
+        if (err || !users) {
             req.flash('error', 'An Error Occurred');
             res.redirect('back');
 
         } else {
-            res.render('profile/index', {users: foundUsers});
+            res.render('profile/index', {users});
         }
     });
 });
@@ -301,13 +301,13 @@ router.get('/confirm-email/:id', (req, res) => {
 //route for changing password. Not too much different from previous routes.
 router.put('/change-password', middleware.isLoggedIn, validatePasswordUpdate, (req, res) => {
     if (req.body.newPassword == req.body.newPasswordConfirm) {
-        User.findById(req.user._id, (err, foundUser) => {
-            if (err || !foundUser) {
+        User.findById(req.user._id, (err, user) => {
+            if (err || !user) {
                 req.flash('error', 'Error, cannot find user');
                 res.redirect('/');
 
             } else {
-                foundUser.changePassword(req.body.oldPassword, req.body.newPassword, (err) => {
+                user.changePassword(req.body.oldPassword, req.body.newPassword, (err) => {
                     if (err) {
                         req.flash('error', 'Error changing your password. Check if old password is correct.');
                         res.redirect('/');

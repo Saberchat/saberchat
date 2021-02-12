@@ -38,13 +38,13 @@ router.get("/", middleware.isLoggedIn, middleware.isAdmin, wrapAsync(admin.index
         .populate({path: 'author', select: ['username', 'imageUrl']})
         .populate({path: 'statusBy', select: ['username', 'imageUrl']})
         .populate({path: 'room', select: ['name']})
-        .exec((err, foundComments) => {
+        .exec((err, comments) => {
             if (err) {
                 req.flash('error', 'Cannot access DataBase');
                 res.redirect('/admin');
 
             } else {
-                res.render('admin/mod', {comments: foundComments});
+                res.render('admin/mod', {comments: comments});
             }
         });
 });*/
@@ -52,25 +52,25 @@ router.get("/moderate", middleware.isLoggedIn, middleware.isMod, wrapAsync(admin
 
 // displays permissions page
 router.get('/permissions', middleware.isLoggedIn, middleware.isAdmin, (req, res) => {
-    User.find({authenticated: true}, (err, foundUsers) => {
-        if (err || !foundUsers) {
+    User.find({authenticated: true}, (err, users) => {
+        if (err || !users) {
             req.flash('error', 'Cannot access Database');
             res.redirect('/admin');
 
         } else {
-            res.render('admin/permission', {users: foundUsers});
+            res.render('admin/permission', {users: users});
         }
     });
 });
 
 // displays status page
 router.get('/status', middleware.isLoggedIn, middleware.isMod, (req, res) => {
-    User.find({authenticated: true}, (err, foundUsers) => {
-        if (err || !foundUsers) {
+    User.find({authenticated: true}, (err, users) => {
+        if (err || !users) {
             req.flash('error', 'Cannot access Database');
             res.redirect('/admin');
         } else {
-            res.render('admin/status', {users: foundUsers, tags: ['Cashier', 'Tutor', 'Editor']});
+            res.render('admin/status', {users: users, tags: ['Cashier', 'Tutor', 'Editor']});
         }
     });
 });

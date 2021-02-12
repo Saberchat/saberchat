@@ -11,9 +11,6 @@ const inbox = require('../controllers/inbox');
 // Display user inbox
 router.get('/', middleware.isLoggedIn, wrapAsync(inbox.index));
 
-// Message show route
-router.get('/:id', middleware.isLoggedIn, wrapAsync(inbox.showMsg));
-
 // New messsage form
 router.get('/messages/new', middleware.isLoggedIn, wrapAsync(inbox.newMsgForm));
 
@@ -38,6 +35,8 @@ router.delete('/clear', middleware.isLoggedIn, inbox.clear);
 // Delete messages
 router.delete('/delete', middleware.isLoggedIn, wrapAsync(inbox.delete));
 
+// Message show route
+router.get('/:id', middleware.isLoggedIn, wrapAsync(inbox.showMsg));
 
 // ========================================
 // access request routes

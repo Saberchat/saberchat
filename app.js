@@ -211,11 +211,11 @@ const getRandMessage = (list => {
 // deletes all comments at midnight
 
 // const manageComments = schedule.scheduleJob('0 0 0 * * *', () => {
-// 	Comment.find({}, (err, foundComments) => {
+// 	Comment.find({}, (err, comments) => {
 // 		if(err) {
 // 			console.log(err);
 // 		} else {
-// 			foundComments.map((comment) => {
+// 			comments.map((comment) => {
 // 				if(true) {
 // 					comment.remove();
 // 					console.log('removed comments');

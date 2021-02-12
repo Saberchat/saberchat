@@ -15,14 +15,16 @@ cloudinary.config({
 const cloudUploader = util.promisify(cloudinary.uploader.upload);
 const cloudDestroyer = util.promisify(cloudinary.uploader.destroy);
 
-const cloudUpload = async (file) => {
+const cloudUpload = async (file, type) => {
     // turn buffer into file
     const imgFile = parseBuffer(file.originalname, file.buffer).content;
 
     // upload to cloudinary
-    const options = {
-        folder: 'SaberChat'
-    };
+    const options = {folder: 'SaberChat'};
+    if (type == "video") {
+        options.resource_type = "video";
+    }
+
     let error;
     let cResult;
     await cloudUploader(imgFile, options)
@@ -36,11 +38,15 @@ const cloudUpload = async (file) => {
     return [error, cResult];
 };
 
-const cloudDelete = async (filename) => {
+const cloudDelete = async (filename, type) => {
     let cResult;
     let error;
     // delete image
-    await cloudDestroyer(filename)
+    const options = {};
+    if (type == "video") {
+        options.resource_type = "video";
+    }
+    await cloudDestroyer(filename, options)
         .catch(err => {
             error = err;
         })

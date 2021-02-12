@@ -11,6 +11,7 @@ const express = require('express');
 const middleware = require('../middleware');
 const router = express.Router();
 const dateFormat = require('dateformat');
+const path = require('path');
 const {transport, transport_mandatory} = require("../utils/transport");
 const {getPopularityCoefficiant, sortByPopularity, equateObjects} = require("../utils/popularity-algorithms");
 const convertToLink = require("../utils/convert-to-link");
@@ -448,11 +449,19 @@ module.exports.updateItem = async function(req, res) {
         }
 
         if (req.file) {
-            let [cloudError, cloudResult] = await cloudDelete(item.imageFile.filename);
-            // check for failure
-            if (cloudError || !cloudResult || cloudResult.result !== 'ok') {
-                req.flash('error', 'Error deleting uploaded image');
-                return res.redirect('back');
+            let cloudError;
+            let cloudResult;
+            if (item.imageFile && item.imageFile.filename) {
+                if (path.extname(item.imageFile.url.split("SaberChat/")[1]).toLowerCase() == ".mp4") {
+                    [cloudErr, cloudResult] = await cloudDelete(item.imageFile.filename, "video");
+                } else {
+                    [cloudErr, cloudResult] = await cloudDelete(item.imageFile.filename, "image");
+                }
+                // check for failure
+                if (cloudError || !cloudResult || cloudResult.result !== 'ok') {
+                    req.flash('error', 'Error deleting uploaded image');
+                    return res.redirect('back');
+                }
             }
 
             [cloudErr, cloudResult] = await cloudUpload(req.file);
@@ -540,7 +549,11 @@ module.exports.deleteItem = async function(req, res) {
 
     // delete any uploads
     if (item.imageFile && item.imageFile.filename) {
-        let [cloudError, cloudResult] = await cloudDelete(item.imageFile.filename);
+        if (path.extname(item.imageFile.url.split("SaberChat/")[1]).toLowerCase() == ".mp4") {
+            [cloudErr, cloudResult] = await cloudDelete(item.imageFile.filename, "video");
+        } else {
+            [cloudErr, cloudResult] = await cloudDelete(item.imageFile.filename, "image");
+        }
         // check for failure
         if (cloudError || !cloudResult || cloudResult.result !== 'ok') {
             req.flash('error', 'Error deleting uploaded image');

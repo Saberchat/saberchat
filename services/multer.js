@@ -5,8 +5,9 @@ const util = require('util');
 const storage = multer.memoryStorage();
 const imageFilter = (req, file, callback) => {
     const ext = path.extname(file.originalname);
-    if (ext !== '.png' && ext !== '.jpg' && ext !== '.jpeg') {
-        return callback(new Error('Invalid image format!'));
+    const extensions = [".png", ".jpg", ".jpeg", ".mp4"];
+    if (!extensions.includes(ext.toLowerCase())) {
+        return callback(new Error('Invalid Media Format'));
     }
     callback(null, true);
 };
@@ -15,7 +16,7 @@ const multerConfig = {
     storage: storage,
     fileFilter: imageFilter,
     limits: {
-        fileSize: 3 * 10 ** 6
+        fileSize: 3 * 10 ** 8
     }
 };
 

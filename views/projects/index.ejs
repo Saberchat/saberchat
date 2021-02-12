@@ -156,8 +156,13 @@
                         <div class="block-content mode">
                             <% if (project.images.length > 0) { %>
                                 <img class="project-first-image" src="<%= project.images[0] %>"/>
-                            <% } else if (project.imageFiles.length > 0) { %>
-                                <img class="project-first-image" src="<%= project.imageFiles[0].url%>"/>
+                            <% } else { %>
+                                <% for (let media of project.imageFiles) { %>
+                                    <% if (media.url.split("SaberChat/")[1].split('.')[1] != "mp4") { %>
+                                        <img class="project-first-image" src="<%= media.url%>"/>
+                                        <% break;%>
+                                    <% } %>
+                                <% } %>
                             <% } %>
 
                             <span hidden>
