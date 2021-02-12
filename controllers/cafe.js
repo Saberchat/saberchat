@@ -7,16 +7,11 @@ const Category = require('../models/itemType');
 const Cafe = require('../models/cafe')
 
 //LIBRARIES
-const express = require('express');
-const middleware = require('../middleware');
-const router = express.Router();
 const dateFormat = require('dateformat');
 const path = require('path');
-const {transport, transport_mandatory} = require("../utils/transport");
-const {getPopularityCoefficiant, sortByPopularity, equateObjects} = require("../utils/popularity-algorithms");
+const {transport} = require("../utils/transport");
+const { sortByPopularity } = require("../utils/popularity-algorithms");
 const convertToLink = require("../utils/convert-to-link");
-const filter = require('../utils/filter');
-const {getHours, sortTimes, getStats} = require('../utils/time');
 const getData = require("../utils/cafe-data");
 const {cloudUpload, cloudDelete} = require('../services/cloudinary');
 

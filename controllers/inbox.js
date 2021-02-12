@@ -4,13 +4,12 @@ const filter = new Filter();
 const path = require('path');
 const { sendGridEmail } = require("../utils/transport");
 const convertToLink = require("../utils/convert-to-link");
-const {cloudUpload, cloudDelete} = require('../services/cloudinary');
+const { cloudUpload } = require('../services/cloudinary');
 
 const User = require('../models/user');
 const Message = require('../models/message');
 const AccessReq = require('../models/accessRequest');
 const Room = require('../models/room');
-const { request } = require('express');
 
 // Inbox GET index page
 module.exports.index = async function(req, res) {
@@ -245,17 +244,17 @@ module.exports.createMsg = async function(req, res) {
             }
         }
 
-        let email_text;
+        let emailText;
         if(message.toEveryone) {
-            email_text = `<p>Hello ${r.firstName},</p><p>You have a new Saberchat inbox notification from <strong>${req.user.username}</strong>!</p><p><strong>To</strong>: Everyone</p><p>${newMessage.text}</p><p>You can access the full message at https://alsion-saberchat.herokuapp.com</p> ${imageString}`;
+            emailText = `<p>Hello ${r.firstName},</p><p>You have a new Saberchat inbox notification from <strong>${req.user.username}</strong>!</p><p><strong>To</strong>: Everyone</p><p>${newMessage.text}</p><p>You can access the full message at https://alsion-saberchat.herokuapp.com</p> ${imageString}`;
         } else if(message.anonymous) {
-            email_text = `<p>Hello ${r.firstName},</p><p>You have a new Saberchat anonymous notification!</p><p><strong>To</strong>: ${recipientArr.join(', ')}</p><p>${newMessage.text}</p><p>You can access the full message at https://alsion-saberchat.herokuapp.com</p> ${imageString}`;
+            emailText = `<p>Hello ${r.firstName},</p><p>You have a new Saberchat anonymous notification!</p><p><strong>To</strong>: ${recipientArr.join(', ')}</p><p>${newMessage.text}</p><p>You can access the full message at https://alsion-saberchat.herokuapp.com</p> ${imageString}`;
         } else {
-            email_text = `<p>Hello ${r.firstName},</p><p>You have a new Saberchat inbox notification from <strong>${req.user.username}</strong>!</p><p><strong>To</strong>: ${recipientArr.join(', ')}</p><p>${newMessage.text}</p><p>You can access the full message at https://alsion-saberchat.herokuapp.com</p> ${imageString}`;
+            emailText = `<p>Hello ${r.firstName},</p><p>You have a new Saberchat inbox notification from <strong>${req.user.username}</strong>!</p><p><strong>To</strong>: ${recipientArr.join(', ')}</p><p>${newMessage.text}</p><p>You can access the full message at https://alsion-saberchat.herokuapp.com</p> ${imageString}`;
         }
 
         if(r.receiving_emails) {
-            await sendGridEmail(r.email, `New Inbox Notification - ${newMessage.subject}`, email_text);
+            await sendGridEmail(r.email, `New Inbox Notification - ${newMessage.subject}`, emailText);
         }
     }
 
@@ -379,9 +378,9 @@ module.exports.reply = async function(req, res) {
 
         //Send email notifying about the reply to everyone except person who posted the reply
         if (!(recipient._id.equals(req.user._id)) && recipient.receiving_emails) {
-            const email_text = `<p>Hello ${recipient.firstName},</p><p><strong>${req.user.username}</strong> replied to <strong>${message.subject}</strong>.<p>${reply.text}</p><p>You can access the full message at https://alsion-saberchat.herokuapp.com</p> ${imageString}`;
+            const emailText = `<p>Hello ${recipient.firstName},</p><p><strong>${req.user.username}</strong> replied to <strong>${message.subject}</strong>.<p>${reply.text}</p><p>You can access the full message at https://alsion-saberchat.herokuapp.com</p> ${imageString}`;
 
-            await sendGridEmail(recipient.email, `New Reply On ${message.subject}`, email_text);
+            await sendGridEmail(recipient.email, `New Reply On ${message.subject}`, emailText);
         }
     }
 
@@ -453,9 +452,9 @@ module.exports.acceptReq = async function(req, res) {
     await Req.save();
 
     if(Req.requester.receiving_emails) {
-        const email_text = `<p>Hello ${Req.requester.firstName},</p><p>Your request to join chat room <strong>${room.name}</strong> has been accepted!<p><p>You can access the room at https://alsion-saberchat.herokuapp.com</p>`;
+        const emailText = `<p>Hello ${Req.requester.firstName},</p><p>Your request to join chat room <strong>${foundRoom.name}</strong> has been accepted!<p><p>You can access the room at https://alsion-saberchat.herokuapp.com</p>`;
 
-        await sendGridEmail(Req.requester.email, `Room Request Accepted - ${room.name}`, email_text);
+        await sendGridEmail(Req.requester.email, `Room Request Accepted - ${foundRoom.name}`, emailText);
     }
 
     req.flash('success', 'Request accepted');
@@ -483,9 +482,9 @@ module.exports.rejectReq = async function(req, res) {
     await Req.save();
 
     if(Req.requester.receiving_emails) {
-        const email_text = `<p>Hello ${Req.requester.firstName},</p><p>Your request to join chat room <strong>${Req.room.name}</strong> has been rejected. Contact the room creator, <strong>${Req.room.creator.username}</strong>, if you think that there has been a mistake.</p>`;
+        const emailText = `<p>Hello ${Req.requester.firstName},</p><p>Your request to join chat room <strong>${Req.room.name}</strong> has been rejected. Contact the room creator, <strong>${Req.room.creator.username}</strong>, if you think that there has been a mistake.</p>`;
 
-        await sendGridEmail(Req.requester.email, `Room Request Rejected - ${Req.room.name}`, email_text);
+        await sendGridEmail(Req.requester.email, `Room Request Rejected - ${Req.room.name}`, emailText);
     }
 
     req.flash('success', 'Request rejected');

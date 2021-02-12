@@ -12,257 +12,35 @@ const convertToLink = require("../utils/convert-to-link");
 const {singleUpload, multipleUpload} = require('../middleware/multer');
 const {cloudUpload, cloudDelete} = require('../services/cloudinary');
 const {validateAnn} = require('../middleware/validation');
+const wrapAsync = require('../utils/wrapAsync');
 
 //SCHEMA
 const User = require('../models/user');
-const Announcement = require('../models/announcement');
+// const Announcement = require('../models/announcement');
 const Notification = require('../models/message');
 const PostComment = require('../models/postComment');
 
+// Controller
+const Announcement = require('../controllers/announcements');
+
 //ROUTES
-router.get('/', (req, res) => { //RESTful Routing 'INDEX' route
-    Announcement.find({}).populate('sender').exec((err, anns) => { //Collects data about all announcements
-        if (err || !anns) {
-            req.flash('error', "An Error Occurred");
-            res.redirect('back');
+router.route('/')
+    .get(wrapAsync(Announcement.index))
+    .post(middleware.isLoggedIn, middleware.isMod, multipleUpload, validateAnn, wrapAsync(Announcement.create));
 
-        } else {
-            res.render('announcements/index', {announcements: anns.reverse()}); //Render announcement page with data on all announcements
-        }
-    });
-});
+router.get('/new', middleware.isLoggedIn, middleware.isMod, Announcement.new);
 
-router.get('/new', middleware.isLoggedIn, middleware.isMod, (req, res) => { //RESTful Routing 'NEW' route
-    res.render('announcements/new');
-});
+router.get('/mark-all', middleware.isLoggedIn, Announcement.markAll);
 
-router.get('/mark-all', middleware.isLoggedIn, (req, res) => { //Mark all announceents as read
-    req.user.annCount = []; //No new announcements in user's annCount
-    req.user.save();
-    req.flash('success', 'All Announcements Marked As Read!');
-    res.redirect(`/announcements`);
-});
+router.get('/mark/:id', middleware.isLoggedIn, Announcement.markOne);
 
-router.get('/mark/:id', middleware.isLoggedIn, (req, res) => { //Mark specific announcement as read
+router.get('/:id', wrapAsync(Announcement.show));
 
-    //Iterate through user's announcement count and find the announcement that is being marked as read
-    let index = -1;
-    for (let i = 0; i < req.user.annCount.length; i++) {
-        if (req.user.annCount[i].announcement.toString() == req.params.id.toString()) {
-            index = i;
-        }
-    }
+router.get('/:id/edit', middleware.isLoggedIn, middleware.isMod, wrapAsync(Announcement.updateForm));
 
-    //If the announcement exists, remove it from announcement count
-    if (index > -1) {
-        req.user.annCount.splice(index, 1);
-        req.user.save()
-    }
+router.put('/like', middleware.isLoggedIn, wrapAsync(Announcement.likeAnn));
 
-    req.flash('success', 'Announcement Marked As Read!');
-    res.redirect(`/announcements`);
-})
-
-
-router.get('/:id', (req, res) => { //RESTful Routing 'SHOW' route
-    Announcement.findById(req.params.id) //Find only the announcement specified from form
-        .populate('sender')
-        .populate({
-            path: "comments",
-            populate: {
-                path: "sender"
-            }
-        })
-        .exec((err, ann) => { //Get info about the announcement's sender and comments, and then release it to user
-            if (err || !ann) {
-                req.flash('error', 'An Error Occurred');
-                res.redirect('back');
-
-            } else {
-                if (req.user) { //If user is logged in, remove this announcement from their announcement count
-                    let index = -1;
-                    for (let i = 0; i < req.user.annCount.length; i += 1) {
-
-                        if (ann._id.toString() == req.user.annCount[i].announcement._id.toString()) {
-                            index = i;
-                        }
-                    }
-                    if (index != -1) {
-                        req.user.annCount.splice(index, 1);
-                    }
-                    req.user.save();
-                }
-
-                let fileExtensions = new Map();
-                for (let media of ann.imageFiles) {
-                    fileExtensions.set(media.url, path.extname(media.url.split("SaberChat/")[1]));
-                }
-
-                const convertedText = convertToLink(ann.text);
-                res.render('announcements/show', {announcement: ann, convertedText, fileExtensions});
-            }
-        });
-});
-
-router.get('/:id/edit', middleware.isLoggedIn, middleware.isMod, (req, res) => { //RESTful Routing 'EDIT' route
-    Announcement.findById(req.params.id, (err, ann) => { //Find only the announcement specified from form
-        if (err || !ann) {
-            req.flash('error', "An Error Occurred");
-            res.redirect('back');
-        } else if (!ann.sender._id.equals(req.user._id)) { //If you did not send the announcement, you cannot edit it (the 'edit' button does not show up if you did not create the announcement, but this is a double-check)
-            req.flash('error', 'You do not have permission to do that');
-            res.redirect('back');
-        } else {
-            res.render('announcements/edit', {
-                announcement: ann
-            }); //If no problems, allow the user to edit announcement
-        }
-    });
-});
-
-router.post('/', middleware.isLoggedIn, middleware.isMod, multipleUpload, validateAnn, (req, res) => { //RESTful Routing 'CREATE' route
-    (async () => {
-
-        const announcement = await Announcement.create({
-            sender: req.user,
-            subject: req.body.subject,
-            text: req.body.message
-        });
-
-        if (!announcement) {
-            req.flash('error', 'Unable to create announcement');
-            return res.redirect('back');
-        }
-
-        if (req.body.images) { //If any images were added (if not, the 'images' property is null)
-            for (const image in req.body.images) {
-                announcement.images.push(req.body.images[image]);
-            }
-        }
-
-        // if files were uploaded
-        if (req.files) {
-            let cloudErr;
-            let cloudResult;
-            for (let file of req.files) {
-                if (path.extname(file.originalname).toLowerCase() == ".mp4") {
-                    [cloudErr, cloudResult] = await cloudUpload(file, "video");
-                } else {
-                    [cloudErr, cloudResult] = await cloudUpload(file, "image");
-                }
-                if (cloudErr || !cloudResult) {
-                    req.flash('error', 'Upload failed');
-                    return res.redirect('back');
-                }
-
-                announcement.imageFiles.push({
-                    filename: cloudResult.public_id,
-                    url: cloudResult.secure_url
-                });
-            }
-        }
-
-        announcement.date = dateFormat(announcement.created_at, "h:MM TT | mmm d");
-        await announcement.save();
-
-        const users = await User.find({
-            authenticated: true,
-            _id: {
-                $ne: req.user._id
-            }
-        });
-        let announcementEmail;
-
-        let imageString = "";
-
-        for (let image of announcement.images) {
-            imageString += `<img src="${image}">`;
-        }
-
-        if (!users) {
-            req.flash('error', "An Error Occurred");
-            res.rediect('back');
-        }
-
-        let announcementObject = {
-            announcement: announcement,
-            version: "new"
-        };
-
-        for (let user of users) {
-            transport(user, `New Saberchat Announcement - ${announcement.subject}`, `<p>Hello ${user.firstName},</p><p>${req.user.username} has recently posted a new announcement - '${announcement.subject}'.</p><p>${announcement.text}</p><p>You can access the full announcement at https://alsion-saberchat.herokuapp.com</p> ${imageString}`);
-            user.annCount.push(announcementObject);
-            await user.save();
-        }
-
-        req.flash('success', 'Announcement posted to bulletin!');
-        res.redirect(`/announcements/${announcement._id}`);
-
-    })().catch(err => {
-        req.flash('error', "An Error Occurred");
-        return res.redirect('back');
-    });
-});
-
-router.put('/like', middleware.isLoggedIn, (req, res) => {
-    Announcement.findById(req.body.announcement, (err, announcement) => {
-        if (err || !announcement) {
-            res.json({
-                error: 'Error updating announcement'
-            });
-
-        } else {
-            if (announcement.likes.includes(req.user._id)) { //Remove like
-                announcement.likes.splice(announcement.likes.indexOf(req.user._id), 1);
-                announcement.save();
-
-                res.json({
-                    success: `Removed a like from ${announcement.subject}`,
-                    likeCount: announcement.likes.length
-                });
-
-            } else { //Add like
-                announcement.likes.push(req.user._id);
-                announcement.save();
-
-                res.json({
-                    success: `Liked ${announcement.subject}`,
-                    likeCount: announcement.likes.length
-                });
-            }
-        }
-    });
-});
-
-router.put('/like-comment', middleware.isLoggedIn, (req, res) => {
-    PostComment.findById(req.body.commentId, (err, comment) => {
-        if (err || !comment) {
-            res.json({
-                error: 'Error updating comment'
-            });
-
-        } else {
-
-            if (comment.likes.includes(req.user._id)) { //Remove Like
-                comment.likes.splice(comment.likes.indexOf(req.user._id), 1);
-                comment.save();
-                res.json({
-                    success: `Removed a like from a comment`,
-                    likeCount: comment.likes.length
-                });
-
-            } else { //Add Like
-                comment.likes.push(req.user._id);
-                comment.save();
-
-                res.json({
-                    success: `Liked comment`,
-                    likeCount: comment.likes.length
-                });
-            }
-        }
-    });
-});
+router.put('/like-comment', middleware.isLoggedIn, wrapAsync(Announcement.likeComment));
 
 router.put('/comment', middleware.isLoggedIn, (req, res) => {
 
