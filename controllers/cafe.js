@@ -448,7 +448,14 @@ module.exports.updateItem = async function(req, res) {
         }
 
         if (req.file) {
-            const [cloudErr, cloudResult] = await cloudUpload(req.file);
+            let [cloudError, cloudResult] = await cloudDelete(item.imageFile.filename);
+            // check for failure
+            if (cloudError || !cloudResult || cloudResult.result !== 'ok') {
+                req.flash('error', 'Error deleting uploaded image');
+                return res.redirect('back');
+            }
+
+            [cloudErr, cloudResult] = await cloudUpload(req.file);
             if (cloudErr || !cloudResult) {
                 req.flash('error', 'Upload failed');
                 return res.redirect('back');
