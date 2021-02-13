@@ -1,6 +1,7 @@
 const { sendGridEmail } = require("../utils/transport");
 const convertToLink = require("../utils/convert-to-link");
 
+const path = require('path');
 const {singleUpload, multipleUpload} = require('../middleware/multer');
 const {cloudUpload, cloudDelete} = require('../services/cloudinary');
 const {validateAnn} = require('../middleware/validation');
@@ -76,11 +77,12 @@ module.exports.show = async function(req, res) {
         await req.user.save();
     }
 
+    let fileExtensions = new Map();
+    for (let media of Ann.imageFiles) {
+        fileExtensions.set(media.url, path.extname(media.url.split("SaberChat/")[1]));
+    }
     const convertedText = convertToLink(Ann.text);
-    res.render('announcements/show', {
-        announcement: foundAnn,
-        convertedText
-    });
+    res.render('announcements/show', {announcement: Ann, convertedText, fileExtensions});
 };
 
 // Ann GET edit form
@@ -93,7 +95,12 @@ module.exports.updateForm = async function(req, res) {
         return res.redirect('back');
     }
 
-    res.render('announcements/edit', { announcement: Ann });
+    let fileExtensions = new Map();
+    for (let media of Ann.imageFiles) {
+        fileExtensions.set(media.url, path.extname(media.url.split("SaberChat/")[1]));
+    }
+
+    res.render('announcements/edit', { announcement: Ann, fileExtensions });
 };
 
 // Ann POST create

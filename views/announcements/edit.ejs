@@ -54,10 +54,10 @@
 
                 <% for (let media of announcement.imageFiles) { %>
                     <% if(media.filename) { %>
-                        <% if (media.url.split("SaberChat/")[1].split('.')[1].toLowerCase() == "mp4") { %>
-                            <video width="400px" height="250px" src="<%=media.url%>" type="video/mp4" controls autoplay></video>
-                        <% } else { %>
+                        <% if ([".png", ".jpg", ".jpeg"].includes(fileExtensions.get(media.url).toLowerCase())) { %>
                             <img src="<%= media.url %>" alt="attached image" class="img-fluid rounded past-upload">
+                        <% } else { %>
+                            <video width="400px" height="250px" src="<%=media.url%>" type="video/mp4" controls autoplay></video>
                         <% } %>
                         <div class="form-check">
                             <input type="checkbox" name="deleteUpload-<%=media.url%>" id="deleteUpload-<%=media.url%>" class="form-check-input">

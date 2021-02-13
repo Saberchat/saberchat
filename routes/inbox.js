@@ -36,7 +36,7 @@ router.delete('/clear', middleware.isLoggedIn, Inbox.clear);
 router.delete('/delete', middleware.isLoggedIn, wrapAsync(Inbox.delete));
 
 // Message show route
-router.get('/:id', middleware.isLoggedIn, wrapAsync(inbox.showMsg));
+router.get('/:id', middleware.isLoggedIn, wrapAsync(Inbox.showMsg));
 
 // ========================================
 // access request routes

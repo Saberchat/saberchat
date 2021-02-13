@@ -89,13 +89,18 @@ module.exports.index = async function(req, res) {
             req.flash('error', "An Error Occurred");
             return res.redirect('back');
         }
+
+        let fileExtensions = new Map();
         let itemDescriptions = {}; //Object of items and their link-embedded descriptions
         for (let category of categories) {
             for (let item of category.items) {
                 itemDescriptions[item._id] = convertToLink(item.description);
+                if (item.imageFile.filename) {
+                    fileExtensions.set(item.imageFile.url, path.extname(item.imageFile.url.split("SaberChat/")[1]));
+                }
             }
         }
-        return res.render('cafe/menu', {categories: sortedCategories, itemDescriptions, frequentItems});
+        return res.render('cafe/menu', {categories: sortedCategories, itemDescriptions, frequentItems, fileExtensions});
     }
     return res.render('cafe/index', {orders: allOrders});
 }
@@ -408,7 +413,12 @@ module.exports.viewItem = async function(req, res) {
         return res.redirect('back');
     }
 
-    return res.render('cafe/show', {categories, item});
+    let fileExtensions = new Map();
+    if (item.imageFile.filename) {
+        fileExtensions.set(item.imageFile.url, path.extname(item.imageFile.url.split("SaberChat/")[1]));
+    }
+
+    return res.render('cafe/show', {categories, item, fileExtensions});
 }
 
 //UPDATE ITEM

@@ -97,16 +97,16 @@
                                 <% } %>
 
                   <br/><em class="item-description convertible-text"><%= itemDescriptions[item._id.toString()] %></em><br/>
-                  <% if (item.imgUrl != '') { %>
-                      <img class="item-image" src="<%= item.imgUrl %>"/>
-                  <% } else if (["png", "jpg", "jpeg"].includes(item.imageFile.url.split("SaberChat/")[1].split('.')[1].toLowerCase())) { %>
+                  <% if (item.imageFile.filename && [".png", ".jpg", ".jpeg"].includes(fileExtensions.get(item.imageFile.url).toLowerCase())) { %>
                       <img class="item-image" src="<%= item.imageFile.url %>"/>
+                  <% } else if (item.imgUrl != '') { %>
+                      <img class="item-image" src="<%= item.imgUrl %>"/>
                   <% } %>
 
                 </span>
-                        <% } %>
-                    <% }) %>
-                    <br class="category-break" id="<%= category._id %>-break"/>
+                <% } %>
+                <% }) %>
+            <br class="category-break" id="<%= category._id %>-break"/>
             <% }) %>
             <br/>
         </div>

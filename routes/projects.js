@@ -33,7 +33,13 @@ router.get('/', (req, res) => { //RESTful Routing 'INDEX' route
                 res.redirect('back');
 
             } else {
-                res.render('projects/index', {projects: projects}); //Post the project data to HTML page, which formats the data
+                let fileExtensions = new Map();
+                for (let project of projects) {
+                    for (let media of project.imageFiles) {
+                        fileExtensions.set(media.url, path.extname(media.url.split("SaberChat/")[1]));
+                    }
+                }
+                res.render('projects/index', {projects, fileExtensions}); //Post the project data to HTML page, which formats the data
             }
         });
 });
@@ -237,7 +243,12 @@ router.get('/:id/edit', middleware.isLoggedIn, middleware.isFaculty, (req, res) 
             return res.redirect('back');
         }
 
-        res.render('projects/edit', {project, students, creatornames});
+        let fileExtensions = new Map();
+        for (let media of project.imageFiles) {
+            fileExtensions.set(media.url, path.extname(media.url.split("SaberChat/")[1]));
+        }
+
+        res.render('projects/edit', {project, students, creatornames, fileExtensions});
 
     })().catch(err => {
         req.flash('error', "An Error Occurred");
