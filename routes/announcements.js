@@ -6,10 +6,10 @@ const middleware = require('../middleware/index');
 const router = express.Router(); //start express router
 const dateFormat = require('dateformat');
 const path = require('path');
-const {transport, transport_mandatory} = require("../utils/transport");
+const {transport} = require("../utils/transport");
 const convertToLink = require("../utils/convert-to-link");
 
-const {singleUpload, multipleUpload} = require('../middleware/multer');
+const {multipleUpload} = require('../middleware/multer');
 const {cloudUpload, cloudDelete} = require('../services/cloudinary');
 const {validateAnn} = require('../middleware/validation');
 const wrapAsync = require('../utils/wrapAsync');
@@ -19,6 +19,7 @@ const User = require('../models/user');
 // const Announcement = require('../models/announcement');
 const Notification = require('../models/message');
 const PostComment = require('../models/postComment');
+const Ann = require('../models/announcement');
 
 // Controller
 const Announcement = require('../controllers/announcements');
@@ -46,7 +47,7 @@ router.put('/comment', middleware.isLoggedIn, (req, res) => {
 
     (async () => {
 
-        const announcement = await Announcement.findById(req.body.announcement)
+        const announcement = await Ann.findById(req.body.announcement)
             .populate({
                 path: "comments",
                 populate: {
@@ -136,7 +137,7 @@ router.put('/comment', middleware.isLoggedIn, (req, res) => {
 
 router.put('/:id', middleware.isLoggedIn, middleware.isMod, multipleUpload, (req, res) => { //RESTful Routing 'UPDATE' route
     (async () => {
-        const announcement = await Announcement.findById(req.params.id).populate('sender');
+        const announcement = await Ann.findById(req.params.id).populate('sender');
         if (!announcement) {
             req.flash('error', "Unable to access announcement");
             return res.redirect('back');
@@ -147,7 +148,7 @@ router.put('/:id', middleware.isLoggedIn, middleware.isMod, multipleUpload, (req
             return res.redirect('back');
         }
 
-        const updatedAnnouncement = await Announcement.findByIdAndUpdate(req.params.id, {
+        const updatedAnnouncement = await Ann.findByIdAndUpdate(req.params.id, {
             subject: req.body.subject,
             text: req.body.message
         });
@@ -163,17 +164,17 @@ router.put('/:id', middleware.isLoggedIn, middleware.isMod, multipleUpload, (req
             }
         }
 
-        let cloudError;
+        let cloudErr;
         let cloudResult;
         for (let i = updatedAnnouncement.imageFiles.length-1; i >= 0; i--) {
             if (req.body[`deleteUpload-${updatedAnnouncement.imageFiles[i].url}`] && updatedAnnouncement.imageFiles[i] && updatedAnnouncement.imageFiles[i].filename) {
                 if (path.extname(updatedAnnouncement.imageFiles[i].url.split("SaberChat/")[1]).toLowerCase() == ".mp4") {
-                    [cloudErr, cloudResult] = await cloudDelete(updatedProject.imageFiles[i].filename, "video");
+                    [cloudErr, cloudResult] = await cloudDelete(updatedAnnouncement.imageFiles[i].filename, "video");
                 } else {
-                    [cloudErr, cloudResult] = await cloudDelete(updatedProject.imageFiles[i].filename, "image");
+                    [cloudErr, cloudResult] = await cloudDelete(updatedAnnouncement.imageFiles[i].filename, "image");
                 }
                 // check for failure
-                if (cloudError || !cloudResult || cloudResult.result !== 'ok') {
+                if (cloudErr || !cloudResult || cloudResult.result !== 'ok') {
                     req.flash('error', 'Error deleting uploaded image');
                     return res.redirect('back');
                 }
@@ -185,7 +186,7 @@ router.put('/:id', middleware.isLoggedIn, middleware.isMod, multipleUpload, (req
         if (req.files) {
             let cloudErr;
             let cloudResult;
-            for (let file of req.files) {
+            for (let file of req.files.imageFile) {
                 if (path.extname(file.originalname).toLowerCase() == ".mp4") {
                     [cloudErr, cloudResult] = await cloudUpload(file, "video");
                 } else {
@@ -260,7 +261,7 @@ router.put('/:id', middleware.isLoggedIn, middleware.isMod, multipleUpload, (req
 router.delete('/:id', middleware.isLoggedIn, middleware.isMod, (req, res) => { // RESTful Routing 'DESTROY' route
     (async () => {
 
-        const announcement = await Announcement.findById(req.params.id).populate('sender');
+        const announcement = await Ann.findById(req.params.id).populate('sender');
         if (!announcement) {
             req.flash('error', "Unable to access announcement");
             return res.redirect('back');
@@ -272,7 +273,7 @@ router.delete('/:id', middleware.isLoggedIn, middleware.isMod, (req, res) => { /
 
         }
         // delete any uploads
-        let cloudError;
+        let cloudErr;
         let cloudResult;
         for (let file of announcement.imageFiles) {
             if (file && file.filename) {
@@ -282,14 +283,14 @@ router.delete('/:id', middleware.isLoggedIn, middleware.isMod, (req, res) => { /
                     [cloudErr, cloudResult] = await cloudDelete(file.filename, "image");
                 }
                 // check for failure
-                if (cloudError || !cloudResult || cloudResult.result !== 'ok') {
+                if (cloudErr || !cloudResult || cloudResult.result !== 'ok') {
                     req.flash('error', 'Error deleting uploaded image');
                     return res.redirect('back');
                 }
             }
         }
 
-        const deletedAnn = await Announcement.findByIdAndDelete(announcement._id);
+        const deletedAnn = await Ann.findByIdAndDelete(announcement._id);
 
         if (!deletedAnn) {
             req.flash('error', "Unable to delete announcement");

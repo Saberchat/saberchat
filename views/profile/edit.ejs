@@ -36,7 +36,7 @@
     </div>
     <div class="row">
         <div class="col-md-8 offset-md-2 col-12">
-            <form action="/profiles/profile?_method=put" method="post">
+            <form action="/profiles/profile?_method=put" method="post" enctype="multipart/form-data">
                 <div class="form-group">
                     <label for="firstNameInput">First</label>
                     <input id="firstNameInput" class="form-control" type="text" name="firstName"
@@ -119,22 +119,41 @@
                 <% } %>
                 <div class="form-group">
                     <label for="profile-input">Profile Image URL</label><br/>
-                    <!-- <input type="file" id="imageInput" accept="image/*" name="image" required> -->
                     <div id="profile-image-update">
                         <input id="profile-input" oninput="updateImage(this)" class="form-control" type="text"
                                name="imageUrl" value="<%= currentUser.imageUrl %>" placeholder="Enter Image Url">
                         <br/>
-                        <img id="profile-image" src="<%= currentUser.imageUrl %>" alt="Image Does Not Exist"/>
+                        <img class="profile-image"  id="profile-image" src="<%= currentUser.imageUrl %>" alt="Image Does Not Exist"/>
                     </div>
                 </div>
                 <div class="form-group">
+                    <br />
+                    <label for="profile-input">Profile Image Upload</label><br/>
+                    <input type="file" accept="image/png, image/jpg, image/jpeg" name="imageFile">
+                    <% if (currentUser.imageFile.filename) { %>
+                        <div>
+                            <br/><img class="profile-image" src="<%= currentUser.imageFile.url%>" alt="Image Does Not Exist"/>
+                        </div>
+                    <% } %>
+                </div>
+                <br />
+                <div class="form-group">
                     <label for="banner-input">Banner Image Url</label><br/>
-                    <!-- <input type="file" id="bannerInput" accept="image/*" name="banner" required> -->
                     <input id="banner-input" class="form-control" oninput="updateImage(this)" type="text"
                            name="bannerUrl" value="<%= currentUser.bannerUrl %>" placeholder="Enter Banner Url">
                     <br/>
-                    <img id="banner-image" src="<%= currentUser.bannerUrl %>" alt="Image Does Not Exist"/>
+                    <img class="banner-image" id="banner-image" src="<%= currentUser.bannerUrl %>" alt="Image Does Not Exist"/>
                 </div>
+                <div class="form-group">
+                    <br />
+                    <label for="profile-input">Banner Image Upload</label><br/>
+                    <input type="file" id="imageInput" accept="image/png, image/jpg, image/jpeg" name="imageFile2">
+                    <% if (currentUser.bannerFile.filename) { %>
+                        <br/><br/>
+                        <img class="banner-image" src="<%= currentUser.bannerFile.url %>" alt="Image Does Not Exist"/>
+                    <% } %>
+                </div>
+                <br />
                 <button class="btn btn-lg btn-primary btn-block">Submit Changes</button>
             </form>
         </div>

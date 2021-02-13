@@ -4,7 +4,7 @@ const filter = new Filter();
 //create express router
 const dateFormat = require('dateformat');
 const router = express.Router();
-const {transport, transport_mandatory} = require("../utils/transport");
+const {transport} = require("../utils/transport");
 const convertToLink = require("../utils/convert-to-link");
 const {validateRoom} = require('../middleware/validation');
 

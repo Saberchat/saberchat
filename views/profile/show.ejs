@@ -26,10 +26,14 @@
 <%- include('../partials/navbar') %>
 
 <!-- big background image -->
-<div id="banner" style="background-image: url('<%= user.bannerUrl %>');">
+<div id="banner" style="background-image: url('<% if (user.bannerFile.filename) { %> <%= user.bannerFile.url %> <% } else { %> <%= user.bannerUrl %> <% } %>');">
 </div>
 <div class="container mb-5">
-    <img src="<%= user.imageUrl %>" alt="profile image" class="profile-image">
+    <% if (user.imageFile.filename) { %>
+        <img src="<%= user.imageFile.url %>" alt="profile image" class="profile-image">
+    <% } else { %>
+        <img src="<%= user.imageUrl %>" alt="profile image" class="profile-image">
+    <% } %>
     <h1 class="username"><%= user.username %></h1>
     <div class="col-md-4 col-12 order-md-2 profile-box">
         <section class="profile-card">

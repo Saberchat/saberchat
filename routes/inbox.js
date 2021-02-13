@@ -3,7 +3,7 @@ const middleware = require('../middleware');
 const router = express.Router(); //start express router
 const { validateMsg } = require('../middleware/validation');
 const wrapAsync = require('../utils/wrapAsync');
-const {singleUpload, multipleUpload} = require('../middleware/multer');
+const {multipleUpload} = require('../middleware/multer');
 
 // controller
 const Inbox = require('../controllers/inbox');

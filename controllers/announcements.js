@@ -2,7 +2,8 @@ const { sendGridEmail } = require("../utils/transport");
 const convertToLink = require("../utils/convert-to-link");
 
 const path = require('path');
-const {singleUpload, multipleUpload} = require('../middleware/multer');
+const dateFormat = require('dateformat');
+const {multipleUpload} = require('../middleware/multer');
 const {cloudUpload, cloudDelete} = require('../services/cloudinary');
 const {validateAnn} = require('../middleware/validation');
 
@@ -105,20 +106,6 @@ module.exports.updateForm = async function(req, res) {
 
 // Ann POST create
 module.exports.create = async function(req, res) {
-    let announcementObject = {
-        announcement: announcement,
-        version: "new"
-    };
-
-    for (let user of users) {
-        transport(user, `New Saberchat Announcement - ${announcement.subject}`, `<p>Hello ${user.firstName},</p><p>${req.user.username} has recently posted a new announcement - '${announcement.subject}'.</p><p>${announcement.text}</p><p>You can access the full announcement at https://alsion-saberchat.herokuapp.com</p> ${imageString}`);
-        user.annCount.push(announcementObject);
-        await user.save();
-    }
-
-    req.flash('success', 'Announcement posted to bulletin!');
-    res.redirect(`/announcements/${announcement._id}`);
-
     const Ann = await Announcement.create({
         sender: req.user,
         subject: req.body.subject,
@@ -140,7 +127,7 @@ module.exports.create = async function(req, res) {
     if (req.files) {
         let cloudErr;
         let cloudResult;
-        for (let file of req.files) {
+        for (let file of req.files.imageFile) {
             if (path.extname(file.originalname).toLowerCase() == ".mp4") {
                 [cloudErr, cloudResult] = await cloudUpload(file, "video");
             } else {

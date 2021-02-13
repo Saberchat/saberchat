@@ -6,12 +6,12 @@ const middleware = require('../middleware');
 const router = express.Router(); //start express router
 const dateFormat = require('dateformat');
 const path = require('path');
-const {transport, transport_mandatory} = require("../utils/transport");
+const {transport} = require("../utils/transport");
 const convertToLink = require("../utils/convert-to-link");
 const filter = require('../utils/filter');
-const {getPopularityCoefficiant, sortByPopularity} = require("../utils/popularity-algorithms");
+const {sortByPopularity} = require("../utils/popularity-algorithms");
 
-const {singleUpload, multipleUpload} = require('../middleware/multer');
+const {multipleUpload} = require('../middleware/multer');
 const {cloudUpload, cloudDelete} = require('../services/cloudinary');
 const {validateProject} = require('../middleware/validation');
 
@@ -58,7 +58,6 @@ router.get('/new', middleware.isLoggedIn, middleware.isFaculty, (req, res) => { 
 
 router.post('/', middleware.isLoggedIn, middleware.isFaculty, multipleUpload, validateProject, (req, res) => { //RESTful Routing 'CREATE' route
     (async () => { //Asynchronous functions dictates that processes occur one at a time, reducing excessive callbacks
-
         let creators = [];
         let statusGroup; //Group of creators by status
         let individual; //Individual Creator ID
@@ -105,7 +104,7 @@ router.post('/', middleware.isLoggedIn, middleware.isFaculty, multipleUpload, va
         if (req.files) {
             let cloudErr;
             let cloudResult;
-            for (let file of req.files) {
+            for (let file of req.files.imageFile) {
                 if (path.extname(file.originalname).toLowerCase() == ".mp4") {
                     [cloudErr, cloudResult] = await cloudUpload(file, "video");
                 } else {
@@ -170,6 +169,7 @@ router.post('/', middleware.isLoggedIn, middleware.isFaculty, multipleUpload, va
         res.redirect(`/projects/${project._id}`);
 
     })().catch(err => {
+        console.log(err);
         req.flash('error', "An Error Occurred");
         res.redirect('back');
     });
@@ -497,7 +497,7 @@ router.put('/:id', middleware.isLoggedIn, middleware.isFaculty, multipleUpload, 
             }
         }
 
-        let cloudError;
+        let cloudErr;
         let cloudResult;
         for (let i = updatedProject.imageFiles.length-1; i >= 0; i--) {
             if (req.body[`deleteUpload-${updatedProject.imageFiles[i].url}`] && updatedProject.imageFiles[i] && updatedProject.imageFiles[i].filename) {
@@ -507,7 +507,7 @@ router.put('/:id', middleware.isLoggedIn, middleware.isFaculty, multipleUpload, 
                     [cloudErr, cloudResult] = await cloudDelete(updatedProject.imageFiles[i].filename, "image");
                 }
                 // check for failure
-                if (cloudError || !cloudResult || cloudResult.result !== 'ok') {
+                if (cloudErr || !cloudResult || cloudResult.result !== 'ok') {
                     req.flash('error', 'Error deleting uploaded image');
                     return res.redirect('back');
                 }
@@ -519,7 +519,7 @@ router.put('/:id', middleware.isLoggedIn, middleware.isFaculty, multipleUpload, 
         if (req.files) {
             let cloudErr;
             let cloudResult;
-            for (let file of req.files) {
+            for (let file of req.files.imageFile) {
                 if (path.extname(file.originalname).toLowerCase() == ".mp4") {
                     [cloudErr, cloudResult] = await cloudUpload(file, "video");
                 } else {
@@ -611,7 +611,7 @@ router.delete('/:id', middleware.isLoggedIn, middleware.isFaculty, (req, res) =>
         }
 
         // delete any uploads
-        let cloudError;
+        let cloudErr;
         let cloudResult;
         for (let file of project.imageFiles) {
             if (file && file.filename) {
@@ -621,7 +621,7 @@ router.delete('/:id', middleware.isLoggedIn, middleware.isFaculty, (req, res) =>
                     [cloudErr, cloudResult] = await cloudDelete(file.filename, "image");
                 }
                 // check for failure
-                if (cloudError || !cloudResult || cloudResult.result !== 'ok') {
+                if (cloudErr || !cloudResult || cloudResult.result !== 'ok') {
                     req.flash('error', 'Error deleting uploaded image');
                     return res.redirect('back');
                 }

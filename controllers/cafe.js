@@ -359,8 +359,8 @@ module.exports.createItem = async function(req, res) {
         return res.redirect('back');
     }
 
-    if (req.file) {
-        const [cloudErr, cloudResult] = await cloudUpload(req.file);
+    if (req.files) {
+        const [cloudErr, cloudResult] = await cloudUpload(req.files.imageFile[0]);
         if (cloudErr || !cloudResult) {
             req.flash('error', 'Upload failed');
             return res.redirect('back');
@@ -453,8 +453,8 @@ module.exports.updateItem = async function(req, res) {
             return res.redirect('back');
         }
 
-        if (req.file) {
-            let cloudError;
+        if (req.files) {
+            let cloudErr;
             let cloudResult;
             if (item.imageFile && item.imageFile.filename) {
                 if (path.extname(item.imageFile.url.split("SaberChat/")[1]).toLowerCase() == ".mp4") {
@@ -463,13 +463,13 @@ module.exports.updateItem = async function(req, res) {
                     [cloudErr, cloudResult] = await cloudDelete(item.imageFile.filename, "image");
                 }
                 // check for failure
-                if (cloudError || !cloudResult || cloudResult.result !== 'ok') {
+                if (cloudErr || !cloudResult || cloudResult.result !== 'ok') {
                     req.flash('error', 'Error deleting uploaded image');
                     return res.redirect('back');
                 }
             }
 
-            [cloudErr, cloudResult] = await cloudUpload(req.file);
+            [cloudErr, cloudResult] = await cloudUpload(req.files.imageFile[0]);
             if (cloudErr || !cloudResult) {
                 req.flash('error', 'Upload failed');
                 return res.redirect('back');
@@ -560,7 +560,7 @@ module.exports.deleteItem = async function(req, res) {
             [cloudErr, cloudResult] = await cloudDelete(item.imageFile.filename, "image");
         }
         // check for failure
-        if (cloudError || !cloudResult || cloudResult.result !== 'ok') {
+        if (cloudErr || !cloudResult || cloudResult.result !== 'ok') {
             req.flash('error', 'Error deleting uploaded image');
             return res.redirect('back');
         }

@@ -4,7 +4,7 @@ const express = require('express');
 const middleware = require('../middleware');
 const router = express.Router();
 const wrapAsync = require('../utils/wrapAsync');
-const {singleUpload, multipleUpload} = require('../middleware/multer');
+const {singleUpload} = require('../middleware/multer');
 const cafeController = require('../controllers/cafe');
 
 //GENERAL ROUTES

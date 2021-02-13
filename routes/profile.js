@@ -3,6 +3,8 @@ const router = express.Router();
 const Filter = require('bad-words');
 const filter = new Filter();
 const {transport, transport_mandatory} = require("../utils/transport");
+const {singleUpload, multipleUpload} = require('../middleware/multer');
+const {cloudUpload, cloudDelete} = require('../services/cloudinary');
 const convertToLink = require("../utils/convert-to-link");
 
 const {
@@ -98,7 +100,7 @@ router.get('/:id', middleware.isLoggedIn, (req, res) => {
 });
 
 // update user route. Check if current user matches profiles they're trying to edit with middleware.
-router.put('/profile', middleware.isLoggedIn, validateUserUpdate, (req, res) => {
+router.put('/profile', middleware.isLoggedIn, multipleUpload, validateUserUpdate, (req, res) => {
     (async () => {
         const overlap = await User.find({
             authenticated: true,
@@ -135,6 +137,49 @@ router.put('/profile', middleware.isLoggedIn, validateUserUpdate, (req, res) => 
         }
         if (req.body.bannerUrl) {
             user.bannerUrl = req.body.bannerUrl;
+        }
+
+        if (req.files) {
+            let cloudErr;
+            let cloudResult;
+            if (req.files.imageFile) {
+                if (req.user.imageFile.filename) {
+                    [cloudErr, cloudResult] = await cloudDelete(req.user.imageFile.filename, "image");
+                    if (cloudErr || !cloudResult || cloudResult.result !== 'ok') {
+                        req.flash('error', 'Error deleting uploaded image');
+                        return res.redirect('back');
+                    }
+                }
+                [cloudErr, cloudResult] = await cloudUpload(req.files.imageFile[0], "image");
+                if (cloudErr || !cloudResult) {
+                    req.flash('error', 'Upload failed');
+                    return res.redirect('back');
+                }
+                user.imageFile = {
+                    filename: cloudResult.public_id,
+                    url: cloudResult.secure_url
+                };
+            }
+
+            if (req.files.imageFile2) {
+                if (req.user.bannerFile.filename) {
+                    [cloudErr, cloudResult] = await cloudDelete(req.user.bannerFile.filename, "image");
+                    if (cloudErr || !cloudResult || cloudResult.result !== 'ok') {
+                        req.flash('error', 'Error deleting uploaded image 1');
+                        return res.redirect('back');
+                    }
+                }
+
+                [cloudErr, cloudResult] = await cloudUpload(req.files.imageFile2[0], "image");
+                if (cloudErr || !cloudResult) {
+                    req.flash('error', 'Upload failed');
+                    return res.redirect('back');
+                }
+                user.bannerFile = {
+                    filename: cloudResult.public_id,
+                    url: cloudResult.secure_url
+                };
+            }
         }
 
         const updatedUser = await User.findByIdAndUpdate(req.user._id, user); //find and update the user with new info
@@ -248,7 +293,6 @@ router.put('/change-email', middleware.isLoggedIn, validateEmailUpdate, (req, re
         }
 
     })().catch(err => {
-        console.log(err);
         req.flash('error', "An Error Occurred");
         res.redirect('back');
     });
