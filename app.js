@@ -108,6 +108,7 @@ app.use(helmet.contentSecurityPolicy({
         connectSrc: ["'self'", "https://ka-f.fontawesome.com/"],
         scriptSrc: ["'unsafe-inline'", "'self'", ...scriptUrls],
         styleSrc: ["'self'", "'unsafe-inline'", ...styleUrls],
+        mediaSrc: ["'self'", "https://res.cloudinary.com"],
         workerSrc: ["'self'", "blob:"],
         objectSrc: [],
         imgSrc: [
