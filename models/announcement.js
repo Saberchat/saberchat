@@ -7,10 +7,10 @@ var announcementSchema = new mongoose.Schema({
         ref: "User"
     },
     images: [{type: String}],
-    imageFile: {
+    imageFiles: [{
         filename: String,
         url: String
-    },
+    }],
     text: String,
     date: String,
 

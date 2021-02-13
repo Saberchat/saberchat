@@ -25,7 +25,6 @@ middleware.isLoggedIn = ((req, res, next) => {
 middleware.checkIfMember = ((req, res, next) => {
     Room.findById(req.params.id, (err, foundRoom) => {
         if (err || !foundRoom) {
-            console.log(err);
             req.flash('error', 'Room cannot be found or does not exist');
             res.redirect('/chat')
         } else {
@@ -43,7 +42,6 @@ middleware.checkIfMember = ((req, res, next) => {
 middleware.checkForLeave = ((req, res, next) => {
     Room.findById(req.params.id, (err, foundRoom) => {
         if (err || !foundRoom) {
-            console.log(err);
             req.flash('error', 'Room cannot be found or does not exist');
             res.redirect('/chat')
         } else {
@@ -65,7 +63,6 @@ middleware.checkForLeave = ((req, res, next) => {
 middleware.checkRoomOwnership = ((req, res, next) => {
     Room.findById(req.params.id, (err, foundRoom) => {
         if (err || !foundRoom) {
-            console.log(err);
             req.flash('error', 'Room cannot be found or does not exist');
             res.redirect('/chat')
         } else {

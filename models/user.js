@@ -15,9 +15,17 @@ var userSchema = new mongoose.Schema({
     authenticationToken: String,
     receiving_emails: {type: Boolean, default: true},
     bannerUrl: {type: String, default: 'https://i.imgur.com/Wnbn7Ei.gif'},
+    bannerFile: {
+        filename: String,
+        url: String
+    },
     imageUrl: {
         type: String,
         default: 'https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_640.png'
+    },
+    imageFile: {
+        filename: String,
+        url: String
     },
     reportedCount: {type: Number, default: 0},
     falseReportCount: {type: Number, default: 0},

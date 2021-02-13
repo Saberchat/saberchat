@@ -5,7 +5,7 @@ const filter = new Filter();
 const router = express.Router();
 //import passport for authentication
 const passport = require('passport');
-const {transport, transport_mandatory} = require("../utils/transport");
+const {transport_mandatory} = require("../utils/transport");
 
 const middleware = require('../middleware/index');
 const {validateNewUser, validateUserLogin, validatePasswordReset} = require('../middleware/validation');

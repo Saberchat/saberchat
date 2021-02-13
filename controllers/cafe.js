@@ -7,16 +7,13 @@ const Category = require('../models/itemType');
 const Cafe = require('../models/cafe')
 
 //LIBRARIES
-const express = require('express');
-const middleware = require('../middleware');
-const router = express.Router();
 const dateFormat = require('dateformat');
-const {transport, transport_mandatory} = require("../utils/transport");
-const {getPopularityCoefficiant, sortByPopularity, equateObjects} = require("../utils/popularity-algorithms");
+const path = require('path');
+const {transport} = require("../utils/transport");
+const { sortByPopularity } = require("../utils/popularity-algorithms");
 const convertToLink = require("../utils/convert-to-link");
-const filter = require('../utils/filter');
-const {getHours, sortTimes, getStats} = require('../utils/time');
 const getData = require("../utils/cafe-data");
+const {cloudUpload, cloudDelete} = require('../services/cloudinary');
 
 //-----------GENERAL ROUTES-----------//
 
@@ -92,13 +89,18 @@ module.exports.index = async function(req, res) {
             req.flash('error', "An Error Occurred");
             return res.redirect('back');
         }
+
+        let fileExtensions = new Map();
         let itemDescriptions = {}; //Object of items and their link-embedded descriptions
         for (let category of categories) {
             for (let item of category.items) {
                 itemDescriptions[item._id] = convertToLink(item.description);
+                if (item.imageFile.filename) {
+                    fileExtensions.set(item.imageFile.url, path.extname(item.imageFile.url.split("SaberChat/")[1]));
+                }
             }
         }
-        return res.render('cafe/menu', {categories: sortedCategories, itemDescriptions, frequentItems});
+        return res.render('cafe/menu', {categories: sortedCategories, itemDescriptions, frequentItems, fileExtensions});
     }
     return res.render('cafe/index', {orders: allOrders});
 }
@@ -351,9 +353,24 @@ module.exports.createItem = async function(req, res) {
         description: req.body.description,
         imgUrl: req.body.image
     });
+
     if (!item) {
         req.flash('error', "Unable to create item");
         return res.redirect('back');
+    }
+
+    if (req.files) {
+        const [cloudErr, cloudResult] = await cloudUpload(req.files.imageFile[0]);
+        if (cloudErr || !cloudResult) {
+            req.flash('error', 'Upload failed');
+            return res.redirect('back');
+        }
+
+        // Add info to image file
+        item.imageFile = {
+            filename: cloudResult.public_id,
+            url: cloudResult.secure_url
+        };
     }
 
     //Create charge; once created, add to item's info
@@ -396,7 +413,12 @@ module.exports.viewItem = async function(req, res) {
         return res.redirect('back');
     }
 
-    return res.render('cafe/show', {categories, item});
+    let fileExtensions = new Map();
+    if (item.imageFile.filename) {
+        fileExtensions.set(item.imageFile.url, path.extname(item.imageFile.url.split("SaberChat/")[1]));
+    }
+
+    return res.render('cafe/show', {categories, item, fileExtensions});
 }
 
 //UPDATE ITEM
@@ -429,6 +451,35 @@ module.exports.updateItem = async function(req, res) {
         if (!item) {
             req.flash('error', 'item not found');
             return res.redirect('back');
+        }
+
+        if (req.files) {
+            let cloudErr;
+            let cloudResult;
+            if (item.imageFile && item.imageFile.filename) {
+                if (path.extname(item.imageFile.url.split("SaberChat/")[1]).toLowerCase() == ".mp4") {
+                    [cloudErr, cloudResult] = await cloudDelete(item.imageFile.filename, "video");
+                } else {
+                    [cloudErr, cloudResult] = await cloudDelete(item.imageFile.filename, "image");
+                }
+                // check for failure
+                if (cloudErr || !cloudResult || cloudResult.result !== 'ok') {
+                    req.flash('error', 'Error deleting uploaded image');
+                    return res.redirect('back');
+                }
+            }
+
+            [cloudErr, cloudResult] = await cloudUpload(req.files.imageFile[0]);
+            if (cloudErr || !cloudResult) {
+                req.flash('error', 'Upload failed');
+                return res.redirect('back');
+            }
+
+            item.imageFile = {
+                filename: cloudResult.public_id,
+                url: cloudResult.secure_url
+            };
+            await item.save();
         }
 
         const activeOrders = await Order.find({present: true}).populate('items.item'); //Any orders that are active will need to change, to accomodate the item changes.
@@ -499,6 +550,20 @@ module.exports.deleteItem = async function(req, res) {
     if (!item) {
         req.flash('error', 'Could not delete item');
         return res.redirect('back');
+    }
+
+    // delete any uploads
+    if (item.imageFile && item.imageFile.filename) {
+        if (path.extname(item.imageFile.url.split("SaberChat/")[1]).toLowerCase() == ".mp4") {
+            [cloudErr, cloudResult] = await cloudDelete(item.imageFile.filename, "video");
+        } else {
+            [cloudErr, cloudResult] = await cloudDelete(item.imageFile.filename, "image");
+        }
+        // check for failure
+        if (cloudErr || !cloudResult || cloudResult.result !== 'ok') {
+            req.flash('error', 'Error deleting uploaded image');
+            return res.redirect('back');
+        }
     }
 
     const categories = await Category.find({}); //Find all possible categories

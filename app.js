@@ -108,6 +108,7 @@ app.use(helmet.contentSecurityPolicy({
         connectSrc: ["'self'", "https://ka-f.fontawesome.com/"],
         scriptSrc: ["'unsafe-inline'", "'self'", ...scriptUrls],
         styleSrc: ["'self'", "'unsafe-inline'", ...styleUrls],
+        mediaSrc: ["'self'", "https://res.cloudinary.com"],
         workerSrc: ["'self'", "blob:"],
         objectSrc: [],
         imgSrc: [
@@ -211,11 +212,11 @@ const getRandMessage = (list => {
 // deletes all comments at midnight
 
 // const manageComments = schedule.scheduleJob('0 0 0 * * *', () => {
-// 	Comment.find({}, (err, foundComments) => {
+// 	Comment.find({}, (err, comments) => {
 // 		if(err) {
 // 			console.log(err);
 // 		} else {
-// 			foundComments.map((comment) => {
+// 			comments.map((comment) => {
 // 				if(true) {
 // 					comment.remove();
 // 					console.log('removed comments');

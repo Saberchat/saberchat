@@ -23,49 +23,54 @@ const Status = require('../models/status');
 
 const middleware = require('../middleware');
 
+const admin = require("../controllers/admin");
+const wrapAsync = require('../utils/wrapAsync');
+
 //Function to display user inbox
-router.get('/', middleware.isLoggedIn, middleware.isAdmin, (req, res) => {
+/*router.get('/', middleware.isLoggedIn, middleware.isAdmin, (req, res) => {
     res.render('admin/index');
-})
+})*/
+router.get("/", middleware.isLoggedIn, middleware.isAdmin, wrapAsync(admin.index));
 
 // displays moderator page
-router.get('/moderate', middleware.isLoggedIn, middleware.isMod, (req, res) => {
+/*router.get('/moderate', middleware.isLoggedIn, middleware.isMod, (req, res) => {
     Comment.find({status: 'flagged'})
         .populate({path: 'author', select: ['username', 'imageUrl']})
         .populate({path: 'statusBy', select: ['username', 'imageUrl']})
         .populate({path: 'room', select: ['name']})
-        .exec((err, foundComments) => {
+        .exec((err, comments) => {
             if (err) {
                 req.flash('error', 'Cannot access DataBase');
                 res.redirect('/admin');
 
             } else {
-                res.render('admin/mod', {comments: foundComments});
+                res.render('admin/mod', {comments: comments});
             }
         });
-});
+});*/
+router.get("/moderate", middleware.isLoggedIn, middleware.isMod, wrapAsync(admin.moderate))
 
 // displays permissions page
 router.get('/permissions', middleware.isLoggedIn, middleware.isAdmin, (req, res) => {
-    User.find({authenticated: true}, (err, foundUsers) => {
-        if (err || !foundUsers) {
+    User.find({authenticated: true}, (err, users) => {
+        if (err || !users) {
             req.flash('error', 'Cannot access Database');
             res.redirect('/admin');
 
         } else {
-            res.render('admin/permission', {users: foundUsers});
+            res.render('admin/permission', {users: users});
         }
     });
 });
 
 // displays status page
 router.get('/status', middleware.isLoggedIn, middleware.isMod, (req, res) => {
-    User.find({authenticated: true}, (err, foundUsers) => {
-        if (err || !foundUsers) {
+    User.find({authenticated: true}, (err, users) => {
+        if (err || !users) {
             req.flash('error', 'Cannot access Database');
             res.redirect('/admin');
         } else {
-            res.render('admin/status', {users: foundUsers, tags: ['Cashier', 'Tutor', 'Editor']});
+            res.render('admin/status', {users: users, tags: ['Cashier', 'Tutor', 'Editor']});
         }
     });
 });
@@ -643,7 +648,6 @@ router.post('/moderate', middleware.isLoggedIn, middleware.isMod, (req, res) => 
         return res.json({success: "Succesfully collected data", context});
 
     })().catch(err => {
-        console.log(err);
         res.json({error: "An error occurred"});
     });
 });

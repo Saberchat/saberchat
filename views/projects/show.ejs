@@ -4,7 +4,7 @@
     <title>Saberchat</title>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-
+    <!-- <meta http-equiv="Content-Security-Policy" content="default-src 'self'; connect-src *; script-src *; style-src-elem *; img-src *; media-src https://res.cloudinary.com/*; child-src 'none';"> -->
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css">
     <link rel="stylesheet" href="/stylesheets/main.css">
     <!-- link css for navbar. Don't need to include public/javascript/userForm.js since user is already logged in and does not need to access login and register forms.  -->
@@ -23,7 +23,7 @@
     <script src="/javascript/home/index.js"></script>
 
     <!-- I'm using my fontawesome kit -->
-    <script src="https://kit.fontawesome.com/dccc745c41.js" crossorigin="anonymous"></script>
+    <script src="https://kit.fontawesome.com/dccc745c41.js" nonce="EDNnf03nceIOfn39fn3e9h3sdfa" crossorigin="anonymous"></script>
 
 </head>
 <body>
@@ -109,19 +109,17 @@
                         <div id="like-div">
                             <% if (project.likes.includes(currentUser._id)) { %>
                                 <span id="project-like-row"><i id="like-<%= project._id %>-show" onclick="like(this)"
-                                                               class="fas fa-thumbs-up liked-project"></i></span> <span
-                                        id="like-count"
-                                        class="likeCount-<%= project._id %>"><%= project.likes.length %></span>
+                                  class="fas fa-thumbs-up liked-project"></i></span>
+                                  <span id="like-count" class="likeCount-<%= project._id %>"><%= project.likes.length %></span>
 
                             <% } else { %>
                                 <span id="project-like-row"><i id="like-<%= project._id %>-show" onclick="like(this)"
-                                                               class="fas fa-thumbs-up unliked-project"></i></span><span
-                                        id="like-count"
-                                        class="likeCount-<%= project._id %>"><%= project.likes.length %></span>
+                                  class="fas fa-thumbs-up unliked-project"></i></span>
+                                  <span id="like-count" class="likeCount-<%= project._id %>"><%= project.likes.length %></span>
 
                             <% } %>
-                            <a id="comments-count-icon" href="#comment-section"><i
-                                        class="fas fa-comment-dots"></i> <%= project.comments.length %></a>
+                            <a id="comments-count-icon" href="#comment-section">
+                              <i class="fas fa-comment-dots"></i> <%= project.comments.length %></a>
                         </div>
 
                     <% } %>
@@ -221,6 +219,16 @@
                     <% for (let img of project.images) { %>
                         <img class="project-image" src="<%= img %>"/>
                         <br/><br/>
+                    <% } %>
+                    <% for (let media of project.imageFiles) { %>
+                        <% if (media.filename) { %>
+                            <% if ([".png", ".jpg", ".jpeg"].includes(fileExtensions.get(media.url).toLowerCase())) { %>
+                                <img class="project-image" src="<%=media.url %>"/>
+                            <% } else { %>
+                                <video width="400px" height="250px" src="<%=media.url%>" type="video/mp4" controls autoplay></video>
+                            <% } %>
+                            <br/><br/>
+                        <% } %>
                     <% } %>
                 </div>
             </article>
@@ -324,16 +332,14 @@
                                                 class="like-comment-comment"
                                                 id="likeCountComment-<%= comment._id %>"><%= comment.likes.length %></span>
                                     <% } %>
-
                                 </div>
                             </div>
                             <% } %>
-                            <% } %>
-                        </div>
+                        <% } %>
                     </div>
-                </article>
+                </div>
+            </article>
             <% } %>
-
             <br/>
         </div>
     </div>

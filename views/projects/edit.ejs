@@ -11,8 +11,9 @@
     <link rel="stylesheet" href="/stylesheets/components/header.css">
     <link rel="stylesheet" href="/stylesheets/components/navbar.css">
     <link rel="stylesheet" href="/stylesheets/projects/index.css">
-    <link rel="stylesheet" href="/stylesheets/projects/edit.css">
+    <link rel="stylesheet" href="/stylesheets/announcements/edit.css">
     <link rel="stylesheet" href="/stylesheets/announcements/form.css">
+    <link rel="stylesheet" href="/stylesheets/projects/form.css">
 
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
@@ -41,7 +42,7 @@
 
 <div class="row">
     <div class="col-md-8 offset-md-2 col-12">
-        <form action="/projects/<%= project._id %>?_method=put" method="post" id="submit-project-edits">
+        <form action="/projects/<%= project._id %>?_method=put" method="post" id="submit-project-edits" enctype="multipart/form-data">
 
             <div class="form-group">
                 <label for="new-project-message" id="title-label">Title</label>
@@ -92,6 +93,27 @@
                           required><%= project.text %></textarea>
             </div>
 
+            <% for (let media of project.imageFiles) { %>
+                <% if(media.filename) { %>
+                    <% if ([".png", ".jpg", ".jpeg"].includes(fileExtensions.get(media.url).toLowerCase())) { %>
+                        <img src="<%= media.url %>" alt="attached image" class="img-fluid rounded past-upload">
+                    <% } else { %>
+                        <video width="400px" height="250px" src="<%=media.url%>" type="video/mp4" controls autoplay></video>
+                    <% } %>
+                    <div class="form-check">
+                        <input type="checkbox" name="deleteUpload-<%=media.url%>" id="deleteUpload-<%=media.url%>" class="form-check-input"
+                               value="true">
+                        <label class="form-check-label" for="deleteUpload-<%=media.url%>">Remove uploaded media</label>
+                    </div>
+                    <br />
+                <% } %>
+            <% } %>
+
+            <div class="form-group">
+                <label for="imageFile">New Media Uploads</label>
+                <input type="file" name="imageFile" class="image-upload form-control-file" multiple accept="image/png, image/jpg, image/jpeg, video/mp4">
+            </div>
+
             <div id="image-header">
                 <h4 id="image-heading">Images</h4>
                 <button type="button" onclick="addImg()" class="btn btn-primary"><i class="fas fa-plus"></i> Image
@@ -112,8 +134,8 @@
                                  style="width: 50%; height: 50%; margin-top: 10px; border-radius: 15px;"
                                  src="<%= reversedImages[i] %>" alt="Image Does Not Exist"/>
                         </div>
-                        <button type="button" onclick="deleteImg(this)" class="btn btn-danger"><i
-                                    class="fas fa-minus"></i>
+                        <button type="button" onclick="deleteImg(this)" class="btn btn-danger">
+                            <i class="fas fa-minus"></i>
                         </button>
                     </div>
                 <% } %>

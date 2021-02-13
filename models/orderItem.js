@@ -5,6 +5,10 @@ var orderItemSchema = new mongoose.Schema({
     description: String,
     price: Number,
     imgUrl: String,
+    imageFile: {
+        filename: String,
+        url: String
+    },
     availableItems: Number,
     isAvailable: Boolean,
     upvotes: [

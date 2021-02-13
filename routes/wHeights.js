@@ -3,7 +3,7 @@ const express = require('express');
 const router = express.Router();
 const middleware = require('../middleware');
 const dateFormat = require('dateformat');
-const {transport, transport_mandatory} = require("../utils/transport");
+const {transport} = require("../utils/transport");
 const convertToLink = require("../utils/convert-to-link");
 
 //SCHEMA
@@ -66,14 +66,14 @@ router.get('/:id', middleware.isLoggedIn, (req, res) => {
                 path: 'sender'
             }
         })
-        .exec((err, foundArticle) => {
+        .exec((err, article) => {
             if (err) {
                 req.flash('error', 'Cannot find article');
                 res.redirect('/articles');
             } else {
                 res.render('wHeights/show', {
-                    article: foundArticle,
-                    date: dateFormat(foundArticle.created_at, "mmm d, yyyy - h:MM TT")
+                    article: article,
+                    date: dateFormat(article.created_at, "mmm d, yyyy - h:MM TT")
                 });
             }
         });

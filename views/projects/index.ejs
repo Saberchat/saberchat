@@ -156,6 +156,13 @@
                         <div class="block-content mode">
                             <% if (project.images.length > 0) { %>
                                 <img class="project-first-image" src="<%= project.images[0] %>"/>
+                            <% } else { %>
+                                <% for (let media of project.imageFiles) { %>
+                                    <% if (media.filename && [".png", ".jpg", ".jpeg"].includes(fileExtensions.get(media.url).toLowerCase())) { %>
+                                        <img class="project-first-image" src="<%= media.url%>"/>
+                                        <% break;%>
+                                    <% } %>
+                                <% } %>
                             <% } %>
 
                             <span hidden>

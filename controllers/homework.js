@@ -1,10 +1,6 @@
-const express = require('express');
-const middleware = require('../middleware');
-const router = express.Router(); //start express router
 const dateFormat = require('dateformat');
-const {transport, transport_mandatory} = require("../utils/transport");
-const convertToLink = require("../utils/convert-to-link");
-const {validateCourse} = require('../middleware/validation');
+const {transport} = require("../utils/transport");
+const { sortByPopularity } = require("../utils/popularity-algorithms");
 
 const User = require('../models/user');
 const Notification = require('../models/message');
@@ -121,28 +117,38 @@ module.exports.showCourse = async function(req, res) {
 
     let studentIds = []; //Collect info on the ids of all students and tutors in the course
     let tutorIds = [];
-    let tutorRatings = new Map();
+    let tutors = [];
     for (let student of course.students) {
         studentIds.push(student._id.toString());
     }
 
     let averageRating = 0;
+    let tutorObject = {};
     for (let tutor of course.tutors) {
         averageRating = 0;
+        tutorObject = {};
         tutorIds.push(tutor.tutor._id.toString());
         for (let review of tutor.reviews) {
             averageRating += review.rating;
         }
         averageRating = Math.round(averageRating / tutor.reviews.length);
-        tutorRatings.set(tutor._id.toString(), averageRating);
+        tutorObject = tutor;
+        tutorObject.averageRating = averageRating;
+        tutors.push(tutorObject)
     }
+
+    tutors = await sortByPopularity(tutors, "averageRating", "dateJoined").unpopular
+    .concat(sortByPopularity(tutors, "averageRating", "dateJoined").popular);
+
+    tutors = await sortByPopularity(tutors, "reviews", "dateJoined").unpopular
+    .concat(sortByPopularity(tutors, "reviews", "dateJoined").popular);
 
     const teachers = await User.find({authenticated: true, status: "faculty", _id: {$ne: req.user._id}});
     if (!teachers) {
         req.flash('error', "Unable to find teachers");
         return res.redirect('back');
     }
-    return res.render('homework/show', {course, studentIds, tutorIds, tutorRatings, teachers});
+    return res.render('homework/show', {course, studentIds, tutorIds, tutors, teachers});
 }
 
 module.exports.unenrollStudent = async function(req, res) {

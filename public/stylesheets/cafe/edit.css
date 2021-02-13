@@ -9,3 +9,12 @@
 #itemInput {
     display: inline-block;
 }
+
+#file-row {
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
+
+#file-image {
+    text-align: center;
+}

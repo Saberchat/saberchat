@@ -3,6 +3,10 @@ const mongoose = require("mongoose");
 var projectSchema = new mongoose.Schema({
     title: String,
     images: [{type: String}],
+    imageFiles: [{
+        filename: String,
+        url: String
+    }],
     text: String,
     date: String,
     poster: {

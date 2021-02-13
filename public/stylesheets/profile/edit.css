@@ -1,4 +1,4 @@
-#profile-image {
+.profile-image {
     position: relative;
     display: block;
     width: 230px;
@@ -10,7 +10,7 @@
     z-index: 1;
 }
 
-#banner-image {
+.banner-image {
     background-position: center;
     background-size: cover;
     filter: brightness(70%);

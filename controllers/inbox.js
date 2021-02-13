@@ -1,14 +1,15 @@
 const dateFormat = require('dateformat');
 const Filter = require('bad-words');
 const filter = new Filter();
+const path = require('path');
 const { sendGridEmail } = require("../utils/transport");
 const convertToLink = require("../utils/convert-to-link");
+const { cloudUpload } = require('../services/cloudinary');
 
 const User = require('../models/user');
 const Message = require('../models/message');
 const AccessReq = require('../models/accessRequest');
 const Room = require('../models/room');
-const { request } = require('express');
 
 // Inbox GET index page
 module.exports.index = async function(req, res) {
@@ -58,8 +59,12 @@ module.exports.showMsg = async function(req, res) {
         .populate({path: 'replies.sender'})
         .execPopulate();
 
+    let fileExtensions = new Map();
+    for (let media of message.imageFiles) {
+        fileExtensions.set(media.url, path.extname(media.url.split("SaberChat/")[1]));
+    }
     const convertedText = convertToLink(message.text);
-    res.render('inbox/show', {message: message, convertedText});
+    res.render('inbox/show', {message: message, convertedText, fileExtensions});
 };
 
 // Inbox GET new message form
@@ -100,11 +105,34 @@ module.exports.sent = async function(req, res) {
 module.exports.createMsg = async function(req, res) {
     let message = {
         subject: filter.clean(req.body.subject),
-        text: filter.clean(req.body.message)
+        text: filter.clean(req.body.message),
+        imageFiles: []
     };
 
     if(req.body.images) {
         message.images = req.body.images;
+    }
+
+    // if files were uploaded
+    if (req.files) {
+        let cloudErr;
+        let cloudResult;
+        for (let file of req.files.imageFile) {
+            if (path.extname(file.originalname).toLowerCase() == ".mp4") {
+                [cloudErr, cloudResult] = await cloudUpload(file, "video");
+            } else {
+                [cloudErr, cloudResult] = await cloudUpload(file, "image");
+            }
+            if (cloudErr || !cloudResult) {
+                req.flash('error', 'Upload failed');
+                return res.redirect('back');
+            }
+
+            message.imageFiles.push({
+                filename: cloudResult.public_id,
+                url: cloudResult.secure_url
+            });
+        }
     }
 
     message.sender = req.user._id;
@@ -216,17 +244,17 @@ module.exports.createMsg = async function(req, res) {
             }
         }
 
-        let email_text;
+        let emailText;
         if(message.toEveryone) {
-            email_text = `<p>Hello ${r.firstName},</p><p>You have a new Saberchat inbox notification from <strong>${req.user.username}</strong>!</p><p><strong>To</strong>: Everyone</p><p>${newMessage.text}</p><p>You can access the full message at https://alsion-saberchat.herokuapp.com</p> ${imageString}`;
+            emailText = `<p>Hello ${r.firstName},</p><p>You have a new Saberchat inbox notification from <strong>${req.user.username}</strong>!</p><p><strong>To</strong>: Everyone</p><p>${newMessage.text}</p><p>You can access the full message at https://alsion-saberchat.herokuapp.com</p> ${imageString}`;
         } else if(message.anonymous) {
-            email_text = `<p>Hello ${r.firstName},</p><p>You have a new Saberchat anonymous notification!</p><p><strong>To</strong>: ${recipientArr.join(', ')}</p><p>${newMessage.text}</p><p>You can access the full message at https://alsion-saberchat.herokuapp.com</p> ${imageString}`;
+            emailText = `<p>Hello ${r.firstName},</p><p>You have a new Saberchat anonymous notification!</p><p><strong>To</strong>: ${recipientArr.join(', ')}</p><p>${newMessage.text}</p><p>You can access the full message at https://alsion-saberchat.herokuapp.com</p> ${imageString}`;
         } else {
-            email_text = `<p>Hello ${r.firstName},</p><p>You have a new Saberchat inbox notification from <strong>${req.user.username}</strong>!</p><p><strong>To</strong>: ${recipientArr.join(', ')}</p><p>${newMessage.text}</p><p>You can access the full message at https://alsion-saberchat.herokuapp.com</p> ${imageString}`;
+            emailText = `<p>Hello ${r.firstName},</p><p>You have a new Saberchat inbox notification from <strong>${req.user.username}</strong>!</p><p><strong>To</strong>: ${recipientArr.join(', ')}</p><p>${newMessage.text}</p><p>You can access the full message at https://alsion-saberchat.herokuapp.com</p> ${imageString}`;
         }
 
         if(r.receiving_emails) {
-            await sendGridEmail(r.email, `New Inbox Notification - ${newMessage.subject}`, email_text);
+            await sendGridEmail(r.email, `New Inbox Notification - ${newMessage.subject}`, emailText);
         }
     }
 
@@ -289,9 +317,9 @@ module.exports.reply = async function(req, res) {
     }
 
     let reply = {
-        sender: req.user, 
-        text: req.body.text, 
-        images: req.body.images, 
+        sender: req.user,
+        text: req.body.text,
+        images: req.body.images,
         date: dateFormat(new Date(), "h:MM TT | mmm d")
     };
     message.replies.push(reply); //Add reply to message thread
@@ -324,7 +352,7 @@ module.exports.reply = async function(req, res) {
           message.recipients.splice(i, 1);
         }
     }
-    
+
     message.recipients.push(message.sender); //Add original sender to recipient list (code above ensures that they are not added multiple times)
     message.read = [req.user]; //Since the current user replied to this message, they've seen the completely updated message. Nobody else has
     await message.save();
@@ -350,9 +378,9 @@ module.exports.reply = async function(req, res) {
 
         //Send email notifying about the reply to everyone except person who posted the reply
         if (!(recipient._id.equals(req.user._id)) && recipient.receiving_emails) {
-            const email_text = `<p>Hello ${recipient.firstName},</p><p><strong>${req.user.username}</strong> replied to <strong>${message.subject}</strong>.<p>${reply.text}</p><p>You can access the full message at https://alsion-saberchat.herokuapp.com</p> ${imageString}`;
+            const emailText = `<p>Hello ${recipient.firstName},</p><p><strong>${req.user.username}</strong> replied to <strong>${message.subject}</strong>.<p>${reply.text}</p><p>You can access the full message at https://alsion-saberchat.herokuapp.com</p> ${imageString}`;
 
-            await sendGridEmail(recipient.email, `New Reply On ${message.subject}`, email_text);
+            await sendGridEmail(recipient.email, `New Reply On ${message.subject}`, emailText);
         }
     }
 
@@ -373,8 +401,7 @@ module.exports.delete = async function(req, res) {
     if(!messages) {req.flash('error', 'Could not find messages'); return res.redirect('back');}
 
     messages.forEach( message => {
-        const index = req.user.inbox.indexOf(message._id);
-        if(index > -1) {
+        if(req.user.inbox.includes(message._id)) {
             req.user.inbox.splice(index, 1);
             if(!message.read.includes(req.user._id)) {
                 req.user.msgCount -= 1;
@@ -390,12 +417,12 @@ module.exports.delete = async function(req, res) {
 // Access Request Routes
 
 module.exports.showReq = async function(req, res) {
-    const foundReq = await AccessReq.findById(req.params.id)
+    const request = await AccessReq.findById(req.params.id)
     .populate({path: 'requester', select: 'username'})
     .populate({path: 'room', select: ['creator', 'name']}).exec();
-    if(!foundReq) {req.flash('error', 'Unable to access Database.'); return res.redirect('back');}
+    if(!request) {req.flash('error', 'Unable to access Database.'); return res.redirect('back');}
 
-    res.render('inbox/requests/show', {request: foundReq});
+    res.render('inbox/requests/show', {request});
 };
 
 module.exports.acceptReq = async function(req, res) {
@@ -416,20 +443,20 @@ module.exports.acceptReq = async function(req, res) {
 
     }
 
-    const foundRoom = await Room.findById(Req.room._id);
-    if(!foundRoom) { req.flash("error", "Unable to access database");return res.redirect('back'); }
+    const room = await Room.findById(Req.room._id);
+    if(!room) { req.flash("error", "Unable to access database");return res.redirect('back'); }
 
-    foundRoom.members.push(Req.requester);
+    room.members.push(Req.requester);
     Req.status = 'accepted';
-    await foundRoom.save();
+    await room.save();
     await Req.save();
 
     if(Req.requester.receiving_emails) {
-        const email_text = `<p>Hello ${Req.requester.firstName},</p><p>Your request to join chat room <strong>${foundRoom.name}</strong> has been accepted!<p><p>You can access the room at https://alsion-saberchat.herokuapp.com</p>`;
+        const emailText = `<p>Hello ${Req.requester.firstName},</p><p>Your request to join chat room <strong>${foundRoom.name}</strong> has been accepted!<p><p>You can access the room at https://alsion-saberchat.herokuapp.com</p>`;
 
-        await sendGridEmail(Req.requester.email, `Room Request Accepted - ${foundRoom.name}`, email_text);
+        await sendGridEmail(Req.requester.email, `Room Request Accepted - ${foundRoom.name}`, emailText);
     }
-    
+
     req.flash('success', 'Request accepted');
     res.redirect('/inbox');
 };
@@ -455,9 +482,9 @@ module.exports.rejectReq = async function(req, res) {
     await Req.save();
 
     if(Req.requester.receiving_emails) {
-        const email_text = `<p>Hello ${Req.requester.firstName},</p><p>Your request to join chat room <strong>${Req.room.name}</strong> has been rejected. Contact the room creator, <strong>${Req.room.creator.username}</strong>, if you think that there has been a mistake.</p>`;
+        const emailText = `<p>Hello ${Req.requester.firstName},</p><p>Your request to join chat room <strong>${Req.room.name}</strong> has been rejected. Contact the room creator, <strong>${Req.room.creator.username}</strong>, if you think that there has been a mistake.</p>`;
 
-        await sendGridEmail(Req.requester.email, `Room Request Rejected - ${Req.room.name}`, email_text);
+        await sendGridEmail(Req.requester.email, `Room Request Rejected - ${Req.room.name}`, emailText);
     }
 
     req.flash('success', 'Request rejected');
