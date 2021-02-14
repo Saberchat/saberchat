@@ -125,23 +125,25 @@ module.exports.create = async function(req, res) {
 
     // if files were uploaded
     if (req.files) {
-        let cloudErr;
-        let cloudResult;
-        for (let file of req.files.imageFile) {
-            if (path.extname(file.originalname).toLowerCase() == ".mp4") {
-                [cloudErr, cloudResult] = await cloudUpload(file, "video");
-            } else {
-                [cloudErr, cloudResult] = await cloudUpload(file, "image");
-            }
-            if (cloudErr || !cloudResult) {
-                req.flash('error', 'Upload failed');
-                return res.redirect('back');
-            }
+        if (req.files.imageFile) {
+            let cloudErr;
+            let cloudResult;
+            for (let file of req.files.imageFile) {
+                if (path.extname(file.originalname).toLowerCase() == ".mp4") {
+                    [cloudErr, cloudResult] = await cloudUpload(file, "video");
+                } else {
+                    [cloudErr, cloudResult] = await cloudUpload(file, "image");
+                }
+                if (cloudErr || !cloudResult) {
+                    req.flash('error', 'Upload failed');
+                    return res.redirect('back');
+                }
 
-            Ann.imageFiles.push({
-                filename: cloudResult.public_id,
-                url: cloudResult.secure_url
-            });
+                Ann.imageFiles.push({
+                    filename: cloudResult.public_id,
+                    url: cloudResult.secure_url
+                });
+            }
         }
     }
 
@@ -167,7 +169,7 @@ module.exports.create = async function(req, res) {
     }
 
     let announcementObject = {
-        announcement: announcement,
+        announcement: Ann,
         version: "new"
     };
 

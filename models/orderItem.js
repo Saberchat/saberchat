@@ -4,10 +4,14 @@ var orderItemSchema = new mongoose.Schema({
     name: String,
     description: String,
     price: Number,
-    imgUrl: String,
+    imgUrl: {
+        url: String,
+        display: Boolean
+    },
     imageFile: {
         filename: String,
-        url: String
+        url: String,
+        display: Boolean
     },
     availableItems: Number,
     isAvailable: Boolean,

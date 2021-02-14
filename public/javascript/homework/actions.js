@@ -78,7 +78,7 @@ const book = function (button, location) {
                 for (let student of data.students) {
                     userElement = document.createElement("div");
                     userElement.className = "list-group-item list-group-item-action user-element";
-                    userElement.innerHTML = `<a href="/profiles/${student._id}" style="color: black; text-decoration: none;"> <img class="student-profile-image" src="${student.imageUrl}" alt="profile picture"> <span class="${student.permission} ${student.status} ${student.tags.join(' ')} student-block"><span class="span-tag-name">${student.firstName} ${student.lastName}</span> <span class="span-tag-username">${student.username}</span></span></a>`;
+                    userElement.innerHTML = `<a href="/profiles/${student._id}" style="color: black; text-decoration: none;"> <img class="student-profile-image" src="${student.imageUrl.url}" alt="profile picture"> <span class="${student.permission} ${student.status} ${student.tags.join(' ')} student-block"><span class="span-tag-name">${student.firstName} ${student.lastName}</span> <span class="span-tag-username">${student.username}</span></span></a>`;
 
                     if (student._id == data.user._id) {
                         let lessonInfoButton = document.createElement("a");
@@ -283,7 +283,7 @@ const removeStudent = function (button, location) {
             let blockedElement = document.createElement("li");
             blockedElement.className = "list-group-item";
             blockedElement.id = `item-${data.student._id}`;
-            blockedElement.innerHTML = `<a href="../profiles/${data.student._id}"class="user-element-text"> <img class="profile-image" src="${data.student.imageUrl}" alt="profile picture"> <span class="username ${data.student.status} ${data.student.permission} ${data.student.tags.join(' ')}"><span class="enrolled-name">${data.student.firstName} ${data.student.lastName}</span> <span class="enrolled-username">${data.student.username}</span></span> </a> <button class="btn btn-danger leave-button" id="unblock-button-${data.student._id}" data-toggle="modal" data-target="#modal-index-unblock-${data.student._id}">Unblock</button>`;
+            blockedElement.innerHTML = `<a href="../profiles/${data.student._id}"class="user-element-text"> <img class="profile-image" src="${data.student.imageUrl.url}" alt="profile picture"> <span class="username ${data.student.status} ${data.student.permission} ${data.student.tags.join(' ')}"><span class="enrolled-name">${data.student.firstName} ${data.student.lastName}</span> <span class="enrolled-username">${data.student.username}</span></span> </a> <button class="btn btn-danger leave-button" id="unblock-button-${data.student._id}" data-toggle="modal" data-target="#modal-index-unblock-${data.student._id}">Unblock</button>`;
 
             let unblockModal = document.createElement("div");
             unblockModal.className = "modal fade";
@@ -329,7 +329,7 @@ const removeTutor = function (button, location) {
             let blockedElement = document.createElement("li");
             blockedElement.className = "list-group-item";
             blockedElement.id = `item-${data.tutor._id}`;
-            blockedElement.innerHTML = `<a href="../profiles/${data.tutor._id}"class="user-element-text"> <img class="profile-image" src="${data.tutor.imageUrl}" alt="profile picture"> <span class="username ${data.tutor.status} ${data.tutor.permission} ${data.tutor.tags.join(' ')}"><span class="enrolled-name">${data.tutor.firstName} ${data.tutor.lastName}</span> <span class="enrolled-username">${data.tutor.username}</span></span> </a> <button class="btn btn-danger leave-button" id="unblock-button-${data.tutor._id}" data-toggle="modal" data-target="#modal-index-unblock-${data.tutor._id}">Unblock</button>`;
+            blockedElement.innerHTML = `<a href="../profiles/${data.tutor._id}"class="user-element-text"> <img class="profile-image" src="${data.tutor.imageUrl.url}" alt="profile picture"> <span class="username ${data.tutor.status} ${data.tutor.permission} ${data.tutor.tags.join(' ')}"><span class="enrolled-name">${data.tutor.firstName} ${data.tutor.lastName}</span> <span class="enrolled-username">${data.tutor.username}</span></span> </a> <button class="btn btn-danger leave-button" id="unblock-button-${data.tutor._id}" data-toggle="modal" data-target="#modal-index-unblock-${data.tutor._id}">Unblock</button>`;
 
             let unblockModal = document.createElement("div");
             unblockModal.className = "modal fade";

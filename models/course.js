@@ -3,8 +3,16 @@ const mongoose = require('mongoose');
 const courseSchema = new mongoose.Schema({
     name: String,
     joinCode: String,
-    thumbnail: {type: String, default: "https://alsionschool.org/images/community/gallery/Beach.jpg"},
     description: String,
+    thumbnailFile: {
+        filename: String,
+        url: String,
+        display: {type: Boolean, default: false}
+    },
+    thumbnail: {
+        url: {type: String, default: "https://alsionschool.org/images/community/gallery/Beach.jpg"},
+        display: {type: Boolean, default: true}
+    },
     active: Boolean,
     teacher: {
         type: mongoose.Schema.Types.ObjectId,

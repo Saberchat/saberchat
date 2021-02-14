@@ -351,7 +351,7 @@ module.exports.createItem = async function(req, res) {
         name: req.body.name,
         availableItems: parseInt(req.body.available),
         description: req.body.description,
-        imgUrl: req.body.image
+        imgUrl: {url: req.body.image, display: req.body.showImage == "url"}
     });
 
     if (!item) {
@@ -359,18 +359,23 @@ module.exports.createItem = async function(req, res) {
         return res.redirect('back');
     }
 
-    if (req.files) {
-        const [cloudErr, cloudResult] = await cloudUpload(req.files.imageFile[0]);
-        if (cloudErr || !cloudResult) {
-            req.flash('error', 'Upload failed');
-            return res.redirect('back');
-        }
+    item.imageFile.display = req.body.showImage == "upload";
 
-        // Add info to image file
-        item.imageFile = {
-            filename: cloudResult.public_id,
-            url: cloudResult.secure_url
-        };
+    if (req.files) {
+        if (req.files.imageFile) {
+            const [cloudErr, cloudResult] = await cloudUpload(req.files.imageFile[0]);
+            if (cloudErr || !cloudResult) {
+                req.flash('error', 'Upload failed');
+                return res.redirect('back');
+            }
+
+            // Add info to image file
+            item.imageFile = {
+                filename: cloudResult.public_id,
+                url: cloudResult.secure_url,
+                display: req.body.showImage == "upload"
+            };
+        }
     }
 
     //Create charge; once created, add to item's info
@@ -446,39 +451,44 @@ module.exports.updateItem = async function(req, res) {
             availableItems: parseInt(req.body.available),
             isAvailable: (parseInt(req.body.available) > 0),
             description: req.body.description,
-            imgUrl: req.body.image
+            imgUrl: {url: req.body.image, display: req.body.showImage == "url"},
         });
         if (!item) {
             req.flash('error', 'item not found');
             return res.redirect('back');
         }
 
+        item.imageFile.display = req.body.showImage == "upload";
+
         if (req.files) {
-            let cloudErr;
-            let cloudResult;
-            if (item.imageFile && item.imageFile.filename) {
-                if (path.extname(item.imageFile.url.split("SaberChat/")[1]).toLowerCase() == ".mp4") {
-                    [cloudErr, cloudResult] = await cloudDelete(item.imageFile.filename, "video");
-                } else {
-                    [cloudErr, cloudResult] = await cloudDelete(item.imageFile.filename, "image");
+            if (req.files.imageFile) {
+                let cloudErr;
+                let cloudResult;
+                if (item.imageFile && item.imageFile.filename) {
+                    if (path.extname(item.imageFile.url.split("SaberChat/")[1]).toLowerCase() == ".mp4") {
+                        [cloudErr, cloudResult] = await cloudDelete(item.imageFile.filename, "video");
+                    } else {
+                        [cloudErr, cloudResult] = await cloudDelete(item.imageFile.filename, "image");
+                    }
+                    // check for failure
+                    if (cloudErr || !cloudResult || cloudResult.result !== 'ok') {
+                        req.flash('error', 'Error deleting uploaded image');
+                        return res.redirect('back');
+                    }
                 }
-                // check for failure
-                if (cloudErr || !cloudResult || cloudResult.result !== 'ok') {
-                    req.flash('error', 'Error deleting uploaded image');
+
+                [cloudErr, cloudResult] = await cloudUpload(req.files.imageFile[0]);
+                if (cloudErr || !cloudResult) {
+                    req.flash('error', 'Upload failed');
                     return res.redirect('back');
                 }
-            }
 
-            [cloudErr, cloudResult] = await cloudUpload(req.files.imageFile[0]);
-            if (cloudErr || !cloudResult) {
-                req.flash('error', 'Upload failed');
-                return res.redirect('back');
+                item.imageFile = {
+                    filename: cloudResult.public_id,
+                    url: cloudResult.secure_url,
+                    display: false
+                };
             }
-
-            item.imageFile = {
-                filename: cloudResult.public_id,
-                url: cloudResult.secure_url
-            };
             await item.save();
         }
 

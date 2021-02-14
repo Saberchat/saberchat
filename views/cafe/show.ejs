@@ -105,11 +105,19 @@
                             <label for="usernameInput">Image (URL)</label>
                             <div id="image-block">
                                 <input id="image-input" oninput="createImage(this)" class="form-control" type="text"
-                                       name="image" value="<%= item.imgUrl %>" placeholder="Enter URL for Item Image">
+                                       name="image" value="<%= item.imgUrl.url %>" placeholder="Enter URL for Item Image">
                                 <br/>
-                                <img id="item-image" src="<%= item.imgUrl %>" alt="Image Does Not Exist"/>
+                                <img id="item-image" src="<%= item.imgUrl.url %>" alt="Image Does Not Exist"/>
                             </div>
                         </div>
+                    </div>
+
+                    <div class="form-group">
+                        <input type="radio" name="showImage" value="upload" id="showUploadedImage" <% if (item.imageFile.display) {%> checked <%}%>/>
+                        <label for="showUploadedImage">Display Uploaded Image</label>
+                        <br />
+                        <input type="radio" name="showImage" value="url" id="showLinkImage" <% if (item.imgUrl.display) {%> checked <%}%>/>
+                        <label for="showLinkImage">Display Image URL</label>
                     </div>
                 </div>
                 <div class="form-group">

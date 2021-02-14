@@ -78,14 +78,14 @@
                             <div class="project-header">
                                 <% if (currentUser) { %>
                                     <a class="project-info" href="../profiles/<%= project.poster._id %>">
-                                        <img src="<%= project.poster.imageUrl %>" alt="profile pic"
+                                        <img src="<% if (project.poster.imageFile.display) {%> <%= project.poster.imageFile.url%><%} else {%> <%=project.poster.imageUrl.url%><%}%>" alt="profile pic"
                                              class="poster-profile mode">
                                         <%= project.poster.firstName %> <%= project.poster.lastName %>
                                     </a>
 
                                 <% } else { %>
                                     <span class="project-info">
-                        <img src="<%= project.poster.imageUrl %>" alt="profile pic" class="poster-profile">
+                        <img src="<% if (project.poster.imageFile.display) {%> <%= project.poster.imageFile.url%><%} else {%> <%=project.poster.imageUrl.url%><%}%>" alt="profile pic" class="poster-profile">
                         <%= project.poster.firstName %> <%= project.poster.lastName %>
                       </span>
                                 <% } %>
@@ -181,19 +181,19 @@
                                     <p class="creator-row"><span class="creator-heading">Creator:</span> <a
                                                 class="creator-names"
                                                 href="profiles/<%= project.creators[0]._id %>"><img
-                                                    src="<%= project.creators[0].imageUrl %>" alt="profile pic"
-                                                    class="creator-profile"> <%= project.creators[0].firstName %> <%= project.creators[0].lastName %>
+                                                src="<% if (project.creators[0].imageFile.display) {%> <%= project.creators[0].imageFile.url%><%} else {%> <%=project.creators[0].imageUrl.url%><%}%>"
+                                                alt="profile pic" class="creator-profile"> <%= project.creators[0].firstName %> <%= project.creators[0].lastName %>
                                         </a></p>
 
                                 <% } else if (project.creators.length == 2){ %>
                                     <p class="creator-row"><span class="creator-heading">Creators:</span> <a
                                                 class="creator-names"
                                                 href="profiles/<%= project.creators[0]._id %>"><img
-                                                    src="<%= project.creators[0].imageUrl %>" alt="profile pic"
+                                                    src="<% if (project.creators[0].imageFile.display) {%> <%= project.creators[0].imageFile.url%><%} else {%> <%=project.creators[0].imageUrl.url%><%}%>" alt="profile pic"
                                                     class="creator-profile"> <%= project.creators[0].firstName %> <%= project.creators[0].lastName %>
                                         </a>, <a class="creator-names"
                                                  href="profiles/<%= project.creators[1]._id %>"><img
-                                                    src="<%= project.creators[1].imageUrl %>" alt="profile pic"
+                                                    src="<% if (project.creators[1].imageFile.display) {%> <%= project.creators[1].imageFile.url%><%} else {%> <%=project.creators[1].imageUrl.url%><%}%>" alt="profile pic"
                                                     class="creator-profile"> <%= project.creators[1].firstName %> <%= project.creators[1].lastName %>
                                         </a></p>
 
@@ -201,7 +201,7 @@
                                     <p class="creator-row"><span class="creator-heading">Creators:</span> <a
                                                 class="creator-names"
                                                 href="profiles/<%= project.creators[0]._id %>"><img
-                                                    src="<%= project.creators[0].imageUrl %>" alt="profile pic"
+                                                    src="<% if (project.creators[0].imageFile.display) {%> <%= project.creators[0].imageFile.url%><%} else {%> <%=project.creators[0].imageUrl.url%><%}%>" alt="profile pic"
                                                     class="creator-profile"> <%= project.creators[0].firstName %> <%= project.creators[0].lastName %>
                                         </a> and <%= project.creators.length - 1 %> others</p>
                                 <% } %>
@@ -213,24 +213,24 @@
 
                                 <% } else if (project.creators.length == 1){ %>
                                     <p class="creator-row"><span class="creator-heading">Creator:</span> <span
-                                                class="creator-names"><img src="<%= project.creators[0].imageUrl %>"
+                                                class="creator-names"><img src="<% if (project.creators[0].imageFile.display) {%> <%= project.creators[0].imageFile.url%><%} else {%> <%=project.creators[0].imageUrl.url%><%}%>"
                                                                            alt="profile pic"
                                                                            class="creator-profile"> <%= project.creators[0].firstName %> <%= project.creators[0].lastName %></span>
                                     </p>
 
                                 <% } else if (project.creators.length == 2){ %>
                                     <p class="creator-row"><span class="creator-heading">Creators:</span> <span
-                                                class="creator-names"><img src="<%= project.creators[0].imageUrl %>"
+                                                class="creator-names"><img src="<% if (project.creators[0].imageFile.display) {%> <%= project.creators[0].imageFile.url%><%} else {%> <%=project.creators[0].imageUrl.url%><%}%>"
                                                                            alt="profile pic"
                                                                            class="creator-profile"> <%= project.creators[0].firstName %> <%= project.creators[0].lastName %></span>,
-                                        <span class="creator-names"><img src="<%= project.creators[1].imageUrl %>"
+                                        <span class="creator-names"><img src="<% if (project.creators[1].imageFile.display) {%> <%= project.creators[1].imageFile.url%><%} else {%> <%=project.creators[1].imageUrl.url%><%}%>"
                                                                          alt="profile pic"
                                                                          class="creator-profile"> <%= project.creators[1].firstName %> <%= project.creators[1].lastName %></span>
                                     </p>
 
                                 <% } else if (project.creators.length > 2) { %>
                                     <p class="creator-row"><span class="creator-heading">Creators:</span> <span
-                                                class="creator-names"><img src="<%= project.creators[0].imageUrl %>"
+                                                class="creator-names"><img src="<% if (project.creators[0].imageFile.display) {%> <%= project.creators[0].imageFile.url%><%} else {%> <%=project.creators[0].imageUrl.url%><%}%>"
                                                                            alt="profile pic"
                                                                            class="creator-profile"> <%= project.creators[0].firstName %> <%= project.creators[0].lastName %></span>
                                         and <%= project.creators.length - 1 %> others</p>

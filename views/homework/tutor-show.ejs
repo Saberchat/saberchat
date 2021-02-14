@@ -36,10 +36,10 @@
 <%- include('../partials/navbar') %>
 
 <!-- big background image -->
-<div id="banner" style="background-image: url('<%= tutor.tutor.bannerUrl %>');"></div>
+<div id="banner" style="background-image: url('<% if (tutor.tutor.bannerFile.display) { %> <%= tutor.tutor.bannerFile.url %> <% } else { %> <%= tutor.tutor.bannerUrl.url %> <% } %>');"></div>
 <div class="container mb-5">
     <div class="tutor-info">
-        <a href="../../profiles/<%= tutor.tutor._id %>"><img src="<%= tutor.tutor.imageUrl %>" alt="profile image"
+        <a href="../../profiles/<%= tutor.tutor._id %>"><img src="<% if (tutor.tutor.imageFile.display) {%> <%= tutor.tutor.imageFile.url%><%} else {%> <%=tutor.tutor.imageUrl.url%><%}%>" alt="profile image"
                                                              class="profile-image"></a>
         <h1 class="username"><%= tutor.tutor.firstName %> <%= tutor.tutor.lastName %></h1>
     </div>
@@ -385,7 +385,7 @@
                 <section class="profile-desc">
                     <div class="desc-head">
                         <a href="../../profiles/<%= review.review.sender._id %>" class="user-element-text"><h3><img
-                                        class="follower-image" src="<%= review.review.sender.imageUrl %>"/><span
+                                        class="follower-image" src="<% if (review.review.sender.imageFile.display) {%> <%= review.review.sender.imageFile.url%><%} else {%> <%=review.review.sender.imageUrl.url%><%}%>"/><span
                                         class="review-sender"><%= review.review.sender.firstName %> <%= review.review.sender.lastName %></span>
                             </h3></a>
 
@@ -443,7 +443,7 @@
                     <% for (let student of students) { %>
                         <div class="list-group-item list-group-item-action user-element">
                             <a href="/profiles/<%= student._id %>" class="student-profile user-element-text">
-                                <img class="student-profile-image" src="<%= student.imageUrl %>" alt="profile picture">
+                                <img class="student-profile-image" src="<% if (student.imageFile.display) {%> <%= student.imageFile.url%><%} else {%> <%=student.imageUrl.url%><%}%>" alt="profile picture">
                                 <span class="<%= student.permission %> <%= student.status %> <%= student.tags.join(' ') %> student-block"><span
                                             class="span-tag-name"><%= student.firstName %> <%= student.lastName %></span> <span
                                             class="span-tag-username"><%= student.username %></span></span>
@@ -519,7 +519,7 @@
                     <% for (let student of tutor.formerStudents) { %>
                         <div class="list-group-item list-group-item-action user-element">
                             <a href="/profiles/<%= student._id %>" class="student-profile user-element-text">
-                                <img class="student-profile-image" src="<%= student.imageUrl %>" alt="profile picture">
+                                <img class="student-profile-image" src="<% if (student.imageFile.display) {%> <%= student.imageFile.url%><%} else {%> <%=student.imageUrl.url%><%}%>" alt="profile picture">
                                 <span class="<%= student.permission %> <%= student.status %> <%= student.tags.join(' ') %> student-block"><span
                                             class="span-tag-name"><%= student.firstName %> <%= student.lastName %></span> <span
                                             class="span-tag-username"><%= student.username %></span></span>
@@ -562,7 +562,7 @@
                                 <div class="project-header">
                           <span>
                             <a class="project-info" href="/profiles/<%= c.teacher._id %>">
-                              <img src="<%= c.teacher.imageUrl %>" alt="profile pic" class="sender-profile-image">
+                              <img src="<% if (c.teacher.imageFile.display) {%> <%= c.teacher.imageFile.url%><%} else {%> <%=c.teacher.imageUrl.url%><%}%>" alt="profile pic" class="sender-profile-image">
                               <%= c.teacher.firstName %> <%= c.teacher.lastName %>
                             </a>
 
@@ -649,7 +649,7 @@
                             </div>
 
                             <div class="block-content">
-                                <img class="project-first-image" src="<%= c.thumbnail %>"/>
+                                <img class="project-first-image" src="<%= c.thumbnail.url %>"/>
                                 <p class="announcement-text"><%= c.description %></p>
                             </div>
 

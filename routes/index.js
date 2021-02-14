@@ -12,6 +12,7 @@ const {validateNewUser, validateUserLogin, validatePasswordReset} = require('../
 
 //import user schema for db actions
 const User = require('../models/user');
+const Course = require('../models/course');
 const Email = require('../models/email');
 const Announcement = require('../models/announcement');
 

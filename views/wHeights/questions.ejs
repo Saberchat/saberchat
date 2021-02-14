@@ -105,13 +105,13 @@
 
                         <% if (currentUser) { %>
                             <a class="button-text" href="../profiles/<%= announcement.sender._id %>">
-                                <img src="<%= announcement.sender.imageUrl %>" alt="profile pic" class="author-profile">
+                                <img src="<%= announcement.sender.imageUrl.url %>" alt="profile pic" class="author-profile">
                                 <%= announcement.sender.firstName %> <%= announcement.sender.lastName %>
                             </a>
 
                         <% } else { %>
                             <span class="button-text">
-                      <img src="<%= announcement.sender.imageUrl %>" alt="profile pic" class="author-profile">
+                      <img src="<%= announcement.sender.imageUrl.url %>" alt="profile pic" class="author-profile">
                       <%= announcement.sender.firstName %> <%= announcement.sender.lastName %>
                     </span>
                         <% } %>

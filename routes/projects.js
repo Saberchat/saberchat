@@ -102,24 +102,26 @@ router.post('/', middleware.isLoggedIn, middleware.isFaculty, multipleUpload, va
         }
 
         if (req.files) {
-            let cloudErr;
-            let cloudResult;
-            for (let file of req.files.imageFile) {
-                if (path.extname(file.originalname).toLowerCase() == ".mp4") {
-                    [cloudErr, cloudResult] = await cloudUpload(file, "video");
-                } else {
-                    [cloudErr, cloudResult] = await cloudUpload(file, "image");
-                }
+            if (req.files.imageFile) {
+                let cloudErr;
+                let cloudResult;
+                for (let file of req.files.imageFile) {
+                    if (path.extname(file.originalname).toLowerCase() == ".mp4") {
+                        [cloudErr, cloudResult] = await cloudUpload(file, "video");
+                    } else {
+                        [cloudErr, cloudResult] = await cloudUpload(file, "image");
+                    }
 
-                if (cloudErr || !cloudResult) {
-                    req.flash('error', 'Upload failed');
-                    return res.redirect('back');
-                }
+                    if (cloudErr || !cloudResult) {
+                        req.flash('error', 'Upload failed');
+                        return res.redirect('back');
+                    }
 
-                project.imageFiles.push({
-                    filename: cloudResult.public_id,
-                    url: cloudResult.secure_url
-                });
+                    project.imageFiles.push({
+                        filename: cloudResult.public_id,
+                        url: cloudResult.secure_url
+                    });
+                }
             }
         }
 
@@ -517,23 +519,23 @@ router.put('/:id', middleware.isLoggedIn, middleware.isFaculty, multipleUpload, 
 
         // if files were uploaded
         if (req.files) {
-            let cloudErr;
-            let cloudResult;
-            for (let file of req.files.imageFile) {
-                if (path.extname(file.originalname).toLowerCase() == ".mp4") {
-                    [cloudErr, cloudResult] = await cloudUpload(file, "video");
-                } else {
-                    [cloudErr, cloudResult] = await cloudUpload(file, "image");
-                }
-                if (cloudErr || !cloudResult) {
-                    req.flash('error', 'Upload failed');
-                    return res.redirect('back');
-                }
+            if (req.files.imageFile) {
+                for (let file of req.files.imageFile) {
+                    if (path.extname(file.originalname).toLowerCase() == ".mp4") {
+                        [cloudErr, cloudResult] = await cloudUpload(file, "video");
+                    } else {
+                        [cloudErr, cloudResult] = await cloudUpload(file, "image");
+                    }
+                    if (cloudErr || !cloudResult) {
+                        req.flash('error', 'Upload failed');
+                        return res.redirect('back');
+                    }
 
-                updatedProject.imageFiles.push({
-                    filename: cloudResult.public_id,
-                    url: cloudResult.secure_url
-                });
+                    updatedProject.imageFiles.push({
+                        filename: cloudResult.public_id,
+                        url: cloudResult.secure_url
+                    });
+                }
             }
         }
 
@@ -584,6 +586,7 @@ router.put('/:id', middleware.isLoggedIn, middleware.isFaculty, multipleUpload, 
         return res.redirect(`/projects/${project._id}`);
 
     })().catch(err => {
+        console.log(err);
         req.flash('error', "An Error Occurred");
         res.redirect('back');
     });

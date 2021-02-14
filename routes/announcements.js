@@ -184,23 +184,23 @@ router.put('/:id', middleware.isLoggedIn, middleware.isMod, multipleUpload, (req
 
         // if files were uploaded
         if (req.files) {
-            let cloudErr;
-            let cloudResult;
-            for (let file of req.files.imageFile) {
-                if (path.extname(file.originalname).toLowerCase() == ".mp4") {
-                    [cloudErr, cloudResult] = await cloudUpload(file, "video");
-                } else {
-                    [cloudErr, cloudResult] = await cloudUpload(file, "image");
-                }
-                if (cloudErr || !cloudResult) {
-                    req.flash('error', 'Upload failed');
-                    return res.redirect('back');
-                }
+            if (req.files.imageFile) {
+                for (let file of req.files.imageFile) {
+                    if (path.extname(file.originalname).toLowerCase() == ".mp4") {
+                        [cloudErr, cloudResult] = await cloudUpload(file, "video");
+                    } else {
+                        [cloudErr, cloudResult] = await cloudUpload(file, "image");
+                    }
+                    if (cloudErr || !cloudResult) {
+                        req.flash('error', 'Upload failed');
+                        return res.redirect('back');
+                    }
 
-                updatedAnnouncement.imageFiles.push({
-                    filename: cloudResult.public_id,
-                    url: cloudResult.secure_url
-                });
+                    updatedAnnouncement.imageFiles.push({
+                        filename: cloudResult.public_id,
+                        url: cloudResult.secure_url
+                    });
+                }
             }
         }
 

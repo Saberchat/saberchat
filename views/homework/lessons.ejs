@@ -35,12 +35,12 @@
 <!-- include the navbar via ejs -->
 <%- include('../partials/navbar') %>
 
-<div id="banner" style="background-image: url('<%= tutor.tutor.bannerUrl %>');"></div>
+<div id="banner" style="background-image: url('<% if (tutor.tutor.bannerFile.display) { %> <%= tutor.tutor.bannerFile.url %> <% } else { %> <%= tutor.tutor.bannerUrl.url %> <% } %>');"></div>
 
 <div class="container mb-5 tutor-info">
-    <a href="../../profiles/<%= tutor.tutor._id %>"><img src="<%= tutor.tutor.imageUrl %>" alt="profile image"
+    <a href="../../profiles/<%= tutor.tutor._id %>"><img src="<% if (tutor.tutor.imageFile.display) {%> <%= tutor.tutor.imageFile.url%><%} else {%> <%=tutor.tutor.imageUrl.url%><%}%>" alt="profile image"
                                                          class="profile-image"></a>
-    <a href="../../profiles/<%= student._id %>"><img src="<%= student.imageUrl %>" alt="profile image"
+    <a href="../../profiles/<%= student._id %>"><img src="<% if (student.imageFile.display) {%> <%= student.imageFile.url%><%} else {%> <%=student.imageUrl.url%><%}%>" alt="profile image"
                                                      class="profile-image"></a>
     <h1 class="username"><%= student.firstName %>'s Lessons
         with <%= tutor.tutor.firstName %> <%= tutor.tutor.lastName %></h1>

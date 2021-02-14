@@ -22,7 +22,12 @@ const comment = function (form, event) {
                 let newComment = document.createElement('div');
                 newComment.className = "media mb-2 comment-body";
                 newComment.style = "text-align: left;";
-                let commentHTML = `<img src="${data.comments[data.comments.length - 1].sender.imageUrl}" alt="user" class="user-image"><div class="media-body ml-3"><div class="bg-primary rounded py-2 px-3 mb-2 w-75"><p class="text-small mb-0 text-white">`;
+                let commentHTML;
+                if (data.comments[data.comments.length - 1].sender.imageFile.display) {
+                     commentHTML = `<img src="${data.comments[data.comments.length - 1].sender.imageFile.url}" alt="user" class="user-image"><div class="media-body ml-3"><div class="bg-primary rounded py-2 px-3 mb-2 w-75"><p class="text-small mb-0 text-white">`;
+                 } else {
+                     commentHTML = `<img src="${data.comments[data.comments.length - 1].sender.imageUrl.url}" alt="user" class="user-image"><div class="media-body ml-3"><div class="bg-primary rounded py-2 px-3 mb-2 w-75"><p class="text-small mb-0 text-white">`;
+                 }
 
                 // If someone is mentioned in this segment, make their @ a link
                 for (let line of data.comments[data.comments.length - 1].text.split(" ")) {

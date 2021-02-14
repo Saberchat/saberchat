@@ -151,7 +151,7 @@
         <% } else { %>
             <% for (let course of courses) { %>
                 <div class="card course-title" title="<%= course.name %>">
-                    <img class="card-img-top course-thumbnail" src="<%= course.thumbnail %>" alt="Card image cap">
+                    <img class="card-img-top course-thumbnail" src="<% if (course.thumbnailFile.display) { %> <%=course.thumbnailFile.url%> <%} else { %> <%= course.thumbnail.url %> <% } %>" alt="Card image cap">
                     <div class="card-body">
                         <h5 class="card-title"><%= course.name.slice(0, 25) %>
                             <% if (course.name.length > 25) { %>...

@@ -20,7 +20,7 @@ const follow = function (button, location) {
                 let newFollower = document.createElement("span");
                 newFollower.id = `follower-${data.user._id}`;
                 newFollower.className = "follower-block";
-                newFollower.innerHTML = `<a href="../profiles/${data.user._id}" class="follower-link"> <img class="follower-image" src="${data.user.imageUrl}" alt="profile picture"> <span class="follower-name">${data.user.firstName} ${data.user.lastName}</span> ${data.user.username} </a><br><br>`;
+                newFollower.innerHTML = `<a href="../profiles/${data.user._id}" class="follower-link"> <img class="follower-image" src="${data.user.imageUrl.url}" alt="profile picture"> <span class="follower-name">${data.user.firstName} ${data.user.lastName}</span> ${data.user.username} </a><br><br>`;
                 document.getElementById("followers-list").appendChild(newFollower);
                 document.getElementById('followers-button').innerText = `${parseInt(document.getElementById('followers-button').innerText.split(' ')[0]) + 1} Follower(s)`;
             }

@@ -3,7 +3,7 @@ const router = express.Router();
 const Filter = require('bad-words');
 const filter = new Filter();
 const {transport, transport_mandatory} = require("../utils/transport");
-const {singleUpload, multipleUpload} = require('../middleware/multer');
+const {multipleUpload} = require('../middleware/multer');
 const {cloudUpload, cloudDelete} = require('../services/cloudinary');
 const convertToLink = require("../utils/convert-to-link");
 
@@ -129,14 +129,30 @@ router.put('/profile', middleware.isLoggedIn, multipleUpload, validateUserUpdate
             username: filter.clean(req.body.username),
             description: filter.clean(req.body.description),
             title: filter.clean(req.body.title),
-            status: status.toLowerCase()
+            status: status.toLowerCase(),
+            imageFile: {
+                url: req.user.imageFile.url,
+                filename: req.user.imageFile.filename,
+                display: req.body.showProfileImage == "upload"
+            },
+            bannerFile: {
+                url: req.user.bannerFile.url,
+                filename: req.user.bannerFile.filename,
+                display: req.body.showBannerImage == "upload"
+            },
         };
 
         if (req.body.imageUrl) {
-            user.imageUrl = req.body.imageUrl;
+            user.imageUrl = {
+                url: req.body.imageUrl,
+                display: req.body.showProfileImage == "url"
+            };
         }
         if (req.body.bannerUrl) {
-            user.bannerUrl = req.body.bannerUrl;
+            user.bannerUrl = {
+                url: req.body.bannerUrl,
+                display: req.body.showBannerImage == "url"
+            };
         }
 
         if (req.files) {
@@ -157,7 +173,8 @@ router.put('/profile', middleware.isLoggedIn, multipleUpload, validateUserUpdate
                 }
                 user.imageFile = {
                     filename: cloudResult.public_id,
-                    url: cloudResult.secure_url
+                    url: cloudResult.secure_url,
+                    display: req.body.showProfileImage == "upload"
                 };
             }
 
@@ -177,7 +194,8 @@ router.put('/profile', middleware.isLoggedIn, multipleUpload, validateUserUpdate
                 }
                 user.bannerFile = {
                     filename: cloudResult.public_id,
-                    url: cloudResult.secure_url
+                    url: cloudResult.secure_url,
+                    display: req.body.showBannerImage == "upload"
                 };
             }
         }

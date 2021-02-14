@@ -53,10 +53,10 @@
                 <% if (room.type == 'public' || room.members.includes(currentUser._id)) { %>
                     <a href="chat/<%= room._id %>" class="list-group-item list-group-item-action">
                         <% if (commentObject[room._id.toString()]) { %>
-                            <img src="<%= commentObject[room._id.toString()].author.imageUrl %>" alt="user"
+                            <img src="<% if (commentObject[room._id.toString()].author.imageFile.display) {%> <%= commentObject[room._id.toString()].author.imageFile.url%><%} else {%> <%=commentObject[room._id.toString()].author.imageUrl.url%><%}%>" alt="user"
                                  class="user-image">
                         <% } else if (room.creator.id) { %>
-                            <img src="<%= room.creator.id.imageUrl %>" alt="user" class="user-image">
+                            <img src="<% if (room.creator.id.imageFile.display) {%> <%= room.creator.id.imageFile.url%><%} else {%> <%=room.creator.id.imageUrl.url%><%}%>" alt="user" class="user-image">
                         <% } %>
 
                         <% if (currentUser.newRoomCount.includes(room._id)) { %>

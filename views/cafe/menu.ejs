@@ -97,10 +97,10 @@
                                 <% } %>
 
                   <br/><em class="item-description convertible-text"><%= itemDescriptions[item._id.toString()] %></em><br/>
-                  <% if (item.imageFile.filename && [".png", ".jpg", ".jpeg"].includes(fileExtensions.get(item.imageFile.url).toLowerCase())) { %>
+                  <% if (item.imageFile.display && [".png", ".jpg", ".jpeg"].includes(fileExtensions.get(item.imageFile.url).toLowerCase())) { %>
                       <img class="item-image" src="<%= item.imageFile.url %>"/>
-                  <% } else if (item.imgUrl != '') { %>
-                      <img class="item-image" src="<%= item.imgUrl %>"/>
+                  <% } else { %>
+                      <img class="item-image" src="<%= item.imgUrl.url %>"/>
                   <% } %>
 
                 </span>

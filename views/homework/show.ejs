@@ -37,7 +37,7 @@
         <div class="row">
             <div class="col-12">
                 <div class="jumbotron text-center" id="course-thumbnail"
-                     style="background-image: url('<%= course.thumbnail %>');">
+                     style="background-image: url('<% if (course.thumbnailFile.display) { %> <%=course.thumbnailFile.url%> <%} else { %> <%= course.thumbnail.url %> <% } %>');">
                     <h1 id="courseName"><%= course.name %></h1>
                     <p id="courseDescription"><%= course.description %></p>
                     <a id="back-button" class="btn btn-primary" href="/homework"><i class="fas fa-arrow-left"></i> Back</a>
@@ -109,7 +109,7 @@
                 <li class="list-group-item list-group-item-success">Teacher</li>
                 <li class="list-group-item">
                     <a href="/profiles/<%= course.teacher._id %>" class="user-element-text">
-                        <img class="profile-image" src="<%= course.teacher.imageUrl %>" alt="profile picture">
+                        <img class="profile-image" src="<% if (course.teacher.imageFile.display) {%> <%= course.teacher.imageFile.url%><%} else {%> <%=course.teacher.imageUrl.url%><%}%>" alt="profile picture">
                         <span class="username <%= course.teacher.status %> <%= course.teacher.permission %> <%= course.teacher.tags.join(' ') %>"><span
                                     class="enrolled-name"><%= course.teacher.firstName %> <%= course.teacher.lastName %></span> <span
                                     class="enrolled-username"><%= course.teacher.username %></span></span>
@@ -124,7 +124,7 @@
                     <% for (let student of course.students) { %>
                         <li class="list-group-item" id="item-<%= student._id %>">
                             <a href="../profiles/<%= student._id %>" class="user-element-text">
-                                <img class="profile-image" src="<%= student.imageUrl %>" alt="profile picture">
+                                <img class="profile-image" src="<% if (student.imageFile.display) {%> <%= student.imageFile.url%><%} else {%> <%=student.imageUrl.url%><%}%>" alt="profile picture">
                                 <span class="username <%= student.status %> <%= student.permission %> <%= student.tags.join(' ') %>"><span
                                             class="enrolled-name"><%= student.firstName %> <%= student.lastName %></span> <span
                                             class="enrolled-username"><%= student.username %></span></span>
@@ -178,7 +178,7 @@
                             id="item-<%= tutor.tutor._id %>">
                             <a href="/homework/tutors/<%= course._id %>?tutorId=<%= tutor.tutor._id %>"
                                class="user-element-text">
-                                <img class="profile-image" src="<%= tutor.tutor.imageUrl %>" alt="profile picture">
+                                <img class="profile-image" src="<% if (tutor.tutor.imageFile.display) {%> <%= tutor.tutor.imageFile.url%><%} else {%> <%=tutor.tutor.imageUrl.url%><%}%>" alt="profile picture">
                                 <span class="username <%= tutor.tutor.status %> <%= tutor.tutor.permission %> <%= tutor.tutor.tags.join(' ') %>"><span
                                             class="enrolled-name"><%= tutor.tutor.firstName %> <%= tutor.tutor.lastName %></span> <span
                                             class="enrolled-username"><%= tutor.tutor.username %></span></span>
@@ -238,7 +238,7 @@
                             id="tutor-<%= tutor.tutor._id %>">
                             <a href="/homework/tutors/<%= course._id %>?tutorId=<%= tutor.tutor._id %>"
                                class="tutor-link">
-                                <img class="profile-image" src="<%= tutor.tutor.imageUrl %>" alt="profile picture">
+                                <img class="profile-image" src="<% if (tutor.tutor.imageFile.display) {%> <%= tutor.tutor.imageFile.url%><%} else {%> <%=tutor.tutor.imageUrl.url%><%}%>" alt="profile picture">
                                 <span class="tutor-name <%= tutor.tutor.status %> <%= tutor.tutor.permission %> <%= tutor.tutor.tags.join(' ') %>"><%= tutor.tutor.firstName %> <%= tutor.tutor.lastName %></span>
                             </a>
 
@@ -534,8 +534,7 @@
             <% } else { %>
                 <div class="empty-field" id="no-tutors">
                     <br />
-                    <%=tutors.length%>
-                    <h2>No Tutors, <%=tutors.length%></h2>
+                    <h2>No Tutors</h2>
                 </div>
             <% } %>
 
@@ -575,7 +574,7 @@
                     <div class="form-group">
                         <label for="thumbnail-input">Thumbnail Image Url</label><br/>
                         <input id="thumbnail-input" class="form-control" type="text" oninput="changeThumbnail(this)"
-                               name="thumbnailUrl" value="<%= course.thumbnail %>" placeholder="Enter Thumbnail Url">
+                               name="thumbnailUrl" value="<%= course.thumbnail.url %>" placeholder="Enter Thumbnail Url">
                     </div>
                     <button type="submit" class="btn btn-lg btn-primary btn-block">Confirm Changes</button>
                     <br/>
@@ -670,7 +669,7 @@
                         <% for (let b of course.blocked) { %>
                             <li class="list-group-item" id="item-<%= b._id %>">
                                 <a href="../profiles/<%= b._id %>" class="user-element-text">
-                                    <img class="profile-image" src="<%= b.imageUrl %>" alt="profile picture">
+                                    <img class="profile-image" src="<% if (b.imageFile.display) {%> <%= b.imageFile.url%><%} else {%> <%=b.imageUrl.url%><%}%>" alt="profile picture">
                                     <span class="username <%= b.status %> <%= b.permission %> <%= b.tags.join(' ') %>"><span
                                                 class="enrolled-name"><%= b.firstName %> <%= b.lastName %></span> <span
                                                 class="enrolled-username"><%= b.username %></span></span>

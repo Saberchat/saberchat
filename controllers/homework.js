@@ -240,9 +240,15 @@ module.exports.updateSettings = async function(req, res) {
     }
 
     for (let attr in req.body) { //Iterate through each of the data's keys and update the course with the corresponding value
-        if (req.body[attr].split(' ').join('') != '') {
-            course[attr] = req.body[attr];
+        if (attr != "thumbnail") {
+            if (req.body[attr].split(' ').join('') != '') {
+                course[attr] = req.body[attr];
+            }
         }
+    }
+
+    if (req.body.thumbnail.split(' ').join('') != '') {
+        course.thumbnail.url = req.body.thumbnail;
     }
 
     await course.save();
