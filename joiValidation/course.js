@@ -16,6 +16,7 @@ const courseSchema = Joi.object({
         "string.empty": "Description is required.",
         "string.min": "Descrip. minimum 50 characters."
     }),
+    showThumbnail: Joi.string()
 });
 
 module.exports = {courseSchema};

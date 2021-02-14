@@ -171,7 +171,6 @@ router.post('/', middleware.isLoggedIn, middleware.isFaculty, multipleUpload, va
         res.redirect(`/projects/${project._id}`);
 
     })().catch(err => {
-        console.log(err);
         req.flash('error', "An Error Occurred");
         res.redirect('back');
     });
@@ -586,7 +585,6 @@ router.put('/:id', middleware.isLoggedIn, middleware.isFaculty, multipleUpload, 
         return res.redirect(`/projects/${project._id}`);
 
     })().catch(err => {
-        console.log(err);
         req.flash('error', "An Error Occurred");
         res.redirect('back');
     });

@@ -8,6 +8,14 @@
     background-size: 100%;
 }
 
+.thumbnail-backup, #thumbnail-backup {
+    background-position: center;
+    background-size: cover;
+    filter: brightness(70%);
+    width: 50%;
+    margin-bottom: 40px;
+}
+
 #back-button {
     margin-right: 10px;
 }

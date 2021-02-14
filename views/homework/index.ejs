@@ -43,7 +43,7 @@
                 <h1><i class="fas fa-chalkboard-teacher"></i> Tutoring Center </h1>
                 <p>A platform for students to communicate and help each other learn</p>
                 <% if (currentUser.status == 'faculty') { %>
-                    <form action="/homework" method="post" id="add-course-form">
+                    <form action="/homework" method="post" id="add-course-form" enctype="multipart/form-data">
                         <button type="button" data-toggle="modal" data-target="#modal-teacher" class="btn btn-info"><i
                                     class="fas fa-chalkboard-teacher"></i> Create Course
                         </button>
@@ -59,9 +59,19 @@
                                     </div>
                                     <div class="modal-body">
                                         <input class="form-control" type="text" name="title" placeholder="Course Name"/><br/>
-                                        <input class="form-control" type="text" id="thumbnail" name="thumbnail"
-                                               placeholder="Course Thumbnail" oninput="changeThumbnailInit()"/>
+                                        <input class="form-control" type="text" id="thumbnail" name="thumbnail" placeholder="Course Thumbnail" oninput="changeThumbnailInit()"/>
                                         <img hidden id="thumbnail-photo" src=""/><br/>
+                                        <div class="form-group">
+                                            <label for="imageFile">Thumbnail Upload</label>
+                                            <input type="file" name="imageFile" class="image-upload form-control-file" accept="image/png, image/jpg, image/jpeg">
+                                        </div>
+                                        <div class="form-group">
+                                            <input type="radio" name="showThumbnail" value="upload" id="showUploadedImage" checked/>
+                                            <label for="showUploadedImage">Display Uploaded Image</label>
+                                            <br />
+                                            <input type="radio" name="showThumbnail" value="url" id="showLinkImage"/>
+                                            <label for="showLinkImage">Display Image URL</label>
+                                        </div>
                                         <textarea rows="5" class="form-control" name="description"
                                                   placeholder="Course Description"></textarea>
                                     </div>

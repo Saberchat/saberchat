@@ -1,6 +1,7 @@
 const dateFormat = require('dateformat');
 const {transport} = require("../utils/transport");
 const { sortByPopularity } = require("../utils/popularity-algorithms");
+const {cloudUpload, cloudDelete} = require('../services/cloudinary');
 
 const User = require('../models/user');
 const Notification = require('../models/message');
@@ -50,7 +51,7 @@ module.exports.createCourse = async function(req, res) {
 
     const course = await Course.create({ //Create course with specified information
         name: req.body.title,
-        thumbnail: req.body.thumbnail,
+        thumbnail: {url: req.body.thumbnail, display: req.body.showThumbnail == "url"},
         joinCode,
         description: req.body.description,
         active: true,
@@ -60,6 +61,22 @@ module.exports.createCourse = async function(req, res) {
     if (!course) {
         req.flash('error', "Unable to create course");
         return res.redirect('back');
+    }
+
+    if (req.files) {
+        if (req.files.imageFile) {
+            let [cloudErr, cloudResult] = await cloudUpload(req.files.imageFile[0], "image");
+            if (cloudErr || !cloudResult) {
+                req.flash("error", "Upload failed");
+                return res.redirect("back");
+            }
+            course.thumbnailFile = {
+                filename: cloudResult.public_id,
+                url: cloudResult.secure_url,
+                display: req.body.showThumbnail == "upload"
+            };
+            await course.save();
+        }
     }
 
     req.flash('success', "Successfully created course");
@@ -236,7 +253,8 @@ module.exports.unenrollTutor = async function(req, res) {
 module.exports.updateSettings = async function(req, res) {
     const course = await Course.findById(req.params.id);
     if (!course) {
-        return res.json({error: "An Error Occurred"});
+        req.flash("error", "An error occurred");
+        return res.redirect("back");
     }
 
     for (let attr in req.body) { //Iterate through each of the data's keys and update the course with the corresponding value
@@ -248,11 +266,38 @@ module.exports.updateSettings = async function(req, res) {
     }
 
     if (req.body.thumbnail.split(' ').join('') != '') {
-        course.thumbnail.url = req.body.thumbnail;
+        course.thumbnail = {url: req.body.thumbnail, display: req.body.showThumbnail == "url"};
+    }
+    course.thumbnailFile.display = req.body.showThumbnail == "upload";
+
+    if (req.files) {
+        let cloudErr;
+        let cloudResult;
+        if (course.thumbnailFile.filename) {
+            [cloudErr, cloudResult] = await cloudDelete(course.thumbnailFile.filename, "image");
+            if (cloudErr || !cloudResult) {
+                req.flash("error", "Error deleting uploaded image");
+                return res.redirect("back");
+            }
+        }
+
+        if (req.files.imageFile) {
+            [cloudErr, cloudResult] = await cloudUpload(req.files.imageFile[0], "image");
+            if (cloudErr || !cloudResult) {
+                req.flash("error", "Upload failed");
+                return res.redirect("back");
+            }
+            course.thumbnailFile = {
+                filename: cloudResult.public_id,
+                url: cloudResult.secure_url,
+                display: req.body.showThumbnail == "upload"
+            };
+        }
     }
 
     await course.save();
-    return res.json({success: "Succesfully Updated Course Information"});
+    req.flash("success", "Updated course settings")
+    return res.redirect(`/homework/${course._id}`);
 }
 
 module.exports.deleteCourse = async function(req, res) {

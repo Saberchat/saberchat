@@ -4,18 +4,19 @@ const express = require('express');
 const middleware = require('../middleware');
 const router = express.Router(); //start express router
 const {validateCourse} = require('../middleware/validation');
+const {singleUpload} = require('../middleware/multer');
 const wrapAsync = require('../utils/wrapAsync');
 const hwController = require('../controllers/homework');
 
 //General routes
 router.route('/')
     .get(middleware.isLoggedIn, wrapAsync(hwController.index)) //View index
-    .post(middleware.isLoggedIn, middleware.isFaculty, validateCourse, wrapAsync(hwController.createCourse)); //Create new course
+    .post(middleware.isLoggedIn, middleware.isFaculty, singleUpload, validateCourse, wrapAsync(hwController.createCourse)); //Create new course
 
 //Course-specific routes
 router.route('/:id')
     .get(middleware.isLoggedIn, middleware.memberOfCourse, wrapAsync(hwController.showCourse)) //View specific course
-    .put(middleware.isLoggedIn, middleware.isFaculty, middleware.memberOfCourse, wrapAsync(hwController.updateSettings)) //Update specific course's settings
+    .put(middleware.isLoggedIn, middleware.isFaculty, middleware.memberOfCourse, singleUpload, wrapAsync(hwController.updateSettings)) //Update specific course's settings
     .delete(middleware.isLoggedIn, middleware.isFaculty, middleware.memberOfCourse, wrapAsync(hwController.deleteCourse)); //Delete course
 
 //Show a specific tutor

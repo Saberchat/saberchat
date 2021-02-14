@@ -19,7 +19,31 @@ const changeThumbnailInit = function () { //Display thumbnail during course init
 }
 
 const changeThumbnail = function (input) { //Change thumbnail image based on input
-    document.getElementsByClassName("jumbotron")[0].style.backgroundImage = `url('${input.value}`;
+    if (document.getElementById("showLinkImage").checked) {
+        document.getElementsByClassName("jumbotron")[0].style.backgroundImage = `url('${input.value}`;
+    } else {
+        document.getElementById("thumbnail-backup").src = input.value;
+    }
+}
+
+const changeThumbnailUpload = function(url, backup) {
+    if (document.getElementById("showUploadedImage").checked) {
+        document.getElementsByClassName("jumbotron")[0].style.backgroundImage = `url(${url})`;
+        document.getElementById("thumbnail-backup").src = backup;
+    } else {
+        document.getElementsByClassName("jumbotron")[0].style.backgroundImage = `url(${backup})`;
+        document.getElementById("thumbnail-backup").src = url;
+    }
+}
+
+const changeThumbnailUrl = function(url, backup) {
+    if (document.getElementById("showLinkImage").checked) {
+        document.getElementsByClassName("jumbotron")[0].style.backgroundImage = `url(${url})`;
+        document.getElementById("thumbnail-backup").src = backup;
+    } else {
+        document.getElementsByClassName("jumbotron")[0].style.backgroundImage = `url(${backup})`;
+        document.getElementById("thumbnail-backup").src = url;
+    }
 }
 
 const changeInfo = function (input) { //Change course description based on input
@@ -28,40 +52,6 @@ const changeInfo = function (input) { //Change course description based on input
 
 const changeName = function (input) { //Change course name based on input
     document.getElementById("courseName").innerText = document.getElementById("newName").value;
-}
-
-const updateSettings = function (courseID, event) {
-    const url = `/homework/${courseID}?_method=put`;
-    const data = {
-        name: document.getElementById('newName').value,
-        description: document.getElementById('descInput').value,
-        thumbnail: document.getElementById('thumbnail-input').value
-    };
-
-    $.post(url, data, data => {
-        document.getElementById('loading').style.color = "grey";
-        document.getElementById('loading').innerText = "Waiting";
-
-        if (data.success) {
-            document.getElementById('loading').hidden = false;
-            document.getElementById('loading').style.color = "green";
-            document.getElementById('loading').innerText = data.success;
-
-            setTimeout(() => {
-                document.getElementById('loading').hidden = true;
-            }, 1000);
-
-        } else {
-            document.getElementById('loading').hidden = false;
-            document.getElementById('loading').style.color = "red";
-            document.getElementById('loading').innerText = data.error;
-
-            setTimeout(() => {
-                document.getElementById('loading').hidden = true;
-            }, 1000);
-        }
-    });
-    event.preventDefault(); //Prevent page from automatically refreshing
 }
 
 const changeJoinCode = function (courseID, event) { //Change course join code (in case security is compromised)
