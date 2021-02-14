@@ -26,11 +26,44 @@ const middleware = require('../middleware');
 const admin = require("../controllers/admin");
 const wrapAsync = require('../utils/wrapAsync');
 
+router.get("/", middleware.isLoggedIn, middleware.isAdmin, wrapAsync(admin.index));
+
+router.get("/moderate", middleware.isLoggedIn, middleware.isMod, wrapAsync(admin.moderateGet));
+
+router.post('/moderate', middleware.isLoggedIn, middleware.isMod, wrapAsync(admin.moderatePost));
+
+router.put('/moderate', middleware.isLoggedIn, middleware.isMod, wrapAsync(admin.moderatePut));
+
+router.delete('/moderate', middleware.isLoggedIn, middleware.isMod, wrapAsync(admin.moderateDelete));
+
+router.get("/permissions", middleware.isLoggedIn, middleware.isAdmin, wrapAsync(admin.permissionsGet));
+
+router.put("/permissions", middleware.isLoggedIn, middleware.isAdmin, wrapAsync(admin.permissionsPut));
+
+router.get("/status", middleware.isLoggedIn, middleware.isMod, wrapAsync(admin.statusGet));
+
+router.put('/status', middleware.isLoggedIn, middleware.isMod, wrapAsync(admin.statusPut));
+
+router.get("/whitelist", middleware.isLoggedIn, middleware.isMod, wrapAsync(admin.whitelistGet));
+
+router.put("/whitelist", middleware.isLoggedIn, middleware.isMod, wrapAsync(admin.whitelistPut));
+
+router.delete("/whitelist/:id", middleware.isLoggedIn, middleware.isMod, wrapAsync(admin.whitelistId));
+
+router.put('/tag', middleware.isLoggedIn, middleware.isMod, wrapAsync(admin.tag));
+
+router.get('/manageCafe', middleware.isLoggedIn, middleware.isMod, wrapAsync(admin.manageCafe));
+
+module.exports = router;
+
+// EVERYTHING BELOW THIS LINE IS 100% COMMENTED OUT CODE
+
+
+
 //Function to display user inbox
 /*router.get('/', middleware.isLoggedIn, middleware.isAdmin, (req, res) => {
     res.render('admin/index');
 })*/
-router.get("/", middleware.isLoggedIn, middleware.isAdmin, wrapAsync(admin.index));
 
 // displays moderator page
 /*router.get('/moderate', middleware.isLoggedIn, middleware.isMod, (req, res) => {
@@ -48,10 +81,8 @@ router.get("/", middleware.isLoggedIn, middleware.isAdmin, wrapAsync(admin.index
             }
         });
 });*/
-router.get("/moderate", middleware.isLoggedIn, middleware.isMod, wrapAsync(admin.moderate))
-
 // displays permissions page
-router.get('/permissions', middleware.isLoggedIn, middleware.isAdmin, (req, res) => {
+/*router.get('/permissions', middleware.isLoggedIn, middleware.isAdmin, (req, res) => {
     User.find({authenticated: true}, (err, users) => {
         if (err || !users) {
             req.flash('error', 'Cannot access Database');
@@ -61,10 +92,10 @@ router.get('/permissions', middleware.isLoggedIn, middleware.isAdmin, (req, res)
             res.render('admin/permission', {users: users});
         }
     });
-});
+});*/
 
 // displays status page
-router.get('/status', middleware.isLoggedIn, middleware.isMod, (req, res) => {
+/*router.get('/status', middleware.isLoggedIn, middleware.isMod, (req, res) => {
     User.find({authenticated: true}, (err, users) => {
         if (err || !users) {
             req.flash('error', 'Cannot access Database');
@@ -74,8 +105,9 @@ router.get('/status', middleware.isLoggedIn, middleware.isMod, (req, res) => {
         }
     });
 });
+*/
 
-router.get('/whitelist', middleware.isLoggedIn, middleware.isPrincipal, (req, res) => {
+/*router.get('/whitelist', middleware.isLoggedIn, middleware.isPrincipal, (req, res) => {
     (async () => {
         let emails;
 
@@ -112,9 +144,8 @@ router.get('/whitelist', middleware.isLoggedIn, middleware.isPrincipal, (req, re
         req.flash('error', "An Error Occurred");
         res.redirect('back');
     });
-});
-
-router.put('/whitelist', middleware.isLoggedIn, middleware.isPrincipal, (req, res) => {
+});*/
+/*router.put('/whitelist', middleware.isLoggedIn, middleware.isPrincipal, (req, res) => {
     (async () => {
         if (req.body.version == "whitelist" && req.body.address.split('@')[1] == "alsionschool.org") {
             return res.json({error: "Alsion emails do not need to be added to the whitelist"});
@@ -135,9 +166,9 @@ router.put('/whitelist', middleware.isLoggedIn, middleware.isPrincipal, (req, re
     })().catch(err => {
         res.json({error: "An error occurred"});
     });
-});
+});*/
 
-router.delete('/whitelist/:id', middleware.isLoggedIn, middleware.isPrincipal, (req, res) => {
+/*router.delete('/whitelist/:id', middleware.isLoggedIn, middleware.isPrincipal, (req, res) => {
     (async () => {
         const email = await Email.findById(req.params.id);
         if (!email) {
@@ -163,8 +194,7 @@ router.delete('/whitelist/:id', middleware.isLoggedIn, middleware.isPrincipal, (
     })().catch(err => {
         res.json({error: "An error occurred"});
     });
-});
-
+});*/
 // router.post('/add-permission', (req, res) => {
 //   Permission.create({title: req.body.permission}, (err, permission ) => {
 //     if (err || !permission) {
@@ -475,6 +505,7 @@ router.delete('/whitelist/:id', middleware.isLoggedIn, middleware.isPrincipal, (
 // });
 
 // changes permissions
+/*
 router.put('/permissions', middleware.isLoggedIn, middleware.isAdmin, (req, res) => {
 
     User.findById(req.body.user, (err, user) => {
@@ -503,10 +534,10 @@ router.put('/permissions', middleware.isLoggedIn, middleware.isAdmin, (req, res)
             }
         }
     });
-});
+});*/
 
 // changes status
-router.put('/status', middleware.isLoggedIn, middleware.isMod, (req, res) => {
+/*router.put('/status', middleware.isLoggedIn, middleware.isMod, (req, res) => {
     (async () => {
         const user = await User.findById(req.body.user);
 
@@ -545,9 +576,9 @@ router.put('/status', middleware.isLoggedIn, middleware.isMod, (req, res) => {
     })().catch(err => {
         res.json({error: "Error. Could not change"});
     });
-});
+});*/
 
-router.put('/tag', middleware.isLoggedIn, middleware.isMod, (req, res) => {
+/*router.put('/tag', middleware.isLoggedIn, middleware.isMod, (req, res) => {
 
     (async () => {
         const user = await User.findById(req.body.user);
@@ -602,10 +633,10 @@ router.put('/tag', middleware.isLoggedIn, middleware.isMod, (req, res) => {
     })().catch(err => {
         res.json({error: 'Error. Could not change'});
     });
-});
+});*/
 
 //Context
-router.post('/moderate', middleware.isLoggedIn, middleware.isMod, (req, res) => {
+/*router.post('/moderate', middleware.isLoggedIn, middleware.isMod, (req, res) => {
     (async () => {
         const reportedComment = await Comment.findById(req.body.commentId).populate("author");
         if (!reportedComment) {
@@ -650,10 +681,10 @@ router.post('/moderate', middleware.isLoggedIn, middleware.isMod, (req, res) => 
     })().catch(err => {
         res.json({error: "An error occurred"});
     });
-});
+});*/
 
 // route for ignoring reported comments
-router.put('/moderate', middleware.isLoggedIn, middleware.isMod, (req, res) => {
+/*router.put('/moderate', middleware.isLoggedIn, middleware.isMod, (req, res) => {
     Comment.findById(req.body.id).populate('statusBy').exec((err, comment) => {
         if (err || !comment) {
             res.json({error: 'Could not find comment'});
@@ -673,10 +704,10 @@ router.put('/moderate', middleware.isLoggedIn, middleware.isMod, (req, res) => {
             res.json({success: 'Ignored comment'});
         }
     });
-});
+});*/
 
 // route for deleting reported comments
-router.delete('/moderate', middleware.isLoggedIn, middleware.isMod, (req, res) => {
+/*router.delete('/moderate', middleware.isLoggedIn, middleware.isMod, (req, res) => {
     Comment.findById(req.body.id).populate("author").exec((err, comment) => {
         if (err || !comment) {
             res.json({error: 'Could not find comment'});
@@ -695,10 +726,10 @@ router.delete('/moderate', middleware.isLoggedIn, middleware.isMod, (req, res) =
             res.json({success: 'Deleted comment'});
         }
     });
-});
+});*/
 
-router.get('/manageCafe', middleware.isLoggedIn, middleware.isMod, (req, res) => {
+/*router.get('/manageCafe', middleware.isLoggedIn, middleware.isMod, (req, res) => {
     res.redirect('/cafe/manage');
-});
+});*/
 
-module.exports = router;
+//module.exports = router;
