@@ -97,7 +97,11 @@
                 <% if(media.filename) { %>
                     <% if ([".png", ".jpg", ".jpeg"].includes(fileExtensions.get(media.url).toLowerCase())) { %>
                         <img src="<%= media.url %>" alt="attached image" class="img-fluid rounded past-upload">
-                    <% } else { %>
+                    <% } else if ([".mp3", ".m4a"].includes(fileExtensions.get(media.url).toLowerCase())) { %>
+                        <audio controls>
+                            <source src="<%=media.url%>" type="audio/mpeg"></source>
+                        </audio>
+                    <% } else {%>
                         <video width="400px" height="250px" src="<%=media.url%>" type="video/mp4" controls></video>
                     <% } %>
                     <div class="form-check">
@@ -111,7 +115,7 @@
 
             <div class="form-group">
                 <label for="imageFile">New Media Uploads</label>
-                <input type="file" name="imageFile" class="image-upload form-control-file" multiple accept="image/png, image/jpg, image/jpeg, video/mp4">
+                <input type="file" name="imageFile" class="image-upload form-control-file" multiple accept="image/png, image/jpg, image/jpeg, video/mp4, audio/mp3, audio/m4a">
             </div>
 
             <div id="image-header">

@@ -168,7 +168,7 @@ router.put('/:id', middleware.isLoggedIn, middleware.isMod, multipleUpload, (req
         let cloudResult;
         for (let i = updatedAnnouncement.imageFiles.length-1; i >= 0; i--) {
             if (req.body[`deleteUpload-${updatedAnnouncement.imageFiles[i].url}`] && updatedAnnouncement.imageFiles[i] && updatedAnnouncement.imageFiles[i].filename) {
-                if (path.extname(updatedAnnouncement.imageFiles[i].url.split("SaberChat/")[1]).toLowerCase() == ".mp4") {
+                if ([".mp3", ".mp4", ".m4a"].includes(path.extname(updatedAnnouncement.imageFiles[i].url.split("SaberChat/")[1]).toLowerCase())) {
                     [cloudErr, cloudResult] = await cloudDelete(updatedAnnouncement.imageFiles[i].filename, "video");
                 } else {
                     [cloudErr, cloudResult] = await cloudDelete(updatedAnnouncement.imageFiles[i].filename, "image");
@@ -186,7 +186,7 @@ router.put('/:id', middleware.isLoggedIn, middleware.isMod, multipleUpload, (req
         if (req.files) {
             if (req.files.imageFile) {
                 for (let file of req.files.imageFile) {
-                    if (path.extname(file.originalname).toLowerCase() == ".mp4") {
+                    if ([".mp3", ".mp4", ".m4a"].includes(path.extname(file.originalname).toLowerCase())) {
                         [cloudErr, cloudResult] = await cloudUpload(file, "video");
                     } else {
                         [cloudErr, cloudResult] = await cloudUpload(file, "image");
@@ -277,7 +277,7 @@ router.delete('/:id', middleware.isLoggedIn, middleware.isMod, (req, res) => { /
         let cloudResult;
         for (let file of announcement.imageFiles) {
             if (file && file.filename) {
-                if (path.extname(file.url.split("SaberChat/")[1]).toLowerCase() == ".mp4") {
+                if ([".mp3", ".mp4", ".m4a"].includes(path.extname(file.url.split("SaberChat/")[1]).toLowerCase())) {
                     [cloudErr, cloudResult] = await cloudDelete(file.filename, "video");
                 } else {
                     [cloudErr, cloudResult] = await cloudDelete(file.filename, "image");

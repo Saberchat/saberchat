@@ -118,7 +118,7 @@ module.exports.createMsg = async function(req, res) {
         let cloudErr;
         let cloudResult;
         for (let file of req.files.imageFile) {
-            if (path.extname(file.originalname).toLowerCase() == ".mp4") {
+            if ([".mp3", ".mp4", ".m4a"].includes(path.extname(file.originalname).toLowerCase())) {
                 [cloudErr, cloudResult] = await cloudUpload(file, "video");
             } else {
                 [cloudErr, cloudResult] = await cloudUpload(file, "image");
