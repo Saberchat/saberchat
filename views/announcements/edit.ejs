@@ -61,7 +61,7 @@
                                 <source src="<%=media.url%>" type="audio/mpeg"></source>
                             </audio>
                         <% } else { %>
-                            <video width="400px" height="250px" src="<%=media.url%>" type="video/mp4" controls></video>
+                            <video width="600px" height="375px" src="<%=media.url%>" type="video/mp4" controls></video>
                         <% } %>
                         <div class="form-check">
                             <input type="checkbox" name="deleteUpload-<%=media.url%>" id="deleteUpload-<%=media.url%>" class="form-check-input">
@@ -73,7 +73,7 @@
 
                 <div class="form-group">
                     <label for="imageFile">New Media Uploads</label>
-                    <input type="file" name="imageFile" class="image-upload form-control-file" multiple accept="image/png, image/jpg, image/jpeg, video/mp4, audio/mp3, audio/m4a">
+                    <input type="file" name="imageFile" class="image-upload form-control-file" multiple accept="image/png, image/jpg, image/jpeg, video/mp4, audio/*">
                 </div>
 
                 <div id="image-header">
