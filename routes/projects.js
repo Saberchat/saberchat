@@ -106,7 +106,7 @@ router.post('/', middleware.isLoggedIn, middleware.isFaculty, multipleUpload, va
                 let cloudErr;
                 let cloudResult;
                 for (let file of req.files.imageFile) {
-                    if (path.extname(file.originalname).toLowerCase() == ".mp4") {
+                    if ([".mp3", ".mp4", ".m4a"].includes(path.extname(file.originalname).toLowerCase())) {
                         [cloudErr, cloudResult] = await cloudUpload(file, "video");
                     } else {
                         [cloudErr, cloudResult] = await cloudUpload(file, "image");
@@ -502,7 +502,7 @@ router.put('/:id', middleware.isLoggedIn, middleware.isFaculty, multipleUpload, 
         let cloudResult;
         for (let i = updatedProject.imageFiles.length-1; i >= 0; i--) {
             if (req.body[`deleteUpload-${updatedProject.imageFiles[i].url}`] && updatedProject.imageFiles[i] && updatedProject.imageFiles[i].filename) {
-                if (path.extname(updatedProject.imageFiles[i].url.split("SaberChat/")[1]).toLowerCase() == ".mp4") {
+                if ([".mp3", ".mp4", ".m4a"].includes(path.extname(updatedProject.imageFiles[i].url.split("SaberChat/")[1]).toLowerCase())) {
                     [cloudErr, cloudResult] = await cloudDelete(updatedProject.imageFiles[i].filename, "video");
                 } else {
                     [cloudErr, cloudResult] = await cloudDelete(updatedProject.imageFiles[i].filename, "image");
@@ -520,7 +520,7 @@ router.put('/:id', middleware.isLoggedIn, middleware.isFaculty, multipleUpload, 
         if (req.files) {
             if (req.files.imageFile) {
                 for (let file of req.files.imageFile) {
-                    if (path.extname(file.originalname).toLowerCase() == ".mp4") {
+                    if ([".mp3", ".mp4", ".m4a"].includes(path.extname(file.originalname).toLowerCase())) {
                         [cloudErr, cloudResult] = await cloudUpload(file, "video");
                     } else {
                         [cloudErr, cloudResult] = await cloudUpload(file, "image");
@@ -616,7 +616,7 @@ router.delete('/:id', middleware.isLoggedIn, middleware.isFaculty, (req, res) =>
         let cloudResult;
         for (let file of project.imageFiles) {
             if (file && file.filename) {
-                if (path.extname(file.url.split("SaberChat/")[1]).toLowerCase() == ".mp4") {
+                if ([".mp3", ".mp4", ".m4a"].includes(path.extname(file.url.split("SaberChat/")[1]).toLowerCase())) {
                     [cloudErr, cloudResult] = await cloudDelete(file.filename, "video");
                 } else {
                     [cloudErr, cloudResult] = await cloudDelete(file.filename, "image");
