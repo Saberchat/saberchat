@@ -158,7 +158,7 @@
                                 <img class="project-first-image" src="<%= project.images[0] %>"/>
                             <% } else { %>
                                 <% for (let media of project.imageFiles) { %>
-                                    <% if (media.filename && [".png", ".jpg", ".jpeg"].includes(fileExtensions.get(media.url).toLowerCase())) { %>
+                                    <% if (media.filename && [".png", ".jpg", ".jpeg", ".gif"].includes(fileExtensions.get(media.url).toLowerCase())) { %>
                                         <img class="project-first-image" src="<%= media.url%>"/>
                                         <% break;%>
                                     <% } %>

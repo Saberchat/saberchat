@@ -73,6 +73,7 @@ module.exports.createCourse = async function(req, res) {
             course.thumbnailFile = {
                 filename: cloudResult.public_id,
                 url: cloudResult.secure_url,
+                originalName: req.files.imageFile[0].originalname,
                 display: req.body.showThumbnail == "upload"
             };
             await course.save();
@@ -290,6 +291,7 @@ module.exports.updateSettings = async function(req, res) {
             course.thumbnailFile = {
                 filename: cloudResult.public_id,
                 url: cloudResult.secure_url,
+                originalName: req.files.imageFile[0].originalname,
                 display: req.body.showThumbnail == "upload"
             };
         }

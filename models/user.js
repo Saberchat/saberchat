@@ -21,6 +21,7 @@ var userSchema = new mongoose.Schema({
     bannerFile: {
         filename: String,
         url: String,
+        originalName: String,
         display: {type: Boolean, default: false}
     },
     imageUrl: {
@@ -30,6 +31,7 @@ var userSchema = new mongoose.Schema({
     imageFile: {
         filename: String,
         url: String,
+        originalName: String,
         display: {type: Boolean, default: false}
     },
     reportedCount: {type: Number, default: 0},

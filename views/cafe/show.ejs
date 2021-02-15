@@ -88,7 +88,7 @@
 
                     <div class="row" id="file-row">
                         <div class="col">
-                            <% if (item.imageFile.filename && [".png", ".jpg", ".jpeg"].includes(fileExtensions.get(item.imageFile.url).toLowerCase())) { %>
+                            <% if (item.imageFile.filename && [".png", ".jpg", ".jpeg", ".gif"].includes(fileExtensions.get(item.imageFile.url).toLowerCase())) { %>
                                     <div id="file-image">
                                         <img id="item-image-file" src="<%= item.imageFile.url%>" alt="Image Does Not Exist"/>
                                     </div>

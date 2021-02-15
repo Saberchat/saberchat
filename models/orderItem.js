@@ -11,6 +11,7 @@ var orderItemSchema = new mongoose.Schema({
     imageFile: {
         filename: String,
         url: String,
+        originalName: String,
         display: Boolean
     },
     availableItems: Number,

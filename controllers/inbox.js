@@ -120,6 +120,8 @@ module.exports.createMsg = async function(req, res) {
         for (let file of req.files.imageFile) {
             if ([".mp3", ".mp4", ".m4a"].includes(path.extname(file.originalname).toLowerCase())) {
                 [cloudErr, cloudResult] = await cloudUpload(file, "video");
+            } else if (path.extname(file.originalname).toLowerCase() == ".pdf") {
+                [cloudErr, cloudResult] = await cloudUpload(file, "pdf");
             } else {
                 [cloudErr, cloudResult] = await cloudUpload(file, "image");
             }
@@ -130,7 +132,8 @@ module.exports.createMsg = async function(req, res) {
 
             message.imageFiles.push({
                 filename: cloudResult.public_id,
-                url: cloudResult.secure_url
+                url: cloudResult.secure_url,
+                originalName: file.originalname
             });
         }
     }

@@ -9,7 +9,8 @@ var announcementSchema = new mongoose.Schema({
     images: [{type: String}],
     imageFiles: [{
         filename: String,
-        url: String
+        url: String,
+        originalName: String
     }],
     text: String,
     date: String,

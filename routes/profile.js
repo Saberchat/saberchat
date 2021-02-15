@@ -174,6 +174,7 @@ router.put('/profile', middleware.isLoggedIn, multipleUpload, validateUserUpdate
                 user.imageFile = {
                     filename: cloudResult.public_id,
                     url: cloudResult.secure_url,
+                    originalName: req.files.imageFile[0].originalname,
                     display: req.body.showProfileImage == "upload"
                 };
             }
@@ -195,6 +196,7 @@ router.put('/profile', middleware.isLoggedIn, multipleUpload, validateUserUpdate
                 user.bannerFile = {
                     filename: cloudResult.public_id,
                     url: cloudResult.secure_url,
+                    originalName: req.files.imageFile2[0].originalname,
                     display: req.body.showBannerImage == "upload"
                 };
             }

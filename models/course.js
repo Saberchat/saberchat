@@ -7,6 +7,7 @@ const courseSchema = new mongoose.Schema({
     thumbnailFile: {
         filename: String,
         url: String,
+        originalName: String,
         display: {type: Boolean, default: false}
     },
     thumbnail: {

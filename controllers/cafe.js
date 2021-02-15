@@ -373,6 +373,7 @@ module.exports.createItem = async function(req, res) {
             item.imageFile = {
                 filename: cloudResult.public_id,
                 url: cloudResult.secure_url,
+                originalName: req.files.imageFile[0].originalname,
                 display: req.body.showImage == "upload"
             };
         }
@@ -486,6 +487,7 @@ module.exports.updateItem = async function(req, res) {
                 item.imageFile = {
                     filename: cloudResult.public_id,
                     url: cloudResult.secure_url,
+                    originalName: req.files.imageFile[0].originalname,
                     display: false
                 };
             }

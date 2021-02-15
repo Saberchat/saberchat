@@ -108,6 +108,8 @@ router.post('/', middleware.isLoggedIn, middleware.isFaculty, multipleUpload, va
                 for (let file of req.files.imageFile) {
                     if ([".mp3", ".mp4", ".m4a"].includes(path.extname(file.originalname).toLowerCase())) {
                         [cloudErr, cloudResult] = await cloudUpload(file, "video");
+                    } else if (path.extname(file.originalname).toLowerCase() == ".pdf") {
+                        [cloudErr, cloudResult] = await cloudUpload(file, "pdf");
                     } else {
                         [cloudErr, cloudResult] = await cloudUpload(file, "image");
                     }
@@ -119,7 +121,8 @@ router.post('/', middleware.isLoggedIn, middleware.isFaculty, multipleUpload, va
 
                     project.imageFiles.push({
                         filename: cloudResult.public_id,
-                        url: cloudResult.secure_url
+                        url: cloudResult.secure_url,
+                        originalName: file.originalname
                     });
                 }
             }
@@ -504,6 +507,8 @@ router.put('/:id', middleware.isLoggedIn, middleware.isFaculty, multipleUpload, 
             if (req.body[`deleteUpload-${updatedProject.imageFiles[i].url}`] && updatedProject.imageFiles[i] && updatedProject.imageFiles[i].filename) {
                 if ([".mp3", ".mp4", ".m4a"].includes(path.extname(updatedProject.imageFiles[i].url.split("SaberChat/")[1]).toLowerCase())) {
                     [cloudErr, cloudResult] = await cloudDelete(updatedProject.imageFiles[i].filename, "video");
+                } else if (path.extname(updatedProject.imageFiles[i].url.split("SaberChat/")[1]).toLowerCase() == ".pdf") {
+                    [cloudErr, cloudResult] = await cloudDelete(updatedProject.imageFiles[i].filename, "pdf");
                 } else {
                     [cloudErr, cloudResult] = await cloudDelete(updatedProject.imageFiles[i].filename, "image");
                 }
@@ -522,6 +527,8 @@ router.put('/:id', middleware.isLoggedIn, middleware.isFaculty, multipleUpload, 
                 for (let file of req.files.imageFile) {
                     if ([".mp3", ".mp4", ".m4a"].includes(path.extname(file.originalname).toLowerCase())) {
                         [cloudErr, cloudResult] = await cloudUpload(file, "video");
+                    } else if (path.extname(file.originalname).toLowerCase() == ".pdf") {
+                        [cloudErr, cloudResult] = await cloudUpload(file, "pdf");
                     } else {
                         [cloudErr, cloudResult] = await cloudUpload(file, "image");
                     }
@@ -532,7 +539,8 @@ router.put('/:id', middleware.isLoggedIn, middleware.isFaculty, multipleUpload, 
 
                     updatedProject.imageFiles.push({
                         filename: cloudResult.public_id,
-                        url: cloudResult.secure_url
+                        url: cloudResult.secure_url,
+                        originalName: file.originalname
                     });
                 }
             }
@@ -618,6 +626,8 @@ router.delete('/:id', middleware.isLoggedIn, middleware.isFaculty, (req, res) =>
             if (file && file.filename) {
                 if ([".mp3", ".mp4", ".m4a"].includes(path.extname(file.url.split("SaberChat/")[1]).toLowerCase())) {
                     [cloudErr, cloudResult] = await cloudDelete(file.filename, "video");
+                } else if (path.extname(file.url.split("SaberChat/")[1]).toLowerCase() == ".pdf") {
+                    [cloudErr, cloudResult] = await cloudDelete(file.filename, "pdf");
                 } else {
                     [cloudErr, cloudResult] = await cloudDelete(file.filename, "image");
                 }
@@ -628,7 +638,6 @@ router.delete('/:id', middleware.isLoggedIn, middleware.isFaculty, (req, res) =>
                 }
             }
         }
-
         req.flash("success", "Project Deleted!");
         return res.redirect('/projects');
 
