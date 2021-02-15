@@ -5,7 +5,6 @@ const path = require('path');
 const dateFormat = require('dateformat');
 const {multipleUpload} = require('../middleware/multer');
 const {cloudUpload, cloudDelete} = require('../services/cloudinary');
-const {validateAnn} = require('../middleware/validation');
 
 //SCHEMA
 const User = require('../models/user');
@@ -17,24 +16,24 @@ const PostComment = require('../models/postComment');
 module.exports.index = async function(req, res) {
     const Anns = await Announcement.find({}).populate('sender').exec();
     if(!Anns) {req.flash('error', 'Cannot find announcements.'); return res.redirect('back');}
-    res.render('announcements/index', {announcements: Anns.reverse()});
+    return res.render('announcements/index', {announcements: Anns.reverse()});
 };
 
 // Ann GET new ann
-module.exports.new = function(req, res) {
-    res.render('announcements/new');
+module.exports.new = async function(req, res) {
+    return res.render('announcements/new');
 };
 
 // Ann GET markall ann as read
-module.exports.markAll = function(req, res) {
+module.exports.markAll = async function(req, res) {
     req.user.annCount = []; //No new announcements in user's annCount
-    req.user.save();
+    await req.user.save();
     req.flash('success', 'All Announcements Marked As Read!');
-    res.redirect(`/announcements`);
+    return res.redirect(`/announcements`);
 };
 
 // Ann GET mark one ann as read
-module.exports.markOne = function(req, res) {
+module.exports.markOne = async function(req, res) {
     //Iterate through user's announcement count and find the announcement that is being marked as read
     let index = -1;
     for (let i = 0; i < req.user.annCount.length; i++) {
@@ -45,11 +44,11 @@ module.exports.markOne = function(req, res) {
     //If the announcement exists, remove it from announcement count
     if (index > -1) {
         req.user.annCount.splice(index, 1);
-        req.user.save()
+        await req.user.save()
     }
 
     req.flash('success', 'Announcement Marked As Read!');
-    res.redirect(`/announcements`);
+    return res.redirect(`/announcements`);
 };
 
 // Ann GET show
@@ -83,7 +82,7 @@ module.exports.show = async function(req, res) {
         fileExtensions.set(media.url, path.extname(media.url.split("SaberChat/")[1]));
     }
     const convertedText = convertToLink(Ann.text);
-    res.render('announcements/show', {announcement: Ann, convertedText, fileExtensions});
+    return res.render('announcements/show', {announcement: Ann, convertedText, fileExtensions});
 };
 
 // Ann GET edit form
@@ -101,7 +100,7 @@ module.exports.updateForm = async function(req, res) {
         fileExtensions.set(media.url, path.extname(media.url.split("SaberChat/")[1]));
     }
 
-    res.render('announcements/edit', { announcement: Ann, fileExtensions });
+    return res.render('announcements/edit', { announcement: Ann, fileExtensions });
 };
 
 // Ann POST create
@@ -168,7 +167,7 @@ module.exports.create = async function(req, res) {
 
     if (!Users) {
         req.flash('error', "An Error Occurred");
-        res.rediect('back');
+        return res.rediect('back');
     }
 
     let announcementObject = {
@@ -188,8 +187,129 @@ module.exports.create = async function(req, res) {
     }
 
     req.flash('success', 'Announcement posted to bulletin!');
-    res.redirect(`/announcements/${Ann._id}`);
+    return res.redirect(`/announcements/${Ann._id}`);
 };
+
+module.exports.updateAnn = async function(req, res) {
+    const announcement = await Announcement.findById(req.params.id).populate('sender');
+    if (!announcement) {
+        req.flash('error', "Unable to access announcement");
+        return res.redirect('back');
+    }
+
+    if (announcement.sender._id.toString() != req.user._id.toString()) {
+        req.flash('error', "You can only update announcements which you have sent");
+        return res.redirect('back');
+    }
+
+    const updatedAnnouncement = await Announcement.findByIdAndUpdate(req.params.id, {
+        subject: req.body.subject,
+        text: req.body.message
+    });
+    if (!updatedAnnouncement) {
+        req.flash('error', "Unable to update announcement");
+        return res.redirect('back');
+    }
+
+    updatedAnnouncement.images = []; //Empty image array so that you can fill it with whatever images are added (all images are there, not just new ones)
+    if (req.body.images) { //Only add images if any are provided
+        for (const image in req.body.images) {
+            updatedAnnouncement.images.push(req.body.images[image]);
+        }
+    }
+
+    let cloudErr;
+    let cloudResult;
+    for (let i = updatedAnnouncement.imageFiles.length-1; i >= 0; i--) {
+        if (req.body[`deleteUpload-${updatedAnnouncement.imageFiles[i].url}`] && updatedAnnouncement.imageFiles[i] && updatedAnnouncement.imageFiles[i].filename) {
+            if ([".mp3", ".mp4", ".m4a"].includes(path.extname(updatedAnnouncement.imageFiles[i].url.split("SaberChat/")[1]).toLowerCase())) {
+                [cloudErr, cloudResult] = await cloudDelete(updatedAnnouncement.imageFiles[i].filename, "video");
+            } else if (path.extname(updatedAnnouncement.imageFiles[i].url.split("SaberChat/")[1]).toLowerCase() == ".pdf") {
+                [cloudErr, cloudResult] = await cloudDelete(updatedAnnouncement.imageFiles[i].filename, "pdf");
+            } else {
+                [cloudErr, cloudResult] = await cloudDelete(updatedAnnouncement.imageFiles[i].filename, "image");
+            }
+            // check for failure
+            if (cloudErr || !cloudResult || cloudResult.result !== 'ok') {
+                req.flash('error', 'Error deleting uploaded image');
+                return res.redirect('back');
+            }
+            updatedAnnouncement.imageFiles.splice(i, 1);
+        }
+    }
+
+    // if files were uploaded
+    if (req.files) {
+        if (req.files.imageFile) {
+            for (let file of req.files.imageFile) {
+                if ([".mp3", ".mp4", ".m4a"].includes(path.extname(file.originalname).toLowerCase())) {
+                    [cloudErr, cloudResult] = await cloudUpload(file, "video");
+                } else if (path.extname(file.originalname).toLowerCase() == ".pdf") {
+                    [cloudErr, cloudResult] = await cloudUpload(file, "pdf");
+                } else {
+                    [cloudErr, cloudResult] = await cloudUpload(file, "image");
+                }
+                if (cloudErr || !cloudResult) {
+                    req.flash('error', 'Upload failed');
+                    return res.redirect('back');
+                }
+
+                updatedAnnouncement.imageFiles.push({
+                    filename: cloudResult.public_id,
+                    url: cloudResult.secure_url,
+                    originalName: file.originalname
+                });
+            }
+        }
+    }
+
+    await updatedAnnouncement.save();
+    const users = await User.find({
+        authenticated: true,
+        _id: {
+            $ne: req.user._id
+        }
+    });
+
+    let announcementEmail;
+    let imageString = "";
+    for (let image of announcement.images) {
+        imageString += `<img src="${image}">`;
+    }
+
+    if (!users) {
+        req.flash('error', "An Error Occurred");
+        return res.rediect('back');
+    }
+
+    let announcementObject = {
+        announcement: updatedAnnouncement,
+        version: "updated"
+    };
+
+    let overlap;
+    for (let user of users) {
+        if (user.receiving_emails) {
+            await sendGridEmail(user.email, `Updated Saberchat Announcement - ${announcement.subject}`, `<p>Hello ${user.firstName},</p><p>${req.user.username} has recently updated an announcement - '${announcement.subject}'.</p><p>${announcement.text}</p><p>You can access the full announcement at https://alsion-saberchat.herokuapp.com</p> ${imageString}`);
+        }
+
+        overlap = false;
+        for (let a of user.annCount) {
+            if (a.announcement.toString() == updatedAnnouncement._id.toString()) {
+                overlap = true;
+                break;
+            }
+        }
+
+        if (!overlap) {
+            user.annCount.push(announcementObject);
+            await user.save();
+        }
+    }
+
+    req.flash('success', 'Announcement Updated!');
+    return res.redirect(`/announcements/${updatedAnnouncement._id}`);
+}
 
 // Ann PUT like ann
 module.exports.likeAnn = async function(req, res) {
@@ -200,7 +320,7 @@ module.exports.likeAnn = async function(req, res) {
         Ann.likes.splice(Ann.likes.indexOf(req.user._id), 1);
         await Ann.save();
 
-        res.json({
+        return res.json({
             success: `Removed a like from ${Ann.subject}`,
             likeCount: Ann.likes.length
         });
@@ -208,12 +328,90 @@ module.exports.likeAnn = async function(req, res) {
         Ann.likes.push(req.user._id);
         await Ann.save();
 
-        res.json({
+        return res.json({
             success: `Liked ${Ann.subject}`,
             likeCount: Ann.likes.length
         });
     }
 };
+
+// Ann PUT comment
+module.exports.comment = async function(req, res) {
+    const announcement = await Announcement.findById(req.body.announcement)
+        .populate({
+            path: "comments",
+            populate: {
+                path: "sender"
+            }
+        });
+    if (!announcement) {
+        return res.json({
+            error: 'Error commenting'
+        });
+    }
+
+    const comment = await PostComment.create({
+        text: req.body.text,
+        sender: req.user
+    });
+    if (!comment) {
+        return res.json({error: 'Error commenting'});
+    }
+
+    comment.date = dateFormat(comment.created_at, "h:MM TT | mmm d");
+    await comment.save();
+
+    announcement.comments.push(comment);
+    await announcement.save();
+
+    let users = [];
+    let user;
+    for (let line of comment.text.split(" ")) {
+        if (line[0] == '@') {
+            user = await User.findById(line.split("#")[1].split("_")[0]);
+
+            if (!user) {
+                return res.json({
+                    error: "Error accessing user"
+                });
+            }
+            users.push(user);
+        }
+    }
+
+    let notif;
+    for (let user of users) {
+        notif = await Notification.create({
+            subject: `New Mention in ${announcement.subject}`,
+            sender: req.user,
+            noReply: true,
+            recipients: [user],
+            read: [],
+            toEveryone: false,
+            images: []
+        });
+        if (!notif) {
+            return res.json({error: "Error creating notification"});
+        }
+
+        notif.date = dateFormat(notif.created_at, "h:MM TT | mmm d");
+        notif.text = `Hello ${user.firstName},\n\n${req.user.firstName} ${req.user.lastName} mentioned you in a comment on "${announcement.subject}":\n${comment.text}`;
+        await notif.save();
+
+        if (user.receiving_emails) {
+            await sendGridEmail(user.email, `New Mention in ${announcement.subject}`, `<p>Hello ${user.firstName},</p><p>${req.user.firstName} ${req.user.lastName} mentioned you in a comment on <strong>${announcement.subject}</strong>.<p>${comment.text}</p>`);
+        }
+
+        user.inbox.push(notif); //Add notif to user's inbox
+        user.msgCount += 1;
+        await user.save();
+    }
+
+    return res.json({
+        success: 'Successful comment',
+        comments: announcement.comments
+    });
+}
 
 // Ann PUT like comment
 module.exports.likeComment = async function(req, res) {
@@ -223,7 +421,7 @@ module.exports.likeComment = async function(req, res) {
     if (postComment.likes.includes(req.user._id)) { //Remove Like
         postComment.likes.splice(postComment.likes.indexOf(req.user._id), 1);
         await postComment.save();
-        res.json({
+        return res.json({
             success: `Removed like`,
             likeCount: postComment.likes.length
         });
@@ -232,9 +430,70 @@ module.exports.likeComment = async function(req, res) {
         postComment.likes.push(req.user._id);
         postComment.save();
 
-        res.json({
+        return res.json({
             success: `Liked comment`,
             likeCount: postComment.likes.length
         });
     }
-};
+}
+
+module.exports.deleteAnn = async function(req, res) {
+    const announcement = await Announcement.findById(req.params.id).populate('sender');
+    if (!announcement) {
+        req.flash('error', "Unable to access announcement");
+        return res.redirect('back');
+    }
+
+    if (announcement.sender._id.toString() != req.user._id.toString()) {
+        req.flash('error', "You can only delete announcements that you have posted");
+        return res.redirect('back');
+
+    }
+    // delete any uploads
+    let cloudErr;
+    let cloudResult;
+    for (let file of announcement.imageFiles) {
+        if (file && file.filename) {
+            if ([".mp3", ".mp4", ".m4a"].includes(path.extname(file.url.split("SaberChat/")[1]).toLowerCase())) {
+                [cloudErr, cloudResult] = await cloudDelete(file.filename, "video");
+            } else if (path.extname(file.url.split("SaberChat/")[1]).toLowerCase() == ".pdf") {
+                [cloudErr, cloudResult] = await cloudDelete(file.filename, "pdf");
+            } else {
+                [cloudErr, cloudResult] = await cloudDelete(file.filename, "image");
+            }
+            // check for failure
+            if (cloudErr || !cloudResult || cloudResult.result !== 'ok') {
+                req.flash('error', 'Error deleting uploaded image');
+                return res.redirect('back');
+            }
+        }
+    }
+
+    const deletedAnn = await Announcement.findByIdAndDelete(announcement._id);
+    if (!deletedAnn) {
+        req.flash('error', "Unable to delete announcement");
+        return res.redirect('back');
+    }
+
+    const users = await User.find({authenticated: true});
+    if (!users) {
+        req.flash('error', "Unable to find users");
+        return res.redirect('back');
+    }
+
+    for (let user of users) {
+        let index;
+        for (let i = 0; i < user.annCount.length; i += 1) {
+            if (user.annCount[i].announcement.toString() == deletedAnn._id.toString()) {
+                index = i;
+            }
+        }
+        if (index > -1) {
+            user.annCount.splice(index, 1);
+            await user.save();
+        }
+    }
+
+    req.flash('success', 'Announcement Deleted!');
+    return res.redirect('/announcements/');
+}

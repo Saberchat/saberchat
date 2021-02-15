@@ -10,7 +10,7 @@ const Filter = require('bad-words');
 const filter = new Filter();
 const dateFormat = require('dateformat');
 const router = express.Router();
-const {transport, transport_mandatory} = require("../utils/transport");
+const { sendGridEmail } = require("../utils/transport");
 const convertToLink = require("../utils/convert-to-link");
 const {validateRoom} = require('../middleware/validation');
 const middleware = require('../middleware');
@@ -115,7 +115,7 @@ module.exports.editRoom = async function(req, res) {
         return res.redirect('back');
     }
 
-    res.render('chat/edit', {users, room});
+    return res.render('chat/edit', {users, room});
 }
 
 module.exports.createRoom = async function(req, res) {
@@ -212,7 +212,7 @@ module.exports.leaveRoom = async function(req, res) {
     await room.save();
 
     req.flash('success', 'You have left ' + room.name);
-    res.redirect('/chat');
+    return res.redirect('/chat');
 }
 
 module.exports.requestJoin = async function(req, res) {
@@ -258,10 +258,11 @@ module.exports.requestJoin = async function(req, res) {
         }
 
         await roomCreator.requests.push(createdReq._id);
-        roomCreator.save();
+        await roomCreator.save();
 
-        transport(roomCreator, 'New Room Access Request', `<p>Hello ${roomCreator.firstName},</p><p><strong>${req.user.username}</strong> is requesting to join your room, <strong>${foundRoom.name}.</strong></p><p>You can access the full request at https://alsion-saberchat.herokuapp.com</p>`);
-
+        if (roomCreator.receiving_emails) {
+            await sendGridEmail(roomCreator.email, 'New Room Access Request', `<p>Hello ${roomCreator.firstName},</p><p><strong>${req.user.username}</strong> is requesting to join your room, <strong>${foundRoom.name}.</strong></p><p>You can access the full request at https://alsion-saberchat.herokuapp.com</p>`);
+        }
         return res.json({success: 'Request for access sent'});
     }
 }
@@ -372,7 +373,7 @@ module.exports.deleteRoom = async function(req, res) {
         }
     }
     req.flash('success', 'Deleted room');
-    res.redirect('/chat');
+    return res.redirect('/chat');
 }
 
 module.exports.reportComment = async function(req, res) {

@@ -1,7 +1,7 @@
 const express = require('express');
 //start express router
 const router = express.Router();
-const {transport, transport_mandatory} = require("../utils/transport");
+const { sendGridEmail } = require("../utils/transport");
 
 const User = require('../models/user');
 const Email = require('../models/email');
@@ -57,8 +57,6 @@ router.get('/manageCafe', middleware.isLoggedIn, middleware.isMod, wrapAsync(adm
 module.exports = router;
 
 // EVERYTHING BELOW THIS LINE IS 100% COMMENTED OUT CODE
-
-
 
 //Function to display user inbox
 /*router.get('/', middleware.isLoggedIn, middleware.isAdmin, (req, res) => {
@@ -492,7 +490,7 @@ module.exports = router;
 // 			return res.redirect('back');
 // 		}
 //
-//     transport(deletedUser, 'Profile Deletion Notice', `<p>Hello ${deletedUser.firstName},</p><p>You are receiving this email because your email has been removed from Saberchat's email whitelist. Your account and all of its data has been deleted. Please contact a faculty member if  you think there has been a mistake.</p>`);
+//      await sendGridEmail(deletedUser.email, 'Profile Deletion Notice', `<p>Hello ${deletedUser.firstName},</p><p>You are receiving this email because your email has been removed from Saberchat's email whitelist. Your account and all of its data has been deleted. Please contact a faculty member if  you think there has been a mistake.</p>`);
 // 	}
 //
 // 	req.flash('success', "Email Removed From Whitelist! Any users with this email have been removed.");

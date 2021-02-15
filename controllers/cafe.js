@@ -9,7 +9,7 @@ const Cafe = require('../models/cafe')
 //LIBRARIES
 const dateFormat = require('dateformat');
 const path = require('path');
-const {transport} = require("../utils/transport");
+const { sendGridEmail } = require("../utils/transport");
 const { sortByPopularity } = require("../utils/popularity-algorithms");
 const convertToLink = require("../utils/convert-to-link");
 const getData = require("../utils/cafe-data");
@@ -193,7 +193,9 @@ module.exports.processOrder = async function(req, res) {
     const formattedCharge = `$${(order.charge * 100).toString().slice(0, (order.charge * 100).toString().length - 2)}.${(order.charge * 100).toString().slice((order.charge * 100).toString().length - 2)}`;
     notif.text = `Your order is ready to pick up:\n ${itemText.join("\n")} \n\nExtra Instructions: ${order.instructions} \nTotal Cost: ${formattedCharge}`;
     await notif.save();
-    transport(order.customer, 'Cafe Order Ready', `<p>Hello ${order.customer.firstName},</p><p>${notif.text}</p>`);
+    if (order.customer.receiving_emails) {
+        await sendGridEmail(order.customer.email, 'Cafe Order Ready', `<p>Hello ${order.customer.firstName},</p><p>${notif.text}</p>`);
+    }
 
     order.customer.inbox.push(notif); //Add notif to user's inbox
     order.customer.msgCount++;
@@ -252,16 +254,16 @@ module.exports.deleteOrder = async function(req, res) {
 
         //Formats the charge in money format
         const formattedCharge = `$${(order.charge * 100).toString().slice(0, (order.charge * 100).toString().length - 2)}.${(order.charge * 100).toString().slice((order.charge * 100).toString().length - 2)}`;
-
         if (req.body.rejectionReason == "") {
             notif.text = `Your order was rejected. This is most likely because we suspect your order is not genuine. Contact us if you think there has been a mistake. No reason was provided for rejection.\n ${itemText.join("\n")} \n\nExtra Instructions: ${order.instructions} \nTotal Cost: ${formattedCharge}`;
-
         } else {
             notif.text = `Your order was rejected. This is most likely because we suspect your order is not genuine. Contact us if you think there has been a mistake. The reason was provided for rejection was the following: \"${req.body.rejectionReason}\"\n ${itemText.join("\n")} \n\nExtra Instructions: ${order.instructions} \nTotal Cost: ${formattedCharge}`;
         }
 
         await notif.save();
-        transport(order.customer, 'Cafe Order Rejected', `<p>Hello ${order.customer.firstName},</p><p>${notif.text}</p>`);
+        if (order.customer.receiving_emails) {
+            await sendGridEmail(order.customer.email, 'Cafe Order Rejected', `<p>Hello ${order.customer.firstName},</p><p>${notif.text}</p>`);
+        }
 
         //Refund if the transaction is via online balance
         if (!order.payingInPerson) {
@@ -808,7 +810,7 @@ module.exports.updateCategory = async function(req, res) {
     const other = await Category.findOne({name: "Other"}); //Find category 'other'
     if (!other) {
         req.flash('error', "Unable to find item category 'Other', please add it'");
-        res.redirect('back'); //There's nowhere for the category-less items to go unless 'Other' exists
+        return res.redirect('back'); //There's nowhere for the category-less items to go unless 'Other' exists
     }
 
     for (let item of category.items) {

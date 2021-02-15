@@ -3,7 +3,7 @@ const express = require('express');
 const router = express.Router();
 const middleware = require('../middleware');
 const dateFormat = require('dateformat');
-const {transport} = require("../utils/transport");
+const { sendGridEmail } = require("../utils/transport");
 const convertToLink = require("../utils/convert-to-link");
 
 //SCHEMA
@@ -188,10 +188,10 @@ router.put('/comment', middleware.isLoggedIn, (req, res) => {
 
             notif.date = dateFormat(notif.created_at, "h:MM TT | mmm d");
             notif.text = `Hello ${user.firstName},\n\n${req.user.firstName} ${req.user.lastName} mentioned you in a comment on "${article.title}":\n${comment.text}`;
-
             await notif.save();
-
-            transport(user, `New Mention in ${article.title}`, `<p>Hello ${user.firstName},</p><p>${req.user.firstName} ${req.user.lastName} mentioned you in a comment on <strong>${article.title}</strong>.<p>${comment.text}</p>`);
+            if (user.receiving_emails) {
+                await sendGridEmail(user.email, `New Mention in ${article.title}`, `<p>Hello ${user.firstName},</p><p>${req.user.firstName} ${req.user.lastName} mentioned you in a comment on <strong>${article.title}</strong>.<p>${comment.text}</p>`);
+            }
 
             user.inbox.push(notif); //Add notif to user's inbox
             user.msgCount += 1;

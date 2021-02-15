@@ -3,7 +3,7 @@ const User = require("../models/user");
 const Email = require("../models/email");
 
 module.exports.index = async function(req, res) {
-    res.render("admin/index");
+    return res.render("admin/index");
 }
 
 module.exports.moderateGet = async function(req, res) {
@@ -14,10 +14,10 @@ module.exports.moderateGet = async function(req, res) {
         .exec((err, comments) => {
             if (err) {
                 req.flash('error', 'Cannot access DataBase');
-                res.redirect('/admin');
+                return res.redirect('/admin');
 
             } else {
-                res.render('admin/mod', {comments});
+                return res.render('admin/mod', {comments});
             }
         });
 }
@@ -67,13 +67,13 @@ module.exports.moderatePost = async function(req, res) {
 module.exports.moderatePut = async function(req, res) {
     Comment.findById(req.body.id).populate('statusBy').exec((err, comment) => {
         if (err || !comment) {
-            res.json({error: 'Could not find comment'});
+            return res.json({error: 'Could not find comment'});
 
         } else if (comment.author.equals(req.user._id)) {
-            res.json({error: "You cannot handle your own comments"});
+            return res.json({error: "You cannot handle your own comments"});
 
         } else if (comment.statusBy._id.equals(req.user._id)) {
-            res.json({error: "You cannot handle comments you have reported"});
+            return res.json({error: "You cannot handle comments you have reported"});
 
         } else {
             comment.status = "ignored";
@@ -81,7 +81,7 @@ module.exports.moderatePut = async function(req, res) {
             comment.statusBy.falseReportCount += 1;
             comment.statusBy.save();
 
-            res.json({success: 'Ignored comment'});
+            return res.json({success: 'Ignored comment'});
         }
     });
 }
@@ -89,20 +89,20 @@ module.exports.moderatePut = async function(req, res) {
 module.exports.moderateDelete = async function(req, res) {
     Comment.findById(req.body.id).populate("author").exec((err, comment) => {
         if (err || !comment) {
-            res.json({error: 'Could not find comment'});
+            return res.json({error: 'Could not find comment'});
 
         } else if (comment.author.equals(req.user._id)) {
-            res.json({error: "You cannot handle your own comments"});
+            return res.json({error: "You cannot handle your own comments"});
 
         } else if (comment.statusBy._id.equals(req.user._id)) {
-            res.json({error: "You cannot handle comments you have reported"});
+            return res.json({error: "You cannot handle comments you have reported"});
 
         } else {
             comment.status = "deleted";
             comment.save();
             comment.author.reportedCount += 1;
             comment.author.save();
-            res.json({success: 'Deleted comment'});
+            return res.json({success: 'Deleted comment'});
         }
     });
 }
@@ -111,10 +111,10 @@ module.exports.permissionsGet = async function(req, res) {
     User.find({authenticated: true}, (err, foundUsers) => {
         if (err || !foundUsers) {
             req.flash('error', 'Cannot access Database');
-            res.redirect('/admin');
+            return res.redirect('/admin');
 
         } else {
-            res.render('admin/permission', {users: foundUsers});
+            return res.render('admin/permission', {users: foundUsers});
         }
     });
 }
@@ -123,9 +123,9 @@ module.exports.statusGet = async function(req, res) {
     User.find({authenticated: true}, (err, foundUsers) => {
         if (err || !foundUsers) {
             req.flash('error', 'Cannot access Database');
-            res.redirect('/admin');
+            return res.redirect('/admin');
         } else {
-            res.render('admin/status', {users: foundUsers, tags: ['Cashier', 'Tutor', 'Editor']});
+            return res.render('admin/status', {users: foundUsers, tags: ['Cashier', 'Tutor', 'Editor']});
         }
     });
 }
@@ -243,27 +243,27 @@ module.exports.whitelistId = async function (req, res) {
 module.exports.permissionsPut = async function (req, res) {
     User.findById(req.body.user, (err, user) => {
         if (err || !user) {
-            res.json({error: "Error. Could not change"});
+            return res.json({error: "Error. Could not change"});
 
         } else if (req.body.role == 'admin' || req.body.role == "principal") { //Changing a user to administrator or principal requires specific permissions
 
             if (req.user.permission == 'principal') { // check if current user is the principal
                 user.permission = req.body.role;
                 user.save();
-                res.json({success: "Succesfully changed", user});
+                return res.json({success: "Succesfully changed", user});
 
             } else {
-                res.json({error: "You do not have permissions to do that", user});
+                return res.json({error: "You do not have permissions to do that", user});
             }
 
         } else {
             if ((user.permission == "principal" || user.permission == "admin") && req.user.permission != "principal") {
-                res.json({error: "You do not have permissions to do that", user});
+                return res.json({error: "You do not have permissions to do that", user});
 
             } else {
                 user.permission = req.body.role;
                 user.save();
-                res.json({success: 'Succesfully changed', user});
+                return res.json({success: 'Succesfully changed', user});
             }
         }
     });
@@ -321,5 +321,5 @@ module.exports.tag = async function(req, res) {
 }
 
 module.exports.manageCafe = async function(req, res) {
-    res.redirect('/cafe/manage');
+    return res.redirect('/cafe/manage');
 }

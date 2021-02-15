@@ -33,7 +33,7 @@ module.exports.index = async function(req, res) {
 
     const activeReqCount = req.user.requests.filter((req)=>req.status === "pending").length;
 
-	res.render('inbox/index', {inbox: req.user.inbox.reverse(), requests: req.user.requests.reverse(), reqCount: activeReqCount});
+	return res.render('inbox/index', {inbox: req.user.inbox.reverse(), requests: req.user.requests.reverse(), reqCount: activeReqCount});
 };
 
 // Inbox GET show message
@@ -64,14 +64,14 @@ module.exports.showMsg = async function(req, res) {
         fileExtensions.set(media.url, path.extname(media.url.split("SaberChat/")[1]));
     }
     const convertedText = convertToLink(message.text);
-    res.render('inbox/show', {message: message, convertedText, fileExtensions});
+    return res.render('inbox/show', {message: message, convertedText, fileExtensions});
 };
 
 // Inbox GET new message form
 module.exports.newMsgForm = async function(req, res) {
     const users = await User.find({authenticated: true});
 	if(!users) { req.flash('error', 'Unable to access Database.'); return res.redirect('back'); }
-	res.render('inbox/new', {users: users});
+	return res.render('inbox/new', {users: users});
 };
 
 // Inbox GET sent messages
@@ -98,7 +98,7 @@ module.exports.sent = async function(req, res) {
         }
     }
 
-    res.render('inbox/index_sent', {inbox: sent_msgs.reverse()});
+    return res.render('inbox/index_sent', {inbox: sent_msgs.reverse()});
 };
 
 // Inbox POST create messsage
@@ -262,7 +262,7 @@ module.exports.createMsg = async function(req, res) {
     }
 
     req.flash('success', 'Message sent');
-    res.redirect(`/inbox/${newMessage._id}`);
+    return res.redirect(`/inbox/${newMessage._id}`);
 };
 
 // Inbox PUT mark all messages as read
@@ -278,7 +278,7 @@ module.exports.markReadAll = async function(req, res) {
     req.user.msgCount -= result.nModified;
     await req.user.save();
     req.flash('success', 'Marked all as read.');
-    res.redirect('back');
+    return res.redirect('back');
 };
 
 // Inbox PUT mark selected messages as read
@@ -298,7 +298,7 @@ module.exports.markReadSelected = async function(req, res) {
     req.user.msgCount -= result.nModified;
     req.user.save();
     req.flash('success', 'Marked as read');
-    res.redirect('back');
+    return res.redirect('back');
 };
 
 // Inbox DELETE clear inbox
@@ -307,7 +307,7 @@ module.exports.clear = function(req, res) {
 	req.user.msgCount = 0;
 	req.user.save();
 	req.flash('success', 'Inbox cleared!');
-	res.redirect('/inbox');
+	return res.redirect('/inbox');
 };
 
 // Inbox PUT reply to message
@@ -387,7 +387,7 @@ module.exports.reply = async function(req, res) {
         }
     }
 
-    res.json({ //Send JSON response to front-end
+    return res.json({ //Send JSON response to front-end
         success: `Replied to ${message._id}`,
         message: message
     });
@@ -413,7 +413,7 @@ module.exports.delete = async function(req, res) {
     });
     await req.user.save();
 
-    res.redirect('back');
+    return res.redirect('back');
 };
 
 // ==========================================
@@ -425,7 +425,7 @@ module.exports.showReq = async function(req, res) {
     .populate({path: 'room', select: ['creator', 'name']}).exec();
     if(!request) {req.flash('error', 'Unable to access Database.'); return res.redirect('back');}
 
-    res.render('inbox/requests/show', {request});
+    return res.render('inbox/requests/show', {request});
 };
 
 module.exports.acceptReq = async function(req, res) {
@@ -461,7 +461,7 @@ module.exports.acceptReq = async function(req, res) {
     }
 
     req.flash('success', 'Request accepted');
-    res.redirect('/inbox');
+    return res.redirect('/inbox');
 };
 
 module.exports.rejectReq = async function(req, res) {
@@ -491,5 +491,5 @@ module.exports.rejectReq = async function(req, res) {
     }
 
     req.flash('success', 'Request rejected');
-    res.redirect('/inbox');
+    return res.redirect('/inbox');
 };

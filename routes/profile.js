@@ -2,7 +2,7 @@ const express = require('express')
 const router = express.Router();
 const Filter = require('bad-words');
 const filter = new Filter();
-const {transport, transport_mandatory} = require("../utils/transport");
+const { sendGridEmail } = require("../utils/transport");
 const {multipleUpload} = require('../middleware/multer');
 const {cloudUpload, cloudDelete} = require('../services/cloudinary');
 const convertToLink = require("../utils/convert-to-link");
@@ -208,9 +208,12 @@ router.put('/profile', middleware.isLoggedIn, multipleUpload, validateUserUpdate
             return res.redirect('back');
         }
 
-        transport(updatedUser, 'Profile Update Confirmation', `<p>Hello ${user.firstName},</p><p>You are receiving this email because you recently made changes to your Saberchat profile.\n\nIf you did not recently make any changes, contact a faculty member immediately.</p>`);
+        if (updatedUser.receiving_emails) {
+            await sendGridEmail(updatedUser.email, 'Profile Update Confirmation', `<p>Hello ${updatedUser.firstName},</p><p>You are receiving this email because you recently made changes to your Saberchat profile.\n\nIf you did not recently make any changes, contact a faculty member immediately.</p>`);
+        }
+
         req.flash('success', 'Updated your profile');
-        res.redirect('/profiles/' + req.user._id);
+        return res.redirect(`/profiles/${req.user._id}`);
 
     })().catch(err => {
         req.flash('error', "An Error Occurred");
@@ -349,8 +352,7 @@ router.get('/confirm-email/:id', (req, res) => {
                 user.authenticationToken = token;
                 user.save();
 
-                transport_mandatory(user, 'Email Update Confirmation', `<p>Hello ${user.firstName},</p><p>You are receiving this email because you recently made changes to your Saberchat email. This is a confirmation of your profile.</p><p>Your username is ${user.username}.</p><p>Your full name is ${user.firstName} ${user.lastName}.</p><p>Your email is ${user.email}.</p>`);
-
+                sendGridEmail(user, 'Email Update Confirmation', `<p>Hello ${user.firstName},</p><p>You are receiving this email because you recently made changes to your Saberchat email. This is a confirmation of your profile.</p><p>Your username is ${user.username}.</p><p>Your full name is ${user.firstName} ${user.lastName}.</p><p>Your email is ${user.email}.</p>`);
                 req.flash('success', "Email updated!")
                 res.redirect('/');
 
@@ -377,9 +379,7 @@ router.put('/change-password', middleware.isLoggedIn, validatePasswordUpdate, (r
                         res.redirect('/');
 
                     } else {
-
-                        transport_mandatory(req.user, 'Password Update Confirmation', `<p>Hello ${req.user.firstName},</p><p>You are receiving this email because you recently made changes to your Saberchat password. This is a confirmation of your profile.\n\nYour username is ${req.user.username}.\nYour full name is ${req.user.firstName} ${req.user.lastName}.\nYour email is ${req.user.email}\n\nIf you did not recently change your password, reset it immediately and contact a faculty member.</p>`);
-
+                        sendGridEmail(req.user.email, 'Password Update Confirmation', `<p>Hello ${req.user.firstName},</p><p>You are receiving this email because you recently made changes to your Saberchat password. This is a confirmation of your profile.\n\nYour username is ${req.user.username}.\nYour full name is ${req.user.firstName} ${req.user.lastName}.\nYour email is ${req.user.email}\n\nIf you did not recently change your password, reset it immediately and contact a faculty member.</p>`);
                         req.flash('success', 'Successfully changed your password');
                         res.redirect('/profiles/' + req.user._id);
                     }
@@ -639,7 +639,7 @@ router.put('/change-password', middleware.isLoggedIn, validatePasswordUpdate, (r
 //       return res.redirect('back');
 //     }
 //
-//     transport_mandatory(deletedUser, 'Profile Deletion Confirmation', `<p>Hello ${deletedUser.firstName},</p><p>You are receiving this email because you recently deleted your Saberchat account. If you did not delete your account, contact a staff member immediately.</p>`);
+//     await sendGridEmail(deletedUser.email, 'Profile Deletion Confirmation', `<p>Hello ${deletedUser.firstName},</p><p>You are receiving this email because you recently deleted your Saberchat account. If you did not delete your account, contact a staff member immediately.</p>`);
 //
 //     req.flash('success', "Account deleted!");
 //     res.redirect('/');

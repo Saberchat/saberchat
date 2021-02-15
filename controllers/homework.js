@@ -1,5 +1,5 @@
 const dateFormat = require('dateformat');
-const {transport} = require("../utils/transport");
+const { sendGridEmail } = require("../utils/transport");
 const { sortByPopularity } = require("../utils/popularity-algorithms");
 const {cloudUpload, cloudDelete} = require('../services/cloudinary');
 
@@ -451,7 +451,9 @@ module.exports.removeStudent = async function(req, res) {
     studentId.inbox.push(notif);
     studentId.msgCount++;
     await studentId.save();
-    transport(studentId, `Removal from ${course.name}`, `<p>Hello ${studentId.firstName},</p><p>${notif.text}</p>`);
+    if (studentId.receiving_emails) {
+        await sendGridEmail(studentId.email, `Removal from ${course.name}`, `<p>Hello ${studentId.firstName},</p><p>${notif.text}</p>`);
+    }
     course.blocked.push(studentId);
 
     for (let i = 0; i < course.students.length; i++) {
@@ -538,7 +540,9 @@ module.exports.removeTutor = async function(req, res) {
             tutorId.inbox.push(notif);
             tutorId.msgCount++;
             await tutorId.save();
-            transport(tutorId, `Removal from ${course.name}`, `<p>Hello ${tutorId.firstName},</p><p>${notif.text}</p>`);
+            if (tutorId.receiving_emails) {
+                await sendGridEmail(tutorId.email, `Removal from ${course.name}`, `<p>Hello ${tutorId.firstName},</p><p>${notif.text}</p>`);
+            }
 
             course.blocked.push(tutorId); //Remove tutor and block them
             course.tutors.splice(i, 1);
@@ -592,7 +596,9 @@ module.exports.unblock = async function(req, res) {
     blockedId.inbox.push(notif);
     blockedId.msgCount++;
     await blockedId.save();
-    transport(blockedId, `Unblocked from ${course.name}`, `<p>Hello ${blockedId.firstName},</p><p>${notif.text}</p>`);
+    if (blockedId.receiving_emails) {
+        await sendGridEmail(blockedId.email, `Removal from ${course.name}`, `<p>Hello ${blockedId.firstName},</p><p>${notif.text}</p>`);
+    }
     return res.json({success: "Succesfully unblocked user", blocked: blockedId, course});
 }
 
