@@ -23,8 +23,6 @@ const cloudUpload = async (file, type) => {
     const options = {folder: 'SaberChat'};
     if (type == "video") {
         options.resource_type = type;
-    } else if (type == "pdf") {
-        options.format = type;
     }
 
     let error;
@@ -43,14 +41,12 @@ const cloudUpload = async (file, type) => {
 const cloudDelete = async (filename, type) => {
     let cResult;
     let error;
-    // delete image
     const options = {};
     if (type == "video") {
         options.resource_type = type;
-    } else if (type == "pdf") {
-        options.format = type;
     }
-    
+
+    // delete media
     await cloudDestroyer(filename, options)
         .catch(err => {
             error = err;

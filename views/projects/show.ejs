@@ -227,7 +227,6 @@
                                 <img class="project-image" src="<%=media.url %>"/>
                             <% } else if (fileExtensions.get(media.url).toLowerCase() == ".mp4") { %>
                                 <video width="600px" height="375px" src="<%=media.url%>" type="video/mp4" controls></video>
-                                <a href="<%=media.url%>" target="_blank"><h5><i class="fas fa-paperclip"></i> Open "<%=media.originalName%>" In New Tab  </h5></a>
                             <% } else if ([".mp3", ".m4a"].includes(fileExtensions.get(media.url).toLowerCase())) {%>
                                 <audio controls>
                                     <source src="<%=media.url%>" type="audio/mpeg"></source>
