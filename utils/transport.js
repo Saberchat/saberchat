@@ -12,7 +12,7 @@ async function sendGridEmail(email, subject, content, mandatory) {
                 {
                     "to": [
                         {
-                            "email": 'alexzhou3999@gmail.com'
+                            "email": email
                         }
                     ],
                     "subject": subject
