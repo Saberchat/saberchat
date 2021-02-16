@@ -9,7 +9,7 @@ const Cafe = require('../models/cafe')
 //LIBRARIES
 const dateFormat = require('dateformat');
 const path = require('path');
-const sendGridEmail = require("../utils/transport");
+const sendGridEmail = require("../services/sendGrid");
 const { sortByPopularity } = require("../utils/popularity-algorithms");
 const convertToLink = require("../utils/convert-to-link");
 const getData = require("../utils/cafe-data");

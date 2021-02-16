@@ -2,7 +2,7 @@
 const Filter = require('bad-words');
 const filter = new Filter();
 const passport = require('passport');
-const sendGridEmail = require("../utils/transport");
+const sendGridEmail = require("../services/sendGrid");
 
 //SCHEMA
 const User = require('../models/user');

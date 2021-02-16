@@ -1,5 +1,5 @@
 const dateFormat = require('dateformat');
-const sendGridEmail = require("../utils/transport");
+const sendGridEmail = require("../services/sendGrid");
 const { sortByPopularity } = require("../utils/popularity-algorithms");
 const {cloudUpload, cloudDelete} = require('../services/cloudinary');
 

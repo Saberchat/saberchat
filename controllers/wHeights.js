@@ -1,6 +1,6 @@
 //LIBRARIES
 const dateFormat = require('dateformat');
-const sendGridEmail = require("../utils/transport");
+const sendGridEmail = require("../services/sendGrid");
 const convertToLink = require("../utils/convert-to-link");
 
 //SCHEMA
