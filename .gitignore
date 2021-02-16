@@ -2,7 +2,7 @@
 .env
 # for mac
 .DS_Store
-# don't know what this is for
+# don't know what this is for, seems like webstorm
 .idea/
 # for npm
 node_modules/
