@@ -41,8 +41,8 @@
                                 id="view-msg"
                                 onclick="setMessages()"
                                 disabled
-                        >Messages <% if (currentUser.inbox.length > 0) { %>
-                            <span class="badge badge-pill badge-danger"><%=currentUser.inbox.length%></span>
+                        >Messages <% if (currentUser.msgCount > 0) { %>
+                            <span class="badge badge-pill badge-danger"><%=currentUser.msgCount%></span>
                             <%} %></button>
 
                         <button

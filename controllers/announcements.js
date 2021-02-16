@@ -1,4 +1,4 @@
-const { sendGridEmail } = require("../utils/transport");
+const sendGridEmail = require("../utils/transport");
 const convertToLink = require("../utils/convert-to-link");
 
 const path = require('path');
@@ -181,7 +181,7 @@ module.exports.create = async function(req, res) {
         }
         const emailText = `<p>Hello ${user.firstName},</p><p>${req.user.username} has recently posted a new announcement - '${Ann.subject}'.</p><p>${Ann.text}</p><p>You can access the full announcement at https://alsion-saberchat.herokuapp.com</p> ${imageString}`;
 
-        await sendGridEmail(user.email, `New Saberchat Announcement - ${Ann.subject}`, emailText);
+        await sendGridEmail(user.email, `New Saberchat Announcement - ${Ann.subject}`, emailText, false);
         user.annCount.push(announcementObject);
         await user.save();
     }
@@ -290,7 +290,7 @@ module.exports.updateAnn = async function(req, res) {
     let overlap;
     for (let user of users) {
         if (user.receiving_emails) {
-            await sendGridEmail(user.email, `Updated Saberchat Announcement - ${announcement.subject}`, `<p>Hello ${user.firstName},</p><p>${req.user.username} has recently updated an announcement - '${announcement.subject}'.</p><p>${announcement.text}</p><p>You can access the full announcement at https://alsion-saberchat.herokuapp.com</p> ${imageString}`);
+            await sendGridEmail(user.email, `Updated Saberchat Announcement - ${announcement.subject}`, `<p>Hello ${user.firstName},</p><p>${req.user.username} has recently updated an announcement - '${announcement.subject}'.</p><p>${announcement.text}</p><p>You can access the full announcement at https://alsion-saberchat.herokuapp.com</p> ${imageString}`, false);
         }
 
         overlap = false;
@@ -399,7 +399,7 @@ module.exports.comment = async function(req, res) {
         await notif.save();
 
         if (user.receiving_emails) {
-            await sendGridEmail(user.email, `New Mention in ${announcement.subject}`, `<p>Hello ${user.firstName},</p><p>${req.user.firstName} ${req.user.lastName} mentioned you in a comment on <strong>${announcement.subject}</strong>.<p>${comment.text}</p>`);
+            await sendGridEmail(user.email, `New Mention in ${announcement.subject}`, `<p>Hello ${user.firstName},</p><p>${req.user.firstName} ${req.user.lastName} mentioned you in a comment on <strong>${announcement.subject}</strong>.<p>${comment.text}</p>`, false);
         }
 
         user.inbox.push(notif); //Add notif to user's inbox

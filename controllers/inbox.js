@@ -2,7 +2,7 @@ const dateFormat = require('dateformat');
 const Filter = require('bad-words');
 const filter = new Filter();
 const path = require('path');
-const { sendGridEmail } = require("../utils/transport");
+const sendGridEmail = require("../utils/transport");
 const convertToLink = require("../utils/convert-to-link");
 const { cloudUpload } = require('../services/cloudinary');
 
@@ -117,24 +117,26 @@ module.exports.createMsg = async function(req, res) {
     if (req.files) {
         let cloudErr;
         let cloudResult;
-        for (let file of req.files.imageFile) {
-            if ([".mp3", ".mp4", ".m4a"].includes(path.extname(file.originalname).toLowerCase())) {
-                [cloudErr, cloudResult] = await cloudUpload(file, "video");
-            } else if (path.extname(file.originalname).toLowerCase() == ".pdf") {
-                [cloudErr, cloudResult] = await cloudUpload(file, "pdf");
-            } else {
-                [cloudErr, cloudResult] = await cloudUpload(file, "image");
-            }
-            if (cloudErr || !cloudResult) {
-                req.flash('error', 'Upload failed');
-                return res.redirect('back');
-            }
+        if (req.files.imageFile) {
+            for (let file of req.files.imageFile) {
+                if ([".mp3", ".mp4", ".m4a"].includes(path.extname(file.originalname).toLowerCase())) {
+                    [cloudErr, cloudResult] = await cloudUpload(file, "video");
+                } else if (path.extname(file.originalname).toLowerCase() == ".pdf") {
+                    [cloudErr, cloudResult] = await cloudUpload(file, "pdf");
+                } else {
+                    [cloudErr, cloudResult] = await cloudUpload(file, "image");
+                }
+                if (cloudErr || !cloudResult) {
+                    req.flash('error', 'Upload failed');
+                    return res.redirect('back');
+                }
 
-            message.imageFiles.push({
-                filename: cloudResult.public_id,
-                url: cloudResult.secure_url,
-                originalName: file.originalname
-            });
+                message.imageFiles.push({
+                    filename: cloudResult.public_id,
+                    url: cloudResult.secure_url,
+                    originalName: file.originalname
+                });
+            }
         }
     }
 
@@ -257,7 +259,7 @@ module.exports.createMsg = async function(req, res) {
         }
 
         if(r.receiving_emails) {
-            await sendGridEmail(r.email, `New Inbox Notification - ${newMessage.subject}`, emailText);
+            await sendGridEmail(r.email, `New Inbox Notification - ${newMessage.subject}`, emailText, false);
         }
     }
 
@@ -383,7 +385,7 @@ module.exports.reply = async function(req, res) {
         if (!(recipient._id.equals(req.user._id)) && recipient.receiving_emails) {
             const emailText = `<p>Hello ${recipient.firstName},</p><p><strong>${req.user.username}</strong> replied to <strong>${message.subject}</strong>.<p>${reply.text}</p><p>You can access the full message at https://alsion-saberchat.herokuapp.com</p> ${imageString}`;
 
-            await sendGridEmail(recipient.email, `New Reply On ${message.subject}`, emailText);
+            await sendGridEmail(recipient.email, `New Reply On ${message.subject}`, emailText, false);
         }
     }
 
@@ -456,8 +458,7 @@ module.exports.acceptReq = async function(req, res) {
 
     if(Req.requester.receiving_emails) {
         const emailText = `<p>Hello ${Req.requester.firstName},</p><p>Your request to join chat room <strong>${foundRoom.name}</strong> has been accepted!<p><p>You can access the room at https://alsion-saberchat.herokuapp.com</p>`;
-
-        await sendGridEmail(Req.requester.email, `Room Request Accepted - ${foundRoom.name}`, emailText);
+        await sendGridEmail(Req.requester.email, `Room Request Accepted - ${foundRoom.name}`, emailText, false);
     }
 
     req.flash('success', 'Request accepted');
@@ -487,7 +488,7 @@ module.exports.rejectReq = async function(req, res) {
     if(Req.requester.receiving_emails) {
         const emailText = `<p>Hello ${Req.requester.firstName},</p><p>Your request to join chat room <strong>${Req.room.name}</strong> has been rejected. Contact the room creator, <strong>${Req.room.creator.username}</strong>, if you think that there has been a mistake.</p>`;
 
-        await sendGridEmail(Req.requester.email, `Room Request Rejected - ${Req.room.name}`, emailText);
+        await sendGridEmail(Req.requester.email, `Room Request Rejected - ${Req.room.name}`, emailText, false);
     }
 
     req.flash('success', 'Request rejected');

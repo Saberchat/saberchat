@@ -6,7 +6,7 @@ const middleware = require('../middleware');
 const router = express.Router(); //start express router
 const dateFormat = require('dateformat');
 const path = require('path');
-const { sendGridEmail } = require("../utils/transport");
+const sendGridEmail = require("../utils/transport");
 const convertToLink = require("../utils/convert-to-link");
 const filter = require('../utils/filter');
 const {sortByPopularity} = require("../utils/popularity-algorithms");
@@ -163,7 +163,7 @@ router.post('/', middleware.isLoggedIn, middleware.isFaculty, multipleUpload, va
             notif.text = `Hello ${follower.firstName},\n\n${req.user.firstName} ${req.user.lastName} recently posted a new project: "${project.title}". Check it out!`;
             await notif.save();
             if (follower.receiving_emails) {
-                await sendGridEmail(follower.email, `New Project Post - ${project.title}`, `<p>Hello ${follower.firstName},</p><p>${req.user.firstName} ${req.user.lastName} recently posted a new project: <strong>${project.title}</strong>. Check it out!</p>${imageString}`);
+                await sendGridEmail(follower.email, `New Project Post - ${project.title}`, `<p>Hello ${follower.firstName},</p><p>${req.user.firstName} ${req.user.lastName} recently posted a new project: <strong>${project.title}</strong>. Check it out!</p>${imageString}`, false);
             }
 
             follower.inbox.push(notif); //Add notif to user's inbox
@@ -415,7 +415,7 @@ router.put('/comment', middleware.isLoggedIn, (req, res) => {
 
             await notif.save();
             if (user.receiving_emails) {
-                await sendGridEmail(user.email, `New Mention in ${project.title}`, `<p>Hello ${user.firstName},</p><p>${req.user.firstName} ${req.user.lastName} mentioned you in a comment on <strong>${project.title}</strong>.<p>${comment.text}</p>`);
+                await sendGridEmail(user.email, `New Mention in ${project.title}`, `<p>Hello ${user.firstName},</p><p>${req.user.firstName} ${req.user.lastName} mentioned you in a comment on <strong>${project.title}</strong>.<p>${comment.text}</p>`, false);
             }
 
             user.inbox.push(notif); //Add notif to user's inbox
@@ -584,7 +584,7 @@ router.put('/:id', middleware.isLoggedIn, middleware.isFaculty, multipleUpload, 
             notif.text = `Hello ${follower.firstName},\n\n${req.user.firstName} ${req.user.lastName} recently updated one of their projects: "${updatedProject.title}". Check it out!`;
             await notif.save();
             if (follower.receiving_emails) {
-                await sendGridEmail(follower.email, `Updated Project Post - ${updatedProject.title}`, `<p>Hello ${follower.firstName},</p><p>${req.user.firstName} ${req.user.lastName} recently updated one of their projects: <strong>${updatedProject.title}</strong>. Check it out!</p>${imageString}`);
+                await sendGridEmail(follower.email, `Updated Project Post - ${updatedProject.title}`, `<p>Hello ${follower.firstName},</p><p>${req.user.firstName} ${req.user.lastName} recently updated one of their projects: <strong>${updatedProject.title}</strong>. Check it out!</p>${imageString}`, false);
             }
 
             follower.inbox.push(notif); //Add notif to user's inbox

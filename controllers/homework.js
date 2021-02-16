@@ -1,5 +1,5 @@
 const dateFormat = require('dateformat');
-const { sendGridEmail } = require("../utils/transport");
+const sendGridEmail = require("../utils/transport");
 const { sortByPopularity } = require("../utils/popularity-algorithms");
 const {cloudUpload, cloudDelete} = require('../services/cloudinary');
 
@@ -155,11 +155,11 @@ module.exports.showCourse = async function(req, res) {
         tutors.push(tutorObject)
     }
 
-    tutors = await sortByPopularity(tutors, "averageRating", "dateJoined").unpopular
-    .concat(sortByPopularity(tutors, "averageRating", "dateJoined").popular);
+    tutors = await sortByPopularity(tutors, "averageRating", "dateJoined", null).unpopular
+    .concat(sortByPopularity(tutors, "averageRating", "dateJoined", null).popular);
 
-    tutors = await sortByPopularity(tutors, "reviews", "dateJoined").unpopular
-    .concat(sortByPopularity(tutors, "reviews", "dateJoined").popular);
+    tutors = await sortByPopularity(tutors, "reviews", "dateJoined", null).unpopular
+    .concat(sortByPopularity(tutors, "reviews", "dateJoined", null).popular);
 
     const teachers = await User.find({authenticated: true, status: "faculty", _id: {$ne: req.user._id}});
     if (!teachers) {
@@ -452,7 +452,7 @@ module.exports.removeStudent = async function(req, res) {
     studentId.msgCount++;
     await studentId.save();
     if (studentId.receiving_emails) {
-        await sendGridEmail(studentId.email, `Removal from ${course.name}`, `<p>Hello ${studentId.firstName},</p><p>${notif.text}</p>`);
+        await sendGridEmail(studentId.email, `Removal from ${course.name}`, `<p>Hello ${studentId.firstName},</p><p>${notif.text}</p>`, false);
     }
     course.blocked.push(studentId);
 
@@ -541,7 +541,7 @@ module.exports.removeTutor = async function(req, res) {
             tutorId.msgCount++;
             await tutorId.save();
             if (tutorId.receiving_emails) {
-                await sendGridEmail(tutorId.email, `Removal from ${course.name}`, `<p>Hello ${tutorId.firstName},</p><p>${notif.text}</p>`);
+                await sendGridEmail(tutorId.email, `Removal from ${course.name}`, `<p>Hello ${tutorId.firstName},</p><p>${notif.text}</p>`, false);
             }
 
             course.blocked.push(tutorId); //Remove tutor and block them
@@ -597,7 +597,7 @@ module.exports.unblock = async function(req, res) {
     blockedId.msgCount++;
     await blockedId.save();
     if (blockedId.receiving_emails) {
-        await sendGridEmail(blockedId.email, `Removal from ${course.name}`, `<p>Hello ${blockedId.firstName},</p><p>${notif.text}</p>`);
+        await sendGridEmail(blockedId.email, `Removal from ${course.name}`, `<p>Hello ${blockedId.firstName},</p><p>${notif.text}</p>`, false);
     }
     return res.json({success: "Succesfully unblocked user", blocked: blockedId, course});
 }

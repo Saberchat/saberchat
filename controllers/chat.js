@@ -10,7 +10,7 @@ const Filter = require('bad-words');
 const filter = new Filter();
 const dateFormat = require('dateformat');
 const router = express.Router();
-const { sendGridEmail } = require("../utils/transport");
+const sendGridEmail = require("../utils/transport");
 const convertToLink = require("../utils/convert-to-link");
 const {validateRoom} = require('../middleware/validation');
 const middleware = require('../middleware');
@@ -261,7 +261,7 @@ module.exports.requestJoin = async function(req, res) {
         await roomCreator.save();
 
         if (roomCreator.receiving_emails) {
-            await sendGridEmail(roomCreator.email, 'New Room Access Request', `<p>Hello ${roomCreator.firstName},</p><p><strong>${req.user.username}</strong> is requesting to join your room, <strong>${foundRoom.name}.</strong></p><p>You can access the full request at https://alsion-saberchat.herokuapp.com</p>`);
+            await sendGridEmail(roomCreator.email, 'New Room Access Request', `<p>Hello ${roomCreator.firstName},</p><p><strong>${req.user.username}</strong> is requesting to join your room, <strong>${foundRoom.name}.</strong></p><p>You can access the full request at https://alsion-saberchat.herokuapp.com</p>`, false);
         }
         return res.json({success: 'Request for access sent'});
     }

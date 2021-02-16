@@ -9,46 +9,57 @@ const {multipleUpload} = require('../middleware/multer');
 const Inbox = require('../controllers/inbox');
 
 // Display user Inbox
-router.get('/', middleware.isLoggedIn, wrapAsync(Inbox.index));
+router.route('/')
+    .get(middleware.isLoggedIn, wrapAsync(Inbox.index));
 
 // New messsage form
-router.get('/messages/new', middleware.isLoggedIn, wrapAsync(Inbox.newMsgForm));
+router.route('/messages/new')
+    .get(middleware.isLoggedIn, wrapAsync(Inbox.newMsgForm));
 
 // Display sent messages
-router.get('/sent', middleware.isLoggedIn, wrapAsync(Inbox.sent));
+router.route('/sent')
+    .get(middleware.isLoggedIn, wrapAsync(Inbox.sent));
 
 // Create messsage
-router.post('/messages', middleware.isLoggedIn, multipleUpload, validateMsg, wrapAsync(Inbox.createMsg));
+router.route('/messages')
+    .post(middleware.isLoggedIn, multipleUpload, validateMsg, wrapAsync(Inbox.createMsg));
 
 //User can reply to notifications sent to them
-router.put('/reply', middleware.isLoggedIn, wrapAsync(Inbox.reply));
+router.route('/reply')
+    .put(middleware.isLoggedIn, wrapAsync(Inbox.reply));
 
 // Mark all messages as read
-router.put('/mark-all', middleware.isLoggedIn, wrapAsync(Inbox.markReadAll));
+router.route('/mark-all')
+    .put(middleware.isLoggedIn, wrapAsync(Inbox.markReadAll));
 
 // Mark selected messages as read
-router.put('/mark-selected', middleware.isLoggedIn, wrapAsync(Inbox.markReadSelected));
+router.route('/mark-selected')
+    .put(middleware.isLoggedIn, wrapAsync(Inbox.markReadSelected));
 
 // Clear entire Inbox
-router.delete('/clear', middleware.isLoggedIn, Inbox.clear);
+router.route('/clear')
+    .delete(middleware.isLoggedIn, Inbox.clear);
 
 // Delete messages
-router.delete('/delete', middleware.isLoggedIn, wrapAsync(Inbox.delete));
+router.route('/delete')
+    .delete(middleware.isLoggedIn, wrapAsync(Inbox.delete));
 
 // Message show route
-router.get('/:id', middleware.isLoggedIn, wrapAsync(Inbox.showMsg));
+router.route('/:id')
+    .get(middleware.isLoggedIn, wrapAsync(Inbox.showMsg));
 
-// ========================================
-// access request routes
-// ========================================
+// ACCESS REQUESTS
 
 // displays single access request
-router.get('/requests/:id', middleware.isLoggedIn, wrapAsync(Inbox.showReq));
+router.route('/requests/:id')
+    .get(middleware.isLoggedIn, wrapAsync(Inbox.showReq));
 
 // route to accept request
-router.post('/requests/:id/accept', middleware.isLoggedIn, wrapAsync(Inbox.acceptReq));
+router.route('/requests/:id/accept')
+    .post(middleware.isLoggedIn, wrapAsync(Inbox.acceptReq));
 
 // route to reject request
-router.post('/requests/:id/reject', middleware.isLoggedIn, wrapAsync(Inbox.rejectReq));
+router.route('/requests/:id/reject')
+    .post(middleware.isLoggedIn, wrapAsync(Inbox.rejectReq));
 
 module.exports = router;

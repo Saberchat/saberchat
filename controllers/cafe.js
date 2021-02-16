@@ -9,7 +9,7 @@ const Cafe = require('../models/cafe')
 //LIBRARIES
 const dateFormat = require('dateformat');
 const path = require('path');
-const { sendGridEmail } = require("../utils/transport");
+const sendGridEmail = require("../utils/transport");
 const { sortByPopularity } = require("../utils/popularity-algorithms");
 const convertToLink = require("../utils/convert-to-link");
 const getData = require("../utils/cafe-data");
@@ -36,7 +36,7 @@ module.exports.index = async function(req, res) {
     for (let category of categories) {
         if (category.items.length > 0) {
             sortedCategory = category;
-            sortedCategory.items = sortByPopularity(category.items, "upvotes", "created_at").popular.concat(sortByPopularity(category.items, "upvotes", "created_at").unpopular);
+            sortedCategory.items = sortByPopularity(category.items, "upvotes", "created_at", null).popular.concat(sortByPopularity(category.items, "upvotes", "created_at", null).unpopular);
             for (let i = sortedCategory.items.length-1; i > 0; i--) {
                 if (!sortedCategory.items[i].isAvailable) {
                     sortedCategory.items.splice(i, 1);
@@ -194,7 +194,7 @@ module.exports.processOrder = async function(req, res) {
     notif.text = `Your order is ready to pick up:\n ${itemText.join("\n")} \n\nExtra Instructions: ${order.instructions} \nTotal Cost: ${formattedCharge}`;
     await notif.save();
     if (order.customer.receiving_emails) {
-        await sendGridEmail(order.customer.email, 'Cafe Order Ready', `<p>Hello ${order.customer.firstName},</p><p>${notif.text}</p>`);
+        await sendGridEmail(order.customer.email, 'Cafe Order Ready', `<p>Hello ${order.customer.firstName},</p><p>${notif.text}</p>`, false);
     }
 
     order.customer.inbox.push(notif); //Add notif to user's inbox
@@ -262,7 +262,7 @@ module.exports.deleteOrder = async function(req, res) {
 
         await notif.save();
         if (order.customer.receiving_emails) {
-            await sendGridEmail(order.customer.email, 'Cafe Order Rejected', `<p>Hello ${order.customer.firstName},</p><p>${notif.text}</p>`);
+            await sendGridEmail(order.customer.email, 'Cafe Order Rejected', `<p>Hello ${order.customer.firstName},</p><p>${notif.text}</p>`, false);
         }
 
         //Refund if the transaction is via online balance
@@ -650,7 +650,7 @@ module.exports.manage = async function(req, res) {
     let sortedCategory;
     for (let category of categories) {
         sortedCategory = category;
-        sortedCategory.items = sortByPopularity(category.items, "upvotes", "created_at").popular.concat(sortByPopularity(category.items, "upvotes", "created_at").unpopular);
+        sortedCategory.items = sortByPopularity(category.items, "upvotes", "created_at", null).popular.concat(sortByPopularity(category.items, "upvotes", "created_at", null).unpopular);
         sortedCategories.push(sortedCategory);
     }
 

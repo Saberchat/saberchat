@@ -1,7 +1,7 @@
 const express = require('express');
 //start express router
 const router = express.Router();
-const { sendGridEmail } = require("../utils/transport");
+const sendGridEmail = require("../utils/transport");
 
 const User = require('../models/user');
 const Email = require('../models/email');
@@ -490,7 +490,7 @@ module.exports = router;
 // 			return res.redirect('back');
 // 		}
 //
-//      await sendGridEmail(deletedUser.email, 'Profile Deletion Notice', `<p>Hello ${deletedUser.firstName},</p><p>You are receiving this email because your email has been removed from Saberchat's email whitelist. Your account and all of its data has been deleted. Please contact a faculty member if  you think there has been a mistake.</p>`);
+//      await sendGridEmail(deletedUser.email, 'Profile Deletion Notice', `<p>Hello ${deletedUser.firstName},</p><p>You are receiving this email because your email has been removed from Saberchat's email whitelist. Your account and all of its data has been deleted. Please contact a faculty member if  you think there has been a mistake.</p>`, false);
 // 	}
 //
 // 	req.flash('success', "Email Removed From Whitelist! Any users with this email have been removed.");
