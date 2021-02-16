@@ -44,8 +44,8 @@ const addEmail = function(event, version) {
 
 const removeEmail = function (button) {
     const emailId = button.id.split('-')[1];
-    const url = `/admin/whitelist/${emailId}?_method=delete`;
-    const data = {};
+    const url = `/admin/whitelist?_method=delete`;
+    const data = {email: emailId};
 
     $.post(url, data, data => {
         $(`#modal-${emailId}`).modal('hide');

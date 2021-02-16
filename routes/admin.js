@@ -1,62 +1,60 @@
 const express = require('express');
-//start express router
-const router = express.Router();
-const sendGridEmail = require("../utils/transport");
-
-const User = require('../models/user');
-const Email = require('../models/email');
-
-const Comment = require('../models/comment');
-const Room = require('../models/room');
-const Request = require('../models/accessRequest');
-
-const Message = require('../models/message');
-const Announcement = require('../models/announcement');
-const Project = require('../models/project');
-const Course = require('../models/course');
-
-const Order = require('../models/order');
-const Article = require('../models/article');
-
-const Permission = require('../models/permission');
-const Status = require('../models/status');
-
+const router = express.Router(); //Start express router
 const middleware = require('../middleware');
-
 const admin = require("../controllers/admin");
 const wrapAsync = require('../utils/wrapAsync');
 
-router.get("/", middleware.isLoggedIn, middleware.isAdmin, wrapAsync(admin.index));
+router.route("/")
+    .get(middleware.isLoggedIn, middleware.isAdmin, wrapAsync(admin.index));
 
-router.get("/moderate", middleware.isLoggedIn, middleware.isMod, wrapAsync(admin.moderateGet));
+router.route("/moderate")
+    .get(middleware.isLoggedIn, middleware.isMod, wrapAsync(admin.moderateGet))
+    .post(middleware.isLoggedIn, middleware.isMod, wrapAsync(admin.moderatePost))
+    .put(middleware.isLoggedIn, middleware.isMod, wrapAsync(admin.moderatePut))
+    .delete(middleware.isLoggedIn, middleware.isMod, wrapAsync(admin.moderateDelete));
 
-router.post('/moderate', middleware.isLoggedIn, middleware.isMod, wrapAsync(admin.moderatePost));
+router.route("/permissions")
+    .get(middleware.isLoggedIn, middleware.isAdmin, wrapAsync(admin.permissionsGet))
+    .put(middleware.isLoggedIn, middleware.isAdmin, wrapAsync(admin.permissionsPut));
 
-router.put('/moderate', middleware.isLoggedIn, middleware.isMod, wrapAsync(admin.moderatePut));
+router.route("/status")
+    .get(middleware.isLoggedIn, middleware.isMod, wrapAsync(admin.statusGet))
+    .put(middleware.isLoggedIn, middleware.isMod, wrapAsync(admin.statusPut));
 
-router.delete('/moderate', middleware.isLoggedIn, middleware.isMod, wrapAsync(admin.moderateDelete));
+router.route("/whitelist")
+    .get(middleware.isLoggedIn, middleware.isMod, wrapAsync(admin.whitelistGet))
+    .put(middleware.isLoggedIn, middleware.isMod, wrapAsync(admin.whitelistPut))
+    .delete(middleware.isLoggedIn, middleware.isMod, wrapAsync(admin.whitelistId));
 
-router.get("/permissions", middleware.isLoggedIn, middleware.isAdmin, wrapAsync(admin.permissionsGet));
+router.route('/tag')
+    .put(middleware.isLoggedIn, middleware.isMod, wrapAsync(admin.tag));
 
-router.put("/permissions", middleware.isLoggedIn, middleware.isAdmin, wrapAsync(admin.permissionsPut));
-
-router.get("/status", middleware.isLoggedIn, middleware.isMod, wrapAsync(admin.statusGet));
-
-router.put('/status', middleware.isLoggedIn, middleware.isMod, wrapAsync(admin.statusPut));
-
-router.get("/whitelist", middleware.isLoggedIn, middleware.isMod, wrapAsync(admin.whitelistGet));
-
-router.put("/whitelist", middleware.isLoggedIn, middleware.isMod, wrapAsync(admin.whitelistPut));
-
-router.delete("/whitelist/:id", middleware.isLoggedIn, middleware.isMod, wrapAsync(admin.whitelistId));
-
-router.put('/tag', middleware.isLoggedIn, middleware.isMod, wrapAsync(admin.tag));
-
-router.get('/manageCafe', middleware.isLoggedIn, middleware.isMod, wrapAsync(admin.manageCafe));
+router.route('/manageCafe')
+    .get(middleware.isLoggedIn, middleware.isMod, wrapAsync(admin.manageCafe));
 
 module.exports = router;
 
 // EVERYTHING BELOW THIS LINE IS 100% COMMENTED OUT CODE
+
+// const sendGridEmail = require("../utils/transport");
+//
+// const User = require('../models/user');
+// const Email = require('../models/email');
+//
+// const Comment = require('../models/comment');
+// const Room = require('../models/room');
+// const Request = require('../models/accessRequest');
+//
+// const Message = require('../models/message');
+// const Announcement = require('../models/announcement');
+// const Project = require('../models/project');
+// const Course = require('../models/course');
+//
+// const Order = require('../models/order');
+// const Article = require('../models/article');
+//
+// const Permission = require('../models/permission');
+// const Status = require('../models/status');
 
 //Function to display user inbox
 /*router.get('/', middleware.isLoggedIn, middleware.isAdmin, (req, res) => {

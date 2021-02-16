@@ -218,7 +218,7 @@ module.exports.whitelistPut = async function (req, res) {
 }
 
 module.exports.whitelistId = async function (req, res) {
-    const email = await Email.findById(req.params.id);
+    const email = await Email.findById(req.body.email);
     if (!email) {
         return res.json({error: "Unable to find email"});
     }
