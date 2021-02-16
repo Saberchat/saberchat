@@ -27,7 +27,7 @@ module.exports.new = function(req, res) {
 // Ann GET markall ann as read
 module.exports.markAll = function(req, res) {
     req.user.annCount = []; //No new announcements in user's annCount
-    await req.user.save();
+    req.user.save();
     req.flash('success', 'All Announcements Marked As Read!');
     return res.redirect(`/announcements`);
 };
@@ -44,7 +44,7 @@ module.exports.markOne = function(req, res) {
     //If the announcement exists, remove it from announcement count
     if (index > -1) {
         req.user.annCount.splice(index, 1);
-        await req.user.save()
+        req.user.save()
     }
 
     req.flash('success', 'Announcement Marked As Read!');
