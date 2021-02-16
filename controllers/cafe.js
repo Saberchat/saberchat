@@ -621,7 +621,7 @@ module.exports.deleteItem = async function(req, res) {
 
 //MANAGE CAFE/VIEW ORDERS
 module.exports.manage = async function(req, res) {
-    if (req.query.orders) { //If page calls to display orders
+    if (req.query.orders) { //If route calls to display orders
         const orders = await Order.find({present: true}).populate('items.item');
         if (!orders) {
             req.flash('error', 'Could not find orders');

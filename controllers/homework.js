@@ -79,7 +79,6 @@ module.exports.createCourse = async function(req, res) {
             await course.save();
         }
     }
-
     req.flash('success', "Successfully created course");
     return res.redirect('/homework');
 }

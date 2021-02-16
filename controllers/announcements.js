@@ -20,12 +20,12 @@ module.exports.index = async function(req, res) {
 };
 
 // Ann GET new ann
-module.exports.new = async function(req, res) {
+module.exports.new = function(req, res) {
     return res.render('announcements/new');
 };
 
 // Ann GET markall ann as read
-module.exports.markAll = async function(req, res) {
+module.exports.markAll = function(req, res) {
     req.user.annCount = []; //No new announcements in user's annCount
     await req.user.save();
     req.flash('success', 'All Announcements Marked As Read!');
@@ -33,7 +33,7 @@ module.exports.markAll = async function(req, res) {
 };
 
 // Ann GET mark one ann as read
-module.exports.markOne = async function(req, res) {
+module.exports.markOne = function(req, res) {
     //Iterate through user's announcement count and find the announcement that is being marked as read
     let index = -1;
     for (let i = 0; i < req.user.annCount.length; i++) {
@@ -89,7 +89,6 @@ module.exports.show = async function(req, res) {
 module.exports.updateForm = async function(req, res) {
     const Ann = await Announcement.findById(req.params.id);
     if(!Ann) {req.flash('error', 'Could not find announcement'); return res.redirect('back');}
-
     if(!Ann.sender._id.equals(req.user._id)) {
         req.flash('error', 'You do not have permission to do that.');
         return res.redirect('back');
@@ -110,7 +109,6 @@ module.exports.create = async function(req, res) {
         subject: req.body.subject,
         text: req.body.message
     });
-
     if (!Ann) {
         req.flash('error', 'Unable to create announcement');
         return res.redirect('back');
@@ -158,16 +156,14 @@ module.exports.create = async function(req, res) {
             $ne: req.user._id
         }
     });
-
-    let imageString = "";
-
-    for (const image of Ann.images) {
-        imageString += `<img src="${image}">`;
-    }
-
     if (!Users) {
         req.flash('error', "An Error Occurred");
         return res.rediect('back');
+    }
+
+    let imageString = "";
+    for (const image of Ann.images) {
+        imageString += `<img src="${image}">`;
     }
 
     let announcementObject = {

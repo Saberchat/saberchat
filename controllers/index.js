@@ -10,7 +10,7 @@ const Course = require('../models/course');
 const Email = require('../models/email');
 const Announcement = require('../models/announcement');
 
-module.exports.index = async function(req, res) {
+module.exports.index = function(req, res) {
     return res.render('index');
 }
 
@@ -218,7 +218,7 @@ module.exports.forgotPassword = async function(req, res) {
     return res.redirect('/');
 }
 
-module.exports.resetPasswordForm = async function(req, res) {
+module.exports.resetPasswordForm = function(req, res) {
     return res.render('profile/reset-password', {user: req.query.user});
 }
 
@@ -248,12 +248,10 @@ module.exports.resetPassword = async function(req, res) {
     return res.redirect('back');
 }
 
-module.exports.logout = async function(req, res) {
-    //logout with passport
-    await req.logout();
-    //flash message success and redirect
-    req.flash("success", "Logged you out!");
-    await res.redirect("/");
+module.exports.logout = function(req, res) {
+    req.logout(); //logout with passport
+    req.flash("success", "Logged you out!"); //flash message success and redirect
+    return res.redirect("/");
 }
 
 module.exports.contact = async function(req, res) {
@@ -277,18 +275,16 @@ module.exports.alsion = async function(req, res) {
     for (let fac of faculty) {
         teacherNames.push(`${fac.firstName} ${fac.lastName}`);
     }
-
     return res.render('other/alsion_info', {faculty: teacherNames.join(', ')});
 }
 
-module.exports.darkmode = async function(req, res) {
+module.exports.darkmode = function(req, res) {
     if (req.user.darkmode) {
         req.user.darkmode = false;
-
     } else {
         req.user.darkmode = true;
     }
 
-    await req.user.save();
+    req.user.save();
     return res.redirect('back');
 }

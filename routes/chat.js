@@ -11,28 +11,22 @@ router.route('/')
     .get(middleware.isLoggedIn, wrapAsync(controller.index))
     .post(middleware.isLoggedIn, validateRoom, wrapAsync(controller.createRoom));
 
-router.route('/new')
-    .get(middleware.isLoggedIn, wrapAsync(controller.newRoom));
-
 router.route('/:id')
     .get(middleware.isLoggedIn, middleware.checkIfMember, wrapAsync(controller.showRoom))
     .put(middleware.isLoggedIn, middleware.checkRoomOwnership, validateRoom, wrapAsync(controller.updateRoom))
     .delete(middleware.isLoggedIn, middleware.checkRoomOwnership, wrapAsync(controller.deleteRoom))
 
-router.route('/:id/people')
-    .get(middleware.isLoggedIn, middleware.checkIfMember, wrapAsync(controller.showMembers));
+router.get('/new', middleware.isLoggedIn, wrapAsync(controller.newRoom));
+router.get('/:id/people', middleware.isLoggedIn, middleware.checkIfMember, wrapAsync(controller.showMembers));
 
-router.route('/:id/edit')
-    .get(middleware.isLoggedIn, middleware.checkRoomOwnership, wrapAsync(controller.editRoom));
+router.get('/:id/edit', middleware.isLoggedIn, middleware.checkRoomOwnership, wrapAsync(controller.editRoom));
 
-router.route('/:id/leave')
-    .post(middleware.isLoggedIn, middleware.checkForLeave, wrapAsync(controller.leaveRoom));
+router.post('/:id/leave', middleware.isLoggedIn, middleware.checkForLeave, wrapAsync(controller.leaveRoom));
 
 router.route('/:id/request')
     .post(middleware.isLoggedIn, wrapAsync(controller.requestJoin))
     .delete(middleware.isLoggedIn, wrapAsync(controller.requestCancel));
 
-router.route('/comments/:id/report')
-    .put(middleware.isLoggedIn, wrapAsync(controller.reportComment));
+router.put('/comments/:id/report', middleware.isLoggedIn, wrapAsync(controller.reportComment));
 
 module.exports = router;

@@ -6,43 +6,21 @@ const {validateNewUser, validateUserLogin, validatePasswordReset} = require('../
 const indexController = require('../controllers/index');
 const wrapAsync = require('../utils/wrapAsync');
 
-// Index Landing Page
-router.route('/')
-    .get(wrapAsync(indexController.index));
 
 // USER ROUTES
+router.get('/', indexController.index); // Index Landing Page
+router.get('/darkmode', middleware.isLoggedIn, indexController.darkmode); //Set darkmode
+router.get('/contact', middleware.isLoggedIn, wrapAsync(indexController.contact)); //Contact info and school info
+router.get('/alsion', wrapAsync(indexController.alsion)); //Alsion info
 
-//Register User
-router.route("/register")
-    .post(validateNewUser, wrapAsync(indexController.register));
-
-router.route('/authenticate/:id')
-    .get(wrapAsync(indexController.authenticate));
-
-// Custom login handling so that flash messages can be sent.
-router.route('/login')
-    .post(validateUserLogin, indexController.login); //No async
-
-router.route('/forgot-password')
-    .post(validatePasswordReset, wrapAsync(indexController.forgotPassword));
+router.post("/register", validateNewUser, wrapAsync(indexController.register)); //Register User
+router.get('/authenticate/:id', wrapAsync(indexController.authenticate)); // Index Landing Page
+router.post('/login', validateUserLogin, indexController.login); // Custom login handling so that flash messages can be sent.
+router.post('/forgot-password', validatePasswordReset, wrapAsync(indexController.forgotPassword));
+router.post("/logout", middleware.isLoggedIn, indexController.logout); //logout route
 
 router.route('/reset-password')
-    .get(wrapAsync(indexController.resetPasswordForm))
+    .get(indexController.resetPasswordForm)
     .put(wrapAsync(indexController.resetPassword));
-
-//logout route
-router.route("/logout")
-    .get(middleware.isLoggedIn, wrapAsync(indexController.logout));
-
-//Set darkmode
-router.route('/darkmode')
-    .get(middleware.isLoggedIn, wrapAsync(indexController.darkmode));
-
-//Contact info and school info
-router.route('/contact')
-    .get(middleware.isLoggedIn, wrapAsync(indexController.contact));
-
-router.route('/alsion')
-    .get(wrapAsync(indexController.alsion));
 
 module.exports = router;

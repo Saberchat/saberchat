@@ -14,14 +14,8 @@ router.route('/new')
     .get(middleware.isLoggedIn, wrapAsync(wHeightsController.new))
     .post(middleware.isLoggedIn, wrapAsync(wHeightsController.create));
 
-// display specific article
-router.route('/:id')
-    .get(middleware.isLoggedIn, wrapAsync(wHeightsController.show));
-
-router.route('/comment')
-    .put(middleware.isLoggedIn, wrapAsync(wHeightsController.comment));
-
-router.route('/like-comment')
-    .put(middleware.isLoggedIn, wrapAsync(wHeightsController.likeComment));
+router.put('/comment', middleware.isLoggedIn, wrapAsync(wHeightsController.comment)); //Comment on article
+router.put('/like-comment', middleware.isLoggedIn, wrapAsync(wHeightsController.likeComment)); //Like A Comment
+router.get('/:id', middleware.isLoggedIn, wrapAsync(wHeightsController.show)); // Display specific article
 
 module.exports = router;
