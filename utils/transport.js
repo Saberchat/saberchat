@@ -38,6 +38,7 @@ async function sendGridEmail(email, subject, content, mandatory) {
                 "Authorization": "Bearer " + process.env.SENDGRID_KEY
             }
         });
+        console.log(`Email Sent with status code: ${response.status}`);
     }
 }
 
