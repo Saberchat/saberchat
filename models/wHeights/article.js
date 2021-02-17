@@ -15,10 +15,8 @@ var articleSchema = new mongoose.Schema({
     category: String,
     comments: [{
         type: mongoose.Schema.Types.ObjectId,
-        ref: 'PostComment',
-        default: []
+        ref: 'PostComment'
     }]
-
 }, {timestamps: {createdAt: 'created_at'}});
 
 module.exports = mongoose.model("Article", articleSchema);

@@ -260,12 +260,11 @@ module.exports.updateAnn = async function(req, res) {
     }
 
     await updatedAnnouncement.save();
-    const users = await User.find({
-        authenticated: true,
-        _id: {
-            $ne: req.user._id
-        }
-    });
+    const users = await User.find({authenticated: true, _id: {$ne: req.user._id}});
+    if (!users) {
+        req.flash('error', "An Error Occurred");
+        return res.rediect('back');
+    }
 
     let announcementEmail;
     let imageString = "";
@@ -273,16 +272,7 @@ module.exports.updateAnn = async function(req, res) {
         imageString += `<img src="${image}">`;
     }
 
-    if (!users) {
-        req.flash('error', "An Error Occurred");
-        return res.rediect('back');
-    }
-
-    let announcementObject = {
-        announcement: updatedAnnouncement,
-        version: "updated"
-    };
-
+    let announcementObject = {announcement: updatedAnnouncement, version: "updated"};
     let overlap;
     for (let user of users) {
         if (user.receiving_emails) {
@@ -291,12 +281,11 @@ module.exports.updateAnn = async function(req, res) {
 
         overlap = false;
         for (let a of user.annCount) {
-            if (a.announcement.toString() == updatedAnnouncement._id.toString()) {
+            if (a.announcement.equals(updatedAnnouncement._id)) {
                 overlap = true;
                 break;
             }
         }
-
         if (!overlap) {
             user.annCount.push(announcementObject);
             await user.save();
@@ -478,15 +467,13 @@ module.exports.deleteAnn = async function(req, res) {
     }
 
     for (let user of users) {
-        let index;
         for (let i = 0; i < user.annCount.length; i += 1) {
-            if (user.annCount[i].announcement.toString() == deletedAnn._id.toString()) {
-                index = i;
+            if (user.annCount[i].announcement.equals(deletedAnn._id)) {
+                user.annCount.splice(i, 1);
+                await user.save();
+                req.flash('success', 'Announcement Deleted!');
+                return res.redirect('/announcements/');
             }
-        }
-        if (index > -1) {
-            user.annCount.splice(index, 1);
-            await user.save();
         }
     }
 

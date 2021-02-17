@@ -37,38 +37,18 @@ var userSchema = new mongoose.Schema({
     reportedCount: {type: Number, default: 0},
     falseReportCount: {type: Number, default: 0},
     msgCount: {type: Number, default: 0},
-    annCount: [
-        {
-            announcement: {type: mongoose.Schema.Types.ObjectId, ref: "Announcement"},
-            version: String
-        }
-    ],
+    annCount: [{
+        announcement: {type: mongoose.Schema.Types.ObjectId, ref: "Announcement"},
+        version: String
+    }],
     newRoomCount: [{type: mongoose.Schema.Types.ObjectID, ref: "Room"}],
     reqCount: {type: Number, default: 0},
-    inbox: [
-        {
-            type: mongoose.Schema.Types.ObjectId,
-            ref: "Message"
-        }
-    ],
-    requests: [
-        {
-            type: mongoose.Schema.Types.ObjectId,
-            ref: "AccessRequest"
-        }
-    ],
-    followers: [
-        {
-
-            type: mongoose.Schema.Types.ObjectId,
-            ref: "User",
-            default: []
-
-        }
-    ],
+    inbox: [{type: mongoose.Schema.Types.ObjectId, ref: "Message"}],
+    requests: [{type: mongoose.Schema.Types.ObjectId, ref: "AccessRequest"}],
+    followers: [{type: mongoose.Schema.Types.ObjectId, ref: "User"}],
     permission: {type: String, default: "default"}, // for permissions
     status: {type: String, default: "guest"}, // 7th, 8th, 9th, 10th, 11th, 12th, alumni, parents, faculty, cashier, editor, tutor, etc.
-    tags: [{type: String, default: []}], //Cashier, Editor, Tutor, Etc.
+    tags: [{type: String}], //Cashier, Editor, Tutor, Etc.
     balance: {type: Number, default: 0},
     debt: {type: Number, default: 0},
     darkmode: {type: Boolean, default: false}

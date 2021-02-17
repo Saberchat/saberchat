@@ -35,10 +35,8 @@ var messageSchema = new mongoose.Schema({
         sender: {type: mongoose.Schema.Types.ObjectId, ref: 'User'},
         text: String,
         images: [{type: String}],
-        date: String,
-        default: []
+        date: String
     }]
-
 }, {timestamps: {createdAt: 'created_at'}});
 
 module.exports = mongoose.model("Message", messageSchema);

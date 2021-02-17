@@ -312,16 +312,14 @@ io.on('connect', (socket) => {
         });
     });
 
-    socket.on('order', (itemList, itemCount, instructions, payingInPerson, customerId) => { //If an order is sent, handle it here (determined from cafe-socket frontend)
-
-        (async () => { //Asynchronous function to control processes one at a time
-
-            const cafe = await Cafe.find({}); //Collect data on cafe to figure out whether it's open or not
+    socket.on('order', async(itemList, itemCount, instructions, payingInPerson, customerId) => { //If an order is sent, handle it here (determined from cafe-socket frontend)
+        try {
+            const cafe = await Cafe.findOne({}); //Collect data on cafe to figure out whether it's open or not
             if (!cafe) {
                 return console.log('error accessing cafe');
             }
 
-            if (cafe[0].open) { //If the cafe is open, run everything else. Otherwise, nothing matters since orders aren't being accepted
+            if (cafe.open) { //If the cafe is open, run everything else. Otherwise, nothing matters since orders aren't being accepted
                 const user = await User.findById(customerId);
                 if (!user) {
                     return console.log('error accessing user');
@@ -407,7 +405,7 @@ io.on('connect', (socket) => {
                     const deletedOrder = await Order.findByIdAndDelete(order._id);
 
                     if (!deletedOrder) {
-                        console.log('Error deleting order');
+                        return console.log('Error deleting order');
                     }
                 }
 
@@ -415,12 +413,12 @@ io.on('connect', (socket) => {
                 if (!displayItems) {
                     return console.log('Error accessing display items');
                 }
-                io.emit('order', order, displayItems); //Send order to cafe admins via socket
-
+                return io.emit('order', order, displayItems); //Send order to cafe admins via socket
             }
-        })().catch(err => { //Execute and catch any error
-            return console.log(err);
-        });
+
+        } catch(err) { //Execute and catch any error
+            console.log(err);
+        }
     });
 });
 

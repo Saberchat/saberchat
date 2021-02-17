@@ -10,6 +10,10 @@ body {
     background-size: auto;
 }
 
+.modal-body {
+    text-align: left;
+}
+
 .chat-box::-webkit-scrollbar {
     width: 5px;
 }

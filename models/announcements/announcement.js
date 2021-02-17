@@ -14,19 +14,8 @@ var announcementSchema = new mongoose.Schema({
     }],
     text: String,
     date: String,
-
-    likes: [{
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'User',
-        default: []
-    }],
-
-    comments: [{
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'PostComment',
-        default: []
-    }]
-
+    likes: [{type: mongoose.Schema.Types.ObjectId, ref: 'User'}],
+    comments: [{type: mongoose.Schema.Types.ObjectId, ref: 'PostComment'}]
 }, {timestamps: {createdAt: 'created_at'}});
 
 module.exports = mongoose.model("Announcement", announcementSchema);

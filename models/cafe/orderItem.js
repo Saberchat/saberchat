@@ -16,13 +16,7 @@ var orderItemSchema = new mongoose.Schema({
     },
     availableItems: Number,
     isAvailable: Boolean,
-    upvotes: [
-        {
-            type: mongoose.Schema.Types.ObjectId,
-            ref: 'User',
-            default: []
-        }
-    ]
+    upvotes: [{type: mongoose.Schema.Types.ObjectId, ref: 'User'}]
 }, {timestamps: {createdAt: 'created_at'}});
 
 module.exports = mongoose.model('OrderItem', orderItemSchema);
