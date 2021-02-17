@@ -102,9 +102,11 @@
                             <source src="<%=media.url%>" type="audio/mpeg"></source>
                         </audio>
                     <% } else if (fileExtensions.get(media.url).toLowerCase() == ".mp4") {%>
-                        <video width="800px" height="500px" src="<%=media.url%>" type="video/mp4" controls></video>
+                        <video width="800px" height="500px" src="<%=media.url%>" type="video/*" controls></video>
+                    <% } else if ([".mov", ".heic"].includes(fileExtensions.get(media.url).toLowerCase())) {%>
+                        <a href="<%=media.url%>" download><h5><i class="fas fa-paperclip"></i> Download "<%=media.originalName%>"</h5></a>
                     <% } else if (fileExtensions.get(media.url).toLowerCase() == ".pdf") {%>
-                        <a href="<%=media.url%>" target="_blank"><h5><i class="fas fa-paperclip"></i> Open "<%=media.originalName%>" In New Tab  </h5></a>
+                        <a href="<%=media.url%>" target="_blank"><h5>Open "<%=media.originalName%>" In New Tab  </h5></a>
                     <% } %>
                     <div class="form-check">
                         <input type="checkbox" name="deleteUpload-<%=media.url%>" id="deleteUpload-<%=media.url%>" class="form-check-input"
@@ -117,7 +119,7 @@
 
             <div class="form-group">
                 <label for="imageFile">New Media Uploads</label>
-                <input type="file" name="imageFile" class="image-upload form-control-file" multiple accept="image/png, image/jpg, image/jpeg, image/gif, video/mp4, audio/*, application/pdf">
+                <input type="file" name="imageFile" class="image-upload form-control-file" multiple accept="image/*, video/*, audio/*, application/pdf">
             </div>
 
             <div id="image-header">

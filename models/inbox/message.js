@@ -8,24 +8,9 @@ var messageSchema = new mongoose.Schema({
         url: String,
         originalName: String
     }],
-    read: [
-        {
-            type: mongoose.Schema.Types.ObjectId,
-            ref: 'User'
-        }
-    ],
-    sender: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "User"
-    },
-
-    recipients: [
-        {
-            type: mongoose.Schema.Types.ObjectId,
-            ref: 'User'
-        }
-    ],
-
+    read: [{type: mongoose.Schema.Types.ObjectId, ref: 'User'}],
+    sender: {type: mongoose.Schema.Types.ObjectId, ref: "User"},
+    recipients: [{type: mongoose.Schema.Types.ObjectId, ref: 'User'}],
     text: String,
     toEveryone: {type: Boolean, default: false},
     anonymous: {type: Boolean, default: false},

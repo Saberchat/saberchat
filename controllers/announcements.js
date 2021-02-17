@@ -126,7 +126,7 @@ module.exports.create = async function(req, res) {
             let cloudErr;
             let cloudResult;
             for (let file of req.files.imageFile) {
-                if ([".mp3", ".mp4", ".m4a"].includes(path.extname(file.originalname).toLowerCase())) {
+                if ([".mp3", ".mp4", ".m4a", ".mov"].includes(path.extname(file.originalname).toLowerCase())) {
                     [cloudErr, cloudResult] = await cloudUpload(file, "video");
                 } else if (path.extname(file.originalname).toLowerCase() == ".pdf") {
                     [cloudErr, cloudResult] = await cloudUpload(file, "pdf");
@@ -218,7 +218,7 @@ module.exports.updateAnn = async function(req, res) {
     let cloudResult;
     for (let i = updatedAnnouncement.imageFiles.length-1; i >= 0; i--) {
         if (req.body[`deleteUpload-${updatedAnnouncement.imageFiles[i].url}`] && updatedAnnouncement.imageFiles[i] && updatedAnnouncement.imageFiles[i].filename) {
-            if ([".mp3", ".mp4", ".m4a"].includes(path.extname(updatedAnnouncement.imageFiles[i].url.split("SaberChat/")[1]).toLowerCase())) {
+            if ([".mp3", ".mp4", ".m4a", ".mov"].includes(path.extname(updatedAnnouncement.imageFiles[i].url.split("SaberChat/")[1]).toLowerCase())) {
                 [cloudErr, cloudResult] = await cloudDelete(updatedAnnouncement.imageFiles[i].filename, "video");
             } else if (path.extname(updatedAnnouncement.imageFiles[i].url.split("SaberChat/")[1]).toLowerCase() == ".pdf") {
                 [cloudErr, cloudResult] = await cloudDelete(updatedAnnouncement.imageFiles[i].filename, "pdf");
@@ -238,7 +238,7 @@ module.exports.updateAnn = async function(req, res) {
     if (req.files) {
         if (req.files.imageFile) {
             for (let file of req.files.imageFile) {
-                if ([".mp3", ".mp4", ".m4a"].includes(path.extname(file.originalname).toLowerCase())) {
+                if ([".mp3", ".mp4", ".m4a", ".mov"].includes(path.extname(file.originalname).toLowerCase())) {
                     [cloudErr, cloudResult] = await cloudUpload(file, "video");
                 } else if (path.extname(file.originalname).toLowerCase() == ".pdf") {
                     [cloudErr, cloudResult] = await cloudUpload(file, "pdf");
@@ -439,7 +439,7 @@ module.exports.deleteAnn = async function(req, res) {
     let cloudResult;
     for (let file of announcement.imageFiles) {
         if (file && file.filename) {
-            if ([".mp3", ".mp4", ".m4a"].includes(path.extname(file.url.split("SaberChat/")[1]).toLowerCase())) {
+            if ([".mp3", ".mp4", ".m4a", ".mov"].includes(path.extname(file.url.split("SaberChat/")[1]).toLowerCase())) {
                 [cloudErr, cloudResult] = await cloudDelete(file.filename, "video");
             } else if (path.extname(file.url.split("SaberChat/")[1]).toLowerCase() == ".pdf") {
                 [cloudErr, cloudResult] = await cloudDelete(file.filename, "pdf");

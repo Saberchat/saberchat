@@ -115,7 +115,8 @@ module.exports.isEditor = function(req, res, next) {
     return res.redirect('back');
 }
 
-module.exports.cafeOpen = async function(req, res, next) { //Whether cafe is open to orders
+//Whether cafe is open to orders
+module.exports.cafeOpen = async function(req, res, next) {
     const cafe = await Cafe.findOne({});
     if (!cafe) {
         req.flash('error', "An Error Occurred")

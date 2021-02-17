@@ -21,7 +21,7 @@ module.exports.convertToLink = function(text) {
             emails.push(text.slice(text.indexOf(line), text.indexOf(line) + line.length));
 
             //Money can be confused as a link, so $ expressions are discounted
-        } else if (line.slice(0, line.length - 1).includes('.') && line.slice(0, line.length - 1).split('.')[1].length >= 2 && !line.includes('$')) {
+        } else if (line.slice(0, line.length - 1).includes('.') && line.slice(0, line.length - 1).split('.')[1].length > 0 && !line.includes('$')) {
             links.push(text.slice(text.indexOf(line), text.indexOf(line) + line.length));
         }
     }

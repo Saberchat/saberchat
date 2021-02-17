@@ -5,7 +5,7 @@ const util = require('util');
 const storage = multer.memoryStorage();
 const imageFilter = (req, file, callback) => {
     const ext = path.extname(file.originalname);
-    const extensions = [".png", ".jpg", ".jpeg", ".gif", ".mp4", ".mp3", ".m4a", ".pdf"];
+    const extensions = [".png", ".jpg", ".jpeg", ".heic", ".gif", ".mp4", ".mp3", ".m4a", ".mov", ".pdf"];
     if (!extensions.includes(ext.toLowerCase())) {
         return callback(new Error('Invalid Media Format'));
     }

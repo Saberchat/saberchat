@@ -5,18 +5,10 @@ const mongoose = require("mongoose");
 var articleSchema = new mongoose.Schema({
     title: String,
     thumbnail: String,
-    content: [
-        {type: Object}
-    ],
-    author: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'User'
-    },
+    content: [{type: Object}],
+    author: {type: mongoose.Schema.Types.ObjectId, ref: 'User'},
     category: String,
-    comments: [{
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'PostComment'
-    }]
+    comments: [{type: mongoose.Schema.Types.ObjectId, ref: 'PostComment'}]
 }, {timestamps: {createdAt: 'created_at'}});
 
 module.exports = mongoose.model("Article", articleSchema);

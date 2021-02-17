@@ -468,11 +468,7 @@ module.exports.updateItem = async function(req, res) {
                 let cloudErr;
                 let cloudResult;
                 if (item.imageFile && item.imageFile.filename) {
-                    if (path.extname(item.imageFile.url.split("SaberChat/")[1]).toLowerCase() == ".mp4") {
-                        [cloudErr, cloudResult] = await cloudDelete(item.imageFile.filename, "video");
-                    } else {
-                        [cloudErr, cloudResult] = await cloudDelete(item.imageFile.filename, "image");
-                    }
+                    [cloudErr, cloudResult] = await cloudDelete(item.imageFile.filename, "image");
                     // check for failure
                     if (cloudErr || !cloudResult || cloudResult.result !== 'ok') {
                         req.flash('error', 'Error deleting uploaded image');
@@ -569,8 +565,6 @@ module.exports.deleteItem = async function(req, res) {
     // delete any uploads
     if (item.imageFile && item.imageFile.filename) {
         if (path.extname(item.imageFile.url.split("SaberChat/")[1]).toLowerCase() == ".mp4") {
-            [cloudErr, cloudResult] = await cloudDelete(item.imageFile.filename, "video");
-        } else {
             [cloudErr, cloudResult] = await cloudDelete(item.imageFile.filename, "image");
         }
         // check for failure
