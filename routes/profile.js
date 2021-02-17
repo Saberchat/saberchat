@@ -6,62 +6,48 @@ const {sendGridEmail} = require("../services/sendGrid");
 const {multipleUpload} = require('../middleware/multer');
 const {cloudUpload, cloudDelete} = require('../services/cloudinary');
 const {convertToLink} = require("../utils/convert-to-link");
-
-const {
-    validateUserUpdate,
-    validateEmailUpdate,
-    validatePasswordUpdate
-} = require('../middleware/validation');
-const axios = require('axios');
-
-if (process.env.NODE_ENV !== "production") {
-    require('dotenv').config();
-}
-
-const User = require('../models/user');
-const Email = require('../models/admin/email');
-
-const Comment = require('../models/chat/comment');
-const Room = require('../models/chat/room');
-const Request = require('../models/inbox/accessRequest');
-
-const Message = require('../models/inbox/message');
-const Announcement = require('../models/announcements/announcement');
-const Project = require('../models/projects/project');
-
-const Order = require('../models/cafe/order');
-const Article = require('../models/wHeights/article');
-
+const {validateUserUpdate, validateEmailUpdate, validatePasswordUpdate} = require('../middleware/validation');
 const middleware = require('../middleware');
-
 const profile = require("../controllers/profile");
-
 const wrapAsync = require("../utils/wrapAsync");
 
-// renders the list of users page
-router.get('/', middleware.isLoggedIn, wrapAsync(profile.index));
-
-//renders profiles edit page
-router.get('/edit', middleware.isLoggedIn, wrapAsync(profile.edit));
-
-//renders the email/password edit page
-router.get('/change-login-info', middleware.isLoggedIn, wrapAsync(profile.changeLoginInfo));
-
-//renders views/profiles/show.ejs at /profiles route.
+router.get('/', middleware.isLoggedIn, wrapAsync(profile.index)); // renders the list of users page
+router.get('/edit', middleware.isLoggedIn, profile.edit); //renders profiles edit page
+router.get('/change-login-info', middleware.isLoggedIn, profile.changeLoginInfo); //renders the email/password edit page
+router.get('/confirm-email/:id', wrapAsync(profile.confirmEmailID));
 router.get('/:id', middleware.isLoggedIn, wrapAsync(profile.id));
 
-// update user route. Check if current user matches profiles they're trying to edit with middleware.
-router.put('/profile', middleware.isLoggedIn, multipleUpload, validateUserUpdate, wrapAsync(profile.profilePut));
+router.put('/profile', middleware.isLoggedIn, multipleUpload, validateUserUpdate, wrapAsync(profile.profilePut)); // update user route.
+router.put('/tag', middleware.isAdmin, profile.tagPut);
+router.put('/change-email', middleware.isLoggedIn, validateEmailUpdate, wrapAsync(profile.changeEmailPut)); //route for changing email
+router.put('/change-password', middleware.isLoggedIn, validatePasswordUpdate, wrapAsync(profile.changePasswordPut)); //route for changing password
+router.put('/follow/:id', wrapAsync(profile.followID));
+router.put('/unfollow/:id', wrapAsync(profile.unfollowID));
+router.put('/remove/:id', wrapAsync(profile.removeID));
 
-router.put('/tag', middleware.isAdmin, wrapAsync(profile.tagPut));
+module.exports = router;
 
-//route for changing email. Similar to edit profiles route. But changing email logs out user for some reason.
-router.put('/change-email', middleware.isLoggedIn, validateEmailUpdate, wrapAsync(profile.changeEmailPut));
+//EVERYTHING BELOW IS UNCOMMENTED AND IS FOR CHANGES WE MIGHT DO LATER
 
-router.get('/confirm-email/:id', wrapAsync(profile.confirmEmailID));
-
-//route for changing password. Not too much different from previous routes.
-router.put('/change-password', middleware.isLoggedIn, validatePasswordUpdate, wrapAsync(profile.changePasswordPut));
+// const axios = require('axios');
+//
+// if (process.env.NODE_ENV !== "production") {
+//     require('dotenv').config();
+// }
+//
+// const User = require('../models/user');
+// const Email = require('../models/admin/email');
+//
+// const Comment = require('../models/chat/comment');
+// const Room = require('../models/chat/room');
+// const Request = require('../models/inbox/accessRequest');
+//
+// const Message = require('../models/inbox/message');
+// const Announcement = require('../models/announcements/announcement');
+// const Project = require('../models/projects/project');
+//
+// const Order = require('../models/cafe/order');
+// const Article = require('../models/wHeights/article');
 
 // router.delete('/delete-account', middleware.isLoggedIn, (req, res) => {
 //   (async() => {
@@ -319,11 +305,3 @@ router.put('/change-password', middleware.isLoggedIn, validatePasswordUpdate, wr
 //     res.redirect('back');
 //   });
 // });
-
-router.put('/follow/:id', wrapAsync(profile.followID));
-
-router.put('/unfollow/:id', wrapAsync(profile.unfollowID));
-
-router.put('/remove/:id', wrapAsync(profile.removeID));
-
-module.exports = router;

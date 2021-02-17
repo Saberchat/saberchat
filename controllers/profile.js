@@ -2,7 +2,7 @@ const User = require('../models/user');
 const {sendGridEmail} = require("../services/sendGrid");
 const {convertToLink} = require("../utils/convert-to-link");
 const Filter = require('bad-words');
-const {filter} = new Filter();
+const filter = new Filter();
 const {cloudUpload, cloudDelete} = require('../services/cloudinary');
 
 module.exports.index = async function(req, res) {
@@ -11,21 +11,19 @@ module.exports.index = async function(req, res) {
         req.flash("error", "An error occurred");
         return res.redirect("back");
     }
-
     return res.render("profile/index", {users});
 }
 
-module.exports.edit = async function(req, res) {
-    res.render('profile/edit');
+module.exports.edit = function(req, res) {
+    return res.render('profile/edit');
 }
 
-module.exports.changeLoginInfo = async function(req, res) {
-    res.render('profile/edit_pwd_email');
+module.exports.changeLoginInfo = function(req, res) {
+    return res.render('profile/edit_pwd_email');
 }
 
 module.exports.id = async function(req, res) {
     const user = await User.findById(req.params.id).populate('followers');
-
     if (!user) {
         req.flash('error', 'Error. Cannot find user.');
         return res.redirect('back');
@@ -40,6 +38,10 @@ module.exports.id = async function(req, res) {
     }
 
     const users = await User.find({authenticated: true});
+    if (!users) {
+        req.flash('error', 'Error. Cannot find users.');
+        return res.redirect('back');
+    }
 
     for (let u of users) {
         if (u.followers.includes(user._id)) {
@@ -170,227 +172,199 @@ module.exports.profilePut = async function(req, res) {
     return res.redirect(`/profiles/${req.user._id}`);
 }
 
-module.exports.tagPut = async function(res, req) {
+module.exports.tagPut = function(res, req) {
     if (req.user.tags.includes(req.body.tag)) {
         req.user.tags.splice(req.user.tags.indexOf(req.body.tag), 1);
         req.user.save();
-        res.json({success: "Succesfully removed status", tag: req.body.tag, user: req.user._id});
+        return res.json({success: "Succesfully removed status", tag: req.body.tag, user: req.user._id});
 
     } else {
         req.user.tags.push(req.body.tag);
         req.user.save();
-        res.json({success: "Succesfully added status", tag: req.body.tag, user: req.user._id});
+        return res.json({success: "Succesfully added status", tag: req.body.tag, user: req.user._id});
     }
 }
 
 module.exports.changeEmailPut = async function(res, req) {
     if (req.body.receiving_emails) {
         req.user.receiving_emails = true;
-        await req.user.save();
 
     } else {
         req.user.receiving_emails = false;
-        await req.user.save();
     }
+
+    await req.user.save();
 
     if (req.user.email == req.body.email) {
         req.flash('success', "Email sending settings updated");
         return res.redirect(`/profiles/${req.user._id}`);
-
-    } else {
-        const emails = await Email.find({address: req.body.email, version: "whitelist"});
-
-        if (!emails) {
-            req.flash('error', "Unable to find emails");
-            return res.redirect('back');
-
-        } else if (emails.length == 0 && req.body.email.split("@")[1] != "alsionschool.org") {
-            req.flash('error', "New email must be an Alsion-verified email");
-            return res.redirect('back');
-        }
-
-        const overlap = await User.find({authenticated: true, email: req.body.email, _id: {$ne: req.user._id}});
-
-        if (!overlap) {
-            req.flash('error', "Unable to find users");
-            return res.redirect('back');
-
-        } else if (overlap.length > 0) {
-            req.flash('error', "Another user already has that email.");
-            return res.redirect('back');
-        }
-
-        const url = process.env.SENDGRID_BASE_URL + '/mail/send';
-        const data = {
-            "personalizations": [
-                {
-                    "to": [
-                        {
-                            "email": req.body.email
-                        }
-                    ],
-                    "subject": 'Profile Update Confirmation'
-                }
-            ],
-            "from": {
-                "email": "noreply.saberchat@gmail.com",
-                "name": "SaberChat"
-            },
-            "content": [
-                {
-                    "type": "text/html",
-                    "value": `<p>Hello ${req.user.firstName},</p><p>You are receiving this email because you recently requested to change your Saberchat email to ${req.body.email}.</p><p>Click <a href="https://alsion-saberchat.herokuapp.com/profiles/confirm-email/${req.user._id}?token=${req.user.authenticationToken}&email=${req.body.email}">this link</a> to confirm your new email address.`
-                }
-            ]
-        }
-
-        axios({
-            method: 'post',
-            url: url,
-            data: data,
-            headers: {
-                "Authorization": "Bearer " + process.env.SENDGRID_KEY
-            }
-        }).then(response => {
-            console.log(`Email Sent with status code: ${response.status}`);
-        }).catch(error => {
-            console.log(error);
-        });
-
-        req.flash('success', 'Go to your new email to confirm new address');
-        return res.redirect('/profiles/change-login-info');
     }
+
+    const emails = await Email.find({address: req.body.email, version: "whitelist"});
+    if (!emails) {
+        req.flash('error', "Unable to find emails");
+        return res.redirect('back');
+    }
+
+    if (emails.length == 0 && req.body.email.split("@")[1] != "alsionschool.org") {
+        req.flash('error', "New email must be an Alsion-verified email");
+        return res.redirect('back');
+    }
+
+    const overlap = await User.find({authenticated: true, email: req.body.email, _id: {$ne: req.user._id}});
+    if (!overlap) {
+        req.flash('error', "Unable to find users");
+        return res.redirect('back');
+
+    } else if (overlap.length > 0) {
+        req.flash('error', "Another user already has that email.");
+        return res.redirect('back');
+    }
+
+    const url = process.env.SENDGRID_BASE_URL + '/mail/send';
+    const data = {
+        "personalizations": [
+            {
+                "to": [
+                    {
+                        "email": req.body.email
+                    }
+                ],
+                "subject": 'Profile Update Confirmation'
+            }
+        ],
+        "from": {
+            "email": "noreply.saberchat@gmail.com",
+            "name": "SaberChat"
+        },
+        "content": [
+            {
+                "type": "text/html",
+                "value": `<p>Hello ${req.user.firstName},</p><p>You are receiving this email because you recently requested to change your Saberchat email to ${req.body.email}.</p><p>Click <a href="https://alsion-saberchat.herokuapp.com/profiles/confirm-email/${req.user._id}?token=${req.user.authenticationToken}&email=${req.body.email}">this link</a> to confirm your new email address.`
+            }
+        ]
+    }
+
+    axios({
+        method: 'post',
+        url: url,
+        data: data,
+        headers: {
+            "Authorization": "Bearer " + process.env.SENDGRID_KEY
+        }
+    }).then(response => {
+        console.log(`Email Sent with status code: ${response.status}`);
+    }).catch(error => {
+        console.log(error);
+    });
+
+    req.flash('success', 'Go to your new email to confirm new address');
+    return res.redirect('/profiles/change-login-info');
 }
 
 module.exports.confirmEmailID = async function(req, res) {
-    User.findById(req.params.id, (err, user) => {
-        if (err || !user) {
-            req.flash('error', "Unable to find user");
-            res.redirect('back');
+    const user = await User.findById(req.params.id);
+    if (!user) {
+        req.flash('error', "Unable to find user");
+        return res.redirect('back');
+    }
 
-        } else {
+    //Update authentication token
+    let charSetMatrix = [];
 
-            //Update authentication token
-            let charSetMatrix = [];
+    charSetMatrix.push('qwertyuiopasdfghjklzxcvbnm'.split(''));
+    charSetMatrix.push('QWERTYUIOPASDFGHJKLZXCVBNM'.split(''));
+    charSetMatrix.push('1234567890'.split(''));
+    charSetMatrix.push('()%!~$#*[){]|,.<>');
 
-            charSetMatrix.push('qwertyuiopasdfghjklzxcvbnm'.split(''));
-            charSetMatrix.push('QWERTYUIOPASDFGHJKLZXCVBNM'.split(''));
-            charSetMatrix.push('1234567890'.split(''));
-            charSetMatrix.push('()%!~$#*[){]|,.<>');
+    let tokenLength = Math.round((Math.random() * 15)) + 15;
+    let token = "";
 
-            let tokenLength = Math.round((Math.random() * 15)) + 15;
-            let token = "";
+    let charSet; //Which character set to choose from
 
-            let charSet; //Which character set to choose from
+    for (let i = 0; i < tokenLength; i += 1) {
+        charSet = charSetMatrix[Math.floor(Math.random() * 4)];
+        token += charSet[Math.floor((Math.random() * charSet.length))];
+    }
 
-            for (let i = 0; i < tokenLength; i += 1) {
-                charSet = charSetMatrix[Math.floor(Math.random() * 4)];
-                token += charSet[Math.floor((Math.random() * charSet.length))];
-            }
+    if (req.query.token.toString() == user.authenticationToken) {
+        user.email = req.query.email;
+        user.authenticationToken = token;
+        await user.save();
 
-            if (req.query.token.toString() == user.authenticationToken) {
-                user.email = req.query.email;
-                user.authenticationToken = token;
-                user.save();
-
-                sendGridEmail(user, 'Email Update Confirmation', `<p>Hello ${user.firstName},</p><p>You are receiving this email because you recently made changes to your Saberchat email. This is a confirmation of your profile.</p><p>Your username is ${user.username}.</p><p>Your full name is ${user.firstName} ${user.lastName}.</p><p>Your email is ${user.email}.</p>`, false);
-                req.flash('success', "Email updated!")
-                res.redirect('/');
-
-            } else {
-                req.flash('error', "Invalid authentication token");
-                res.redirect('/');
-            }
-        }
-    });
+        await sendGridEmail(user, 'Email Update Confirmation', `<p>Hello ${user.firstName},</p><p>You are receiving this email because you recently made changes to your Saberchat email. This is a confirmation of your profile.</p><p>Your username is ${user.username}.</p><p>Your full name is ${user.firstName} ${user.lastName}.</p><p>Your email is ${user.email}.</p>`, false);
+        req.flash('success', "Email updated!")
+        return res.redirect('/');
+    }
+    req.flash('error', "Invalid authentication token");
+    return res.redirect('/');
 }
 
 module.exports.changePasswordPut = async function(req, res) {
     if (req.body.newPassword == req.body.newPasswordConfirm) {
-        User.findById(req.user._id, (err, user) => {
-            if (err || !user) {
-                req.flash('error', 'Error, cannot find user');
-                res.redirect('/');
+        const user = await User.findById(req.user._id);
+        if (!user) {
+            req.flash('error', 'Error, cannot find user');
+            return res.redirect('/');
+        }
 
-            } else {
-                user.changePassword(req.body.oldPassword, req.body.newPassword, (err) => {
-                    if (err) {
-                        req.flash('error', 'Error changing your password. Check if old password is correct.');
-                        res.redirect('/');
-
-                    } else {
-                        sendGridEmail(req.user.email, 'Password Update Confirmation', `<p>Hello ${req.user.firstName},</p><p>You are receiving this email because you recently made changes to your Saberchat password. This is a confirmation of your profile.\n\nYour username is ${req.user.username}.\nYour full name is ${req.user.firstName} ${req.user.lastName}.\nYour email is ${req.user.email}\n\nIf you did not recently change your password, reset it immediately and contact a faculty member.</p>`, false);
-                        req.flash('success', 'Successfully changed your password');
-                        res.redirect('/profiles/' + req.user._id);
-                    }
-                });
-            }
-        });
-
-    } else {
-        req.flash('error', "Passwords do not match");
-        res.redirect('back');
+        await user.changePassword(req.body.oldPassword, req.body.newPassword);
+        await sendGridEmail(req.user.email, 'Password Update Confirmation', `<p>Hello ${req.user.firstName},</p><p>You are receiving this email because you recently made changes to your Saberchat password. This is a confirmation of your profile.\n\nYour username is ${req.user.username}.\nYour full name is ${req.user.firstName} ${req.user.lastName}.\nYour email is ${req.user.email}\n\nIf you did not recently change your password, reset it immediately and contact a faculty member.</p>`, false);
+        req.flash('success', 'Successfully changed your password');
+        return res.redirect('/profiles/' + req.user._id);
     }
+
+    req.flash('error', "Passwords do not match");
+    return res.redirect('back');
 }
 
 module.exports.followID = async function(req, res) {
-    User.findById(req.params.id, (err, user) => {
-        if (err || !user) {
-            res.json({error: "Error finding user"});
+    const user = await User.findById(req.params.id);
+    if (!user) {
+        return res.json({error: "Error finding user"});
+    }
 
-        } else if (user.followers.includes(req.user._id)) {
-            res.json({error: "You are already following this user"});
+    if (user.followers.includes(req.user._id)) {
+        return res.json({error: "You are already following this user"});
+    }
 
-        } else if (user._id.equals(req.user._id)) {
-            res.json({error: "You may not follow yourself"});
+    if (user._id.equals(req.user._id)) {
+        return res.json({error: "You may not follow yourself"});
+    }
 
-        } else {
-            user.followers.push(req.user);
-            user.save();
-            res.json({success: "Succesfully followed user", user: req.user});
-        }
-    });
+
+    user.followers.push(req.user);
+    await user.save();
+    return res.json({success: "Succesfully followed user", user: req.user});
 }
 
 module.exports.unfollowID = async function(req, res) {
-    User.findById(req.params.id, (err, user) => {
-        if (err || !user) {
-            res.json({error: "Error finding user"});
+    const user = await User.findById(req.params.id);
+    if (!user) {
+        return res.json({error: "Error finding user"});
+    }
 
-        } else {
-            let index = -1;
-            for (let i = 0; i < user.followers.length; i++) {
-                if (user.followers[i].equals(req.user._id)) {
-                    index = i;
-                }
-            }
-
-            if (index > -1) {
-                user.followers.splice(index, 1);
-                user.save();
-                res.json({success: "Unfollowed user", user: req.user});
-
-            } else {
-                res.json({error: "You are not following this user"});
-            }
+    for (let i = 0; i < user.followers.length; i++) {
+        if (user.followers[i].equals(req.user._id)) {
+            user.followers.splice(i, 1);
+            await user.save();
+            return res.json({success: "Unfollowed user", user: req.user});
         }
-    });
+    }
+    return res.json({error: "You are not following this user"});
 }
 
 module.exports.removeID = async function(req, res) {
-    User.findById(req.params.id, (err, user) => {
-        if (err || !user) {
-            res.json({error: "Error finding user"});
+    const user = await User.findById(req.params.id);
+    if (!user) {
+        return res.json({error: "Error finding user"});
+    }
 
-        } else {
-            if (req.user.followers.includes(user._id)) {
-                req.user.followers.splice(req.user.followers.indexOf(user._id), 1);
-                req.user.save();
-                res.json({success: "Succesfully removed user"});
+    if (req.user.followers.includes(user._id)) {
+        req.user.followers.splice(req.user.followers.indexOf(user._id), 1);
+        req.user.save();
+        res.json({success: "Succesfully removed user"});
+    }
 
-            } else {
-                res.json({error: "User is not following you"});
-            }
-        }
-    });
+    return res.json({error: "User is not following you"});
 }
