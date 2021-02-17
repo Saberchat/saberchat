@@ -1,4 +1,4 @@
-const convertToLink = function (text) {
+module.exports.convertToLink = function(text) {
     const delimeter = new RegExp(/[\"\'\r]/, 'g'); //Regex for most troublesome link characters
     let deformatted = []; //Holds words/links from text
     let embedded = false; //Boolean value to check if link/email is embedded in each line of text
@@ -21,7 +21,7 @@ const convertToLink = function (text) {
             emails.push(text.slice(text.indexOf(line), text.indexOf(line) + line.length));
 
             //Money can be confused as a link, so $ expressions are discounted
-        } else if (line.slice(0, line.length - 1).includes('.') && !line.includes('$')) {
+        } else if (line.slice(0, line.length - 1).includes('.') && line.slice(0, line.length - 1).split('.')[1].length >= 2 && !line.includes('$')) {
             links.push(text.slice(text.indexOf(line), text.indexOf(line) + line.length));
         }
     }
@@ -73,5 +73,3 @@ const convertToLink = function (text) {
     }
     return convertedText;
 }
-
-module.exports = convertToLink;

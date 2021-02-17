@@ -7,10 +7,10 @@ const AccessReq = require('../models/inbox/accessRequest');
 //LIBRARIES
 const express = require('express');
 const Filter = require('bad-words');
-const filter = new Filter();
+const {filter} = new Filter();
 const dateFormat = require('dateformat');
 const router = express.Router();
-const sendGridEmail = require("../services/sendGrid");
+const {sendGridEmail} = require("../services/sendGrid");
 const convertToLink = require("../utils/convert-to-link");
 const {validateRoom} = require('../middleware/validation');
 const middleware = require('../middleware');

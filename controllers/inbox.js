@@ -1,8 +1,8 @@
 const dateFormat = require('dateformat');
 const Filter = require('bad-words');
-const filter = new Filter();
+const {filter} = new Filter();
 const path = require('path');
-const sendGridEmail = require("../services/sendGrid");
+const {sendGridEmail} = require("../services/sendGrid");
 const convertToLink = require("../utils/convert-to-link");
 const { cloudUpload } = require('../services/cloudinary');
 

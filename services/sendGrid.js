@@ -4,7 +4,7 @@ if (process.env.NODE_ENV !== "production") {
 
 const axios = require('axios');
 
-async function sendGridEmail(email, subject, content, mandatory) {
+module.exports.sendGridEmail = async function(email, subject, content, mandatory) {
     if(process.env.SENDING_EMAILS === 'true' || mandatory) {
         const url = process.env.SENDGRID_BASE_URL + '/mail/send';
         const data = {
@@ -41,5 +41,3 @@ async function sendGridEmail(email, subject, content, mandatory) {
         console.log(`Email Sent with status code: ${response.status}`);
     }
 }
-
-module.exports = sendGridEmail;

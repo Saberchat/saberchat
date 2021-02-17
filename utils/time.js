@@ -1,4 +1,4 @@
-const formatTime = function(time) {
+module.exports.formatTime = function(time) {
     let hourComponent;
     let timeInHours;
 
@@ -27,7 +27,7 @@ const formatTime = function(time) {
     return timeInHours;
 }
 
-const getHours = function(dates) {
+module.exports.getHours = function(dates) {
     let finalTimes = [];
     let finalTimesUnformatted = [];
     let dateInMs;
@@ -42,7 +42,7 @@ const getHours = function(dates) {
     return {finalTimes, finalTimesUnformatted};
 }
 
-const sortTimes = function(times, formattedTimes) {
+module.exports.sortTimes = function(times, formattedTimes) {
     let temp;
     for (let i = 0; i < times.length-1; i ++) {
         for (let j = 0; j < times.length-1; j ++) {
@@ -57,7 +57,7 @@ const sortTimes = function(times, formattedTimes) {
     return {times, formattedTimes};
 }
 
-const getStats = function(times) {
+module.exports.getStats = function(times) {
     let avgTime = 0;
     let stdDevTime = 0;
     let medianTime;
@@ -85,5 +85,3 @@ const getStats = function(times) {
 
     return {avgTime: formattedAvgTime, medianTime, minTime, maxTime};
 }
-
-module.exports = {getHours, sortTimes, getStats};

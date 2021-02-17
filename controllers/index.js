@@ -1,8 +1,8 @@
 //LIBRARIES
 const Filter = require('bad-words');
-const filter = new Filter();
+const {filter} = new Filter();
 const passport = require('passport');
-const sendGridEmail = require("../services/sendGrid");
+const {sendGridEmail} = require("../services/sendGrid");
 
 //SCHEMA
 const User = require('../models/user');

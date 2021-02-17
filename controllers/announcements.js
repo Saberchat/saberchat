@@ -1,4 +1,4 @@
-const sendGridEmail = require("../services/sendGrid");
+const {sendGridEmail} = require("../services/sendGrid");
 const convertToLink = require("../utils/convert-to-link");
 
 const path = require('path');

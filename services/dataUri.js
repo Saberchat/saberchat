@@ -3,8 +3,6 @@ const path = require('path');
 
 const parser = new DataUriParser();
 
-const parseBuffer = (filename, buffer) => {
+module.exports.parseBuffer = function(filename, buffer) {
     return parser.format(path.extname(filename), buffer);
-};
-
-module.exports = parseBuffer;
+}

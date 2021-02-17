@@ -7,10 +7,10 @@ const Item = require('../models/cafe/orderItem');
 const express = require('express');
 const dateFormat = require('dateformat');
 const {getPopularityCoefficiant, sortByPopularity, equateObjects} = require("../utils/popularity-algorithms");
-const filter = require('../utils/filter');
+const {filter} = require('../utils/filter');
 const {getHours, sortTimes, getStats} = require('../utils/time');
 
-const getData = async function(customers, items, orders) {
+module.exports = async function(customers, items, orders) {
     //Calculate most popular and lucrative customers, and customers with the longest orders
     let popularCustomers = [];
     let longestOrderCustomers = [];
@@ -126,5 +126,3 @@ const getData = async function(customers, items, orders) {
         pricepoints, times: formattedTimes, timeStats
     }
 }
-
-module.exports = getData;

@@ -1,7 +1,7 @@
 //Popularity Functions can be used to calculate and sort popularity for projects, cafe items, tutors, etc.
 
 // Takes an array of objects and outputs the average popularity coefficient (likes per day)
-const getPopularityCoefficiant = function(objects, likeFactor, dateFactor) {
+module.exports.getPopularityCoefficiant = function(objects, likeFactor, dateFactor) {
     const now = new Date().getTime();
     const rate = 86400; //Rate of conversion is seconds to days
     let popularityCoefficiant = 0;
@@ -16,7 +16,7 @@ const getPopularityCoefficiant = function(objects, likeFactor, dateFactor) {
     return popularityCoefficiant;
 }
 
-const sortByPopularity = function(objects, likeFactor, dateFactor, fields) { //Sort objects by popularity coefficiant
+module.exports.sortByPopularity = function(objects, likeFactor, dateFactor, fields) { //Sort objects by popularity coefficiant
     let sorted = {popular: [], unpopular: []}; //Object holds both popular and unpopular items
 
     let temp; //Sort objects by order of popularity coefficiant
@@ -54,7 +54,7 @@ const sortByPopularity = function(objects, likeFactor, dateFactor, fields) { //S
     return sorted;
 }
 
-const equateObjects = function(objects, property) { //Find overlapping objects, based on the equality of one array property
+module.exports.equateObjects = function(objects, property) { //Find overlapping objects, based on the equality of one array property
     let sortedObjects = new Map();
     let sortedMatrix = [];
 
@@ -76,5 +76,3 @@ const equateObjects = function(objects, property) { //Find overlapping objects, 
 
     return sortByPopularity(sortedMatrix, "instances", "date").popular;
 }
-
-module.exports = {getPopularityCoefficiant, sortByPopularity, equateObjects};

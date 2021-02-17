@@ -31,7 +31,7 @@ module.exports = router;
 
 // EVERYTHING BELOW THIS LINE IS 100% COMMENTED OUT CODE
 
-// const sendGridEmail = require("../utils/transport");
+// const {sendGridEmail} = require("../utils/transport");
 //
 // const User = require('../models/user');
 // const Email = require('../models/admin/email');

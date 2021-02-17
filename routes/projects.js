@@ -6,9 +6,9 @@ const middleware = require('../middleware');
 const router = express.Router(); //start express router
 const dateFormat = require('dateformat');
 const path = require('path');
-const sendGridEmail = require("../services/sendGrid");
-const convertToLink = require("../utils/convert-to-link");
-const filter = require('../utils/filter');
+const {sendGridEmail} = require("../services/sendGrid");
+const {convertToLink} = require("../utils/convert-to-link");
+const {filter} = require('../utils/filter');
 const {sortByPopularity} = require("../utils/popularity-algorithms");
 
 const {multipleUpload} = require('../middleware/multer');

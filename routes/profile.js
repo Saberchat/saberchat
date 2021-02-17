@@ -1,8 +1,8 @@
 const express = require('express')
 const router = express.Router();
 const Filter = require('bad-words');
-const filter = new Filter();
-const sendGridEmail = require("../services/sendGrid");
+const {filter} = new Filter();
+const {sendGridEmail} = require("../services/sendGrid");
 const {multipleUpload} = require('../middleware/multer');
 const {cloudUpload, cloudDelete} = require('../services/cloudinary');
 const convertToLink = require("../utils/convert-to-link");

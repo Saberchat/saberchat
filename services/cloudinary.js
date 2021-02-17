@@ -2,7 +2,7 @@ if (process.env.NODE_ENV !== "production") {
     require('dotenv').config();
 }
 
-const parseBuffer = require('./dataUri');
+const {parseBuffer} = require('./dataUri');
 const cloudinary = require('cloudinary').v2;
 const util = require('util');
 
@@ -15,7 +15,7 @@ cloudinary.config({
 const cloudUploader = util.promisify(cloudinary.uploader.upload);
 const cloudDestroyer = util.promisify(cloudinary.uploader.destroy);
 
-const cloudUpload = async (file, type) => {
+module.exports.cloudUpload = async function (file, type) {
     // turn buffer into file
     const imgFile = parseBuffer(file.originalname, file.buffer).content;
 
@@ -36,9 +36,9 @@ const cloudUpload = async (file, type) => {
         });
 
     return [error, cResult];
-};
+}
 
-const cloudDelete = async (filename, type) => {
+module.exports.cloudDelete = async function(filename, type) {
     let cResult;
     let error;
     const options = {};
@@ -56,9 +56,4 @@ const cloudDelete = async (filename, type) => {
         });
 
     return [error, cResult];
-};
-
-module.exports = {
-    cloudUpload: cloudUpload,
-    cloudDelete: cloudDelete
-};
+}
