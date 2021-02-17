@@ -1,6 +1,9 @@
 const User = require('../models/user');
 const {sendGridEmail} = require("../services/sendGrid");
-const {multipleUpload} = require('../middleware/multer');
+const {convertToLink} = require("../utils/convert-to-link");
+const Filter = require('bad-words');
+const {filter} = new Filter();
+const {cloudUpload, cloudDelete} = require('../services/cloudinary');
 
 module.exports.index = async function(req, res) {
     const users = await User.find({authenticated: true});
