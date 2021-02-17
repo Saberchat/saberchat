@@ -1,7 +1,7 @@
 //SCHEMA
 const User = require('../models/user');
-const Order = require('../models/order');
-const Item = require('../models/orderItem');
+const Order = require('../models/cafe/order');
+const Item = require('../models/cafe/orderItem');
 
 //LIBRARIES
 const express = require('express');
@@ -10,11 +10,7 @@ const {getPopularityCoefficiant, sortByPopularity, equateObjects} = require("../
 const filter = require('../utils/filter');
 const {getHours, sortTimes, getStats} = require('../utils/time');
 
-const getData = async function() {
-    const customers = await User.find({authenticated: true}); if (!customers) {return false;}
-    const items = await Item.find({}); if (!items) {return false;}
-    const orders = await Order.find({}); if (!orders) {return false;}
-
+const getData = async function(customers, items, orders) {
     //Calculate most popular and lucrative customers, and customers with the longest orders
     let popularCustomers = [];
     let longestOrderCustomers = [];

@@ -34,22 +34,22 @@ module.exports = router;
 // const sendGridEmail = require("../utils/transport");
 //
 // const User = require('../models/user');
-// const Email = require('../models/email');
+// const Email = require('../models/admin/email');
 //
-// const Comment = require('../models/comment');
-// const Room = require('../models/room');
-// const Request = require('../models/accessRequest');
+// const Comment = require('../models/chat/comment');
+// const Room = require('../models/chat/room');
+// const Request = require('../models/inbox/accessRequest');
 //
-// const Message = require('../models/message');
-// const Announcement = require('../models/announcement');
-// const Project = require('../models/project');
-// const Course = require('../models/course');
+// const Message = require('../models/inbox/message');
+// const Announcement = require('../models/announcements/announcement');
+// const Project = require('../models/projects/project');
+// const Course = require('../models/homework/course');
 //
-// const Order = require('../models/order');
-// const Article = require('../models/article');
+// const Order = require('../models/cafe/order');
+// const Article = require('../models/wHeights/article');
 //
-// const Permission = require('../models/permission');
-// const Status = require('../models/status');
+// const Permission = require('../models/admin/permission');
+// const Status = require('../models/admin/status');
 
 // router.post('/add-permission', (req, res) => {
 //   Permission.create({title: req.body.permission}, (err, permission ) => {

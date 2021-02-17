@@ -19,44 +19,33 @@ if (process.env.NODE_ENV !== "production") {
 }
 
 const User = require('../models/user');
-const Email = require('../models/email');
+const Email = require('../models/admin/email');
 
-const Comment = require('../models/comment');
-const Room = require('../models/room');
-const Request = require('../models/accessRequest');
+const Comment = require('../models/chat/comment');
+const Room = require('../models/chat/room');
+const Request = require('../models/inbox/accessRequest');
 
-const Message = require('../models/message');
-const Announcement = require('../models/announcement');
-const Project = require('../models/project');
+const Message = require('../models/inbox/message');
+const Announcement = require('../models/announcements/announcement');
+const Project = require('../models/projects/project');
 
-const Order = require('../models/order');
-const Article = require('../models/article');
+const Order = require('../models/cafe/order');
+const Article = require('../models/wHeights/article');
 
 const middleware = require('../middleware');
 
+const profile = require("../controllers/profile");
+
+const wrapAsync = require("../utils/wrapAsync");
+
 // renders the list of users page
-router.get('/', middleware.isLoggedIn, (req, res) => {
-
-    User.find({authenticated: true}, (err, users) => {
-        if (err || !users) {
-            req.flash('error', 'An Error Occurred');
-            res.redirect('back');
-
-        } else {
-            res.render('profile/index', {users});
-        }
-    });
-});
+router.get('/', middleware.isLoggedIn, wrapAsync(profile.index));
 
 //renders profiles edit page
-router.get('/edit', middleware.isLoggedIn, (req, res) => {
-    res.render('profile/edit');
-});
+router.get('/edit', middleware.isLoggedIn, wrapAsync(profile.edit));
 
 //renders the email/password edit page
-router.get('/change-login-info', middleware.isLoggedIn, (req, res) => {
-    res.render('profile/edit_pwd_email');
-});
+router.get('/change-login-info', middleware.isLoggedIn, wrapAsync(profile.changeLoginInfo));
 
 //renders views/profiles/show.ejs at /profiles route.
 router.get('/:id', middleware.isLoggedIn, (req, res) => {

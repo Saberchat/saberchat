@@ -1,11 +1,3 @@
-//SCHEMA
-const User = require('../models/user');
-const Order = require('../models/order');
-const Item = require('../models/orderItem');
-const Notification = require('../models/message');
-const Category = require('../models/itemType');
-const Cafe = require('../models/cafe')
-
 //LIBRARIES
 const dateFormat = require('dateformat');
 const path = require('path');
@@ -14,6 +6,14 @@ const { sortByPopularity } = require("../utils/popularity-algorithms");
 const convertToLink = require("../utils/convert-to-link");
 const getData = require("../utils/cafe-data");
 const {cloudUpload, cloudDelete} = require('../services/cloudinary');
+
+//SCHEMA
+const User = require('../models/user');
+const Order = require('../models/cafe/order');
+const Item = require('../models/cafe/orderItem');
+const Notification = require('../models/inbox/message');
+const Category = require('../models/cafe/itemType');
+const Cafe = require('../models/cafe/cafe')
 
 //-----------GENERAL ROUTES-----------//
 
@@ -204,13 +204,13 @@ module.exports.processOrder = async function(req, res) {
     order.present = false; //Order is not active anymore
     await order.save();
 
-    const cafes = await Cafe.find({});
-    if (!cafes) {
+    const cafe = await Cafe.findOne({});
+    if (!cafe) {
         return res.json({error: 'Could not find cafe info'});
     }
 
-    cafes[0].revenue += order.charge;
-    await cafes[0].save();
+    cafe.revenue += order.charge;
+    await cafe.save();
     return res.json({success: 'Successfully confirmed order'});
 }
 
@@ -285,12 +285,12 @@ module.exports.deleteOrder = async function(req, res) {
 
     //Cancellation starts here
 
-    const cafes = await Cafe.find({});
-    if (!cafes[0]) {
+    const cafe = await Cafe.findOne({});
+    if (!cafe) {
         return res.json({error: 'Could not access cafe'});
     }
 
-    if (!cafes[0].open) {
+    if (!cafe.open) {
         return res.json({error: 'The cafe is currently not taking orders'});
     }
 
@@ -631,7 +631,11 @@ module.exports.manage = async function(req, res) {
     }
 
     if (req.query.data) { //If page calls to display data, commented out for now
-        const data = await getData();
+        const customers = await User.find({authenticated: true}); if (!customers) {return false;}
+        const items = await Item.find({}); if (!items) {return false;}
+        const allOrders = await Order.find({}); if (!allOrders) {return false;}
+
+        const data = await getData(customers, items, allOrders);
         if (!data) {
             req.flash("error", "An Error Occurred");
             return res.redirect("back")
@@ -654,29 +658,29 @@ module.exports.manage = async function(req, res) {
         sortedCategories.push(sortedCategory);
     }
 
-    const cafes = await Cafe.find({});
-    if (!cafes) {
+    const cafe = await Cafe.findOne({});
+    if (!cafe) {
         req.flash('error', "An Error Occurred");
         return res.redirect('back');
     }
 
-    return res.render('cafe/manage', {categories: sortedCategories, open: cafes[0].open});
+    return res.render('cafe/manage', {categories: sortedCategories, open: cafe.open});
 }
 
 //OPEN/CLOSE CAFE
 module.exports.changeStatus = async function(req, res) {
-    const cafes = await Cafe.find({});
-    if (!cafes) {
+    const cafe = await Cafe.findOne({});
+    if (!cafe) {
         return res.json({error: "An error occurred"});
     }
 
-    if (cafes[0].open) {
-        cafes[0].open = false;
+    if (cafe.open) {
+        cafe.open = false;
     } else {
-        cafes[0].open = true;
+        cafe.open = true;
     }
-    await cafes[0].save();
-    return res.json({success: "Succesfully updated cafe", open: cafes[0].open});
+    await cafe.save();
+    return res.json({success: "Succesfully updated cafe", open: cafe.open});
 }
 
 //-----------ROUTES FOR GENERAL ITEM CATEGORIES-------------//

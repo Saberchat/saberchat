@@ -8,8 +8,8 @@ const {cloudUpload, cloudDelete} = require('../services/cloudinary');
 
 //SCHEMA
 const User = require('../models/user');
-const Announcement = require('../models/announcement');
-const Notification = require('../models/message');
+const Announcement = require('../models/announcements/announcement');
+const Notification = require('../models/inbox/message');
 const PostComment = require('../models/postComment');
 
 // Ann GET index

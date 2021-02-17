@@ -12,14 +12,14 @@ router.route('/')
     .post(middleware.isLoggedIn, validateRoom, wrapAsync(controller.createRoom));
 
 router.route('/:id')
-    .get(middleware.isLoggedIn, middleware.checkIfMember, wrapAsync(controller.showRoom))
-    .put(middleware.isLoggedIn, middleware.checkRoomOwnership, validateRoom, wrapAsync(controller.updateRoom))
-    .delete(middleware.isLoggedIn, middleware.checkRoomOwnership, wrapAsync(controller.deleteRoom))
+    .get(middleware.isLoggedIn, wrapAsync(middleware.checkIfMember), wrapAsync(controller.showRoom))
+    .put(middleware.isLoggedIn, wrapAsync(middleware.checkRoomOwnership), validateRoom, wrapAsync(controller.updateRoom))
+    .delete(middleware.isLoggedIn, wrapAsync(middleware.checkRoomOwnership), wrapAsync(controller.deleteRoom))
 
 router.get('/new', middleware.isLoggedIn, wrapAsync(controller.newRoom));
-router.get('/:id/people', middleware.isLoggedIn, middleware.checkIfMember, wrapAsync(controller.showMembers));
+router.get('/:id/people', middleware.isLoggedIn, wrapAsync(middleware.checkIfMember), wrapAsync(controller.showMembers));
 
-router.get('/:id/edit', middleware.isLoggedIn, middleware.checkRoomOwnership, wrapAsync(controller.editRoom));
+router.get('/:id/edit', middleware.isLoggedIn, wrapAsync(middleware.checkRoomOwnership), wrapAsync(controller.editRoom));
 
 router.post('/:id/leave', middleware.isLoggedIn, middleware.checkForLeave, wrapAsync(controller.leaveRoom));
 

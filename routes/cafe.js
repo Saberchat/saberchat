@@ -9,8 +9,8 @@ const cafeController = require('../controllers/cafe');
 
 //GENERAL ROUTES
 router.route('/')
-    .get(middleware.isLoggedIn, middleware.cafeOpen, wrapAsync(cafeController.index)) //View homepage, view menu or view new order form
-    .post(middleware.isLoggedIn, middleware.cafeOpen, wrapAsync(cafeController.order)); //Create new order
+    .get(middleware.isLoggedIn, wrapAsync(middleware.cafeOpen), wrapAsync(cafeController.index)) //View homepage, view menu or view new order form
+    .post(middleware.isLoggedIn, wrapAsync(middleware.cafeOpen), wrapAsync(cafeController.order)); //Create new order
 
 //SPECIFIC ORDER ROUTES
 router.route('/order/:id')
