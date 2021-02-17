@@ -5,7 +5,7 @@ const {filter} = new Filter();
 const {sendGridEmail} = require("../services/sendGrid");
 const {multipleUpload} = require('../middleware/multer');
 const {cloudUpload, cloudDelete} = require('../services/cloudinary');
-const convertToLink = require("../utils/convert-to-link");
+const {convertToLink} = require("../utils/convert-to-link");
 
 const {
     validateUserUpdate,

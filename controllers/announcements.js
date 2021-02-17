@@ -1,5 +1,5 @@
 const {sendGridEmail} = require("../services/sendGrid");
-const convertToLink = require("../utils/convert-to-link");
+const {convertToLink} = require("../utils/convert-to-link");
 
 const path = require('path');
 const dateFormat = require('dateformat');

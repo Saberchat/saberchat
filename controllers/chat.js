@@ -11,7 +11,7 @@ const {filter} = new Filter();
 const dateFormat = require('dateformat');
 const router = express.Router();
 const {sendGridEmail} = require("../services/sendGrid");
-const convertToLink = require("../utils/convert-to-link");
+const {convertToLink} = require("../utils/convert-to-link");
 const {validateRoom} = require('../middleware/validation');
 const middleware = require('../middleware');
 

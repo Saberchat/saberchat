@@ -22,7 +22,7 @@ module.exports.sortByPopularity = function(objects, likeFactor, dateFactor, fiel
     let temp; //Sort objects by order of popularity coefficiant
     for (let i = 0; i < objects.length - 1; i++) {
         for (let j = 0; j < objects.length - 1; j++) {
-            if (getPopularityCoefficiant([objects[j]], likeFactor, dateFactor) < getPopularityCoefficiant([objects[j + 1]], likeFactor, dateFactor)) {
+            if (module.exports.getPopularityCoefficiant([objects[j]], likeFactor, dateFactor) < module.exports.getPopularityCoefficiant([objects[j + 1]], likeFactor, dateFactor)) {
                 temp = objects[j];
                 objects[j] = objects[j + 1];
                 objects[j + 1] = temp;
@@ -31,7 +31,7 @@ module.exports.sortByPopularity = function(objects, likeFactor, dateFactor, fiel
     }
 
     for (let object of objects) { //Uses popularity coefficiant to sort objects into popular and unpopular
-        if (getPopularityCoefficiant([object], likeFactor, dateFactor) >= getPopularityCoefficiant(objects, likeFactor, dateFactor)) {
+        if (module.exports.getPopularityCoefficiant([object], likeFactor, dateFactor) >= module.exports.getPopularityCoefficiant(objects, likeFactor, dateFactor)) {
             sorted.popular.push(object);
         } else {
             sorted.unpopular.push(object);
@@ -74,5 +74,5 @@ module.exports.equateObjects = function(objects, property) { //Find overlapping 
         });
     }
 
-    return sortByPopularity(sortedMatrix, "instances", "date").popular;
+    return module.exports.sortByPopularity(sortedMatrix, "instances", "date").popular;
 }

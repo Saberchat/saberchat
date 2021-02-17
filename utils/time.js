@@ -36,7 +36,7 @@ module.exports.getHours = function(dates) {
     for (let date of dates) {
         dateInMs = date.getTime();
         finalTimesUnformatted.push(((dateInMs/3600000)% 24)-8);
-        finalTimes.push(formatTime(((dateInMs/3600000)% 24)-8));
+        finalTimes.push(module.exports.formatTime(((dateInMs/3600000)% 24)-8));
     }
 
     return {finalTimes, finalTimesUnformatted};
@@ -69,19 +69,19 @@ module.exports.getStats = function(times) {
     }
 
     if (times.length%2 == 0) {
-        medianTime = formatTime((times[times.length/2] + times[(times.length/2)+1])/2);
+        medianTime = module.exports.formatTime((times[times.length/2] + times[(times.length/2)+1])/2);
     } else {
-        medianTime = formatTime(times[(times.length+1)/2]);
+        medianTime = module.exports.formatTime(times[(times.length+1)/2]);
     }
 
-    let formattedAvgTime = formatTime(Math.round(avgTime));
+    let formattedAvgTime = module.exports.formatTime(Math.round(avgTime));
     for (let time of times) {
         stdDevTime += Math.pow((time-avgTime), 2);
     }
 
     stdDevTime = Math.sqrt(stdDevTime/times.length);
-    minTime = formatTime(avgTime-(2*stdDevTime));
-    maxTime = formatTime(avgTime+(2*stdDevTime));
+    minTime = module.exports.formatTime(avgTime-(2*stdDevTime));
+    maxTime = module.exports.formatTime(avgTime+(2*stdDevTime));
 
     return {avgTime: formattedAvgTime, medianTime, minTime, maxTime};
 }
