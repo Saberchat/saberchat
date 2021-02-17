@@ -34,29 +34,18 @@ const Article = require('../models/wHeights/article');
 
 const middleware = require('../middleware');
 
+const profile = require("../controllers/profile");
+
+const wrapAsync = require("../utils/wrapAsync");
+
 // renders the list of users page
-router.get('/', middleware.isLoggedIn, (req, res) => {
-
-    User.find({authenticated: true}, (err, users) => {
-        if (err || !users) {
-            req.flash('error', 'An Error Occurred');
-            res.redirect('back');
-
-        } else {
-            res.render('profile/index', {users});
-        }
-    });
-});
+router.get('/', middleware.isLoggedIn, wrapAsync(profile.index));
 
 //renders profiles edit page
-router.get('/edit', middleware.isLoggedIn, (req, res) => {
-    res.render('profile/edit');
-});
+router.get('/edit', middleware.isLoggedIn, wrapAsync(profile.edit));
 
 //renders the email/password edit page
-router.get('/change-login-info', middleware.isLoggedIn, (req, res) => {
-    res.render('profile/edit_pwd_email');
-});
+router.get('/change-login-info', middleware.isLoggedIn, wrapAsync(profile.changeLoginInfo));
 
 //renders views/profiles/show.ejs at /profiles route.
 router.get('/:id', middleware.isLoggedIn, (req, res) => {
