@@ -17,8 +17,8 @@ const {validateProject} = require('../middleware/validation');
 
 //SCHEMA
 const User = require('../models/user');
-const Project = require('../models/project');
-const Notification = require('../models/message');
+const Project = require('../models/projects/project');
+const Notification = require('../models/inbox/message');
 const PostComment = require('../models/postComment');
 
 //ROUTES

@@ -4,10 +4,10 @@ const { sortByPopularity } = require("../utils/popularity-algorithms");
 const {cloudUpload, cloudDelete} = require('../services/cloudinary');
 
 const User = require('../models/user');
-const Notification = require('../models/message');
-const Course = require('../models/course');
+const Notification = require('../models/inbox/message');
+const Course = require('../models/homework/course');
 const PostComment = require('../models/postComment');
-const Room = require('../models/room');
+const Room = require('../models/chat/room');
 
 module.exports.index = async function(req, res) {
     const courses = await Course.find({});

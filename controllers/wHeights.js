@@ -4,9 +4,9 @@ const sendGridEmail = require("../services/sendGrid");
 const convertToLink = require("../utils/convert-to-link");
 
 //SCHEMA
-const Article = require('../models/article');
+const Article = require('../models/wHeights/article');
 const User = require('../models/user');
-const Type = require('../models/articleType');
+const Type = require('../models/wHeights/articleType');
 const PostComment = require('../models/postComment');
 
 // index page

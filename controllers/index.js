@@ -6,9 +6,9 @@ const sendGridEmail = require("../services/sendGrid");
 
 //SCHEMA
 const User = require('../models/user');
-const Course = require('../models/course');
-const Email = require('../models/email');
-const Announcement = require('../models/announcement');
+const Course = require('../models/homework/course');
+const Email = require('../models/admin/email');
+const Announcement = require('../models/announcements/announcement');
 
 module.exports.index = function(req, res) {
     return res.render('index');

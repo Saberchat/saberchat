@@ -7,9 +7,9 @@ const convertToLink = require("../utils/convert-to-link");
 const { cloudUpload } = require('../services/cloudinary');
 
 const User = require('../models/user');
-const Message = require('../models/message');
-const AccessReq = require('../models/accessRequest');
-const Room = require('../models/room');
+const Message = require('../models/inbox/message');
+const AccessReq = require('../models/inbox/accessRequest');
+const Room = require('../models/chat/room');
 
 // Inbox GET index page
 module.exports.index = async function(req, res) {
@@ -457,8 +457,8 @@ module.exports.acceptReq = async function(req, res) {
     await Req.save();
 
     if(Req.requester.receiving_emails) {
-        const emailText = `<p>Hello ${Req.requester.firstName},</p><p>Your request to join chat room <strong>${foundRoom.name}</strong> has been accepted!<p><p>You can access the room at https://alsion-saberchat.herokuapp.com</p>`;
-        await sendGridEmail(Req.requester.email, `Room Request Accepted - ${foundRoom.name}`, emailText, false);
+        const emailText = `<p>Hello ${Req.requester.firstName},</p><p>Your request to join chat room <strong>${room.name}</strong> has been accepted!<p><p>You can access the room at https://alsion-saberchat.herokuapp.com</p>`;
+        await sendGridEmail(Req.requester.email, `Room Request Accepted - ${room.name}`, emailText, false);
     }
 
     req.flash('success', 'Request accepted');

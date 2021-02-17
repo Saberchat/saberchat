@@ -42,11 +42,11 @@ const filter = new Filter();
 const schedule = require('node-schedule');
 
 // require the models for database actions
-const Comment = require('./models/comment');
+const Comment = require('./models/chat/comment');
 const User = require("./models/user");
-const Order = require('./models/order');
-const Item = require('./models/orderItem');
-const Cafe = require('./models/cafe');
+const Order = require('./models/cafe/order');
+const Item = require('./models/cafe/orderItem');
+const Cafe = require('./models/cafe/cafe');
 
 //require the routes
 const indexRoutes = require('./routes/index');

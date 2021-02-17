@@ -1,8 +1,8 @@
 //SCHEMAS
-const Comment = require('../models/comment');
+const Comment = require('../models/chat/comment');
 const User = require('../models/user');
-const Room = require('../models/room');
-const AccessReq = require('../models/accessRequest');
+const Room = require('../models/chat/room');
+const AccessReq = require('../models/inbox/accessRequest');
 
 //LIBRARIES
 const express = require('express');
