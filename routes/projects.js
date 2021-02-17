@@ -24,18 +24,16 @@ router.route('/')
 
 router.get('/new', middleware.isLoggedIn, middleware.isFaculty, wrapAsync(controller.newProject));
 
+router.put('/like', middleware.isLoggedIn, wrapAsync(controller.likeProject));
+router.put('/comment', middleware.isLoggedIn, wrapAsync(controller.postComment));
+router.put('/like-comment', middleware.isLoggedIn, wrapAsync(controller.likeComment));
+
 router.route('/:id')
     .get(wrapAsync(controller.showProject))
     .put(middleware.isLoggedIn, middleware.isFaculty, multipleUpload, wrapAsync(controller.updateProject))
     .delete(middleware.isLoggedIn, middleware.isFaculty, wrapAsync(controller.deleteProject));
 
 router.get('/:id/edit', middleware.isLoggedIn, middleware.isFaculty, wrapAsync(controller.editProject));
-
-router.put('/like', middleware.isLoggedIn, wrapAsync(controller.likeProject));
-
-router.put('/comment', middleware.isLoggedIn, wrapAsync(controller.postComment));
-
-router.put('/like-comment', middleware.isLoggedIn, wrapAsync(controller.likeComment));
 
 //COMMENTED OUT FOR NOW, UNTIL WE MAKE FURTHER DECISIONS AT MEETING
 

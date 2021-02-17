@@ -18,7 +18,6 @@ router.route('/:id')
 
 router.get('/new', middleware.isLoggedIn, wrapAsync(controller.newRoom));
 router.get('/:id/people', middleware.isLoggedIn, wrapAsync(middleware.checkIfMember), wrapAsync(controller.showMembers));
-
 router.get('/:id/edit', middleware.isLoggedIn, wrapAsync(middleware.checkRoomOwnership), wrapAsync(controller.editRoom));
 
 router.post('/:id/leave', middleware.isLoggedIn, middleware.checkForLeave, wrapAsync(controller.leaveRoom));

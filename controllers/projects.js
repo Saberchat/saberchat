@@ -3,9 +3,9 @@ const middleware = require('../middleware');
 const router = express.Router(); //start express router
 const dateFormat = require('dateformat');
 const path = require('path');
-const sendGridEmail = require("../services/sendGrid");
-const convertToLink = require("../utils/convert-to-link");
-const filter = require('../utils/filter');
+const {sendGridEmail} = require("../services/sendGrid");
+const {convertToLink} = require("../utils/convert-to-link");
+const {filter} = require('../utils/filter');
 const {sortByPopularity} = require("../utils/popularity-algorithms");
 
 const {multipleUpload} = require('../middleware/multer');
@@ -14,8 +14,8 @@ const {validateProject} = require('../middleware/validation');
 
 //SCHEMA
 const User = require('../models/user');
-const Project = require('../models/project');
-const Notification = require('../models/message');
+const Project = require('../models/projects/project');
+const Notification = require('../models/inbox/message');
 const PostComment = require('../models/postComment');
 
 
@@ -247,11 +247,9 @@ module.exports.updateProject = async function(req, res) {
 
     } else {
         let statuses = ['7th', '8th', '9th', '11th', '12th'];
-
         let creatorInputArray = req.body.creatorInput.split(',');
 
         for (let creator of creatorInputArray) {
-
             if (statuses.includes(creator)) {
                 statusGroup = await User.find({authenticated: true, status: creator});
 
@@ -277,7 +275,6 @@ module.exports.updateProject = async function(req, res) {
     }
 
     const project = await Project.findById(req.params.id).populate('poster');
-
     if (!project) {
         req.flash('error', "Unable to find project");
         return res.redirect('back');
@@ -442,9 +439,7 @@ module.exports.deleteProject = async function(req, res) {
 }
 
 module.exports.likeProject = async function(req, res) {
-    console.log("completed task");
     let project = await Project.findById(req.body.project);
-
     if (!project) {
         return res.json({error: 'Error updating project'});
     }
@@ -470,7 +465,6 @@ module.exports.likeProject = async function(req, res) {
 }
 
 module.exports.postComment = async function(req, res) {
-    console.log("completed task");
     const project = await Project.findById(req.body.project)
         .populate({
             path: "comments",
@@ -552,9 +546,7 @@ module.exports.postComment = async function(req, res) {
 }
 
 module.exports.likeComment = async function(req, res) {
-    console.log("completed task");
     let comment = PostComment.findById(req.body.commentId);
-
     if (!comment) {
         return res.json({error: 'Error updating comment'});
     }
