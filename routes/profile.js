@@ -1,7 +1,7 @@
 const express = require('express')
 const router = express.Router();
 const Filter = require('bad-words');
-const {filter} = new Filter();
+const filter = new Filter();
 const {sendGridEmail} = require("../services/sendGrid");
 const {multipleUpload} = require('../middleware/multer');
 const {cloudUpload, cloudDelete} = require('../services/cloudinary');

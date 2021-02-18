@@ -7,7 +7,7 @@ const Item = require('../models/cafe/orderItem');
 const express = require('express');
 const dateFormat = require('dateformat');
 const {getPopularityCoefficiant, sortByPopularity, equateObjects} = require("../utils/popularity-algorithms");
-const {filter} = require('../utils/filter');
+const filter = require('../utils/filter');
 const {getHours, sortTimes, getStats} = require('../utils/time');
 
 module.exports = async function(customers, items, orders) {
