@@ -1,6 +1,6 @@
 module.exports.convertToLink = function(text) {
     const delimeter = new RegExp(/[\"\'\r]/, 'g'); //Regex for most troublesome link characters
-    const alphanumeric = new RegExp(/[a-z0-9]/, 'g')
+    const alpha = new RegExp(/[a-z]/, 'g')
     let deformatted = []; //Holds words/links from text
     let embedded = false; //Boolean value to check if link/email is embedded in each line of text
 
@@ -23,7 +23,7 @@ module.exports.convertToLink = function(text) {
 
             //Money can be confused as a link, so $ expressions are discounted
         } else if (line.slice(0, line.length - 1).includes('.') && line.slice(0, line.length - 1).split('.')[1].length > 0 && !line.includes('$')) {
-            if (line.slice(0, line.length - 1).split('.')[1][0].match(alphanumeric)) {
+            if (line.slice(0, line.length - 1).split('.')[1][0].match(alpha)) {
                 links.push(text.slice(text.indexOf(line), text.indexOf(line) + line.length));
             }
         }
