@@ -9,7 +9,6 @@ var roomSchema = new mongoose.Schema({
     members: [{type: mongoose.Schema.Types.ObjectId, ref: "User"}],
     confirmed: [{type: mongoose.Schema.Types.ObjectId, ref: "User"}],
     creator: {type: mongoose.Schema.Types.ObjectId, ref: "User"},
-    createdBy: {type: mongoose.Schema.Types.ObjectId, ref: "User"},
     moderate: {type: Boolean, default: true},
     mutable: {type: Boolean, default: true}
 }, {timestamps: {createdAt: 'created_at'}});
