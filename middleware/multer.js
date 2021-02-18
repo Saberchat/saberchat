@@ -17,7 +17,6 @@ module.exports.multipleUpload = function(req, res, next) {
             req.flash('error', err.message);
             res.redirect('back');
         } else {
-            console.log(req.body);
             next();
         }
     });
