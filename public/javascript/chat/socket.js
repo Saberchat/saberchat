@@ -121,7 +121,6 @@ const chatInit = function (username, userId, messageForm, input, chatDisplay, ro
         </div>
       </div>`;
         } else {
-            console.log("Example here second");
             element =
                 `<div class="media mb-2">
         <img src="${msg.userImage}" alt="user" class="user-image">
