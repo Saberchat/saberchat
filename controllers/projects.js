@@ -23,7 +23,6 @@ module.exports.index = async function(req, res) {
     const projects = await Project.find({})
         .populate('creators')
         .populate('poster')
-    //Find all projects, collect info on their creators and posters (part of the 'User' schema)
     if (!projects) {
         req.flash('error', 'An Error Occurred');
         return res.redirect('back');
@@ -35,20 +34,16 @@ module.exports.index = async function(req, res) {
             fileExtensions.set(media.url, path.extname(media.url.split("SaberChat/")[1]));
         }
     }
-
     return res.render('projects/index', {projects, fileExtensions});
-    //Post the project data to HTML page, which formats the data
 }
 
 
 module.exports.newProject = async function(req, res) {
     let users = await User.find({authenticated: true, status: {$nin: ['alumnus', 'guest', 'parent', 'faculty']}});
-
     if (!users) {
         req.flash('error', "An Error Occurred");
         return res.redirect('back');
     }
-
     return res.render('projects/new', {students: users});
 }
 

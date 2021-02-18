@@ -9,15 +9,10 @@ const express = require('express');
 const Filter = require('bad-words');
 const filter = new Filter();
 const dateFormat = require('dateformat');
-const router = express.Router();
 const {sendGridEmail} = require("../services/sendGrid");
-const {convertToLink} = require("../utils/convert-to-link");
-const {validateRoom} = require('../middleware/validation');
-const middleware = require('../middleware');
 
 module.exports.index = async function(req, res) {
     const rooms = await Room.find({}).populate("creator");
-
     if (!rooms) {
         req.flash('error', 'Unable to find rooms');
         return res.redirect('back');
@@ -25,7 +20,6 @@ module.exports.index = async function(req, res) {
 
     let commentObject = {};
     let roomComments;
-
     for (let room of rooms) {
         roomComments = await Comment.find({room: room._id, status: {$in: ["none", "ignored"]}}).populate("author");
         if (!roomComments) {
@@ -51,18 +45,15 @@ module.exports.index = async function(req, res) {
         req.flash('error', 'Unable to find access requests');
         return res.redirect('back');
     }
-
     return res.render('chat/index', {rooms, requests, commentObject});
 }
 
 module.exports.newRoom = async function(req, res) {
     const users = await User.find({authenticated: true});
-
     if (!users) {
         req.flash('error', "An Error Occurred");
         return res.redirect('back');
     }
-
     return res.render('chat/new', {users: users});
 }
 
@@ -90,7 +81,7 @@ module.exports.showRoom = async function(req, res) {
         return res.redirect('/chat');
     }
 
-    return res.render('chat/show', {comments: comments, room: room});
+    return res.render('chat/show', {comments, room: room});
 }
 
 module.exports.showMembers = async function(req, res) {
@@ -354,7 +345,6 @@ module.exports.deleteRoom = async function(req, res) {
             return res.redirect('back');
         }
     }
-
     await room.creator.save();
 
     const deletedRoom = await Room.findByIdAndDelete(req.params.id).populate("members");
@@ -375,7 +365,6 @@ module.exports.deleteRoom = async function(req, res) {
 
 module.exports.reportComment = async function(req, res) {
     const comment = await Comment.findById(req.params.id).populate({path: 'room', select: 'moderate'});
-
     if (!comment) {
         return res.json('Error');
     } else if (!comment.room.moderate) {
@@ -384,10 +373,10 @@ module.exports.reportComment = async function(req, res) {
         return res.json('Already Reported');
     } else if (comment.status == 'ignored') {
         return res.json('Report Ignored by Mod');
-    } else {
-        comment.status = 'flagged'; // set status to flagged
-        comment.statusBy = req.body.user; // remember who flagged it
-        await comment.save();
-        return res.json('Reported');
     }
+    
+    comment.status = 'flagged'; // set status to flagged
+    comment.statusBy = req.body.user; // remember who flagged it
+    await comment.save();
+    return res.json('Reported');
 }

@@ -423,7 +423,6 @@ module.exports.removeStudent = async function(req, res) {
                         await tutor.tutor.save();
                     }
                 }
-
                 tutor.rooms.splice(i, 1); //Officially remove room from tutor
             }
         }
@@ -438,7 +437,6 @@ module.exports.removeStudent = async function(req, res) {
         read: [],
         mages: []
     });
-
     if (!notif) {
         return res.json({error: "Error removing student"});
     }

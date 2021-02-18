@@ -35,16 +35,13 @@ module.exports.markAll = function(req, res) {
 // Ann GET mark one ann as read
 module.exports.markOne = function(req, res) {
     //Iterate through user's announcement count and find the announcement that is being marked as read
-    let index = -1;
     for (let i = 0; i < req.user.annCount.length; i++) {
         if (req.user.annCount[i].announcement.toString() == req.params.id.toString()) {
-            index = i;
+            req.user.annCount.splice(i, 1);
+            req.user.save()
+            req.flash('success', 'Announcement Marked As Read!');
+            return res.redirect(`/announcements`);
         }
-    }
-    //If the announcement exists, remove it from announcement count
-    if (index > -1) {
-        req.user.annCount.splice(index, 1);
-        req.user.save()
     }
 
     req.flash('success', 'Announcement Marked As Read!');
@@ -64,17 +61,12 @@ module.exports.show = async function(req, res) {
     if(!Ann) {req.flash('error', 'Could not find announcement'); return res.redirect('back');}
 
     if(req.user) {
-        let index = -1;
         for (let i = 0; i < req.user.annCount.length; i ++) {
             if (req.user.annCount[i].announcement._id.equals(Ann._id)) {
-                index = i;
+                req.user.annCount.splice(i, 1);
+                await req.user.save();
             }
         }
-
-        if (index > -1) {
-            req.user.annCount.splice(index, 1);
-        }
-        await req.user.save();
     }
 
     let fileExtensions = new Map();
@@ -98,7 +90,6 @@ module.exports.updateForm = async function(req, res) {
     for (let media of Ann.imageFiles) {
         fileExtensions.set(media.url, path.extname(media.url.split("SaberChat/")[1]));
     }
-
     return res.render('announcements/edit', { announcement: Ann, fileExtensions });
 };
 
@@ -152,9 +143,7 @@ module.exports.create = async function(req, res) {
 
     const Users = await User.find({
         authenticated: true,
-        _id: {
-            $ne: req.user._id
-        }
+        _id: {$ne: req.user._id}
     });
     if (!Users) {
         req.flash('error', "An Error Occurred");
@@ -266,7 +255,6 @@ module.exports.updateAnn = async function(req, res) {
         return res.rediect('back');
     }
 
-    let announcementEmail;
     let imageString = "";
     for (let image of announcement.images) {
         imageString += `<img src="${image}">`;

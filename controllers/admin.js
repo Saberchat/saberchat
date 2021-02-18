@@ -127,8 +127,6 @@ module.exports.statusPut = async function(req, res) {
     }
 
     if (user.status == "faculty") {
-        let teaching = false;
-
         const courses = await Course.find({});
         if (!courses) {
             return res.json({error: "Error. Could not change", user});
@@ -136,13 +134,10 @@ module.exports.statusPut = async function(req, res) {
 
         for (let course of courses) {
             if (course.teacher.equals(user._id)) {
-                teaching = true;
-                break;
+                return res.json({error: "User is an active teacher", user});
             }
         }
-        if (teaching) {
-            return res.json({error: "User is an active teacher", user});
-        }
+
         user.status = req.body.status;
         await user.save();
         return res.json({success: "Succesfully changed", user});
@@ -260,20 +255,12 @@ module.exports.tag = async function(req, res) {
                 return res.json({error: 'Error. Could not change'});
             }
 
-            let active = false;
-            loop1:
-                for (let course of courses) {
-                    loop2:
-                        for (let tutor of course.tutors) {
-                            if (tutor.tutor.equals(user._id)) {
-                                active = true;
-                                break loop1;
-                            }
-                        }
+            for (let course of courses) {
+                for (let tutor of course.tutors) {
+                    if (tutor.tutor.equals(user._id)) {
+                        return res.json({error: "User is an Active Tutor"});
+                    }
                 }
-
-            if (active) {
-                return res.json({error: "User is an Active Tutor"});
             }
 
             user.tags.splice(user.tags.indexOf(req.body.tag), 1);

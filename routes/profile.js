@@ -1,33 +1,31 @@
 const express = require('express')
 const router = express.Router();
-const Filter = require('bad-words');
-const filter = new Filter();
-const {sendGridEmail} = require("../services/sendGrid");
 const {multipleUpload} = require('../middleware/multer');
-const {cloudUpload, cloudDelete} = require('../services/cloudinary');
-const {convertToLink} = require("../utils/convert-to-link");
 const {validateUserUpdate, validateEmailUpdate, validatePasswordUpdate} = require('../middleware/validation');
 const middleware = require('../middleware');
 const profile = require("../controllers/profile");
 const wrapAsync = require("../utils/wrapAsync");
 
-router.get('/', middleware.isLoggedIn, wrapAsync(profile.index)); // renders the list of users page
+router.route('/')
+    .get(middleware.isLoggedIn, wrapAsync(profile.index)) // renders the list of users page
+    .put(middleware.isLoggedIn, multipleUpload, validateUserUpdate, wrapAsync(profile.update));
+
 router.get('/edit', middleware.isLoggedIn, profile.edit); //renders profiles edit page
 router.get('/change-login-info', middleware.isLoggedIn, profile.changeLoginInfo); //renders the email/password edit page
-router.get('/confirm-email/:id', wrapAsync(profile.confirmEmailID));
-router.get('/:id', middleware.isLoggedIn, wrapAsync(profile.id));
+router.get('/confirm-email/:id', wrapAsync(profile.confirmEmail));
+router.get('/:id', middleware.isLoggedIn, wrapAsync(profile.show));
 
 router.put('/profile', middleware.isLoggedIn, multipleUpload, validateUserUpdate, wrapAsync(profile.profilePut)); // update user route.
 router.put('/tag', middleware.isAdmin, profile.tagPut);
 router.put('/change-email', middleware.isLoggedIn, validateEmailUpdate, wrapAsync(profile.changeEmailPut)); //route for changing email
 router.put('/change-password', middleware.isLoggedIn, validatePasswordUpdate, wrapAsync(profile.changePasswordPut)); //route for changing password
-router.put('/follow/:id', wrapAsync(profile.followID));
-router.put('/unfollow/:id', wrapAsync(profile.unfollowID));
-router.put('/remove/:id', wrapAsync(profile.removeID));
+router.put('/follow/:id', wrapAsync(profile.follow));
+router.put('/unfollow/:id', wrapAsync(profile.unfollow));
+router.put('/remove/:id', wrapAsync(profile.remove));
 
 module.exports = router;
 
-//EVERYTHING BELOW IS UNCOMMENTED AND IS FOR CHANGES WE MIGHT DO LATER
+//EVERYTHING BELOW IS COMMENTED OUT AND IS FOR CHANGES WE MIGHT DO LATER
 
 // const axios = require('axios');
 //

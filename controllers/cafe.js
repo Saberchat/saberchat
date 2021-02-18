@@ -279,7 +279,6 @@ module.exports.deleteOrder = async function(req, res) {
         if (!deletedOrder) {
             return res.json({error: 'Could not delete order'});
         }
-
         return res.json({success: 'Successfully rejected order'});
     }
 
@@ -319,7 +318,6 @@ module.exports.deleteOrder = async function(req, res) {
         item.item.isAvailable = true;
         await item.item.save();
     }
-
     return res.json({success: 'Successfully canceled'});
 }
 
@@ -667,12 +665,7 @@ module.exports.changeStatus = async function(req, res) {
     if (!cafe) {
         return res.json({error: "An error occurred"});
     }
-
-    if (cafe.open) {
-        cafe.open = false;
-    } else {
-        cafe.open = true;
-    }
+    cafe.open = (cafe.open == false);
     await cafe.save();
     return res.json({success: "Succesfully updated cafe", open: cafe.open});
 }
@@ -686,7 +679,6 @@ module.exports.newCategory = async function(req, res) {
         req.flash('error', "Unable to find categories");
         return res.redirect('back');
     }
-
     return res.render('cafe/newItemCategory', {categories});
 }
 
@@ -761,7 +753,6 @@ module.exports.viewCategory = async function(req, res) {
         req.flash('error', "An Error Occurred");
         return res.redirect('back');
     }
-
     return res.render('cafe/editItemCategory', {category, categories});
 }
 

@@ -31,7 +31,6 @@ module.exports.getHours = function(dates) {
     let finalTimes = [];
     let finalTimesUnformatted = [];
     let dateInMs;
-    let actual;
 
     for (let date of dates) {
         dateInMs = date.getTime();

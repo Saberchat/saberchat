@@ -1,13 +1,9 @@
 //SCHEMA
-const User = require('../models/user');
 const Order = require('../models/cafe/order');
 const Item = require('../models/cafe/orderItem');
 
 //LIBRARIES
-const express = require('express');
-const dateFormat = require('dateformat');
-const {getPopularityCoefficiant, sortByPopularity, equateObjects} = require("../utils/popularity-algorithms");
-const filter = require('../utils/filter');
+const {sortByPopularity, equateObjects} = require("../utils/popularity-algorithms");
 const {getHours, sortTimes, getStats} = require('../utils/time');
 
 module.exports = async function(customers, items, orders) {
@@ -27,7 +23,6 @@ module.exports = async function(customers, items, orders) {
             orderLength += order.items.length/orders.length;
             spent += order.charge;
         }
-
         popularCustomers.push({customer, orderCount: customerOrders.length, date: customer.created_at});
         longestOrderCustomers.push({customer, orderLength, date: customer.created_at});
         lucrativeCustomers.push({customer, spent, avgCharge: Math.round((spent/orders.length)*100)/100, date: customer.created_at});
@@ -57,7 +52,6 @@ module.exports = async function(customers, items, orders) {
         }
 
         orderedItems.push({item, orderCount: itemCount, date: item.created_at});
-
         if (itemOrderedCount == 0) {
             orderedQuantities.push({item, numOrders: itemOrderedCount, orderCount: itemCount, avgQuantity: 0});
         } else {
@@ -70,7 +64,7 @@ module.exports = async function(customers, items, orders) {
     let itemCombos = [];
     let itemCombo = [];
     for (let order of orders) {
-        let itemCombo = [];
+        itemCombo = [];
         for (let item of order.items) {
             itemCombo.push(item.item);
         }
@@ -87,7 +81,6 @@ module.exports = async function(customers, items, orders) {
         for (let object of combo.objects) {
             populatedItem = await Item.findById(object);
             if (!populatedItem) {return false;}
-
             populatedCombination.push(populatedItem);
         }
         populatedCombinations.push({combination: populatedCombination, instances: combo.instances});
@@ -111,7 +104,6 @@ module.exports = async function(customers, items, orders) {
 
     //Calculate most common timeframes
     let times = [];
-    let orderingTime;
     for (let order of orders) {
         times.push(new Date(order.created_at));
     }

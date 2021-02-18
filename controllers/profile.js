@@ -22,7 +22,7 @@ module.exports.changeLoginInfo = function(req, res) {
     return res.render('profile/edit_pwd_email');
 }
 
-module.exports.id = async function(req, res) {
+module.exports.show = async function(req, res) {
     const user = await User.findById(req.params.id).populate('followers');
     if (!user) {
         req.flash('error', 'Error. Cannot find user.');
@@ -57,7 +57,7 @@ module.exports.id = async function(req, res) {
     res.render('profile/show', {user, following, followerIds, convertedDescription});
 }
 
-module.exports.profilePut = async function(req, res) {
+module.exports.update = async function(req, res) {
     const overlap = await User.find({
         authenticated: true,
         username: filter.clean(req.body.username),
@@ -262,7 +262,7 @@ module.exports.changeEmailPut = async function(req, res) {
     return res.redirect('/profiles/change-login-info');
 }
 
-module.exports.confirmEmailID = async function(req, res) {
+module.exports.confirmEmail = async function(req, res) {
     const user = await User.findById(req.params.id);
     if (!user) {
         req.flash('error', "Unable to find user");
@@ -318,7 +318,7 @@ module.exports.changePasswordPut = async function(req, res) {
     return res.redirect('back');
 }
 
-module.exports.followID = async function(req, res) {
+module.exports.follow = async function(req, res) {
     const user = await User.findById(req.params.id);
     if (!user) {
         return res.json({error: "Error finding user"});
@@ -338,7 +338,7 @@ module.exports.followID = async function(req, res) {
     return res.json({success: "Succesfully followed user", user: req.user});
 }
 
-module.exports.unfollowID = async function(req, res) {
+module.exports.unfollow = async function(req, res) {
     const user = await User.findById(req.params.id);
     if (!user) {
         return res.json({error: "Error finding user"});
@@ -354,7 +354,7 @@ module.exports.unfollowID = async function(req, res) {
     return res.json({error: "You are not following this user"});
 }
 
-module.exports.removeID = async function(req, res) {
+module.exports.remove = async function(req, res) {
     const user = await User.findById(req.params.id);
     if (!user) {
         return res.json({error: "Error finding user"});

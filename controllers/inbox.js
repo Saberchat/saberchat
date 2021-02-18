@@ -31,9 +31,8 @@ module.exports.index = async function(req, res) {
 		}
         ).execPopulate();
 
-    const activeReqCount = req.user.requests.filter((req)=>req.status === "pending").length;
-
-	return res.render('inbox/index', {inbox: req.user.inbox.reverse(), requests: req.user.requests.reverse(), activeRequests: activeReqCount});
+    const activeRequests = req.user.requests.filter((req)=>req.status === "pending");
+	return res.render('inbox/index', {inbox: req.user.inbox.reverse(), requests: req.user.requests.reverse(), activeRequests});
 };
 
 // Inbox GET show message
@@ -144,7 +143,6 @@ module.exports.createMsg = async function(req, res) {
     message.noReply = (req.body.noreply == "true");
 
     let recipients = [];
-
     if(req.body.recipients) {
         recipients = JSON.parse(req.body.recipients);
     }
