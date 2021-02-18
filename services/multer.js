@@ -20,5 +20,14 @@ const multerConfig = {
     }
 };
 
-module.exports.uploadSingle = util.promisify(multer(multerConfig).fields([{name: "imageFile", maxCount: 1}, {name: "imageFile2", maxCount: 1}]));
-module.exports.uploadMultiple = util.promisify(multer(multerConfig).fields([{name: "imageFile", maxCount: 3}, {name: "imageFile2", maxCount: 3}])); //Max 3 uploads (might change, discuss as a team)
+module.exports.uploadSingle = util.promisify(multer(multerConfig).fields([
+    {name: "imageFile", maxCount: 1},
+    {name: "imageFile2", maxCount: 1},
+    {name: "imageFile3", maxCount: 1},
+]));
+
+module.exports.uploadMultiple = util.promisify(multer(multerConfig).fields([
+    {name: "imageFile", maxCount: 3},
+    {name: "imageFile2", maxCount: 3},
+    {name: "imageFile3", maxCount: 3},
+]));

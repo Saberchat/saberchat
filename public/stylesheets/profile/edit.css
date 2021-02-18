@@ -11,9 +11,13 @@
 }
 
 .banner-image {
+    position: relative;
+    display: block;
+    object-fit: cover;
     background-position: center;
     background-size: cover;
     filter: brightness(70%);
+    box-shadow: 0px 10px 10px rgba(0, 0, 0, 0.3);
     width: 100%;
 }
 

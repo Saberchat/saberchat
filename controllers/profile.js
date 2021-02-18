@@ -172,7 +172,7 @@ module.exports.profilePut = async function(req, res) {
     return res.redirect(`/profiles/${req.user._id}`);
 }
 
-module.exports.tagPut = function(res, req) {
+module.exports.tagPut = function(req, res) {
     if (req.user.tags.includes(req.body.tag)) {
         req.user.tags.splice(req.user.tags.indexOf(req.body.tag), 1);
         req.user.save();
@@ -185,7 +185,7 @@ module.exports.tagPut = function(res, req) {
     }
 }
 
-module.exports.changeEmailPut = async function(res, req) {
+module.exports.changeEmailPut = async function(req, res) {
     if (req.body.receiving_emails) {
         req.user.receiving_emails = true;
 
