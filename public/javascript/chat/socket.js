@@ -114,7 +114,7 @@ const chatInit = function (username, userId, messageForm, input, chatDisplay, ro
         <img src="${msg.userImage}" alt="user" class="user-image">
         <div class="media-body ml-3">
           <div class="bg-grey rounded py-2 px-3 mb-2 w-65">
-            <p class="text-small mb-0 text-dark">${msg.text}</p>
+            <p class="text-small mb-0 text-dark">${msg.text.split('<').join('&lt')}</p>
           </div>
           <p class="small text-muted msg-info"><span class="username">${msg.username}</span>, ${$.format.date(Date.now(), "h:mm a | MMM d")}</p>
           <button class="flag" id="${msg.id}" onclick="report(this)"><i class="far fa-flag"></i> <span class="flag-tooltip">Report comment</span></button>
@@ -127,7 +127,7 @@ const chatInit = function (username, userId, messageForm, input, chatDisplay, ro
         <img src="${msg.userImage}" alt="user" class="user-image">
         <div class="media-body ml-3">
           <div class="bg-grey rounded py-2 px-3 mb-2 w-65">
-            <p class="text-small mb-0 text-dark">${msg.text}</p>
+            <p class="text-small mb-0 text-dark">${msg.text.split('<').join('&lt')}</p>
           </div>
           <p class="small text-muted msg-info"><span class="username">${msg.username}</span>, ${$.format.date(Date.now(), "h:mm a | MMM d")}</p>
         </div>
