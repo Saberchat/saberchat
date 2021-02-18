@@ -56,7 +56,7 @@ module.exports.checkRoomOwnership = async function(req, res, next) {
         return res.redirect('/chat')
     }
 
-    if (room.creator.id.equals(req.user._id)) { return next();}
+    if (room.creator.equals(req.user._id)) { return next();}
     req.flash('error', 'You do not have permission to do that');
     return res.redirect('/chat/' + room._id);
 }

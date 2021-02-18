@@ -42,7 +42,7 @@
                 <h1 class="title" id="darkmode-header">People in "<%= room.name %>" (<%= room.members.length %>)</h1>
 
                 <a class="btn btn-primary" href="/chat/<%= room._id %>"><i class="fas fa-arrow-left"></i> Back</a>
-                <% if (room.creator.id._id.equals(currentUser._id)) { %>
+                <% if (room.creator._id.equals(currentUser._id)) { %>
                     <a class="btn btn-secondary" href="/chat/<%= room._id %>/edit"><i class="fas fa-cog"></i> Edit Room
                         Settings</a>
                 <% } %>
@@ -110,7 +110,7 @@
                                             <span class="tag badge badge-pill badge-<%= tagMap.get(tag) %>"><%= tag %></span>
                                         <% } %>
 
-                                        <% if (room.creator.id._id.equals(user._id)) { %>
+                                        <% if (room.creator._id.equals(user._id)) { %>
                                             <span class="tag badge badge-pill badge-secondary">Owner</span>
                                         <% } %>
                                     </a>

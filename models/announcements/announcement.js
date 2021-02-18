@@ -2,10 +2,7 @@ const mongoose = require('mongoose');
 
 var announcementSchema = new mongoose.Schema({
     subject: String,
-    sender: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "User"
-    },
+    sender: {type: mongoose.Schema.Types.ObjectId, ref: "User"},
     images: [{type: String}],
     imageFiles: [{
         filename: String,

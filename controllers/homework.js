@@ -17,11 +17,9 @@ module.exports.index = async function(req, res) {
     }
 
     let courseList = [];
-    let userIncluded;
     for (let course of courses) {
         if ((course.teacher.equals(req.user._id)) || (course.students.includes(req.user._id))) {
             courseList.push(course);
-
         } else {
             for (let tutor of course.tutors) {
                 if (tutor.tutor.equals(req.user._id)) {
@@ -30,7 +28,6 @@ module.exports.index = async function(req, res) {
             }
         }
     }
-
     return res.render('homework/index', {courses: courseList});
 }
 
@@ -70,6 +67,7 @@ module.exports.createCourse = async function(req, res) {
                 req.flash("error", "Upload failed");
                 return res.redirect("back");
             }
+
             course.thumbnailFile = {
                 filename: cloudResult.public_id,
                 url: cloudResult.secure_url,
@@ -727,7 +725,7 @@ module.exports.bookTutor = async function(req, res) {
 
             const room = await Room.create({ //Create chat room between student and tutor
                 name: `${req.user.firstName}'s Tutoring Sessions With ${tutor.tutor.firstName} - ${course.name}`,
-                creator: {id: tutor.tutor._id, username: tutor.tutor.username},
+                creator: tutor.tutor._id,
                 members: [req.user._id, tutor.tutor._id],
                 type: "private",
                 mutable: false

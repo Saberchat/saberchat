@@ -16,7 +16,7 @@ const {validateRoom} = require('../middleware/validation');
 const middleware = require('../middleware');
 
 module.exports.index = async function(req, res) {
-    const rooms = await Room.find({}).populate("creator.id");
+    const rooms = await Room.find({}).populate("creator");
 
     if (!rooms) {
         req.flash('error', 'Unable to find rooms');
@@ -94,7 +94,7 @@ module.exports.showRoom = async function(req, res) {
 }
 
 module.exports.showMembers = async function(req, res) {
-    const room = await Room.findById(req.params.id).populate('creator.id').populate('members');
+    const room = await Room.findById(req.params.id).populate('creator').populate('members');
     if (!room) {
         req.flash('error', "Unable to find room");
         return res.redirect('back');
@@ -129,7 +129,7 @@ module.exports.createRoom = async function(req, res) {
 
     let roomCount = 0;
     for (let room of rooms) {
-        if (room.creator.id.equals(req.user._id)) {
+        if (room.creator.equals(req.user._id)) {
             roomCount++;
         }
     }
@@ -140,8 +140,7 @@ module.exports.createRoom = async function(req, res) {
 
     const roomObject = {
         name: filter.clean(req.body.name),
-        'creator.id': req.user._id,
-        'creator.username': req.user.username,
+        creator: req.user._id,
         members: [req.user._id]
     };
 
@@ -189,7 +188,7 @@ module.exports.leaveRoom = async function(req, res) {
         return res.redirect('back');
     }
 
-    if (room.creator.id.equals(req.user._id)) {
+    if (room.creator.equals(req.user._id)) {
         req.flash('error', 'You cannot leave a room you created');
         return res.redirect('back');
     }
@@ -242,13 +241,13 @@ module.exports.requestJoin = async function(req, res) {
         const request = {
             requester: req.user._id,
             room: room._id,
-            receiver: room.creator.id
+            receiver: room.creator
         };
 
         // create the request and find the room creator
         const [createdReq, roomCreator] = await Promise.all([
             AccessReq.create(request),
-            User.findById(room.creator.id)
+            User.findById(room.creator)
         ]);
 
         if (!createdReq || !roomCreator) {
@@ -266,7 +265,7 @@ module.exports.requestJoin = async function(req, res) {
 }
 
 module.exports.requestCancel = async function(req, res) {
-    const room = await Room.findById(req.params.id).populate("creator.id");
+    const room = await Room.findById(req.params.id).populate("creator");
     if (!room) {
         return res.json({error: "Unable to find room"});
     }
@@ -276,8 +275,8 @@ module.exports.requestCancel = async function(req, res) {
         return res.json({error: "Unable to find request"});
     }
 
-    room.creator.id.requests.splice(room.creator.id.requests.indexOf(deletedReq._id), 1);
-    await room.creator.id.save();
+    room.creator.requests.splice(room.creator.requests.indexOf(deletedReq._id), 1);
+    await room.creator.save();
 
     return res.json({success: "Successfully deleted request"});
 }
@@ -320,7 +319,7 @@ module.exports.updateRoom = async function(req, res) {
 }
 
 module.exports.deleteRoom = async function(req, res) {
-    const room = await Room.findById(req.params.id).populate("creator.id");
+    const room = await Room.findById(req.params.id).populate("creator");
     if (!room) {
         req.flash('error', 'An error occured');
         return res.redirect('back');
@@ -345,8 +344,8 @@ module.exports.deleteRoom = async function(req, res) {
 
     let deletedRequest;
     for (let request of requests) {
-        if (room.creator.id.requests.includes(request._id)) {
-            room.creator.id.requests.splice(room.creator.id.requests.indexOf(request._id), 1);
+        if (room.creator.requests.includes(request._id)) {
+            room.creator.requests.splice(room.creator.requests.indexOf(request._id), 1);
         }
 
         deletedRequest = await AccessReq.findByIdAndDelete(request._id);
@@ -356,7 +355,7 @@ module.exports.deleteRoom = async function(req, res) {
         }
     }
 
-    await room.creator.id.save();
+    await room.creator.save();
 
     const deletedRoom = await Room.findByIdAndDelete(req.params.id).populate("members");
     if (!deletedRoom) {

@@ -8,10 +8,8 @@ var roomSchema = new mongoose.Schema({
     date: String,
     members: [{type: mongoose.Schema.Types.ObjectId, ref: "User"}],
     confirmed: [{type: mongoose.Schema.Types.ObjectId, ref: "User"}],
-    creator: {
-        id: {type: mongoose.Schema.Types.ObjectId, ref: "User"},
-        username: String
-    },
+    creator: {type: mongoose.Schema.Types.ObjectId, ref: "User"},
+    createdBy: {type: mongoose.Schema.Types.ObjectId, ref: "User"},
     moderate: {type: Boolean, default: true},
     mutable: {type: Boolean, default: true}
 }, {timestamps: {createdAt: 'created_at'}});

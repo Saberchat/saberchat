@@ -39,7 +39,7 @@
         <p class="text-dark lead mb-3"><%= room.description %></p>
         <a href="/chat" class="btn btn-primary" class="exit-button"><i class="fas fa-arrow-left"></i> Exit</a>
         <% if (room.mutable) { %>
-            <% if (room.creator.id.equals(currentUser._id)) { %>
+            <% if (room.creator.equals(currentUser._id)) { %>
                 <a class="btn btn-success" href="<%= room._id %>/people"><i class="fas fa-user"></i> People</a>
                 <a href="/chat/<%= room._id %>/edit" class="btn btn-secondary"><i class="fas fa-cog"></i> Room Settings</a>
             <% } else if(room.type == 'private') { %>

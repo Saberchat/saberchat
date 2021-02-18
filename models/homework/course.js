@@ -15,10 +15,7 @@ const courseSchema = new mongoose.Schema({
         display: {type: Boolean, default: true}
     },
     active: Boolean,
-    teacher: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'User'
-    },
+    teacher: {type: mongoose.Schema.Types.ObjectId, ref: 'User'},
     students: [{type: mongoose.Schema.Types.ObjectId, ref: 'User'}],
     blocked: [{type: mongoose.Schema.Types.ObjectId, ref: 'User'}],
     lessons: Number,
