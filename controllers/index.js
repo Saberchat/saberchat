@@ -9,7 +9,6 @@ const User = require('../models/user');
 const Course = require('../models/homework/course');
 const Email = require('../models/admin/email');
 const Announcement = require('../models/announcements/announcement');
-const Item = require('../models/cafe/orderItem');
 
 module.exports.index = function(req, res) {
     return res.render('index');
