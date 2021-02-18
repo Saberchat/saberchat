@@ -41,7 +41,7 @@
                 <input id="search-input" oninput="searchFunction()" class="form-control search" type="text" placeholder="Search..." title="Type in name"/>
               </div><br />
 
-              <ul class="list-group">
+            <ul class="list-group">
 
                 <li class="list-group-item mode darkmode-outline">
                   <span id="modify-header">Modify Permissions</span>
@@ -65,19 +65,18 @@
                           </div>
                         </div>
                       </div>
-                    </div>
-                  </form> -->
+                    </form> -->
                 </li>
 
                 <% let permMatrix = [["principal", "Principal"], ["admin", "Administrator"], ["mod", "Moderator"], ["default", "Default"]]; %>
-                <% let statusMatrix = [ ["faculty", "Faculty", []], ["12th", "Seniors", []], ["11th", "Juniors", []], ["10th", "Sophomores", []], ["9th", "Freshmen", []], ["8th", "8th Graders", []], ["7th", "7th Graders", []], ["alumnus", "Alumni", []], ["parent", "Parents", []], ["guest", "Guests", []] ] %>
+                <% let statusMatrix = [["faculty", "Faculty", []], ["12th", "Seniors", []], ["11th", "Juniors", []], ["10th", "Sophomores", []], ["9th", "Freshmen", []], ["8th", "8th Graders", []], ["7th", "7th Graders", []], ["alumnus", "Alumni", []], ["parent", "Parents", []], ["guest", "Guests", []]] %>
                 <% let statusMap = new Map([["faculty", "Faculty"], ["12th", "Senior"], ["11th", "Junior"], ["10th", "Sophomore"], ["9th", "Freshman"], ["8th", "8th Grader"], ["7th", "7th Grader"], ["alumnus", "Alumnus"], ["parent", "Parent"], ["guest", "Guest"]]); %>
-                <% let tagMap = new Map([["Tutor", "warning"], ["Cashier", "success"], ["Editor", "primary"]])%>
+                <% let tagMap = new Map([["Tutor", "warning"], ["Cashier", "success"], ["Editor", "primary"]]) %>
 
                 <% for (let perm of permMatrix) { %>
 
-                  <% for (let user of users) { %>
-                      <% if(!user._id.equals(currentUser._id) && user.permission == perm[0]){ %>
+                    <% for (let user of users) { %>
+                        <% if(!user._id.equals(currentUser._id) && user.permission == perm[0]){ %>
                             <% for (let status of statusMatrix) { %>
                               <% if (status[0].toLowerCase() == user.status.toLowerCase())  { %>
                                 <li class="list-group-item user <%=perm[1].toLowerCase()%> <%=status[0].toLowerCase()%> <%=status[1].toLowerCase()%> <%=perm[0]%> <%=user.tags.join(' ')%> cafe" id="<%=user._id%>">
@@ -108,10 +107,11 @@
 
                 <% } %>
 
-              </ul><br />
-            </div>
-          </div>
+            </ul>
+            <br/>
         </div>
-    </body>
-    <script src="/javascript/admin/permission.js"></script>
-  </html>
+    </div>
+</div>
+</body>
+<script src="/javascript/admin/permission.js"></script>
+</html>

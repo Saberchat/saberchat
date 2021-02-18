@@ -1,11 +1,20 @@
 .main, .element, #heading {
-  text-align: center;
+    text-align: center;
 }
 
 #heading {
-  width: 100%;
+    width: 100%;
 }
 
 #itemInput {
-  display: inline-block;
+    display: inline-block;
+}
+
+#file-row {
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
+
+#file-image {
+    text-align: center;
 }

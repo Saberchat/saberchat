@@ -5,7 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Saberchat</title>
 
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css" integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css"
+          integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk" crossorigin="anonymous">
     <link rel="stylesheet" href="/stylesheets/main.css">
     <link rel="stylesheet" href="/stylesheets/components/navbar.css">
     <link rel="stylesheet" href="/stylesheets/components/header.css">
@@ -18,9 +19,12 @@
       <%}%>
     <%}%>
 
-    <script src="https://code.jquery.com/jquery-3.5.1.min.js" integrity="sha256-9/aliU8dGd2tb6OSsuzixeV4y/faTqgFtohetphbbj0=" crossorigin="anonymous"></script>
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"
+            integrity="sha256-9/aliU8dGd2tb6OSsuzixeV4y/faTqgFtohetphbbj0=" crossorigin="anonymous"></script>
     <script src="https://unpkg.com/@popperjs/core@2" crossorigin="anonymous"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js" integrity="sha384-OgVRvuATP1z7JjHLkuOU7Xw704+h835Lr+6QL9UvYjZE3Ipu6Tp75j7Bh/kR0JKI" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js"
+            integrity="sha384-OgVRvuATP1z7JjHLkuOU7Xw704+h835Lr+6QL9UvYjZE3Ipu6Tp75j7Bh/kR0JKI"
+            crossorigin="anonymous"></script>
 
     <script src="https://kit.fontawesome.com/dccc745c41.js" crossorigin="anonymous"></script>
 
@@ -44,7 +48,7 @@
                   <input id="search-input" oninput="searchFunction()" class="form-control search" type="text" placeholder="Search..." title="Type in name"/>
                 </div><br />
 
-                <ul class="list-group">
+            <ul class="list-group">
 
                   <li class="list-group-item mode darkmode-outline">
                     <span id="modify-header">Modify Statuses</span>
@@ -78,16 +82,16 @@
                         </div>
                       </div>
                     </form> -->
-                  </li>
+                </li>
 
-                  <% let statusMatrix = [ ["Faculty", "Faculty", []], ["12th", "Seniors", []], ["11th", "Juniors", []], ["10th", "Sophomores", []], ["9th", "Freshmen", []], ["8th", "8th Graders", []], ["7th", "7th Graders", []], ["Alumnus", "Alumni", []], ["Parent", "Parents", []], ["Guest", "Guests", []] ] %>
-                  <% let permMatrix = [["principal", "Principal"], ["admin", "Administrator"], ["mod", "Moderator"], ["default", "Default"]]; %>
-                  <% let permMap = new Map(permMatrix); %>
-                  <% let tagMap = new Map([["Tutor", "warning"], ["Cashier", "success"], ["Editor", "info"]]); %>
+                <% let statusMatrix = [["Faculty", "Faculty", []], ["12th", "Seniors", []], ["11th", "Juniors", []], ["10th", "Sophomores", []], ["9th", "Freshmen", []], ["8th", "8th Graders", []], ["7th", "7th Graders", []], ["Alumnus", "Alumni", []], ["Parent", "Parents", []], ["Guest", "Guests", []]] %>
+                <% let permMatrix = [["principal", "Principal"], ["admin", "Administrator"], ["mod", "Moderator"], ["default", "Default"]]; %>
+                <% let permMap = new Map(permMatrix); %>
+                <% let tagMap = new Map([["Tutor", "warning"], ["Cashier", "success"], ["Editor", "info"]]); %>
 
-                  <% for (let status of statusMatrix) { %>
+                <% for (let status of statusMatrix) { %>
                     <% for (let user of users) { %>
-                      <% if(!user._id.equals(currentUser._id) && user.status.toLowerCase() == status[0].toLowerCase()){ %>
+                        <% if(!user._id.equals(currentUser._id) && user.status.toLowerCase() == status[0].toLowerCase()){ %>
                             <% for (let perm of permMatrix) { %>
                               <% if (perm[0].toLowerCase() == user.permission.toLowerCase())  { %>
                                 <li class="list-group-item user <%=status[0].toLowerCase()%> <%=status[1].toLowerCase()%> <%=perm[0]%> <%=user.tags.join(' ')%> cafe" id="user-<%=user._id%>">
@@ -129,10 +133,11 @@
                   <% }; %>
                 <% } %>
 
-                </ul><br />
-            </div>
+            </ul>
+            <br/>
         </div>
     </div>
-    <script src="/javascript/admin/status.js"></script>
+</div>
+<script src="/javascript/admin/status.js"></script>
 </body>
 </html>

@@ -447,9 +447,9 @@ Classes to toggle displays
 }
 
 #mark-sel-btn {
-  display: none;
+    display: none;
 }
 
 .unread {
-  font-weight: 700;
+    font-weight: 700;
 }

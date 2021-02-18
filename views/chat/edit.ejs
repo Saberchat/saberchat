@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html>
-  <head>
+<head>
     <title>Saberchat</title>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -14,6 +14,7 @@
     <%if (currentUser) {%>
       <%if (currentUser.darkmode) { %>
         <link rel="stylesheet" href="/stylesheets/projects/dark.css">
+        <link rel="stylesheet" href="/stylesheets/profile/dark-profile.css">
       <%}%>
     <%}%>
 
@@ -32,84 +33,96 @@
     <!-- include the backdrop for nav -->
     <%- include('../partials/header') %>
 
-    <div class="container mt-5">
-      <div class="row">
-          <div class="col-12 new-room">
-              <h1 class="title"><span>Edit "<%= room.name %>"</span></h1>
-              <a class="btn btn-primary" href="/chat/<%= room._id %>"><i class="fas fa-arrow-left"></i> Back</a>
-          </div>
-      </div>
-      <div class="row">
+<div class="container mt-5">
+    <div class="row">
+        <div class="col-12 new-room">
+            <h1 class="title" id="darkmode-header">Edit "<%= room.name %>"</h1>
+            <a class="btn btn-primary" href="/chat/<%= room._id %>"><i class="fas fa-arrow-left"></i> Back</a>
+        </div>
+    </div>
+    <div class="row">
         <div class="col-md-8 offset-md-2 col-12">
 
-          <form action="/chat/<%= room._id %>?_method=put" method="post">
+            <form action="/chat/<%= room._id %>?_method=put" method="post">
 
-            <div class="form-group">
-              <label for="usernameInput">Name</label>
-              <input id="usernameInput" class="form-control" type="text" name="name" value="<%= room.name %>" placeholder="(max 45) Enter Room Name" maxlength="45" required>
-            </div>
-            <div class="form-group">
-              <label for="descInput">Description</label>
-              <textarea id="descInput" class="form-control" name="description" placeholder="(max 300) Enter room description" maxlength="300" rows="5"><%= room.description %></textarea>
-            </div>
-            <div class="form-check mb-3">
-              <input name="moderate" id="moderate" type="checkbox" class="form-check-input" value="false"
-              <% if (!room.moderate) { %>
-               checked
-              <% } %>
-              >
-              <label for="moderate" class="form-check-label">Disable moderation and reporting comments (enabled if left blank)</label>
-            </div>
-            <div class="form-check mb-3">
-              <input name="type" id="roomType" type="checkbox" onclick="updateDisplay()" class="form-check-input" value="true"
-              <% if (room.type == 'private') { %>
-                checked
-              <% } %>
-              >
-              <label for="roomType" class="form-check-label">Private (public if left blank)</label>
-            </div>
+                <div class="form-group">
+                    <label for="usernameInput">Name</label>
+                    <input id="usernameInput" class="form-control mode" type="text" name="name" value="<%= room.name %>"
+                           placeholder="(max 45) Enter Room Name" maxlength="45" required>
+                </div>
+                <div class="form-group">
+                    <label for="descInput">Description</label>
+                    <textarea id="descInput" class="form-control mode" name="description"
+                              placeholder="(max 300) Enter room description" maxlength="300"
+                              rows="5"><%= room.description %></textarea>
+                </div>
+                <div class="form-check mb-3">
+                    <input name="moderate" id="moderate" type="checkbox" class="form-check-input" value="false"
+                    <% if (!room.moderate) { %>
+                           checked
+                            <% } %>
+                    >
+                    <label for="moderate" class="form-check-label">Disable moderation and reporting comments (enabled if
+                        left blank)</label>
+                </div>
+                <div class="form-check mb-3">
+                    <input name="type" id="roomType" type="checkbox" onclick="updateDisplay()" class="form-check-input"
+                           value="true"
+                    <% if (room.type == 'private') { %>
+                           checked
+                            <% } %>
+                    >
+                    <label for="roomType" class="form-check-label">Private (public if left blank)</label>
+                </div>
 
-            <div id="remove-block">
-              <h4>Remove Members</h4>
-              <div class="search-filter mb-3">
-                  <i class="fas fa-search"></i>
-                  <input id="remove-search-input" oninput="searchFunction('remove')" class="form-control  search-input" type="text" placeholder="Search..." title="Type in Username">
-              </div>
-              <div id="remove-user-list" class="user-list">
-                  <% users.forEach(user => { %>
-                      <% if (!(user._id.equals(currentUser._id)) && room.members.includes(user._id)) { %>
-                          <div class="form-check">
-                              <input name="checkRemove[<%= user._id %>]" id="<%= user._id %>" class="form-check-input" type="checkbox" value="">
-                              <label class="form-check-label" for="<%= user._id %>"><%= user.username %> (<%= user.firstName.charAt(0) %>.<%= user.lastName.charAt(0) %>.)</label>
-                          </div>
-                      <% } %>
-                  <% }); %>
-              </div>
-            </div>
+                <div id="remove-block">
+                    <h4>Remove Members</h4>
+                    <div class="search-filter mb-3">
+                        <i class="fas fa-search"></i>
+                        <input id="remove-search-input" oninput="searchFunction('remove')"
+                               class="form-control  search-input" type="text" placeholder="Search..."
+                               title="Type in Username">
+                    </div>
+                    <div id="remove-user-list" class="user-list">
+                        <% users.forEach(user => { %>
+                            <% if (!(user._id.equals(currentUser._id)) && room.members.includes(user._id)) { %>
+                                <div class="form-check">
+                                    <input name="checkRemove[<%= user._id %>]" id="<%= user._id %>"
+                                           class="form-check-input" type="checkbox" value="">
+                                    <label class="form-check-label" for="<%= user._id %>"><%= user.username %>
+                                        (<%= user.firstName.charAt(0) %>.<%= user.lastName.charAt(0) %>.)</label>
+                                </div>
+                            <% } %>
+                        <% }); %>
+                    </div>
+                </div>
 
-            <div id="add-block">
-              <h4>Add Members</h4>
-              <div class="search-filter mb-3">
-                  <i class="fas fa-search"></i>
-                  <input id="add-search-input" oninput="searchFunction('add')" class="form-control  search-input" type="text" placeholder="Search..." title="Type in Username">
-              </div>
-              <div id="add-user-list" class="user-list">
-                  <% users.forEach(user => { %>
-                      <% if (!(user._id.equals(currentUser._id)) && !(room.members.includes(user._id))) { %>
-                          <div class="form-check">
-                              <input name="checkAdd[<%= user._id %>]" id="<%= user._id %>" class="form-check-input" type="checkbox" value="">
-                              <label class="form-check-label" for="<%= user._id %>"><%= user.username %> (<%= user.firstName.charAt(0) %>.<%= user.lastName.charAt(0) %>.)</label>
-                          </div>
-                      <% } %>
-                  <% }); %>
-              </div>
-            </div>
-            <button id="submit-button" class="btn btn-lg btn-success btn-block">Submit</button>
+                <div id="add-block">
+                    <h4>Add Members</h4>
+                    <div class="search-filter mb-3">
+                        <i class="fas fa-search"></i>
+                        <input id="add-search-input" oninput="searchFunction('add')" class="form-control  search-input"
+                               type="text" placeholder="Search..." title="Type in Username">
+                    </div>
+                    <div id="add-user-list" class="user-list">
+                        <% users.forEach(user => { %>
+                            <% if (!(user._id.equals(currentUser._id)) && !(room.members.includes(user._id))) { %>
+                                <div class="form-check">
+                                    <input name="checkAdd[<%= user._id %>]" id="<%= user._id %>"
+                                           class="form-check-input" type="checkbox" value="">
+                                    <label class="form-check-label" for="<%= user._id %>"><%= user.username %>
+                                        (<%= user.firstName.charAt(0) %>.<%= user.lastName.charAt(0) %>.)</label>
+                                </div>
+                            <% } %>
+                        <% }); %>
+                    </div>
+                </div>
+                <button id="submit-button" class="btn btn-lg btn-success btn-block">Submit</button>
 
           </form>
           <div class="container mt-2"></div>
           <!-- delete button and form with bootstrap modal -->
-          <form action="/chat/<%= room._id %>/delete?_method=delete" method="post" id="delete-form">
+          <form action="/chat/<%= room._id %>?_method=delete" method="post" id="delete-form">
             <button type="button" class="btn btn-lg btn-danger btn-block" data-toggle="modal" data-target="#deleteModal" id="delete-button">Delete this room</button>
             <div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
               <div class="modal-dialog">
@@ -128,12 +141,10 @@
                     <button type="submit" class="btn btn-danger">Yes, Delete Room</button>
                   </div>
                 </div>
-              </div>
-            </div>
-          </form>
+            </form>
         </div>
-      </div>
-      <br />
     </div>
-  </body>
+    <br/>
+</div>
+</body>
 </html>

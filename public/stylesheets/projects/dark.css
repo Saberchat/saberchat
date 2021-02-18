@@ -31,3 +31,7 @@
   color: white;
 
 }
+
+.creator-heading, #creator-heading, #creator-div, .creator-names, #exampleModalLabel {
+    color: white;
+}

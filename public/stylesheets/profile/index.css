@@ -30,27 +30,27 @@ input#search-input {
     overflow: hidden;
 }
 
-.list-group-item .username{
+.list-group-item .username {
     margin-left: 15px;
     font-size: 1.2rem;
     font-weight: 300;
 }
 
-.profile-image{
+.profile-image {
     display: inline-block;
-    border-radius:50%;
-    width:40px;
-    height:40px;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
     object-fit: cover;
 }
 
 strong {
-  font-weight: bold;
+    font-weight: bold;
 }
 
 .user-element-text, .user-element-text:hover {
-  color: black;
-  text-decoration: none;
+    color: black;
+    text-decoration: none;
 }
 
 .username {
@@ -58,26 +58,26 @@ strong {
 }
 
 .span-tag-name {
-  font-weight: bold;
+    font-weight: bold;
 }
 
 .span-tag-username {
-  font-size: 80%;
+    font-size: 80%;
 }
 
 .tags {
-  margin-right: 20px;
+    margin-right: 20px;
 }
 
 .tag {
-  margin-right: 5px;
+    margin-right: 5px;
 }
 
 .unfollow-button, .follow-button {
-  float: right;
-  color: white;
+    float: right;
+    color: white;
 }
 
 .follow-div {
-  display: inline;
+    display: inline;
 }

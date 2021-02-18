@@ -1,4 +1,4 @@
-const scriptUrls = [
+module.exports.scriptUrls = [
     "https://stackpath.bootstrapcdn.com/", // bootstrap
     "https://maxcdn.bootstrapcdn.com/",
     "https://kit.fontawesome.com/", // fontawesome
@@ -9,12 +9,7 @@ const scriptUrls = [
 
 ];
 
-const styleUrls = [
+module.exports.styleUrls = [
     "https://stackpath.bootstrapcdn.com/",
     "https://maxcdn.bootstrapcdn.com/"
 ];
-
-module.exports = {
-    scriptUrls: scriptUrls,
-    styleUrls: styleUrls
-};

@@ -12,7 +12,7 @@ const editor = new EditorJS({
             class: Header,
             config: {
                 placeholder: 'Enter a header...',
-                levels: [1,2,3,4],
+                levels: [1, 2, 3, 4],
                 defaultLevel: 2
             }
         },
@@ -35,23 +35,23 @@ const saveButton = document.getElementById('save-button');
 const postIt = ((url, data) => {
 
     $('body').append($('<form/>', {
-      id: 'jQueryPostItForm',
-      method: 'post',
-      action: url
+        id: 'jQueryPostItForm',
+        method: 'post',
+        action: url
     }));
 
     for (let i in data) {
-      $('#jQueryPostItForm').append($('<input/>', {
-        type: 'hidden',
-        name: i,
-        value: data[i]
-      }));
+        $('#jQueryPostItForm').append($('<input/>', {
+            type: 'hidden',
+            name: i,
+            value: data[i]
+        }));
     }
     $('#jQueryPostItForm').submit();
 });
 
 saveButton.addEventListener('click', () => {
-    editor.save().then( savedData => {
+    editor.save().then(savedData => {
         articleTitle = document.getElementById('title').value;
         articleAuthor = document.getElementById('author').value;
 

@@ -1,12 +1,12 @@
 html, body, #container {
-width: 50%;
-height: 50%;
+    width: 50%;
+    height: 50%;
 }
 
-#container {
-  float: center;
-}
+/* #container {
+    float: center;
+} */
 
 .keyword {
-  font-weight: bold;
+    font-weight: bold;
 }

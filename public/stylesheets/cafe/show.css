@@ -1,16 +1,16 @@
 h2 {
-  text-align: center;
+    text-align: center;
 }
 
 .paying-in-person {
-  margin-top: 20px;
-  font-weight: bold;
+    margin-top: 20px;
+    font-weight: bold;
 }
 
 .rejection-input {
-  margin-top: 10px;
+    margin-top: 10px;
 }
 
 .cost {
-  font-weight: bold;
+    font-weight: bold;
 }

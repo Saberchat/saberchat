@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html>
-  <head>
+<head>
     <title>Saberchat</title>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -41,128 +41,164 @@
   </head>
   <body class="mode">
 
-    <div class="container mt-5">
-      <div class="row">
+<div class="container mt-5">
+    <div class="row">
         <div class="col-12">
-          <div class="jumbotron text-center header">
-            <% let studentStatuses = ['7th', '8th', '9th', '10th', '11th', '12th'] %>
-            <h1><i class="fas fa-chalkboard-teacher"></i> Tutoring Center </h1>
-            <p>A platform for students to communicate and help each other learn</p>
-            <% if (currentUser.status == 'faculty') { %>
-              <form action="/homework" method="post" id="add-course-form">
-                <button type="button" data-toggle="modal" data-target="#modal-teacher" class="btn btn-info"><i class="fas fa-chalkboard-teacher"></i> Create Course</button>
-                <div class="modal fade" id="modal-teacher" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
-                  <div class="modal-dialog mode">
-                    <div class="modal-content mode">
-                      <div class="modal-header mode">
-                        <h5 class="modal-title" id="exampleModalLabel">Create New Course</h5>
-                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                          <span aria-hidden="true">&times;</span>
+            <div class="jumbotron text-center header">
+                <% let studentStatuses = ['7th', '8th', '9th', '10th', '11th', '12th'] %>
+                <h1><i class="fas fa-chalkboard-teacher"></i> Tutoring Center </h1>
+                <p>A platform for students to communicate and help each other learn</p>
+                <% if (currentUser.status == 'faculty') { %>
+                    <form action="/homework" method="post" id="add-course-form" enctype="multipart/form-data">
+                        <button type="button" data-toggle="modal" data-target="#modal-teacher" class="btn btn-info"><i
+                                    class="fas fa-chalkboard-teacher"></i> Create Course
                         </button>
-                      </div>
-                      <div class="modal-body">
-                        <input class="form-control" type="text" name="title" placeholder="Course Name"/><br />
-                        <input class="form-control" type="text" id="thumbnail" name="thumbnail" placeholder="Course Thumbnail" oninput="changeThumbnailInit()"/>
-                        <img hidden id="thumbnail-photo" src="" /><br />
-                        <textarea rows="5" class="form-control" name="description" placeholder="Course Description"></textarea>
-                      </div>
-                      <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Back</button>
-                        <button type="submit" class="btn btn-primary">Create</button>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </form>
+                        <div class="modal fade" id="modal-teacher" tabindex="-1" aria-labelledby="deleteModalLabel"
+                             aria-hidden="true">
+                            <div class="modal-dialog mode">
+                                <div class="modal-content mode">
+                                    <div class="modal-header mode">
+                                        <h5 class="modal-title" id="exampleModalLabel">Create New Course</h5>
+                                        <button type="button" class="close mode" data-dismiss="modal" aria-label="Close">
+                                            <span aria-hidden="true">&times;</span>
+                                        </button>
+                                    </div>
+                                    <div class="modal-body mode">
+                                        <input class="form-control mode" type="text" name="title" placeholder="Course Name"/><br/>
+                                        <input class="form-control mode" type="text" id="thumbnail" name="thumbnail" placeholder="Course Thumbnail" oninput="changeThumbnailInit()"/>
+                                        <img hidden id="thumbnail-photo" src=""/><br/>
+                                        <div class="form-group">
+                                            <label for="imageFile">Thumbnail Upload</label>
+                                            <input type="file" name="imageFile" class="image-upload form-control-file" accept="image/png, image/jpg, image/jpeg">
+                                        </div>
+                                        <div class="form-group">
+                                            <input type="radio" name="showThumbnail" value="upload" id="showUploadedImage" checked/>
+                                            <label for="showUploadedImage">Display Uploaded Image</label>
+                                            <br />
+                                            <input type="radio" name="showThumbnail" value="url" id="showLinkImage"/>
+                                            <label for="showLinkImage">Display Image URL</label>
+                                        </div>
+                                        <textarea rows="5" class="form-control mode" name="description"
+                                                  placeholder="Course Description"></textarea>
+                                    </div>
+                                    <div class="modal-footer mode">
+                                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Back
+                                        </button>
+                                        <button type="submit" class="btn btn-primary">Create</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
 
-            <%} else if (studentStatuses.includes(currentUser.status)) { %>
-              <form action="/homework/join" method="post" id="join-course-student">
-                <button type="button" data-toggle="modal" data-target="#modal-join" class="btn btn-primary"><i class="fas fa-chalkboard-teacher"></i> Join Course</button>
-                <div class="modal fade" id="modal-join" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
-                  <div class="modal-dialog mode">
-                    <div class="modal-content mode">
-                      <div class="modal-header mode">
-                        <h5 class="modal-title" id="exampleModalLabel">Join Course</h5>
-                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                          <span aria-hidden="true">&times;</span>
+                <% } else if (studentStatuses.includes(currentUser.status)) { %>
+                    <form action="/homework/join" method="post" id="join-course-student">
+                        <button type="button" data-toggle="modal" data-target="#modal-join" class="btn btn-primary"><i
+                                    class="fas fa-chalkboard-teacher"></i> Join Course
                         </button>
-                      </div>
-                      <div class="modal-body">
-                        <input class="form-control search" type="text" name="joincode" placeholder="Enter Join Code"/>
-                      </div>
-                      <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Back</button>
-                        <button type="submit" class="btn btn-primary">Join</button>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </form>
-
-              <% if (currentUser.tags.includes("Tutor")) { %>
-                <form action="/homework/join-tutor" method="post" id="join-course-tutor">
-                  <button type="button" data-toggle="modal" data-target="#modal-tutor" class="btn btn-success"><i class="fas fa-chalkboard-teacher"></i> Join Course As Tutor</button>
-                  <div class="modal fade" id="modal-tutor" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
-                    <div class="modal-dialog mode">
-                      <div class="modal-content mode">
-                        <div class="modal-header mode">
-                          <h5 class="modal-title" id="exampleModalLabel">Join Course As Tutor</h5>
-                          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                            <span aria-hidden="true">&times;</span>
-                          </button>
+                        <div class="modal fade" id="modal-join" tabindex="-1" aria-labelledby="deleteModalLabel"
+                             aria-hidden="true">
+                            <div class="modal-dialog mode">
+                                <div class="modal-content mode">
+                                    <div class="modal-header mode">
+                                        <h5 class="modal-title" id="exampleModalLabel">Join Course</h5>
+                                        <button type="button" class="close mode" data-dismiss="modal" aria-label="Close">
+                                            <span aria-hidden="true">&times;</span>
+                                        </button>
+                                    </div>
+                                    <div class="modal-body mode">
+                                        <input class="form-control mode" type="text" name="joincode"
+                                               placeholder="Enter Join Code"/>
+                                    </div>
+                                    <div class="modal-footer mode">
+                                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Back
+                                        </button>
+                                        <button type="submit" class="btn btn-primary">Join</button>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
-                        <div class="modal-body">
-                          <input class="form-control search" type="text" name="joincode" placeholder="Enter Join Code"/><br />
-                          <label for="slots" id="slots-label">Number of Student Slots: 0</label><br />
-                          <input type="range" min="0" max="10" value="0" class="slider search" id="slots" name="slots" onchange="setStudents()">
-                          <textarea rows="5" minlength="50" maxlength="500" class="form-control mode" name="bio" placeholder="A Short Bio About Yourself"></textarea>
-                        </div>
-                        <div class="modal-footer">
-                          <button type="button" class="btn btn-secondary" data-dismiss="modal">Back</button>
-                          <button type="submit" class="btn btn-primary">Join</button>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </form>
-              <% } %>
-            <% } %>
+                    </form>
 
-          </div>
-        </div>
-      </div>
-
-      <div id="courses">
-      <% if (courses.length == 0) { %>
-        <h2>No Courses</h2>
-      <% } else { %>
-        <% for (let course of courses) { %>
-          <div class="card course-title" title="<%=course.name%>">
-            <img class="card-img-top course-thumbnail" src="<%=course.thumbnail%>" alt="Card image cap">
-            <div class="card-body chat">
-              <h5 class="card-title"><%=course.name.slice(0, 25)%><% if (course.name.length > 25) {%>... <% } %></h5>
-
-              <span class="card-text user-position">
-              <% if (course.teacher.equals(currentUser._id)) { %>
-                Teacher
-              <% } else if (course.students.includes(currentUser._id)) { %>
-                Student
-              <% } else { %>
-                <% for (let tutor of course.tutors) { %>
-                  <% if (tutor.tutor.equals(currentUser._id)) { %>
-                    Tutor
-                    <% break;%>
-                  <% } %>
+                    <% if (currentUser.tags.includes("Tutor")) { %>
+                        <form action="/homework/join" method="post" id="join-course-tutor">
+                            <button type="button" data-toggle="modal" data-target="#modal-tutor"
+                                    class="btn btn-success"><i class="fas fa-chalkboard-teacher"></i> Join Course As
+                                Tutor
+                            </button>
+                            <div class="modal fade" id="modal-tutor" tabindex="-1" aria-labelledby="deleteModalLabel"
+                                 aria-hidden="true">
+                                <div class="modal-dialog">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <h5 class="modal-title" id="exampleModalLabel">Join Course As Tutor</h5>
+                                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                <span aria-hidden="true">&times;</span>
+                                            </button>
+                                        </div>
+                                        <div class="modal-body">
+                                            <input class="form-control" type="text" name="joincode"
+                                                   placeholder="Enter Join Code"/><br/>
+                                            <label for="slots" id="slots-label">Number of Student Slots: 0</label><br/>
+                                            <input type="range" min="0" max="10" value="0" class="slider" id="slots"
+                                                   name="slots" onchange="setStudents()">
+                                            <textarea rows="5" minlength="50" maxlength="500" class="form-control"
+                                                      name="bio" placeholder="A Short Bio About Yourself"></textarea>
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Back
+                                            </button>
+                                            <button type="submit" class="btn btn-primary">Join</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                    <% } %>
                 <% } %>
-              <% } %>
-            </span><br />
 
-              <p class="card-text course-description"><%=course.description.slice(0, 151)%><%if (course.description.length > 150) {%>...<%}%></p>
-              <a href="homework/<%=course._id%>" class="btn btn-primary">Go to Course</a>
             </div>
-          </div>
-        <% } %>
-      <% } %>
+        </div>
     </div>
-  </body>
+
+    <div id="courses">
+        <% if (courses.length == 0) { %>
+            <h2>No Courses</h2>
+        <% } else { %>
+            <% for (let course of courses) { %>
+                <div class="card course-title darkmode-outline" title="<%= course.name %>">
+                    <img class="card-img-top course-thumbnail" src="<% if (course.thumbnailFile.display) { %> <%=course.thumbnailFile.url%> <%} else { %> <%= course.thumbnail.url %> <% } %>" alt="Card image cap">
+                    <div class="card-body">
+                        <h5 class="card-title"><%= course.name.slice(0, 25) %>
+                            <% if (course.name.length > 25) { %>...
+                            <% } %>
+                        </h5>
+
+                        <span class="card-text user-position">
+                            <% if (course.teacher.equals(currentUser._id)) { %>
+                                Teacher
+                            <% } else if (course.students.includes(currentUser._id)) { %>
+                                Student
+                            <% } else { %>
+                                <% for (let tutor of course.tutors) { %>
+                                    <% if (tutor.tutor.equals(currentUser._id)) { %>
+                                        Tutor
+                                        <% break; %>
+                                    <% } %>
+                                <% } %>
+                            <% } %>
+                        </span><br/>
+
+                        <p class="card-text course-description"><%= course.description.slice(0, 151) %>
+                            <% if (course.description.length > 150) { %>...
+                            <% } %>
+                        </p>
+                        <a href="homework/<%= course._id %>" class="btn btn-primary">Go to Course</a>
+                    </div>
+                </div>
+            <% } %>
+        <% } %>
+    </div>
+</div>
+</body>
 </html>

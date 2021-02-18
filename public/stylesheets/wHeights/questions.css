@@ -1,34 +1,34 @@
 .button-text, .date {
-  color: white;
+    color: white;
 }
 
 .block-header {
-  padding-bottom: 20px;
+    padding-bottom: 20px;
 }
 
 .date {
-  font-size: 80%;
+    font-size: 80%;
 }
 
 .author-profile {
-  width: 30px;
-  height: 30px;
-  object-fit: cover;
-  border-radius: 50%;
+    width: 30px;
+    height: 30px;
+    object-fit: cover;
+    border-radius: 50%;
 }
 
 .edit-button {
-  margin-left: 10px;
+    margin-left: 10px;
 }
 
 .delete-form {
-  display: inline-block;
+    display: inline-block;
 }
 
 #exampleModalLabel, .modal-body {
-  color: black;
+    color: black;
 }
 
 .announcement-text {
-  white-space: pre-wrap;
+    white-space: pre-wrap;
 }

@@ -4,7 +4,7 @@ flash messages
 ================================
  */
 
- #flash {
+#flash {
     position: absolute;
     z-index: 1;
     margin-top: 20px;
@@ -26,7 +26,6 @@ flash messages
     background-color: #000000ad;
     border-color: #ffffff;
 }
-
 
 
 /*
@@ -158,7 +157,7 @@ div.dropdown-menu.show {
 }
 
 .navbar-custom .navbar-nav .nav-link {
-    color: rgb(255,255,255);
+    color: rgb(255, 255, 255);
 }
 
 .navbar-custom .nav-item.active .nav-link,
@@ -176,25 +175,25 @@ div.dropdown-menu.show {
 }
 
 .nav-profile-img, .profile-img {
-  width: 20px;
-  height: 20px;
-  border-radius: 50%;
-  object-fit: cover;
-  display: inline-block;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    object-fit: cover;
+    display: inline-block;
 }
 
 .profile-img {
-  height:25px;
-  width: 25px;
-  margin-left: 5px;
-  margin-bottom: 5px;
+    height: 25px;
+    width: 25px;
+    margin-left: 5px;
+    margin-bottom: 5px;
 }
 
 .back {
-  position: relative;
-  text-align: center;
+    position: relative;
+    text-align: center;
 }
 
 .reset-password-text {
-  margin-bottom: 10px;
+    margin-bottom: 10px;
 }

@@ -1,4 +1,4 @@
-#profile-image {
+.profile-image {
     position: relative;
     display: block;
     width: 230px;
@@ -10,7 +10,7 @@
     z-index: 1;
 }
 
-#banner-image {
+.banner-image {
     background-position: center;
     background-size: cover;
     filter: brightness(70%);
@@ -18,34 +18,34 @@
 }
 
 #edit-settings, #profile-image-update, #settings-header {
-  text-align: center;
+    text-align: center;
 }
 
 #settings-header {
-  width: 100%;
+    width: 100%;
 }
 
 #delete-account {
-  margin-top: 30px;
+    margin-top: 30px;
 }
 
 #tag-group {
-  margin-left: 10px;
-  display: inline;
+    margin-left: 10px;
+    display: inline;
 }
 
 #profile-input {
-  margin-bottom: 10px;
+    margin-bottom: 10px;
 }
 
 #password-reset {
-  border-color: black;
-  background-color: lightgrey;
-  border-radius: 15px;
-  padding: 30px;
+    border-color: black;
+    background-color: lightgrey;
+    border-radius: 15px;
+    padding: 30px;
 }
 
 .password-input {
-  border-color: darkgrey;
-  border-width: 1px;
+    border-color: darkgrey;
+    border-width: 1px;
 }

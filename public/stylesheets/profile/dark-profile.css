@@ -1,3 +1,7 @@
-.user-element-text, .user-element-text:hover {
+.user-element-text, .user-element-text:hover, #role, #status, #email {
     color: turquoise;
+}
+
+.follower-link, .following-link {
+    color: white;
 }

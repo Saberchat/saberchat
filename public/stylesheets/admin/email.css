@@ -1,12 +1,12 @@
 .email {
-  padding-bottom: 30px;
-  padding-top: 15px;
+    padding-bottom: 30px;
+    padding-top: 15px;
 }
 
 .user-exists {
-  margin-left: 10px;
+    margin-left: 10px;
 }
 
 #loading {
-  color: red;
+    color: red;
 }

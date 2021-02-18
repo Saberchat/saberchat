@@ -25,15 +25,12 @@ const markSelBtn = document.getElementById('mark-sel-btn');
 
 const delSelForm = document.getElementById('del-select-form');
 
-// tracks inbox state
+// tracks inbox and request states
 let inboxDisplay = 'message';
-
-// tracks req inbox state
 let reqDisplay = 'current';
 
-// changes view to messages
-const setMessages = (() => {
-    if(inboxDisplay == 'request') {
+const setMessages = function () { // changes view to messages
+    if (inboxDisplay == 'request') {
         messageActions.classList.add('display');
         messageList.classList.add('display');
         viewMsg.classList.add('active');
@@ -46,11 +43,10 @@ const setMessages = (() => {
 
         inboxDisplay = 'message';
     }
-});
+}
 
-//changes view to requests
-const setRequests = (() => {
-    if(inboxDisplay == 'message') {
+const setRequests = function () { //changes view to requests
+    if (inboxDisplay == 'message') {
         requestActions.classList.add('display');
         requestList.classList.add('display');
         viewReq.classList.add('active');
@@ -63,16 +59,14 @@ const setRequests = (() => {
 
         inboxDisplay = 'request';
     }
-});
+}
 
-// sends form info for deleting selected messages
-const submitDelete = (() => {
+const submitDelete = function () { // sends form info for deleting selected messages
     delSelForm.submit();
-});
+}
 
-// changes req inbox to current
-const seeCurrentReq = (() => {
-    if(reqDisplay == 'history') {
+const seeCurrentReq = function () { // changes req inbox to current
+    if (reqDisplay == 'history') {
         currentReq.classList.add('display');
         pastReq.classList.remove('display');
 
@@ -81,11 +75,10 @@ const seeCurrentReq = (() => {
 
         reqDisplay = 'current';
     }
-});
+}
 
-// changes req inbox to history
-const seePastReq = (() => {
-    if(reqDisplay == 'current') {
+const seePastReq = function () { // changes req inbox to history
+    if (reqDisplay == 'current') {
         pastReq.classList.add('display');
         currentReq.classList.remove('display');
 
@@ -94,21 +87,20 @@ const seePastReq = (() => {
 
         reqDisplay = 'history';
     }
-});
+}
 
-// switches between delete all to delete selected
-const updateDelete = (() => {
+const updateDelete = function () { // switches between delete all to delete selected
     const inputs = document.getElementsByClassName('del-form-input');
     let selected = false;
     for (let i = 0; i < inputs.length; i++) {
         const input = inputs[i];
-        if(input.checked == true) {
+        if (input.checked == true) {
             selected = true;
             break;
         }
     }
 
-    if(selected) {
+    if (selected) {
         delAllBtn.style.display = 'none';
         delSelBtn.style.display = 'block';
         markAllBtn.style.display = 'none';
@@ -119,4 +111,4 @@ const updateDelete = (() => {
         markSelBtn.style.display = 'none';
         markAllBtn.style.display = 'block';
     }
-});
+}

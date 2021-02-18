@@ -5,8 +5,9 @@ const util = require('util');
 const storage = multer.memoryStorage();
 const imageFilter = (req, file, callback) => {
     const ext = path.extname(file.originalname);
-    if(ext !== '.png' && ext !== '.jpg' && ext !== '.jpeg') {
-        return callback(new Error('Invalid image format!'));
+    const extensions = [".png", ".jpg", ".jpeg", ".heic", ".gif", ".mp4", ".mp3", ".m4a", ".mov", ".pdf"];
+    if (!extensions.includes(ext.toLowerCase())) {
+        return callback(new Error('Invalid Media Format'));
     }
     callback(null, true);
 };
@@ -15,12 +16,9 @@ const multerConfig = {
     storage: storage,
     fileFilter: imageFilter,
     limits: {
-        fileSize: 3 * 10**6
+        fileSize: 3 * 10 ** 8
     }
 };
 
-// const multerUpload = util.promisify(multer(multerConfig).single('imageFile'));
-
-// module.exports = multerUpload;
-
-module.exports = multer(multerConfig).single('imageFile');
+module.exports.uploadSingle = util.promisify(multer(multerConfig).fields([{name: "imageFile", maxCount: 1}, {name: "imageFile2", maxCount: 1}]));
+module.exports.uploadMultiple = util.promisify(multer(multerConfig).fields([{name: "imageFile", maxCount: 3}, {name: "imageFile2", maxCount: 3}])); //Max 3 uploads (might change, discuss as a team)

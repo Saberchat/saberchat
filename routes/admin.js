@@ -1,155 +1,55 @@
 const express = require('express');
-//start express router
-const router = express.Router();
-const {transport, transport_mandatory} = require("../other_modules/transport");
-
-const User = require('../models/user');
-const Email = require('../models/email');
-
-const Comment = require('../models/comment');
-const Room = require('../models/room');
-const Request = require('../models/accessRequest');
-
-const Message = require('../models/message');
-const Announcement = require('../models/announcement');
-const Project = require('../models/project');
-const Course = require('../models/course');
-
-const Order = require('../models/order');
-const Article = require('../models/article');
-
-const Permission = require('../models/permission');
-const Status = require('../models/status');
-
+const router = express.Router(); //Start express router
 const middleware = require('../middleware');
+const admin = require("../controllers/admin");
+const wrapAsync = require('../utils/wrapAsync');
 
-//Function to display user inbox
-router.get('/', middleware.isLoggedIn, middleware.isAdmin, (req, res) => {
-	 res.render('admin/index');
-})
+router.get("/", middleware.isLoggedIn, middleware.isAdmin, admin.index);
 
-// displays moderator page
-router.get('/moderate', middleware.isLoggedIn, middleware.isMod, (req, res) => {
-	Comment.find({status: 'flagged'})
-	.populate({path: 'author', select:['username','imageUrl']})
-	.populate({path: 'statusBy', select:['username', 'imageUrl']})
-	.populate({path: 'room', select: ['name']})
-	.exec((err, foundComments) => {
-		if(err) {
-			req.flash('error', 'Cannot access DataBase');
-			res.redirect('/admin');
+router.route("/moderate")
+    .get(middleware.isLoggedIn, middleware.isMod, wrapAsync(admin.moderateGet))
+    .post(middleware.isLoggedIn, middleware.isMod, wrapAsync(admin.moderatePost))
+    .put(middleware.isLoggedIn, middleware.isMod, wrapAsync(admin.moderatePut))
+    .delete(middleware.isLoggedIn, middleware.isMod, wrapAsync(admin.moderateDelete));
 
-		} else {
-		  res.render('admin/mod', {comments: foundComments});
-		}
-	});
-});
+router.route("/permissions")
+    .get(middleware.isLoggedIn, middleware.isAdmin, wrapAsync(admin.permissionsGet))
+    .put(middleware.isLoggedIn, middleware.isAdmin, wrapAsync(admin.permissionsPut));
 
-// displays permissions page
-router.get('/permissions', middleware.isLoggedIn, middleware.isAdmin, (req, res) => {
-	User.find({authenticated: true}, (err, foundUsers) => {
-		if(err || !foundUsers) {
-			req.flash('error', 'Cannot access Database');
-			res.redirect('/admin');
+router.route("/status")
+    .get(middleware.isLoggedIn, middleware.isMod, wrapAsync(admin.statusGet))
+    .put(middleware.isLoggedIn, middleware.isMod, wrapAsync(admin.statusPut));
 
-		} else {
-		  res.render('admin/permission', {users: foundUsers});
-		}
-	});
-});
+router.route("/whitelist")
+    .get(middleware.isLoggedIn, middleware.isMod, wrapAsync(admin.whitelistGet))
+    .put(middleware.isLoggedIn, middleware.isMod, wrapAsync(admin.whitelistPut))
+    .delete(middleware.isLoggedIn, middleware.isMod, wrapAsync(admin.whitelistId));
 
-// displays status page
-router.get('/status', middleware.isLoggedIn, middleware.isMod, (req, res) => {
-	User.find({authenticated: true}, (err, foundUsers) => {
-		if(err || !foundUsers) {
-			req.flash('error', 'Cannot access Database');
-			res.redirect('/admin');
-		} else {
-			res.render('admin/status', {users: foundUsers, tags: ['Cashier', 'Tutor', 'Editor']});
-		}
-	});
-});
+router.put('/tag', middleware.isLoggedIn, middleware.isMod, wrapAsync(admin.tag));
 
-router.get('/whitelist', middleware.isLoggedIn, middleware.isPrincipal, (req, res) => {
-	(async() => {
-		const emails = await Email.find({name: {$ne: req.user.email}});
+module.exports = router;
 
-		if (!emails) {
-			req.flash('error', "Unable to find emails");
-			return res.redirect('back');
-		}
+// EVERYTHING BELOW THIS LINE IS 100% COMMENTED OUT CODE
 
-		const users = await User.find({authenticated: true});
-
-		if (!users) {
-			req.flash('error', "Unable to find users");
-			return res.redirect('back');
-		}
-
-		res.render('admin/whitelist', {emails, users});
-
-	})().catch(err => {
-		req.flash('error', "Unable to access database");
-		res.redirect('back');
-	});
-});
-
-router.put('/whitelist', middleware.isLoggedIn, middleware.isPrincipal, (req, res) => {
-
-	(async() => {
-		if (req.body.address.split('@')[1] == "alsionschool.org") {
-			return res.json({error: "Alsion emails do not need to be added to the whitelist"});
-		}
-
-		const overlap = await Email.find({address: req.body.address});
-
-		if (!overlap) {
-			return res.json({error: "Unable to find emails"});
-		}
-
-		if (overlap.length > 0) {
-			return res.json({error: "Email already in whitelist"});
-		}
-
-		const email = await Email.create({address: req.body.address});
-		if (!email) {
-			return res.json({error: "Error creating email"});
-		}
-
-		return res.json({success: "Email added", email});
-
-	})().catch(err => {
-		res.json({error: "An error occurred"});
-	});
-});
-
-router.delete('/whitelist/:id', middleware.isLoggedIn, middleware.isPrincipal, (req, res) => {
-	(async() => {
-		const email = await Email.findById(req.params.id);
-		if (!email) {
-			return res.json({error: "Unable to find email"});
-		}
-
-		const users = await User.find({authenticated: true, email: email.address});
-		if (!users) {
-			return res.json({error: "Unable to find users"});
-		}
-
-		if (users.length == 0) {
-			const deletedEmail = await Email.findByIdAndDelete(email._id);
-			if (!deletedEmail) {
-				return res.json({error: "Unable to delete email"});
-			}
-
-			return res.json({success: "Deleted email"});
-		}
-
-		return res.json({error: "Active user has this email"});
-
-	})().catch(err => {
-		res.json({error: "An error occurred"});
-	});
-});
+// const {sendGridEmail} = require("../utils/transport");
+//
+// const User = require('../models/user');
+// const Email = require('../models/admin/email');
+//
+// const Comment = require('../models/chat/comment');
+// const Room = require('../models/chat/room');
+// const Request = require('../models/inbox/accessRequest');
+//
+// const Message = require('../models/inbox/message');
+// const Announcement = require('../models/announcements/announcement');
+// const Project = require('../models/projects/project');
+// const Course = require('../models/homework/course');
+//
+// const Order = require('../models/cafe/order');
+// const Article = require('../models/wHeights/article');
+//
+// const Permission = require('../models/admin/permission');
+// const Status = require('../models/admin/status');
 
 // router.post('/add-permission', (req, res) => {
 //   Permission.create({title: req.body.permission}, (err, permission ) => {
@@ -448,244 +348,14 @@ router.delete('/whitelist/:id', middleware.isLoggedIn, middleware.isPrincipal, (
 // 			return res.redirect('back');
 // 		}
 //
-//     transport(deletedUser, 'Profile Deletion Notice', `<p>Hello ${deletedUser.firstName},</p><p>You are receiving this email because your email has been removed from Saberchat's email whitelist. Your account and all of its data has been deleted. Please contact a faculty member if  you think there has been a mistake.</p>`);
+//      await sendGridEmail(deletedUser.email, 'Profile Deletion Notice', `<p>Hello ${deletedUser.firstName},</p><p>You are receiving this email because your email has been removed from Saberchat's email whitelist. Your account and all of its data has been deleted. Please contact a faculty member if  you think there has been a mistake.</p>`, false);
 // 	}
 //
 // 	req.flash('success', "Email Removed From Whitelist! Any users with this email have been removed.");
 // 	res.redirect('/admin/whitelist');
 //
 // 	})().catch(err => {
-// 		req.flash('error', "Unable to access database");
+// 		req.flash('error', "An Error Occurred");
 // 		res.redirect('back');
 // 	});
 // });
-
-// changes permissions
-router.put('/permissions', middleware.isLoggedIn, middleware.isAdmin, (req, res) => {
-
-	User.findById(req.body.user, (err, user) => {
-		if (err || !user) {
-			res.json({error: "Error. Could not change"});
-
-		} else if (req.body.role == 'admin' || req.body.role == "principal") { //Changing a user to administrator or principal requires specific permissions
-
-			if(req.user.permission == 'principal') { // check if current user is the principal
-				user.permission = req.body.role;
-				user.save();
-				res.json({success: "Succesfully changed", user});
-
-			} else {
-				res.json({error: "You do not have permissions to do that", user});
-			}
-
-		} else {
-			if ((user.permission == "principal" || user.permission == "admin") && req.user.permission != "principal") {
-				res.json({error: "You do not have permissions to do that", user});
-
-			} else {
-				user.permission = req.body.role;
-				user.save();
-				res.json({success: 'Succesfully changed', user});
-			}
-		}
-	});
-});
-
-// changes status
-router.put('/status', middleware.isLoggedIn, middleware.isMod, (req, res) => {
-	(async() => {
-		const user = await User.findById(req.body.user);
-
-		if(!user) {
-			return res.json({error: 'Error. Could not change'});
-		}
-
-		if (user.status == "faculty") {
-			let teaching = false;
-
-			const courses = await Course.find({});
-			if (!courses) {
-				return res.json({error: "Error. Could not change", user});
-			}
-
-			for (let course of courses) {
-				if (course.teacher.equals(user._id)) {
-					teaching = true;
-					break;
-				}
-			}
-
-			if (teaching) {
-				return res.json({error: "User is an active teacher", user});
-			}
-
-			user.status = req.body.status;
-			await user.save();
-			return res.json({success: "Succesfully changed", user});
-		}
-
-		user.status = req.body.status;
-		await user.save();
-		return res.json({success: "Successfully Changed", user});
-
-	})().catch(err => {
-		res.json({error: "Error. Could not change"});
-	});
-});
-
-router.put('/tag', middleware.isLoggedIn, middleware.isMod, (req, res) => {
-
-  (async() => {
-    const user = await User.findById(req.body.user);
-
-    if(!user) {
-      return res.json({error: 'Error. Could not change'});
-    }
-
-    if (user.tags.includes(req.body.tag)) {
-
-      if (req.body.tag == "Tutor") {
-        const courses = await Course.find({});
-
-        if (!courses) {
-          return res.json({error: 'Error. Could not change'});
-        }
-
-        let active = false;
-
-        loop1:
-        for (let course of courses) {
-          loop2:
-          for (let tutor of course.tutors) {
-            if (tutor.tutor.equals(user._id)) {
-              active = true;
-              break loop1;
-            }
-          }
-        }
-
-        if (active) {
-          return res.json({error: "User is an Active Tutor"});
-
-        } else {
-          user.tags.splice(user.tags.indexOf(req.body.tag), 1);
-          user.save();
-          return res.json({success: "Successfully removed status", tag: req.body.tag})
-        }
-
-      } else {
-        user.tags.splice(user.tags.indexOf(req.body.tag), 1);
-        user.save();
-        return res.json({success: "Successfully removed status", tag: req.body.tag})
-      }
-
-    } else {
-      user.tags.push(req.body.tag);
-      user.save();
-      return res.json({success: "Successfully added status", tag: req.body.tag})
-    }
-
-  })().catch(err => {
-    res.json({error: 'Error. Could not change'});
-  });
-});
-
-//Context
-router.post('/moderate', middleware.isLoggedIn, middleware.isMod, (req, res) => {
-	(async() => {
-		const reportedComment = await Comment.findById(req.body.commentId).populate("author");
-		if (!reportedComment) {
-			return res.json({error: "Unable to find comment"});
-		}
-
-		let commentIndex;
-		let context = [];
-
-		const allComments = await Comment.find({room: reportedComment.room}).populate("author");
-		if (!allComments) {
-			return res.json({error: "Unable to find other comments"});
-		}
-
-		for (let i = 0; i < allComments.length; i ++) {
-			if (allComments[i]._id.equals(reportedComment._id)) {
-				commentIndex = i;
-				break;
-			}
-		}
-
-		for (let i = 5; i >= 1; i --) {
-			if (commentIndex-i > 0) {
-				if (allComments[commentIndex-i].author) {
-					context.push(allComments[commentIndex-i]);
-				}
-			}
-		}
-
-		context.push(reportedComment);
-
-		for (let i = 1; i <= 5; i ++) {
-			if (commentIndex+i < allComments.length) {
-				if (allComments[commentIndex+i].author) {
-					context.push(allComments[commentIndex+i]);
-				}
-			}
-		}
-
-		return res.json({success: "Succesfully collected data", context});
-
-	})().catch(err => {
-		console.log(err);
-		res.json({error: "An error occurred"});
-	});
-});
-
-// route for ignoring reported comments
-router.put('/moderate', middleware.isLoggedIn, middleware.isMod, (req, res) => {
-	Comment.findById(req.body.id).populate('statusBy').exec((err, comment) => {
-		if (err || !comment) {
-			res.json({error: 'Could not find comment'});
-
-		} else if (comment.author.equals(req.user._id)) {
-			res.json({error: "You cannot handle your own comments"});
-
-		} else if (comment.statusBy._id.equals(req.user._id)) {
-			res.json({error: "You cannot handle comments you have reported"});
-
-		} else {
-			comment.status = "ignored";
-			comment.save();
-			comment.statusBy.falseReportCount += 1;
-			comment.statusBy.save();
-
-		 	res.json({success: 'Ignored comment'});
-		}
-	});
-});
-
-// route for deleting reported comments
-router.delete('/moderate', middleware.isLoggedIn, middleware.isMod, (req, res) => {
-	Comment.findById(req.body.id).populate("author").exec((err, comment) => {
-		if (err || !comment) {
-			res.json({error: 'Could not find comment'});
-
-		} else if (comment.author.equals(req.user._id)) {
-			res.json({error: "You cannot handle your own comments"});
-
-		} else if (comment.statusBy._id.equals(req.user._id)) {
-			res.json({error: "You cannot handle comments you have reported"});
-
-		} else {
-			comment.status = "deleted";
-			comment.save();
-			comment.author.reportedCount += 1;
-			comment.author.save();
-			res.json({success: 'Deleted comment'});
-		}
-	});
-});
-
-router.get('/manageCafe', middleware.isLoggedIn, middleware.isMod, (req, res) => {
-	res.redirect('/cafe/manage');
-});
-
-module.exports = router;

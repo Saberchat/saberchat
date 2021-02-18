@@ -1,11 +1,12 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
+<head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Saberchat</title>
 
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css" integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css"
+          integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk" crossorigin="anonymous">
     <link rel="stylesheet" href="/stylesheets/main.css">
     <link rel="stylesheet" href="/stylesheets/components/header.css">
     <link rel="stylesheet" href="/stylesheets/components/navbar.css">
@@ -14,12 +15,17 @@
     <%if (currentUser) {%>
       <%if (currentUser.darkmode) { %>
         <link rel="stylesheet" href="/stylesheets/Darkmode.css">
+        <link rel="stylesheet" href="/stylesheets/announcements/dark.css">
+        <link rel="stylesheet" href="/stylesheets/projects/dark.css">
       <%}%>
     <%}%>
 
-    <script src="https://code.jquery.com/jquery-3.5.1.min.js" integrity="sha256-9/aliU8dGd2tb6OSsuzixeV4y/faTqgFtohetphbbj0=" crossorigin="anonymous"></script>
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"
+            integrity="sha256-9/aliU8dGd2tb6OSsuzixeV4y/faTqgFtohetphbbj0=" crossorigin="anonymous"></script>
     <script src="https://unpkg.com/@popperjs/core@2" crossorigin="anonymous"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js" integrity="sha384-OgVRvuATP1z7JjHLkuOU7Xw704+h835Lr+6QL9UvYjZE3Ipu6Tp75j7Bh/kR0JKI" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js"
+            integrity="sha384-OgVRvuATP1z7JjHLkuOU7Xw704+h835Lr+6QL9UvYjZE3Ipu6Tp75j7Bh/kR0JKI"
+            crossorigin="anonymous"></script>
 
     <script src="https://kit.fontawesome.com/dccc745c41.js" crossorigin="anonymous"></script>
     <script src="/javascript/nav/userForm.js"></script>
@@ -29,11 +35,11 @@
   </head>
   <body class="mode">
 
-    <%- include('../partials/navbar') %>
-    <%- include('../partials/header') %>
+<%- include('../partials/navbar') %>
+<%- include('../partials/header') %>
 
-    <div class="container mt-5">
-      <div class="row">
+<div class="container mt-5">
+    <div class="row">
         <div class="col-12">
           <div class="jumbotron text-center header">
             <h1><i class="fas fa-sign-in-alt"></i> Announcements</h1>
@@ -41,174 +47,237 @@
             <a class="btn btn-primary" href="/announcements"><i class="fas fa-arrow-left"></i> Back</a>
           </div>
         </div>
-      </div>
-      <div class="row">
+    </div>
+    <div class="row">
         <div class="col-12">
-          <article class="ann-container">
-            <div class="ann-head">
-              <h1><%= announcement.subject %></h1>
+            <article class="ann-container">
+                <div class="ann-head">
+                    <h1><%= announcement.subject %></h1>
 
-              <% if (currentUser) { %>
-                <a id="sender-info" href="../profiles/<%=announcement.sender._id%>">
-                  <img src="<%= announcement.sender.imageUrl %>" alt="profile pic" class="sender-profile-image">
-                  <%=announcement.sender.firstName%> <%=announcement.sender.lastName%>
-                </a>
-                <br /><br />
+                    <% if (currentUser) { %>
+                        <a id="sender-info" class="darkmode-header" href="../profiles/<%= announcement.sender._id %>">
+                            <img src="<% if (announcement.sender.imageFile.display) {%> <%= announcement.sender.imageFile.url%><%} else {%> <%=announcement.sender.imageUrl.url%><%}%>" alt="profile pic"
+                                 class="sender-profile-image">
+                            <%= announcement.sender.firstName %> <%= announcement.sender.lastName %>
+                        </a>
+                        <br/><br/>
 
-              <% } else { %>
-                <span id="sender-info">
-                  <img src="<%= announcement.sender.imageUrl %>" alt="profile pic" class="sender-profile-image">
-                  <%=announcement.sender.firstName%> <%=announcement.sender.lastName%>
+                    <% } else { %>
+                        <span id="sender-info" class="darkmode-header">
+                  <img src="<% if (announcement.sender.imageFile.display) {%> <%= announcement.sender.imageFile.url%><%} else {%> <%=announcement.sender.imageUrl.url%><%}%>" alt="profile pic" class="sender-profile-image">
+                  <%= announcement.sender.firstName %> <%= announcement.sender.lastName %>
                 </span>
-              <% } %>
+                    <% } %>
 
-              <span><%=announcement.date%></span>
+                    <span><%= announcement.date %></span>
 
-              <% if (currentUser) { %>
-                <% if(announcement.sender._id.equals(currentUser._id)) { %>
-                  <div class="announcement-row">
-                    <a href="/announcements/<%= announcement._id %>/edit" class="btn btn-info"><i class="fas fa-cog"></i> Edit</a>
-                    <form action="/announcements/<%= announcement._id %>?_method=delete" method="post" id="delete-form">
-                      <button class="btn btn-danger announcement-button" type="button" data-toggle="modal" data-target="#modal-<%=announcement._id%>"><i class="far fa-trash-alt"></i> Delete</button>
-                      <div class="modal fade" id="modal-<%=announcement._id%>" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
-                        <div class="modal-dialog">
-                          <div class="modal-content">
-                            <div class="modal-header">
-                              <h5 class="modal-title" id="exampleModalLabel">Delete Announcement?</h5>
-                              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                <p aria-hidden="true">&times;</p>
-                              </button>
+                    <% if (currentUser) { %>
+                        <% if(announcement.sender._id.equals(currentUser._id)) { %>
+                            <div class="announcement-row">
+                                <a href="/announcements/<%= announcement._id %>/edit" class="btn btn-info"><i
+                                            class="fas fa-cog"></i> Edit</a>
+                                <form action="/announcements/<%= announcement._id %>?_method=delete" method="post"
+                                      id="delete-form">
+                                    <button class="btn btn-danger announcement-button" type="button" data-toggle="modal"
+                                            data-target="#modal-<%= announcement._id %>"><i
+                                                class="far fa-trash-alt"></i> Delete
+                                    </button>
+                                    <div class="modal fade" id="modal-<%= announcement._id %>" tabindex="-1"
+                                         aria-labelledby="deleteModalLabel" aria-hidden="true">
+                                        <div class="modal-dialog mode">
+                                            <div class="modal-content mode">
+                                                <div class="modal-header mode">
+                                                    <h5 class="modal-title" id="exampleModalLabel">Delete
+                                                        Announcement?</h5>
+                                                    <button type="button" class="close mode" data-dismiss="modal"
+                                                            aria-label="Close"></button>
+                                                    <p aria-hidden="true">&times;</p>
+                                                </div>
+                                                <div class="modal-body mode">
+                                                    This action is irreversible. You will have to manually recreate this
+                                                    announcement.
+                                                </div>
+                                                <div class="modal-footer mode">
+                                                    <button type="button" class="btn btn-secondary"
+                                                            data-dismiss="modal">No, Go Back
+                                                    </button>
+                                                    <button type="submit" class="btn btn-danger">Yes, Delete
+                                                        Announcement
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </form>
                             </div>
-                            <div class="modal-body">
-                              This action is irreversible. You will have to manually recreate this announcement.
-                            </div>
-                            <div class="modal-footer">
-                              <button type="button" class="btn btn-secondary" data-dismiss="modal">No, Go Back</button>
-                              <button type="submit" class="btn btn-danger">Yes, Delete Announcement</button>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    </form>
-                  </div>
-                  <br />
-                <% } %>
-
-                <div class="announcement-row">
-                  <% if (announcement.likes.includes(currentUser._id)) { %>
-                    <span id="announcement-like-row"><i id="like-<%=announcement._id%>-show" onclick="like(this)" class="fas fa-thumbs-up liked-announcement"></i> <span id="like-count" class="likeCount-<%=announcement._id%>"><%=announcement.likes.length%></span></span>
-
-                  <% } else { %>
-                    <span id="announcement-like-row"><i id="like-<%=announcement._id%>-show" onclick="like(this)" class="fas fa-thumbs-up unliked-announcement"></i> <span id="like-count" class="likeCount-<%=announcement._id%>"><%=announcement.likes.length%></span></span>
-
-                  <% }%>
-                  <a id="comments-count-icon" class="comment-button" href="#comment-section"><i class="fas fa-comment-dots"></i> <%=announcement.comments.length%></a>
-                </div>
-
-              <% } %>
-            </div>
-            <div class="ann-body">
-              <p class="announcement-text convertible-text"><%=convertedText%></p>
-              <hr>
-              <div class="ann-images">
-                <% announcement.images.forEach(image => { %>
-                  <img src="<%= image %>" alt="Attached Image" class="img-fluid rounded">
-                <% }) %>
-                <% if(announcement.imageFile.filename) { %>
-                  <img src="<%= announcement.imageFile.url %>" alt="Attached Image" class="img-fluid rounded">
-                <% } %>
-              </div>
-            </div>
-          </article>
-
-          <br />
-
-          <% if (currentUser) { %>
-            <article class="ann-container" id="comment-section">
-              <h3 id="comments-heading">Comments (<%=announcement.comments.length%>)</h3>
-
-              <form id="form-<%=announcement._id%>" onsubmit="comment(this, event)">
-                <div class="input-group comment-input-field">
-                  <input type="text"aria-describedby="send-button" class="form-control rounded-0 border-0 py-4" autocomplete="off" placeholder="Mention any questions or clarifications here" id="comment-input" />
-                  <div class="input-group-append">
-                    <button type="submit" class="btn btn-secondary"> <i class="fa fa-paper-plane send-icon"></i></button>
-                  </div>
-                </div>
-              </form><br />
-
-              <div id="all-comments">
-
-                <% for (let comment of announcement.comments.reverse()) { %>
-                  <% if (comment.sender && comment.sender._id.equals(currentUser._id)) { %>
-                    <!-- Reciever Message-->
-                    <div class="media mb-2 receiver-message">
-                      <img src="<%= comment.sender.imageUrl %>" alt="user" class="user-image">
-                      <div class="media-body ml-3">
-                        <div class="bg-primary rounded py-2 px-3 mb-2 w-75">
-                          <p class="text-small mb-0 text-white">
-
-                            <% for (let line of comment.text.split(" ")) { %>
-                              <% if (line[0] == '@') {%>
-                                <a class="edit-button-text" href="../profiles/<%=line.split('#')[1].split('_')[0]%>"><%=line.split("#")[0]%></a>
-                              <% } else { %>
-                                <%=line%>
-                              <% } %>
-                            <% } %>
-                          </p>
-                        </div>
-                        <p class="small text-muted msg-info"><span class="username">Me</span>, <%= comment.date %></p>
-
-                        <% if (comment.likes.includes(currentUser._id)) { %>
-                          <span class="liked-comment" id="likeComment-<%=comment._id%>" onclick="likeComment(this)"><i class="fas fa-thumbs-up"></i></span> <span class="like-count-comment" id="likeCountComment-<%=comment._id%>"><%=comment.likes.length%></span>
-
-                        <% } else { %>
-                          <span class="unliked-comment" id="likeComment-<%=comment._id%>" onclick="likeComment(this)"><i class="fas fa-thumbs-up"></i></span> <span class="like-comment-comment" id="likeCountComment-<%=comment._id%>"><%=comment.likes.length%></span>
-                        <% }%>
-
-                      </div>
-                    </div>
-                  <% } else if(comment.sender) { %>
-                    <!-- Sender message -->
-                    <div class="media mb-2 comment-body">
-                      <img src="<%= comment.sender.imageUrl %>" alt="user" class="user-image">
-                      <div class="media-body ml-3">
-                        <% if (comment.text.includes(`@${currentUser.username.split(' ').join('')}#${currentUser._id.toString()}`)) { %>
-                          <div class="rounded py-2 px-3 mb-2 w-75 message-reply receiver-message">
-                        <% } else { %>
-                          <div class="bg-grey rounded py-2 px-3 mb-2 w-75">
+                            <br/>
                         <% } %>
 
-                          <p class="text-small mb-0 text-dark">
-                            <% for (let line of comment.text.split(" ")) { %>
-                              <% if (line[0] == '@') {%>
-                                <a href="../profiles/<%=line.split('#')[1].split('_')[0]%>"><%=line.split("#")[0]%></a>
-                              <% } else { %>
-                                <%=line%>
-                              <% } %>
+                        <div class="announcement-row">
+                            <% if (announcement.likes.includes(currentUser._id)) { %>
+                                <span id="announcement-like-row"><i id="like-<%= announcement._id %>-show"
+                                                                    onclick="like(this)"
+                                                                    class="fas fa-thumbs-up liked-announcement"></i> <span
+                                            id="like-count"
+                                            class="likeCount-<%= announcement._id %>"><%= announcement.likes.length %></span></span>
+
+                            <% } else { %>
+                                <span id="announcement-like-row"><i id="like-<%= announcement._id %>-show"
+                                                                    onclick="like(this)"
+                                                                    class="fas fa-thumbs-up unliked-announcement"></i> <span
+                                            id="like-count"
+                                            class="likeCount-<%= announcement._id %>"><%= announcement.likes.length %></span></span>
+
                             <% } %>
-                          </p>
+                            <a id="comments-count-icon" class="comment-button" href="#comment-section"><i
+                                        class="fas fa-comment-dots"></i> <%= announcement.comments.length %></a>
                         </div>
-                        <p class="small text-muted msg-info"><span class="username"><%= comment.sender.username %></span>, <%= comment.date %> <a class="reply-button" id="comment-<%=comment.sender.username.split(' ').join('')%>#<%=comment.sender._id%>" href="#comment-section" onclick="reply(this)">Reply</a></p>
 
-                        <% if (comment.likes.includes(currentUser._id)) { %>
-                          <span class="liked-comment" id="likeComment-<%=comment._id%>" onclick="likeComment(this)"><i class="fas fa-thumbs-up"></i></span> <span class="like-count-comment" id="likeCountComment-<%=comment._id%>"><%=comment.likes.length%></span>
-
-                        <% } else { %>
-                          <span class="unliked-comment" id="likeComment-<%=comment._id%>" onclick="likeComment(this)"><i class="fas fa-thumbs-up"></i></span> <span class="like-comment-comment" id="likeCountComment-<%=comment._id%>"><%=comment.likes.length%></span>
-                        <% }%>
-
-                      </div>
+                    <% } %>
+                </div>
+                <div class="ann-body">
+                    <p class="announcement-text convertible-text"><%= convertedText %></p>
+                    <hr>
+                    <div class="ann-images">
+                        <% for (let img of announcement.images) { %>
+                            <img src="<%= img %>" alt="Attached Image" class="img-fluid rounded">
+                        <% } %>
+                        <% for (let media of announcement.imageFiles) { %>
+                            <% if (media.filename) { %>
+                                <% if ([".png", ".jpg", ".jpeg", ".gif"].includes(fileExtensions.get(media.url).toLowerCase())) { %>
+                                    <img src="<%= media.url %>" alt="Attached Image" class="img-fluid rounded">
+                                <% } else if ([".mp3", ".m4a"].includes(fileExtensions.get(media.url).toLowerCase())) { %>
+                                    <audio controls>
+                                        <source src="<%=media.url%>" type="audio/mpeg"></source>
+                                    </audio>
+                                <% } else if (fileExtensions.get(media.url).toLowerCase() == ".mp4") {%>
+                                    <video width="800px" height="500px" src="<%=media.url%>" type="video/*" controls></video>
+                                <% } else if ([".mov", ".heic"].includes(fileExtensions.get(media.url).toLowerCase())) {%>
+                                    <a href="<%=media.url%>" download><h5><i class="fas fa-paperclip"></i> Download "<%=media.originalName%>"</h5></a>
+                                <% } else if (fileExtensions.get(media.url).toLowerCase() == ".pdf") {%>
+                                    <a href="<%=media.url%>" target="_blank"><h5>Open "<%=media.originalName%>" In New Tab  </h5></a>
+                                <% } %>
+                                <br/><br/>
+                            <% } %>
+                        <% } %>
                     </div>
-                  <% } %>
-                <% } %>
-              </div>
-
+                </div>
             </article>
-          <% } %>
+
+            <br/>
+
+            <% if (currentUser) { %>
+                <article class="ann-container" id="comment-section">
+                    <h3 id="comments-heading">Comments (<%= announcement.comments.length %>)</h3>
+
+                    <form id="form-<%= announcement._id %>" onsubmit="comment(this, event)">
+                        <div class="input-group comment-input-field">
+                            <input type="text" aria-describedby="send-button"
+                                   class="form-control rounded-0 border-0 py-4"
+                                   autocomplete="off" placeholder="Mention any questions or clarifications here"
+                                   id="comment-input"/>
+                            <div class="input-group-append">
+                                <button type="submit" class="btn btn-secondary"><i
+                                            class="fa fa-paper-plane send-icon"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                    <br/>
+
+                    <div id="all-comments">
+
+                        <% for (let comment of announcement.comments.reverse()) { %>
+                            <% if (comment.sender && comment.sender._id.equals(currentUser._id)) { %>
+                                <!-- Reciever Message-->
+                                <div class="media mb-2 receiver-message">
+                                    <img src="<% if (comment.sender.imageFile.display) {%> <%= comment.sender.imageFile.url%><%} else {%> <%=comment.sender.imageUrl.url%><%}%>" alt="user" class="user-image">
+                                    <div class="media-body ml-3">
+                                        <div class="bg-primary rounded py-2 px-3 mb-2 w-75">
+                                            <p class="text-small mb-0 text-white">
+
+                                                <% for (let line of comment.text.split(" ")) { %>
+                                                    <% if (line[0] == '@') { %>
+                                                        <a class="edit-button-text"
+                                                           href="../profiles/<%= line.split('#')[1].split('_')[0] %>"><%= line.split("#")[0] %></a>
+                                                    <% } else { %>
+                                                        <%= line %>
+                                                    <% } %>
+                                                <% } %>
+                                            </p>
+                                        </div>
+                                        <p class="small text-muted msg-info"><span
+                                                    class="username">Me</span>, <%= comment.date %></p>
+
+                                        <% if (comment.likes.includes(currentUser._id)) { %>
+                                            <span class="liked-comment" id="likeComment-<%= comment._id %>"
+                                                  onclick="likeComment(this)"><i class="fas fa-thumbs-up"></i></span>
+                                            <span
+                                                    class="like-count-comment"
+                                                    id="likeCountComment-<%= comment._id %>"><%= comment.likes.length %></span>
+
+                                        <% } else { %>
+                                            <span class="unliked-comment" id="likeComment-<%= comment._id %>"
+                                                  onclick="likeComment(this)"><i class="fas fa-thumbs-up"></i></span>
+                                            <span
+                                                    class="like-comment-comment"
+                                                    id="likeCountComment-<%= comment._id %>"><%= comment.likes.length %></span>
+                                        <% } %>
+
+                                    </div>
+                                </div>
+                            <% } else if(comment.sender) { %>
+                                <!-- Sender message -->
+                        <div class="media mb-2 comment-body">
+                            <img src="<% if (comment.sender.imageFile.display) {%> <%= comment.sender.imageFile.url%><%} else {%> <%=comment.sender.imageUrl.url%><%}%>" alt="user" class="user-image">
+                            <div class="media-body ml-3">
+                                <% if (comment.text.includes(`@${currentUser.username.split(' ').join('')}#${currentUser._id.toString()}`)) { %>
+                                <div class="rounded py-2 px-3 mb-2 w-75 message-reply receiver-message">
+                                    <% } else { %>
+                                    <div class="bg-grey rounded py-2 px-3 mb-2 w-75">
+                                        <% } %>
+
+                                        <p class="text-small mb-0 text-dark">
+                                            <% for (let line of comment.text.split(" ")) { %>
+                                                <% if (line[0] == '@') { %>
+                                                    <a href="../profiles/<%= line.split('#')[1].split('_')[0] %>"><%= line.split("#")[0] %></a>
+                                                <% } else { %>
+                                                    <%= line %>
+                                                <% } %>
+                                            <% } %>
+                                        </p>
+                                    </div>
+                                    <p class="small text-muted msg-info"><span
+                                                class="username"><%= comment.sender.username %></span>, <%= comment.date %>
+                                        <a class="reply-button"
+                                           id="comment-<%= comment.sender.username.split(' ').join('') %>#<%= comment.sender._id %>"
+                                           href="#comment-section" onclick="reply(this)">Reply</a></p>
+
+                                    <% if (comment.likes.includes(currentUser._id)) { %>
+                                        <span class="liked-comment" id="likeComment-<%= comment._id %>"
+                                              onclick="likeComment(this)"><i class="fas fa-thumbs-up"></i></span> <span
+                                                class="like-count-comment"
+                                                id="likeCountComment-<%= comment._id %>"><%= comment.likes.length %></span>
+
+                                    <% } else { %>
+                                        <span class="unliked-comment" id="likeComment-<%= comment._id %>"
+                                              onclick="likeComment(this)"><i class="fas fa-thumbs-up"></i></span> <span
+                                                class="like-comment-comment"
+                                                id="likeCountComment-<%= comment._id %>"><%= comment.likes.length %></span>
+                                    <% } %>
+
+                                </div>
+                            </div>
+                            <% } %>
+                            <% } %>
+                        </div>
+                    </div>
+                </article>
+            <% } %>
 
         </div>
-      </div>
     </div>
+</div>
 </body>
 <script src="/javascript/announcements/like.js"></script>
 <script src="/javascript/announcements/comment.js"></script>

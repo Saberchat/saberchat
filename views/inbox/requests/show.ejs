@@ -1,9 +1,9 @@
 <!DOCTYPE html>
 <html>
-    <head>
-        <meta charset="utf-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1">
-        <title>Saberchat</title>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Saberchat</title>
 
         <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css">
         <link rel="stylesheet" href="/stylesheets/main.css">
@@ -18,13 +18,13 @@
           <%}%>
         <%}%>
 
-        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
-        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js"></script>
-        <script src="../javascript/socket.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js"></script>
+    <script src="../javascript/socket.js"></script>
 
-        <!-- I'm using my fontawesome kit -->
-        <script src="https://kit.fontawesome.com/dccc745c41.js" crossorigin="anonymous"></script>
+    <!-- I'm using my fontawesome kit -->
+    <script src="https://kit.fontawesome.com/dccc745c41.js" crossorigin="anonymous"></script>
 
     </head>
     <body class="mode">
@@ -33,47 +33,48 @@
         <!-- include the backdrop for nav -->
         <%- include('../../partials/header') %>
 
-        <div class="container mt-5">
-            <div class="row">
-                <div class="col-12">
-                    <div class="msg-container request-container">
-                        <h1>Access Request</h1>
-                        <h4><%= request.room.name %></h4>
-                        <p>From:
-                          <a href= "/profiles/<%=request.requester._id%>" class="user-link">
+<div class="container mt-5">
+    <div class="row">
+        <div class="col-12">
+            <div class="msg-container request-container">
+                <h1>Access Request</h1>
+                <h4><%= request.room.name %></h4>
+                <p>From:
+                    <a href="/profiles/<%= request.requester._id %>" class="user-link">
                             <span class="badge badge-pill badge-primary">
                               <%= request.requester.username %>
                             </span>
-                          </a>
-                        </p>
-                        <p>To:
-                          <a href= "/profiles/<%=request.room.creator.id%>" class="user-link">
+                    </a>
+                </p>
+                <p>To:
+                    <a href="/profiles/<%= request.room.creator.id %>" class="user-link">
                             <span class="badge badge-pill badge-secondary">
-                              <% if(request.room.creator.id.equals(currentUser._id)) { %>
-                                me
-                              <% } else { %>
-                                <%= request.room.creator.username %>
-                              <% } %>
+                                <% if(request.room.creator.id.equals(currentUser._id)) { %>
+                                    me
+                                <% } else { %>
+                                    <%= request.room.creator.username %>
+                                <% } %>
                             </span>
-                          </a>
-                        </p>
+                    </a>
+                </p>
 
-                        <span><%=request.date%></span>
-                        <a id="back-button" href="/inbox" class="btn btn-primary back-btn"><i class="fas fa-arrow-left"></i> Back</a><br />
+                <span><%= request.date %></span>
+                <a id="back-button" href="/inbox" class="btn btn-primary back-btn"><i class="fas fa-arrow-left"></i>
+                    Back</a><br/>
 
-                        <% if(request.receiver.equals(currentUser._id) && request.status == 'pending') {%>
-                            <form action="/inbox/requests/<%= request._id %>/reject" method="post" class="evaluate-request">
-                                <button type="submit" class="btn btn-danger"><i class="fas fa-thumbs-down"></i> Reject</button>
-                            </form>
-                            <form action="/inbox/requests/<%= request._id %>/accept" method="post" class="evaluate-request">
-                                <button type="submit" class="btn btn-success"><i class="fas fa-thumbs-up"></i> Accept</button>
-                            </form>
-                        <% } else { %>
-                            <p class="request-status"><%= request.status %></p>
-                        <% } %>
-                    </div>
-                </div>
+                <% if(request.receiver.equals(currentUser._id) && request.status == 'pending') { %>
+                    <form action="/inbox/requests/<%= request._id %>/reject" method="post" class="evaluate-request">
+                        <button type="submit" class="btn btn-danger"><i class="fas fa-thumbs-down"></i> Reject</button>
+                    </form>
+                    <form action="/inbox/requests/<%= request._id %>/accept" method="post" class="evaluate-request">
+                        <button type="submit" class="btn btn-success"><i class="fas fa-thumbs-up"></i> Accept</button>
+                    </form>
+                <% } else { %>
+                    <p class="request-status"><%= request.status %></p>
+                <% } %>
             </div>
         </div>
-    </body>
+    </div>
+</div>
+</body>
 </html>

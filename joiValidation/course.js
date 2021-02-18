@@ -1,5 +1,5 @@
 const BaseJoi = require('joi');
-const { escapeHtmlExtension } = require('./extensions');
+const {escapeHtmlExtension} = require('./extensions');
 
 const Joi = BaseJoi.extend(escapeHtmlExtension);
 
@@ -16,6 +16,7 @@ const courseSchema = Joi.object({
         "string.empty": "Description is required.",
         "string.min": "Descrip. minimum 50 characters."
     }),
+    showThumbnail: Joi.string()
 });
 
 module.exports = {courseSchema};

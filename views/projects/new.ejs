@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html>
-  <head>
+<head>
     <title>Saberchat</title>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -41,8 +41,8 @@
             <a class="btn btn-primary" href="/projects"><i class="fas fa-arrow-left"></i> Back</a>
           </div>
         </div>
-      </div>
     </div>
+</div>
 
     <div class="row">
       <div class="col-md-8 offset-md-2 col-12">
@@ -63,41 +63,49 @@
               <option class="creator-group" value="11th">EC Juniors</option>
               <option class="creator-group" value="12th">EC Seniors</option>
 
-              <% ['7th', '8th', '9th', '10th', '11th', '12th'].forEach(status => { %>
-                <% students.forEach(student => { %>
-                  <% if (student.status == status) { %>
-                    <option class="<%=student.status%>" value="<%=student._id%>"><%=student.username%> (<%=student.firstName%> <%=student.lastName%>)</option>
-                  <% } %>
-                <% }) %>
-              <% }) %>
+                    <% ['7th', '8th', '9th', '10th', '11th', '12th'].forEach(status => { %>
+                        <% students.forEach(student => { %>
+                            <% if (student.status == status) { %>
+                                <option class="<%= student.status %>" value="<%= student._id %>"><%= student.username %>
+                                    (<%= student.firstName %> <%= student.lastName %>)
+                                </option>
+                            <% } %>
+                        <% }) %>
+                    <% }) %>
 
-            </select>
-            <input type="text" id="creator-input" name="creatorInput" hidden />
-            <br />
-          </div>
+                </select>
+                <input type="text" id="creator-input" name="creatorInput" hidden/>
+                <br/>
+            </div>
 
           <div class="form-group mode">
             <label for="new-project-text" id="description-label">Description</label>
             <textarea id="new-project-text" minlength="50" name="text" rows="6" placeholder="Write a little about the project" class="form-control mode" aria-label="With textarea" required></textarea>
           </div>
 
+            <div class="form-group">
+                <label for="imageFile">Media Upload</label>
+                <input type="file" name="imageFile" class="image-upload form-control-file" multiple accept="image/*, video/*, audio/*, application/pdf">
+            </div>
 
-          <div id="image-header">
-            <h4 id="image-heading">Images</h4>
-            <button type="button" onclick="addImg()" class="btn btn-primary"><i class="fas fa-plus"></i> Image</button>
-            <br /><br />
-          </div>
+            <div id="image-header">
+                <h4 id="image-heading">Images</h4>
+                <button type="button" onclick="addImg()" class="btn btn-primary"><i class="fas fa-plus"></i> Image
+                </button>
+                <br/><br/>
+            </div>
 
-          <div id="image-block">
-          </div>
+            <div id="image-block">
+            </div>
 
-          <br />
-          <button type="submit" class="btn btn-primary btn-block" type="submit">Post</button><br />
+            <br/>
+            <button type="submit" class="btn btn-primary btn-block" type="submit">Post</button>
+            <br/>
         </form>
-      </div>
     </div>
-  </body>
+</div>
+</body>
 
-  <script src="/javascript/projects/form.js"></script>
-  <script src="/javascript/projects/creators.js"></script>
+<script src="/javascript/projects/form.js"></script>
+<script src="/javascript/projects/creators.js"></script>
 </html>

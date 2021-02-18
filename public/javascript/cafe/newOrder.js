@@ -17,107 +17,84 @@ let instructionsNew;
 let totalNew;
 let payingStyleNew;
 let balanceBox;
+let formattedCost;
 
 //Changes the order confirmation on the form
-const changeOrderConfirmation = (() => {
-  sum = 0;
-
-  while (orderConfirm.firstChild) { //Remove all the items in the 'confirm order' section
-    orderConfirm.removeChild(orderConfirm.firstChild);
-  }
-
-  for (let i of fci) { //Iterate over every member of 'form-check-input' (Checkboxes)
-    for (let l of fcl) { //Iterate over every memebr of 'form-check-label' (Checkbox Labels)
-      if (l.htmlFor == i.id) { //if the label matches the input
-        if (i.checked) { //If it is checked
-
-          for (let no of numOrders) {
-            if (no.id.split('_')[1] == i.id) { //Id's are constructed in format 'dd_<id>'. This extracts that ID
-              sum += parseInt(no.value) * parseFloat(l.innerText.split('$')[1]);
-
-              orderedItem = document.createElement('strong'); //Create the item confirmation
-              orderedItem.className = "list-group-item list-group-item-action form-check"; //Give it the boostrap class that will style it
-
-              //Decide its text based on what the total cost is
-              if (! (parseInt(no.value) * parseFloat(l.innerText.split('$')[1])).toString().includes('.') ) {
-                orderedItem.innerText = `${no.name} (${no.value} orders) - \$${parseInt(no.value) * parseFloat(l.innerText.split('$')[1])}.00`;
-
-              } else if ((parseInt(no.value) * parseFloat(l.innerText.split('$')[1])).toString().split('.')[1].length == 1){
-                orderedItem.innerText = `${no.name} (${no.value} orders) - \$${parseInt(no.value) * parseFloat(l.innerText.split('$')[1])}0`;
-
-              } else {
-                orderedItem.innerText = `${no.name} (${no.value} orders) - \$${parseInt(no.value) * parseFloat(l.innerText.split('$')[1])}`;
-              }
-
-              orderConfirm.appendChild(orderedItem); //Add the order to the list of orders
-            }
-          }
-        }
-      }
+const changeOrderConfirmation = function () {
+    sum = 0;
+    while (orderConfirm.firstChild) { //Remove all the items in the 'confirm order' section
+        orderConfirm.removeChild(orderConfirm.firstChild);
     }
-  }
 
-  //Once this process is finished, create an element to render the extra instructions and total cost
+    for (let i of fci) { //Iterate over every member of 'form-check-input' (Checkboxes)
+        for (let l of fcl) { //Iterate over every memebr of 'form-check-label' (Checkbox Labels)
+            if (l.htmlFor == i.id) { //if the label matches the input
+                if (i.checked) { //If it is checked
 
-  instructionsNew = document.createElement('span');
-  instructionsNew.style = 'color: blue;';
-  instructionsNew.className = "list-group-item list-group-item-action form-check";
-  instructionsNew.id = "extra-instructions";
+                    for (let no of numOrders) {
+                        if (no.id.split('_')[1] == i.id) { //Id's are constructed in format 'dd_<id>'. This extracts that ID
+                            sum += parseInt(no.value) * parseFloat(l.innerText.split('$')[1]);
 
-  if (extraInstructionsInput.value == '') {
-    instructionsNew.innerHTML = `<strong>Extra Instructions:</strong> None`;
+                            orderedItem = document.createElement('strong'); //Create the item confirmation
+                            orderedItem.className = "list-group-item list-group-item-action form-check darkmode-outline"; //Give it the boostrap class that will style it
 
-  } else {
-    instructionsNew.innerHTML = `<strong>Extra Instructions:</strong> ${extraInstructionsInput.value}`;
-  }
+                            formattedCost = (parseInt(no.value) * parseFloat(l.innerText.split('$')[1]));
+                            orderedItem.innerText = `${no.name} (${no.value} orders) - $${(formattedCost * 100).toString().slice(0, (formattedCost * 100).toString().length - 2)}.${(formattedCost * 100).toString().slice((formattedCost * 100).toString().length - 2)}`;
+                            orderConfirm.appendChild(orderedItem); //Add the order to the list of orders
+                        }
+                    }
+                }
+            }
+        }
+    }
 
-  balanceBox = document.createElement('strong');
-  balanceBox.style = 'color: purple;';
-  balanceBox.className = "list-group-item list-group-item-action form-check";
-  balanceBox.id = "balance-box";
+    instructionsNew = document.createElement('span'); //Once this process is finished, create an element to render the extra instructions and total cost
+    instructionsNew.style = 'color: blue;';
+    instructionsNew.className = "list-group-item list-group-item-action form-check darkmode-outline";
+    instructionsNew.id = "extra-instructions";
 
-  balanceBox.innerText = balanceString;
+    if (extraInstructionsInput.value == '') {
+        instructionsNew.innerHTML = `<strong>Extra Instructions:</strong> None`;
+    } else {
+        instructionsNew.innerHTML = `<strong>Extra Instructions:</strong> ${extraInstructionsInput.value}`;
+    }
 
-  totalNew = document.createElement('span');
-  totalNew.style = 'color: green;';
-  totalNew.className = "list-group-item list-group-item-action form-check";
-  totalNew.id = "total-cost";
+    balanceBox = document.createElement('strong');
+    balanceBox.style = 'color: purple;';
+    balanceBox.className = "list-group-item list-group-item-action form-check darkmode-outline";
+    balanceBox.id = "balance-box";
+    balanceBox.innerText = balanceString;
+    totalNew = document.createElement('span');
+    totalNew.style = 'color: green;';
+    totalNew.className = "list-group-item list-group-item-action form-check darkmode-outline";
+    totalNew.id = "total-cost";
 
-  //Create cost in full '$dd.cc' format based on what the total is
-  if (!sum.toString().includes('.')) {
-    totalNew.innerHTML = `<strong>Total: $${sum}.00</strong>`;
+    if (sum == 0) {
+        totalNew.innerHTML = `<strong>Total: $0.00`;
+    } else {
+        totalNew.innerHTML = `<strong>Total: $${(sum * 100).toString().slice(0, (sum * 100).toString().length - 2)}.${(sum * 100).toString().slice((sum * 100).toString().length - 2)}</strong>`;
+    }
 
-  } else if (sum.toString().split('.')[1].length == 1){
-    totalNew.innerHTML = `<strong>Total: $${sum}0</strong>`;
+    if (sum > parseFloat(balanceString.split("$")[1]) && !payingInPerson.checked) {
+        totalNew.innerHTML += `<em style="color: red; margin-left: 20px;">Charge is over your account balance</em>`
+    }
 
-  } else {
-    totalNew.innerHTML = `<strong>Total: $${sum}</strong>`;
-  }
+    payingStyleNew = document.createElement('strong');
+    payingStyleNew.style = 'color: red;';
+    payingStyleNew.className = "list-group-item list-group-item-action form-check darkmode-outline";
+    payingStyleNew.id = "paying-style";
 
-  if (sum > parseFloat(balanceString.split("$")[1]) && !payingInPerson.checked) {
-    totalNew.innerHTML += `<em style="color: red; margin-left: 20px;">Charge is over your account balance</em>`
-  }
+    if (payingInPerson.checked) {
+        payingStyleNew.innerText = "Paying In-Person";
+    } else {
+        payingStyleNew.innerText = "Paying Online";
+    }
 
-  payingStyleNew = document.createElement('strong');
-  payingStyleNew.style = 'color: red;';
-  payingStyleNew.className = "list-group-item list-group-item-action form-check";
-  payingStyleNew.id = "paying-style";
+    orderConfirm.appendChild(instructionsNew); //Add the total to the div
+    if (!payingInPerson.checked) {
+        orderConfirm.appendChild(balanceBox);
+    }
 
-  if (payingInPerson.checked) {
-    payingStyleNew.innerText = "Paying In-Person";
-
-  } else {
-    payingStyleNew.innerText = "Paying Online";
-  }
-
-  //Add the total to the div
-  orderConfirm.appendChild(instructionsNew);
-
-  if (!payingInPerson.checked) {
-    orderConfirm.appendChild(balanceBox);
-  }
-
-  orderConfirm.appendChild(totalNew);
-  orderConfirm.appendChild(payingStyleNew);
-
-});
+    orderConfirm.appendChild(totalNew);
+    orderConfirm.appendChild(payingStyleNew);
+}

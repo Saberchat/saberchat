@@ -14,6 +14,7 @@
     <%if (currentUser) {%>
       <%if (currentUser.darkmode) { %>
         <link rel="stylesheet" href="/stylesheets/Darkmode.css">
+        <link rel="stylesheet" href="/stylesheets/profile/dark-profile.css">
       <%}%>
     <%}%>
 
@@ -27,95 +28,101 @@
     <script src="/javascript/profile/follow.js"></script>
 </head>
 <body class="mode">
-    <!-- include the navbar via ejs -->
-    <%- include('../partials/navbar') %>
+<!-- include the navbar via ejs -->
+<%- include('../partials/navbar') %>
 
-    <!-- big background image -->
-    <div id="banner" style="background-image: url('<%= user.bannerUrl %>');">
-    </div>
-    <div class="container mb-5 ">
-      <img src="<%= user.imageUrl %>" alt="profile image" class="profile-image">
-      <h1 class="username mode"><%= user.username %></h1>
-          <div class="col-md-4 col-12 order-md-2 profile-box">
-              <section class="profile-card mode">
-                  <div class="profile-head mode">
-                      <h1><%= user.firstName %> <%= user.lastName %></h1>
-                      <hr>
-                  </div>
-                  <div class="profile-body">
-                      <span><%= user.title %></span>
-                      <div class="mode">
-                        <h4 id="role-header" class="mode">Role</h4>
-                      </div>
-                      <% permMatrix = [["principal", "Principal"], ["admin", "Administrator"], ["mod", "Moderator"], ["default", "Default"]] %>
+<!-- big background image -->
+<div id="banner" style="background-image: url('<% if (user.bannerFile.display) { %> <%= user.bannerFile.url %> <% } else { %> <%= user.bannerUrl.url %> <% } %>');">
+</div>
+<div class="container mb-5">
+    <img src="<% if (user.imageFile.display) {%> <%= user.imageFile.url%><%} else {%> <%=user.imageUrl.url%><%}%>" alt="profile image" class="profile-image">
+    <h1 class="username mode"><%= user.username %></h1>
+    <div class="col-md-4 col-12 order-md-2 profile-box">
+        <section class="profile-card mode">
+            <div class="profile-head">
+                <h1><%= user.firstName %> <%= user.lastName %></h1>
+                <hr>
+            </div>
+            <div class="profile-body">
+                <span><%= user.title %></span>
 
-                      <% for (let perm of permMatrix) { %>
-                        <% if (user.permission.toLowerCase() == perm[0].toLowerCase()) { %>
-                          <p><%= perm[1] %></p>
+                <h4 id="role">Role</h4>
+                <% permMatrix = [["principal", "Principal"], ["admin", "Administrator"], ["mod", "Moderator"], ["default", "Default"]] %>
+
+                <% for (let perm of permMatrix) { %>
+                    <% if (user.permission.toLowerCase() == perm[0].toLowerCase()) { %>
+                        <p><%= perm[1] %></p>
+                    <% } %>
+                <% } %>
+
+                <h4 id="status">Status</h4>
+                <p><%= user.status.charAt(0).toUpperCase() + user.status.slice(1) %></p>
+
+                <h4 id="email">Email</h4>
+                <p class="embedded-link"><a href="mailto:<%= user.email %>"><%= user.email %></a></p>
+
+                <% if (currentUser._id.toString() == user._id.toString()) { %>
+                    <button class="btn btn-primary edit-button" id="edit-profile"><a class="edit-button-text"
+                                                                                     href="/profiles/edit">Edit Profile
+                            Settings</a></button>
+                    <button class="btn btn-info edit-button" id="edit-account"><a class="edit-button-text"
+                                                                                  href="/profiles/change-login-info">Edit
+                            Account Settings</a></button>
+
+                <% } else { %>
+                    <div id="follow-div-<%= user.id %>">
+
+                        <% if (followerIds.toString().includes(currentUser._id.toString())) { %>
+                            <button type="button" class="btn btn-danger edit-button unfollow-button" data-toggle="modal"
+                                    data-target="#modal-<%= user._id %>-unfollow" id="unfollow-<%= user._id %>">Unfollow
+                            </button>
+
+                        <% } else { %>
+                            <button type="button" class="btn btn-primary edit-button follow-button" data-toggle="modal"
+                                    data-target="#modal-<%= user._id %>-follow" id="follow-<%= user._id %>">
+                                Follow
+                            </button>
                         <% } %>
-                      <% } %>
-
-                      <h4 id="status-header" class="cafetext">Status</h4>
-                      <p><%= user.status.charAt(0).toUpperCase() + user.status.slice(1) %></p>
-
-                      <h4 id="email-header">Email</h4>
-                      <p class="embedded-link"><a href="mailto:<%=user.email%>"><%= user.email %></a></p>
-
-                      <% if (currentUser._id.toString() == user._id.toString()) { %>
-                        <button class="btn btn-primary edit-button" id="edit-profile"><a class="edit-button-text" href="/profiles/edit">Edit Profile Settings</a></button>
-                        <button class="btn btn-info edit-button" id="edit-account"><a class="edit-button-text" href="/profiles/change-login-info">Edit Account Settings</a></button>
-
-                      <% } else { %>
-                        <div id="follow-div-<%=user.id%>">
-
-                          <% if (followerIds.toString().includes(currentUser._id.toString())) { %>
-                            <button type="button" class="btn btn-danger edit-button unfollow-button" data-toggle="modal" data-target="#modal-<%=user._id%>-unfollow" id="unfollow-<%=user._id%>">Unfollow</button>
-
-                          <% } else { %>
-                            <button type="button" class="btn btn-primary edit-button follow-button" data-toggle="modal" data-target="#modal-<%=user._id%>-follow" id="follow-<%=user._id%>">Follow</a></button>
-                          <% } %>
 
                           <div class="modal fade" id="modal-<%=user._id%>-unfollow" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
-                            <div class="modal-dialog mode">
-                              <div class="modal-content mode">
-                                <div class="modal-header mode">
-                                  <h5 class="modal-title" id="exampleModalLabel">Unfollow <%=user.firstName%> <%=user.lastName%>?</h5>
-                                  <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                    <span aria-hidden="true">&times;</span>
-                                  </button>
-                                </div>
-                                <div class="modal-body mode">
-                                  You will no longer be notified when <%=user.firstName%> <%=user.lastName%> posts anything new.%>
-                                </div>
-                                <div class="modal-footer">
-                                  <button type="button" class="btn btn-secondary" data-dismiss="modal">No, Go Back</button>
-                                  <button type="button" onclick="unfollow(this, 'show')" id="unfollow-confirm-<%=user._id%>" class="btn btn-danger">Yes, Unfollow</a>
-                                </div>
+                              <div class="modal-dialog mode">
+                                  <div class="modal-content mode">
+                                      <div class="modal-header mode">
+                                          <h5 class="modal-title" id="exampleModalLabel">Unfollow <%=user.firstName%> <%=user.lastName%>?</h5>
+                                          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                              <span aria-hidden="true">&times;</span>
+                                          </button>
+                                      </div>
+                                      <div class="modal-body mode">
+                                          You will no longer be notified when <%=user.firstName%> <%=user.lastName%> posts anything new.%>
+                                      </div>
+                                      <div class="modal-footer">
+                                          <button type="button" class="btn btn-secondary" data-dismiss="modal">No, Go Back</button>
+                                          <button type="button" onclick="unfollow(this, 'show')" id="unfollow-confirm-<%=user._id%>" class="btn btn-danger">Yes, Unfollow</a>
+                                      </div>
+                                  </div>
                               </div>
-                            </div>
                           </div>
 
                           <div class="modal fade" id="modal-<%=user._id%>-follow" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
-                            <div class="modal-dialog mode">
-                              <div class="modal-content mode">
-                                <div class="modal-header mode">
-                                  <h5 class="modal-title" id="exampleModalLabel">Follow <%=user.firstName%> <%=user.lastName%>?</h5>
-                                  <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                    <span aria-hidden="true">&times;</span>
-                                  </button>
-                                </div>
-                                <div class="modal-body mode">
-                                  You will be notified when <%=user.firstName%> <%=user.lastName%> posts anything new.%>
-                                </div>
-                                <div class="modal-footer mode">
-                                  <button type="button" class="btn btn-secondary" data-dismiss="modal">No, Go Back</button>
-                                  <button type="button" onclick="follow(this, 'show')" id="follow-confirm-<%=user._id%>" class="btn btn-primary">Yes, Follow</a>
-                                </div>
+                              <div class="modal-dialog mode">
+                                  <div class="modal-content mode">
+                                      <div class="modal-header mode">
+                                          <h5 class="modal-title" id="exampleModalLabel">Follow <%=user.firstName%> <%=user.lastName%>?</h5>
+                                          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                              <span aria-hidden="true">&times;</span>
+                                          </button>
+                                      </div>
+                                      <div class="modal-body mode">
+                                          You will be notified when <%=user.firstName%> <%=user.lastName%> posts anything new.%>
+                                      </div>
+                                      <div class="modal-footer mode">
+                                          <button type="button" class="btn btn-secondary" data-dismiss="modal">No, Go Back</button>
+                                          <button type="button" onclick="follow(this, 'show')" id="follow-confirm-<%=user._id%>" class="btn btn-primary">Yes, Follow</a>
+                                      </div>
+                                  </div>
                               </div>
-                            </div>
                           </div>
-
-                        </div>
                       <% } %>
                   </div>
               </section>
@@ -155,87 +162,98 @@
                         <div class="search-bar-container search">
                           <input id="search-bar-followers" class="mode" type="text" placeholder="&#x1F50D; Search followers" oninput="searchFunctionFollowers()"/>
                         </div>
+                    <% for (let follower of user.followers) { %>
+                        <span id="follower-<%= follower._id %>" class="follower-block">
 
-                        <% for (let follower of user.followers) { %>
-                          <span id="follower-<%=follower._id%>" class="follower-block">
-
-                            <a href="../profiles/<%=follower._id%>" class="follower-link mode">
-                              <img class="follower-image" src="<%= follower.imageUrl %>" alt="profile picture">
-                              <span class="follower-name mode"><%=follower.firstName%> <%=follower.lastName%></span> <%=follower.username%>
+                            <a href="../profiles/<%= follower._id %>" class="follower-link">
+                              <img class="follower-image" src="<% if (follower.imageFile.display) {%> <%= follower.imageFile.url%><%} else {%> <%=follower.imageUrl.url%><%}%> %>" alt="profile picture">
+                              <span class="follower-name"><%= follower.firstName %> <%= follower.lastName %></span> <%= follower.username %>
                             </a>
 
                             <% if (currentUser._id.equals(user._id)) { %>
-                              <button type="button" class="btn btn-warning remove-follower" data-toggle="modal" data-target="#modal-<%=follower._id%>-remove">Remove</button>
-                              <div class="modal fade" id="modal-<%=follower._id%>-remove" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+                                <button type="button" class="btn btn-warning remove-follower" data-toggle="modal"
+                                        data-target="#modal-<%= follower._id %>-remove">Remove</button>
+                                <div class="modal fade" id="modal-<%= follower._id %>-remove" tabindex="-1"
+                                     aria-labelledby="deleteModalLabel" aria-hidden="true">
                                 <div class="modal-dialog mode">
                                   <div class="modal-content mode">
                                     <div class="modal-header mode">
-                                      <h5 class="modal-title" id="exampleModalLabel">Remove <%=follower.firstName%> <%=follower.lastName%>?</h5>
-                                      <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                      <h5 class="modal-title mode"
+                                          id="exampleModalLabel">Remove <%= follower.firstName %> <%= follower.lastName %>?</h5>
+                                      <button type="button" class="close mode" data-dismiss="modal" aria-label="Close">
                                         <span aria-hidden="true">&times;</span>
                                       </button>
                                     </div>
-                                    <div class="modal-body">
-                                      <%=follower.firstName%> <%=follower.lastName%> will no longer be notified when you post anything new.%>
+                                    <div class="modal-body mode">
+                                      <%= follower.firstName %> <%= follower.lastName %> will no longer be notified when you post anything new.
+                                        %>
                                     </div>
-                                    <div class="modal-footer">
-                                      <button type="button" class="btn btn-secondary" data-dismiss="modal">No, Go Back</button>
-                                      <button type="button" id="remove-<%=follower._id%>" onclick="remove(this)" class="btn btn-warning">Yes, Remove</a>
+                                    <div class="modal-footer mode">
+                                      <button type="button" class="btn btn-secondary"
+                                              data-dismiss="modal">No, Go Back</button>
+                                      <button type="button" id="remove-<%= follower._id %>" onclick="remove(this)"
+                                              class="btn btn-warning">Yes, Remove</button>
                                     </div>
                                   </div>
                                 </div>
                               </div>
-                              <% } %>
-                              <br /><br />
+                            <% } %>
+                            <br/><br/>
                           </span>
-                        <% } %>
-                      </div>
+                    <% } %>
+                </div>
 
                       <div id="following-list" hidden>
                         <div class="search-bar-container search">
                           <input class="mode" id="search-bar-following" type="text" placeholder="&#x1F50D; Search following" oninput="searchFunctionFollowing()"/>
                         </div>
 
-                        <% for (let f of following) { %>
-                          <span id="following-<%=f._id%>" class="following-block">
+                    <% for (let f of following) { %>
+                        <span id="following-<%= f._id %>" class="following-block">
 
-                            <a href="../profiles/<%=f._id%>" class="following-link mode">
-                              <img class="follower-image" src="<%= f.imageUrl %>" alt="profile picture">
-                              <span class="follower-name"><%=f.firstName%> <%=f.lastName%></span> <%=f.username%>
+                            <a href="../profiles/<%= f._id %>" class="following-link">
+                              <img class="follower-image" src="<% if (f.imageFile.display) {%> <%=f.imageFile.url%><%} else {%> <%=f.imageUrl.url%><%}%>" alt="profile picture">
+                              <span class="follower-name"><%= f.firstName %> <%= f.lastName %></span> <%= f.username %>
                             </a>
 
                             <% if (currentUser._id.equals(user._id)) { %>
-                              <button type="button" class="btn btn-danger block-following" data-toggle="modal" data-target="#modal-<%=f._id%>-unfollow">Unfollow</button>
-                              <div class="modal fade" id="modal-<%=f._id%>-unfollow" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+                                <button type="button" class="btn btn-danger block-following" data-toggle="modal"
+                                        data-target="#modal-<%= f._id %>-unfollow">Unfollow</button>
+                                <div class="modal fade" id="modal-<%= f._id %>-unfollow" tabindex="-1"
+                                     aria-labelledby="deleteModalLabel" aria-hidden="true">
                                 <div class="modal-dialog mode">
                                   <div class="modal-content mode">
                                     <div class="modal-header mode">
-                                      <h5 class="modal-title" id="exampleModalLabel">Unfollow <%=f.firstName%> <%=f.lastName%>?</h5>
-                                      <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                      <h5 class="modal-title mode"
+                                          id="exampleModalLabel">Unfollow <%= f.firstName %> <%= f.lastName %>?</h5>
+                                      <button type="button" class="close mode" data-dismiss="modal" aria-label="Close">
                                         <span aria-hidden="true">&times;</span>
                                       </button>
                                     </div>
-                                    <div class="modal-body">
-                                      You will no longer be notified when <%=f.firstName%> <%=f.lastName%> posts anything new.%>
+                                    <div class="modal-body mode">
+                                      You will no longer be notified when <%= f.firstName %> <%= f.lastName %> posts anything new.
+                                        %>
                                     </div>
-                                    <div class="modal-footer">
-                                      <button type="button" class="btn btn-secondary" data-dismiss="modal">No, Go Back</button>
-                                      <button type="button" id="unfollow-<%=f._id%>" onclick="unfollow_show(this)" class="btn btn-danger">Yes, Unfollow</a>
+                                    <div class="modal-footer mode">
+                                      <button type="button" class="btn btn-secondary"
+                                              data-dismiss="modal">No, Go Back</button>
+                                      <button type="button" id="unfollow-<%= f._id %>" onclick="unfollow_show(this)"
+                                              class="btn btn-danger">Yes, Unfollow</button>
                                     </div>
                                   </div>
                                 </div>
                               </div>
                             <% } %>
-                            <br /><br />
+                            <br/><br/>
                           </span>
-                        <% } %>
+                    <% } %>
 
-                      </div>
-                  </div>
-              </section>
+                </div>
             </div>
+        </section>
     </div>
+</div>
 
-  </body>
-  <script src="/javascript/embed.js"></script>
+</body>
+<script src="/javascript/embed.js"></script>
 </html>

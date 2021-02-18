@@ -1,14 +1,14 @@
 .creator-heading, #creator-heading {
-  font-weight: bold;
-  display: inline;
-  color: black;
+    font-weight: bold;
+    display: inline;
+    color: black;
 }
 
 .creator-names, .creator-div, #creator-div, .creator-names:hover {
-  display: inline;
-  font-style: italic;
-  color: black;
-  text-decoration: none;
+    display: inline;
+    font-style: italic;
+    color: black;
+    text-decoration: none;
 }
 
 .user-tag {
@@ -78,8 +78,8 @@ body::-webkit-scrollbar {
 }
 
 body {
--ms-overflow-style: none;
-scrollbar-width: none;
+    -ms-overflow-style: none;
+    scrollbar-width: none;
 }
 
 .text-small {
@@ -113,7 +113,7 @@ header {
     background-color: rgba(255, 255, 255, 0.8);
     padding: 50px 10px;
     box-shadow: 0px 10px 10px #868686,
-                0px -5px 15px #727272;
+    0px -5px 15px #727272;
 }
 
 #message-display a {
@@ -135,7 +135,7 @@ header {
 
 span.username {
     font-weight: 700;
-    
+
 }
 
 .user-image {
@@ -170,7 +170,7 @@ General msgs and badword response
     text-align: center;
 }
 
-.announcement h4{
+.announcement h4 {
     display: inline-block;
     color: #9f9aa4;
     font-size: 1.3rem;
@@ -260,92 +260,93 @@ Scroll To Bottom Button
 }
 
 .project-header {
-  padding-bottom: 20px;
+    padding-bottom: 20px;
 }
 
 .project-info, .project-info:hover {
-  color: white;
-  text-decoration: none;
+    color: white;
+    text-decoration: none;
 }
 
 .date {
-  font-size: 80%;
+    font-size: 80%;
 }
 
 .poster-profile {
-  width: 30px;
-  height: 30px;
-  object-fit: cover;
-  border-radius: 50%;
+    width: 30px;
+    height: 30px;
+    object-fit: cover;
+    border-radius: 50%;
 }
 
 .edit-button {
-  margin-left: 10px;
+    margin-left: 10px;
 }
 
 .delete-project {
-  display: inline-block;
+    display: inline-block;
 }
 
 #exampleModalLabel, .modal-body, .creator-names {
-  color: black;
+    color: black;
 }
 
 .block-content {
-  text-align: center;
+    text-align: center;
 }
 
 .project-first-image {
-  width: 25%;
-  height: 25%;
-  float: left;
-  border-radius: 15px;
-  margin-bottom: 20px;
-  margin-right: 20px;
+    width: 25%;
+    height: 25%;
+    float: left;
+    border-radius: 15px;
+    margin-bottom: 20px;
+    margin-right: 20px;
 }
 
 .creator-row {
-  float: left;
+    float: left;
 }
 
 .creator-profile {
-  width: 30px;
-  height: 30px;
-  object-fit: cover;
-  border-radius: 50%;
+    width: 30px;
+    height: 30px;
+    object-fit: cover;
+    border-radius: 50%;
 }
 
 .project-description {
-  white-space: pre-wrap;
+    white-space: pre-wrap;
 }
 
 .comment-button {
-  color: white;
-  text-decoration: none;
-  margin-left: 10px;
+    color: white;
+    text-decoration: none;
+    margin-left: 10px;
 }
 
 .liked-button, .unliked-button {
-  text-decoration: none;
-  margin-left: 10px;
-  font-size: 70%;
+    text-decoration: none;
+    margin-left: 10px;
+    font-size: 70%;
 }
 
 .liked-button {
-  color: #03a5fc;
+    color: #03a5fc;
 }
 
 .unliked-button {
-  color: white;
+    color: white;
 }
 
 .author-name {
-  font-style: italic;
+    font-style: italic;
 }
 
 .creator-head {
-  font-weight: bold;
+    font-weight: bold;
 }
+
 /*
 ===========================
 Screen customizations
@@ -355,11 +356,13 @@ Screen customizations
         width: 100%;
     }
 }
+
 @media (min-width: 550px) {
     .w-65 {
         width: 90%;
     }
 }
+
 @media (min-width: 760px) {
     .w-65 {
         width: 50%;

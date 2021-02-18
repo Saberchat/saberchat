@@ -1,8 +1,9 @@
-const { annSchema } = require('../joiValidation/announcement');
-const { projectSchema } = require('../joiValidation/project');
-const { chatSchema } = require('../joiValidation/chat');
-const { msgSchema } = require('../joiValidation/message');
-const { courseSchema } = require('../joiValidation/course');
+const {annSchema} = require('../joiValidation/announcement');
+const {projectSchema} = require('../joiValidation/project');
+const {chatSchema} = require('../joiValidation/chat');
+const {msgSchema} = require('../joiValidation/message');
+const {courseSchema} = require('../joiValidation/course');
+const {postCommentSchema} = require('../joiValidation/postComment');
 const {
     newUserSchema,
     loginUserSchema,
@@ -13,9 +14,9 @@ const {
 } = require('../joiValidation/user');
 
 const handleValidation = (schema, req, res, next) => {
-    const { error } = schema.validate(req.body);
+    const {error} = schema.validate(req.body);
 
-    if(error) {
+    if (error) {
         const errMsg = error.details.map(err => err.message).join(' ');
         req.flash('error', errMsg);
         res.redirect('back');
@@ -37,6 +38,11 @@ module.exports.validateProject = (req, res, next) => {
 // Inbox messages
 module.exports.validateMsg = (req, res, next) => {
     handleValidation(msgSchema, req, res, next);
+};
+
+// Announcements
+module.exports.validatePostComment = (req, res, next) => {
+    handleValidation(postCommentSchema, req, res, next);
 };
 
 // Courses

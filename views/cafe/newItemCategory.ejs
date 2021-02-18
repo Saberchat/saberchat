@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Saberchat</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/stylesheets/main.css">
+    <!-- link css for navbar. Don't need to include public/javascript/userForm.js since user is already logged in and does not need to access login and register forms.  -->
+    <link rel="stylesheet" href="/stylesheets/components/header.css">
+    <link rel="stylesheet" href="/stylesheets/components/navbar.css">
+    <link rel="stylesheet" href="/stylesheets/chat/new.css">
+    <link rel="stylesheet" href="/stylesheets/cafe/new.css">
+    <%if (currentUser) {%>
+      <%if (currentUser.darkmode) { %>
+        <link rel="stylesheet" href="/stylesheets/Darkmode.css">
+      <%}%>
+    <%}%>
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js"></script>
+
+    <!-- I'm using my fontawesome kit -->
+    <script src="https://kit.fontawesome.com/dccc745c41.js" crossorigin="anonymous"></script>
+</head>
+<body class="mode">
+<!-- include the navbar via ejs -->
+<%- include('../partials/navbar') %>
+<%- include('../partials/header') %>
+
+<div class="container mt-5">
+    <div class="row">
+        <div class="col-12" id="heading">
+            <h1 id="new-heading">New Cafe Item Category</h1>
+            <a class="btn btn-primary" href="/cafe/manage"><i class="fas fa-arrow-left"></i> Back</a><br/><br/>
+        </div>
+    </div>
+
+    <form action="/cafe/category" method="post">
+
+        <h2>Name</h2>
+        <div class="row">
+            <div class="col-md-8 offset-md-2 col-12">
+                <div class="form-group">
+                    <div class="row">
+                        <div class="input-group mb-3">
+                            <input id="category-name" class="form-control mode" type="text" name="name"
+                                   placeholder="Enter Item Category Name" maxlength="45" required/>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <h2>Items</h2>
+        <div class="row">
+            <div class="col-md-8 offset-md-2 col-12">
+                <div class="form-group">
+                    <% categories.forEach(category => { %>
+
+                        <% if (category.items.length > 0) { %>
+                            <h5><%= category.name %></h5>
+                            <% category.items.forEach(item => { %>
+                                <input id="item<%= item._id %>" type="checkbox" name="<%= item._id %>"/>
+                                <label for="item<%= item._id %>"><%= item.name %></label>
+                                <br/>
+                            <% }) %>
+                            <br/>
+                        <% } %>
+                    <% }) %>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-8 offset-md-2 col-12">
+                <button type="submit" class="btn btn-lg btn-primary btn-block">Create</button>
+            </div>
+        </div>
+        <br/>
+
+    </form>
+</div>
+</body>
+</html>

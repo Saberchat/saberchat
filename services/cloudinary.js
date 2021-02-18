@@ -1,8 +1,8 @@
-if(process.env.NODE_ENV !== "production") {
-  require('dotenv').config();
+if (process.env.NODE_ENV !== "production") {
+    require('dotenv').config();
 }
 
-const parseBuffer = require('./dataUri');
+const {parseBuffer} = require('./dataUri');
 const cloudinary = require('cloudinary').v2;
 const util = require('util');
 
@@ -15,35 +15,45 @@ cloudinary.config({
 const cloudUploader = util.promisify(cloudinary.uploader.upload);
 const cloudDestroyer = util.promisify(cloudinary.uploader.destroy);
 
-const cloudUpload = async (file) => {
+module.exports.cloudUpload = async function (file, type) {
     // turn buffer into file
     const imgFile = parseBuffer(file.originalname, file.buffer).content;
 
     // upload to cloudinary
-    const options = {
-      folder: 'SaberChat'
-    };
+    const options = {folder: 'SaberChat'};
+    if (type == "video") {
+        options.resource_type = type;
+    }
+
     let error;
     let cResult;
     await cloudUploader(imgFile, options)
-      .then(result => { cResult = result; })
-      .catch(err => { error = err; });
+        .then(result => {
+            cResult = result;
+        })
+        .catch(err => {
+            error = err;
+        });
 
     return [error, cResult];
-};
+}
 
-const cloudDelete = async (filename) => {
+module.exports.cloudDelete = async function(filename, type) {
     let cResult;
     let error;
-    // delete image
-    await cloudDestroyer(filename)
-    .catch(err=> {error = err;})
-    .then(result=> {cResult = result;});
+    const options = {};
+    if (type == "video") {
+        options.resource_type = type;
+    }
 
-    return [error, cResult];  
-};
+    // delete media
+    await cloudDestroyer(filename, options)
+        .catch(err => {
+            error = err;
+        })
+        .then(result => {
+            cResult = result;
+        });
 
-module.exports = {
-    cloudUpload: cloudUpload,
-    cloudDelete: cloudDelete
-};
+    return [error, cResult];
+}

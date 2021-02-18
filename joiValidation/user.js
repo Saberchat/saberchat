@@ -1,5 +1,5 @@
 const BaseJoi = require('joi');
-const { escapeHtmlExtension } = require('./extensions');
+const {escapeHtmlExtension} = require('./extensions');
 
 const Joi = BaseJoi.extend(escapeHtmlExtension);
 
@@ -62,8 +62,8 @@ const updateUserSchema = Joi.object({
         "string.max": "Title max 50 characters."
     }),
     status: Joi.string().required().valid(
-        '7th','8th','9th','10th','11th','12th','alumnus','guest','parent','faculty'
-        ).messages({
+        '7th', '8th', '9th', '10th', '11th', '12th', 'alumnus', 'guest', 'parent', 'faculty'
+    ).messages({
         "string.empty": "Status is required.",
         "any.only": "Invalid status."
     }),
@@ -75,7 +75,9 @@ const updateUserSchema = Joi.object({
     bannerUrl: Joi.string().pattern(new RegExp(/https:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,4}\b([-a-zA-Z0-9@:%_\+.~#?&//=]*)/)).required().messages({
         "string.empty": "Banner image url is required.",
         "string.pattern.base": "Banner Url should be an https link."
-    })
+    }),
+    showProfileImage: Joi.string(),
+    showBannerImage: Joi.string()
 });
 
 const resetPasswordSchema = Joi.object({

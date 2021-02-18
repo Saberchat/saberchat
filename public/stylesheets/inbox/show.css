@@ -2,7 +2,7 @@
     width: 10rem;
 }
 
-.user-link:hover .badge.badge-pill{
+.user-link:hover .badge.badge-pill {
     color: #dadada;
 }
 
@@ -25,7 +25,7 @@
 }
 
 .msg-body {
-    padding:2rem 5rem;
+    padding: 2rem 5rem;
 }
 
 .msg-body hr {
@@ -34,7 +34,7 @@
 }
 
 .msg-text {
-  white-space: pre-wrap;
+    white-space: pre-wrap;
 }
 
 .msg-images img {
@@ -42,29 +42,35 @@
     box-shadow: 0px 1px 5px #6d6d6d;
 }
 
+#reply-header {
+    font-size: 140%;
+    /* font-weight: 3rem; */
+    margin-bottom: 10px;
+}
+
 .replies {
-  padding: 20px;
+    padding: 20px;
 }
 
 .reply-sender {
-  color: black;
+    color: black;
 }
 
 .reply-image {
-  width: 40%;
-  height: 40%;
-  margin-bottom: 10px;
-  border-radius: 15px;
+    width: 40%;
+    height: 40%;
+    margin-bottom: 10px;
+    border-radius: 15px;
 }
 
 #reply-box {
-  padding: 20px;
+    padding: 20px;
 }
 
 #send-reply {
-  margin-bottom: 10px;
+    margin-bottom: 10px;
 }
 
 .request-status {
-  font-style: italic;
+    font-style: italic;
 }
