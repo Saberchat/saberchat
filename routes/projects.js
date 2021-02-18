@@ -14,6 +14,7 @@ const {sortByPopularity} = require("../utils/popularity-algorithms");
 const {multipleUpload} = require('../middleware/multer');
 const {cloudUpload, cloudDelete} = require('../services/cloudinary');
 const {validateProject} = require('../middleware/validation');
+const {validatePostComment} = require('../middleware/validation');
 
 const wrapAsync = require('../utils/wrapAsync');
 const controller = require('../controllers/projects');
@@ -25,7 +26,7 @@ router.route('/')
 router.get('/new', middleware.isLoggedIn, middleware.isFaculty, wrapAsync(controller.newProject));
 
 router.put('/like', middleware.isLoggedIn, wrapAsync(controller.likeProject));
-router.put('/comment', middleware.isLoggedIn, wrapAsync(controller.postComment));
+router.put('/comment', middleware.isLoggedIn, validatePostComment, wrapAsync(controller.postComment));
 router.put('/like-comment', middleware.isLoggedIn, wrapAsync(controller.likeComment));
 
 router.route('/:id')

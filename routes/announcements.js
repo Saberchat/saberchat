@@ -7,6 +7,7 @@ const router = express.Router(); //start express router
 
 const {multipleUpload} = require('../middleware/multer');
 const {validateAnn} = require('../middleware/validation');
+const {validatePostComment} = require('../middleware/validation');
 const wrapAsync = require('../utils/wrapAsync');
 
 // Controller
@@ -23,7 +24,7 @@ router.get('/mark/:id', middleware.isLoggedIn, Announcement.markOne);
 
 router.put('/like', middleware.isLoggedIn, wrapAsync(Announcement.likeAnn));
 router.put('/like-comment', middleware.isLoggedIn, wrapAsync(Announcement.likeComment));
-router.put('/comment', middleware.isLoggedIn, wrapAsync(Announcement.comment));
+router.put('/comment', middleware.isLoggedIn, validatePostComment, wrapAsync(Announcement.comment));
 
 router.route('/:id')
     .get(wrapAsync(Announcement.show))

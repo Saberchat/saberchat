@@ -69,7 +69,7 @@ const chatInit = function (username, userId, messageForm, input, chatDisplay, ro
                 `<div class="media w-50 ml-auto mb-2">
         <div class="media-body">
           <div class="bg-primary rounded py-2 px-3 mb-2">
-            <p class="text-small mb-0 text-white">${text}</p>
+            <p class="text-small mb-0 text-white">${text.split('<').join('&lt')}</p>
           </div>
           <p class="small text-muted">${$.format.date(Date.now(), "h:mm a | MMM d")}</p>
         </div>
@@ -121,6 +121,7 @@ const chatInit = function (username, userId, messageForm, input, chatDisplay, ro
         </div>
       </div>`;
         } else {
+            console.log("Example here second");
             element =
                 `<div class="media mb-2">
         <img src="${msg.userImage}" alt="user" class="user-image">

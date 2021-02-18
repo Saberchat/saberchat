@@ -276,7 +276,6 @@ io.on('connect', (socket) => {
                 // sends error msg if comment could not be created
                 console.log(err);
             } else {
-
                 // set msg id
                 msg.id = comment._id;
                 // broadcast message to all connected users in the room

@@ -30,7 +30,7 @@ const submitRating = function (button, location) {
     }
 
     const url = `/homework/rate/${courseId}?_method=put`;
-    const data = {tutorId, rating: starCounts.get(tutorId), review: document.getElementById(`review-${tutorId}`).value};
+    const data = {tutorId, rating: starCounts.get(tutorId), text: document.getElementById(`review-${tutorId}`).value};
 
     $.post(url, data, data => {
         if (data.success) {

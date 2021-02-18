@@ -843,7 +843,7 @@ module.exports.rateTutor = async function(req, res) {
     for (let tutor of course.tutors) {
         if (tutor.tutor.equals(req.body.tutorId)) {
             if (tutor.students.includes(req.user._id) || tutor.formerStudents.includes(req.user._id)) { //Only current/former students of a tutor can upvote them
-                let review = await PostComment.create({text: req.body.review, sender: req.user}); //Create comment with review
+                let review = await PostComment.create({text: req.body.text, sender: req.user}); //Create comment with review
                 if (!review) {
                     return res.json({error: "Error reviewing tutor"});
                 }
