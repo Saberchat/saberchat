@@ -90,8 +90,11 @@ module.exports.showMembers = async function(req, res) {
         req.flash('error', "Unable to find room");
         return res.redirect('back');
     }
-
-    return res.render('chat/people', {room});
+    if (room.private) {
+        return res.render('chat/people', {room});
+    }
+    req.flash("error", "Public rooms are open to all users");
+    return res.redirect("back");
 }
 
 module.exports.editRoom = async function(req, res) {

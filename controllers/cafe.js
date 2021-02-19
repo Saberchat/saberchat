@@ -427,130 +427,13 @@ module.exports.viewItem = async function(req, res) {
     return res.render('cafe/show', {categories, item, fileExtensions});
 }
 
-//UPDATE ITEM
+//UPDATE/UPVOTE ITEM
 module.exports.updateItem = async function(req, res) {
     if (req.body.name) {
-        if (!req.user.tags.includes("Cashier")) {
-            req.flash('error', 'You do not have permission to do that');
-            return res.redirect('back');
-        }
-
-        const overlap = await Item.find({_id: {$ne: req.params.id}, name: req.body.name});
-        if (!overlap) {
-            req.flash('error', 'Item Not Found');
-            return res.redirect('back');
-        }
-
-        if (overlap.length > 0) {
-            req.flash('error', 'Item With This Name Exists');
-            return res.redirect('back');
-        }
-
-        const item = await Item.findByIdAndUpdate(req.params.id, {
-            name: req.body.name,
-            price: parseFloat(req.body.price),
-            availableItems: parseInt(req.body.available),
-            isAvailable: (parseInt(req.body.available) > 0),
-            description: req.body.description,
-            imgUrl: {url: req.body.image, display: req.body.showImage == "url"},
-        });
-        if (!item) {
-            req.flash('error', 'item not found');
-            return res.redirect('back');
-        }
-
-        item.imageFile.display = req.body.showImage == "upload";
-        if (req.files) {
-            if (req.files.imageFile) {
-                let cloudErr;
-                let cloudResult;
-                if (item.imageFile && item.imageFile.filename) {
-                    [cloudErr, cloudResult] = await cloudDelete(item.imageFile.filename, "image");
-                    // check for failure
-                    if (cloudErr || !cloudResult || cloudResult.result !== 'ok') {
-                        req.flash('error', 'Error deleting uploaded image');
-                        return res.redirect('back');
-                    }
-                }
-
-                [cloudErr, cloudResult] = await cloudUpload(req.files.imageFile[0]);
-                if (cloudErr || !cloudResult) {
-                    req.flash('error', 'Upload failed');
-                    return res.redirect('back');
-                }
-
-                item.imageFile = {
-                    filename: cloudResult.public_id,
-                    url: cloudResult.secure_url,
-                    originalName: req.files.imageFile[0].originalname,
-                    display: false
-                };
-            }
-            await item.save();
-        }
-
-        const activeOrders = await Order.find({present: true}).populate('items.item'); //Any orders that are active will need to change, to accomodate the item changes.
-        if (!activeOrders) {
-            req.flash('error', "Unable to find active orders");
-            return res.redirect('back');
-        }
-
-        for (let order of activeOrders) {
-            order.charge = 0; //Reset the order's charge, we will have to recalculate
-
-            for (let i = 0; i < order.items.length; i++) { //Iterate over each order, and change its price to match the new item prices
-                order.charge += order.items[i].item.price * order.items[i].quantity;
-                order.items[i].price = item.price;
-            }
-            await order.save();
-        }
-
-        const categories = await Category.find({name: {$ne: req.body.category}}); //Collect all item categories
-        if (!categories) {
-            req.flash('error', "Unable to find item categories");
-            return res.redirect('back');
-        }
-
-        for (let t of categories) { //Remove this item from its old item category (if the category has not changed, it's fine because we' add it back in a moment anyway)
-            if (t.items.includes(item._id)) {
-                t.items.splice(t.items.indexOf(item._id), 1);
-            }
-            await t.save();
-        }
-
-        const category = await Category.findOne({name: req.body.category});  //Add the item to the category which is now specified
-        if (!category) {
-            req.flash('error', 'Unable to find item category');
-            return res.redirect("back");
-        }
-
-        if (category.items.includes(item._id)) { //If item is already in category, remove it so you can put the updated category back (we don't know whether the category will be there or not, so it's better to just cover all bases)
-            category.items.splice(category.items.indexOf(item._id), 1);
-        }
-
-        category.items.push(item);
-        await category.save();
-
-        req.flash('success', "Item updated!");
-        return res.redirect('/cafe/manage');
+        await module.exports.updateItemInfo(req, res);
+    } else {
+        await module.exports.upvoteItem(req, res);
     }
-
-    //UPVOTE ITEM
-
-    const item = await Item.findById(req.params.id);
-    if (!item) {
-        return res.json({error: "Error upvoting item"});
-    }
-
-    if (item.upvotes.includes(req.user._id)) {
-        item.upvotes.splice(item.upvotes.indexOf(req.user._id), 1);
-        await item.save();
-        return res.json({success: `Downvoted ${item.name}`, upvoteCount: item.upvotes.length});
-    }
-
-    item.upvotes.push(req.user._id);
-    await item.save();
-    return res.json({success: `Upvoted ${item.name}`, upvoteCount: item.upvotes.length});
 }
 
 //DELETE ITEM
@@ -564,14 +447,13 @@ module.exports.deleteItem = async function(req, res) {
     // delete any uploads
     if (item.imageFile && item.imageFile.filename) {
         [cloudErr, cloudResult] = await cloudDelete(item.imageFile.filename, "image");
-        // check for failure
         if (cloudErr || !cloudResult || cloudResult.result !== 'ok') {
             req.flash('error', 'Error deleting uploaded image');
             return res.redirect('back');
         }
     }
 
-    const categories = await Category.find({}); //Find all possible categories
+    const categories = await Category.find({});
     if (!categories) {
         req.flash('error', "Could not remove item from list of item categories");
         return res.redirect('back');
@@ -613,15 +495,9 @@ module.exports.deleteItem = async function(req, res) {
 //MANAGE CAFE/VIEW ORDERS
 module.exports.manage = async function(req, res) {
     if (req.query.orders) { //If route calls to display orders
-        const orders = await Order.find({present: true}).populate('items.item');
-        if (!orders) {
-            req.flash('error', 'Could not find orders');
-            return res.redirect('back');
-        }
-        return res.render('cafe/orderDisplay', {orders});
-    }
+        await module.exports.manageOrders(req, res);
 
-    if (req.query.data) { //If page calls to display data, commented out for now
+    } else if (req.query.data) { //If page calls to display data, commented out for now
         const customers = await User.find({authenticated: true}); if (!customers) {return false;}
         const items = await Item.find({}); if (!items) {return false;}
         const allOrders = await Order.find({}); if (!allOrders) {return false;}
@@ -631,31 +507,11 @@ module.exports.manage = async function(req, res) {
             req.flash("error", "An Error Occurred");
             return res.redirect("back")
         }
-
         return res.render("cafe/data", data);
-    }
 
-    const categories = await Category.find({}).populate('items'); //Collect info on all the item categories
-    if (!categories) {
-        req.flash('error', 'An Error Occurred');
-        return res.redirect('back');
+    } else {
+        await module.exports.manageCafe(req, res);
     }
-
-    let sortedCategories = [];
-    let sortedCategory;
-    for (let category of categories) {
-        sortedCategory = category;
-        sortedCategory.items = sortByPopularity(category.items, "upvotes", "created_at", null).popular.concat(sortByPopularity(category.items, "upvotes", "created_at", null).unpopular);
-        sortedCategories.push(sortedCategory);
-    }
-
-    const cafe = await Cafe.findOne({});
-    if (!cafe) {
-        req.flash('error', "An Error Occurred");
-        return res.redirect('back');
-    }
-
-    return res.render('cafe/manage', {categories: sortedCategories, open: cafe.open});
 }
 
 //OPEN/CLOSE CAFE
@@ -664,7 +520,7 @@ module.exports.changeStatus = async function(req, res) {
     if (!cafe) {
         return res.json({error: "An error occurred"});
     }
-    cafe.open = (cafe.open == false);
+    cafe.open = !cafe.open;
     await cafe.save();
     return res.json({success: "Succesfully updated cafe", open: cafe.open});
 }
@@ -841,4 +697,160 @@ module.exports.deleteCategory = async function(req, res) {
     await other.save();
     req.flash('success', "Item category deleted!");
     return res.redirect('/cafe/manage');
+}
+
+module.exports.upvoteItem = async function(req, res) {
+    const item = await Item.findById(req.params.id);
+    if (!item) {
+        return res.json({error: "Error upvoting item"});
+    }
+
+    if (item.upvotes.includes(req.user._id)) {
+        item.upvotes.splice(item.upvotes.indexOf(req.user._id), 1);
+        await item.save();
+        return res.json({success: `Downvoted ${item.name}`, upvoteCount: item.upvotes.length});
+    }
+
+    item.upvotes.push(req.user._id);
+    await item.save();
+    return res.json({success: `Upvoted ${item.name}`, upvoteCount: item.upvotes.length});
+}
+
+module.exports.updateItemInfo = async function(req, res) {
+    if (!req.user.tags.includes("Cashier")) {
+        req.flash('error', 'You do not have permission to do that');
+        return res.redirect('back');
+    }
+
+    const overlap = await Item.find({_id: {$ne: req.params.id}, name: req.body.name});
+    if (!overlap) {
+        req.flash('error', 'Item Not Found');
+        return res.redirect('back');
+    }
+
+    if (overlap.length > 0) {
+        req.flash('error', 'Item With This Name Exists');
+        return res.redirect('back');
+    }
+
+    const item = await Item.findByIdAndUpdate(req.params.id, {
+        name: req.body.name,
+        price: parseFloat(req.body.price),
+        availableItems: parseInt(req.body.available),
+        isAvailable: (parseInt(req.body.available) > 0),
+        description: req.body.description,
+        imgUrl: {url: req.body.image, display: req.body.showImage == "url"},
+    });
+    if (!item) {
+        req.flash('error', 'item not found');
+        return res.redirect('back');
+    }
+
+    item.imageFile.display = req.body.showImage == "upload";
+    if (req.files) {
+        if (req.files.imageFile) {
+            let cloudErr;
+            let cloudResult;
+            if (item.imageFile && item.imageFile.filename) {
+                [cloudErr, cloudResult] = await cloudDelete(item.imageFile.filename, "image");
+                // check for failure
+                if (cloudErr || !cloudResult || cloudResult.result !== 'ok') {
+                    req.flash('error', 'Error deleting uploaded image');
+                    return res.redirect('back');
+                }
+            }
+
+            [cloudErr, cloudResult] = await cloudUpload(req.files.imageFile[0]);
+            if (cloudErr || !cloudResult) {
+                req.flash('error', 'Upload failed');
+                return res.redirect('back');
+            }
+
+            item.imageFile = {
+                filename: cloudResult.public_id,
+                url: cloudResult.secure_url,
+                originalName: req.files.imageFile[0].originalname,
+                display: false
+            };
+        }
+        await item.save();
+    }
+
+    const activeOrders = await Order.find({present: true}).populate('items.item'); //Any orders that are active will need to change, to accomodate the item changes.
+    if (!activeOrders) {
+        req.flash('error', "Unable to find active orders");
+        return res.redirect('back');
+    }
+
+    for (let order of activeOrders) {
+        order.charge = 0; //Reset the order's charge, we will have to recalculate
+
+        for (let i = 0; i < order.items.length; i++) { //Iterate over each order, and change its price to match the new item prices
+            order.charge += order.items[i].item.price * order.items[i].quantity;
+            order.items[i].price = item.price;
+        }
+        await order.save();
+    }
+
+    const categories = await Category.find({name: {$ne: req.body.category}}); //Collect all item categories
+    if (!categories) {
+        req.flash('error', "Unable to find item categories");
+        return res.redirect('back');
+    }
+
+    for (let t of categories) { //Remove this item from its old item category (if the category has not changed, it's fine because we' add it back in a moment anyway)
+        if (t.items.includes(item._id)) {
+            t.items.splice(t.items.indexOf(item._id), 1);
+        }
+        await t.save();
+    }
+
+    const category = await Category.findOne({name: req.body.category});  //Add the item to the category which is now specified
+    if (!category) {
+        req.flash('error', 'Unable to find item category');
+        return res.redirect("back");
+    }
+
+    if (category.items.includes(item._id)) { //If item is already in category, remove it so you can put the updated category back (we don't know whether the category will be there or not, so it's better to just cover all bases)
+        category.items.splice(category.items.indexOf(item._id), 1);
+    }
+
+    category.items.push(item);
+    await category.save();
+
+    req.flash('success', "Item updated!");
+    return res.redirect('/cafe/manage');
+}
+
+module.exports.manageCafe = async function(req, res) {
+    const categories = await Category.find({}).populate('items'); //Collect info on all the item categories
+    if (!categories) {
+        req.flash('error', 'An Error Occurred');
+        return res.redirect('back');
+    }
+
+    let sortedCategories = [];
+    let sortedCategory;
+    for (let category of categories) {
+        sortedCategory = category;
+        sortedCategory.items = sortByPopularity(category.items, "upvotes", "created_at", null).popular.concat(sortByPopularity(category.items, "upvotes", "created_at", null).unpopular);
+        sortedCategories.push(sortedCategory);
+    }
+
+    const cafe = await Cafe.findOne({});
+    if (!cafe) {
+        req.flash('error', "An Error Occurred");
+        return res.redirect('back');
+    }
+
+    return res.render('cafe/manage', {categories: sortedCategories, open: cafe.open});
+}
+
+module.exports.manageOrders = async function(req, res) {
+    const orders = await Order.find({present: true}).populate('items.item');
+    if (!orders) {
+        req.flash('error', 'Could not find orders');
+        return res.redirect('back');
+    }
+    return res.render('cafe/orderDisplay', {orders});
 }
