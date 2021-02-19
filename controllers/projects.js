@@ -1,16 +1,10 @@
-const express = require('express');
-const middleware = require('../middleware');
-const router = express.Router(); //start express router
 const dateFormat = require('dateformat');
 const path = require('path');
 const {sendGridEmail} = require("../services/sendGrid");
 const {convertToLink} = require("../utils/convert-to-link");
-const filter = require('../utils/filter');
+const {keywordFilter} = require('../utils/keywordFilter');
 const {sortByPopularity} = require("../utils/popularity-algorithms");
-
-const {multipleUpload} = require('../middleware/multer');
 const {cloudUpload, cloudDelete} = require('../services/cloudinary');
-const {validateProject} = require('../middleware/validation');
 
 //SCHEMA
 const User = require('../models/user');
@@ -560,4 +554,37 @@ module.exports.likeComment = async function(req, res) {
         success: `Liked comment`,
         likeCount: comment.likes.length
     });
+}
+
+module.exports.data = async function(req, res) {
+    const projects = await Project.find({poster: req.user._id}).populate("comments");
+        if (!projects) {
+            req.flash('error', "Unable to find projects");
+            return res.redirect('back');
+        }
+
+        const {popular, unpopular} = await sortByPopularity(projects, "likes", "created_at", null); //Extract and sort popular projects
+        let popularProjectText = "";
+        let popularCommentText = "";
+        for (let project of popular) {
+            popularProjectText += `${project.title} ${project.text} `;
+            for (let comment of project.comments) {
+                popularCommentText += `${comment.text} `;
+            }
+        }
+
+        //Build string of projects and comments text
+        let unpopularProjectText = "";
+        let unpopularCommentText = "";
+        for (let project of unpopular) {
+            unpopularProjectText += `${project.title} ${project.text} `;
+            for (let comment of project.comments) {
+                unpopularCommentText += `${comment.text} `;
+            }
+        }
+
+        //Map keywords from popular projects and their comments
+        const projectKeywords = await keywordFilter(popularProjectText, unpopularProjectText);
+        const commentKeywords = await keywordFilter(popularCommentText, unpopularCommentText);
+        return res.render('projects/data', {popularProjects: popular, projectKeywords, commentKeywords});
 }

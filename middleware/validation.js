@@ -4,18 +4,10 @@ const {chatSchema} = require('../joiValidation/chat');
 const {msgSchema} = require('../joiValidation/message');
 const {courseSchema} = require('../joiValidation/course');
 const {postCommentSchema} = require('../joiValidation/postComment');
-const {
-    newUserSchema,
-    loginUserSchema,
-    updateUserSchema,
-    resetPasswordSchema,
-    updateEmailSchema,
-    updatePasswordSchema
-} = require('../joiValidation/user');
+const user = require('../joiValidation/user');
 
 const handleValidation = (schema, req, res, next) => {
     const {error} = schema.validate(req.body);
-
     if (error) {
         const errMsg = error.details.map(err => err.message).join(' ');
         req.flash('error', errMsg);
@@ -57,25 +49,25 @@ module.exports.validateRoom = (req, res, next) => {
 
 // Users and profiles
 module.exports.validatePasswordReset = (req, res, next) => {
-    handleValidation(resetPasswordSchema, req, res, next);
+    handleValidation(user.resetPasswordSchema, req, res, next);
 };
 
 module.exports.validateNewUser = (req, res, next) => {
-    handleValidation(newUserSchema, req, res, next);
+    handleValidation(user.newUserSchema, req, res, next);
 };
 
 module.exports.validateUserLogin = (req, res, next) => {
-    handleValidation(loginUserSchema, req, res, next);
+    handleValidation(user.loginUserSchema, req, res, next);
 };
 
 module.exports.validateUserUpdate = (req, res, next) => {
-    handleValidation(updateUserSchema, req, res, next);
+    handleValidation(user.updateUserSchema, req, res, next);
 };
 
 module.exports.validateEmailUpdate = (req, res, next) => {
-    handleValidation(updateEmailSchema, req, res, next);
+    handleValidation(user.updateEmailSchema, req, res, next);
 };
 
 module.exports.validatePasswordUpdate = (req, res, next) => {
-    handleValidation(updatePasswordSchema, req, res, next);
+    handleValidation(user.updatePasswordSchema, req, res, next);
 };

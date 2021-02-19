@@ -1,26 +1,22 @@
 const express = require('express');
-const router = express.Router(); //start express router
-
 const middleware = require('../middleware/index');
 const {validateNewUser, validateUserLogin, validatePasswordReset} = require('../middleware/validation');
-const indexController = require('../controllers/index');
 const wrapAsync = require('../utils/wrapAsync');
-
+const index = require('../controllers/index'); //Controller
+module.exports = express.Router(); //Router
 
 // USER ROUTES
-router.get('/', indexController.index); // Index Landing Page
-router.get('/darkmode', middleware.isLoggedIn, indexController.darkmode); //Set darkmode
-router.get('/contact', middleware.isLoggedIn, wrapAsync(indexController.contact)); //Contact info and school info
-router.get('/alsion', wrapAsync(indexController.alsion)); //Alsion info
-router.get("/logout", middleware.isLoggedIn, indexController.logout); //logout route
+module.exports.get('/', index.index); // Index Landing Page
+module.exports.get('/darkmode', middleware.isLoggedIn, index.darkmode); //Set darkmode
+module.exports.get('/contact', middleware.isLoggedIn, wrapAsync(index.contact)); //Contact info and school info
+module.exports.get('/alsion', wrapAsync(index.alsion)); //Alsion info
+module.exports.get("/logout", middleware.isLoggedIn, index.logout); //logout route
 
-router.post("/register", validateNewUser, wrapAsync(indexController.register)); //Register User
-router.get('/authenticate/:id', wrapAsync(indexController.authenticate)); // Index Landing Page
-router.post('/login', validateUserLogin, indexController.login); // Custom login handling so that flash messages can be sent.
-router.post('/forgot-password', validatePasswordReset, wrapAsync(indexController.forgotPassword));
+module.exports.post("/register", validateNewUser, wrapAsync(index.register)); //Register User
+module.exports.get('/authenticate/:id', wrapAsync(index.authenticate)); // Index Landing Page
+module.exports.post('/login', validateUserLogin, index.login); // Custom login handling so that flash messages can be sent.
+module.exports.post('/forgot-password', validatePasswordReset, wrapAsync(index.forgotPassword));
 
-router.route('/reset-password')
-    .get(indexController.resetPasswordForm)
-    .put(wrapAsync(indexController.resetPassword));
-
-module.exports = router;
+module.exports.route('/reset-password')
+    .get(index.resetPasswordForm)
+    .put(wrapAsync(index.resetPassword));

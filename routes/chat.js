@@ -1,32 +1,29 @@
-// Chat room routes
-
+// Chat rooms routes control the creation and management of rooms and comments
 const express = require('express');
 const middleware = require('../middleware');
 const {validateRoom} = require('../middleware/validation');
-const router = express.Router();
 const wrapAsync = require('../utils/wrapAsync');
-const controller = require('../controllers/chat');
+const chat = require('../controllers/chat'); //Controller
+module.exports = express.Router(); //Router
 
-router.route('/')
-    .get(middleware.isLoggedIn, wrapAsync(controller.index))
-    .post(middleware.isLoggedIn, validateRoom, wrapAsync(controller.createRoom));
+module.exports.route('/')
+    .get(middleware.isLoggedIn, wrapAsync(chat.index))
+    .post(middleware.isLoggedIn, validateRoom, wrapAsync(chat.createRoom));
 
-router.get('/new', middleware.isLoggedIn, wrapAsync(controller.newRoom));
+module.exports.get('/new', middleware.isLoggedIn, wrapAsync(chat.newRoom));
 
-router.route('/:id')
-    .get(middleware.isLoggedIn, wrapAsync(middleware.checkIfMember), wrapAsync(controller.showRoom))
-    .put(middleware.isLoggedIn, wrapAsync(middleware.checkRoomOwnership), validateRoom, wrapAsync(controller.updateRoom))
-    .delete(middleware.isLoggedIn, wrapAsync(middleware.checkRoomOwnership), wrapAsync(controller.deleteRoom))
+module.exports.route('/:id')
+    .get(middleware.isLoggedIn, wrapAsync(middleware.checkIfMember), wrapAsync(chat.showRoom))
+    .put(middleware.isLoggedIn, wrapAsync(middleware.checkRoomOwnership), validateRoom, wrapAsync(chat.updateRoom))
+    .delete(middleware.isLoggedIn, wrapAsync(middleware.checkRoomOwnership), wrapAsync(chat.deleteRoom))
 
-router.get('/:id/people', middleware.isLoggedIn, wrapAsync(middleware.checkIfMember), wrapAsync(controller.showMembers));
-router.get('/:id/edit', middleware.isLoggedIn, wrapAsync(middleware.checkRoomOwnership), wrapAsync(controller.editRoom));
+module.exports.get('/:id/people', middleware.isLoggedIn, wrapAsync(middleware.checkIfMember), wrapAsync(chat.showMembers));
+module.exports.get('/:id/edit', middleware.isLoggedIn, wrapAsync(middleware.checkRoomOwnership), wrapAsync(chat.editRoom));
 
-router.post('/:id/leave', middleware.isLoggedIn, middleware.checkForLeave, wrapAsync(controller.leaveRoom));
+module.exports.post('/:id/leave', middleware.isLoggedIn, middleware.checkForLeave, wrapAsync(chat.leaveRoom));
 
-router.route('/:id/request')
-    .post(middleware.isLoggedIn, wrapAsync(controller.requestJoin))
-    .delete(middleware.isLoggedIn, wrapAsync(controller.requestCancel));
+module.exports.route('/:id/request')
+    .post(middleware.isLoggedIn, wrapAsync(chat.requestJoin))
+    .delete(middleware.isLoggedIn, wrapAsync(chat.requestCancel));
 
-router.put('/comments/:id/report', middleware.isLoggedIn, wrapAsync(controller.reportComment));
-
-module.exports = router;
+module.exports.put('/comments/:id/report', middleware.isLoggedIn, wrapAsync(chat.reportComment));
