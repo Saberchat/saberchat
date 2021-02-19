@@ -460,7 +460,6 @@ module.exports.updateItem = async function(req, res) {
         }
 
         item.imageFile.display = req.body.showImage == "upload";
-
         if (req.files) {
             if (req.files.imageFile) {
                 let cloudErr;
@@ -535,6 +534,8 @@ module.exports.updateItem = async function(req, res) {
         req.flash('success', "Item updated!");
         return res.redirect('/cafe/manage');
     }
+
+    //UPVOTE ITEM
 
     const item = await Item.findById(req.params.id);
     if (!item) {

@@ -40,7 +40,7 @@
     </div>
     <div class="row">
         <div class="col-md-8 offset-md-2 col-12">
-          <form action="/cafe/item" method="post">
+          <form action="/cafe/item" method="post" enctype="multipart/form-data">
             <div class="form-group">
               <div class="row">
                 <div class="col mode">
@@ -78,30 +78,20 @@
               </div>
 
               <div class="row">
-                  <div class="col">
-                      <label for="usernameInput">Image</label>
-                      <div id="image-block">
-                          <input id="image-input" oninput="createImage(this)" class="form-control mode" type="text" name="image" placeholder="Enter URL for Item Image">
-                      </div>
-                  </div>
-              </div>
-              <br />
+                <div class="col">
+                    <label for="usernameInput">Image (URL)</label>
+                    <div id="image-block">
+                        <input id="image-input" oninput="createImage(this)" class="form-control mode" type="text"
+                               name="image" placeholder="Enter URL for Item Image">
+                        <br/>
+                        <img id="item-image" src="" alt="Image Does Not Exist" hidden/>
+                    </div>
+                </div>
+            </div>
 
                     <div class="form-group">
                         <label for="imageFile">Image (Upload)</label>
                         <input type="file" name="imageFile" class="image-upload form-control-file mode" accept="image/png, image/jpg, image/jpeg">
-                    </div>
-
-                    <div class="row">
-                        <div class="col">
-                            <label for="usernameInput">Image (URL)</label>
-                            <div id="image-block">
-                                <input id="image-input" oninput="createImage(this)" class="form-control mode" type="text"
-                                       name="image" placeholder="Enter URL for Item Image">
-                                <br/>
-                                <img id="item-image" src="" alt="Image Does Not Exist" hidden/>
-                            </div>
-                        </div>
                     </div>
 
                     <div class="form-group">
