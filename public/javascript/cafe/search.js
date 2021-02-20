@@ -15,11 +15,12 @@ const search = function () {
     }
 
     let catIncluded; //Category Included
-
-    for (let h = 0; h < catHeaders.length; h += 1) {
+    for (let h = 0; h < catHeaders.length; h ++) {
         catIncluded = false;
+        console.log(catHeaders[h].getElementsByTagName("h2")[0].textContent.replaceAll(' ', ''))
 
         for (let item of document.getElementsByClassName(catHeaders[h].getElementsByTagName("h2")[0].textContent.replaceAll(' ', ''))) {
+            console.log(item)
             if ((item.textContent.replaceAll(' ', '').toLowerCase().includes(filter)) || (item.classList.toString().toLowerCase().includes(filter))) {
                 catIncluded = true;
                 break;
@@ -43,7 +44,7 @@ const searchOrders = function () {
     const searchInput = document.getElementById('search-input');
     let filter = searchInput.value.toLowerCase();
 
-    for (let i = 0; i < orders.length; i += 1) {
+    for (let i = 0; i < orders.length; i ++) {
         if (!orders[i].innerText.toLowerCase().includes(filter)) {
             orders[i].hidden = true;
 

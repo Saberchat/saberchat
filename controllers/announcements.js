@@ -3,7 +3,6 @@ const {convertToLink} = require("../utils/convert-to-link");
 
 const path = require('path');
 const dateFormat = require('dateformat');
-const {multipleUpload} = require('../middleware/multer');
 const {cloudUpload, cloudDelete} = require('../services/cloudinary');
 
 //SCHEMA
@@ -12,20 +11,22 @@ const Announcement = require('../models/announcements/announcement');
 const Notification = require('../models/inbox/message');
 const PostComment = require('../models/postComment');
 
+const controller = {};
+
 // Ann GET index
-module.exports.index = async function(req, res) {
+controller.index = async function(req, res) {
     const Anns = await Announcement.find({}).populate('sender').exec();
     if(!Anns) {req.flash('error', 'Cannot find announcements.'); return res.redirect('back');}
     return res.render('announcements/index', {announcements: Anns.reverse()});
 };
 
 // Ann GET new ann
-module.exports.new = function(req, res) {
+controller.new = function(req, res) {
     return res.render('announcements/new');
 };
 
 // Ann GET markall ann as read
-module.exports.markAll = function(req, res) {
+controller.markAll = function(req, res) {
     req.user.annCount = []; //No new announcements in user's annCount
     req.user.save();
     req.flash('success', 'All Announcements Marked As Read!');
@@ -33,7 +34,7 @@ module.exports.markAll = function(req, res) {
 };
 
 // Ann GET mark one ann as read
-module.exports.markOne = function(req, res) {
+controller.markOne = function(req, res) {
     //Iterate through user's announcement count and find the announcement that is being marked as read
     for (let i = 0; i < req.user.annCount.length; i++) {
         if (req.user.annCount[i].announcement.toString() == req.params.id.toString()) {
@@ -49,7 +50,7 @@ module.exports.markOne = function(req, res) {
 };
 
 // Ann GET show
-module.exports.show = async function(req, res) {
+controller.show = async function(req, res) {
     const Ann = await Announcement.findById(req.params.id)
         .populate('sender')
         .populate({
@@ -78,7 +79,7 @@ module.exports.show = async function(req, res) {
 };
 
 // Ann GET edit form
-module.exports.updateForm = async function(req, res) {
+controller.updateForm = async function(req, res) {
     const Ann = await Announcement.findById(req.params.id);
     if(!Ann) {req.flash('error', 'Could not find announcement'); return res.redirect('back');}
     if(!Ann.sender._id.equals(req.user._id)) {
@@ -94,7 +95,7 @@ module.exports.updateForm = async function(req, res) {
 };
 
 // Ann POST create
-module.exports.create = async function(req, res) {
+controller.create = async function(req, res) {
     const Ann = await Announcement.create({
         sender: req.user,
         subject: req.body.subject,
@@ -175,7 +176,7 @@ module.exports.create = async function(req, res) {
     return res.redirect(`/announcements/${Ann._id}`);
 };
 
-module.exports.updateAnn = async function(req, res) {
+controller.updateAnn = async function(req, res) {
     const announcement = await Announcement.findById(req.params.id).populate('sender');
     if (!announcement) {
         req.flash('error', "Unable to access announcement");
@@ -285,7 +286,7 @@ module.exports.updateAnn = async function(req, res) {
 }
 
 // Ann PUT like ann
-module.exports.likeAnn = async function(req, res) {
+controller.likeAnn = async function(req, res) {
     const Ann = await Announcement.findById(req.body.announcement);
     if(!Ann) {return res.json({error: 'Error updating announcement.'});}
 
@@ -309,7 +310,7 @@ module.exports.likeAnn = async function(req, res) {
 };
 
 // Ann PUT comment
-module.exports.comment = async function(req, res) {
+controller.comment = async function(req, res) {
     const announcement = await Announcement.findById(req.body.announcement)
         .populate({
             path: "comments",
@@ -387,7 +388,7 @@ module.exports.comment = async function(req, res) {
 }
 
 // Ann PUT like comment
-module.exports.likeComment = async function(req, res) {
+controller.likeComment = async function(req, res) {
     const comment = await PostComment.findById(req.body.commentId);
     if(!comment) {return res.json({error: 'Error finding comment'});}
 
@@ -410,7 +411,7 @@ module.exports.likeComment = async function(req, res) {
     }
 }
 
-module.exports.deleteAnn = async function(req, res) {
+controller.deleteAnn = async function(req, res) {
     const announcement = await Announcement.findById(req.params.id).populate('sender');
     if (!announcement) {
         req.flash('error', "Unable to access announcement");
@@ -468,3 +469,5 @@ module.exports.deleteAnn = async function(req, res) {
     req.flash('success', 'Announcement Deleted!');
     return res.redirect('/announcements/');
 }
+
+module.exports = controller;

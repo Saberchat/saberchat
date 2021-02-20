@@ -163,7 +163,9 @@
                                   class="list-group-item list-group-item-action form-check darkmode-outline"><span
                                         class="instructions">Extra Instructions:</span> None</span>
                             <span id="balance-box" class="list-group-item list-group-item-action form-check darkmode-outline">Current Balance:
-                                $<%= `${(currentUser.balance * 100).toString().slice(0, (currentUser.balance * 100).toString().length - 2)}.${(currentUser.balance * 100).toString().slice((currentUser.balance * 100).toString().length - 2)}` %>
+                                <% if (currentUser.balance == 0) {%>$0.00 <%} else { %>
+                                    $<%= `${(currentUser.balance * 100).toString().slice(0, (currentUser.balance * 100).toString().length - 2)}.${(currentUser.balance * 100).toString().slice((currentUser.balance * 100).toString().length - 2)}` %>
+                                <% } %>
                             </span>
                             <span id="total-cost"
                                   class="list-group-item list-group-item-action form-check darkmode-outline">Total: $0.00</span>

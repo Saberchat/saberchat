@@ -26,8 +26,7 @@ const helmet = require('helmet');
 const mongoSanitize = require('express-mongo-sanitize');
 
 const {scriptUrls, styleUrls} = require('./srcUrls');
-
-const wrapAsync = require('./utils/wrapAsync');
+// const heic2any = require("heic2any");
 
 // pretty up the console
 // const colors = require('colors');
@@ -105,7 +104,7 @@ app.use(helmet());
 app.use(helmet.contentSecurityPolicy({
     directives: {
         defaultSrc: [],
-        connectSrc: ["'self'", "https://ka-f.fontawesome.com/"],
+        connectSrc: ["'self'", "https://ka-f.fontawesome.com/", "https://res.cloudinary.com"],
         scriptSrc: ["'unsafe-inline'", "'self'", ...scriptUrls],
         styleSrc: ["'self'", "'unsafe-inline'", ...styleUrls],
         mediaSrc: ["'self'", "https://res.cloudinary.com"],

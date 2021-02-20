@@ -3,18 +3,18 @@
 const Room = require("../models/chat/room");
 const Cafe = require('../models/cafe/cafe')
 const Course = require('../models/homework/course')
-const User = require("../models/user");
-const AccessReq = require('../models/inbox/accessRequest');
+
+const middleware = {};
 
 //checks if user is logged in
-module.exports.isLoggedIn = function(req, res, next) {
+middleware.isLoggedIn = function(req, res, next) {
     if (req.isAuthenticated()) { return next();}
     req.flash('error', 'Please Login');
     return res.redirect('/');
 }
 
 //checks if user is allowed into room
-module.exports.checkIfMember = async function(req, res, next) {
+middleware.checkIfMember = async function(req, res, next) {
     const room = await Room.findById(req.params.id);
     if (!room) {
         req.flash('error', 'Room cannot be found or does not exist');
@@ -29,7 +29,7 @@ module.exports.checkIfMember = async function(req, res, next) {
 }
 
 // checks for if the user can leave from a room
-module.exports.checkForLeave = async function(req, res, next) {
+middleware.checkForLeave = async function(req, res, next) {
     const room = await Room.findById(req.params.id);
     if (!room) {
         req.flash('error', 'Room cannot be found or does not exist');
@@ -49,7 +49,7 @@ module.exports.checkForLeave = async function(req, res, next) {
 }
 
 // check if room owner
-module.exports.checkRoomOwnership = async function(req, res, next) {
+middleware.checkRoomOwnership = async function(req, res, next) {
     const room = await Room.findById(req.params.id);
     if (!room) {
         req.flash('error', 'Room cannot be found or does not exist');
@@ -61,13 +61,13 @@ module.exports.checkRoomOwnership = async function(req, res, next) {
     return res.redirect('/chat/' + room._id);
 }
 
-module.exports.isPrincipal = function(req, res, next) {
+middleware.isPrincipal = function(req, res, next) {
     if (req.user.permission == 'principal') { return next();}
     req.flash('error', 'You do not have permission to do that');
     return res.redirect('/');
 }
 
-module.exports.isAdmin = function(req, res, next) {
+middleware.isAdmin = function(req, res, next) {
     if (req.user.permission == 'admin' || req.user.permission == 'principal') {
         return next();
     }
@@ -75,7 +75,7 @@ module.exports.isAdmin = function(req, res, next) {
     return res.redirect('/');
 }
 
-module.exports.isMod = function(req, res, next) {
+middleware.isMod = function(req, res, next) {
     if (req.user.permission == 'mod' || req.user.permission == 'admin' || req.user.permission == 'principal') {
         return next();
     }
@@ -83,13 +83,13 @@ module.exports.isMod = function(req, res, next) {
     return res.redirect('/');
 }
 
-module.exports.isFaculty = function(req, res, next) {
+middleware.isFaculty = function(req, res, next) {
     if (req.user.status == 'faculty') { return next();}
     req.flash('error', 'You do not have permission to do that');
     return res.redirect('back');
 }
 
-module.exports.isStudent = function(req, res, next) {
+middleware.isStudent = function(req, res, next) {
     if (['7th', '8th', '9th', '10th', '11th', '12th'].includes(req.user.status)) {
         return next();
     }
@@ -97,26 +97,26 @@ module.exports.isStudent = function(req, res, next) {
     return res.redirect('back');
 }
 
-module.exports.isTutor = function(req, res, next) {
+middleware.isTutor = function(req, res, next) {
     if (req.user.tags.includes('Tutor')) { return next();}
     req.flash('error', 'You do not have permission to do that');
     return res.redirect('back');
 }
 
-module.exports.isCashier = function(req, res, next) {
+middleware.isCashier = function(req, res, next) {
     if (req.user.tags.includes('Cashier')) { return next();}
     req.flash('error', 'You do not have permission to do that');
     return res.redirect('back');
 }
 
-module.exports.isEditor = function(req, res, next) {
+middleware.isEditor = function(req, res, next) {
     if (req.user.tags.includes('Editor')) { return next();}
     req.flash('error', 'You do not have permission to do that');
     return res.redirect('back');
 }
 
 //Whether cafe is open to orders
-module.exports.cafeOpen = async function(req, res, next) {
+middleware.cafeOpen = async function(req, res, next) {
     const cafe = await Cafe.findOne({});
     if (!cafe) {
         req.flash('error', "An Error Occurred")
@@ -129,7 +129,7 @@ module.exports.cafeOpen = async function(req, res, next) {
 }
 
 //checks if user is part of a course
-module.exports.memberOfCourse = async function(req, res, next) {
+middleware.memberOfCourse = async function(req, res, next) {
     const course = await Course.findById(req.params.id);
     if (!course) {
         req.flash('error', 'Course not found');
@@ -151,7 +151,7 @@ module.exports.memberOfCourse = async function(req, res, next) {
 }
 
 //checks if user is not part of a course
-module.exports.notMemberOfCourse = async function(req, res, next) {
+middleware.notMemberOfCourse = async function(req, res, next) {
     const course = await Course.findOne({joinCode: req.body.joincode});
     if (!course) {
         req.flash('error', 'Course not found');
@@ -176,3 +176,5 @@ module.exports.notMemberOfCourse = async function(req, res, next) {
     }
     return next();
 }
+
+module.exports = middleware;

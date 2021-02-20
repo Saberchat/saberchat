@@ -5,13 +5,14 @@ const Room = require('../models/chat/room');
 const AccessReq = require('../models/inbox/accessRequest');
 
 //LIBRARIES
-const express = require('express');
 const Filter = require('bad-words');
 const filter = new Filter();
 const dateFormat = require('dateformat');
 const {sendGridEmail} = require("../services/sendGrid");
 
-module.exports.index = async function(req, res) {
+const controller = {};
+
+controller.index = async function(req, res) {
     const rooms = await Room.find({}).populate("creator");
     if (!rooms) {
         req.flash('error', 'Unable to find rooms');
@@ -48,7 +49,7 @@ module.exports.index = async function(req, res) {
     return res.render('chat/index', {rooms, requests, commentObject});
 }
 
-module.exports.newRoom = async function(req, res) {
+controller.newRoom = async function(req, res) {
     const users = await User.find({authenticated: true});
     if (!users) {
         req.flash('error', "An Error Occurred");
@@ -57,7 +58,7 @@ module.exports.newRoom = async function(req, res) {
     return res.render('chat/new', {users: users});
 }
 
-module.exports.showRoom = async function(req, res) {
+controller.showRoom = async function(req, res) {
     const room = await Room.findById(req.params.id);
     if (!room) {
         req.flash('error', 'Could not find room');
@@ -84,7 +85,7 @@ module.exports.showRoom = async function(req, res) {
     return res.render('chat/show', {comments, room: room});
 }
 
-module.exports.showMembers = async function(req, res) {
+controller.showMembers = async function(req, res) {
     const room = await Room.findById(req.params.id).populate('creator').populate('members');
     if (!room) {
         req.flash('error', "Unable to find room");
@@ -97,7 +98,7 @@ module.exports.showMembers = async function(req, res) {
     return res.redirect("back");
 }
 
-module.exports.editRoom = async function(req, res) {
+controller.editRoom = async function(req, res) {
     const room = await Room.findById(req.params.id);
 
     if (!room) {
@@ -114,7 +115,7 @@ module.exports.editRoom = async function(req, res) {
     return res.render('chat/edit', {users, room});
 }
 
-module.exports.createRoom = async function(req, res) {
+controller.createRoom = async function(req, res) {
     const rooms = await Room.find({});
     if (!rooms) {
         req.flash('error', "Unable to access data");
@@ -175,7 +176,7 @@ module.exports.createRoom = async function(req, res) {
     }
 }
 
-module.exports.leaveRoom = async function(req, res) {
+controller.leaveRoom = async function(req, res) {
     const room = await Room.findById(req.params.id);
     if (!room) {
         req.flash('error', 'Room does not exist');
@@ -208,7 +209,7 @@ module.exports.leaveRoom = async function(req, res) {
     return res.redirect('/chat');
 }
 
-module.exports.requestJoin = async function(req, res) {
+controller.requestJoin = async function(req, res) {
     const room = await Room.findById(req.params.id); // find the room
     if (!room) {
         return res.json({error: 'Room does not Exist'});
@@ -258,7 +259,7 @@ module.exports.requestJoin = async function(req, res) {
     }
 }
 
-module.exports.requestCancel = async function(req, res) {
+controller.requestCancel = async function(req, res) {
     const room = await Room.findById(req.params.id).populate("creator");
     if (!room) {
         return res.json({error: "Unable to find room"});
@@ -275,7 +276,7 @@ module.exports.requestCancel = async function(req, res) {
     return res.json({success: "Successfully deleted request"});
 }
 
-module.exports.updateRoom = async function(req, res) {
+controller.updateRoom = async function(req, res) {
     const room = await Room.findByIdAndUpdate(req.params.id, {
         name: filter.clean(req.body.name),
         description: filter.clean(req.body.description)
@@ -312,7 +313,7 @@ module.exports.updateRoom = async function(req, res) {
     return res.redirect('/chat/' + room._id);
 }
 
-module.exports.deleteRoom = async function(req, res) {
+controller.deleteRoom = async function(req, res) {
     const room = await Room.findById(req.params.id).populate("creator");
     if (!room) {
         req.flash('error', 'An error occured');
@@ -366,7 +367,7 @@ module.exports.deleteRoom = async function(req, res) {
     return res.redirect('/chat');
 }
 
-module.exports.reportComment = async function(req, res) {
+controller.reportComment = async function(req, res) {
     const comment = await Comment.findById(req.params.id).populate({path: 'room', select: 'moderate'});
     if (!comment) {
         return res.json('Error');
@@ -383,3 +384,5 @@ module.exports.reportComment = async function(req, res) {
     await comment.save();
     return res.json('Reported');
 }
+
+module.exports = controller;

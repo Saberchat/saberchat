@@ -11,8 +11,10 @@ const Message = require('../models/inbox/message');
 const AccessReq = require('../models/inbox/accessRequest');
 const Room = require('../models/chat/room');
 
+const controller = {};
+
 // Inbox GET index page
-module.exports.index = async function(req, res) {
+controller.index = async function(req, res) {
     await req.user.populate(
 		{
 			path: 'inbox',
@@ -36,7 +38,7 @@ module.exports.index = async function(req, res) {
 };
 
 // Inbox GET show message
-module.exports.showMsg = async function(req, res) {
+controller.showMsg = async function(req, res) {
     const message = await Message.findById(req.params.id);
 	if(!message) {req.flash('error','Cannot find message'); return res.redirect('back');}
 
@@ -67,16 +69,16 @@ module.exports.showMsg = async function(req, res) {
 };
 
 // Inbox GET new message form
-module.exports.newMsgForm = async function(req, res) {
+controller.newMsgForm = async function(req, res) {
     const users = await User.find({authenticated: true});
-	if(!users) { req.flash('error', 'Unable to access Database.'); return res.redirect('back'); }
+	if(!users) { req.flash('error', 'An Error Occurred.'); return res.redirect('back'); }
 	return res.render('inbox/new', {users: users});
 };
 
 // Inbox GET sent messages
-module.exports.sent = async function(req, res) {
+controller.sent = async function(req, res) {
     const messages = await Message.find({});
-    if(!messages) { req.flash('error', 'Unable to access Database.'); return res.redirect('back');}
+    if(!messages) { req.flash('error', 'An Error Occurred.'); return res.redirect('back');}
 
     let sent_msgs = []; // array of user's sent messages
 
@@ -101,7 +103,7 @@ module.exports.sent = async function(req, res) {
 };
 
 // Inbox POST create messsage
-module.exports.createMsg = async function(req, res) {
+controller.createMsg = async function(req, res) {
     let message = {
         subject: filter.clean(req.body.subject),
         text: filter.clean(req.body.message),
@@ -266,7 +268,7 @@ module.exports.createMsg = async function(req, res) {
 };
 
 // Inbox PUT mark all messages as read
-module.exports.markReadAll = async function(req, res) {
+controller.markReadAll = async function(req, res) {
     const result = await Message.updateMany(
         {
             _id: {$in: req.user.inbox},
@@ -282,7 +284,7 @@ module.exports.markReadAll = async function(req, res) {
 };
 
 // Inbox PUT mark selected messages as read
-module.exports.markReadSelected = async function(req, res) {
+controller.markReadSelected = async function(req, res) {
     let ids = [];
 	for(const id in req.body) {
 		ids.push(id);
@@ -302,7 +304,7 @@ module.exports.markReadSelected = async function(req, res) {
 };
 
 // Inbox DELETE clear inbox
-module.exports.clear = function(req, res) {
+controller.clear = function(req, res) {
     req.user.inbox = [];
 	req.user.msgCount = 0;
 	req.user.save();
@@ -311,7 +313,7 @@ module.exports.clear = function(req, res) {
 };
 
 // Inbox PUT reply to message
-module.exports.reply = async function(req, res) {
+controller.reply = async function(req, res) {
     const message = await Message.findById(req.body.message).populate('recipients').populate('sender').exec();
     if(!message) {
         return res.json({error: 'Error finding message'});
@@ -394,7 +396,7 @@ module.exports.reply = async function(req, res) {
 };
 
 // Inbox DELETE messages
-module.exports.delete = async function(req, res) {
+controller.delete = async function(req, res) {
     let ids = [];
     for(const id in req.body) {
         ids.push(id);
@@ -419,21 +421,21 @@ module.exports.delete = async function(req, res) {
 // ==========================================
 // Access Request Routes
 
-module.exports.showReq = async function(req, res) {
+controller.showReq = async function(req, res) {
     const request = await AccessReq.findById(req.params.id)
     .populate({path: 'requester', select: 'username'})
     .populate({path: 'room', select: ['creator', 'name']}).exec();
-    if(!request) {req.flash('error', 'Unable to access Database.'); return res.redirect('back');}
+    if(!request) {req.flash('error', 'An Error Occurred.'); return res.redirect('back');}
 
     return res.render('inbox/requests/show', {request});
 };
 
-module.exports.acceptReq = async function(req, res) {
+controller.acceptReq = async function(req, res) {
     const Req = await AccessReq.findById(req.params.id)
     .populate({path: 'room', select: ['creator']}).populate('requester').exec();
 
     if(!Req) {
-        req.flash("error", "Unable to access database");
+        req.flash("error", "An Error Occurred");
         return res.redirect('back');
 
     } else if(!Req.room.creator.id.equals(req.user._id)) {
@@ -447,7 +449,7 @@ module.exports.acceptReq = async function(req, res) {
     }
 
     const room = await Room.findById(Req.room._id);
-    if(!room) { req.flash("error", "Unable to access database");return res.redirect('back'); }
+    if(!room) { req.flash("error", "An Error Occurred");return res.redirect('back'); }
 
     room.members.push(Req.requester);
     Req.status = 'accepted';
@@ -463,12 +465,12 @@ module.exports.acceptReq = async function(req, res) {
     return res.redirect('/inbox');
 };
 
-module.exports.rejectReq = async function(req, res) {
+controller.rejectReq = async function(req, res) {
     const Req = await AccessReq.findById(req.params.id)
     .populate('room').populate('requester').exec();
 
     if(!Req) {
-        req.flash("error", "Unable to access database");
+        req.flash("error", "An Error Occurred");
         return res.redirect('back');
 
     } else if(!Req.room.creator.id.equals(req.user._id)) {
@@ -492,3 +494,5 @@ module.exports.rejectReq = async function(req, res) {
     req.flash('success', 'Request rejected');
     return res.redirect('/inbox');
 };
+
+module.exports = controller;

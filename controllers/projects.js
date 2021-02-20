@@ -12,8 +12,9 @@ const Project = require('../models/projects/project');
 const Notification = require('../models/inbox/message');
 const PostComment = require('../models/postComment');
 
+const controller = {};
 
-module.exports.index = async function(req, res) {
+controller.index = async function(req, res) {
     const projects = await Project.find({})
         .populate('creators')
         .populate('poster')
@@ -32,7 +33,7 @@ module.exports.index = async function(req, res) {
 }
 
 
-module.exports.newProject = async function(req, res) {
+controller.newProject = async function(req, res) {
     let users = await User.find({authenticated: true, status: {$nin: ['alumnus', 'guest', 'parent', 'faculty']}});
     if (!users) {
         req.flash('error', "An Error Occurred");
@@ -42,7 +43,7 @@ module.exports.newProject = async function(req, res) {
 }
 
 
-module.exports.createProject = async function(req, res) {
+controller.createProject = async function(req, res) {
     let creators = [];
     let statusGroup; //Group of creators by status
     let individual; //Individual Creator ID
@@ -162,7 +163,7 @@ module.exports.createProject = async function(req, res) {
 }
 
 
-module.exports.editProject = async function(req, res) {
+controller.editProject = async function(req, res) {
     const project = await Project.findById(req.params.id)
         .populate('poster')
         .populate('creators');
@@ -201,7 +202,7 @@ module.exports.editProject = async function(req, res) {
 }
 
 
-module.exports.showProject = async function(req, res) {
+controller.showProject = async function(req, res) {
     let project = await Project.findById(req.params.id)
         .populate('poster')
         .populate('creators')
@@ -226,7 +227,7 @@ module.exports.showProject = async function(req, res) {
 }
 
 
-module.exports.updateProject = async function(req, res) {
+controller.updateProject = async function(req, res) {
     let creators = [];
     let statusGroup; //Group of creators by status
     let individual; //Individual Creator ID
@@ -385,7 +386,7 @@ module.exports.updateProject = async function(req, res) {
 }
 
 
-module.exports.deleteProject = async function(req, res) {
+controller.deleteProject = async function(req, res) {
     const project = await Project.findById(req.params.id);
 
     if (!project) {
@@ -427,7 +428,7 @@ module.exports.deleteProject = async function(req, res) {
     return res.redirect('/projects');
 }
 
-module.exports.likeProject = async function(req, res) {
+controller.likeProject = async function(req, res) {
     let project = await Project.findById(req.body.project);
     if (!project) {
         return res.json({error: 'Error updating project'});
@@ -453,7 +454,7 @@ module.exports.likeProject = async function(req, res) {
     }
 }
 
-module.exports.comment = async function(req, res) {
+controller.comment = async function(req, res) {
     const project = await Project.findById(req.body.project)
         .populate({
             path: "comments",
@@ -531,7 +532,7 @@ module.exports.comment = async function(req, res) {
     });
 }
 
-module.exports.likeComment = async function(req, res) {
+controller.likeComment = async function(req, res) {
     const comment = await PostComment.findById(req.body.commentId);
     if (!comment) {
         return res.json({error: 'Error updating comment'});
@@ -556,7 +557,7 @@ module.exports.likeComment = async function(req, res) {
     });
 }
 
-module.exports.data = async function(req, res) {
+controller.data = async function(req, res) {
     const projects = await Project.find({poster: req.user._id}).populate("comments");
         if (!projects) {
             req.flash('error', "Unable to find projects");
@@ -588,3 +589,5 @@ module.exports.data = async function(req, res) {
         const commentKeywords = await keywordFilter(popularCommentText, unpopularCommentText);
         return res.render('projects/data', {popularProjects: popular, projectKeywords, commentKeywords});
 }
+
+module.exports = controller;

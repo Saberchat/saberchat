@@ -9,11 +9,13 @@ const User = require('../models/user');
 const Email = require('../models/admin/email');
 const Announcement = require('../models/announcements/announcement');
 
-module.exports.index = function(req, res) {
+const controller = {};
+
+controller.index = function(req, res) {
     return res.render('index');
 }
 
-module.exports.register = async function(req, res) {
+controller.register = async function(req, res) {
     const whitelistedEmail = await Email.findOne({address: req.body.email, version: "whitelist"});
     if (!whitelistedEmail && req.body.email.split("@")[1] != "alsionschool.org") {
         req.flash('error', 'Only members of the Alsion community may sign up');
@@ -105,7 +107,7 @@ module.exports.register = async function(req, res) {
     return res.redirect("/");
 }
 
-module.exports.authenticate = async function(req, res) {
+controller.authenticate = async function(req, res) {
     const user = await User.findById(req.params.id);
     if (!user) {
         req.flash('error', "Unable to find user");
@@ -149,7 +151,7 @@ module.exports.authenticate = async function(req, res) {
     return res.redirect('/');
 }
 
-module.exports.login = function(req, res, next) {
+controller.login = function(req, res, next) {
     //authenticate user
     passport.authenticate('local', (err, user, info) => {
         if (err) {
@@ -179,7 +181,7 @@ module.exports.login = function(req, res, next) {
     })(req, res, next);
 }
 
-module.exports.forgotPassword = async function(req, res) {
+controller.forgotPassword = async function(req, res) {
     const users = await User.find({authenticated: true, 'email': req.body.newPwdEmail});
     if (!users) {
         req.flash('error', "Unable to find users");
@@ -217,11 +219,11 @@ module.exports.forgotPassword = async function(req, res) {
     return res.redirect('/');
 }
 
-module.exports.resetPasswordForm = function(req, res) {
+controller.resetPasswordForm = function(req, res) {
     return res.render('profile/reset-password', {user: req.query.user});
 }
 
-module.exports.resetPassword = async function(req, res) {
+controller.resetPassword = async function(req, res) {
     if (req.body.newPwd == req.body.newPwdConfirm) {
         const user = await User.findById(req.query.user);
         if (!user) {
@@ -247,13 +249,13 @@ module.exports.resetPassword = async function(req, res) {
     return res.redirect('back');
 }
 
-module.exports.logout = function(req, res) {
+controller.logout = function(req, res) {
     req.logout(); //logout with passport
     req.flash("success", "Logged you out!"); //flash message success and redirect
     return res.redirect("/");
 }
 
-module.exports.contact = async function(req, res) {
+controller.contact = async function(req, res) {
     const faculty = await User.find({authenticated: true, authenticated: true, status: 'faculty'});
     if (!faculty) {
         req.flash('error', "An Error Occurred");
@@ -263,7 +265,7 @@ module.exports.contact = async function(req, res) {
     return res.render('other/contact', {faculty});
 }
 
-module.exports.alsion = async function(req, res) {
+controller.alsion = async function(req, res) {
     const faculty = await User.find({authenticated: true, status: 'faculty'});
     if (!faculty) {
         req.flash('error', "An Error Occurred");
@@ -277,7 +279,7 @@ module.exports.alsion = async function(req, res) {
     return res.render('other/alsion_info', {faculty: teacherNames.join(', ')});
 }
 
-module.exports.darkmode = function(req, res) {
+controller.darkmode = function(req, res) {
     if (req.user.darkmode) {
         req.user.darkmode = false;
     } else {
@@ -287,3 +289,5 @@ module.exports.darkmode = function(req, res) {
     req.user.save();
     return res.redirect('back');
 }
+
+module.exports = controller;

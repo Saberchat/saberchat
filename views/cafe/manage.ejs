@@ -98,9 +98,9 @@
             <% }) %>
 
             <br class="category-break" id="categories-break"/>
-            <li class="list-group-item list-group-item-primary category-header darkmode-outline" id="categories-header">
+            <li class="list-group-item list-group-item-primary darkmode-outline category-header" id="categories-header">
                 <div class="d-flex w-100 justify-content-between">
-                    <h2 class="mb-1 darkmode-header">Item Order Categories</h2>
+                    <h2 class="mb-1 darkmode-header">Item Categories</h2>
                     <span class="darkmode-header"><%= categories.length %> category(s)</span>
                 </div>
             </li>
@@ -113,7 +113,7 @@
                         <% upvoteCount += item.upvotes.length %>
                     <% } %>
                     <a href="/cafe/category/<%= category._id %>" id="category-<%= category.id %>"
-                       class="list-group-item list-group-item-action menu-item itemOrderCategory cafe"><span
+                       class="list-group-item list-group-item-action menu-item ItemCategories cafe"><span
                                 class="item-name"><%= category.name %></span> (<%= category.items.length %> items) <span
                                 class="upvote"
                                 title="Sum of all upvotes for this category (Cafe admins cannot upvote items from here)"></span><span
@@ -129,10 +129,10 @@
                     <% for (let item of category.items) { %>
                         <% upvoteCount += item.upvotes.length %>
                     <% } %>
-                    <div class="list-group-item list-group-item-action menu-item itemOrderCategory cafe"
+                    <div class="list-group-item list-group-item-action menu-item ItemCategories cafe"
                          id="category-<%= category.id %>"><span class="item-name"><%= category.name %></span>
                         (<%= category.items.length %> items) <span
-                                id="modify-banned">You cannot modify this category </span> <span
+                                id="modify-banned">Cannot Modify </span> <span
                                 title="Sum of all upvotes for this category (Cafe admins cannot upvote items from here)"
                                 class="upvote"></span><span id="upvoteCount-<%= category._id %>" class="upvote-count cafetext"> Upvotes: <%= upvoteCount %></span>
                     </div>

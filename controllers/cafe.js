@@ -15,10 +15,11 @@ const Notification = require('../models/inbox/message');
 const Category = require('../models/cafe/itemType');
 const Cafe = require('../models/cafe/cafe')
 
+const controller = {};
 //-----------GENERAL ROUTES-----------//
 
 //SHOW CAFE HOMEPAGE
-module.exports.index = async function(req, res) {
+controller.index = async function(req, res) {
     const categories = await Category.find({}).populate('items');
     if (!categories) {
         req.flash('error', "Unable to find categories");
@@ -108,7 +109,7 @@ module.exports.index = async function(req, res) {
 //-----------GENERAL ORDER ROUTES-----------//
 
 //CREATE ORDER
-module.exports.order = async function(req, res) {
+controller.order = async function(req, res) {
     if (!req.body.check) { //If any items are selected
         req.flash('error', "Cannot send empty order"); //If no items were checked
         return res.redirect('back');
@@ -163,7 +164,7 @@ module.exports.order = async function(req, res) {
 //-----------ROUTES FOR SPECIFIC ORDERS-------------//
 
 //PROCESS AND CONFIRM ORDER
-module.exports.processOrder = async function(req, res) {
+controller.processOrder = async function(req, res) {
     const order = await Order.findById(req.params.id).populate('items.item').populate('customer'); //Find the order that is currently being handled based on id, and populate info about its items
     if (!order) {
         return res.json({error: 'Could not find order'});
@@ -215,7 +216,7 @@ module.exports.processOrder = async function(req, res) {
 }
 
 //REJECT OR CANCEL ORDER
-module.exports.deleteOrder = async function(req, res) {
+controller.deleteOrder = async function(req, res) {
     if (req.body.rejectionReason) {
         if (!req.user.tags.includes("Cashier")) {
             req.flash('error', 'You do not have permission to do that');
@@ -324,7 +325,7 @@ module.exports.deleteOrder = async function(req, res) {
 //-----------ROUTES FOR GENERAL ITEMS-------------//
 
 //FORM TO CREATE NEW ITEM
-module.exports.newItem = async function(req, res) {
+controller.newItem = async function(req, res) {
     const categories = await Category.find({});
     if (!categories) {
         req.flash('error', "An Error Occurred");
@@ -335,7 +336,7 @@ module.exports.newItem = async function(req, res) {
 }
 
 //CREATE NEW ITEM
-module.exports.createItem = async function(req, res) {
+controller.createItem = async function(req, res) {
     const overlap = await Item.find({name: req.body.name});
     if (!overlap) {
         req.flash('error', "Unable to find items");
@@ -406,7 +407,7 @@ module.exports.createItem = async function(req, res) {
 //-----------ROUTES FOR SPECIFIC ITEMS-------------//
 
 //VIEW/EDIT ITEM
-module.exports.viewItem = async function(req, res) {
+controller.viewItem = async function(req, res) {
     const item = await Item.findById(req.params.id);
     if (!item) {
         req.flash('error', "Unable to find item");
@@ -428,16 +429,16 @@ module.exports.viewItem = async function(req, res) {
 }
 
 //UPDATE/UPVOTE ITEM
-module.exports.updateItem = async function(req, res) {
+controller.updateItem = async function(req, res) {
     if (req.body.name) {
-        await module.exports.updateItemInfo(req, res);
+        await controller.updateItemInfo(req, res);
     } else {
-        await module.exports.upvoteItem(req, res);
+        await controller.upvoteItem(req, res);
     }
 }
 
 //DELETE ITEM
-module.exports.deleteItem = async function(req, res) {
+controller.deleteItem = async function(req, res) {
     const item = await Item.findByIdAndDelete(req.params.id); //Delete item based on specified ID
     if (!item) {
         req.flash('error', 'Could not delete item');
@@ -493,29 +494,29 @@ module.exports.deleteItem = async function(req, res) {
 //-----------ROUTES TO MANAGE CAFE -------------//
 
 //MANAGE CAFE/VIEW ORDERS
-module.exports.manage = async function(req, res) {
+controller.manage = async function(req, res) {
     if (req.query.orders) { //If route calls to display orders
-        await module.exports.manageOrders(req, res);
+        await controller.manageOrders(req, res);
 
-    } else if (req.query.data) { //If page calls to display data, commented out for now
-        const customers = await User.find({authenticated: true}); if (!customers) {return false;}
-        const items = await Item.find({}); if (!items) {return false;}
-        const allOrders = await Order.find({}); if (!allOrders) {return false;}
+    // } else if (req.query.data) { //If page calls to display data
+    //     const customers = await User.find({authenticated: true}); if (!customers) {return false;}
+    //     const items = await Item.find({}); if (!items) {return false;}
+    //     const allOrders = await Order.find({}); if (!allOrders) {return false;}
 
-        const data = await getData(customers, items, allOrders);
-        if (!data) {
-            req.flash("error", "An Error Occurred");
-            return res.redirect("back")
-        }
-        return res.render("cafe/data", data);
+    //     const data = await getData(customers, items, allOrders);
+    //     if (!data) {
+    //         req.flash("error", "An Error Occurred");
+    //         return res.redirect("back")
+    //     }
+    //     return res.render("cafe/data", data);
 
     } else {
-        await module.exports.manageCafe(req, res);
+        await controller.manageCafe(req, res);
     }
 }
 
 //OPEN/CLOSE CAFE
-module.exports.changeStatus = async function(req, res) {
+controller.changeStatus = async function(req, res) {
     const cafe = await Cafe.findOne({});
     if (!cafe) {
         return res.json({error: "An error occurred"});
@@ -528,7 +529,7 @@ module.exports.changeStatus = async function(req, res) {
 //-----------ROUTES FOR GENERAL ITEM CATEGORIES-------------//
 
 //FORM TO CREATE NEW ITEM CATEGORY
-module.exports.newCategory = async function(req, res) {
+controller.newCategory = async function(req, res) {
     const categories = await Category.find({}).populate('items'); //Collect info on all the items, so that we can give the user the option to add them to that category
     if (!categories) {
         req.flash('error', "Unable to find categories");
@@ -538,7 +539,7 @@ module.exports.newCategory = async function(req, res) {
 }
 
 //CREATE NEW ITEM CATEGORY
-module.exports.createCategory = async function(req, res) {
+controller.createCategory = async function(req, res) {
     const overlap = await Category.find({name: req.body.name}); //Find all item categories with this name that already exist
     if (!overlap) {
         req.flash('error', "Unable to find item categories");
@@ -591,7 +592,7 @@ module.exports.createCategory = async function(req, res) {
 //-----------ROUTES FOR SPECIFIC ITEM CATEGORIES-------------//
 
 //VIEW/EDIT ITEM CATEGORY
-module.exports.viewCategory = async function(req, res) {
+controller.viewCategory = async function(req, res) {
     const category = await Category.findById(req.params.id).populate('items'); //Find the specified category
     if (!category) {
         req.flash('error', "An Error Occurred");
@@ -612,7 +613,7 @@ module.exports.viewCategory = async function(req, res) {
 }
 
 //UPDATE ITEM CATEGORY
-module.exports.updateCategory = async function(req, res) {
+controller.updateCategory = async function(req, res) {
     const overlap = await Category.find({_id: {$ne: req.params.id}, name: req.body.name}); //Find all categories besides the one we are editing with the same name
     if (!overlap) {
         req.flash('error', "An Error Occurred");
@@ -677,7 +678,7 @@ module.exports.updateCategory = async function(req, res) {
 }
 
 //DELETE ITEM CATEGORY
-module.exports.deleteCategory = async function(req, res) {
+controller.deleteCategory = async function(req, res) {
     const other = await Category.findOne({name: "Other"}); //Find the category with name 'Other' - we've created this category so that any unselected items go here
     if (!other) {
         req.flash('error', "Unable to find item category 'Other', please add it");
@@ -699,7 +700,7 @@ module.exports.deleteCategory = async function(req, res) {
     return res.redirect('/cafe/manage');
 }
 
-module.exports.upvoteItem = async function(req, res) {
+controller.upvoteItem = async function(req, res) {
     const item = await Item.findById(req.params.id);
     if (!item) {
         return res.json({error: "Error upvoting item"});
@@ -716,7 +717,7 @@ module.exports.upvoteItem = async function(req, res) {
     return res.json({success: `Upvoted ${item.name}`, upvoteCount: item.upvotes.length});
 }
 
-module.exports.updateItemInfo = async function(req, res) {
+controller.updateItemInfo = async function(req, res) {
     if (!req.user.tags.includes("Cashier")) {
         req.flash('error', 'You do not have permission to do that');
         return res.redirect('back');
@@ -822,7 +823,7 @@ module.exports.updateItemInfo = async function(req, res) {
     return res.redirect('/cafe/manage');
 }
 
-module.exports.manageCafe = async function(req, res) {
+controller.manageCafe = async function(req, res) {
     const categories = await Category.find({}).populate('items'); //Collect info on all the item categories
     if (!categories) {
         req.flash('error', 'An Error Occurred');
@@ -846,7 +847,7 @@ module.exports.manageCafe = async function(req, res) {
     return res.render('cafe/manage', {categories: sortedCategories, open: cafe.open});
 }
 
-module.exports.manageOrders = async function(req, res) {
+controller.manageOrders = async function(req, res) {
     const orders = await Order.find({present: true}).populate('items.item');
     if (!orders) {
         req.flash('error', 'Could not find orders');
@@ -854,3 +855,5 @@ module.exports.manageOrders = async function(req, res) {
     }
     return res.render('cafe/orderDisplay', {orders});
 }
+
+module.exports = controller;

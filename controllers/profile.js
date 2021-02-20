@@ -18,11 +18,13 @@ const filter = new Filter();
 const axios = require('axios');
 const {cloudUpload, cloudDelete} = require('../services/cloudinary');
 
+const controller = {};
+
 if (process.env.NODE_ENV !== "production") {
     require('dotenv').config();
 }
 
-module.exports.index = async function(req, res) {
+controller.index = async function(req, res) {
     const users = await User.find({authenticated: true});
     if (!users) {
         req.flash("error", "An error occurred");
@@ -31,15 +33,15 @@ module.exports.index = async function(req, res) {
     return res.render("profile/index", {users});
 }
 
-module.exports.edit = function(req, res) {
+controller.edit = function(req, res) {
     return res.render('profile/edit');
 }
 
-module.exports.changeLoginInfo = function(req, res) {
+controller.changeLoginInfo = function(req, res) {
     return res.render('profile/edit_pwd_email');
 }
 
-module.exports.show = async function(req, res) {
+controller.show = async function(req, res) {
     const user = await User.findById(req.params.id).populate('followers');
     if (!user) {
         req.flash('error', 'Error. Cannot find user.');
@@ -74,7 +76,7 @@ module.exports.show = async function(req, res) {
     res.render('profile/show', {user, following, followerIds, convertedDescription});
 }
 
-module.exports.update = async function(req, res) {
+controller.update = async function(req, res) {
     const overlap = await User.find({
         authenticated: true,
         username: filter.clean(req.body.username),
@@ -189,7 +191,7 @@ module.exports.update = async function(req, res) {
     return res.redirect(`/profiles/${req.user._id}`);
 }
 
-module.exports.tagPut = function(req, res) {
+controller.tagPut = function(req, res) {
     if (req.user.tags.includes(req.body.tag)) {
         req.user.tags.splice(req.user.tags.indexOf(req.body.tag), 1);
         req.user.save();
@@ -202,7 +204,7 @@ module.exports.tagPut = function(req, res) {
     }
 }
 
-module.exports.changeEmailPut = async function(req, res) {
+controller.changeEmailPut = async function(req, res) {
     if (req.body.receiving_emails) {
         req.user.receiving_emails = true;
 
@@ -279,7 +281,7 @@ module.exports.changeEmailPut = async function(req, res) {
     return res.redirect('/profiles/change-login-info');
 }
 
-module.exports.confirmEmail = async function(req, res) {
+controller.confirmEmail = async function(req, res) {
     const user = await User.findById(req.params.id);
     if (!user) {
         req.flash('error', "Unable to find user");
@@ -317,7 +319,7 @@ module.exports.confirmEmail = async function(req, res) {
     return res.redirect('/');
 }
 
-module.exports.changePasswordPut = async function(req, res) {
+controller.changePasswordPut = async function(req, res) {
     if (req.body.newPassword == req.body.newPasswordConfirm) {
         const user = await User.findById(req.user._id);
         if (!user) {
@@ -335,7 +337,7 @@ module.exports.changePasswordPut = async function(req, res) {
     return res.redirect('back');
 }
 
-module.exports.follow = async function(req, res) {
+controller.follow = async function(req, res) {
     const user = await User.findById(req.params.id);
     if (!user) {
         return res.json({error: "Error finding user"});
@@ -355,7 +357,7 @@ module.exports.follow = async function(req, res) {
     return res.json({success: "Succesfully followed user", user: req.user});
 }
 
-module.exports.unfollow = async function(req, res) {
+controller.unfollow = async function(req, res) {
     const user = await User.findById(req.params.id);
     if (!user) {
         return res.json({error: "Error finding user"});
@@ -371,7 +373,7 @@ module.exports.unfollow = async function(req, res) {
     return res.json({error: "You are not following this user"});
 }
 
-module.exports.remove = async function(req, res) {
+controller.remove = async function(req, res) {
     const user = await User.findById(req.params.id);
     if (!user) {
         return res.json({error: "Error finding user"});
@@ -386,7 +388,7 @@ module.exports.remove = async function(req, res) {
     return res.json({error: "User is not following you"});
 }
 
-module.exports.deleteAccount = async function(req, res)  {
+controller.deleteAccount = async function(req, res)  {
     const deletedComments = await Comment.deleteMany({author: req.user._id});
 
     if (!deletedComments) {
@@ -635,3 +637,5 @@ module.exports.deleteAccount = async function(req, res)  {
     req.flash('success', "Account deleted!");
     return res.redirect('/');
 }
+
+module.exports = controller;

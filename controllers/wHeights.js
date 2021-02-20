@@ -9,8 +9,10 @@ const User = require('../models/user');
 const Type = require('../models/wHeights/articleType');
 const PostComment = require('../models/postComment');
 
+const controller = {};
+
 // index page
-module.exports.index = async function(req, res) {
+controller.index = async function(req, res) {
     const articles = await Article.find({}).populate('author');
     if (!articles) {
         req.flash('error', 'An Error Occurred');
@@ -20,7 +22,7 @@ module.exports.index = async function(req, res) {
 }
 
 // display form for creating articles
-module.exports.new = async function(req, res) {
+controller.new = async function(req, res) {
     const students = await User.find({
         authenticated: true,
         status: {$in: ["7th", "8th", "9th", "10th", "11th", "12th"]}
@@ -40,7 +42,7 @@ module.exports.new = async function(req, res) {
 }
 
 // display specific article
-module.exports.show = async function(req, res) {
+controller.show = async function(req, res) {
     const article = await Article.findById(req.params.id)
         .populate('author')
         .populate({
@@ -62,7 +64,7 @@ module.exports.show = async function(req, res) {
 }
 
 //Create article
-module.exports.create = async function(req, res) {
+controller.create = async function(req, res) {
     const content = JSON.parse(req.body.content);
 
     const articleObj = {
@@ -98,7 +100,7 @@ module.exports.create = async function(req, res) {
 }
 
 //Comment on article
-module.exports.comment = async function(req, res) {
+controller.comment = async function(req, res) {
     const article = await Article.findById(req.body.article)
         .populate({
             path: "comments",
@@ -174,7 +176,7 @@ module.exports.comment = async function(req, res) {
     return res.json({success: 'Successful comment', comments: article.comments});
 }
 
-module.exports.likeComment = async function(req, res) {
+controller.likeComment = async function(req, res) {
     const comment = await PostComment.findById(req.body.commentId);
     if (!comment) {
         return res.json({error: 'Error updating comment'});
@@ -198,3 +200,5 @@ module.exports.likeComment = async function(req, res) {
         });
     }
 }
+
+module.exports = controller;

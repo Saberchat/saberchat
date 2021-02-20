@@ -13,25 +13,26 @@ const Permission = require('../models/admin/permission');
 const Status = require('../models/admin/status');
 
 const {sendGridEmail} = require("../services/sendGrid");
+const controller = {};
 
-module.exports.index = function(req, res) {
+controller.index = function(req, res) {
     return res.render("admin/index");
 }
 
-module.exports.moderateGet = async function(req, res) {
+controller.moderateGet = async function(req, res) {
     const comments = await Comment.find({status: 'flagged'})
     .populate({path: 'author', select: ['username', 'imageUrl']})
     .populate({path: 'statusBy', select: ['username', 'imageUrl']})
     .populate({path: 'room', select: ['name']});
 
     if (!comments) {
-        req.flash('error', 'Cannot access DataBase');
+        req.flash('error', 'An Error Occurred');
         return res.redirect('/admin');
     }
     return res.render('admin/mod', {comments});
 }
 
-module.exports.moderatePost = async function(req, res) {
+controller.moderatePost = async function(req, res) {
     const reportedComment = await Comment.findById(req.body.commentId).populate("author");
     if (!reportedComment) {
         return res.json({error: "Unable to find comment"});
@@ -72,7 +73,7 @@ module.exports.moderatePost = async function(req, res) {
     return res.json({success: "Succesfully collected data", context});
 }
 
-module.exports.moderatePut = async function(req, res) {
+controller.moderatePut = async function(req, res) {
     const comment = await Comment.findById(req.body.id).populate('statusBy');
     if (!comment) {
         return res.json({error: 'Could not find comment'});
@@ -93,7 +94,7 @@ module.exports.moderatePut = async function(req, res) {
     return res.json({success: 'Ignored comment'});
 }
 
-module.exports.moderateDelete = async function(req, res) {
+controller.moderateDelete = async function(req, res) {
     const comment = await Comment.findById(req.body.id).populate("author");
     if (!comment) {
         return res.json({error: 'Could not find comment'});
@@ -114,25 +115,25 @@ module.exports.moderateDelete = async function(req, res) {
     return res.json({success: 'Deleted comment'});
 }
 
-module.exports.permissionsGet = async function(req, res) {
+controller.permissionsGet = async function(req, res) {
     const users = await User.find({authenticated: true});
     if (!users) {
-        req.flash('error', 'Cannot access Database');
+        req.flash('error', 'An Error Occurred');
         return res.redirect('/admin');
     }
     return res.render('admin/permission', {users});
 }
 
-module.exports.statusGet = async function(req, res) {
+controller.statusGet = async function(req, res) {
     const users = await User.find({authenticated: true});
     if (!users) {
-        req.flash('error', 'Cannot access Database');
+        req.flash('error', 'An Error Occurred');
         return res.redirect('/admin');
     }
     return res.render('admin/status', {users, tags: ['Cashier', 'Tutor', 'Editor']});
 }
 
-module.exports.statusPut = async function(req, res) {
+controller.statusPut = async function(req, res) {
     const user = await User.findById(req.body.user);
     if (!user) {
         return res.json({error: 'Error. Could not change'});
@@ -159,7 +160,7 @@ module.exports.statusPut = async function(req, res) {
     return res.json({success: "Successfully Changed", user});
 }
 
-module.exports.whitelistGet = async function(req, res) {
+controller.whitelistGet = async function(req, res) {
     let emails;
     if (req.query.version) {
         if (["whitelist", "blacklist"].includes(req.query.version)) {
@@ -191,7 +192,7 @@ module.exports.whitelistGet = async function(req, res) {
     return res.render('admin/whitelist', {emails, users, version: "whitelist"});
 }
 
-module.exports.whitelistPut = async function (req, res) {
+controller.whitelistPut = async function (req, res) {
     if (req.body.version === "whitelist" && req.body.address.split('@')[1] === "alsionschool.org") {
         return res.json({error: "Alsion emails do not need to be added to the whitelist"});
     }
@@ -208,7 +209,7 @@ module.exports.whitelistPut = async function (req, res) {
     return res.json({success: "Email added", email});
 }
 
-module.exports.whitelistId = async function (req, res) {
+controller.whitelistId = async function (req, res) {
     const email = await Email.findById(req.body.email);
     if (!email) {
         return res.json({error: "Unable to find email"});
@@ -229,7 +230,7 @@ module.exports.whitelistId = async function (req, res) {
     return res.json({error: "Active user has this email"});
 }
 
-module.exports.permissionsPut = async function (req, res) {
+controller.permissionsPut = async function (req, res) {
     const user = await User.findById(req.body.user);
     if (!user) {
         return res.json({error: "Error. Could not change"});
@@ -255,7 +256,7 @@ module.exports.permissionsPut = async function (req, res) {
     return res.json({success: 'Succesfully changed', user});
 }
 
-module.exports.tag = async function(req, res) {
+controller.tag = async function(req, res) {
     const user = await User.findById(req.body.user);
     if (!user) {
         return res.json({error: 'Error. Could not change'});
@@ -290,7 +291,7 @@ module.exports.tag = async function(req, res) {
     return res.json({success: "Successfully added status", tag: req.body.tag})
 }
 
-module.exports.createPermission = async function(req, res) {
+controller.createPermission = async function(req, res) {
     const permission = await Permission.create({title: req.body.permission});
     if (!permission) {
         req.flash('error', "Unable to create permission");
@@ -301,7 +302,7 @@ module.exports.createPermission = async function(req, res) {
     return res.redirect('/admin/permissions');
 }
 
-module.exports.createStatus = async function(req, res) {
+controller.createStatus = async function(req, res) {
     const status = await Status.create({
         title: req.body.status,
         plural: req.body.plural,
@@ -316,7 +317,7 @@ module.exports.createStatus = async function(req, res) {
     return res.redirect('/admin/status');
 }
 
-module.exports.permanentDelete = async function(req, res) {
+controller.permanentDelete = async function(req, res) {
     const email = await Email.findByIdAndDelete(req.params.id);
 
     if (!email) {
@@ -574,3 +575,5 @@ module.exports.permanentDelete = async function(req, res) {
 	req.flash('success', "Email Removed From Whitelist! Any users with this email have been removed.");
 	return res.redirect('/admin/whitelist');
 }
+
+module.exports = controller;

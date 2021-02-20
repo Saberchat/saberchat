@@ -9,7 +9,9 @@ const Course = require('../models/homework/course');
 const PostComment = require('../models/postComment');
 const Room = require('../models/chat/room');
 
-module.exports.index = async function(req, res) {
+const controller = {};
+
+controller.index = async function(req, res) {
     const courses = await Course.find({});
     if (!courses) {
         req.flash('error', "Unable to find courses");
@@ -31,7 +33,7 @@ module.exports.index = async function(req, res) {
     return res.render('homework/index', {courses: courseList});
 }
 
-module.exports.createCourse = async function(req, res) {
+controller.createCourse = async function(req, res) {
     let charSetMatrix = [];
     charSetMatrix.push('qwertyuiopasdfghjklzxcvbnm'.split(''));
     charSetMatrix.push('QWERTYUIOPASDFGHJKLZXCVBNM'.split(''));
@@ -82,7 +84,7 @@ module.exports.createCourse = async function(req, res) {
 }
 
 //Join as tutor or as student
-module.exports.joinCourse = async function(req, res) {
+controller.joinCourse = async function(req, res) {
     if (req.body.bio) { //Join as tutor
         if (req.user.tags.includes("Tutor")) {
             const course = await Course.findOne({joinCode: req.body.joincode});
@@ -123,7 +125,7 @@ module.exports.joinCourse = async function(req, res) {
     return res.redirect(`back`);
 }
 
-module.exports.showCourse = async function(req, res) {
+controller.showCourse = async function(req, res) {
     const course = await Course.findById(req.params.id).populate('teacher students tutors.tutor tutors.reviews.review blocked');
     if (!course) {
         req.flash('error', "Unable to find course");
@@ -166,7 +168,7 @@ module.exports.showCourse = async function(req, res) {
     return res.render('homework/show', {course, studentIds, tutorIds, tutors, teachers});
 }
 
-module.exports.unenrollStudent = async function(req, res) {
+controller.unenrollStudent = async function(req, res) {
     const course = await Course.findByIdAndUpdate(req.params.id, {$pull: {students: req.user._id}}).populate("tutors.tutor");
     if (!course) {
         req.flash('error', "Unable to find course");
@@ -212,7 +214,7 @@ module.exports.unenrollStudent = async function(req, res) {
     return res.redirect('/homework');
 }
 
-module.exports.unenrollTutor = async function(req, res) {
+controller.unenrollTutor = async function(req, res) {
     const course = await Course.findById(req.params.id).populate('tutors.tutor tutors.rooms.student');
     if (!course) {
         req.flash('error', "Unable to find course");
@@ -248,7 +250,7 @@ module.exports.unenrollTutor = async function(req, res) {
     return res.redirect('/homework');
 }
 
-module.exports.updateSettings = async function(req, res) {
+controller.updateSettings = async function(req, res) {
     const course = await Course.findById(req.params.id);
     if (!course) {
         req.flash("error", "An error occurred");
@@ -299,7 +301,7 @@ module.exports.updateSettings = async function(req, res) {
     return res.redirect(`/homework/${course._id}`);
 }
 
-module.exports.deleteCourse = async function(req, res) {
+controller.deleteCourse = async function(req, res) {
     const course = await Course.findOne({_id: req.params.id, joinCode: req.body.joinCode})
     .populate("tutors.tutor tutors.students tutors.rooms.student");
     if (!course) {
@@ -340,7 +342,7 @@ module.exports.deleteCourse = async function(req, res) {
 
 //-----------TEACHER ROUTES -----------//
 
-module.exports.updateTeacher = async function(req, res) {
+controller.updateTeacher = async function(req, res) {
     const course = await Course.findById(req.params.id);
     if (!course) {
         req.flash("error", "Unable to find course");
@@ -364,7 +366,7 @@ module.exports.updateTeacher = async function(req, res) {
     return res.redirect("/homework");
 }
 
-module.exports.updateJoinCode = async function(req, res) {
+controller.updateJoinCode = async function(req, res) {
     let charSetMatrix = [];
     charSetMatrix.push('qwertyuiopasdfghjklzxcvbnm'.split(''));
     charSetMatrix.push('QWERTYUIOPASDFGHJKLZXCVBNM'.split(''));
@@ -389,7 +391,7 @@ module.exports.updateJoinCode = async function(req, res) {
     return res.json({success: "Succesfully Updated Join Code", joinCode});
 }
 
-module.exports.removeStudent = async function(req, res) {
+controller.removeStudent = async function(req, res) {
     const studentId = await User.findById(req.body.studentId);
     if (!studentId) {
         return res.json({error: "Error removing student"});
@@ -460,7 +462,7 @@ module.exports.removeStudent = async function(req, res) {
     }
 }
 
-module.exports.removeTutor = async function(req, res) {
+controller.removeTutor = async function(req, res) {
     let tutorId;
     if (req.body.show) {
         tutorId = await User.findById(req.body.tutorId);
@@ -553,7 +555,7 @@ module.exports.removeTutor = async function(req, res) {
     }
 }
 
-module.exports.unblock = async function(req, res) {
+controller.unblock = async function(req, res) {
     const blockedId = await User.findById(req.body.blockedId);
     if (!blockedId) {
         return res.json({error: "Unable to access user"});
@@ -599,7 +601,7 @@ module.exports.unblock = async function(req, res) {
 
 //-----------TUTOR ROUTES -----------//
 
-module.exports.updateBio = async function(req, res) {
+controller.updateBio = async function(req, res) {
     const course = await Course.findById(req.params.id);
     if (!course) {
         return res.json({error: "Unable to find course"});
@@ -614,7 +616,7 @@ module.exports.updateBio = async function(req, res) {
     }
 }
 
-module.exports.closeLessons = async function(req, res) {
+controller.closeLessons = async function(req, res) {
     const course = await Course.findById(req.params.id);
     if (!course) {
         return res.json({error: "Error closing lessons"});
@@ -629,7 +631,7 @@ module.exports.closeLessons = async function(req, res) {
     }
 }
 
-module.exports.reopenLessons = async function(req, res) {
+controller.reopenLessons = async function(req, res) {
     const course = await Course.findById(req.params.id);
     if (!course) {
         return res.json({error: "Error closing lessons"});
@@ -644,7 +646,7 @@ module.exports.reopenLessons = async function(req, res) {
     }
 }
 
-module.exports.setStudents = async function(req, res) {
+controller.setStudents = async function(req, res) {
     const course = await Course.findById(req.params.id);
     if (!course) {
         return res.json({error: "Error accessing course"});
@@ -669,7 +671,7 @@ module.exports.setStudents = async function(req, res) {
     }
 }
 
-module.exports.markLesson = async function(req, res) {
+controller.markLesson = async function(req, res) {
     const course = await Course.findById(req.params.id);
     if (!course) {
         return res.json({error: "Error accessing course"});
@@ -700,7 +702,7 @@ module.exports.markLesson = async function(req, res) {
 
 //-----------STUDENT ROUTES -----------//
 
-module.exports.bookTutor = async function(req, res) {
+controller.bookTutor = async function(req, res) {
     const course = await Course.findById(req.params.id).populate('tutors.tutor');
     if (!course) {
         return res.json({error: "Error accessing course"});
@@ -762,7 +764,7 @@ module.exports.bookTutor = async function(req, res) {
     }
 }
 
-module.exports.leaveTutor = async function(req, res) {
+controller.leaveTutor = async function(req, res) {
     const course = await Course.findById(req.params.id).populate('tutors.tutor');
     if (!course) {
         return res.json({error: "Error leaving course"});
@@ -805,7 +807,7 @@ module.exports.leaveTutor = async function(req, res) {
     }
 }
 
-module.exports.upvoteTutor = async function(req, res) {
+controller.upvoteTutor = async function(req, res) {
     const course = await Course.findById(req.params.id);
     if (!course) {
         return res.json({error: "Error upvoting tutor"});
@@ -830,7 +832,7 @@ module.exports.upvoteTutor = async function(req, res) {
     }
 }
 
-module.exports.rateTutor = async function(req, res) {
+controller.rateTutor = async function(req, res) {
     const course = await Course.findById(req.params.id);
     if (!course) {
         return res.json({error: "Error reviewing tutor"});
@@ -870,7 +872,7 @@ module.exports.rateTutor = async function(req, res) {
     }
 }
 
-module.exports.likeReview = async function(req, res) {
+controller.likeReview = async function(req, res) {
     const review = await PostComment.findById(req.params.id);
     if (!review) {
         return res.json({error: "Error accessing review"});
@@ -889,7 +891,7 @@ module.exports.likeReview = async function(req, res) {
 
 //----OTHER----//
 
-module.exports.showTutor = async function(req, res) {
+controller.showTutor = async function(req, res) {
     const course = await Course.findById(req.params.id).populate("tutors.tutor tutors.formerStudents").populate({
         path: "tutors.reviews.review",
         populate: {path: "sender"}
@@ -985,3 +987,5 @@ module.exports.showTutor = async function(req, res) {
         }
     }
 }
+
+module.exports = controller;
