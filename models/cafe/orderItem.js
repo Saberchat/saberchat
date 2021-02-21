@@ -15,7 +15,6 @@ var orderItemSchema = new mongoose.Schema({
         display: Boolean
     },
     availableItems: Number,
-    isAvailable: Boolean,
     upvotes: [{type: mongoose.Schema.Types.ObjectId, ref: 'User'}]
 }, {timestamps: {createdAt: 'created_at'}});
 

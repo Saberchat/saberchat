@@ -76,7 +76,7 @@
                         </div>
                     </li>
                     <% category.items.forEach(item => { %>
-                        <% if (item.isAvailable) { %>
+                        <% if (item.availableItems > 0) { %>
                             <a href="/cafe/item/<%= item._id %>" id="item-<%= item.id %>"
                                class="list-group-item list-group-item-action menu-item cafe <%= category.name.replace(' ', '') %>"><span
                                         class="item-name"><%= item.name %></span> (<%= item.availableItems %> orders

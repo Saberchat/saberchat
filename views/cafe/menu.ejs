@@ -64,7 +64,7 @@
 
                     <% category.items.forEach(item => { %>
 
-                        <% if (item.isAvailable) { %>
+                        <% if (item.availableItems > 0) { %>
                             <% if (frequentItems.toString().includes(item._id.toString())) { %>
                                 <span class="list-group-item list-group-item-info menu-item <%= category.name.split(' ').join('') %>  cafe"
                                       id="item-<%= item.id %>">

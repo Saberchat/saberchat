@@ -535,7 +535,6 @@ controller.deleteAccount = async function(req, res)  {
 
         if (deletedOrder.present) {
           deletedOrder.items[i].item.availableItems += deletedOrder.items[i].quantity;
-          deletedOrder.items[i].item.isAvailable = true;
           await deletedOrder.items[i].item.save();
         }
       }

@@ -95,29 +95,29 @@
 
                       <% inbox.forEach((msg) => { %>
                         <% if(msg.read.includes(currentUser._id)) { %>
-                          <li class="list-group-item list-group-item-action read mode">
+                          <li class="list-group-item list-group-item-action darkmode read">
                         <% } else { %>
-                          <li class="list-group-item list-group-item-action mode">
+                          <li class="list-group-item list-group-item-action darkmode unread">
                         <% } %>
-                          <div class="message-check mode">
+                          <div class="message-check darkmode">
                             <input class="del-form-input" type="checkbox" name="<%= msg._id %>" value="" onchange="updateDelete()">
                           </div>
 
-                          <a href="/inbox/<%= msg._id %>" class="message-body mode" >
-                            <div class="message-head mode">
+                          <a href="/inbox/<%= msg._id %>" class="message-body darkmode" >
+                            <div class="message-head darkmode">
                               <% if (msg.read.includes(currentUser._id)) { %>
-                                  <div class="message-from mode">(<%=1+msg.replies.length%>) <%= msg.sender.username %></div>
+                                  <div class="message-from darkmode ">(<%=1+msg.replies.length%>) <%= msg.sender.username %></div>
                               <% } else { %>
-                                  <div class="message-from unread">(<%=1+msg.replies.length%>) <%= msg.sender.username %></div>
+                                  <div class="message-from darkmode unread">(<%=1+msg.replies.length%>) <%= msg.sender.username %></div>
                               <% } %>
                               <% if (msg.read.includes(currentUser._id)) { %>
-                                <div class="message-subject"><span><%= msg.subject %></span></div>
+                                <div class="message-subject read"><span><%= msg.subject %></span></div>
                               <% } else { %>
                                 <div class="message-subject unread"><span><%= msg.subject %></span></div>
                               <% } %>
                             </div>
 
-                            <div class="message-text mode">
+                            <div class="message-text darkmode">
                               <% if (msg.replies.length > 0) { %>
                                 <%= msg.replies[msg.replies.length - 1].text%>
                               <% } else { %>

@@ -39,7 +39,7 @@ controller.index = async function(req, res) {
             sortedCategory = category;
             sortedCategory.items = sortByPopularity(category.items, "upvotes", "created_at", null).popular.concat(sortByPopularity(category.items, "upvotes", "created_at", null).unpopular);
             for (let i = sortedCategory.items.length-1; i > 0; i--) {
-                if (!sortedCategory.items[i].isAvailable) {
+                if (!sortedCategory.items[i].availableItems > 0) {
                     sortedCategory.items.splice(i, 1);
                 }
             }
@@ -143,7 +143,6 @@ controller.order = async function(req, res) {
     for (let item of orderedItems) {
         item.availableItems -= parseInt(req.body[item.name]);
         charge += (item.price * parseInt(req.body[item.name])); //Increment charge
-        item.isAvailable = (item.availableItems > 0);
         await item.save();
     }
 
@@ -230,7 +229,6 @@ controller.deleteOrder = async function(req, res) {
 
         for (let i of order.items) { //Iterate over each item/quantity object
             i.item.availableItems += i.quantity;
-            i.item.isAvailable = true;
             await i.item.save();
         }
 
@@ -316,7 +314,6 @@ controller.deleteOrder = async function(req, res) {
 
     for (let item of deletedOrder.items) { //For each of the order's items, add the number ordered back to that item. (If there are 12 available quesadillas and the  user ordered 3, there are now 15)
         item.item.availableItems += item.quantity;
-        item.item.isAvailable = true;
         await item.item.save();
     }
     return res.json({success: 'Successfully canceled'});
@@ -386,10 +383,6 @@ controller.createItem = async function(req, res) {
 
     } else {
         item.price = 0.00;
-    }
-
-    if (parseInt(req.body.available) > 0) { //Determine is category is available based on whether or not its availability more than 0
-        item.isAvailable = true;
     }
 
     const category = await Category.findOne({name: req.body.category}); //Find the category specified in the form
@@ -738,7 +731,6 @@ controller.updateItemInfo = async function(req, res) {
         name: req.body.name,
         price: parseFloat(req.body.price),
         availableItems: parseInt(req.body.available),
-        isAvailable: (parseInt(req.body.available) > 0),
         description: req.body.description,
         imgUrl: {url: req.body.image, display: req.body.showImage == "url"},
     });

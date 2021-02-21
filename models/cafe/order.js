@@ -6,7 +6,7 @@ const orderSchema = new mongoose.Schema({
     items: [{
         item: {type: mongoose.Schema.Types.ObjectId, ref: 'OrderItem'},
         quantity: Number,
-        price: Number
+        price: Number //Price of item at ordering point (for cafe stats)
     }],
     instructions: String,
     charge: Number,

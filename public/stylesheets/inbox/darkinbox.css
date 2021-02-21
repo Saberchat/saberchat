@@ -3,6 +3,10 @@
   color: white;
 }
 
+.darkmode {
+  color: white;
+}
+
 #inbox-nav-break {
     color:#d1ecff;;
 }
@@ -41,4 +45,12 @@
 }
 .inboxtext{
   color: turquoise;
+}
+
+.list-group-item.list-group-item-action.unread {
+  background-color: #0a061b;
+}
+
+.list-group-item.list-group-item-action.unread:hover {
+  background-color: #0a061b;
 }

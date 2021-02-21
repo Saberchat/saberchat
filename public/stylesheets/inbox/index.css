@@ -450,6 +450,10 @@ Classes to toggle displays
     display: none;
 }
 
-.unread {
+.unread-field, .unread {
     font-weight: 700;
+}
+
+.read-field, .read {
+    font-weight: 400;
 }

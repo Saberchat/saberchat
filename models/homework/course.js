@@ -14,11 +14,10 @@ const courseSchema = new mongoose.Schema({
         url: {type: String, default: "https://alsionschool.org/images/community/gallery/Beach.jpg"},
         display: {type: Boolean, default: true}
     },
-    active: Boolean,
+    active: {type: Boolean, default: true},
     teacher: {type: mongoose.Schema.Types.ObjectId, ref: 'User'},
     students: [{type: mongoose.Schema.Types.ObjectId, ref: 'User'}],
     blocked: [{type: mongoose.Schema.Types.ObjectId, ref: 'User'}],
-    lessons: Number,
     tutors: [{
         tutor: {type: mongoose.Schema.Types.ObjectId, ref: 'User'},
         slots: {type: Number, default: 0},
