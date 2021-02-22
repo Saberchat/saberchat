@@ -91,7 +91,7 @@ controller.showMembers = async function(req, res) {
         req.flash('error', "Unable to find room");
         return res.redirect('back');
     }
-    if (room.private) {
+    if (room.type == "private") {
         return res.render('chat/people', {room});
     }
     req.flash("error", "Public rooms are open to all users");
