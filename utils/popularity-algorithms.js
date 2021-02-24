@@ -53,26 +53,3 @@ module.exports.sortByPopularity = function(objects, likeFactor, dateFactor, fiel
     }
     return sorted;
 }
-
-module.exports.equateObjects = function(objects, property) { //Find overlapping objects, based on the equality of one array property
-    let sortedObjects = new Map();
-    let sortedMatrix = [];
-
-    for (let object of objects) {
-        if (sortedObjects.has(object[property].sort().toString())) {
-            sortedObjects.set(object[property].sort().toString(), sortedObjects.get(object[property].sort().toString())+1);
-        } else {
-            sortedObjects.set(object[property].sort().toString(), 1);
-        }
-    }
-
-    for (let object of sortedObjects) {
-        sortedMatrix.push({
-            objects: object[0].split(','),
-            instances: object[1],
-            date: new Date()
-        });
-    }
-
-    return module.exports.sortByPopularity(sortedMatrix, "instances", "date").popular;
-}

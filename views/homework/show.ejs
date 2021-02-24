@@ -219,24 +219,21 @@
 
                     <% if (studentIds.includes(currentUser._id.toString())) { %>
                             <div id="tutor-actions-<%= tutor.tutor._id %>" class="tutor-actions">
-                                <% if (tutor.students.includes(currentUser._id) || tutor.formerStudents.includes(currentUser._id)) { %>
+                                <% if (objectArrIncludes(tutor.students.concat(tutor.formerStudents), "student", currentUser._id) > -1) { %>
                                     <button class="btn btn-warning review-button"
                                             id="review-button-<%= tutor.tutor._id %>"
                                             data-toggle="modal" data-target="#modal-review-<%= tutor.tutor._id %>">Leave A Review
                                     </button>
-                                    <% if (tutor.students.includes(currentUser._id)) { %>
+                                    <% if (objectArrIncludes(tutor.students, "student", currentUser._id) > -1) { %>
                                         <button class="btn btn-danger leave-button"
                                                 id="leave-button-<%= tutor.tutor._id %>"
                                                 data-toggle="modal"
                                                 data-target="#modal-stop-<%= tutor.tutor._id %>">Stop Lessons
                                         </button>
-                                        <% for (let room of tutor.rooms) { %>
-                                            <% if (room.student.equals(currentUser._id)) { %>
-                                                <a id="chat-button-<%= tutor.tutor._id %>"
-                                                   class="btn btn-success leave-button"
-                                                   href="/chat/<%= room.room._id %>">Chat</a>
-                                            <% } %>
-                                        <% } %>
+                                        <a id="chat-button-<%= tutor.tutor._id %>"
+                                            class="btn btn-success leave-button"
+                                            href="/chat/<%=tutor.students[objectArrIncludes(tutor.students, 'student', currentUser._id)].room%>">Chat
+                                        </a>
                                     <% } else { %>
                                         <% if (tutor.available) { %>
                                             <button class="btn btn-info book-button"
@@ -287,7 +284,7 @@
                                     <% if (i + 1 <= tutor.averageRating) { %>
                                        class="fas fa-star average-rating-<%= tutor.tutor._id %> average-rating-selected"
                                     <% } else { %>
-                                       class="fas fa-star average-rating-<%= tutor.tutor._id %>"
+                                       class="fas fa-star average-rating-<%= tutor.tutor._id %> average-rating-unselected"
                                             <% } %>
                                     ></i>
                                 <% } %>
@@ -654,10 +651,10 @@
             <div class="col-12" id="blocked-column">
                 <% if (course.blocked.length > 0) { %>
                     <ul class="list-group" id="blocked-div">
-                        <li class="list-group-item list-group-item-success">Blocked</li>
+                        <li class="list-group-item list-group-item-success mode darkmode-outline">Blocked</li>
                         <% for (let b of course.blocked) { %>
-                            <li class="list-group-item" id="item-<%= b._id %>">
-                                <a href="../profiles/<%= b._id %>" class="user-element-text">
+                            <li class="list-group-item cafe" id="item-<%= b._id %>">
+                                <a href="../profiles/<%= b._id %>" class="user-element-text cafetext">
                                     <img class="profile-image" src="<% if (b.imageFile.display) {%> <%= b.imageFile.url%><%} else {%> <%=b.imageUrl.url%><%}%>" alt="profile picture">
                                     <span class="username <%= b.status %> <%= b.permission %> <%= b.tags.join(' ') %>"><span
                                                 class="enrolled-name"><%= b.firstName %> <%= b.lastName %></span> <span

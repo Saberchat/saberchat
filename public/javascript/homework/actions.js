@@ -1,4 +1,4 @@
-const book = function (button, location) {
+const book = function (button, location, darkmode) {
     const courseId = button.id.split('-')[0];
     const tutorId = button.id.split('-')[1];
     const url = `/homework/book/${courseId}?_method=put`;
@@ -7,6 +7,7 @@ const book = function (button, location) {
     $.post(url, data, data => {
         if (data.success) {
             $(`#modal-book-${tutorId}`).modal('hide');
+            console.log(data)
 
             const tutorDiv = document.getElementById(`tutor-actions-${tutorId}`);
             tutorDiv.removeChild(document.getElementById(`book-button-${tutorId}`));
@@ -57,13 +58,13 @@ const book = function (button, location) {
                 let studentHeading = document.createElement("li");
                 studentHeading.className = "nav-item tab-header tab";
                 studentHeading.id = "students";
-                studentHeading.setAttribute("onclick", "changeTab(this)");
-                studentHeading.innerHTML = `<a class="nav-link active">Students (${data.tutor.students.length})</a>`;
+                studentHeading.setAttribute("onclick", `changeTab(this, ${darkmode})`);
+                studentHeading.innerHTML = `<a class="nav-link active">Students (${data.tutor.students.length + data.tutor.formerStudents.length})</a>`;
 
                 let lessonCount = 0;
-                for (let lesson of data.tutor.lessons) {
-                    if (lesson.student == data.user._id) {
-                        lessonCount += 1;
+                for (let student of data.tutor.students) {
+                    if (student.student == data.user._id.toString()) {
+                        lessonCount = student.lessons.length;
                     }
                 }
 
@@ -72,15 +73,21 @@ const book = function (button, location) {
 
                 let studentsList = document.createElement("div");
                 studentsList.className = "list-group";
-                studentsList.innerHTML = `<li class="list-group-item list-group-item-success status-header"> <div class="d-flex w-100 justify-content-between"> <h2 class="mb-1">Students</h2> </div> </li>`;
+                studentsList.innerHTML = `<li class="list-group-item list-group-item-success status-header darkmode-outline"> <div class="d-flex w-100 justify-content-between"> <h2 class="mb-1 darkmode-header">Students</h2> </div> </li>`;
 
                 let userElement;
                 for (let student of data.students) {
                     userElement = document.createElement("div");
-                    userElement.className = "list-group-item list-group-item-action user-element";
-                    userElement.innerHTML = `<a href="/profiles/${student._id}" style="color: black; text-decoration: none;"> <img class="student-profile-image" src="${student.imageUrl.url}" alt="profile picture"> <span class="${student.permission} ${student.status} ${student.tags.join(' ')} student-block"><span class="span-tag-name">${student.firstName} ${student.lastName}</span> <span class="span-tag-username">${student.username}</span></span></a>`;
+                    userElement.className = "list-group-item list-group-item-action user-element cafe";
+                    userElement.innerHTML += `<a href="/profiles/${student._id}" class="student-profile user-element cafetext">`;
+                    if (student.imageUrl.display) {
+                        userElement.innerHTML += `<img class="student-profile-image" src="${student.imageUrl.url}" alt="profile picture"></img>`;
+                    } else {
+                        userElement.innerHTML += `<img class="student-profile-image" src="${student.imageFile.url}" alt="profile picture"></img>`;
+                    }
+                    userElement.innerHTML += ` <span class="${student.permission} ${student.status} ${student.tags.join(' ')} student-block cafetext"><span class="span-tag-name">${student.firstName} ${student.lastName}</span> <span class="span-tag-username">${student.username}</span></span></a>`;
 
-                    if (student._id == data.user._id) {
+                    if (student._id.toString() == data.user._id.toString()) {
                         let lessonInfoButton = document.createElement("a");
                         lessonInfoButton.className = "btn btn-info lesson-button";
                         lessonInfoButton.innerText = "Lesson Information";
@@ -96,7 +103,26 @@ const book = function (button, location) {
                     studentsList.appendChild(userElement);
                 }
 
+                let formerStudentsList = document.createElement("div");
+                formerStudentsList.className = "list-group";
+                formerStudentsList.innerHTML = `<li class="list-group-item list-group-item-success status-header darkmode-outline"> <div class="d-flex w-100 justify-content-between"> <h2 class="mb-1 darkmode-header">Former Students</h2> </div> </li>`;
+
+                for (let student of data.formerStudents) {
+                    userElement = document.createElement("div");
+                    userElement.className = "list-group-item list-group-item-action user-element cafe";
+                    userElement.innerHTML += `<a href="/profiles/${student._id}" class="student-profile user-element cafetext">`;
+                    if (student.imageUrl.display) {
+                        userElement.innerHTML += `<img class="student-profile-image" src="${student.imageUrl.url}" alt="profile picture"></img>`;
+                    } else {
+                        userElement.innerHTML += `<img class="student-profile-image" src="${student.imageFile.url}" alt="profile picture"></img>`;
+                    }
+                    userElement.innerHTML += ` <span class="${student.permission} ${student.status} ${student.tags.join(' ')} student-block cafetext"><span class="span-tag-name">${student.firstName} ${student.lastName}</span> <span class="span-tag-username">${student.username}</span></span></a>`;
+                    formerStudentsList.appendChild(userElement);
+                }
+
                 studentDiv.appendChild(studentsList);
+                studentDiv.innerHTML += "<br/><br/>"
+                studentDiv.appendChild(formerStudentsList);
                 studentDiv.hidden = true;
                 document.getElementById("options-bar").insertBefore(studentHeading, document.getElementById("courses"));
                 document.getElementsByClassName("courses")[0].parentNode.insertBefore(studentDiv, document.getElementsByClassName("courses")[0]);
@@ -105,7 +131,7 @@ const book = function (button, location) {
     });
 }
 
-const leave = function (button, location) {
+const leave = function (button, location, darkmode) {
     const courseId = button.id.split('-')[0];
     const tutorId = button.id.split('-')[1];
     const url = `/homework/leave/${courseId}?_method=put`;
@@ -161,6 +187,7 @@ const leave = function (button, location) {
             if (location == "tutor-show") {
                 document.getElementById("students").parentNode.removeChild(document.getElementById("students"));
                 document.getElementsByClassName("students")[0].parentNode.removeChild(document.getElementsByClassName("students")[0]);
+                changeTab(document.getElementById("reviews"), darkmode);
             }
         }
     });
@@ -276,14 +303,24 @@ const removeStudent = function (button, location) {
                 let blockedDiv = document.createElement("ul");
                 blockedDiv.className = "list-group";
                 blockedDiv.id = "blocked-div";
-                blockedDiv.innerHTML = `<li class="list-group-item list-group-item-success">Blocked</li>`;
+                blockedDiv.innerHTML = `<li class="list-group-item list-group-item-success mode darkmode-outline">Blocked</li>`;
                 document.getElementById("blocked-column").appendChild(blockedDiv);
+                document.getElementById("blocked-column").removeChild(document.getElementById("no-blocked"));
             }
 
             let blockedElement = document.createElement("li");
-            blockedElement.className = "list-group-item";
+            blockedElement.className = "list-group-item cafe";
             blockedElement.id = `item-${data.student._id}`;
-            blockedElement.innerHTML = `<a href="../profiles/${data.student._id}"class="user-element-text"> <img class="profile-image" src="${data.student.imageUrl.url}" alt="profile picture"> <span class="username ${data.student.status} ${data.student.permission} ${data.student.tags.join(' ')}"><span class="enrolled-name">${data.student.firstName} ${data.student.lastName}</span> <span class="enrolled-username">${data.student.username}</span></span> </a> <button class="btn btn-danger leave-button" id="unblock-button-${data.student._id}" data-toggle="modal" data-target="#modal-index-unblock-${data.student._id}">Unblock</button>`;
+            blockedElement.innerHTML += `<a href="/..profiles/${data.student._id}" class="user-element cafetext">`;
+            console.log(data.student.imageUrl.display)
+            if (data.student.imageUrl.display) {
+                console.log("Yah")
+                blockedElement.innerHTML += `<img class="profile-image" src="${data.student.imageUrl.url}" alt="profile picture"></img>`;
+            } else {
+                console.log("Nah")
+                blockedElement.innerHTML += `<img class="profile-image" src="${data.student.imageFile.url}" alt="profile picture"></img>`;
+            }        
+            blockedElement.innerHTML += ` <span class="username ${data.student.status} ${data.student.permission} ${data.student.tags.join(' ')}"><span class="enrolled-name">${data.student.firstName} ${data.student.lastName}</span> <span class="enrolled-username">${data.student.username}</span></span> </a> <button class="btn btn-danger leave-button" id="unblock-button-${data.student._id}" data-toggle="modal" data-target="#modal-index-unblock-${data.student._id}">Unblock</button>`;
 
             let unblockModal = document.createElement("div");
             unblockModal.className = "modal fade";
@@ -291,7 +328,7 @@ const removeStudent = function (button, location) {
             unblockModal.setAttribute("tabindex", "-1");
             unblockModal.setAttribute("aria-labelledby", "deleteModalLabel");
             unblockModal.setAttribute("aria-hidden", "true");
-            unblockModal.innerHTML = `<div class="modal-dialog"> <div class="modal-content"> <div class="modal-header"> <h5 class="modal-title" id="exampleModalLabel">Unblock ${data.student.firstName} ${data.student.lastName} From Your Course?</h5> <button type="button" class="close" data-dismiss="modal" aria-label="Close"> <span aria-hidden="true">&times;</span> </button> </div> <div class="modal-body"> <p> ${data.student.firstName} will be able to rejoin the course with the join code. </p> </div> <div class="modal-footer"> <button type="button" class="btn btn-secondary" data-dismiss="modal">Back</button> <button type="button" class="btn btn-danger" id="${data.course._id}-${data.student._id}" onclick="unblock(this)">Yes, Unblock</button> </div> </div></div>`;
+            unblockModal.innerHTML = `<div class="modal-dialog mode"> <div class="modal-content mode"> <div class="modal-header mode"> <h5 class="modal-title" id="exampleModalLabel">Unblock ${data.student.firstName} ${data.student.lastName} From Your Course?</h5> <button type="button" class="close mode" data-dismiss="modal" aria-label="Close"> <span aria-hidden="true">&times;</span> </button> </div> <div class="modal-body mode"> <p> ${data.student.firstName} will be able to rejoin the course with the join code. </p> </div> <div class="modal-footer mode"> <button type="button" class="btn btn-secondary" data-dismiss="modal">Back</button> <button type="button" class="btn btn-danger" id="${data.course._id}-${data.student._id}" onclick="unblock(this)">Yes, Unblock</button> </div> </div></div>`;
 
             document.getElementById("blocked-div").appendChild(blockedElement);
             document.getElementById("blocked-div").appendChild(unblockModal);
@@ -299,6 +336,8 @@ const removeStudent = function (button, location) {
             if (data.course.students.length == 0) {
                 document.getElementById("students").parentNode.removeChild(document.getElementById("students"));
             }
+        } else {
+            console.log(data.error)
         }
     });
 }
@@ -321,15 +360,21 @@ const removeTutor = function (button, location) {
                 let blockedDiv = document.createElement("ul");
                 blockedDiv.className = "list-group";
                 blockedDiv.id = "blocked-div";
-                blockedDiv.innerHTML = `<li class="list-group-item list-group-item-success">Blocked</li>`;
+                blockedDiv.innerHTML = `<li class="list-group-item list-group-item-success mode darkmode-outline">Blocked</li>`;
                 document.getElementById("blocked-column").appendChild(blockedDiv);
                 document.getElementById("blocked-column").removeChild(document.getElementById("no-blocked"));
             }
 
             let blockedElement = document.createElement("li");
-            blockedElement.className = "list-group-item";
+            blockedElement.className = "list-group-item cafe";
             blockedElement.id = `item-${data.tutor._id}`;
-            blockedElement.innerHTML = `<a href="../profiles/${data.tutor._id}"class="user-element-text"> <img class="profile-image" src="${data.tutor.imageUrl.url}" alt="profile picture"> <span class="username ${data.tutor.status} ${data.tutor.permission} ${data.tutor.tags.join(' ')}"><span class="enrolled-name">${data.tutor.firstName} ${data.tutor.lastName}</span> <span class="enrolled-username">${data.tutor.username}</span></span> </a> <button class="btn btn-danger leave-button" id="unblock-button-${data.tutor._id}" data-toggle="modal" data-target="#modal-index-unblock-${data.tutor._id}">Unblock</button>`;
+            blockedElement.innerHTML += `<a href="../profiles/${data.tutor._id}" class="user-element-text cafetext">`;
+            if (data.tutor.imageUrl.display) {
+                blockedElement.innerHTML += `<img class="profile-image" src="${data.tutor.imageUrl.url}" alt="profile picture"></img>`;
+            } else {
+                blockedElement.innerHTML += `<img class="profile-image" src="${data.tutor.imageFile.url}" alt="profile picture"></img>`;
+            }
+            blockedElement.innerHTML += `<span class="username ${data.tutor.status} ${data.tutor.permission} ${data.tutor.tags.join(' ')}"><span class="enrolled-name">${data.tutor.firstName} ${data.tutor.lastName}</span> <span class="enrolled-username">${data.tutor.username}</span></span> </a> <button class="btn btn-danger leave-button" id="unblock-button-${data.tutor._id}" data-toggle="modal" data-target="#modal-index-unblock-${data.tutor._id}">Unblock</button>`;
 
             let unblockModal = document.createElement("div");
             unblockModal.className = "modal fade";
@@ -337,7 +382,7 @@ const removeTutor = function (button, location) {
             unblockModal.setAttribute("tabindex", "-1");
             unblockModal.setAttribute("aria-labelledby", "deleteModalLabel");
             unblockModal.setAttribute("aria-hidden", "true");
-            unblockModal.innerHTML = `<div class="modal-dialog"> <div class="modal-content"> <div class="modal-header"> <h5 class="modal-title" id="exampleModalLabel">Unblock ${data.tutor.firstName} ${data.tutor.lastName} From Your Course?</h5> <button type="button" class="close" data-dismiss="modal" aria-label="Close"> <span aria-hidden="true">&times;</span> </button> </div> <div class="modal-body"> <p> ${data.tutor.firstName} will be able to rejoin the course with the join code. </p> </div> <div class="modal-footer"> <button type="button" class="btn btn-secondary" data-dismiss="modal">Back</button> <button type="button" class="btn btn-danger" id="${data.course._id}-${data.tutor._id}" onclick="unblock(this)">Yes, Unblock</button> </div> </div></div>`;
+            unblockModal.innerHTML = `<div class="modal-dialog mode"> <div class="modal-content mode"> <div class="modal-header mode"> <h5 class="modal-title" id="exampleModalLabel">Unblock ${data.tutor.firstName} ${data.tutor.lastName} From Your Course?</h5> <button type="button" class="close mode" data-dismiss="modal" aria-label="Close"> <span aria-hidden="true">&times;</span> </button> </div> <div class="modal-body mode"> <p> ${data.tutor.firstName} will be able to rejoin the course with the join code. </p> </div> <div class="modal-footer mode"> <button type="button" class="btn btn-secondary" data-dismiss="modal">Back</button> <button type="button" class="btn btn-danger" id="${data.course._id}-${data.tutor._id}" onclick="unblock(this)">Yes, Unblock</button> </div> </div></div>`;
 
             document.getElementById("blocked-div").appendChild(blockedElement);
             document.getElementById("blocked-div").appendChild(unblockModal);

@@ -24,19 +24,16 @@ const courseSchema = new mongoose.Schema({
         available: {type: Boolean, default: true},
         bio: String,
         dateJoined: Date,
-        students: [{type: mongoose.Schema.Types.ObjectId, ref: 'User'}],
-        formerStudents: [{type: mongoose.Schema.Types.ObjectId, ref: 'User'}],
-        upvotes: [{type: mongoose.Schema.Types.ObjectId, ref: 'User'}],
-        rooms: [{
+        students: [{
             student: {type: mongoose.Schema.Types.ObjectId, ref: 'User'},
+            lessons: [{time: Number, date: String, summary: String}],
             room: {type: mongoose.Schema.Types.ObjectId, ref: 'Room'}
         }],
-        lessons: [{
+        formerStudents: [{
             student: {type: mongoose.Schema.Types.ObjectId, ref: 'User'},
-            time: Number,
-            date: String,
-            summary: String
+            lessons: [{time: Number, date: String, summary: String}],
         }],
+        upvotes: [{type: mongoose.Schema.Types.ObjectId, ref: 'User'}],
         reviews: [{
             review: {type: mongoose.Schema.Types.ObjectId, ref: 'PostComment'},
             rating: Number

@@ -16,7 +16,7 @@ router.get('/confirm-email/:id', wrapAsync(profile.confirmEmail));
 router.get('/:id', middleware.isLoggedIn, wrapAsync(profile.show));
 
 router.put('/profile', middleware.isLoggedIn, multipleUpload, validateUserUpdate, wrapAsync(profile.profilePut)); // update user route.
-router.put('/tag', middleware.isAdmin, profile.tagPut);
+router.put('/tag', middleware.isAdmin, wrapAsync(profile.tagPut));
 router.put('/change-email', middleware.isLoggedIn, validateEmailUpdate, wrapAsync(profile.changeEmailPut)); //route for changing email
 router.put('/change-password', middleware.isLoggedIn, validatePasswordUpdate, wrapAsync(profile.changePasswordPut)); //route for changing password
 router.put('/follow/:id', wrapAsync(profile.follow));

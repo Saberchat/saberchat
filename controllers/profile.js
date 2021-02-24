@@ -11,12 +11,14 @@ const Project = require('../models/projects/project');
 
 const Order = require('../models/cafe/order');
 const Article = require('../models/wHeights/article');
+const Course = require('../models/homework/course');
 const {sendGridEmail} = require("../services/sendGrid");
 const {convertToLink} = require("../utils/convert-to-link");
 const Filter = require('bad-words');
 const filter = new Filter();
 const axios = require('axios');
 const {cloudUpload, cloudDelete} = require('../services/cloudinary');
+const {objectArrIncludes} = require('../utils/object-operations');
 
 const controller = {};
 
@@ -183,23 +185,32 @@ controller.update = async function(req, res) {
         return res.redirect('back');
     }
 
-    if (updatedUser.receiving_emails) {
-        await sendGridEmail(updatedUser.email, 'Profile Update Confirmation', `<p>Hello ${updatedUser.firstName},</p><p>You are receiving this email because you recently made changes to your Saberchat profile.\n\nIf you did not recently make any changes, contact a faculty member immediately.</p>`, false);
-    }
-
     req.flash('success', 'Updated your profile');
     return res.redirect(`/profiles/${req.user._id}`);
 }
 
-controller.tagPut = function(req, res) {
+controller.tagPut = async function(req, res) {
     if (req.user.tags.includes(req.body.tag)) {
-        req.user.tags.splice(req.user.tags.indexOf(req.body.tag), 1);
-        req.user.save();
-        return res.json({success: "Succesfully removed status", tag: req.body.tag, user: req.user._id});
+      if (req.body.tag == "Tutor") {
+        const courses = await Course.find({});
+        if (!courses) {
+            return res.json({error: 'Error. Could not change'});
+        }
+
+        for (let course of courses) {
+            if (objectArrIncludes(course.tutors, "tutor", req.user._id) > -1) {
+                return res.json({error: "You are an active tutor"});
+            }
+        }
+      }
+      
+      req.user.tags.splice(req.user.tags.indexOf(req.body.tag), 1);
+      await req.user.save();
+      return res.json({success: "Succesfully removed status", tag: req.body.tag, user: req.user._id});
 
     } else {
         req.user.tags.push(req.body.tag);
-        req.user.save();
+        await req.user.save();
         return res.json({success: "Succesfully added status", tag: req.body.tag, user: req.user._id});
     }
 }
@@ -249,7 +260,7 @@ controller.changeEmailPut = async function(req, res) {
                         "email": req.body.email
                     }
                 ],
-                "subject": 'Profile Update Confirmation'
+                "subject": 'Email Update Confirmation'
             }
         ],
         "from": {

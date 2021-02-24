@@ -1,4 +1,4 @@
-const upvote = function (button) {
+const upvote = function (button, location) {
     const courseId = button.id.split('-')[1];
     const tutorId = button.id.split("-")[2];
     const url = `/homework/upvote/${courseId}?_method=put`;
@@ -12,6 +12,12 @@ const upvote = function (button) {
 
             } else {
                 button.innerHTML = `<span class="upvoted"><i class="fas fa-arrow-circle-up"></i><span class="upvote-count" id="upvoteCount-<%=course._id%>-${tutorId}"> ${data.upvoteCount}</span></span>`;
+            }
+
+            if (location) {
+                if (location == "show") {
+                    button.innerHTML += "<br>"
+                }
             }
         }
     });

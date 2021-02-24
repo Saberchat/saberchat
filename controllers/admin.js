@@ -13,6 +13,7 @@ const Permission = require('../models/admin/permission');
 const Status = require('../models/admin/status');
 
 const {sendGridEmail} = require("../services/sendGrid");
+const {objectArrIncludes} = require("../utils/object-operations");
 const controller = {};
 
 controller.index = function(req, res) {
@@ -269,10 +270,8 @@ controller.tag = async function(req, res) {
             }
 
             for (let course of courses) {
-                for (let tutor of course.tutors) {
-                    if (tutor.tutor.equals(user._id)) {
-                        return res.json({error: "User is an Active Tutor"});
-                    }
+                if (objectArrIncludes(course.tutors, "tutor", user._id) > -1) {
+                    return res.json({error: "User is an Active Tutor"});
                 }
             }
 

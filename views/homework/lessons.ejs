@@ -45,26 +45,25 @@
 <div class="container mb-5 tutor-info">
     <a href="../../profiles/<%= tutor.tutor._id %>"><img src="<% if (tutor.tutor.imageFile.display) {%> <%= tutor.tutor.imageFile.url%><%} else {%> <%=tutor.tutor.imageUrl.url%><%}%>" alt="profile image"
                                                          class="profile-image"></a>
-    <a href="../../profiles/<%= student._id %>"><img src="<% if (student.imageFile.display) {%> <%= student.imageFile.url%><%} else {%> <%=student.imageUrl.url%><%}%>" alt="profile image"
+    <a href="../../profiles/<%= student.student._id %>"><img src="<% if (student.student.imageFile.display) {%> <%= student.student.imageFile.url%><%} else {%> <%=student.student.imageUrl.url%><%}%>" alt="profile image"
                                                      class="profile-image"></a>
-    <h1 class="username mode"><%= student.firstName %>'s Lessons
+    <h1 class="username mode"><%= student.student.firstName %>'s Lessons
         with <%= tutor.tutor.firstName %> <%= tutor.tutor.lastName %></h1>
 </div>
 
 <div class="container mt-5">
-    <% if (lessons.length > 0) { %>
-        <ul id="lesson-info-<%= student._id %>" class="list-group">
+    <% if (student.lessons.length > 0) { %>
+        <ul id="lesson-info-<%= student.student._id %>" class="list-group">
             <li class="list-group-item list-group-item-success status-header darkmode-outline">
                 <div class="d-flex w-100 justify-content-between">
-                    <h2 class="mb-1 darkmode-header">Lessons (<%= lessons.length %>)</h2>
-
+                    <h2 class="mb-1 darkmode-header">Lessons (<%= student.lessons.length %>)</h2>
                     <p id="time-count" class="darkmode-header">
                         <%=time%> minutes
                     </p>
                 </div>
             </li>
 
-            <% for (let lesson of lessons) { %>
+            <% for (let lesson of student.lessons.reverse()) { %>
                 <li class="list-group-item list-group-item-action tutor-profile menu-item cafe">
                     <span class="lesson-info"><%= lesson.date %> | <%= lesson.time %> minute(s)</span><br/>
                     <p>
