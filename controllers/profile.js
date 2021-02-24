@@ -230,7 +230,7 @@ controller.changeEmailPut = async function(req, res) {
         return res.redirect(`/profiles/${req.user._id}`);
     }
 
-    const emails = await Email.find({address: req.body.email, version: "whitelist"});
+    const emails = await Email.find({address: req.body.email, version: "accesslist"});
     if (!emails) {
         req.flash('error', "Unable to find emails");
         return res.redirect('back');

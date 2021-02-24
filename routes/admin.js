@@ -20,15 +20,15 @@ router.route("/status")
     .get(middleware.isLoggedIn, middleware.isMod, wrapAsync(admin.statusGet))
     .put(middleware.isLoggedIn, middleware.isMod, wrapAsync(admin.statusPut));
 
-router.route("/whitelist")
-    .get(middleware.isLoggedIn, middleware.isMod, wrapAsync(admin.whitelistGet))
-    .put(middleware.isLoggedIn, middleware.isMod, wrapAsync(admin.whitelistPut))
-    .delete(middleware.isLoggedIn, middleware.isMod, wrapAsync(admin.whitelistId));
+router.route("/accesslist")
+    .get(middleware.isLoggedIn, middleware.isMod, wrapAsync(admin.accesslistGet))
+    .put(middleware.isLoggedIn, middleware.isMod, wrapAsync(admin.accesslistPut))
+    .delete(middleware.isLoggedIn, middleware.isMod, wrapAsync(admin.accesslistId));
 
 router.put('/tag', middleware.isLoggedIn, middleware.isMod, wrapAsync(admin.tag));
 
 // router.post('/add-permission', middleware.isPrincipal, wrapAsync(admin.createPermission));
 // router.post('/add-status', middleware.isPrincipal, wrapAsync(admin.createStatus));
-// router.delete('/whitelist/:id', middleware.isLoggedIn, middleware.isPrincipal, wrapAsync(admin.permanentDelete));
+// router.delete('/accesslist/:id', middleware.isLoggedIn, middleware.isPrincipal, wrapAsync(admin.permanentDelete));
 
 module.exports = router;

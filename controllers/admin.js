@@ -161,16 +161,16 @@ controller.statusPut = async function(req, res) {
     return res.json({success: "Successfully Changed", user});
 }
 
-controller.whitelistGet = async function(req, res) {
+controller.accesslistGet = async function(req, res) {
     let emails;
     if (req.query.version) {
-        if (["whitelist", "blacklist"].includes(req.query.version)) {
+        if (["accesslist", "blockedlist"].includes(req.query.version)) {
             emails = await Email.find({name: {$ne: req.user.email}, version: req.query.version});
         } else {
-            emails = await Email.find({name: {$ne: req.user.email}, version: "whitelist"});
+            emails = await Email.find({name: {$ne: req.user.email}, version: "accesslist"});
         }
     } else {
-        emails = await Email.find({name: {$ne: req.user.email}, version: "whitelist"});
+        emails = await Email.find({name: {$ne: req.user.email}, version: "accesslist"});
     }
 
     if (!emails) {
@@ -185,22 +185,22 @@ controller.whitelistGet = async function(req, res) {
     }
 
     if (req.query.version) {
-        if (["whitelist", "blacklist"].includes(req.query.version)) {
-            return res.render('admin/whitelist', {emails, users, version: req.query.version});
+        if (["accesslist", "blockedlist"].includes(req.query.version)) {
+            return res.render('admin/accesslist', {emails, users, version: req.query.version});
         }
     }
 
-    return res.render('admin/whitelist', {emails, users, version: "whitelist"});
+    return res.render('admin/accesslist', {emails, users, version: "accesslist"});
 }
 
-controller.whitelistPut = async function (req, res) {
-    if (req.body.version === "whitelist" && req.body.address.split('@')[1] === "alsionschool.org") {
-        return res.json({error: "Alsion emails do not need to be added to the whitelist"});
+controller.accesslistPut = async function (req, res) {
+    if (req.body.version === "accesslist" && req.body.address.split('@')[1] === "alsionschool.org") {
+        return res.json({error: "Alsion emails do not need to be added to the accesslist"});
     }
 
     const overlap = await Email.findOne({address: req.body.address});
     if (overlap) { //If any emails overlap, don't create the new email
-        return res.json({error: "Email is already either in whitelist or blacklist"});
+        return res.json({error: "Email is already either in accesslist or blockedlist"});
     }
 
     const email = await Email.create({address: req.body.address, version: req.body.version});
@@ -210,7 +210,7 @@ controller.whitelistPut = async function (req, res) {
     return res.json({success: "Email added", email});
 }
 
-controller.whitelistId = async function (req, res) {
+controller.accesslistId = async function (req, res) {
     const email = await Email.findById(req.body.email);
     if (!email) {
         return res.json({error: "Unable to find email"});
@@ -567,11 +567,11 @@ controller.permanentDelete = async function(req, res) {
 			req.flash('error', 'Unable to delete account');
 			return res.redirect('back');
 		}
-        await sendGridEmail(deletedUser.email, 'Profile Deletion Notice', `<p>Hello ${deletedUser.firstName},</p><p>You are receiving this email because your email has been removed from Saberchat's email whitelist. Your account and all of its data has been deleted. Please contact a faculty member if  you think there has been a mistake.</p>`, false);
+        await sendGridEmail(deletedUser.email, 'Profile Deletion Notice', `<p>Hello ${deletedUser.firstName},</p><p>You are receiving this email because your email has been removed from Saberchat's email accesslist. Your account and all of its data has been deleted. Please contact a faculty member if  you think there has been a mistake.</p>`, false);
 	}
 
-	req.flash('success', "Email Removed From Whitelist! Any users with this email have been removed.");
-	return res.redirect('/admin/whitelist');
+	req.flash('success', "Email Removed From Access List! Any users with this email have been removed.");
+	return res.redirect('/admin/accesslist');
 }
 
 module.exports = controller;

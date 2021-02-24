@@ -16,8 +16,8 @@ controller.index = function(req, res) {
 }
 
 controller.register = async function(req, res) {
-    const whitelistedEmail = await Email.findOne({address: req.body.email, version: "whitelist"});
-    if (!whitelistedEmail && req.body.email.split("@")[1] != "alsionschool.org") {
+    const accesslistedEmail = await Email.findOne({address: req.body.email, version: "accesslist"});
+    if (!accesslistedEmail && req.body.email.split("@")[1] != "alsionschool.org") {
         req.flash('error', 'Only members of the Alsion community may sign up');
         return res.redirect('/');
     }

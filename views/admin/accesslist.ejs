@@ -37,7 +37,7 @@
     <div class="row">
         <div class="col-12">
 
-            <h1>Email<% if (version == "whitelist") { %> Whitelist<% } else { %> Blacklist<% } %></h1>
+            <h1>Email<% if (version == "accesslist") { %> Access List<% } else { %> Blocked List<% } %></h1>
             <span id="loading"></span>
             <hr>
 
@@ -50,7 +50,7 @@
 
             <ul class="list-group" id="email-list">
                 <li class="list-group-item darkmode-outline">
-                    <span id="modify-header">Email <% if (version == "whitelist") { %> Whitelist<% } else { %> Blacklist<% } %></span>
+                    <span id="modify-header">Email <% if (version == "accesslist") { %> Access List<% } else { %> Blocked List<% } %></span>
                     <form id="add-email-form" onsubmit="addEmail(event, '<%=version%>')">
                         <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#modal-add-email"
                                 id="delete-button"><i class="fas fa-inbox"></i> Add Email
@@ -60,7 +60,7 @@
                             <div class="modal-dialog mode">
                                 <div class="modal-content mode">
                                     <div class="modal-header mode">
-                                        <h5 class="modal-title" id="exampleModalLabel">Add Email To <% if (version == "whitelist") { %> Whitelist<% } else { %> Blacklist<% } %></h5>
+                                        <h5 class="modal-title" id="exampleModalLabel">Add Email To <% if (version == "accesslist") { %> Access List<% } else { %> Blocked List<% } %></h5>
                                         <button type="button" class="close mode" data-dismiss="modal" aria-label="Close">
                                             <span aria-hidden="true">&times;</span>
                                         </button>
@@ -109,7 +109,7 @@
                                         <div class="modal-content mode">
                                             <div class="modal-header mode">
                                                 <h5 class="modal-title" id="exampleModalLabel">Remove Email From
-                                                    Whitelist?</h5>
+                                                    Access List?</h5>
                                                 <button type="button" class="close mode" data-dismiss="modal"
                                                         aria-label="Close">
                                                     <span aria-hidden="true">&times;</span>
@@ -140,6 +140,6 @@
         </div>
     </div>
 </div>
-<script src="/javascript/admin/whitelist.js"></script>
+<script src="/javascript/admin/accesslist.js"></script>
 </body>
 </html>
