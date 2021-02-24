@@ -249,7 +249,8 @@ controller.requestJoin = async function(req, res) {
             return res.json({error: 'An error occurred'});
         }
 
-        await roomCreator.requests.push(createdReq._id);
+        roomCreator.requests.push(createdReq._id);
+        roomCreator.reqCount ++;
         await roomCreator.save();
 
         if (roomCreator.receiving_emails) {
@@ -271,6 +272,7 @@ controller.requestCancel = async function(req, res) {
     }
 
     room.creator.requests.splice(room.creator.requests.indexOf(deletedReq._id), 1);
+    room.creator.reqCount --;
     await room.creator.save();
 
     return res.json({success: "Successfully deleted request"});

@@ -74,9 +74,9 @@
                     <!-- ejs logic. If there is a user, show the bootstrap dropdown and links below -->
                     <% if(currentUser) { %>
                         <li class="nav-item">
-                            <% if ((currentUser.msgCount + currentUser.requests.length) > 0) { %>
+                            <% if ((currentUser.msgCount + currentUser.reqCount) > 0) { %>
                                 <a class="nav-link" href="/inbox/"><i class="fas fa-inbox"></i> Inbox <span
-                                            class="badge badge-pill badge-danger"><%= currentUser.msgCount + currentUser.requests.length %></span></a>
+                                            class="badge badge-pill badge-danger"><%= currentUser.msgCount + currentUser.reqCount %></span></a>
                             <% } else { %>
                                 <a class="nav-link" href="/inbox/"><i class="fas fa-inbox"></i> Inbox</a>
                             <% } %>

@@ -453,8 +453,10 @@ controller.acceptReq = async function(req, res) {
 
     room.members.push(Req.requester);
     Req.status = 'accepted';
+    req.user.reqCount --;
     await room.save();
     await Req.save();
+    await req.user.save();
 
     if(Req.requester.receiving_emails) {
         const emailText = `<p>Hello ${Req.requester.firstName},</p><p>Your request to join chat room <strong>${room.name}</strong> has been accepted!<p><p>You can access the room at https://alsion-saberchat.herokuapp.com</p>`;
@@ -483,7 +485,9 @@ controller.rejectReq = async function(req, res) {
 
     }
     Req.status = 'rejected';
+    req.user.reqCount --;
     await Req.save();
+    await req.user.save();
 
     if(Req.requester.receiving_emails) {
         const emailText = `<p>Hello ${Req.requester.firstName},</p><p>Your request to join chat room <strong>${Req.room.name}</strong> has been rejected. Contact the room creator, <strong>${Req.room.creator.username}</strong>, if you think that there has been a mistake.</p>`;
