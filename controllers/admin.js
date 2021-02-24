@@ -502,7 +502,7 @@ controller.permanentDelete = async function(req, res) {
     }
 
     for (let room of roomsCreated) {
-        if (room.creator.id.toString() == user._id.toString()) {
+        if (room.creator.toString() == user._id.toString()) {
       	deletedRoomCreated = await Room.findByIdAndDelete(room._id);
             if (!deletedRoomCreated) {
                 req.flash('error', "Unable to delete your rooms");

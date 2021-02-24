@@ -438,7 +438,7 @@ controller.acceptReq = async function(req, res) {
         req.flash("error", "An Error Occurred");
         return res.redirect('back');
 
-    } else if(!Req.room.creator.id.equals(req.user._id)) {
+    } else if(!Req.room.creator.equals(req.user._id)) {
         req.flash("error", "You do not have permission to do that");
         return res.redirect('back');
 
@@ -473,7 +473,7 @@ controller.rejectReq = async function(req, res) {
         req.flash("error", "An Error Occurred");
         return res.redirect('back');
 
-    } else if(!Req.room.creator.id.equals(req.user._id)) {
+    } else if(!Req.room.creator.equals(req.user._id)) {
         req.flash("error", "You do not have permission to do that");
         return res.redirect('back');
 
