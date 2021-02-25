@@ -1,4 +1,4 @@
-const {sortByPopularity} = require("../utils/popularity-algorithms");
+const {sortByPopularity} = require("../utils/popularity");
 
 //Find overlapping objects, based on the equality of one array property
 module.exports.equateObjects = function(objects, property) {

@@ -6,8 +6,7 @@ module.exports.getPopularityCoefficiant = function(objects, likeFactor, dateFact
     const rate = 86400; //Rate of conversion is seconds to days
     let popularityCoefficiant = 0;
     for (let object of objects) {
-        //Check datatype of likeFactor (can be a list of likes or a uniform int)
-        if (typeof object[likeFactor] == "number") {
+        if (typeof object[likeFactor] == "number") { //Check datatype of likeFactor (can be a list or a uniform int)
             popularityCoefficiant += ((rate * object[likeFactor]) / (now - object[dateFactor].getTime())) / objects.length;
         } else {
             popularityCoefficiant += ((rate * object[likeFactor].length) / (now - object[dateFactor].getTime())) / objects.length;

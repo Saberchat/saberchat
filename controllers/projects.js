@@ -3,7 +3,7 @@ const path = require('path');
 const {sendGridEmail} = require("../services/sendGrid");
 const {convertToLink} = require("../utils/convert-to-link");
 const {keywordFilter} = require('../utils/keywordFilter');
-const {sortByPopularity} = require("../utils/popularity-algorithms");
+const {sortByPopularity} = require("../utils/popularity");
 const {cloudUpload, cloudDelete} = require('../services/cloudinary');
 
 //SCHEMA

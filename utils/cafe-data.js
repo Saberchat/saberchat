@@ -3,7 +3,7 @@ const Order = require('../models/cafe/order');
 const Item = require('../models/cafe/orderItem');
 
 //LIBRARIES
-const {sortByPopularity} = require("../utils/popularity-algorithms");
+const {sortByPopularity} = require("../utils/popularity");
 const {equateObjects} = require("../utils/object-operations");
 const {getHours, sortTimes, getStats} = require('../utils/time');
 
