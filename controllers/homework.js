@@ -283,7 +283,7 @@ controller.updateSettings = async function(req, res) {
 }
 
 controller.deleteCourse = async function(req, res) {
-    const course = await Course.deleteOne({_id: req.params.id, joinCode: req.body.joinCode})
+    const course = await Course.findOne({_id: req.params.id, joinCode: req.body.joinCode})
     .populate("tutors.tutor tutors.students.student");
     if (!course) {
         req.flash("error", "Incorrect join code");
@@ -303,6 +303,12 @@ controller.deleteCourse = async function(req, res) {
             await removeIfIncluded(student.student.newRoomCount, student.room);
             await student.student.save();
         }
+    }
+
+    const deletedCourse = await Course.findByIdAndDelete(course._id);
+    if (!deletedCourse) {
+        req.flash("error", "An error occurred");
+        return res.redirect("back");
     }
     req.flash("success", `Deleted ${course.name}!`);
     return res.redirect("/homework");
