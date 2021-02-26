@@ -66,11 +66,11 @@
                                     <div class="modal-content mode">
                                         <div class="modal-header mode">
                                             <h5 class="modal-title" id="exampleModalLabel">Context For Reported Comment</h5>
-                                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                            <button type="button" class="close mode" data-dismiss="modal" aria-label="Close">
                                                 <span aria-hidden="true">&times;</span>
                                             </button>
                                         </div>
-                                        <div class="modal-body" id="context-body-<%=comment._id%>">
+                                        <div class="modal-body mode" id="context-body-<%=comment._id%>">
                                         </div>
                                     </div>
                                 </div>
@@ -82,16 +82,16 @@
                                     <div class="modal-content mode">
                                         <div class="modal-header mode">
                                             <h5 class="modal-title" id="exampleModalLabel">Ignore Comment?</h5>
-                                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                            <button type="button" class="close mode" data-dismiss="modal" aria-label="Close">
                                                 <span aria-hidden="true">&times;</span>
                                             </button>
                                         </div>
-                                        <div class="modal-body">
+                                        <div class="modal-body mode">
                                             <p>
                                                 Users will not be able to report this comment again.
                                             </p>
                                         </div>
-                                        <div class="modal-footer">
+                                        <div class="modal-footer mode">
                                             <button type="button" class="btn btn-secondary" data-dismiss="modal">Back
                                             </button>
                                             <button id="ignore-<%= comment._id %>" type="button" class="btn btn-success"
@@ -108,14 +108,14 @@
                                     <div class="modal-content mode">
                                         <div class="modal-header mode">
                                             <h5 class="modal-title" id="exampleModalLabel">Delete Comment?</h5>
-                                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                            <button type="button" class="close mode" data-dismiss="modal" aria-label="Close">
                                                 <span aria-hidden="true">&times;</span>
                                             </button>
                                         </div>
-                                        <div class="modal-body">
+                                        <div class="modal-body mode">
                                             Users will not be able to see this comment.
                                         </div>
-                                        <div class="modal-footer">
+                                        <div class="modal-footer mode">
                                             <button type="button" class="btn btn-secondary" data-dismiss="modal">Back
                                             </button>
                                             <button id="delete-<%= comment._id %>" onclick="deleteComment(this)"
