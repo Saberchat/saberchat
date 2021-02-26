@@ -27,7 +27,7 @@ module.exports.uploadSingle = util.promisify(multer(multerConfig).fields([
 ]));
 
 module.exports.uploadMultiple = util.promisify(multer(multerConfig).fields([
-    {name: "imageFile", maxCount: 3},
-    {name: "imageFile2", maxCount: 3},
-    {name: "imageFile3", maxCount: 3}
+    {name: "imageFile", maxCount: 7},
+    {name: "imageFile2", maxCount: 7},
+    {name: "imageFile3", maxCount: 7}
 ]));

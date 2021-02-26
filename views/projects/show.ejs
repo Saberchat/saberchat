@@ -140,7 +140,7 @@
 
                                 <% tempcreators.forEach(creator => { %>
                                     <a class="creator-names" href="../profiles/<%= creator._id %>"><img
-                                                src="<%=  %>" alt="profile pic"
+                                                src="<% if (creator.imageFile.display) {%> <%= creator.imageFile.url%><%} else {%> <%=creator.imageUrl.url%><%}%>" alt="profile pic"
                                                 class="creator-profile"> <%= creator.firstName %> <%= creator.lastName %></a>
                                     ,
                                 <% }) %>

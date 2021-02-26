@@ -8,3 +8,4 @@
 node_modules/
 # for vscode settings stuff
 jsconfig.json
+settings.json

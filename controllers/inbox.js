@@ -321,7 +321,7 @@ controller.reply = async function(req, res) {
         return res.json({error: 'Cannot reply to this message'})
     }
 
-    let reply = {
+    const reply = {
         sender: req.user,
         text: req.body.text,
         images: req.body.images,
@@ -379,20 +379,16 @@ controller.reply = async function(req, res) {
             recipient.msgCount += 1;
         }
 
-        recipient.save();
+        await recipient.save();
 
         //Send email notifying about the reply to everyone except person who posted the reply
         if (!(recipient._id.equals(req.user._id)) && recipient.receiving_emails) {
             const emailText = `<p>Hello ${recipient.firstName},</p><p><strong>${req.user.username}</strong> replied to <strong>${message.subject}</strong>.<p>${reply.text}</p><p>You can access the full message at https://alsion-saberchat.herokuapp.com</p> ${imageString}`;
-
             await sendGridEmail(recipient.email, `New Reply On ${message.subject}`, emailText, false);
         }
     }
 
-    return res.json({ //Send JSON response to front-end
-        success: `Replied to ${message._id}`,
-        message: message
-    });
+    return res.json({success: `Replied to ${message._id}`, message}); //Send JSON response to front-end
 };
 
 // Inbox DELETE messages
