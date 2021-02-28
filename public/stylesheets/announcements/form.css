@@ -14,18 +14,18 @@ form {
     position: relative;
 }
 
-#image-header {
+#image-header, #media-header {
     margin-top: 2rem;
 }
 
-#image-header h4 {
+#image-header h4, #media-header h4 {
     font-weight: 500;
     font-size: 1.3rem;
-
     display: inline-block;
+    width: 5rem;
 }
 
-#image-header button {
+#image-header button, #media-header button {
     float: right;
 }
 

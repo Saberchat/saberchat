@@ -9,8 +9,8 @@
           integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk" crossorigin="anonymous">
     <link rel="stylesheet" href="/stylesheets/main.css">
 
-    <link rel="stylesheet" href="/stylesheets/components/header.css">
     <link rel="stylesheet" href="/stylesheets/components/navbar.css">
+    <link rel="stylesheet" href="/stylesheets/components/header.css">
     <link rel="stylesheet" href="/stylesheets/announcements/form.css">
     <%if (currentUser) {%>
       <%if (currentUser.darkmode) { %>
@@ -45,38 +45,40 @@
     </div>
 </div>
 
+
 <div class="row">
-    <div class="col-md-8 offset-md-2 col-12">
-        <form action="/announcements/" method="post" enctype="multipart/form-data">
-          <div class="form-group mode">
-            <label for="subject">Subject</label>
-            <input type="text" class="form-control mode" name="subject" placeholder="A short title..." maxlength="50" required>
-          </div><br />
+	<div class="col-md-8 offset-md-2 col-12">
+		<div class="form-container">
+			<form action="/announcements/" method="post" enctype="multipart/form-data">
+				<div class="form-group mode">
+					<label for="subject">Subject</label>
+					<input type="text" class="form-control mode" name="subject" placeholder="A short title..." maxlength="50" required>
+				</div><br />
 
-          <div class="form-group mode">
-            <label for="message">Message</label>
-            <textarea minlength="50" class="form-control mode" name="message" rows="5" placeholder="What it is about..." required></textarea>
-          </div>
+				<div class="form-group mode">
+					<label for="message">Message</label>
+					<textarea minlength="50" class="form-control mode" name="message" rows="5" placeholder="What it is about..." required></textarea>
+				</div>
 
-            <div class="form-group">
-                <label for="imageFile">Media Uploads</label>
-                <input type="file" name="imageFile" class="image-upload form-control-file" multiple accept="image/*, video/*, audio/*, application/pdf">
-            </div>
-
-            <div id="image-header">
-                <h4>Images</h4>
-                <button type="button" onclick="addImg()" class="btn btn-primary"><i class="fas fa-plus"></i> Add
-                </button>
-            </div>
-
-            <div id="image-block">
-            </div>
-            <button type="submit" class="btn btn-primary btn-block">Post</button>
-            <br/>
-        </form>
-    </div>
+				<div id="media-header">
+					<button type="button" onclick="upload()" class="btn btn-primary"><i class="fas fa-plus"></i> File Upload</button>
+					<br/><br/>
+				</div>
+				<div id="uploads"></div>
+				
+				<div id="image-header">
+					<button type="button" onclick="addImg()" class="btn btn-primary"><i class="fas fa-plus"></i> Image URL</button>
+					<br/><br/>
+				</div>
+				<div id="image-block"></div>
+				
+				<button type="submit" class="btn btn-primary btn-block">Post</button>
+				<br/>
+			</form>
+		</div>
+	</div>
 </div>
-
+<script src="/javascript/upload-input.js"></script>
 <script src="/javascript/announcements/form.js"></script>
 </body>
 </html>

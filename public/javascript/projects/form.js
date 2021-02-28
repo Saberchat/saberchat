@@ -1,5 +1,4 @@
 const imgContainer = document.getElementById('image-block');
-
 let i = document.getElementsByClassName('input-container').length;
 
 const addImg = function () { //Adds the image input field

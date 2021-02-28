@@ -8,6 +8,7 @@
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css">
     <link rel="stylesheet" href="/stylesheets/main.css">
     <!-- link css for navbar. Don't need to include public/javascript/userForm.js since user is already logged in and does not need to access login and register forms.  -->
+
     <link rel="stylesheet" href="/stylesheets/components/navbar.css">
     <link rel="stylesheet" href="/stylesheets/components/header.css">
     <link rel="stylesheet" href="/stylesheets/inbox/form.css">
@@ -34,7 +35,7 @@
 <div class="container">
     <div class="row">
         <div class="col-md-8 offset-md-2 col-12">
-            <div class="form-container">
+            <div class="form-container darkmode-outline">
                 <h1>New Message</h1>
                 <div id="back-button">
                     <a href="/inbox" class="btn btn-primary back-btn"><i class="fas fa-arrow-left"></i> Back</a>
@@ -102,40 +103,40 @@
                             <input type="checkbox" class="form-check-input" name="noreply" value="true" id="noreply">
                             <label class="form-check-label" for="noreply">Disable Replies</label>
                         </div>
-
                     </div>
 
-                    <div class="form-group">
+                    <div class="form-group mode">
                         <label for="subject">Subject</label>
                         <input id="subject" placeholder="A short title..." class="form-control mode" type="text"
                                name="subject" required>
-                    </div>
-                    <div class="form-group">
+                    </div><br />
+                    <div class="form-group mode">
                         <label for="message">Message</label>
                         <textarea name="message" id="message" placeholder="Message text..." rows="5"
                                   class="form-control mode" required></textarea>
                     </div>
 
-                    <div class="form-group">
-                        <label for="imageFile">Media Upload</label>
-                        <input type="file" name="imageFile" class="image-upload form-control-file" multiple accept="image/*, video/*, audio/*, application/pdf">
-                    </div>
-
-                    <div id="image-header">
-                        <h4>Images</h4>
-                        <button type="button" onclick="addImg()" class="btn btn-primary"><i class="fas fa-plus"></i>
-                            Image
+                    <div id="media-header">
+                        <button type="button" onclick="upload()" class="btn btn-primary"><i class="fas fa-plus"></i> File Upload</button>
+                        <br/><br/>
+                    </div><br>
+                      <div id="uploads"></div>
+                      
+                      <div id="image-header">
+                        <button type="button" onclick="addImg()" class="btn btn-primary"><i class="fas fa-plus"></i> Image URL
                         </button>
-                    </div>
+                        <br/><br/>
+                      </div>
 
-                    <div id="image-block">
-                    </div>
+                      <div id="image-block"></div>
+
                     <button type="submit" class="btn btn-primary btn-block">Send</button>
                 </form>
             </div>
         </div>
     </div>
 </div>
+<script src="/javascript/upload-input.js"></script>
 <script src="/javascript/inbox/form.js"></script>
 <script src="/javascript/inbox/new.js"></script>
 </body>

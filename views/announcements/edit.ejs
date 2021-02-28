@@ -76,15 +76,15 @@
                     <% } %>
                 <% } %>
 
-                <div class="form-group">
-                    <label for="imageFile">New Media Uploads</label>
-                    <input type="file" name="imageFile" class="image-upload form-control-file" multiple accept="image/*, video/*, audio/*, application/pdf">
-                </div>
-
+                <div id="media-header">
+                    <button type="button" onclick="upload()" class="btn btn-primary"><i class="fas fa-plus"></i> File Upload</button>
+                    <br/><br/>
+                  </div>
+                <div id="uploads"></div>
+    
                 <div id="image-header">
-                    <h4>Image Urls</h4>
-                    <button type="button" onclick="addImg()" class="btn btn-primary"><i class="fas fa-plus"></i> Add
-                    </button>
+                    <button type="button" onclick="addImg()" class="btn btn-primary"><i class="fas fa-plus"></i> Image URL</button>
+                    <br/><br/>
                 </div>
 
                 <div id="image-block">
@@ -111,6 +111,7 @@
         </div>
     </div>
 </div>
+<script src="/javascript/upload-input.js"></script>
 <script src="/javascript/announcements/form.js"></script>
 <script src="/javascript/announcements/edit.js"></script>
 </body>

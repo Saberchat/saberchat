@@ -2,7 +2,7 @@ body, #submit-project-edits, #submit-new-project {
     text-align: center;
 }
 
-label, #image-heading {
+label, #image-heading, #media-heading {
     float: left;
 }
 
