@@ -7,7 +7,8 @@ const postCommentSchema = new mongoose.Schema({
     sender: {type: mongoose.Schema.Types.ObjectId, ref: 'User'},
     date: String,
     likes: [{type: mongoose.Schema.Types.ObjectId, ref: 'User'}],
-    comments: [{type: mongoose.Schema.Types.ObjectId, ref: 'PostComment'}]
+    comments: [{type: mongoose.Schema.Types.ObjectId, ref: 'PostComment'}],
+    handled: {type: Boolean, default: false} //Only for bug reports
 }, {
     timestamps: {createdAt: 'created_at'}
 });

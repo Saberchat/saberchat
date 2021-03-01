@@ -14,6 +14,7 @@ router.route('/')
     .post(middleware.isLoggedIn, wrapAsync(reports.create));
 
 router.get('/new', middleware.isLoggedIn, reports.new);
+router.get('/handle/:id', middleware.isLoggedIn, middleware.isAdmin, wrapAsync(reports.handleReport));
 
 router.put('/like', middleware.isLoggedIn, wrapAsync(reports.likeReport));
 router.put('/like-comment', middleware.isLoggedIn, wrapAsync(reports.likeComment));

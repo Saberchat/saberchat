@@ -79,14 +79,14 @@ controller.updateReport = async function(req, res) {
 
     const updatedReport = await PostComment.findByIdAndUpdate(req.params.id, {
         subject: req.body.subject,
-        text: req.body.message
+        text: req.body.message,
+        handled: false
     });
     if (!updatedReport) {
         req.flash('error', "Unable to update report");
         return res.redirect('back');
     }
 
-    await updatedReport.save();
     const users = await User.find({authenticated: true, _id: {$ne: req.user._id}});
     if (!users) {
         req.flash('error', "An Error Occurred");
@@ -95,6 +95,16 @@ controller.updateReport = async function(req, res) {
 
     req.flash('success', 'Report Updated!');
     return res.redirect(`/reports/${updatedReport._id}`);
+}
+
+controller.handleReport = async function(req, res) {
+    const report = await PostComment.findByIdAndUpdate(req.params.id, {handled: true});
+    if (!report) {
+        req.flash("error", "Unable to access report");
+        return res.redirect("back");
+    }
+    req.flash("success", "Handled report!");
+    return res.redirect("/reports/");
 }
 
 // Report PUT like report
