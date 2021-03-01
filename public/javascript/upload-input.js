@@ -1,6 +1,14 @@
-let fileCount = 0;
+let fileCount = 0; //Track how many file inputs have been opened
+let filesCounted = false; //Check whether previously uploaded files are accounted for (for editing pages)
 
-const upload = function() {
+const upload = function(files) {
+    if (!filesCounted && files) {
+        fileCount += files;
+        filesCounted = true;
+    }
+
+    console.log(fileCount)
+    
     if (fileCount < 7) {
         fileCount ++;
         let newInputBlock = document.createElement("div");

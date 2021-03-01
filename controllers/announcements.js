@@ -325,6 +325,7 @@ controller.comment = async function(req, res) {
     }
 
     const comment = await PostComment.create({
+        type: "comment",
         text: req.body.text,
         sender: req.user
     });

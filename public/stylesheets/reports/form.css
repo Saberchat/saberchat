@@ -1,0 +1,44 @@
+/* Forms styling */
+.form-group label {
+    font-size: 1.2rem;
+    font-weight: 500;
+}
+
+form {
+    margin-bottom: 5rem;
+}
+
+/* Image block/area */
+#image-block {
+    margin: 2rem 0;
+    position: relative;
+}
+
+#image-header, #media-header {
+    margin-top: 2rem;
+}
+
+#image-header h4, #media-header h4 {
+    font-weight: 500;
+    font-size: 1.3rem;
+    display: inline-block;
+    width: 5rem;
+}
+
+#image-header button, #media-header button {
+    float: right;
+}
+
+/* Individual Images */
+.image-group {
+    margin: 1rem 0;
+}
+
+.image-group .input-container {
+    width: 80%;
+    display: inline-block;
+}
+
+#image-block .image-group button {
+    float: right;
+}

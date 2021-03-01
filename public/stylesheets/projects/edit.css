@@ -13,3 +13,7 @@ label, #image-heading, #media-heading {
 #title-label, #creator-input-label, #description-label {
     font-weight: bold;
 }
+
+#uploads {
+    text-align: left;
+}
