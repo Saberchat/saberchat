@@ -50,7 +50,7 @@ controller.show = async function(req, res) {
         req.flash('error', 'Error. Cannot find user.');
         return res.redirect('back');
     }
-    console.log(`\n${user.firstName.toUpperCase()} ${user.lastName.toUpperCase()}' SABERCHAT LOGIN ACTIVITY`);
+    console.log(`\n${user.firstName.toUpperCase()} ${user.lastName.toUpperCase()}'S SABERCHAT LOGIN ACTIVITY`);
     for (let login of user.logins) {
       console.log(`${dateFormat(login, "h:MM TT")} on ${dateFormat(login, "mmm d, yyyy")}`);
     }
