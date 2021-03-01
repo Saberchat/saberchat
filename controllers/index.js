@@ -175,6 +175,7 @@ controller.login = function(req, res, next) {
                 return next(err);
             }
             user.logins.push(new Date());
+            user.save();
             //flash message success
             req.flash('success', 'Welcome ' + user.firstName);
             return res.redirect('/');
