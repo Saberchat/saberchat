@@ -51,7 +51,8 @@ var userSchema = new mongoose.Schema({
     tags: [{type: String}], //Cashier, Editor, Tutor, Etc.
     balance: {type: Number, default: 0},
     debt: {type: Number, default: 0},
-    darkmode: {type: Boolean, default: false}
+    darkmode: {type: Boolean, default: false},
+    logins: [{type: Date}]
 }, {timestamps: {createdAt: 'created_at'}});
 
 //adds authentication functionality
