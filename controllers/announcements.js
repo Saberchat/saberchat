@@ -1,5 +1,6 @@
 const {sendGridEmail} = require("../services/sendGrid");
 const {convertToLink} = require("../utils/convert-to-link");
+const {objectArrIncludes} = require("../utils/object-operations");
 
 const path = require('path');
 const dateFormat = require('dateformat');
@@ -35,16 +36,10 @@ controller.markAll = function(req, res) {
 
 // Ann GET mark one ann as read
 controller.markOne = function(req, res) {
-    //Iterate through user's announcement count and find the announcement that is being marked as read
-    for (let i = 0; i < req.user.annCount.length; i++) {
-        if (req.user.annCount[i].announcement.toString() == req.params.id.toString()) {
-            req.user.annCount.splice(i, 1);
-            req.user.save()
-            req.flash('success', 'Announcement Marked As Read!');
-            return res.redirect(`/announcements`);
-        }
+    if (objectArrIncludes(req.user.annCount, "announcement", req.params.id) > -1) {
+        req.user.annCount.splice(objectArrIncludes(req.user.annCount, "announcement", req.params.id), 1);
+        req.user.save();
     }
-
     req.flash('success', 'Announcement Marked As Read!');
     return res.redirect(`/announcements`);
 };
@@ -62,11 +57,9 @@ controller.show = async function(req, res) {
     if(!Ann) {req.flash('error', 'Could not find announcement'); return res.redirect('back');}
 
     if(req.user) {
-        for (let i = 0; i < req.user.annCount.length; i ++) {
-            if (req.user.annCount[i].announcement._id.equals(Ann._id)) {
-                req.user.annCount.splice(i, 1);
-                await req.user.save();
-            }
+        if (objectArrIncludes(req.user.annCount, "announcement", Ann._id, "_id") > -1) {
+            req.user.annCount.splice(objectArrIncludes(req.user.annCount, "announcement", Ann._id, "_id"), 1);
+            await req.user.save();
         }
     }
 
@@ -156,20 +149,13 @@ controller.create = async function(req, res) {
         imageString += `<img src="${image}">`;
     }
 
-    let announcementObject = {
-        announcement: Ann,
-        version: "new"
-    };
-
     for (let user of Users) {
-        if (!user.receiving_emails) {
-            continue
+        if (user.receiving_emails) {
+            const emailText = `<p>Hello ${user.firstName},</p><p>${req.user.username} has recently posted a new announcement - '${Ann.subject}'.</p><p>${Ann.text}</p><p>You can access the full announcement at https://alsion-saberchat.herokuapp.com</p> ${imageString}`;
+            await sendGridEmail(user.email, `New Saberchat Announcement - ${Ann.subject}`, emailText, false);
+            user.annCount.push({announcement: Ann, version: "new"});
+            await user.save();
         }
-        const emailText = `<p>Hello ${user.firstName},</p><p>${req.user.username} has recently posted a new announcement - '${Ann.subject}'.</p><p>${Ann.text}</p><p>You can access the full announcement at https://alsion-saberchat.herokuapp.com</p> ${imageString}`;
-
-        await sendGridEmail(user.email, `New Saberchat Announcement - ${Ann.subject}`, emailText, false);
-        user.annCount.push(announcementObject);
-        await user.save();
     }
 
     req.flash('success', 'Announcement posted to bulletin!');
@@ -261,22 +247,14 @@ controller.updateAnn = async function(req, res) {
         imageString += `<img src="${image}">`;
     }
 
-    let announcementObject = {announcement: updatedAnnouncement, version: "updated"};
-    let overlap;
     for (let user of users) {
         if (user.receiving_emails) {
             await sendGridEmail(user.email, `Updated Saberchat Announcement - ${announcement.subject}`, `<p>Hello ${user.firstName},</p><p>${req.user.username} has recently updated an announcement - '${announcement.subject}'.</p><p>${announcement.text}</p><p>You can access the full announcement at https://alsion-saberchat.herokuapp.com</p> ${imageString}`, false);
         }
 
-        overlap = false;
-        for (let a of user.annCount) {
-            if (a.announcement.equals(updatedAnnouncement._id)) {
-                overlap = true;
-                break;
-            }
-        }
-        if (!overlap) {
-            user.annCount.push(announcementObject);
+        //If announcement not already in user's anncount, add it
+        if (objectArrIncludes(user.annCount, "announcement", updatedAnnouncement._id) == -1) {
+            user.annCount.push({announcement: updatedAnnouncement, version: "updated"});
             await user.save();
         }
     }
@@ -457,13 +435,9 @@ controller.deleteAnn = async function(req, res) {
     }
 
     for (let user of users) {
-        for (let i = 0; i < user.annCount.length; i += 1) {
-            if (user.annCount[i].announcement.equals(deletedAnn._id)) {
-                user.annCount.splice(i, 1);
-                await user.save();
-                req.flash('success', 'Announcement Deleted!');
-                return res.redirect('/announcements/');
-            }
+        if (objectArrIncludes(user.annCount, "announcement", deletedAnn._id) > -1) {
+            user.annCount.splice(objectArrIncludes(user.annCount, "announcement", deletedAnn._id), 1);
+            await user.save();
         }
     }
 

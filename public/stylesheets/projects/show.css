@@ -20,6 +20,21 @@
     color: #6e6e6e;
 }
 
+#handled {
+    color: rgb(66, 167, 41);
+    font-weight: bold;
+}
+
+#not-handled {
+    color: rgb(226, 80, 80);
+    font-weight: bold;
+}
+
+.reported-buttons {
+    width: 20%;
+    text-align: center;
+}
+
 #edit-div, #like-div {
     margin-bottom: 15px;
     margin-top: -15px;

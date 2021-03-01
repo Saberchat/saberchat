@@ -54,6 +54,11 @@
             <article class="ann-container">
                 <div class="ann-head">
                     <h1><%= report.subject %></h1>
+                    <% if (report.handled) { %>
+                        <span id="handled">Report Has Been Handled</span>
+                    <% } else {%>
+                        <span id="not-handled">Report Not Yet Handled</span>
+                    <% } %>
 
                     <% if (currentUser) { %>
                         <a id="sender-info" class="darkmode-header" href="../profiles/<%= report.sender._id %>">

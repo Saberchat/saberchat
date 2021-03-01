@@ -70,12 +70,14 @@
                                 <span class="announcement-subject-header"><%= report.subject %></span>
                             </a>
                             <% if (report.handled) { %>
-                                <span class="badge badge-pill badge-success announcement-button">Report Has Been Handled</span>
+                                <span class="badge badge-pill badge-success" id="marked">Report Has Been Handled</span>
                             <% } else { %>
                                 <% if (["admin", "principal"].includes(currentUser.permission)) { %>
                                     <a href="/reports/handle/<%= report._id %>">
-                                        <span class="badge badge-pill badge-warning">Mark As Handled</span>
+                                        <span class="badge badge-pill badge-warning" id="mark">Mark As Handled</span>
                                     </a>
+                                <% } else {%>
+                                    <span class="badge badge-pill badge-warning" id="unmarked">Report Not Yet Handled</span>
                                 <% } %>
                             <% } %>
                             <span class="float-right announcement-date"><%= report.date %></span>
