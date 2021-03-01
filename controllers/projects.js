@@ -468,9 +468,9 @@ controller.comment = async function(req, res) {
     }
 
     const comment = await PostComment.create({
+        type: "comment",
         text: req.body.text,
         sender: req.user,
-        date: dateFormat(new Date(), "h:MM TT | mmm d")
     });
     if (!comment) {
         return res.json({error: 'Error commenting'});

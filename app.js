@@ -58,6 +58,7 @@ const announcementRoutes = require('./routes/announcements');
 const projectRoutes = require('./routes/projects');
 const wHeightsRoutes = require('./routes/wHeights');
 const hwRoutes = require('./routes/homework');
+const reportRoutes = require('./routes/reports');
 
 // set up ports and socket.io
 const http = require('http').createServer(app);
@@ -189,6 +190,7 @@ app.use('/cafe', cafeRoutes);
 app.use('/projects', projectRoutes);
 // app.use('/articles', wHeightsRoutes);
 app.use('/homework', hwRoutes);
+app.use('/reports', reportRoutes);
 
 // Catch-all route.
 app.get('*', (req, res) => {
