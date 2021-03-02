@@ -5,6 +5,7 @@ const {sendGridEmail} = require("../services/sendGrid");
 const { sortByPopularity } = require("../utils/popularity");
 const {convertToLink} = require("../utils/convert-to-link");
 const getData = require("../utils/cafe-data");
+const {removeIfIncluded} = require("../utils/object-operations");
 const {cloudUpload, cloudDelete} = require('../services/cloudinary');
 
 //SCHEMA
@@ -454,10 +455,8 @@ controller.deleteItem = async function(req, res) {
     }
 
     for (let category of categories) { //If the category includes this item, remove the item from that category's item list
-        if (category.items.includes(item._id)) {
-            category.items.splice(category.items.indexOf(item._id), 1);
-            await category.save();
-        }
+        removeIfIncluded(category.items, item._id);
+        await category.save();
     }
 
     const orders = await Order.find({}).populate('items.item');
@@ -792,9 +791,7 @@ controller.updateItemInfo = async function(req, res) {
     }
 
     for (let t of categories) { //Remove this item from its old item category (if the category has not changed, it's fine because we' add it back in a moment anyway)
-        if (t.items.includes(item._id)) {
-            t.items.splice(t.items.indexOf(item._id), 1);
-        }
+        removeIfIncluded(t.items, item._id);
         await t.save();
     }
 
@@ -804,10 +801,7 @@ controller.updateItemInfo = async function(req, res) {
         return res.redirect("back");
     }
 
-    if (category.items.includes(item._id)) { //If item is already in category, remove it so you can put the updated category back (we don't know whether the category will be there or not, so it's better to just cover all bases)
-        category.items.splice(category.items.indexOf(item._id), 1);
-    }
-
+    removeIfIncluded(category.items, item._id); //If item is already in category, remove it so you can put the updated category back (we don't know whether the category will be there or not, so it's better to just cover all bases)
     category.items.push(item);
     await category.save();
 

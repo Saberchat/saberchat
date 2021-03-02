@@ -9,6 +9,7 @@ const Filter = require('bad-words');
 const filter = new Filter();
 const dateFormat = require('dateformat');
 const {sendGridEmail} = require("../services/sendGrid");
+const {removeIfIncluded} = require("../utils/object-operations");
 
 const controller = {};
 
@@ -69,11 +70,8 @@ controller.showRoom = async function(req, res) {
         room.confirmed.push(req.user._id);
         await room.save();
     }
-
-    if (req.user.newRoomCount.includes(room._id)) {
-        req.user.newRoomCount.splice(req.user.newRoomCount.indexOf(room._id), 1);
-        await req.user.save();
-    }
+    removeIfIncluded(req.user.newRoomCount, room._id);
+    await req.user.save();
 
     const comments = await Comment.find({room: room._id}).sort({_id: -1}).limit(30)
     .populate({path: 'author', select: ['username', 'imageUrl']});
@@ -341,10 +339,7 @@ controller.deleteRoom = async function(req, res) {
 
     let deletedRequest;
     for (let request of requests) {
-        if (room.creator.requests.includes(request._id)) {
-            room.creator.requests.splice(room.creator.requests.indexOf(request._id), 1);
-        }
-
+        removeIfIncluded(room.creator.requests, request._id);
         deletedRequest = await AccessReq.findByIdAndDelete(request._id);
         if (!deletedRequest) {
             req.flash('error', 'Unable to delete requests');
@@ -360,10 +355,8 @@ controller.deleteRoom = async function(req, res) {
     }
 
     for (let member of deletedRoom.members) {
-        if (member.newRoomCount.includes(deletedRoom._id)) {
-            member.newRoomCount.splice(member.newRoomCount.indexOf(deletedRoom._id), 1);
-            await member.save();
-        }
+        removeIfIncluded(member.newRoomCount, deletedRoom._id);
+        await member.save();
     }
     req.flash('success', 'Deleted room');
     return res.redirect('/chat');

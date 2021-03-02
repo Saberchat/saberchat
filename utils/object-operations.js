@@ -1,7 +1,8 @@
 const {sortByPopularity} = require("../utils/popularity");
+const package = {};
 
 //Find overlapping objects, based on the equality of one array property
-module.exports.equateObjects = function(objects, property) {
+package.equateObjects = function(objects, property) {
     let sortedObjects = new Map();
     let sortedMatrix = [];
 
@@ -25,7 +26,7 @@ module.exports.equateObjects = function(objects, property) {
 }
 
 //Check if an object which includes a certain property contains a key in that property
-module.exports.objectArrIncludes = function(arr, property, key, subproperty) {
+package.objectArrIncludes = function(arr, property, key, subproperty) {
     for (let i = 0; i < arr.length; i ++) {
         if (subproperty) {
             if (arr[i][property][subproperty].toString() == key.toString()) {
@@ -40,7 +41,7 @@ module.exports.objectArrIncludes = function(arr, property, key, subproperty) {
 }
 
 //Build an array with a single property for each item in an array of objects
-module.exports.parsePropertyArray = function(arr, property) {
+package.parsePropertyArray = function(arr, property) {
     let final = [];
     for (let object of arr) {
         final.push(object[property]);
@@ -48,8 +49,16 @@ module.exports.parsePropertyArray = function(arr, property) {
     return final;
 }
 
-module.exports.removeIfIncluded = function(arr, element) {
-    if (arr.includes(element)) {
-        arr.splice(arr.indexOf(element), 1);
+package.removeIfIncluded = function(arr, element, property) {
+    if (property) {
+        if (package.objectArrIncludes(arr, property, element) > -1) {
+            arr.splice(package.objectArrIncludes(arr, property, element), 1);
+        }
+    } else {
+        if (arr.includes(element)) {
+            arr.splice(arr.indexOf(element), 1);
+       }
     }
 }
+
+module.exports = package;

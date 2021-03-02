@@ -5,6 +5,7 @@ const path = require('path');
 const {sendGridEmail} = require("../services/sendGrid");
 const {convertToLink} = require("../utils/convert-to-link");
 const { cloudUpload } = require('../services/cloudinary');
+const {objectArrIncludes, removeIfIncluded} = require("../utils/object-operations");
 
 const User = require('../models/user');
 const Message = require('../models/inbox/message');
@@ -82,7 +83,7 @@ controller.sent = async function(req, res) {
 
     let sent_msgs = []; // array of user's sent messages
 
-    for(const message of messages) {
+    for(let message of messages) {
         // if user sent the message, push and continue
         if(message.sender.equals(req.user._id)) {
             sent_msgs.push(message);
@@ -90,7 +91,7 @@ controller.sent = async function(req, res) {
         }
 
         // else check for user's replies by most recent
-        for(const reply of message.replies.reverse()) {
+        for(let reply of message.replies.reverse()) {
             if(reply.sender.equals(req.user._id)) {
                 // push most recent reply by user
                 // sent_msgs.push(reply); // this breaks the ejs currently
@@ -180,8 +181,7 @@ controller.createMsg = async function(req, res) {
             const status = statuses[i];
             if(recipients.includes(status)) {
                 selStatuses.push(status);
-                const index = recipients.indexOf(status);
-                recipients.splice(index, 1);
+                recipients.splice(recipients.indexOf(status), 1);
             }
         }
 
@@ -314,7 +314,7 @@ controller.clear = function(req, res) {
 
 // Inbox PUT reply to message
 controller.reply = async function(req, res) {
-    const message = await Message.findById(req.body.message).populate('recipients').populate('sender').exec();
+    const message = await Message.findById(req.body.message).populate('recipients').populate('sender');
     if(!message) {
         return res.json({error: 'Error finding message'});
     } else if(message.anonymous || message.noReply) {
@@ -331,7 +331,6 @@ controller.reply = async function(req, res) {
 
     //Create string to track reply's images
     let imageString = "";
-
     if (reply.images) {
         for (let image of reply.images) {
             imageString += `<img src="${image}">`;
@@ -341,54 +340,30 @@ controller.reply = async function(req, res) {
     let readRecipients = message.read; //Users who have read the original message will need to have their msgCount incremented again
 
     //Iterates through the recipients and sees if the sender is part of them. If not, then no reply has been sent yet, but since the sender has sent the message, they have 'read' it. Hence, they are added to the readRecipients array.
-
-    let senderIncluded = false; //Checks whether the sender is part of the thread
-    for (const recipient of message.recipients) {
-        if (recipient._id.equals(message.sender._id)) {
-            senderIncluded = true;
-            break;
-        }
-    }
-    if(!senderIncluded) {
+    if (objectArrIncludes(message.recipients, "_id", message.sender._id) == -1) {
         readRecipients.push(message.sender);
     }
-    for (let i = message.recipients.length-1; i >= 0; i--) { //If the original sender is already part of the recipients, remove them just in case
-        if (message.recipients[i]._id.equals(message.sender._id)) {
-          message.recipients.splice(i, 1);
-        }
-    }
+    removeIfIncluded(message.recipients, message.sender._id, "_id"); //If the original sender is already part of the recipients, remove them just in case
 
     message.recipients.push(message.sender); //Add original sender to recipient list (code above ensures that they are not added multiple times)
     message.read = [req.user]; //Since the current user replied to this message, they've seen the completely updated message. Nobody else has
     await message.save();
 
-    for (const recipient of message.recipients) { //Remove original message and add it back so that it appears 'new'
-
-        //Remove message from recipient's inbox
-        for (let i = recipient.inbox.length - 1; i >= 0; i --) {
-            if (recipient.inbox[i].equals(message._id)) {
-            recipient.inbox.splice(i, 1);
-            }
-        }
-
-        //Add it to the front of the recipient's inbox
-        recipient.inbox.push(message._id);
+    for (let recipient of message.recipients) { //Remove original message and add it back so that it appears 'new'
+        removeIfIncluded(recipient.inbox, message._id); //Remove message from recipient's inbox
+        recipient.inbox.push(message._id); //Add it to the front of the recipient's inbox
 
         //If the recipient has already read this message and it is not the person sending the reply (or the recipient is the original message sender), increment their message count again
         if (readRecipients.includes(recipient._id) && !(recipient._id.equals(req.user._id))) {
             recipient.msgCount += 1;
         }
-
         await recipient.save();
-
-        //Send email notifying about the reply to everyone except person who posted the reply
         if (!(recipient._id.equals(req.user._id)) && recipient.receiving_emails) {
             const emailText = `<p>Hello ${recipient.firstName},</p><p><strong>${req.user.username}</strong> replied to <strong>${message.subject}</strong>.<p>${reply.text}</p><p>You can access the full message at https://alsion-saberchat.herokuapp.com</p> ${imageString}`;
             await sendGridEmail(recipient.email, `New Reply On ${message.subject}`, emailText, false);
         }
     }
-
-    return res.json({success: `Replied to ${message._id}`, message}); //Send JSON response to front-end
+    return res.json({success: `Replied to ${message._id}`, message, darkmode: req.user.darkmode}); //Send JSON response to front-end
 };
 
 // Inbox DELETE messages

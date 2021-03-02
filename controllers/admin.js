@@ -399,7 +399,7 @@ controller.permanentDelete = async function(req, res) {
 
     for (let i = message.replies.length; i > 0; i--) {
         if (message.replies[i].sender.equals(user._id)) {
-        message.replies.splice(i, 1);
+            message.replies.splice(i, 1);
         }
     }
         }
