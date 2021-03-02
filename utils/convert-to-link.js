@@ -1,4 +1,4 @@
-module.exports.convertToLink = function(text) {
+module.exports = function(text) {
     const delimeter = new RegExp(/[\"\'\r]/, 'g'); //Regex for most troublesome link characters
     const alpha = new RegExp(/[a-z]/, 'g')
     let deformatted = []; //Holds words/links from text
@@ -18,10 +18,10 @@ module.exports.convertToLink = function(text) {
 
     //Parse emails and links from deformatted text
     for (let line of deformatted) {
-        if ((line.includes('@'))) {
+        if ((line.includes('@'))) { //All emails must include @, use that as the catch
             emails.push(text.slice(text.indexOf(line), text.indexOf(line) + line.length));
 
-            //Money can be confused as a link, so $ expressions are discounted
+        //Money can be confused as a link, so $ expressions are discounted
         } else if (line.slice(0, line.length - 1).includes('.') && line.slice(0, line.length - 1).split('.')[1].length > 0 && !line.includes('$')) {
             if (line.slice(0, line.length - 1).split('.')[1][0].match(alpha)) {
                 links.push(text.slice(text.indexOf(line), text.indexOf(line) + line.length));

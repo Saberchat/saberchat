@@ -16,10 +16,6 @@ const {sendGridEmail} = require("../services/sendGrid");
 const {objectArrIncludes} = require("../utils/object-operations");
 const controller = {};
 
-controller.index = function(req, res) {
-    return res.render("admin/index");
-}
-
 controller.moderateGet = async function(req, res) {
     const comments = await Comment.find({status: 'flagged'})
     .populate({path: 'author', select: ['username', 'imageUrl']})
@@ -33,7 +29,7 @@ controller.moderateGet = async function(req, res) {
     return res.render('admin/mod', {comments});
 }
 
-controller.moderatePost = async function(req, res) {
+controller.getContext = async function(req, res) {
     const reportedComment = await Comment.findById(req.body.commentId).populate("author");
     if (!reportedComment) {
         return res.json({error: "Unable to find comment"});

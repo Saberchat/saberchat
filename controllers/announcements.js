@@ -1,5 +1,5 @@
 const {sendGridEmail} = require("../services/sendGrid");
-const {convertToLink} = require("../utils/convert-to-link");
+const convertToLink = require("../utils/convert-to-link");
 const {objectArrIncludes} = require("../utils/object-operations");
 
 const path = require('path');

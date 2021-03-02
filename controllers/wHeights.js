@@ -1,7 +1,7 @@
 //LIBRARIES
 const dateFormat = require('dateformat');
 const {sendGridEmail} = require("../services/sendGrid");
-const {convertToLink} = require("../utils/convert-to-link");
+const convertToLink = require("../utils/convert-to-link");
 
 //SCHEMA
 const Article = require('../models/wHeights/article');

@@ -10,12 +10,16 @@ for (let word of otherFillers) {
     fillers.push(word);
 }
 
-module.exports.keywordFilter = function(text, compareTo) {
+module.exports = function(text, compareTo) {
+    //Maps hold parsed keywords
     let textKeywords = new Map();
     let compareKeywords = new Map();
+
+    //Regular expressions determine where to split text
     const textSplitter = new RegExp(/[\"\s\'\r\n]/, 'g');
     const delimeter = new RegExp(/[^a-zA-z0-9]/, 'g');
 
+    //Split each phrase by textsplitter and each word by delimeter, then evaluate each one to see whether it's a keyword
     let processedWord;
     for (let word of text.split(textSplitter)) {
         processedWord = word.split(delimeter).join('').toLowerCase();
@@ -28,6 +32,7 @@ module.exports.keywordFilter = function(text, compareTo) {
         }
     }
 
+    //Perform same operations on compareTo text
     for (let word of compareTo.split(textSplitter)) {
         processedWord = word.split(delimeter).join('').toLowerCase();
         if (processedWord.length > 3 && !fillers.includes(processedWord)) {
@@ -44,6 +49,7 @@ module.exports.keywordFilter = function(text, compareTo) {
         meanValue += value[1] / textKeywords.size;
     }
 
+    //Extract words which are unique only to the original text, not compareTo
     for (let value of compareKeywords) {
         if (textKeywords.has(value[0])) {
             textKeywords.delete(value[0]);
@@ -56,6 +62,7 @@ module.exports.keywordFilter = function(text, compareTo) {
         }
     }
 
+    //Parse out most popular keywords based on mean value
     meanValue = 0;
     for (let value of compareKeywords) {
         meanValue += value[1] / compareKeywords.size;

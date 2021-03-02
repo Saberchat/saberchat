@@ -1,3 +1,4 @@
+//Runs and catches errors in all async functions
 module.exports = function(func) {
     return function(req, res, next) {
         func(req, res, next).catch(err => {

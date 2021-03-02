@@ -10,21 +10,21 @@ const router = express.Router(); //Router
 
 //ROUTES
 router.route('/')
-    .get(middleware.isLoggedIn, wrapAsync(reports.index))
-    .post(middleware.isLoggedIn, wrapAsync(reports.create));
+    .get(middleware.isLoggedIn, wrapAsync(reports.index)) //Show all reports
+    .post(middleware.isLoggedIn, wrapAsync(reports.create)); //Create report
 
-router.get('/new', middleware.isLoggedIn, reports.new);
-router.get('/handle/:id', middleware.isLoggedIn, middleware.isAdmin, wrapAsync(reports.handleReport));
+router.get('/new', middleware.isLoggedIn, reports.new); //Form to create new report
+router.get('/handle/:id', middleware.isLoggedIn, middleware.isAdmin, wrapAsync(reports.handleReport)); //Handle report
 
-router.put('/like', middleware.isLoggedIn, wrapAsync(reports.likeReport));
-router.put('/like-comment', middleware.isLoggedIn, wrapAsync(reports.likeComment));
-router.put('/comment', middleware.isLoggedIn, wrapAsync(reports.comment));
+router.put('/like', middleware.isLoggedIn, wrapAsync(reports.likeReport)); //Like report
+router.put('/like-comment', middleware.isLoggedIn, wrapAsync(reports.likeComment)); //Comment on report
+router.put('/comment', middleware.isLoggedIn, wrapAsync(reports.comment)); //Like comment on report
 
 router.route('/:id')
-    .get(middleware.isLoggedIn, wrapAsync(reports.show))
-    .put(middleware.isLoggedIn, wrapAsync(reports.updateReport))
-    .delete(middleware.isLoggedIn, wrapAsync(reports.deleteReport));
+    .get(middleware.isLoggedIn, wrapAsync(reports.show)) //Show specific report
+    .put(middleware.isLoggedIn, wrapAsync(reports.updateReport)) //Update specific report
+    .delete(middleware.isLoggedIn, wrapAsync(reports.deleteReport)); //Delete specific report
 
-router.get('/:id/edit', middleware.isLoggedIn, wrapAsync(reports.updateForm));
+router.get('/:id/edit', middleware.isLoggedIn, wrapAsync(reports.updateForm)); //Form to edit specific report
 
 module.exports = router;

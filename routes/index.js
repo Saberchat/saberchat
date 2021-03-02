@@ -15,10 +15,10 @@ router.get("/logout", middleware.isLoggedIn, index.logout); //logout route
 router.post("/register", validateNewUser, wrapAsync(index.register)); //Register User
 router.get('/authenticate/:id', wrapAsync(index.authenticate)); // Index Landing Page
 router.post('/login', validateUserLogin, index.login); // Custom login handling so that flash messages can be sent.
-router.post('/forgot-password', validatePasswordReset, wrapAsync(index.forgotPassword));
+router.post('/forgot-password', validatePasswordReset, wrapAsync(index.forgotPassword)); //Submit forgot password form
 
 router.route('/reset-password')
-    .get(index.resetPasswordForm)
-    .put(wrapAsync(index.resetPassword));
+    .get(index.resetPasswordForm) //Form to reset password
+    .put(wrapAsync(index.resetPassword)); //Reset password
 
 module.exports = router;

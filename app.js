@@ -401,7 +401,7 @@ io.on('connect', (socket) => {
                 order.items = orderItemsObjects;
                 await order.save();
 
-                if (order.charge > user.balance && !payingInPerson) {
+                if (order.charge > user.balance && !payingInPerson) { //If charge is over online balance, and user is paying online
                     const deletedOrder = await Order.findByIdAndDelete(order._id);
 
                     if (!deletedOrder) {

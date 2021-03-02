@@ -12,16 +12,16 @@ router.route('/')
 
 router.get('/edit', middleware.isLoggedIn, profile.edit); //renders profiles edit page
 router.get('/change-login-info', middleware.isLoggedIn, profile.changeLoginInfo); //renders the email/password edit page
-router.get('/confirm-email/:id', wrapAsync(profile.confirmEmail));
-router.get('/:id', middleware.isLoggedIn, wrapAsync(profile.show));
+router.get('/confirm-email/:id', wrapAsync(profile.confirmEmail)); //Confirm new email
+router.get('/:id', middleware.isLoggedIn, wrapAsync(profile.show)); //Show specific user's profile
 
 router.put('/profile', middleware.isLoggedIn, multipleUpload, validateUserUpdate, wrapAsync(profile.profilePut)); // update user route.
-router.put('/tag', middleware.isAdmin, wrapAsync(profile.tagPut));
+router.put('/tag', middleware.isAdmin, wrapAsync(profile.tagPut)); //Update user's tags
 router.put('/change-email', middleware.isLoggedIn, validateEmailUpdate, wrapAsync(profile.changeEmailPut)); //route for changing email
 router.put('/change-password', middleware.isLoggedIn, validatePasswordUpdate, wrapAsync(profile.changePasswordPut)); //route for changing password
-router.put('/follow/:id', wrapAsync(profile.follow));
-router.put('/unfollow/:id', wrapAsync(profile.unfollow));
-router.put('/remove/:id', wrapAsync(profile.remove));
+router.put('/follow/:id', wrapAsync(profile.follow)); //Follow user
+router.put('/unfollow/:id', wrapAsync(profile.unfollow)); //Unfollow user
+router.put('/remove/:id', wrapAsync(profile.remove)); //Remove/block user
 
 // router.delete('/delete-account', middleware.isLoggedIn, wrapAsync(profile.deleteAccount));
 

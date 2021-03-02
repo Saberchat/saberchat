@@ -1,4 +1,4 @@
-const {convertToLink} = require("../utils/convert-to-link");
+const convertToLink = require("../utils/convert-to-link");
 const dateFormat = require('dateformat');
 
 //SCHEMA

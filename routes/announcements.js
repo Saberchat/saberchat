@@ -1,4 +1,4 @@
-//Announcement routes dictate the posting, viewing, and editing of the Saberchat Announcement Bulletin
+//announcements routes dictate the posting, viewing, and editing of the Saberchat announcements Bulletin
 
 //LIBRARIES
 const express = require('express');
@@ -7,27 +7,27 @@ const {multipleUpload} = require('../middleware/multer');
 const {validateAnn} = require('../middleware/validation');
 const {validatePostComment} = require('../middleware/validation');
 const wrapAsync = require('../utils/wrapAsync');
-const Announcement = require('../controllers/announcements'); // Controller
+const announcements = require('../controllers/announcements'); // Controller
 const router = express.Router(); //Router
 
 //ROUTES
 router.route('/')
-    .get(wrapAsync(Announcement.index))
-    .post(middleware.isLoggedIn, middleware.isMod, multipleUpload, validateAnn, wrapAsync(Announcement.create));
+    .get(wrapAsync(announcements.index)) //Show all announcements
+    .post(middleware.isLoggedIn, middleware.isMod, multipleUpload, validateAnn, wrapAsync(announcements.create)); //Create announcement
 
-router.get('/new', middleware.isLoggedIn, middleware.isMod, Announcement.new);
-router.get('/mark-all', middleware.isLoggedIn, Announcement.markAll);
-router.get('/mark/:id', middleware.isLoggedIn, Announcement.markOne);
+router.get('/new', middleware.isLoggedIn, middleware.isMod, announcements.new); //Form to create new announcement
+router.get('/mark-all', middleware.isLoggedIn, announcements.markAll); //Mark all announcements as read
+router.get('/mark/:id', middleware.isLoggedIn, announcements.markOne); //Mark specific announcement as read
 
-router.put('/like', middleware.isLoggedIn, wrapAsync(Announcement.likeAnn));
-router.put('/like-comment', middleware.isLoggedIn, wrapAsync(Announcement.likeComment));
-router.put('/comment', middleware.isLoggedIn, validatePostComment, wrapAsync(Announcement.comment));
+router.put('/like', middleware.isLoggedIn, wrapAsync(announcements.likeAnn)); //Like announcement
+router.put('/like-comment', middleware.isLoggedIn, wrapAsync(announcements.likeComment)); //Comment on announcement
+router.put('/comment', middleware.isLoggedIn, validatePostComment, wrapAsync(announcements.comment)); //Like a comment on announcement
 
 router.route('/:id')
-    .get(wrapAsync(Announcement.show))
-    .put(middleware.isLoggedIn, middleware.isMod, multipleUpload, wrapAsync(Announcement.updateAnn))
-    .delete(middleware.isLoggedIn, middleware.isMod, wrapAsync(Announcement.deleteAnn));
+    .get(wrapAsync(announcements.show)) //Show specific announcement
+    .put(middleware.isLoggedIn, middleware.isMod, multipleUpload, wrapAsync(announcements.updateAnn)) //Update specific announcement
+    .delete(middleware.isLoggedIn, middleware.isMod, wrapAsync(announcements.deleteAnn)); //Delete specific announcement
 
-router.get('/:id/edit', middleware.isLoggedIn, middleware.isMod, wrapAsync(Announcement.updateForm));
+router.get('/:id/edit', middleware.isLoggedIn, middleware.isMod, wrapAsync(announcements.updateForm)); //Form to edit specific announcement
 
 module.exports = router;
