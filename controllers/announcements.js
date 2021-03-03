@@ -16,9 +16,9 @@ const controller = {};
 
 // Ann GET index
 controller.index = async function(req, res) {
-    const Anns = await Announcement.find({}).populate('sender').exec();
-    if(!Anns) {req.flash('error', 'Cannot find announcements.'); return res.redirect('back');}
-    return res.render('announcements/index', {announcements: Anns.reverse()});
+    const announcements = await Announcement.find({}).populate('sender').exec();
+    if(!announcements) {req.flash('error', 'Cannot find announcements.'); return res.redirect('back');}
+    return res.render('announcements/index', {announcements: announcements.reverse()});
 };
 
 // Ann GET new ann
@@ -46,7 +46,7 @@ controller.markOne = function(req, res) {
 
 // Ann GET show
 controller.show = async function(req, res) {
-    const Ann = await Announcement.findById(req.params.id)
+    const announcement = await Announcement.findById(req.params.id)
         .populate('sender')
         .populate({
             path: "comments",
@@ -54,54 +54,54 @@ controller.show = async function(req, res) {
                 path: "sender"
             }
         }).exec();
-    if(!Ann) {req.flash('error', 'Could not find announcement'); return res.redirect('back');}
+    if(!announcement) {req.flash('error', 'Could not find announcement'); return res.redirect('back');}
 
     if(req.user) {
-        if (objectArrIncludes(req.user.annCount, "announcement", Ann._id, "_id") > -1) {
-            req.user.annCount.splice(objectArrIncludes(req.user.annCount, "announcement", Ann._id, "_id"), 1);
+        if (objectArrIncludes(req.user.annCount, "announcement", announcement._id, "_id") > -1) {
+            req.user.annCount.splice(objectArrIncludes(req.user.annCount, "announcement", announcement._id, "_id"), 1);
             await req.user.save();
         }
     }
 
     let fileExtensions = new Map();
-    for (let media of Ann.imageFiles) {
+    for (let media of announcement.imageFiles) {
         fileExtensions.set(media.url, path.extname(media.url.split("SaberChat/")[1]));
     }
-    const convertedText = convertToLink(Ann.text);
-    return res.render('announcements/show', {announcement: Ann, convertedText, fileExtensions});
+    const convertedText = convertToLink(announcement.text);
+    return res.render('announcements/show', {announcement, convertedText, fileExtensions});
 };
 
 // Ann GET edit form
 controller.updateForm = async function(req, res) {
-    const Ann = await Announcement.findById(req.params.id);
-    if(!Ann) {req.flash('error', 'Could not find announcement'); return res.redirect('back');}
-    if(!Ann.sender._id.equals(req.user._id)) {
+    const announcement = await Announcement.findById(req.params.id);
+    if(!announcement) {req.flash('error', 'Could not find announcement'); return res.redirect('back');}
+    if(!announcement.sender._id.equals(req.user._id)) {
         req.flash('error', 'You do not have permission to do that.');
         return res.redirect('back');
     }
 
     let fileExtensions = new Map();
-    for (let media of Ann.imageFiles) {
+    for (let media of announcement.imageFiles) {
         fileExtensions.set(media.url, path.extname(media.url.split("SaberChat/")[1]));
     }
-    return res.render('announcements/edit', { announcement: Ann, fileExtensions });
+    return res.render('announcements/edit', { announcement, fileExtensions });
 };
 
 // Ann POST create
 controller.create = async function(req, res) {
-    const Ann = await Announcement.create({
+    const announcement = await Announcement.create({
         sender: req.user,
         subject: req.body.subject,
         text: req.body.message
     });
-    if (!Ann) {
+    if (!announcement) {
         req.flash('error', 'Unable to create announcement');
         return res.redirect('back');
     }
 
     if (req.body.images) { //If any images were added (if not, the 'images' property is null)
         for (const image in req.body.images) {
-            Ann.images.push(req.body.images[image]);
+            announcement.images.push(req.body.images[image]);
         }
     }
 
@@ -123,7 +123,7 @@ controller.create = async function(req, res) {
                     return res.redirect('back');
                 }
 
-                Ann.imageFiles.push({
+                announcement.imageFiles.push({
                     filename: cloudResult.public_id,
                     url: cloudResult.secure_url,
                     originalName: file.originalname
@@ -132,8 +132,8 @@ controller.create = async function(req, res) {
         }
     }
 
-    Ann.date = dateFormat(Ann.created_at, "h:MM TT | mmm d");
-    await Ann.save();
+    announcement.date = dateFormat(announcement.created_at, "h:MM TT | mmm d");
+    await announcement.save();
 
     const Users = await User.find({
         authenticated: true,
@@ -145,21 +145,21 @@ controller.create = async function(req, res) {
     }
 
     let imageString = "";
-    for (const image of Ann.images) {
+    for (const image of announcement.images) {
         imageString += `<img src="${image}">`;
     }
 
     for (let user of Users) {
         if (user.receiving_emails) {
-            const emailText = `<p>Hello ${user.firstName},</p><p>${req.user.username} has recently posted a new announcement - '${Ann.subject}'.</p><p>${Ann.text}</p><p>You can access the full announcement at https://alsion-saberchat.herokuapp.com</p> ${imageString}`;
-            await sendGridEmail(user.email, `New Saberchat Announcement - ${Ann.subject}`, emailText, false);
-            user.annCount.push({announcement: Ann, version: "new"});
+            const emailText = `<p>Hello ${user.firstName},</p><p>${req.user.username} has recently posted a new announcement - '${announcement.subject}'.</p><p>${announcement.text}</p><p>You can access the full announcement at https://alsion-saberchat.herokuapp.com</p> ${imageString}`;
+            await sendGridEmail(user.email, `New Saberchat Announcement - ${announcement.subject}`, emailText, false);
+            user.annCount.push({announcement, version: "new"});
             await user.save();
         }
     }
 
     req.flash('success', 'Announcement posted to bulletin!');
-    return res.redirect(`/announcements/${Ann._id}`);
+    return res.redirect(`/announcements/${announcement._id}`);
 };
 
 controller.updateAnn = async function(req, res) {
@@ -174,39 +174,39 @@ controller.updateAnn = async function(req, res) {
         return res.redirect('back');
     }
 
-    const updatedAnnouncement = await Announcement.findByIdAndUpdate(req.params.id, {
+    const updatedAnn = await Announcement.findByIdAndUpdate(req.params.id, {
         subject: req.body.subject,
         text: req.body.message
     });
-    if (!updatedAnnouncement) {
+    if (!updatedAnn) {
         req.flash('error', "Unable to update announcement");
         return res.redirect('back');
     }
 
-    updatedAnnouncement.images = []; //Empty image array so that you can fill it with whatever images are added (all images are there, not just new ones)
+    updatedAnn.images = []; //Empty image array so that you can fill it with whatever images are added (all images are there, not just new ones)
     if (req.body.images) { //Only add images if any are provided
         for (const image in req.body.images) {
-            updatedAnnouncement.images.push(req.body.images[image]);
+            updatedAnn.images.push(req.body.images[image]);
         }
     }
 
     let cloudErr;
     let cloudResult;
-    for (let i = updatedAnnouncement.imageFiles.length-1; i >= 0; i--) {
-        if (req.body[`deleteUpload-${updatedAnnouncement.imageFiles[i].url}`] && updatedAnnouncement.imageFiles[i] && updatedAnnouncement.imageFiles[i].filename) {
-            if ([".mp3", ".mp4", ".m4a", ".mov"].includes(path.extname(updatedAnnouncement.imageFiles[i].url.split("SaberChat/")[1]).toLowerCase())) {
-                [cloudErr, cloudResult] = await cloudDelete(updatedAnnouncement.imageFiles[i].filename, "video");
-            } else if (path.extname(updatedAnnouncement.imageFiles[i].url.split("SaberChat/")[1]).toLowerCase() == ".pdf") {
-                [cloudErr, cloudResult] = await cloudDelete(updatedAnnouncement.imageFiles[i].filename, "pdf");
+    for (let i = updatedAnn.imageFiles.length-1; i >= 0; i--) {
+        if (req.body[`deleteUpload-${updatedAnn.imageFiles[i].url}`] && updatedAnn.imageFiles[i] && updatedAnn.imageFiles[i].filename) {
+            if ([".mp3", ".mp4", ".m4a", ".mov"].includes(path.extname(updatedAnn.imageFiles[i].url.split("SaberChat/")[1]).toLowerCase())) {
+                [cloudErr, cloudResult] = await cloudDelete(updatedAnn.imageFiles[i].filename, "video");
+            } else if (path.extname(updatedAnn.imageFiles[i].url.split("SaberChat/")[1]).toLowerCase() == ".pdf") {
+                [cloudErr, cloudResult] = await cloudDelete(updatedAnn.imageFiles[i].filename, "pdf");
             } else {
-                [cloudErr, cloudResult] = await cloudDelete(updatedAnnouncement.imageFiles[i].filename, "image");
+                [cloudErr, cloudResult] = await cloudDelete(updatedAnn.imageFiles[i].filename, "image");
             }
             // check for failure
             if (cloudErr || !cloudResult || cloudResult.result !== 'ok') {
                 req.flash('error', 'Error deleting uploaded image');
                 return res.redirect('back');
             }
-            updatedAnnouncement.imageFiles.splice(i, 1);
+            updatedAnn.imageFiles.splice(i, 1);
         }
     }
 
@@ -226,7 +226,7 @@ controller.updateAnn = async function(req, res) {
                     return res.redirect('back');
                 }
 
-                updatedAnnouncement.imageFiles.push({
+                updatedAnn.imageFiles.push({
                     filename: cloudResult.public_id,
                     url: cloudResult.secure_url,
                     originalName: file.originalname
@@ -235,7 +235,7 @@ controller.updateAnn = async function(req, res) {
         }
     }
 
-    await updatedAnnouncement.save();
+    await updatedAnn.save();
     const users = await User.find({authenticated: true, _id: {$ne: req.user._id}});
     if (!users) {
         req.flash('error', "An Error Occurred");
@@ -253,36 +253,36 @@ controller.updateAnn = async function(req, res) {
         }
 
         //If announcement not already in user's anncount, add it
-        if (objectArrIncludes(user.annCount, "announcement", updatedAnnouncement._id) == -1) {
-            user.annCount.push({announcement: updatedAnnouncement, version: "updated"});
+        if (objectArrIncludes(user.annCount, "announcement", updatedAnn._id) == -1) {
+            user.annCount.push({announcement: updatedAnn, version: "updated"});
             await user.save();
         }
     }
 
     req.flash('success', 'Announcement Updated!');
-    return res.redirect(`/announcements/${updatedAnnouncement._id}`);
+    return res.redirect(`/announcements/${updatedAnn._id}`);
 }
 
 // Ann PUT like ann
 controller.likeAnn = async function(req, res) {
-    const Ann = await Announcement.findById(req.body.announcement);
-    if(!Ann) {return res.json({error: 'Error updating announcement.'});}
+    const announcement = await Announcement.findById(req.body.announcement);
+    if(!announcement) {return res.json({error: 'Error updating announcement.'});}
 
-    if (Ann.likes.includes(req.user._id)) { //Remove like
-        Ann.likes.splice(Ann.likes.indexOf(req.user._id), 1);
-        await Ann.save();
+    if (announcement.likes.includes(req.user._id)) { //Remove like
+        announcement.likes.splice(announcement.likes.indexOf(req.user._id), 1);
+        await announcement.save();
 
         return res.json({
-            success: `Removed a like from ${Ann.subject}`,
-            likeCount: Ann.likes.length
+            success: `Removed a like from ${announcement.subject}`,
+            likeCount: announcement.likes.length
         });
     } else {
-        Ann.likes.push(req.user._id);
-        await Ann.save();
+        announcement.likes.push(req.user._id);
+        await announcement.save();
 
         return res.json({
-            success: `Liked ${Ann.subject}`,
-            likeCount: Ann.likes.length
+            success: `Liked ${announcement.subject}`,
+            likeCount: announcement.likes.length
         });
     }
 };

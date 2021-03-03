@@ -490,7 +490,7 @@ controller.manage = async function(req, res) {
     if (req.query.orders) { //If route calls to display orders
         await controller.manageOrders(req, res);
 
-    // } else if (req.query.data) { //If page calls to display data
+    // } else if (req.query.data) { //If route calls to display data
     //     const customers = await User.find({authenticated: true}); if (!customers) {return false;}
     //     const items = await Item.find({}); if (!items) {return false;}
     //     const allOrders = await Order.find({}); if (!allOrders) {return false;}
@@ -502,7 +502,7 @@ controller.manage = async function(req, res) {
     //     }
     //     return res.render("cafe/data", data);
 
-    } else {
+    } else { //If route calls to display regular management
         await controller.manageCafe(req, res);
     }
 }
