@@ -8,10 +8,10 @@ const {equateObjects} = require("../utils/object-operations");
 const {getHours, sortTimes, getStats} = require('../utils/time');
 
 module.exports = async function(customers, items, orders) {
-    //Calculate most popular and lucrative customers, and customers with the longest orders
-    let popularCustomers = [];
-    let longestOrderCustomers = [];
-    let lucrativeCustomers = [];
+    const data = {items}; //Object with all collected cafe data
+    data.popularCustomers = []; //Calculate most popular and lucrative customers, and customers with the longest orders
+    data.longestOrderCustomers = [];
+    data.lucrativeCustomers = [];
     let orderLength = 0;
     let spent = 0;
 
@@ -20,30 +20,33 @@ module.exports = async function(customers, items, orders) {
         customerOrders = await Order.find({customer: customer._id}); if (!customerOrders) {return false;}
         orderLength = 0;
         spent = 0;
-        for (let order of customerOrders) {
+        for (let order of customerOrders) { //Calculate average order length and total spent based on individual orders and charges
             orderLength += order.items.length/orders.length;
             spent += order.charge;
         }
-        popularCustomers.push({customer, orderCount: customerOrders.length, date: customer.created_at});
-        longestOrderCustomers.push({customer, orderLength, date: customer.created_at});
-        lucrativeCustomers.push({customer, spent, avgCharge: Math.round((spent/orders.length)*100)/100, date: customer.created_at});
+
+        //Add objects with each group of data to arrays
+        data.popularCustomers.push({customer, orderCount: customerOrders.length, date: customer.created_at});
+        data.longestOrderCustomers.push({customer, orderLength, date: customer.created_at});
+        data.lucrativeCustomers.push({customer, spent, avgCharge: Math.round((spent/orders.length)*100)/100, date: customer.created_at});
     }
 
-    popularCustomers = sortByPopularity(popularCustomers, "orderCount", "date", null).popular;
-    longestOrderCustomers = sortByPopularity(longestOrderCustomers, "orderLength", "date", null).popular;
-    lucrativeCustomers = sortByPopularity(lucrativeCustomers, "spent", "date", null).popular;
+    //Sort objects
+    data.popularCustomers = sortByPopularity(data.popularCustomers, "orderCount", "date", null).popular;
+    data.longestOrderCustomers = sortByPopularity(data.longestOrderCustomers, "orderLength", "date", null).popular;
+    data.lucrativeCustomers = sortByPopularity(data.lucrativeCustomers, "spent", "date", null).popular;
 
-    //Evaluate the most purchased items
-    const upvotedItems = sortByPopularity(items, "upvotes", "created_at", null).popular;
+    //Evaluate the most purchased and upvoted items
+    data.upvotedItems = sortByPopularity(items, "upvotes", "created_at", null).popular;
     let orderedItems = [];
-    let orderedQuantities = [];
+    data.orderedQuantities = [];
 
     let itemCount = 0; //Total number of orders for this item
     let itemOrderedCount = 0; //Number of instances the item was ordered
     for (let item of items) {
         itemCount = 0;
         itemOrderedCount = 0;
-        for (let order of orders) {
+        for (let order of orders) { //Iterate through orders and increment the amount ordered
             for (let orderItem of order.items) {
                 if (orderItem.item.equals(item._id)) {
                     itemCount += orderItem.quantity;
@@ -52,14 +55,15 @@ module.exports = async function(customers, items, orders) {
             }
         }
 
+        //Add objects with packaged data
         orderedItems.push({item, orderCount: itemCount, date: item.created_at});
         if (itemOrderedCount == 0) {
-            orderedQuantities.push({item, numOrders: itemOrderedCount, orderCount: itemCount, avgQuantity: 0});
+            data.orderedQuantities.push({item, numOrders: itemOrderedCount, orderCount: itemCount, avgQuantity: 0});
         } else {
-            orderedQuantities.push({item, numOrders: itemOrderedCount, orderCount: itemCount, avgQuantity: itemCount/itemOrderedCount});
+            data.orderedQuantities.push({item, numOrders: itemOrderedCount, orderCount: itemCount, avgQuantity: itemCount/itemOrderedCount});
         }
     }
-    const popularOrderedItems = sortByPopularity(orderedItems, "orderCount", "date", null).popular;
+    data.popularOrderedItems = sortByPopularity(orderedItems, "orderCount", "date", null).popular;
 
     //Calculate common item combinations
     let itemCombos = [];
@@ -72,50 +76,44 @@ module.exports = async function(customers, items, orders) {
         itemCombos.push({items: itemCombo});
     }
 
+    //Sort combinations
     let combinations = equateObjects(itemCombos, "items");
-    let populatedCombinations = [];
+    data.combinations = [];
     let populatedCombination = [];
     let populatedItem;
 
-    for (let combo of combinations) {
+    for (let combo of combinations) { //Iterate through combinations and populate their info
         populatedCombination = [];
         for (let object of combo.objects) {
             populatedItem = await Item.findById(object);
             if (!populatedItem) {return false;}
             populatedCombination.push(populatedItem);
         }
-        populatedCombinations.push({combination: populatedCombination, instances: combo.instances});
+        data.combinations.push({combination: populatedCombination, instances: combo.instances});
     }
 
-    //Calculate popularity at various price points
-    let pricepoints = new Map();
+    data.pricepoints = new Map(); //Calculate popularity at various price points
     for (let item of items) {
-        pricepoints.set(item._id.toString(), new Map());
+        data.pricepoints.set(item._id.toString(), new Map());
     }
 
-    for (let order of orders) {
+    for (let order of orders) { //Iterate through orders and set their price points
         for (let item of order.items) {
-            if (pricepoints.get(item.item._id.toString()).has(item.price)) {
-                pricepoints.get(item.item._id.toString()).set(item.price, pricepoints.get(item.item._id.toString()).get(item.price) + 1);
+            if (data.pricepoints.get(item.item._id.toString()).has(item.price)) {
+                data.pricepoints.get(item.item._id.toString()).set(item.price, data.pricepoints.get(item.item._id.toString()).get(item.price) + 1);
             } else {
-                pricepoints.get(item.item._id.toString()).set(item.price, 1);
+                data.pricepoints.get(item.item._id.toString()).set(item.price, 1);
             }
         }
     }
 
-    //Calculate most common timeframes
-    let times = [];
+    let times = []; //Calculate most common timeframes using the times package
     for (let order of orders) {
         times.push(new Date(order.created_at));
     }
 
-    let formattedTimes = sortTimes(getHours(times).finalTimesUnformatted, getHours(times).finalTimes).formattedTimes;
-    let timeStats = getStats(sortTimes(getHours(times).finalTimesUnformatted, getHours(times).finalTimes).times);
+    data.times = sortTimes(getHours(times).finalTimesUnformatted, getHours(times).finalTimes).formattedTimes;
+    data.timeStats = getStats(sortTimes(getHours(times).finalTimesUnformatted, getHours(times).finalTimes).times);
 
-    return {
-        items, popularCustomers, longestOrderCustomers,
-        lucrativeCustomers, popularOrderedItems, upvotedItems,
-        orderedQuantities, combinations: populatedCombinations,
-        pricepoints, times: formattedTimes, timeStats
-    }
+    return data;
 }

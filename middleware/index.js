@@ -37,7 +37,7 @@ middleware.checkForLeave = async function(req, res, next) {
         return res.redirect('/chat')
     }
 
-    if (room.type != 'private') {
+    if (!room.private) {
         req.flash('error', 'You cannot leave a public room.');
         return res.redirect('back')
     }

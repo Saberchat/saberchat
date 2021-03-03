@@ -2,6 +2,7 @@ const mongoose = require("mongoose");
 
 var projectSchema = new mongoose.Schema({
     title: String,
+    poster: {type: mongoose.Schema.Types.ObjectId, ref: 'User'},
     images: [{type: String}],
     imageFiles: [{
         filename: String,
@@ -10,7 +11,6 @@ var projectSchema = new mongoose.Schema({
     }],
     text: String,
     date: String,
-    poster: {type: mongoose.Schema.Types.ObjectId, ref: 'User'},
     creators: [{type: mongoose.Schema.Types.ObjectId, ref: 'User'}],
     likes: [{type: mongoose.Schema.Types.ObjectId, ref: 'User'}],
     comments: [{type: mongoose.Schema.Types.ObjectId, ref: 'PostComment'}]

@@ -117,8 +117,8 @@ controller.createProject = async function(req, res) {
     project.date = dateFormat(project.created_at, "h:MM TT | mmm d");
     await project.save();
 
-    const followers = await User.find({authenticated: true, _id: {$in: req.user.followers}});
-    if (!followers) {
+    const users = await User.find({authenticated: true, _id: {$ne: req.user._id}});
+    if (!users) {
         req.flash('error', "Unable to access your followers");
         return res.redirect('back');
     }
@@ -130,12 +130,12 @@ controller.createProject = async function(req, res) {
         imageString += `<img style="width: 50%; height: 50%;" src="${image}"/>`;
     }
 
-    for (let follower of followers) {
+    for (let user of users) {
         notif = await Notification.create({
             subject: "New Project Post",
             sender: req.user,
             noReply: true,
-            recipients: [follower],
+            recipients: [user],
             read: [],
             toEveryone: false,
             images: project.images
@@ -146,15 +146,15 @@ controller.createProject = async function(req, res) {
         }
 
         notif.date = dateFormat(notif.created_at, "h:MM TT | mmm d");
-        notif.text = `Hello ${follower.firstName},\n\n${req.user.firstName} ${req.user.lastName} recently posted a new project: "${project.title}". Check it out!`;
+        notif.text = `Hello ${user.firstName},\n\n${req.user.firstName} ${req.user.lastName} recently posted a new project: "${project.title}". Check it out!`;
         await notif.save();
-        if (follower.receiving_emails) {
-            await sendGridEmail(follower.email, `New Project Post - ${project.title}`, `<p>Hello ${follower.firstName},</p><p>${req.user.firstName} ${req.user.lastName} recently posted a new project: <strong>${project.title}</strong>. Check it out!</p>${imageString}`, false);
+        if (user.receiving_emails) {
+            await sendGridEmail(user.email, `New Project Post - ${project.title}`, `<p>Hello ${user.firstName},</p><p>${req.user.firstName} ${req.user.lastName} recently posted a new project: <strong>${project.title}</strong>. Check it out!</p>${imageString}`, false);
         }
 
-        follower.inbox.push(notif); //Add notif to user's inbox
-        follower.msgCount += 1;
-        await follower.save();
+        user.inbox.push(notif); //Add notif to user's inbox
+        user.msgCount += 1;
+        await user.save();
 
     }
 
@@ -337,49 +337,7 @@ controller.updateProject = async function(req, res) {
             }
         }
     }
-
     await updatedProject.save();
-    const followers = await User.find({authenticated: true, _id: {$in: req.user.followers}});
-    if (!followers) {
-        req.flash('error', "Umable to access your followers");
-        return res.redirect('back');
-    }
-
-    let notif;
-    let imageString = ``;
-
-    for (let image of updatedProject.images) {
-        imageString += `<img style="width: 50%; height: 50%;" src="${image}"/>`;
-    }
-
-    for (let follower of followers) {
-
-        notif = await Notification.create({
-            subject: "New Project Post",
-            sender: req.user,
-            noReply: true,
-            recipients: [follower],
-            read: [],
-            toEveryone: false,
-            images: updatedProject.images
-        }); //Create a notification to alert the user
-
-        if (!notif) {
-            req.flash('error', 'Unable to send notification');
-            return res.redirect('back');
-        }
-
-        notif.date = dateFormat(notif.created_at, "h:MM TT | mmm d");
-        notif.text = `Hello ${follower.firstName},\n\n${req.user.firstName} ${req.user.lastName} recently updated one of their projects: "${updatedProject.title}". Check it out!`;
-        await notif.save();
-        if (follower.receiving_emails) {
-            await sendGridEmail(follower.email, `Updated Project Post - ${updatedProject.title}`, `<p>Hello ${follower.firstName},</p><p>${req.user.firstName} ${req.user.lastName} recently updated one of their projects: <strong>${updatedProject.title}</strong>. Check it out!</p>${imageString}`, false);
-        }
-
-        follower.inbox.push(notif); //Add notif to user's inbox
-        follower.msgCount += 1;
-        await follower.save();
-    }
 
     req.flash("success", "Project Updated!");
     return res.redirect(`/projects/${project._id}`);
@@ -496,8 +454,6 @@ controller.comment = async function(req, res) {
     }
 
     let notif;
-    let commentEmail;
-
     for (let user of users) {
         notif = await Notification.create({
             subject: `New Mention in ${project.title}`,

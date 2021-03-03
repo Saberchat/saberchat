@@ -40,11 +40,11 @@
         <a href="/chat" class="btn btn-primary" class="exit-button"><i class="fas fa-arrow-left"></i> Exit</a>
         <% if (room.mutable) { %>
             <% if (room.creator.equals(currentUser._id)) { %>
-                <% if (room.type == "private") { %>
+                <% if (room.private) { %>
                     <a class="btn btn-success" href="/chat/<%= room._id %>/people"><i class="fas fa-user"></i> People</a>
                 <% } %>
                 <a href="/chat/<%= room._id %>/edit" class="btn btn-secondary"><i class="fas fa-cog"></i> Room Settings</a>
-            <% } else if(room.type == 'private') { %>
+            <% } else if(room.private) { %>
                 <!-- leave button/form with bootstrap modal -->
                 <form action="/chat/<%= room._id %>/leave" method="post" id="leave-room">
                     <!-- Button trigger modal -->

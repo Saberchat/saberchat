@@ -14,9 +14,9 @@ const Status = require('../models/admin/status');
 
 const {sendGridEmail} = require("../services/sendGrid");
 const {objectArrIncludes} = require("../utils/object-operations");
-const controller = {};
+const controller = {}; //Controller object
 
-controller.moderateGet = async function(req, res) {
+controller.moderateGet = async function(req, res) { //Show all reported comments
     const comments = await Comment.find({status: 'flagged'})
     .populate({path: 'author', select: ['username', 'imageUrl']})
     .populate({path: 'statusBy', select: ['username', 'imageUrl']})
@@ -29,90 +29,66 @@ controller.moderateGet = async function(req, res) {
     return res.render('admin/mod', {comments});
 }
 
-controller.getContext = async function(req, res) {
+controller.getContext = async function(req, res) { //Get context for reported comment
     const reportedComment = await Comment.findById(req.body.commentId).populate("author");
     if (!reportedComment) {
         return res.json({error: "Unable to find comment"});
     }
 
-    let commentIndex;
-    let context = [];
-
-    const allComments = await Comment.find({room: reportedComment.room}).populate("author");
+    const allComments = await Comment.find({room: reportedComment.room}).populate("author"); //All comments from the reported comment's room
     if (!allComments) {
         return res.json({error: "Unable to find other comments"});
     }
 
-    for (let i = 0; i < allComments.length; i++) {
-        if (allComments[i]._id.equals(reportedComment._id)) {
-            commentIndex = i;
-            break;
-        }
-    }
+    const commentIndex = objectArrIncludes(allComments, "_id", reportedComment._id); //Get index of reported comment
+    let context = []; //Comments 5 before and 5 after
 
-    for (let i = 5; i >= 1; i--) {
-        if (commentIndex - i > 0) {
-            if (allComments[commentIndex - i].author) {
-                context.push(allComments[commentIndex - i]);
-            }
-        }
-    }
-    context.push(reportedComment);
-
-    for (let i = 1; i <= 5; i++) {
-        if (commentIndex + i < allComments.length) {
+    //Find the comments 5 before and 5 after the reported one, and add to array
+    for (let i = -5; i >= 5; i++) {
+        if (commentIndex + i > 0) {
             if (allComments[commentIndex + i].author) {
                 context.push(allComments[commentIndex + i]);
             }
         }
     }
-
     return res.json({success: "Succesfully collected data", context});
 }
 
-controller.moderatePut = async function(req, res) {
+controller.ignoreComment = async function(req, res) { //Ignore comment
     const comment = await Comment.findById(req.body.id).populate('statusBy');
-    if (!comment) {
-        return res.json({error: 'Could not find comment'});
-    }
+    if (!comment) { return res.json({error: 'Could not find comment'});}
 
-    if (comment.author.equals(req.user._id)) {
-        return res.json({error: "You cannot handle your own comments"});
-    }
-
-    if (comment.statusBy._id.equals(req.user._id)) {
-        return res.json({error: "You cannot handle comments you have reported"});
+    //Users cannot handle comments that they have written/reported
+    if (comment.author.equals(req.user._id) || comment.statusBy._id.equals(req.user._id)) {
+        return res.json({error: "You cannot handle comments that you have written or reported"});
     }
 
     comment.status = "ignored";
     await comment.save();
-    comment.statusBy.falseReportCount += 1;
+    comment.statusBy.falseReportCount += 1; //Mark that the person who reported comment has reported an inoffensive comment
     await comment.statusBy.save();
     return res.json({success: 'Ignored comment'});
 }
 
-controller.moderateDelete = async function(req, res) {
+controller.deleteComment = async function(req, res) {
     const comment = await Comment.findById(req.body.id).populate("author");
     if (!comment) {
         return res.json({error: 'Could not find comment'});
     }
 
-    if (comment.author.equals(req.user._id)) {
-        return res.json({error: "You cannot handle your own comments"});
-    }
-
-    if (comment.statusBy._id.equals(req.user._id)) {
-        return res.json({error: "You cannot handle comments you have reported"});
+    //Users cannot handle comments that they have written/reported
+    if (comment.author.equals(req.user._id) || comment.statusBy._id.equals(req.user._id)) {
+        return res.json({error: "You cannot handle comments that you have written or reported"});
     }
 
     comment.status = "deleted";
     await comment.save();
-    comment.author.reportedCount += 1;
+    comment.author.reportedCount += 1; //Mark that the person who wrote the comment has written an offensive comment
     await comment.author.save();
     return res.json({success: 'Deleted comment'});
 }
 
-controller.permissionsGet = async function(req, res) {
+controller.permissionsGet = async function(req, res) { //Show page with all users and their permissions
     const users = await User.find({authenticated: true});
     if (!users) {
         req.flash('error', 'An Error Occurred');
@@ -121,22 +97,48 @@ controller.permissionsGet = async function(req, res) {
     return res.render('admin/permission', {users});
 }
 
-controller.statusGet = async function(req, res) {
+controller.statusGet = async function(req, res) { //Show page with all users and their statuses
     const users = await User.find({authenticated: true});
     if (!users) {
         req.flash('error', 'An Error Occurred');
         return res.redirect('/admin');
     }
-    return res.render('admin/status', {users, tags: ['Cashier', 'Tutor', 'Editor']});
+    return res.render('admin/status', {users, tags: ['Cashier', 'Tutor', 'Editor']}); //List of tags that can be added/removed to tutors
 }
 
-controller.statusPut = async function(req, res) {
+controller.permissionsPut = async function (req, res) { //Update a user's permissions
+    const user = await User.findById(req.body.user);
+    if (!user) {
+        return res.json({error: "Error. Could not change"});
+    }
+
+    if (req.body.role == 'admin' || req.body.role == "principal") { //Changing a user to administrator or principal requires specific permissions
+        if (req.user.permission == 'principal') { // check if current user is the principal
+            user.permission = req.body.role;
+            user.save();
+            return res.json({success: "Succesfully changed", user});
+
+        } else {
+            return res.json({error: "You do not have permissions to do that", user});
+        }
+    }
+
+    if ((user.permission == "principal" || user.permission == "admin") && req.user.permission != "principal") { //More permission restructions
+        return res.json({error: "You do not have permissions to do that", user});
+    }
+
+    user.permission = req.body.role; //Update user's permission
+    await user.save();
+    return res.json({success: 'Succesfully changed', user});
+}
+
+controller.statusPut = async function(req, res) { //Update user's status
     const user = await User.findById(req.body.user);
     if (!user) {
         return res.json({error: 'Error. Could not change'});
     }
 
-    if (user.status == "faculty") {
+    if (user.status == "faculty") { //If user is currently teaching a course, they cannot lose their faculty status
         const courses = await Course.find({});
         if (!courses) {
             return res.json({error: "Error. Could not change", user});
@@ -148,7 +150,7 @@ controller.statusPut = async function(req, res) {
             }
         }
 
-        user.status = req.body.status;
+        user.status = req.body.status; //If no errors, update user's status
         await user.save();
         return res.json({success: "Succesfully changed", user});
     }
@@ -157,16 +159,16 @@ controller.statusPut = async function(req, res) {
     return res.json({success: "Successfully Changed", user});
 }
 
-controller.accesslistGet = async function(req, res) {
+controller.accesslistGet = async function(req, res) { //Show page with all permitted emails
     let emails;
-    if (req.query.version) {
+    if (req.query.version) { //If user wants a specific email list
         if (["accesslist", "blockedlist"].includes(req.query.version)) {
-            emails = await Email.find({name: {$ne: req.user.email}, version: req.query.version});
-        } else {
-            emails = await Email.find({name: {$ne: req.user.email}, version: "accesslist"});
+            emails = await Email.find({address: {$ne: req.user.email}, version: req.query.version});
+        } else { //If list is not access list or blocked list, use the access list
+            emails = await Email.find({address: {$ne: req.user.email}, version: "accesslist"});
         }
-    } else {
-        emails = await Email.find({name: {$ne: req.user.email}, version: "accesslist"});
+    } else { //If list is not specified, use the access list
+        emails = await Email.find({address: {$ne: req.user.email}, version: "accesslist"});
     }
 
     if (!emails) {
@@ -180,23 +182,29 @@ controller.accesslistGet = async function(req, res) {
         return res.redirect('back');
     }
 
-    if (req.query.version) {
+    if (req.query.version) { //Display list based on specified version
         if (["accesslist", "blockedlist"].includes(req.query.version)) {
             return res.render('admin/accesslist', {emails, users, version: req.query.version});
         }
     }
-
     return res.render('admin/accesslist', {emails, users, version: "accesslist"});
 }
 
-controller.accesslistPut = async function (req, res) {
-    if (req.body.version === "accesslist" && req.body.address.split('@')[1] === "alsionschool.org") {
-        return res.json({error: "Alsion emails do not need to be added to the accesslist"});
+controller.addEmail = async function (req, res) { //Add email to access list/blocked list
+    if (req.body.version === "accesslist" && req.body.address.split('@')[1] === "alsionschool.org") { //These emails are already verified
+        return res.json({error: "Alsion emails do not need to be added to the Access List"});
     }
 
     const overlap = await Email.findOne({address: req.body.address});
     if (overlap) { //If any emails overlap, don't create the new email
-        return res.json({error: "Email is already either in accesslist or blockedlist"});
+        return res.json({error: "Email is already either in Access List or Blocked List"});
+    }
+
+    if (req.body.version == "blockedlist") {
+        const user = await User.findOne({email: req.body.address});
+        if (user) {
+            return res.json({error: "A user with that email already exists"});
+        }
     }
 
     const email = await Email.create({address: req.body.address, version: req.body.version});
@@ -206,7 +214,7 @@ controller.accesslistPut = async function (req, res) {
     return res.json({success: "Email added", email});
 }
 
-controller.accesslistId = async function (req, res) {
+controller.deleteEmail = async function (req, res) { //Remove email from access list/blocked list
     const email = await Email.findById(req.body.email);
     if (!email) {
         return res.json({error: "Unable to find email"});
@@ -225,32 +233,6 @@ controller.accesslistId = async function (req, res) {
         return res.json({success: "Deleted email"});
     }
     return res.json({error: "Active user has this email"});
-}
-
-controller.permissionsPut = async function (req, res) {
-    const user = await User.findById(req.body.user);
-    if (!user) {
-        return res.json({error: "Error. Could not change"});
-    }
-
-    if (req.body.role == 'admin' || req.body.role == "principal") { //Changing a user to administrator or principal requires specific permissions
-        if (req.user.permission == 'principal') { // check if current user is the principal
-            user.permission = req.body.role;
-            user.save();
-            return res.json({success: "Succesfully changed", user});
-
-        } else {
-            return res.json({error: "You do not have permissions to do that", user});
-        }
-    }
-
-    if ((user.permission == "principal" || user.permission == "admin") && req.user.permission != "principal") {
-        return res.json({error: "You do not have permissions to do that", user});
-    }
-
-    user.permission = req.body.role;
-    await user.save();
-    return res.json({success: 'Succesfully changed', user});
 }
 
 controller.tag = async function(req, res) {

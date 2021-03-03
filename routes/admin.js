@@ -7,8 +7,8 @@ const router = express.Router(); //Router
 router.route("/moderate")
     .get(middleware.isLoggedIn, middleware.isMod, wrapAsync(admin.moderateGet)) //View all reported comments
     .post(middleware.isLoggedIn, middleware.isMod, wrapAsync(admin.getContext)) //Get context for reported comment
-    .put(middleware.isLoggedIn, middleware.isMod, wrapAsync(admin.moderatePut)) //Ignore reported comment
-    .delete(middleware.isLoggedIn, middleware.isMod, wrapAsync(admin.moderateDelete)); //Delete reported comment
+    .put(middleware.isLoggedIn, middleware.isMod, wrapAsync(admin.ignoreComment)) //Ignore reported comment
+    .delete(middleware.isLoggedIn, middleware.isMod, wrapAsync(admin.deleteComment)); //Delete reported comment
 
 router.route("/permissions")
     .get(middleware.isLoggedIn, middleware.isAdmin, wrapAsync(admin.permissionsGet)) //Show list of users with permissions
@@ -20,8 +20,8 @@ router.route("/status")
 
 router.route("/accesslist")
     .get(middleware.isLoggedIn, middleware.isMod, wrapAsync(admin.accesslistGet)) //Show either access list or blocked list
-    .put(middleware.isLoggedIn, middleware.isMod, wrapAsync(admin.accesslistPut)) //Update access/blocked list
-    .delete(middleware.isLoggedIn, middleware.isMod, wrapAsync(admin.accesslistId)); //Remove email from access/blocked list
+    .put(middleware.isLoggedIn, middleware.isMod, wrapAsync(admin.addEmail)) //Update access/blocked list
+    .delete(middleware.isLoggedIn, middleware.isMod, wrapAsync(admin.deleteEmail)); //Remove email from access/blocked list
 
 router.put('/tag', middleware.isLoggedIn, middleware.isMod, wrapAsync(admin.tag));
 

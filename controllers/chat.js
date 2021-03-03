@@ -89,7 +89,7 @@ controller.showMembers = async function(req, res) {
         req.flash('error', "Unable to find room");
         return res.redirect('back');
     }
-    if (room.type == "private") {
+    if (room.private) {
         return res.render('chat/people', {room});
     }
     req.flash("error", "Public rooms are open to all users");
@@ -147,7 +147,7 @@ controller.createRoom = async function(req, res) {
             for (const user in req.body.check) {
                 room.members.push(user);
             }
-            room.type = 'private';
+            room.private = true;
         }
         if (req.body.moderate == 'false') {
             room.moderate = false;
@@ -297,9 +297,9 @@ controller.updateRoom = async function(req, res) {
         for (const aUser in req.body.checkAdd) {
             room.members.push(aUser);
         }
-        room.type = 'private';
+        room.private = true;
     } else {
-        room.type = 'public';
+        room.private = false;
     }
 
     if (req.body.moderate == 'false') {

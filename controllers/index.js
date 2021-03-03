@@ -8,10 +8,19 @@ const {sendGridEmail} = require("../services/sendGrid");
 const User = require('../models/user');
 const Email = require('../models/admin/email');
 const Announcement = require('../models/announcements/announcement');
+const Room = require('../models/chat/room');
 
 const controller = {};
 
 controller.index = function(req, res) {
+    Room.find({}, (err, rooms) => {
+        for (let room of rooms) {
+            if (room.private) {
+                room.private = true;
+                room.save();
+            }
+        }
+    })
     return res.render('index');
 }
 

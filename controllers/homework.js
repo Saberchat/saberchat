@@ -677,7 +677,7 @@ controller.bookTutor = async function(req, res) {
                 name: `${req.user.firstName}'s Tutoring Sessions With ${tutor.tutor.firstName} - ${course.name}`,
                 creator: tutor.tutor._id,
                 members: [req.user._id, tutor.tutor._id],
-                type: "private",
+                private: true,
                 mutable: false
             });
             if (!room) {

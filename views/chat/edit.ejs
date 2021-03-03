@@ -68,7 +68,7 @@
                 <div class="form-check mb-3">
                     <input name="type" id="roomType" type="checkbox" onclick="updateDisplay()" class="form-check-input"
                            value="true"
-                    <% if (room.type == 'private') { %>
+                    <% if (room.private) { %>
                            checked
                             <% } %>
                     >
@@ -77,10 +77,10 @@
 
                 <div id="remove-block">
                     <h4>Remove Members</h4>
-                    <div class="search-filter mb-3">
+                    <div class="search-filter mb-3 mode">
                         <i class="fas fa-search"></i>
                         <input id="remove-search-input" oninput="searchFunction('remove')"
-                               class="form-control  search-input" type="text" placeholder="Search..."
+                               class="form-control mode search-input" type="text" placeholder="Search..."
                                title="Type in Username">
                     </div>
                     <div id="remove-user-list" class="user-list">
@@ -99,9 +99,9 @@
 
                 <div id="add-block">
                     <h4>Add Members</h4>
-                    <div class="search-filter mb-3">
+                    <div class="search-filter mb-3" mode>
                         <i class="fas fa-search"></i>
-                        <input id="add-search-input" oninput="searchFunction('add')" class="form-control  search-input"
+                        <input id="add-search-input" oninput="searchFunction('add')" class="form-control mode search-input"
                                type="text" placeholder="Search..." title="Type in Username">
                     </div>
                     <div id="add-user-list" class="user-list">

@@ -104,7 +104,7 @@
                     <p class="mb-1 darkmode-header">Request access to join new rooms.</p>
                 </li>
                 <% rooms.forEach(room => { %>
-                    <% if (room.type == 'private' && !(room.members.includes(currentUser._id)) && room.mutable) { %>
+                    <% if (room.private && !(room.members.includes(currentUser._id)) && room.mutable) { %>
                         <li class="list-group-item list-group-item-action cafe">
                             <%= room.name %>
                             <% let roomRequested = false; %>
