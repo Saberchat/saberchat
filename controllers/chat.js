@@ -308,7 +308,7 @@ controller.updateRoom = async function(req, res) {
         room.moderate = true;
     }
 
-    room.save();
+    await room.save();
     req.flash('success', 'Updated your group');
     return res.redirect('/chat/' + room._id);
 }

@@ -298,16 +298,16 @@ controller.markReadSelected = async function(req, res) {
             $push: {read: req.user._id}
         });
     req.user.msgCount -= result.nModified;
-    req.user.save();
+    await req.user.save();
     req.flash('success', 'Marked as read');
     return res.redirect('back');
 };
 
 // Inbox DELETE clear inbox
-controller.clear = function(req, res) {
+controller.clear = async function(req, res) {
     req.user.inbox = [];
 	req.user.msgCount = 0;
-	req.user.save();
+	await req.user.save();
 	req.flash('success', 'Inbox cleared!');
 	return res.redirect('/inbox');
 };
@@ -402,36 +402,36 @@ controller.showReq = async function(req, res) {
 };
 
 controller.acceptReq = async function(req, res) {
-    const Req = await AccessReq.findById(req.params.id)
+    const request = await AccessReq.findById(req.params.id)
     .populate({path: 'room', select: ['creator']}).populate('requester').exec();
 
-    if(!Req) {
+    if(!request) {
         req.flash("error", "An Error Occurred");
         return res.redirect('back');
 
-    } else if(!Req.room.creator.equals(req.user._id)) {
+    } else if(!request.room.creator.equals(req.user._id)) {
         req.flash("error", "You do not have permission to do that");
         return res.redirect('back');
 
-    } else if(Req.status != 'pending') {
+    } else if(request.status != 'pending') {
         req.flash('error', 'Request already handled');
         return res.redirect('back');
 
     }
 
-    const room = await Room.findById(Req.room._id);
+    const room = await Room.findById(request.room._id);
     if(!room) { req.flash("error", "An Error Occurred");return res.redirect('back'); }
 
-    room.members.push(Req.requester);
-    Req.status = 'accepted';
+    room.members.push(request.requester);
+    request.status = 'accepted';
     req.user.reqCount --;
     await room.save();
-    await Req.save();
+    await request.save();
     await req.user.save();
 
-    if(Req.requester.receiving_emails) {
-        const emailText = `<p>Hello ${Req.requester.firstName},</p><p>Your request to join chat room <strong>${room.name}</strong> has been accepted!<p><p>You can access the room at https://alsion-saberchat.herokuapp.com</p>`;
-        await sendGridEmail(Req.requester.email, `Room Request Accepted - ${room.name}`, emailText, false);
+    if(request.requester.receiving_emails) {
+        const emailText = `<p>Hello ${request.requester.firstName},</p><p>Your request to join chat room <strong>${room.name}</strong> has been accepted!<p><p>You can access the room at https://alsion-saberchat.herokuapp.com</p>`;
+        await sendGridEmail(request.requester.email, `Room Request Accepted - ${room.name}`, emailText, false);
     }
 
     req.flash('success', 'Request accepted');
@@ -439,31 +439,31 @@ controller.acceptReq = async function(req, res) {
 };
 
 controller.rejectReq = async function(req, res) {
-    const Req = await AccessReq.findById(req.params.id)
+    const request = await AccessReq.findById(req.params.id)
     .populate('room').populate('requester').exec();
 
-    if(!Req) {
+    if(!request) {
         req.flash("error", "An Error Occurred");
         return res.redirect('back');
 
-    } else if(!Req.room.creator.equals(req.user._id)) {
+    } else if(!request.room.creator.equals(req.user._id)) {
         req.flash("error", "You do not have permission to do that");
         return res.redirect('back');
 
-    } else if(Req.status != 'pending') {
+    } else if(request.status != 'pending') {
         req.flash('error', 'Request already handled');
         return res.redirect('back');
 
     }
-    Req.status = 'rejected';
+    request.status = 'rejected';
     req.user.reqCount --;
-    await Req.save();
+    await request.save();
     await req.user.save();
 
-    if(Req.requester.receiving_emails) {
-        const emailText = `<p>Hello ${Req.requester.firstName},</p><p>Your request to join chat room <strong>${Req.room.name}</strong> has been rejected. Contact the room creator, <strong>${Req.room.creator.username}</strong>, if you think that there has been a mistake.</p>`;
+    if(request.requester.receiving_emails) {
+        const emailText = `<p>Hello ${request.requester.firstName},</p><p>Your request to join chat room <strong>${request.room.name}</strong> has been rejected. Contact the room creator, <strong>${request.room.creator.username}</strong>, if you think that there has been a mistake.</p>`;
 
-        await sendGridEmail(Req.requester.email, `Room Request Rejected - ${Req.room.name}`, emailText, false);
+        await sendGridEmail(request.requester.email, `Room Request Rejected - ${request.room.name}`, emailText, false);
     }
 
     req.flash('success', 'Request rejected');

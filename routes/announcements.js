@@ -16,8 +16,8 @@ router.route('/')
     .post(middleware.isLoggedIn, middleware.isMod, multipleUpload, validateAnn, wrapAsync(announcements.create)); //Create announcement
 
 router.get('/new', middleware.isLoggedIn, middleware.isMod, announcements.new); //Form to create new announcement
-router.get('/mark-all', middleware.isLoggedIn, announcements.markAll); //Mark all announcements as read
-router.get('/mark/:id', middleware.isLoggedIn, announcements.markOne); //Mark specific announcement as read
+router.get('/mark-all', middleware.isLoggedIn, wrapAsync(announcements.markAll)); //Mark all announcements as read
+router.get('/mark/:id', middleware.isLoggedIn, wrapAsync(announcements.markOne)); //Mark specific announcement as read
 
 router.put('/like', middleware.isLoggedIn, wrapAsync(announcements.likeAnn)); //Like announcement
 router.put('/like-comment', middleware.isLoggedIn, wrapAsync(announcements.likeComment)); //Comment on announcement

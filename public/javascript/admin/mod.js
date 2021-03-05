@@ -1,34 +1,38 @@
-let loaded = [];
+let loaded = []; //Stores which comments have had their contexts loaded (so that comments are not doubled)
 
-const ignoreComment = function (button) {
+const ignoreComment = function (button) { //Ignore a reported comment
     const url = '/admin/moderate?_method=put';
     const commentId = button.id.split('-')[1];
     const listItem = document.getElementById(`comment-${commentId}`);
-    $.post(url, {id: commentId}, data => {
+    const data = {commentId};
+
+    $.post(url, data, data => {
         $(`#modal-ignore-${commentId}`).modal('hide');
-        if (data.success) {
+        if (data.success) { //If successful response, remove comment from list
             listItem.remove();
-            const reportedComments = document.getElementsByClassName("reported-comment");
+            const reportedComments = document.getElementsByClassName("reported-comment"); //If there are no reported comments, change reported comment message
             if (reportedComments.length == 0) {
                 document.getElementById("reported-comments-header").innerText = "No Reported Comments";
             }
 
-        } else if (data.error) {
+        } else if (data.error) { //If unsuccesssful response, display an error message
             document.getElementById("mod-error").innerText = data.error;
             document.getElementById("mod-error").style.display = "inline";
 
-            setTimeout(() => {
+            setTimeout(() => { //After a second, remove the error message
                 document.getElementById("mod-error").style.display = "none";
             }, 1000);
         }
     });
 }
 
-const deleteComment = function (button) {
+const deleteComment = function (button) { //Delete a reported comment
     const url = '/admin/moderate?_method=delete';
     const commentId = button.id.split('-')[1];
     const listItem = document.getElementById(`comment-${commentId}`);
-    $.post(url, {id: commentId}, data => {
+    const data = {commentId};
+
+    $.post(url, data, data => {
         $(`#modal-delete-${commentId}`).modal('hide');
         if (data.success) {
             listItem.remove();

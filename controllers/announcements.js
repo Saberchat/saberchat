@@ -27,18 +27,18 @@ controller.new = function(req, res) {
 };
 
 // Ann GET markall ann as read
-controller.markAll = function(req, res) {
+controller.markAll = async function(req, res) {
     req.user.annCount = []; //No new announcements in user's annCount
-    req.user.save();
+    await req.user.save();
     req.flash('success', 'All Announcements Marked As Read!');
     return res.redirect(`/announcements`);
 };
 
 // Ann GET mark one ann as read
-controller.markOne = function(req, res) {
+controller.markOne = async function(req, res) {
     if (objectArrIncludes(req.user.annCount, "announcement", req.params.id) > -1) {
         req.user.annCount.splice(objectArrIncludes(req.user.annCount, "announcement", req.params.id), 1);
-        req.user.save();
+        await req.user.save();
     }
     req.flash('success', 'Announcement Marked As Read!');
     return res.redirect(`/announcements`);
@@ -265,7 +265,7 @@ controller.updateAnn = async function(req, res) {
 
 // Ann PUT like ann
 controller.likeAnn = async function(req, res) {
-    const announcement = await Announcement.findById(req.body.announcement);
+    const announcement = await Announcement.findById(req.body.announcementId);
     if(!announcement) {return res.json({error: 'Error updating announcement.'});}
 
     if (announcement.likes.includes(req.user._id)) { //Remove like
@@ -378,16 +378,14 @@ controller.likeComment = async function(req, res) {
             success: `Removed a like`,
             likeCount: comment.likes.length
         });
-
-    } else { //Add Like
-        comment.likes.push(req.user._id);
-        comment.save();
-
-        return res.json({
-            success: `Liked comment`,
-            likeCount: comment.likes.length
-        });
     }
+
+    comment.likes.push(req.user._id); //Add Like
+    await comment.save();
+    return res.json({
+        success: `Liked comment`,
+        likeCount: comment.likes.length
+    });
 }
 
 controller.deleteAnn = async function(req, res) {

@@ -155,7 +155,6 @@ controller.createProject = async function(req, res) {
         user.inbox.push(notif); //Add notif to user's inbox
         user.msgCount += 1;
         await user.save();
-
     }
 
     req.flash('success', "Project Posted!");
@@ -167,7 +166,6 @@ controller.editProject = async function(req, res) {
     const project = await Project.findById(req.params.id)
         .populate('poster')
         .populate('creators');
-        //Find one project based on id provided in form
     if (!project) {
         req.flash('error', 'Unable to find project');
         res.redirect('back');
@@ -178,15 +176,14 @@ controller.editProject = async function(req, res) {
     }
 
     let creatornames = []; //Will store a list of all the project's creators' usernames
-
     for (let creator of project.creators) { //Add each creator's username to creatornames
         creatornames.push(creator.username);
     }
 
-    const students = await User.find({
+    const students = await User.find({ //Find all students - all of whom are possible project creators
         authenticated: true,
         status: {$nin: ['alumnus', 'guest', 'parent', 'faculty']}
-    }); //Find all students - all of whom are possible project creators
+    }); 
 
     if (!students) {
         req.flash('error', 'Unable to find student list');
@@ -197,10 +194,8 @@ controller.editProject = async function(req, res) {
     for (let media of project.imageFiles) {
         fileExtensions.set(media.url, path.extname(media.url.split("SaberChat/")[1]));
     }
-
     return res.render('projects/edit', {project, students, creatornames, fileExtensions});
 }
-
 
 controller.showProject = async function(req, res) {
     let project = await Project.findById(req.params.id)
@@ -258,7 +253,6 @@ controller.updateProject = async function(req, res) {
                     req.flash('error', "Unable to find the users you listed");
                     return res.redirect('back');
                 }
-
                 creators.push(individual);
             }
         }
@@ -338,7 +332,6 @@ controller.updateProject = async function(req, res) {
         }
     }
     await updatedProject.save();
-
     req.flash("success", "Project Updated!");
     return res.redirect(`/projects/${project._id}`);
 }
@@ -346,7 +339,6 @@ controller.updateProject = async function(req, res) {
 
 controller.deleteProject = async function(req, res) {
     const project = await Project.findById(req.params.id);
-
     if (!project) {
         req.flash('error', "Unable to access project");
         return res.redirect('back');
@@ -357,7 +349,6 @@ controller.deleteProject = async function(req, res) {
     }
 
     const deletedProject = await Project.findByIdAndDelete(project._id);
-
     if (!deletedProject) {
         req.flash('error', "Unable to delete project");
         return res.redirect('back');
@@ -394,22 +385,20 @@ controller.likeProject = async function(req, res) {
 
     if (project.likes.includes(req.user._id)) { //Remove like
         project.likes.splice(project.likes.indexOf(req.user._id), 1);
-        project.save();
+        await project.save();
 
         return res.json({
             success: `Removed a like from ${project.title}`,
             likeCount: project.likes.length
         });
-
-    } else { //Add like
-        project.likes.push(req.user._id);
-        project.save();
-
-        return res.json({
-            success: `Liked ${project.title}`,
-            likeCount: project.likes.length
-        });
     }
+
+    project.likes.push(req.user._id); //Add like
+    await project.save();
+    return res.json({
+        success: `Liked ${project.title}`,
+        likeCount: project.likes.length
+    });
 }
 
 controller.comment = async function(req, res) {
@@ -420,7 +409,6 @@ controller.comment = async function(req, res) {
                 path: "sender"
             }
         });
-
     if (!project) {
         return res.json({error: 'Error commenting'});
     }
@@ -442,7 +430,6 @@ controller.comment = async function(req, res) {
 
     let users = [];
     let user;
-
     for (let line of comment.text.split(" ")) {
         if (line[0] == '@') {
             user = await User.findById(line.split("#")[1].split("_")[0]);
@@ -497,7 +484,6 @@ controller.likeComment = async function(req, res) {
     if (comment.likes.includes(req.user._id)) { //Remove Like
         comment.likes.splice(comment.likes.indexOf(req.user._id), 1);
         await comment.save();
-
         return res.json({
             success: `Removed a like from a comment`,
             likeCount: comment.likes.length
@@ -506,7 +492,6 @@ controller.likeComment = async function(req, res) {
 
     comment.likes.push(req.user._id);
     await comment.save();
-
     return res.json({
         success: `Liked comment`,
         likeCount: comment.likes.length

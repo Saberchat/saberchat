@@ -55,7 +55,7 @@ controller.getContext = async function(req, res) { //Get context for reported co
 }
 
 controller.ignoreComment = async function(req, res) { //Ignore comment
-    const comment = await Comment.findById(req.body.id).populate('statusBy');
+    const comment = await Comment.findById(req.body.commentId).populate('statusBy');
     if (!comment) { return res.json({error: 'Could not find comment'});}
 
     //Users cannot handle comments that they have written/reported
@@ -71,7 +71,7 @@ controller.ignoreComment = async function(req, res) { //Ignore comment
 }
 
 controller.deleteComment = async function(req, res) {
-    const comment = await Comment.findById(req.body.id).populate("author");
+    const comment = await Comment.findById(req.body.commentId).populate("author");
     if (!comment) {
         return res.json({error: 'Could not find comment'});
     }
@@ -107,7 +107,7 @@ controller.statusGet = async function(req, res) { //Show page with all users and
 }
 
 controller.permissionsPut = async function (req, res) { //Update a user's permissions
-    const user = await User.findById(req.body.user);
+    const user = await User.findById(req.body.userId);
     if (!user) {
         return res.json({error: "Error. Could not change"});
     }
@@ -115,7 +115,7 @@ controller.permissionsPut = async function (req, res) { //Update a user's permis
     if (req.body.role == 'admin' || req.body.role == "principal") { //Changing a user to administrator or principal requires specific permissions
         if (req.user.permission == 'principal') { // check if current user is the principal
             user.permission = req.body.role;
-            user.save();
+            await user.save();
             return res.json({success: "Succesfully changed", user});
 
         } else {
@@ -133,7 +133,7 @@ controller.permissionsPut = async function (req, res) { //Update a user's permis
 }
 
 controller.statusPut = async function(req, res) { //Update user's status
-    const user = await User.findById(req.body.user);
+    const user = await User.findById(req.body.userId);
     if (!user) {
         return res.json({error: 'Error. Could not change'});
     }
@@ -236,7 +236,7 @@ controller.deleteEmail = async function (req, res) { //Remove email from access 
 }
 
 controller.tag = async function(req, res) {
-    const user = await User.findById(req.body.user);
+    const user = await User.findById(req.body.userId);
     if (!user) {
         return res.json({error: 'Error. Could not change'});
     }
@@ -360,7 +360,6 @@ controller.permanentDelete = async function(req, res) {
     }
 
     messagesReceived = await Message.find({});
-
     if (!messagesReceived) {
         req.flash('error', "Unable to find your messages");
         return res.redirect('back');
@@ -388,7 +387,6 @@ controller.permanentDelete = async function(req, res) {
       if (message.recipients.length == 1 && message.recipients[0].equals(message.sender)) {
 
         //Remove 1 from the original sender's read (if they haven't read this message yet)
-
         if (!message.read.includes(message.sender)) {
           messageSender = await User.findById(message.sender);
 
@@ -398,7 +396,7 @@ controller.permanentDelete = async function(req, res) {
           }
 
           messageSender.msgCount -= 1;
-          messageSender.save();
+          await messageSender.save();
         }
 
         messageUpdate = await Message.findByIdAndDelete(message._id);

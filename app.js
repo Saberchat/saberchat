@@ -73,36 +73,18 @@ mongoose.connect(process.env.DATABASE_URL,
         useFindAndModify: false
     });
 
-// ============================
-// app configuration
-// ============================
-// use favicon
-app.use(favicon(__dirname + '/public/images/favicon.ico'));
-// make public dir accessible in all views
-app.use(express.static(__dirname + "/public"));
-// try serving editorjs package to frontend
-app.use('/editor', express.static(__dirname + "/node_modules/@editorjs"));
-// use body parser
-app.use(bodyParser.urlencoded({
-    extended: true
-}));
-// set view engine to ejs
-app.set("view engine", "ejs");
-// I think yall already know what method override is
-app.use(methodOverride('_method'));
-// use connect-flash for flash messages
-app.use(flash());
+// APP CONFIGURATION
+app.use(favicon(__dirname + '/public/images/favicon.ico')); // use favicon
+app.use(express.static(__dirname + "/public")); // make public dir accessible in all views
+app.use('/editor', express.static(__dirname + "/node_modules/@editorjs")); // try serving editorjs package to frontend
+app.use(bodyParser.urlencoded({extended: true})); // use body parser
+app.set("view engine", "ejs"); // set view engine to ejs
+app.use(methodOverride('_method')); // Allows for forms to use PUT and DELETE requests
+app.use(flash()); // use connect-flash for flash messages
+app.use(mongoSanitize({replaceWith: '_'})); // replaces $ and .  with _ in req.body, req.query, or req.params
+app.use(helmet()); // Helmet security headers
 
-// replaces $ and .  with _ in req.body, req.query, or req.params
-app.use(mongoSanitize({
-    replaceWith: '_'
-}));
-
-// Helmet security headers
-app.use(helmet());
-
-// customizations for helmet content security policy
-app.use(helmet.contentSecurityPolicy({
+app.use(helmet.contentSecurityPolicy({ // customizations for helmet content security policy
     directives: {
         defaultSrc: [],
         connectSrc: ["'self'", "https://ka-f.fontawesome.com/", "https://res.cloudinary.com"],
@@ -120,18 +102,14 @@ app.use(helmet.contentSecurityPolicy({
     }
 }));
 
-// customizations for helmet referrer policy
-app.use(helmet.referrerPolicy({
+app.use(helmet.referrerPolicy({ // customizations for helmet referrer policy
     policy: "same-origin"
 }));
 
-// express session stuff for authorization that I know nothing about
-const session = require('express-session');
-// using memorystore package because express-session leads to memory leaks and isnt optimized for production.
-const MemoryStore = require('memorystore')(session);
+const session = require('express-session'); // Sets up express session for authorization
+const MemoryStore = require('memorystore')(session); // Memorystore package (express-session has memory leaks, bad for production)
 // app.use(require("express-session")({
-// 	// I think secret is what's used to encrypt the information
-// 	secret: "Programming For Alsion Is Cool",
+// 	secret: "Programming For Alsion Is Cool", // Secret used to encrypt the information
 // 	resave: false,
 // 	saveUninitialized: false
 // }));
@@ -156,30 +134,21 @@ if (process.env.NODE_ENV === 'production') {
 }
 
 app.use(session(sessionConfig));
-
-// passport required authorization setup that I also know nothing about.
-app.use(passport.initialize());
+app.use(passport.initialize()); // passport required authorization setup that I also know nothing about.
 app.use(passport.session());
-// sets strategy used. We can add login via google, facebook, twitter, etc. if we want. For now email and pswrd.
-passport.use(User.createStrategy());
-// prepares the user schema for authorization
-passport.serializeUser(User.serializeUser());
+passport.use(User.createStrategy()); // Sets strategy used. FOR NOW: email and pwd. LATER: Google, FB, Twitter logins
+passport.serializeUser(User.serializeUser()); // prepares the user schema for authorization
 passport.deserializeUser(User.deserializeUser());
 
-// setting app locals, which can be accessed in all ejs views
-app.use((req, res, next) => {
-    // puts user info into 'currentUser' variable
-    res.locals.currentUser = req.user;
+app.use((req, res, next) => { // setting app locals, which can be accessed in all ejs views
+    res.locals.currentUser = req.user; // puts user info into 'currentUser' variable
     // flash message stuff
     res.locals.error = req.flash('error');
     res.locals.success = req.flash('success');
     next();
 });
 
-// =======================
-// Routes
-// =======================
-// tell the app to use the required/imported routes.
+// Import Routes
 app.use(indexRoutes);
 app.use('/chat', chatRoutes);
 app.use('/profiles', profileRoutes);

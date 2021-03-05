@@ -8,19 +8,10 @@ const {sendGridEmail} = require("../services/sendGrid");
 const User = require('../models/user');
 const Email = require('../models/admin/email');
 const Announcement = require('../models/announcements/announcement');
-const Room = require('../models/chat/room');
 
 const controller = {};
 
 controller.index = function(req, res) {
-    Room.find({}, (err, rooms) => {
-        for (let room of rooms) {
-            if (room.private) {
-                room.private = true;
-                room.save();
-            }
-        }
-    })
     return res.render('index');
 }
 
@@ -125,16 +116,13 @@ controller.authenticate = async function(req, res) {
 
     //Update authentication token
     let charSetMatrix = [];
-
     charSetMatrix.push('qwertyuiopasdfghjklzxcvbnm'.split(''));
     charSetMatrix.push('QWERTYUIOPASDFGHJKLZXCVBNM'.split(''));
     charSetMatrix.push('1234567890'.split(''));
 
     let tokenLength = Math.round((Math.random() * 15)) + 15;
     let token = "";
-
     let charSet; //Which character set to choose from
-
     for (let i = 0; i < tokenLength; i += 1) {
         charSet = charSetMatrix[Math.floor(Math.random() * 3)];
         token += charSet[Math.floor((Math.random() * charSet.length))];
@@ -160,20 +148,18 @@ controller.authenticate = async function(req, res) {
     return res.redirect('/');
 }
 
-controller.login = function(req, res, next) {
-    //authenticate user
-    passport.authenticate('local', (err, user, info) => {
-        if (err) {
+controller.login = async function(req, res, next) { //No need for async as login record can be saved after page reloads
+    passport.authenticate('local', (err, user, info) => { //authenticate user with passport
+        if (err) { //If an error occurs
             return next(err);
         }
 
-        if (!user) {
-            //flash message error
+        if (!user) { //If user does not exist
             req.flash('error', 'Invalid Email or Password');
             return res.redirect('/');
         }
 
-        if (!user.authenticated) {
+        if (!user.authenticated) { //If user is not email authenticated
             req.flash('error', 'Go to your email to verify your account');
             return res.redirect('/');
         }
@@ -185,7 +171,6 @@ controller.login = function(req, res, next) {
             }
             user.logins.push(new Date());
             user.save();
-            //flash message success
             req.flash('success', 'Welcome ' + user.firstName);
             return res.redirect('/');
         });
@@ -193,19 +178,13 @@ controller.login = function(req, res, next) {
 }
 
 controller.forgotPassword = async function(req, res) {
-    const users = await User.find({authenticated: true, 'email': req.body.newPwdEmail});
-    if (!users) {
-        req.flash('error', "Unable to find users");
-        return res.redirect('/');
-    }
-
-    if (users.length == 0) {
+    const user = await User.findOne({authenticated: true, email: req.body.newPwdEmail});
+    if (!user) {
         req.flash('error', "We couldn't find any users with that email address");
         return res.redirect('/');
     }
 
     let charSetMatrix = [];
-
     charSetMatrix.push('qwertyuiopasdfghjklzxcvbnm'.split(''));
     charSetMatrix.push('QWERTYUIOPASDFGHJKLZXCVBNM'.split(''));
     charSetMatrix.push('1234567890'.split(''));
@@ -220,12 +199,9 @@ controller.forgotPassword = async function(req, res) {
         pwd += charSet[Math.floor((Math.random() * charSet.length))];
     }
 
-    for (let user of users) {
-        user.tempPwd = pwd;
-        await user.save();
-    }
-
-    await sendGridEmail(users[0].email, 'Saberchat Password Reset', `<p>Hello ${users[0].firstName},</p><p>You are receiving this email because you recently requested a password reset.</p><p>Click <a href="https://alsion-saberchat.herokuapp.com/reset-password?user=${users[0]._id}">here</a> to reset your password. Use the following character sequence as your temporary password:</p><p>${pwd}</p>`, true);
+    user.tempPwd = pwd;
+    await user.save();
+    await sendGridEmail(user.email, 'Saberchat Password Reset', `<p>Hello ${user.firstName},</p><p>You are receiving this email because you recently requested a password reset.</p><p>Click <a href="https://alsion-saberchat.herokuapp.com/reset-password?user=${user._id}">here</a> to reset your password. Use the following character sequence as your temporary password:</p><p>${pwd}</p>`, true);
     req.flash('success', "Check your email for instructions on  how to reset your password");
     return res.redirect('/');
 }
@@ -290,14 +266,14 @@ controller.alsion = async function(req, res) {
     return res.render('other/alsion_info', {faculty: teacherNames.join(', ')});
 }
 
-controller.darkmode = function(req, res) {
+controller.darkmode = async function(req, res) {
     if (req.user.darkmode) {
         req.user.darkmode = false;
     } else {
         req.user.darkmode = true;
     }
 
-    req.user.save();
+    await req.user.save();
     return res.redirect('back');
 }
 

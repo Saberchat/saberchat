@@ -401,7 +401,7 @@ controller.remove = async function(req, res) {
 
     if (req.user.followers.includes(user._id)) {
         req.user.followers.splice(req.user.followers.indexOf(user._id), 1);
-        req.user.save();
+        await req.user.save();
         res.json({success: "Succesfully removed user"});
     }
 

@@ -194,16 +194,14 @@ controller.likeComment = async function(req, res) {
             success: `Removed a like`,
             likeCount: comment.likes.length
         });
-
-    } else { //Add Like
-        comment.likes.push(req.user._id);
-        comment.save();
-
-        return res.json({
-            success: `Liked comment`,
-            likeCount: comment.likes.length
-        });
     }
+
+    comment.likes.push(req.user._id); //Add Like
+    await comment.save();
+    return res.json({
+        success: `Liked comment`,
+        likeCount: comment.likes.length
+    });
 }
 
 controller.deleteReport = async function(req, res) {

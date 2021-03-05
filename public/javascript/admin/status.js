@@ -1,28 +1,26 @@
-const loading = document.getElementById('loading');
-
-// sends put request with data
-const updateStatus = function (select) {
+const updateStatus = function (select) { //Update a user's official stautus
+    const loading = document.getElementById('loading');
     loading.style.display = 'block';
     loading.style.color = 'gray';
     loading.innerHTML = 'Waiting...';
     const status = select.value;
     const url = '/admin/status?_method=put';
     const userId = select.id;
-    const data = {user: userId, status: status};
-    $.post(url, data, data => {
+    const data = {userId, status};
+    $.post(url, data, data => { //If data is successful, display success message
         if (data.success) {
             loading.style.color = 'green';
             loading.innerHTML = data.success;
-        } else if (data.error) {
+        } else if (data.error) { //If unsuccessful, display error message
             loading.style.color = 'red';
             loading.innerHTML = data.error;
         }
 
-        setTimeout(() => {
+        setTimeout(() => { //After a second, hide the message
             loading.style.display = "none";
         }, 1000);
 
-        if (data.user) {
+        if (data.user) { //If a user was updated, change their displayed status
             for (let option of select) {
                 if (option.value == data.user.status) {
                     option.selected = true;
@@ -32,8 +30,8 @@ const updateStatus = function (select) {
     });
 }
 
-// sends put request with data
-const updateTag = function (select) {
+const updateTag = function (select) { //Update a user's status tags
+    const loading = document.getElementById('loading');
     loading.style.color = 'gray';
     loading.innerHTML = 'Waiting...';
     const tag = select.value;
@@ -44,9 +42,8 @@ const updateTag = function (select) {
     const tagMap = new Map([["Tutor", "warning"], ["Cashier", "success"], ["Editor", "info"]]); //Map tracks the different button classes for each status tag
 
     // Send out JSON request
-    const data = {user: userId, tag: tag};
+    const data = {userId, tag};
     $.post(url, data, data => {
-
         if (data.success) { //If data is successfully posted
             loading.style.color = 'green';
             loading.innerHTML = data.success;
@@ -79,17 +76,17 @@ const updateTag = function (select) {
     });
 }
 
-const searchFunction = function () {
+const searchFunction = function () { //Function to search for user info within body
     const users = document.getElementsByClassName('user');
     const searchInput = document.getElementById('search-input');
     let filter = searchInput.value.toLowerCase();
 
-    for (let i = 0; i < users.length; i += 1) {
-        if (!(users[i].textContent.split('\n')[1].toLowerCase().includes(filter) || users[i].classList.toString().toLowerCase().includes(filter.toLowerCase()))) {
-            users[i].hidden = true;
+    for (let i = 0; i < users.length; i += 1) { //Iterate through user list and see if any text/class names match the search input
+        if ((users[i].textContent.split('\n')[1].toLowerCase().includes(filter) || users[i].classList.toString().toLowerCase().includes(filter.toLowerCase()))) {
+            users[i].hidden = false;
 
         } else {
-            users[i].hidden = false;
+            users[i].hidden = true;
         }
     }
 }

@@ -1,19 +1,19 @@
-const searchFunction = function () {
+const searchFunction = function () { //Search for an email that matches a keyword
     const emails = document.getElementsByClassName('email');
     const searchInput = document.getElementById('search-input');
     let filter = searchInput.value.toLowerCase();
 
-    for (let i = 0; i < emails.length; i += 1) {
-        if (!emails[i].innerText.replace('User Exists', '').toLowerCase().includes(filter)) {
-            emails[i].hidden = true;
+    for (let i = 0; i < emails.length; i += 1) { //Iterate through emails and display any that contain search keyword
+        if (emails[i].innerText.replace('User Exists', '').toLowerCase().includes(filter)) {
+            emails[i].hidden = false;
 
         } else {
-            emails[i].hidden = false;
+            emails[i].hidden = true;
         }
     }
 }
 
-const addEmail = function(event, version) {
+const addEmail = function(event, version) { //Add an email to access list/blocked list
     event.preventDefault();
     const url = '/admin/accesslist?_method=put';
     const address = document.getElementById("address").value;
@@ -22,7 +22,7 @@ const addEmail = function(event, version) {
     $.post(url, data, data => {
         $("#modal-add-email").modal('hide');
 
-        if (data.success) {
+        if (data.success) { //If successful response, create new HTML element for email
             document.getElementById("address").value = "";
             let newEmail = document.createElement("li");
             newEmail.className = "list-group-item email cafe";
@@ -31,18 +31,18 @@ const addEmail = function(event, version) {
 
             document.getElementById("email-list").insertBefore(newEmail, document.getElementsByClassName("email")[0]);
 
-        } else if (data.error) {
+        } else if (data.error) { //Display error if unsuccessful response
             document.getElementById("loading").style.display = "block";
             document.getElementById("loading").innerText = data.error;
 
-            setTimeout(() => {
+            setTimeout(() => { //After a second, remove the laoding message
                 document.getElementById("loading").style.display = "none";
             }, 1000)
         }
     });
 }
 
-const removeEmail = function (button) {
+const removeEmail = function (button) { //Remove email from access list/blocked list
     const emailId = button.id.split('-')[1];
     const url = `/admin/accesslist?_method=delete`;
     const data = {email: emailId};
@@ -50,15 +50,15 @@ const removeEmail = function (button) {
     $.post(url, data, data => {
         $(`#modal-${emailId}`).modal('hide');
 
-        if (data.success) {
+        if (data.success) { //If successful response, remove email's body from page
             document.getElementById("email-list").removeChild(document.getElementById(`${emailId}`));
 
-        } else if (data.error) {
+        } else if (data.error) { //Display error if unsuccessful image
             document.getElementById("loading").style.color = "red";
             document.getElementById("loading").style.display = "block";
             document.getElementById("loading").innerText = data.error;
 
-            setTimeout(() => {
+            setTimeout(() => { //After a second, remove the loading message
                 document.getElementById("loading").style.display = "none";
             }, 1000)
         }
