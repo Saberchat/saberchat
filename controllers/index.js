@@ -100,7 +100,7 @@ controller.register = async function(req, res) {
         req.flash("error", "An Error Occurred");
         return res.redirect("/");
     }
-    await sendGridEmail(user.email, 'Verify Saberchat Account', `<p>Hello ${newUser.firstName},</p><p>Welcome to Saberchat! A confirmation of your account:</p><ul><li>Your username is ${newUser.username}.</li><li>Your full name is ${newUser.firstName} ${newUser.lastName}.</li><li>Your linked email is ${newUser.email}</li></ul><p>Click <a href="https://alsion-saberchat.herokuapp.com/authenticate/${newUser._id}?token=${token}">this link</a> to verify your account.</p>`, true);
+    await sendGridEmail(user.email, 'Verify Saberchat Account', `<p>Hello ${newUser.firstName},</p><p>Welcome to Saberchat! A confirmation of your account:</p><ul><li>Your username is ${newUser.username}.</li><li>Your full name is ${newUser.firstName} ${newUser.lastName}.</li><li>Your linked email is ${newUser.email}</li></ul><p>Click <a href="https://saberchat.net/authenticate/${newUser._id}?token=${token}">this link</a> to verify your account.</p>`, true);
 
     // if registration is successful, login user.
     req.flash("success", "Welcome to Saberchat " + user.firstName + "! Go to your email to verify your account");
@@ -201,7 +201,7 @@ controller.forgotPassword = async function(req, res) {
 
     user.tempPwd = pwd;
     await user.save();
-    await sendGridEmail(user.email, 'Saberchat Password Reset', `<p>Hello ${user.firstName},</p><p>You are receiving this email because you recently requested a password reset.</p><p>Click <a href="https://alsion-saberchat.herokuapp.com/reset-password?user=${user._id}">here</a> to reset your password. Use the following character sequence as your temporary password:</p><p>${pwd}</p>`, true);
+    await sendGridEmail(user.email, 'Saberchat Password Reset', `<p>Hello ${user.firstName},</p><p>You are receiving this email because you recently requested a password reset.</p><p>Click <a href="https://saberchat.net/reset-password?user=${user._id}">here</a> to reset your password. Use the following character sequence as your temporary password:</p><p>${pwd}</p>`, true);
     req.flash('success', "Check your email for instructions on  how to reset your password");
     return res.redirect('/');
 }

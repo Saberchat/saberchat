@@ -220,55 +220,58 @@ controller.deleteEmail = async function (req, res) { //Remove email from access 
         return res.json({error: "Unable to find email"});
     }
 
-    const users = await User.find({authenticated: true, email: email.address});
+    const users = await User.find({authenticated: true, email: email.address}); //Find users with this email
     if (!users) {
         return res.json({error: "Unable to find users"});
     }
 
-    if (users.length === 0) {
+    if (users.length === 0) { //If nobody currently has this email, remove it
         const deletedEmail = await Email.findByIdAndDelete(email._id);
         if (!deletedEmail) {
             return res.json({error: "Unable to delete email"});
         }
         return res.json({success: "Deleted email"});
     }
-    return res.json({error: "Active user has this email"});
+    return res.json({error: "Active user has this email"}); //If someone has this email, don't remove it
 }
 
-controller.tag = async function(req, res) {
+controller.tag = async function(req, res) { //Add/remove status tag to user
     const user = await User.findById(req.body.userId);
     if (!user) {
         return res.json({error: 'Error. Could not change'});
     }
-    if (user.tags.includes(req.body.tag)) {
-        if (req.body.tag == "Tutor") {
+    if (user.tags.includes(req.body.tag)) { //If user already has this tag (in which case, remove it)
+        if (req.body.tag == "Tutor") { //
             const courses = await Course.find({});
             if (!courses) {
                 return res.json({error: 'Error. Could not change'});
             }
 
-            for (let course of courses) {
+            for (let course of courses) { //Iterate through courses and see if user is a tutor in any of them
                 if (objectArrIncludes(course.tutors, "tutor", user._id) > -1) {
                     return res.json({error: "User is an Active Tutor"});
                 }
             }
 
+            //If there is no error, remove the tag
             user.tags.splice(user.tags.indexOf(req.body.tag), 1);
             await user.save();
             return res.json({success: "Successfully removed status", tag: req.body.tag})
         }
 
+        //Remove the tag
         user.tags.splice(user.tags.indexOf(req.body.tag), 1);
         await user.save();
         return res.json({success: "Successfully removed status", tag: req.body.tag})
     }
 
+    //If user does not already have this tag, add it
     user.tags.push(req.body.tag);
     await user.save();
     return res.json({success: "Successfully added status", tag: req.body.tag})
 }
 
-controller.createPermission = async function(req, res) {
+controller.createPermission = async function(req, res) { //Create a permission
     const permission = await Permission.create({title: req.body.permission});
     if (!permission) {
         req.flash('error', "Unable to create permission");
@@ -279,7 +282,7 @@ controller.createPermission = async function(req, res) {
     return res.redirect('/admin/permissions');
 }
 
-controller.createStatus = async function(req, res) {
+controller.createStatus = async function(req, res) { //Create a status
     const status = await Status.create({
         title: req.body.status,
         plural: req.body.plural,

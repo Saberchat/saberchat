@@ -4,14 +4,13 @@ const comment = function (form, event) {
     if (document.getElementById('comment-input').value.split(' ').join('') != '') {
         const announcementId = form.id.split("-")[1];
         const url = `/announcements/comment?_method=put`;
-        const data = {announcement: announcementId, text: document.getElementById('comment-input').value};
-        document.getElementById('comment-input').value = ""; //Empty input field
+        const data = {announcementId, text: document.getElementById('comment-input').value};
+        document.getElementById('comment-input').value = ""; //Reset input field once comment is posted
 
         $.post(url, data, data => {
 
             if (data.success) {
                 // DOM Elements that change with new comment
-                const comments = document.getElementsByClassName('comment-body');
                 const allComments = document.getElementById('all-comments');
 
                 //Update the two HTML comment counters
@@ -52,6 +51,6 @@ const comment = function (form, event) {
     }
 }
 
-const reply = function (comment) {
+const reply = function (comment) { //When reply button is clicked, put the replied comment sender's username in the input field
     document.getElementById('comment-input').value = `@${comment.id.split("comment-")[1]}_ `
 }

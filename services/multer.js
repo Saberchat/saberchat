@@ -14,7 +14,7 @@ const fileFilter = (req, file, callback) => {
 
 const multerConfig = {
     storage, fileFilter,
-    limits: {fileSize: 3 * 10 ** 8}
+    limits: {fileSize: 7 * 10 ** 7}
 };
 
 module.exports.uploadSingle = util.promisify(multer(multerConfig).fields([{name: "imageFile", maxCount: 1}]));

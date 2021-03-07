@@ -1,6 +1,6 @@
 # Saberchat
 
-demo on heroku Link: https://alsion-saberchat.herokuapp.com/
+demo on heroku Link: https://saberchat.net/
 
 ToC
 -----------------------------------------

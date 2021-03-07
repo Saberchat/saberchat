@@ -252,7 +252,7 @@ controller.requestJoin = async function(req, res) {
         await roomCreator.save();
 
         if (roomCreator.receiving_emails) {
-            await sendGridEmail(roomCreator.email, 'New Room Access Request', `<p>Hello ${roomCreator.firstName},</p><p><strong>${req.user.username}</strong> is requesting to join your room, <strong>${room.name}.</strong></p><p>You can access the full request at https://alsion-saberchat.herokuapp.com</p>`, false);
+            await sendGridEmail(roomCreator.email, 'New Room Access Request', `<p>Hello ${roomCreator.firstName},</p><p><strong>${req.user.username}</strong> is requesting to join your room, <strong>${room.name}.</strong></p><p>You can access the full request at https://saberchat.net</p>`, false);
         }
         return res.json({success: 'Request for access sent'});
     }

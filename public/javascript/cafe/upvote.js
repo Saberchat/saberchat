@@ -5,12 +5,12 @@ const upvote = function (button) {
     const data = {};
     $.post(url, data, data => {
         if (data.success) {
-            if (data.success.includes("Downvoted")) {
+            if (data.success.includes("Downvoted")) { //If upvote is removed, make button grey
                 button.style.color = "grey";
-            } else {
+            } else { //If upvote is added, make button red
                 button.style.color = "red";
             }
-            document.getElementById(`upvoteCount-${itemId}`).innerText = data.upvoteCount;
+            document.getElementById(`upvoteCount-${itemId}`).innerText = data.upvoteCount; //Update upvote count
         }
     });
 }

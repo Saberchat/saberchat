@@ -1,15 +1,13 @@
 let fileCount = 0; //Track how many file inputs have been opened
 let filesCounted = false; //Check whether previously uploaded files are accounted for (for editing pages)
 
-const upload = function(files) {
-    if (!filesCounted && files) {
+const upload = function(files) { //Add a new upload input
+    if (!filesCounted && files) { //If a number of files is already there (on update page)
         fileCount += files;
         filesCounted = true;
     }
 
-    console.log(fileCount)
-    
-    if (fileCount < 7) {
+    if (fileCount < 7) { //Not more than 7 files can be added
         fileCount ++;
         let newInputBlock = document.createElement("div");
         newInputBlock.className = "form-group";
@@ -24,7 +22,7 @@ const upload = function(files) {
     }
 }
 
-const removeFile = function(button) {
+const removeFile = function(button) { //Delete a file input
     if (fileCount > 0) {
         fileCount --;
         const removeable = document.getElementById(`imageFile-${button.id.split('-')[1]}`);

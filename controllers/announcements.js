@@ -16,8 +16,11 @@ const controller = {};
 
 // Ann GET index
 controller.index = async function(req, res) {
-    const announcements = await Announcement.find({}).populate('sender').exec();
-    if(!announcements) {req.flash('error', 'Cannot find announcements.'); return res.redirect('back');}
+    const announcements = await Announcement.find({}).populate('sender');
+    if(!announcements) {
+        req.flash('error', 'Cannot find announcements.');
+        return res.redirect('back');
+    }
     return res.render('announcements/index', {announcements: announcements.reverse()});
 };
 
@@ -36,7 +39,7 @@ controller.markAll = async function(req, res) {
 
 // Ann GET mark one ann as read
 controller.markOne = async function(req, res) {
-    if (objectArrIncludes(req.user.annCount, "announcement", req.params.id) > -1) {
+    if (objectArrIncludes(req.user.annCount, "announcement", req.params.id) > -1) { //If user's annCount includes announcement, remove it
         req.user.annCount.splice(objectArrIncludes(req.user.annCount, "announcement", req.params.id), 1);
         await req.user.save();
     }
@@ -53,38 +56,45 @@ controller.show = async function(req, res) {
             populate: {
                 path: "sender"
             }
-        }).exec();
-    if(!announcement) {req.flash('error', 'Could not find announcement'); return res.redirect('back');}
+        });
+    if(!announcement) {
+        req.flash('error', 'Could not find announcement');
+        return res.redirect('back');
+    }
 
     if(req.user) {
+        //If this announcement is new to the user, it is no longer new, so remove it
         if (objectArrIncludes(req.user.annCount, "announcement", announcement._id, "_id") > -1) {
             req.user.annCount.splice(objectArrIncludes(req.user.annCount, "announcement", announcement._id, "_id"), 1);
             await req.user.save();
         }
     }
 
-    let fileExtensions = new Map();
+    let fileExtensions = new Map(); //Track which file format each attachment is in
     for (let media of announcement.imageFiles) {
         fileExtensions.set(media.url, path.extname(media.url.split("SaberChat/")[1]));
     }
-    const convertedText = convertToLink(announcement.text);
+    const convertedText = convertToLink(announcement.text); //Parse and add hrefs to all links in text
     return res.render('announcements/show', {announcement, convertedText, fileExtensions});
 };
 
 // Ann GET edit form
 controller.updateForm = async function(req, res) {
     const announcement = await Announcement.findById(req.params.id);
-    if(!announcement) {req.flash('error', 'Could not find announcement'); return res.redirect('back');}
-    if(!announcement.sender._id.equals(req.user._id)) {
+    if(!announcement) {
+        req.flash('error', 'Could not find announcement');
+        return res.redirect('back');
+    }
+    if(!announcement.sender._id.equals(req.user._id)) { //Only the sender may edit the announcement
         req.flash('error', 'You do not have permission to do that.');
         return res.redirect('back');
     }
 
-    let fileExtensions = new Map();
+    let fileExtensions = new Map(); //Track which file format each attachment is in
     for (let media of announcement.imageFiles) {
         fileExtensions.set(media.url, path.extname(media.url.split("SaberChat/")[1]));
     }
-    return res.render('announcements/edit', { announcement, fileExtensions });
+    return res.render('announcements/edit', {announcement, fileExtensions});
 };
 
 // Ann POST create
@@ -105,12 +115,12 @@ controller.create = async function(req, res) {
         }
     }
 
-    // if files were uploaded
+    // if files were uploaded, process them
     if (req.files) {
         if (req.files.imageFile) {
             let cloudErr;
             let cloudResult;
-            for (let file of req.files.imageFile) {
+            for (let file of req.files.imageFile) { //Upload each file to cloudinary
                 if ([".mp3", ".mp4", ".m4a", ".mov"].includes(path.extname(file.originalname).toLowerCase())) {
                     [cloudErr, cloudResult] = await cloudUpload(file, "video");
                 } else if (path.extname(file.originalname).toLowerCase() == ".pdf") {
@@ -135,23 +145,20 @@ controller.create = async function(req, res) {
     announcement.date = dateFormat(announcement.created_at, "h:MM TT | mmm d");
     await announcement.save();
 
-    const Users = await User.find({
-        authenticated: true,
-        _id: {$ne: req.user._id}
-    });
-    if (!Users) {
+    const users = await User.find({authenticated: true, _id: {$ne: req.user._id}});
+    if (!users) {
         req.flash('error', "An Error Occurred");
         return res.rediect('back');
     }
 
-    let imageString = "";
+    let imageString = ""; //Build string of all attached images
     for (const image of announcement.images) {
         imageString += `<img src="${image}">`;
     }
 
-    for (let user of Users) {
+    for (let user of users) { //Send email to all users
         if (user.receiving_emails) {
-            const emailText = `<p>Hello ${user.firstName},</p><p>${req.user.username} has recently posted a new announcement - '${announcement.subject}'.</p><p>${announcement.text}</p><p>You can access the full announcement at https://alsion-saberchat.herokuapp.com</p> ${imageString}`;
+            const emailText = `<p>Hello ${user.firstName},</p><p>${req.user.username} has recently posted a new announcement - '${announcement.subject}'.</p><p>${announcement.text}</p><p>You can access the full announcement at https://saberchat.net</p> ${imageString}`;
             await sendGridEmail(user.email, `New Saberchat Announcement - ${announcement.subject}`, emailText, false);
             user.annCount.push({announcement, version: "new"});
             await user.save();
@@ -162,6 +169,7 @@ controller.create = async function(req, res) {
     return res.redirect(`/announcements/${announcement._id}`);
 };
 
+//Ann PUT Update
 controller.updateAnn = async function(req, res) {
     const announcement = await Announcement.findById(req.params.id).populate('sender');
     if (!announcement) {
@@ -190,6 +198,7 @@ controller.updateAnn = async function(req, res) {
         }
     }
 
+    //Iterate through all selected media to remove and delete them
     let cloudErr;
     let cloudResult;
     for (let i = updatedAnn.imageFiles.length-1; i >= 0; i--) {
@@ -213,6 +222,7 @@ controller.updateAnn = async function(req, res) {
     // if files were uploaded
     if (req.files) {
         if (req.files.imageFile) {
+            //Iterate through all new attached media
             for (let file of req.files.imageFile) {
                 if ([".mp3", ".mp4", ".m4a", ".mov"].includes(path.extname(file.originalname).toLowerCase())) {
                     [cloudErr, cloudResult] = await cloudUpload(file, "video");
@@ -249,7 +259,7 @@ controller.updateAnn = async function(req, res) {
 
     for (let user of users) {
         if (user.receiving_emails) {
-            await sendGridEmail(user.email, `Updated Saberchat Announcement - ${announcement.subject}`, `<p>Hello ${user.firstName},</p><p>${req.user.username} has recently updated an announcement - '${announcement.subject}'.</p><p>${announcement.text}</p><p>You can access the full announcement at https://alsion-saberchat.herokuapp.com</p> ${imageString}`, false);
+            await sendGridEmail(user.email, `Updated Saberchat Announcement - ${announcement.subject}`, `<p>Hello ${user.firstName},</p><p>${req.user.username} has recently updated an announcement - '${announcement.subject}'.</p><p>${announcement.text}</p><p>You can access the full announcement at https://saberchat.net</p> ${imageString}`, false);
         }
 
         //If announcement not already in user's anncount, add it
@@ -289,7 +299,7 @@ controller.likeAnn = async function(req, res) {
 
 // Ann PUT comment
 controller.comment = async function(req, res) {
-    const announcement = await Announcement.findById(req.body.announcement)
+    const announcement = await Announcement.findById(req.body.announcementId)
         .populate({
             path: "comments",
             populate: {

@@ -28,13 +28,13 @@ const order = function (form, customer) {
             // index = int index of current element relative to parent list
         });
 
-        if (itemList.length > 0) {
+        if (itemList.length > 0) { //If some items have been ordered, send socket request
             socket.emit('order', itemList, itemCount, instructions, payingInPerson, customer);
         }
     });
 }
 
-const getOrders = function (outputStream) {
+const getOrders = function (outputStream) { //Build order card once order has been successfully sent in cafe
     let socket = io();
 
     socket.on('connect', () => {

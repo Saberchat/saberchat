@@ -32,7 +32,7 @@ const editor = new EditorJS({
 
 const saveButton = document.getElementById('save-button');
 
-const postIt = ((url, data) => {
+const postIt = ((url, data) => { //Use Jquery to update page based on input
 
     $('body').append($('<form/>', {
         id: 'jQueryPostItForm',
@@ -50,7 +50,7 @@ const postIt = ((url, data) => {
     $('#jQueryPostItForm').submit();
 });
 
-saveButton.addEventListener('click', () => {
+saveButton.addEventListener('click', () => { //Save article draft
     editor.save().then(savedData => {
         articleTitle = document.getElementById('title').value;
         articleAuthor = document.getElementById('author').value;

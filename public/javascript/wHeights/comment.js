@@ -23,6 +23,7 @@ const comment = ((form, event) => {
                 newComment.className = "media mb-2 comment-body";
                 newComment.style = "text-align: left;";
                 let commentHTML;
+                //Build comment body based on user's image display
                 if (data.comments[data.comments.length - 1].sender.imageFile.display) {
                      commentHTML = `<img src="${data.comments[data.comments.length - 1].sender.imageFile.url}" alt="user" class="user-image"><div class="media-body ml-3"><div class="bg-primary rounded py-2 px-3 mb-2 w-75"><p class="text-small mb-0 text-white">`;
                  } else {
@@ -47,11 +48,10 @@ const comment = ((form, event) => {
 
             }
         });
-
         event.preventDefault(); //Prevent page from automatically refreshing
     }
 });
 
-const reply = (comment => {
+const reply = (comment => { //When reply button is clicked, put the replied comment sender's username in the input field
     document.getElementById('comment-input').value = `@${comment.id.split("comment-")[1]}_ `
 });

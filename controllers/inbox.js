@@ -251,11 +251,11 @@ controller.createMsg = async function(req, res) {
 
         let emailText;
         if(message.toEveryone) {
-            emailText = `<p>Hello ${r.firstName},</p><p>You have a new Saberchat inbox notification from <strong>${req.user.username}</strong>!</p><p><strong>To</strong>: Everyone</p><p>${newMessage.text}</p><p>You can access the full message at https://alsion-saberchat.herokuapp.com</p> ${imageString}`;
+            emailText = `<p>Hello ${r.firstName},</p><p>You have a new Saberchat inbox notification from <strong>${req.user.username}</strong>!</p><p><strong>To</strong>: Everyone</p><p>${newMessage.text}</p><p>You can access the full message at https://saberchat.net</p> ${imageString}`;
         } else if(message.anonymous) {
-            emailText = `<p>Hello ${r.firstName},</p><p>You have a new Saberchat anonymous notification!</p><p><strong>To</strong>: ${recipientArr.join(', ')}</p><p>${newMessage.text}</p><p>You can access the full message at https://alsion-saberchat.herokuapp.com</p> ${imageString}`;
+            emailText = `<p>Hello ${r.firstName},</p><p>You have a new Saberchat anonymous notification!</p><p><strong>To</strong>: ${recipientArr.join(', ')}</p><p>${newMessage.text}</p><p>You can access the full message at https://saberchat.net</p> ${imageString}`;
         } else {
-            emailText = `<p>Hello ${r.firstName},</p><p>You have a new Saberchat inbox notification from <strong>${req.user.username}</strong>!</p><p><strong>To</strong>: ${recipientArr.join(', ')}</p><p>${newMessage.text}</p><p>You can access the full message at https://alsion-saberchat.herokuapp.com</p> ${imageString}`;
+            emailText = `<p>Hello ${r.firstName},</p><p>You have a new Saberchat inbox notification from <strong>${req.user.username}</strong>!</p><p><strong>To</strong>: ${recipientArr.join(', ')}</p><p>${newMessage.text}</p><p>You can access the full message at https://saberchat.net</p> ${imageString}`;
         }
 
         if(r.receiving_emails) {
@@ -359,7 +359,7 @@ controller.reply = async function(req, res) {
         }
         await recipient.save();
         if (!(recipient._id.equals(req.user._id)) && recipient.receiving_emails) {
-            const emailText = `<p>Hello ${recipient.firstName},</p><p><strong>${req.user.username}</strong> replied to <strong>${message.subject}</strong>.<p>${reply.text}</p><p>You can access the full message at https://alsion-saberchat.herokuapp.com</p> ${imageString}`;
+            const emailText = `<p>Hello ${recipient.firstName},</p><p><strong>${req.user.username}</strong> replied to <strong>${message.subject}</strong>.<p>${reply.text}</p><p>You can access the full message at https://saberchat.net</p> ${imageString}`;
             await sendGridEmail(recipient.email, `New Reply On ${message.subject}`, emailText, false);
         }
     }
@@ -430,7 +430,7 @@ controller.acceptReq = async function(req, res) {
     await req.user.save();
 
     if(request.requester.receiving_emails) {
-        const emailText = `<p>Hello ${request.requester.firstName},</p><p>Your request to join chat room <strong>${room.name}</strong> has been accepted!<p><p>You can access the room at https://alsion-saberchat.herokuapp.com</p>`;
+        const emailText = `<p>Hello ${request.requester.firstName},</p><p>Your request to join chat room <strong>${room.name}</strong> has been accepted!<p><p>You can access the room at https://saberchat.net</p>`;
         await sendGridEmail(request.requester.email, `Room Request Accepted - ${room.name}`, emailText, false);
     }
 
