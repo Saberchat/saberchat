@@ -3,7 +3,7 @@ const mongoose = require('mongoose');
 var messageSchema = new mongoose.Schema({
     subject: String,
     images: [{type: String}],
-    imageFiles: [{
+    mediaFiles: [{
         filename: String,
         url: String,
         originalName: String

@@ -32,6 +32,7 @@ controller.index = async function(req, res) {
         if (roomComments.length == 0) {
             commentObject[room._id.toString()] = null;
 
+        //Find latest comment
         } else {
             for (let i = roomComments.length - 1; i >= 0; i -= 1) {
                 if (roomComments[i].author) {
@@ -42,6 +43,7 @@ controller.index = async function(req, res) {
         }
     }
 
+    //Track all of the current user's beliefs
     const requests = await AccessReq.find({requester: req.user._id, status: "pending"});
     if (!requests) {
         req.flash('error', 'Unable to find access requests');
@@ -70,7 +72,7 @@ controller.showRoom = async function(req, res) {
         room.confirmed.push(req.user._id);
         await room.save();
     }
-    removeIfIncluded(req.user.newRoomCount, room._id);
+    removeIfIncluded(req.user.newRoomCount, room._id); //If user has not seen room before, remove it
     await req.user.save();
 
     const comments = await Comment.find({room: room._id}).sort({_id: -1}).limit(30)
@@ -98,7 +100,6 @@ controller.showMembers = async function(req, res) {
 
 controller.editRoom = async function(req, res) {
     const room = await Room.findById(req.params.id);
-
     if (!room) {
         req.flash('error', "Unable to find room");
         return res.redirect('back');
@@ -109,7 +110,6 @@ controller.editRoom = async function(req, res) {
         req.flash('error', 'An Error Occurred');
         return res.redirect('back');
     }
-
     return res.render('chat/edit', {users, room});
 }
 
@@ -121,6 +121,7 @@ controller.createRoom = async function(req, res) {
     }
 
     let roomCount = 0;
+    //Iterate through rooms and see how many rooms this user has created
     for (let room of rooms) {
         if (room.creator.equals(req.user._id)) {
             roomCount++;
@@ -143,15 +144,20 @@ controller.createRoom = async function(req, res) {
         return res.redirect('/chat/new');
 
     } else {
+        //If room is marked as private
         if (req.body.type == 'true') {
             for (const user in req.body.check) {
                 room.members.push(user);
             }
             room.private = true;
         }
+
+        //If room is marked to have moderation
         if (req.body.moderate == 'false') {
             room.moderate = false;
         }
+
+        //If room has a description
         if (req.body.description) {
             room.description = filter.clean(req.body.description);
         }
@@ -159,17 +165,16 @@ controller.createRoom = async function(req, res) {
         room.date = dateFormat(room.created_at, "h:MM TT | mmm d");
         await room.save();
 
-        const members = await User.find({authenticated: true, _id: {$in: room.members}});
+        const members = await User.find({authenticated: true, _id: {$in: room.members, $ne: req.user._id}});
         if (!members) {
             req.flash('error', 'Members could not be found');
             return res.redirect('/chat/new');
         }
 
-        for (let member of members) {
+        for (let member of members) { //Iterate through all new members and add room to their newRoomCount
             member.newRoomCount.push(room._id);
             await member.save();
         }
-
         return res.redirect('/chat/' + room._id);
     }
 }
@@ -197,10 +202,8 @@ controller.leaveRoom = async function(req, res) {
     }
 
     //remove user from room's member list and confirmed list
-    let index = room.members.indexOf(req.user._id);
-    room.members.splice(index, 1);
-    index = room.confirmed.indexOf(req.user._id);
-    room.confirmed.splice(index, 1);
+    removeIfIncluded(room.members, req.user._id);
+    removeIfIncluded(room.confirmed, req.user._id);
     await room.save();
 
     req.flash('success', 'You have left ' + room.name);
@@ -216,46 +219,44 @@ controller.requestJoin = async function(req, res) {
     if (room.type == 'public') {
         return res.json({error: 'Room is public'});
 
-    } else if (!room.mutable) {
+    } else if (!room.mutable) { //If room cannot get new members
         return res.json({error: 'Room does not accept access requests'});
     }
 
     // find if the request already exists to prevent spam
     const request = await AccessReq.findOne({requester: req.user._id, room: room._id});
-
     if (request && request.status != 'pending') {
         return res.json({error: `Request has already been ${request.status}`});
 
     } else if (request) {
         return res.json({error: 'Identical request has already been sent'});
-
-    } else {
-
-        const request = {
-            requester: req.user._id,
-            room: room._id,
-            receiver: room.creator
-        };
-
-        // create the request and find the room creator
-        const [createdReq, roomCreator] = await Promise.all([
-            AccessReq.create(request),
-            User.findById(room.creator)
-        ]);
-
-        if (!createdReq || !roomCreator) {
-            return res.json({error: 'An error occurred'});
-        }
-
-        roomCreator.requests.push(createdReq._id);
-        roomCreator.reqCount ++;
-        await roomCreator.save();
-
-        if (roomCreator.receiving_emails) {
-            await sendGridEmail(roomCreator.email, 'New Room Access Request', `<p>Hello ${roomCreator.firstName},</p><p><strong>${req.user.username}</strong> is requesting to join your room, <strong>${room.name}.</strong></p><p>You can access the full request at https://saberchat.net</p>`, false);
-        }
-        return res.json({success: 'Request for access sent'});
     }
+
+    const request = {
+        requester: req.user._id,
+        room: room._id,
+        receiver: room.creator
+    };
+
+    // create the request and find the room creator
+    const [createdReq, roomCreator] = await Promise.all([
+        AccessReq.create(request),
+        User.findById(room.creator)
+    ]);
+
+    if (!createdReq || !roomCreator) {
+        return res.json({error: 'An error occurred'});
+    }
+
+    //Add access request to room creator's inbox
+    roomCreator.requests.push(createdReq._id);
+    roomCreator.reqCount ++;
+    await roomCreator.save();
+
+    if (roomCreator.receiving_emails) {
+        await sendGridEmail(roomCreator.email, 'New Room Access Request', `<p>Hello ${roomCreator.firstName},</p><p><strong>${req.user.username}</strong> is requesting to join your room, <strong>${room.name}.</strong></p><p>You can access the full request at https://saberchat.net</p>`, false);
+    }
+    return res.json({success: 'Request for access sent'});
 }
 
 controller.requestCancel = async function(req, res) {
@@ -269,10 +270,10 @@ controller.requestCancel = async function(req, res) {
         return res.json({error: "Unable to find request"});
     }
 
-    room.creator.requests.splice(room.creator.requests.indexOf(deletedReq._id), 1);
+    //Remove Access Request From from creator's inbox
+    removeIfIncluded(room.creator.requests, deletedReq._id);
     room.creator.reqCount --;
     await room.creator.save();
-
     return res.json({success: "Successfully deleted request"});
 }
 
@@ -281,18 +282,15 @@ controller.updateRoom = async function(req, res) {
         name: filter.clean(req.body.name),
         description: filter.clean(req.body.description)
     });
-
     if (!room) {
         req.flash('error', 'An Error Occurred');
         return res.redirect('back');
     }
 
-    if (req.body.type == 'true') {
+    if (req.body.type == 'true') { //If room is private, iterate through users that need to be removed and added
         for (const rUser in req.body.checkRemove) {
-            let index = room.members.indexOf(rUser);
-            room.members.splice(index, 1);
-            index = room.confirmed.indexOf(rUser);
-            room.confirmed.splice(index, 1);
+            removeIfIncluded(room.members, rUser);
+            removeIfIncluded(room.confirmed, rUser);
         }
         for (const aUser in req.body.checkAdd) {
             room.members.push(aUser);
@@ -337,8 +335,8 @@ controller.deleteRoom = async function(req, res) {
         return res.redirect('back');
     }
 
-    let deletedRequest;
-    for (let request of requests) {
+    let deletedRequest; 
+    for (let request of requests) { //Iterate through all active join requests and remove them from room creator's inbox
         removeIfIncluded(room.creator.requests, request._id);
         deletedRequest = await AccessReq.findByIdAndDelete(request._id);
         if (!deletedRequest) {
@@ -354,7 +352,7 @@ controller.deleteRoom = async function(req, res) {
         return res.redirect('back');
     }
 
-    for (let member of deletedRoom.members) {
+    for (let member of deletedRoom.members) { //Remove room from all members' newRoomCounts
         removeIfIncluded(member.newRoomCount, deletedRoom._id);
         await member.save();
     }
@@ -365,7 +363,7 @@ controller.deleteRoom = async function(req, res) {
 controller.reportComment = async function(req, res) {
     const comment = await Comment.findById(req.params.id).populate({path: 'room', select: 'moderate'});
     if (!comment) {
-        return res.json('Error');
+        return res.json('Error finding comment');
     } else if (!comment.room.moderate) {
         return res.json('Reporting Is Disabled');
     } else if (comment.status == 'flagged') {

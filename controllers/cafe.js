@@ -97,8 +97,8 @@ controller.index = async function(req, res) {
         for (let category of categories) {
             for (let item of category.items) {
                 itemDescriptions[item._id] = convertToLink(item.description);
-                if (item.imageFile.filename) {
-                    fileExtensions.set(item.imageFile.url, path.extname(item.imageFile.url.split("SaberChat/")[1]));
+                if (item.mediaFile.filename) {
+                    fileExtensions.set(item.mediaFile.url, path.extname(item.mediaFile.url.split("SaberChat/")[1]));
                 }
             }
         }
@@ -358,21 +358,21 @@ controller.createItem = async function(req, res) {
         return res.redirect('back');
     }
 
-    item.imageFile.display = req.body.showImage == "upload";
+    item.mediaFile.display = req.body.showImage == "upload";
 
     if (req.files) {
-        if (req.files.imageFile) {
-            const [cloudErr, cloudResult] = await cloudUpload(req.files.imageFile[0]);
+        if (req.files.mediaFile) {
+            const [cloudErr, cloudResult] = await cloudUpload(req.files.mediaFile[0]);
             if (cloudErr || !cloudResult) {
                 req.flash('error', 'Upload failed');
                 return res.redirect('back');
             }
 
             // Add info to image file
-            item.imageFile = {
+            item.mediaFile = {
                 filename: cloudResult.public_id,
                 url: cloudResult.secure_url,
-                originalName: req.files.imageFile[0].originalname,
+                originalName: req.files.mediaFile[0].originalname,
                 display: req.body.showImage == "upload"
             };
         }
@@ -415,8 +415,8 @@ controller.viewItem = async function(req, res) {
     }
 
     let fileExtensions = new Map();
-    if (item.imageFile.filename) {
-        fileExtensions.set(item.imageFile.url, path.extname(item.imageFile.url.split("SaberChat/")[1]));
+    if (item.mediaFile.filename) {
+        fileExtensions.set(item.mediaFile.url, path.extname(item.mediaFile.url.split("SaberChat/")[1]));
     }
 
     return res.render('cafe/show', {categories, item, fileExtensions});
@@ -440,8 +440,8 @@ controller.deleteItem = async function(req, res) {
     }
 
     // delete any uploads
-    if (item.imageFile && item.imageFile.filename) {
-        [cloudErr, cloudResult] = await cloudDelete(item.imageFile.filename, "image");
+    if (item.mediaFile && item.mediaFile.filename) {
+        [cloudErr, cloudResult] = await cloudDelete(item.mediaFile.filename, "image");
         if (cloudErr || !cloudResult || cloudResult.result !== 'ok') {
             req.flash('error', 'Error deleting uploaded image');
             return res.redirect('back');
@@ -698,8 +698,7 @@ controller.upvoteItem = async function(req, res) {
         return res.json({error: "Error upvoting item"});
     }
 
-    if (item.upvotes.includes(req.user._id)) {
-        item.upvotes.splice(item.upvotes.indexOf(req.user._id), 1);
+    if (removeIfIncluded(item.upvotes, req.user._id)) {
         await item.save();
         return res.json({success: `Downvoted ${item.name}`, upvoteCount: item.upvotes.length});
     }
@@ -738,13 +737,13 @@ controller.updateItemInfo = async function(req, res) {
         return res.redirect('back');
     }
 
-    item.imageFile.display = req.body.showImage == "upload";
+    item.mediaFile.display = req.body.showImage == "upload";
     if (req.files) {
-        if (req.files.imageFile) {
+        if (req.files.mediaFile) {
             let cloudErr;
             let cloudResult;
-            if (item.imageFile && item.imageFile.filename) {
-                [cloudErr, cloudResult] = await cloudDelete(item.imageFile.filename, "image");
+            if (item.mediaFile && item.mediaFile.filename) {
+                [cloudErr, cloudResult] = await cloudDelete(item.mediaFile.filename, "image");
                 // check for failure
                 if (cloudErr || !cloudResult || cloudResult.result !== 'ok') {
                     req.flash('error', 'Error deleting uploaded image');
@@ -752,16 +751,16 @@ controller.updateItemInfo = async function(req, res) {
                 }
             }
 
-            [cloudErr, cloudResult] = await cloudUpload(req.files.imageFile[0]);
+            [cloudErr, cloudResult] = await cloudUpload(req.files.mediaFile[0]);
             if (cloudErr || !cloudResult) {
                 req.flash('error', 'Upload failed');
                 return res.redirect('back');
             }
 
-            item.imageFile = {
+            item.mediaFile = {
                 filename: cloudResult.public_id,
                 url: cloudResult.secure_url,
-                originalName: req.files.imageFile[0].originalname,
+                originalName: req.files.mediaFile[0].originalname,
                 display: false
             };
         }

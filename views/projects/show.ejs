@@ -56,14 +56,14 @@
                     <% if (currentUser) { %>
                         <a class="project-info" href="../profiles/<%= project.poster._id %>">
 
-                            <img src="<% if (project.poster.imageFile.display) {%> <%= project.poster.imageFile.url%><%} else {%> <%=project.poster.imageUrl.url%><%}%>" alt="profile pic" id="poster-profile">
+                            <img src="<% if (project.poster.mediaFile.display) {%> <%= project.poster.mediaFile.url%><%} else {%> <%=project.poster.imageUrl.url%><%}%>" alt="profile pic" id="poster-profile">
                             <%= project.poster.firstName %> <%= project.poster.lastName %>
                         </a>
                         <br/><br/>
 
                     <% } else { %>
                         <span class="project-info">
-                  <img src="<% if (project.poster.imageFile.display) {%> <%= project.poster.imageFile.url%><%} else {%> <%=project.poster.imageUrl.url%><%}%>" alt="profile pic" id="poster-profile">
+                  <img src="<% if (project.poster.mediaFile.display) {%> <%= project.poster.mediaFile.url%><%} else {%> <%=project.poster.imageUrl.url%><%}%>" alt="profile pic" id="poster-profile">
                   <%= project.poster.firstName %> <%= project.poster.lastName %>
                 </span>
                     <% } %>
@@ -140,19 +140,19 @@
 
                                 <% tempcreators.forEach(creator => { %>
                                     <a class="creator-names" href="../profiles/<%= creator._id %>"><img
-                                                src="<% if (creator.imageFile.display) {%> <%= creator.imageFile.url%><%} else {%> <%=creator.imageUrl.url%><%}%>" alt="profile pic"
+                                                src="<% if (creator.mediaFile.display) {%> <%= creator.mediaFile.url%><%} else {%> <%=creator.imageUrl.url%><%}%>" alt="profile pic"
                                                 class="creator-profile"> <%= creator.firstName %> <%= creator.lastName %></a>
                                     ,
                                 <% }) %>
 
                                 <a class="creator-names"
                                    href="../profiles/<%= project.creators[project.creators.length - 2]._id %>"><img
-                                            src="<% if (project.creators[project.creators.length - 2].imageFile.display) {%> <%= project.creators[project.creators.length - 2].imageFile.url%><%} else {%> <%=project.creators[project.creators.length - 2].imageUrl.url%><%}%>"
+                                            src="<% if (project.creators[project.creators.length - 2].mediaFile.display) {%> <%= project.creators[project.creators.length - 2].mediaFile.url%><%} else {%> <%=project.creators[project.creators.length - 2].imageUrl.url%><%}%>"
                                             alt="profile pic"
                                             class="creator-profile"> <%= project.creators[project.creators.length - 2].firstName %> <%= project.creators[project.creators.length - 2].lastName %></a>,
                   <a class="creator-names"
                      href="../profiles/<%= project.creators[project.creators.length - 1]._id %>"><img
-                              src="<% if (project.creators[project.creators.length - 1].imageFile.display) {%> <%= project.creators[project.creators.length - 1].imageFile.url%><%} else {%> <%=project.creators[project.creators.length - 1].imageUrl.url%><%}%>" alt="profile pic"
+                              src="<% if (project.creators[project.creators.length - 1].mediaFile.display) {%> <%= project.creators[project.creators.length - 1].mediaFile.url%><%} else {%> <%=project.creators[project.creators.length - 1].imageUrl.url%><%}%>" alt="profile pic"
                               class="creator-profile"> <%= project.creators[project.creators.length - 1].firstName %> <%= project.creators[project.creators.length - 1].lastName %></a>
 
                 </span>
@@ -161,10 +161,10 @@
                             <p><span id="creator-heading">Creators:</span> <span id="creator-div"><a
                                             class="creator-names"
                                             href="../profiles/<%= project.creators[0]._id %>"><img
-                                                src="<% if (project.creators[0].imageFile.display) {%> <%= project.creators[0].imageFile.url%><%} else {%> <%=project.creators[0].imageUrl.url%><%}%>" alt="profile pic"
+                                                src="<% if (project.creators[0].mediaFile.display) {%> <%= project.creators[0].mediaFile.url%><%} else {%> <%=project.creators[0].imageUrl.url%><%}%>" alt="profile pic"
                                                 class="creator-profile"> <%= project.creators[0].firstName %> <%= project.creators[0].lastName %></a>, <a
                                             class="creator-names" href="../profiles/<%= project.creators[1]._id %>"><img
-                                                src="<% if (project.creators[1].imageFile.display) {%> <%= project.creators[1].imageFile.url%><%} else {%> <%=project.creators[1].imageUrl.url%><%}%>" class="creator-profile"
+                                                src="<% if (project.creators[1].mediaFile.display) {%> <%= project.creators[1].mediaFile.url%><%} else {%> <%=project.creators[1].imageUrl.url%><%}%>" class="creator-profile"
                                                 alt="profile pic"/> <%= project.creators[1].firstName %> <%= project.creators[1].lastName %></a></span>
                             </p>
 
@@ -172,7 +172,7 @@
                             <p><span id="creator-heading">Creator:</span> <span id="creator-div"><a
                                             class="creator-names"
                                             href="../profiles/<%= project.creators[0]._id %>"><img
-                                                src="<% if (project.creators[0].imageFile.display) {%> <%= project.creators[0].imageFile.url%><%} else {%> <%=project.creators[0].imageUrl.url%><%}%>" alt="profile pic"
+                                                src="<% if (project.creators[0].mediaFile.display) {%> <%= project.creators[0].mediaFile.url%><%} else {%> <%=project.creators[0].imageUrl.url%><%}%>" alt="profile pic"
                                                 class="creator-profile"> <%= project.creators[0].firstName %> <%= project.creators[0].lastName %></a></span>
                             </p>
 
@@ -189,29 +189,29 @@
 
                             <span id="creator-div">
                                 <% tempcreators.forEach(creator => { %>
-                                    <img src="<% if (creator.imageFile.display) {%> <%= creator.imageFile.url%><%} else {%> <%=creator.imageUrl.url%><%}%>" alt="profile pic"
+                                    <img src="<% if (creator.mediaFile.display) {%> <%= creator.mediaFile.url%><%} else {%> <%=creator.imageUrl.url%><%}%>" alt="profile pic"
                                          class="creator-profile"> <%= creator.firstName %> <%= creator.lastName %>,
                                 <% }) %>
 
-                                <img src="<% if (project.creators[project.creators.length - 2].imageFile.display) {%> <%= project.creators[project.creators.length - 2].imageFile.url%><%} else {%> <%=project.creators[project.creators.length - 2].imageUrl.url%><%}%>"
+                                <img src="<% if (project.creators[project.creators.length - 2].mediaFile.display) {%> <%= project.creators[project.creators.length - 2].mediaFile.url%><%} else {%> <%=project.creators[project.creators.length - 2].imageUrl.url%><%}%>"
                                      alt="profile pic"
                                      class="creator-profile"> <%= project.creators[project.creators.length - 2].firstName %> <%= project.creators[project.creators.length - 2].lastName %>,
-                  <img src="<% if (project.creators[project.creators.length - 2].imageFile.display) {%> <%= project.creators[project.creators.length - 2].imageFile.url%><%} else {%> <%=project.creators[project.creators.length - 2].imageUrl.url%><%}%>" alt="profile pic"
+                  <img src="<% if (project.creators[project.creators.length - 2].mediaFile.display) {%> <%= project.creators[project.creators.length - 2].mediaFile.url%><%} else {%> <%=project.creators[project.creators.length - 2].imageUrl.url%><%}%>" alt="profile pic"
                        class="creator-profile"> <%= project.creators[project.creators.length - 1].firstName %> <%= project.creators[project.creators.length - 1].lastName %>
 
                   </span>
 
                         <% } else if (project.creators.length == 2){ %>
                             <p><span id="creator-heading">Creators:</span> <span id="creator-div"><img
-                                            src="<% if (project.creators[0].imageFile.display) {%> <%= project.creators[0].imageFile.url%><%} else {%> <%=project.creators[0].imageUrl.url%><%}%>" alt="profile pic"
+                                            src="<% if (project.creators[0].mediaFile.display) {%> <%= project.creators[0].mediaFile.url%><%} else {%> <%=project.creators[0].imageUrl.url%><%}%>" alt="profile pic"
                                             class="creator-profile"> <%= project.creators[0].firstName %> <%= project.creators[0].lastName %>, <img
-                                            src="<% if (project.creators[1].imageFile.display) {%> <%= project.creators[1].imageFile.url%><%} else {%> <%=project.creators[1].imageUrl.url%><%}%>" alt="profile pic"
+                                            src="<% if (project.creators[1].mediaFile.display) {%> <%= project.creators[1].mediaFile.url%><%} else {%> <%=project.creators[1].imageUrl.url%><%}%>" alt="profile pic"
                                             class="creator-profile"> <%= project.creators[1].firstName %> <%= project.creators[1].lastName %></span>
                             </p>
 
                         <% } else if (project.creators.length == 1){ %>
                             <p><span id="creator-heading">Creator:</span> <span id="creator-div"><img
-                                            src="<% if (project.creators[0].imageFile.display) {%> <%= project.creators[0].imageFile.url%><%} else {%> <%=project.creators[0].imageUrl.url%><%}%>" alt="profile pic"
+                                            src="<% if (project.creators[0].mediaFile.display) {%> <%= project.creators[0].mediaFile.url%><%} else {%> <%=project.creators[0].imageUrl.url%><%}%>" alt="profile pic"
                                             class="creator-profile"> <%= project.creators[0].firstName %> <%= project.creators[0].lastName %></span>
                             </p>
 
@@ -227,7 +227,7 @@
                         <img class="project-image" src="<%= img %>"/>
                         <br/><br/>
                     <% } %>
-                    <% for (let media of project.imageFiles) { %>
+                    <% for (let media of project.mediaFiles) { %>
                         <% if (media.filename) { %>
                             <% if ([".png", ".jpg", ".jpeg", ".gif"].includes(fileExtensions.get(media.url).toLowerCase())) { %>
                                 <img class="project-image" src="<%=media.url %>"/>
@@ -273,7 +273,7 @@
                             <% if (comment.sender && comment.sender._id.equals(currentUser._id)) { %>
                                 <!-- Reciever Message-->
                                 <div class="media mb-2 comment-body">
-                                    <img src="<% if (comment.sender.imageFile.display) {%> <%= comment.sender.imageFile.url%><%} else {%> <%=comment.sender.imageUrl.url%><%}%>" alt="user" class="user-image">
+                                    <img src="<% if (comment.sender.mediaFile.display) {%> <%= comment.sender.mediaFile.url%><%} else {%> <%=comment.sender.imageUrl.url%><%}%>" alt="user" class="user-image">
                                     <div class="media-body ml-3">
                                         <div class="bg-primary rounded py-2 px-3 mb-2 w-75">
                                             <p class="text-small mb-0 text-white">
@@ -311,7 +311,7 @@
                             <% } else if(comment.sender) { %>
                                 <!-- Sender message -->
                         <div class="media mb-2 comment-body">
-                            <img src="<% if (comment.sender.imageFile.display) {%> <%= comment.sender.imageFile.url%><%} else {%> <%=comment.sender.imageUrl.url%><%}%>" alt="user" class="user-image">
+                            <img src="<% if (comment.sender.mediaFile.display) {%> <%= comment.sender.mediaFile.url%><%} else {%> <%=comment.sender.imageUrl.url%><%}%>" alt="user" class="user-image">
                             <div class="media-body ml-3">
                                 <% if (comment.text.includes(`@${currentUser.username.split(' ').join('')}#${currentUser._id.toString()}`)) { %>
                                 <div class="rounded py-2 px-3 mb-2 w-75 mentioned-comment">

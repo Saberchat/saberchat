@@ -1,7 +1,7 @@
 const dateFormat = require('dateformat');
 const {sendGridEmail} = require("../services/sendGrid");
 const {sortByPopularity} = require("../utils/popularity");
-const {objectArrIncludes, parsePropertyArray, removeIfIncluded} = require("../utils/object-operations");
+const {objectArrIndex, parsePropertyArray, removeIfIncluded} = require("../utils/object-operations");
 const {cloudUpload, cloudDelete} = require('../services/cloudinary');
 
 const User = require('../models/user');
@@ -35,7 +35,7 @@ controller.index = async function(req, res) {
 }
 
 controller.createCourse = async function(req, res) {
-    let charSetMatrix = [];
+    let charSetMatrix = []; //Build unique join code for course
     charSetMatrix.push('qwertyuiopasdfghjklzxcvbnm'.split(''));
     charSetMatrix.push('QWERTYUIOPASDFGHJKLZXCVBNM'.split(''));
     charSetMatrix.push('1234567890'.split(''));
@@ -63,9 +63,10 @@ controller.createCourse = async function(req, res) {
         return res.redirect('back');
     }
 
+    //If thumbnail file has been uploaded, set it up with cloudinary
     if (req.files) {
-        if (req.files.imageFile) {
-            let [cloudErr, cloudResult] = await cloudUpload(req.files.imageFile[0], "image");
+        if (req.files.mediaFile) {
+            let [cloudErr, cloudResult] = await cloudUpload(req.files.mediaFile[0], "image");
             if (cloudErr || !cloudResult) {
                 req.flash("error", "Upload failed");
                 return res.redirect("back");
@@ -74,7 +75,7 @@ controller.createCourse = async function(req, res) {
             course.thumbnailFile = {
                 filename: cloudResult.public_id,
                 url: cloudResult.secure_url,
-                originalName: req.files.imageFile[0].originalname,
+                originalName: req.files.mediaFile[0].originalname,
                 display: req.body.showThumbnail == "upload"
             };
             await course.save();
@@ -140,7 +141,7 @@ controller.showCourse = async function(req, res) {
         studentIds.push(student._id.toString());
     }
 
-    let averageRating = 0;
+    let averageRating = 0; //Collect info on tutors and their ratings
     let tutorObject = {};
     for (let tutor of course.tutors) {
         averageRating = 0;
@@ -155,6 +156,7 @@ controller.showCourse = async function(req, res) {
         tutors.push(tutorObject)
     }
 
+    //Sort tutors for display by two characteristics - average rating and reviews
     tutors = await sortByPopularity(tutors, "averageRating", "dateJoined", null).unpopular
     .concat(sortByPopularity(tutors, "averageRating", "dateJoined", null).popular);
 
@@ -166,7 +168,7 @@ controller.showCourse = async function(req, res) {
         req.flash('error', "Unable to find teachers");
         return res.redirect('back');
     }
-    return res.render('homework/show', {course, studentIds, tutorIds, tutors, teachers, objectArrIncludes});
+    return res.render('homework/show', {course, studentIds, tutorIds, tutors, teachers, objectArrIndex}); //Export function for ejs evaluation
 }
 
 controller.unenrollStudent = async function(req, res) {
@@ -179,16 +181,17 @@ controller.unenrollStudent = async function(req, res) {
     //Remove user from all tutors they have signed up with, and delete corresponding chat rooms
     let deletedRoom;
     for (let tutor of course.tutors) {
-        if (objectArrIncludes(tutor.students, "student", req.user._id) > -1) { //Update the tutor's students array
+        if (objectArrIndex(tutor.students, "student", req.user._id) > -1) { //Update the tutor's students array
             tutor.formerStudents.push({
                 student: req.user._id,
-                lessons: tutor.students[objectArrIncludes(tutor.students, "student", req.user._id)].lessons
+                lessons: tutor.students[objectArrIndex(tutor.students, "student", req.user._id)].lessons
             });
-            deletedRoom = await Room.findByIdAndDelete(tutor.students[objectArrIncludes(tutor.students, "student", req.user._id)].room);
-            tutor.students.splice(objectArrIncludes(tutor.students, "student", req.user._id), 1);
+            deletedRoom = await Room.findByIdAndDelete(tutor.students[objectArrIndex(tutor.students, "student", req.user._id)].room);
+            tutor.students.splice(objectArrIndex(tutor.students, "student", req.user._id), 1);
             tutor.slots++;
             tutor.available = true;
 
+            //Remove rooms from teacher/student newRoomCounts
             await removeIfIncluded(req.user.newRoomCount, deletedRoom._id);
             await req.user.save();
             await removeIfIncluded(tutor.tutor.newRoomCount, deletedRoom._id);
@@ -217,6 +220,7 @@ controller.unenrollTutor = async function(req, res) {
                     return res.redirect('back');
                 }
 
+                //Remove rooms from teacher/student newRoomCounts
                 await removeIfIncluded(student.student.newRoomCount, deletedRoom._id);
                 await student.student.save();
                 await removeIfIncluded(req.user.newRoomCount, deletedRoom._id);
@@ -251,6 +255,7 @@ controller.updateSettings = async function(req, res) {
     }
     course.thumbnailFile.display = req.body.showThumbnail == "upload";
 
+    //Iterate through newly uploaded thumbnail file, handle with cloudinary
     if (req.files) {
         let cloudErr;
         let cloudResult;
@@ -262,16 +267,17 @@ controller.updateSettings = async function(req, res) {
             }
         }
 
-        if (req.files.imageFile) {
-            [cloudErr, cloudResult] = await cloudUpload(req.files.imageFile[0], "image");
+        if (req.files.mediaFile) {
+            [cloudErr, cloudResult] = await cloudUpload(req.files.mediaFile[0], "image");
             if (cloudErr || !cloudResult) {
                 req.flash("error", "Upload failed");
                 return res.redirect("back");
             }
-            course.thumbnailFile = {
+
+            course.thumbnailFile = { //Update thumbnail display
                 filename: cloudResult.public_id,
                 url: cloudResult.secure_url,
-                originalName: req.files.imageFile[0].originalname,
+                originalName: req.files.mediaFile[0].originalname,
                 display: req.body.showThumbnail == "upload"
             };
         }
@@ -291,7 +297,7 @@ controller.deleteCourse = async function(req, res) {
     }
 
     let deletedRoom;
-    for (let tutor of course.tutors) {
+    for (let tutor of course.tutors) { //Iterate through tutors and delete all of their rooms
         for (let student of tutor.students) {
             deletedRoom = await Room.findByIdAndDelete(student.room);
             if (!deletedRoom) {
@@ -316,7 +322,7 @@ controller.deleteCourse = async function(req, res) {
 
 //-----------TEACHER ROUTES -----------//
 
-controller.updateTeacher = async function(req, res) {
+controller.updateTeacher = async function(req, res) { //Update course teacher
     const course = await Course.findById(req.params.id);
     if (!course) {
         req.flash("error", "Unable to find course");
@@ -341,6 +347,7 @@ controller.updateTeacher = async function(req, res) {
 }
 
 controller.updateJoinCode = async function(req, res) {
+    //Build new join code
     let charSetMatrix = [];
     charSetMatrix.push('qwertyuiopasdfghjklzxcvbnm'.split(''));
     charSetMatrix.push('QWERTYUIOPASDFGHJKLZXCVBNM'.split(''));
@@ -377,26 +384,27 @@ controller.removeStudent = async function(req, res) {
     }
 
     let deletedRoom;
-    for (let tutor of course.tutors) {
-        if (objectArrIncludes(tutor.students, "student", studentId._id, "_id") > -1) {
-            tutor.formerStudents.push({
+    for (let tutor of course.tutors) { //Iterate through tutors and remove the student
+        if (objectArrIndex(tutor.students, "student", studentId._id, "_id") > -1) {
+            tutor.formerStudents.push({ //Add student to list of former studnts
                 student: studentId._id,
-                lessons: tutor.students[objectArrIncludes(tutor.students, "student", studentId._id, "_id")].lessons
+                lessons: tutor.students[objectArrIndex(tutor.students, "student", studentId._id, "_id")].lessons
             });
-            deletedRoom = await Room.findByIdAndDelete(tutor.students[objectArrIncludes(tutor.students, "student", studentId._id, "_id")].room);
+            deletedRoom = await Room.findByIdAndDelete(tutor.students[objectArrIndex(tutor.students, "student", studentId._id, "_id")].room);
             if (!deletedRoom) {
                 return res.json({error: "Error removing room"});
             }
 
+            //Update newRoomCount for student and tutor, and remove student from list of tutor's current students
             await removeIfIncluded(studentId.newRoomCount, deletedRoom._id);
             await studentId.save();
             await removeIfIncluded(tutor.tutor.newRoomCount, deletedRoom._id);
             await tutor.tutor.save();
-            tutor.students.splice(objectArrIncludes(tutor.students, "student", studentId._id, "_id"), 1);
+            tutor.students.splice(objectArrIndex(tutor.students, "student", studentId._id, "_id"), 1);
         }
     }
 
-    const notif = await Notification.create({  //Create a notification to alert the user
+    const notif = await Notification.create({  //Create a notification to alert the student that they have been blocked
         subject: `Removal from ${course.name}`,
         text: `You were removed from ${course.name} for the following reason:\n"${req.body.reason}"`,
         sender: req.user,
@@ -419,16 +427,12 @@ controller.removeStudent = async function(req, res) {
     }
     course.blocked.push(studentId);
 
-    for (let i = 0; i < course.students.length; i++) {
-        if (course.students[i]._id.equals(studentId._id)) {
-            course.students.splice(i, 1);
-            await course.save();
-            return res.json({success: "Succesfully removed student", student: studentId, course});
-        }
-    }
+    removeIfIncluded(course.students, studentId._id, "_id"); //Remove student
+    await course.save();
+    return res.json({success: "Succesfully removed student", student: studentId, course});
 }
 
-controller.removeTutor = async function(req, res) {
+controller.removeTutor = async function(req, res) { //Remove tutor from course
     let tutorId;
     if (req.body.show) {
         tutorId = await User.findById(req.body.tutorId);
@@ -515,7 +519,7 @@ controller.removeTutor = async function(req, res) {
     }
 }
 
-controller.unblock = async function(req, res) {
+controller.unblock = async function(req, res) { //Unblock a previously blocked user
     const blockedId = await User.findById(req.body.blockedId);
     if (!blockedId) {
         return res.json({error: "Unable to access user"});
@@ -529,10 +533,9 @@ controller.unblock = async function(req, res) {
     if (!course.blocked.includes(blockedId._id)) { //If the user is not blocked, they cannot be unblocked
         return res.json({error: "User is not blocked from this course"});
     }
-
-    course.blocked.splice(course.blocked.indexOf(blockedId._id), 1); //Unblock user
+    
+    removeIfIncluded(course.blocked, blockedId._id); //Unblock user
     await course.save();
-
     const notif = await Notification.create({  //Create a notification to alert the user
         subject: `Unblocked from ${course.name}`,
         text: `You have been unblocked from ${course.name}. You can rejoin with the join code now whenever you need to.`,
@@ -634,7 +637,7 @@ controller.markLesson = async function(req, res) {
     if (!course) {
         return res.json({error: "Error accessing course"});
     }
-
+    //Find specific tutor and add lesson for their student
     for (let tutor of course.tutors) {
         if (tutor.tutor.equals(req.user._id)) {
             for (let student of tutor.students) {
@@ -663,9 +666,9 @@ controller.bookTutor = async function(req, res) {
     let formerStudent = false;
     for (let tutor of course.tutors) { //Iterate through tutors and search for the corresponding one
         if (tutor.tutor._id.equals(req.body.tutorId) && tutor.available) {
-            if (objectArrIncludes(tutor.formerStudents, "student", req.user._id) > -1) { //Remove student from tutor's former students (if they were there)
+            if (objectArrIndex(tutor.formerStudents, "student", req.user._id) > -1) { //Remove student from tutor's former students (if they were there)
                 formerStudent = true;
-                tutor.formerStudents.splice(objectArrIncludes(tutor.formerStudents, "student", req.user._id), 1);
+                tutor.formerStudents.splice(objectArrIndex(tutor.formerStudents, "student", req.user._id), 1);
             }
 
             tutor.slots--;
@@ -699,11 +702,13 @@ controller.bookTutor = async function(req, res) {
             tutor.students.push(studentObject);
             await course.save();
 
+            //All current students of the tutor
             const studentIds = await User.find({authenticated: true, _id: {$in: parsePropertyArray(tutor.students, "student")}});
             if (!studentIds) {
                 return res.json({error: "Error accessing students"});
             }
 
+            //All former students of the tutor
             const formerStudents = await User.find({authenticated: true, _id: {$in: parsePropertyArray(tutor.formerStudents, "student")}});
             if (!formerStudents) {
                 return res.json({error: "Error accessing students"});
@@ -727,22 +732,24 @@ controller.leaveTutor = async function(req, res) {
     let deletedRoom;
     for (let tutor of course.tutors) { //If the selected tutor is the one being left, and the user is a student of that tutor, leave
         if (tutor.tutor._id.equals(req.body.tutorId)) {
-            if (objectArrIncludes(tutor.students, "student", req.user._id) > -1) {
-                deletedRoom = await Room.findByIdAndDelete(tutor.students[objectArrIncludes(tutor.students, "student", req.user._id)].room);
+            if (objectArrIndex(tutor.students, "student", req.user._id) > -1) {
+                deletedRoom = await Room.findByIdAndDelete(tutor.students[objectArrIndex(tutor.students, "student", req.user._id)].room);
                 if (!deletedRoom) {
                     return res.json({error: "Error deleting room"});
                 }
-                await removeIfIncluded(tutor.tutor.newRoomCount, tutor.students[objectArrIncludes(tutor.students, "student", req.user._id)].room);
+
+                //Remove room, add student to tutor's former students
+                await removeIfIncluded(tutor.tutor.newRoomCount, tutor.students[objectArrIndex(tutor.students, "student", req.user._id)].room);
                 await tutor.tutor.save();
-                await removeIfIncluded(req.user.newRoomCount, tutor.students[objectArrIncludes(tutor.students, "student", req.user._id)].room)
+                await removeIfIncluded(req.user.newRoomCount, tutor.students[objectArrIndex(tutor.students, "student", req.user._id)].room)
                 await req.user.save();
-                if (objectArrIncludes(tutor.formerStudents, "student", req.user._id) == -1) {
+                if (objectArrIndex(tutor.formerStudents, "student", req.user._id) == -1) {
                     tutor.formerStudents.push({
                         student: req.user._id,
-                        lessons: tutor.students[objectArrIncludes(tutor.students, "student", req.user._id).lessons]
+                        lessons: tutor.students[objectArrIndex(tutor.students, "student", req.user._id).lessons]
                     });
                 }
-                tutor.students.splice(objectArrIncludes(tutor.students, "student", req.user._id), 1);
+                tutor.students.splice(objectArrIndex(tutor.students, "student", req.user._id), 1);
                 tutor.slots++;
                 tutor.available = true;
 
@@ -763,18 +770,15 @@ controller.upvoteTutor = async function(req, res) {
 
     for (let tutor of course.tutors) {
         if (tutor.tutor.equals(req.body.tutorId)) { //Search for tutor until they are found
-            if (objectArrIncludes(tutor.students.concat(tutor.formerStudents), "student", req.user._id) > -1) { //Only current/former students of a tutor can upvote them
-                if (tutor.upvotes.includes(req.user._id)) { //If tutor is currently upvoted by this user, downvote them
-                    tutor.upvotes.splice(tutor.upvotes.indexOf(req.user._id), 1);
+            if (objectArrIndex(tutor.students.concat(tutor.formerStudents), "student", req.user._id) > -1) { //Only current/former students of a tutor can upvote them
+                if (removeIfIncluded(tutor.upvotes, req.user._id)) { //If tutor is currently upvoted by this user, downvote them
                     await course.save();
                     return res.json({success: "Downvoted tutor", upvoteCount: tutor.upvotes.length});
                 }
-
                 tutor.upvotes.push(req.user._id);
                 await course.save();
                 return res.json({success: "Upvoted tutor", upvoteCount: tutor.upvotes.length});
             }
-
             return res.json({error: "You are not a student of this tutor"});
         }
     }
@@ -788,7 +792,7 @@ controller.rateTutor = async function(req, res) {
 
     for (let tutor of course.tutors) {
         if (tutor.tutor.equals(req.body.tutorId)) {
-            if (objectArrIncludes(tutor.students.concat(tutor.formerStudents), "student", req.user._id) > -1) { //Only current/former students of a tutor can upvote them
+            if (objectArrIndex(tutor.students.concat(tutor.formerStudents), "student", req.user._id) > -1) { //Only current/former students of a tutor can upvote them
                 let review = await PostComment.create({type: "review", text: req.body.text, sender: req.user}); //Create comment with review
                 if (!review) {
                     return res.json({error: "Error reviewing tutor"});
@@ -805,6 +809,7 @@ controller.rateTutor = async function(req, res) {
                     averageRating += review.rating;
                 }
 
+                //Update tutor's average rating based on new rating
                 averageRating = Math.round(averageRating / tutor.reviews.length);
                 return res.json({
                     success: "Succesfully upvoted tutor",
@@ -814,7 +819,6 @@ controller.rateTutor = async function(req, res) {
                     user: req.user
                 });
             }
-
             return res.json({error: "You are not a student of this tutor"});
         }
     }
@@ -826,12 +830,11 @@ controller.likeReview = async function(req, res) {
         return res.json({error: "Error accessing review"});
     }
 
-    if (review.likes.includes(req.user._id)) { //If user has liked this review, remove a like
-        review.likes.splice(review.likes.indexOf(req.user._id), 1);
+    if (removeIfIncluded(review.likes, req.user._id)) { //If user has liked this review, remove a like
         await review.save();
         return res.json({success: "Removed a like", likeCount: review.likes.length, review});
     }
-
+    
     review.likes.push(req.user._id);
     await review.save();
     return res.json({success: "Liked", likeCount: review.likes.length});
@@ -881,7 +884,7 @@ controller.showTutor = async function(req, res) {
                 }
             }
 
-            let averageRating = 0;
+            let averageRating = 0; //Calculate tutor's average rating
             for (let review of tutor.reviews) {
                 averageRating += review.rating;
             }
@@ -893,7 +896,7 @@ controller.showTutor = async function(req, res) {
                 return res.redirect('back');
             }
 
-            let lessonMap = new Map();
+            let lessonMap = new Map(); //Track all lessons of this tutor's students
             let time = 0;
             for (let student of tutor.students.concat(tutor.formerStudents)) {
                 time = 0;
@@ -903,13 +906,14 @@ controller.showTutor = async function(req, res) {
                 lessonMap.set(student.student._id.toString(), time);
             }
 
-            if (req.query.studentId) {
+            if (req.query.studentId) { //If query is to show a tutor's lessons with a specific student
                 const allStudents = tutor.students.concat(tutor.formerStudents);
-                if (objectArrIncludes(allStudents, "student", req.query.studentId, "_id") > -1) {
-                    if (allStudents[objectArrIncludes(allStudents, "student", req.query.studentId, "_id")].student._id.equals(req.user._id) || tutor.tutor._id.equals(req.user._id) || course.teacher.equals(req.user._id)) {
+                if (objectArrIndex(allStudents, "student", req.query.studentId, "_id") > -1) {
+                    //Check that user is either a student of this tutor, this tutor, or the course's teacher
+                    if (allStudents[objectArrIndex(allStudents, "student", req.query.studentId, "_id")].student._id.equals(req.user._id) || tutor.tutor._id.equals(req.user._id) || course.teacher.equals(req.user._id)) {
                         return res.render('homework/lessons', {
-                            course, tutor, student: allStudents[objectArrIncludes(allStudents, "student", req.query.studentId, "_id")],
-                            time: lessonMap.get(allStudents[objectArrIncludes(allStudents, "student", req.query.studentId, "_id")].student._id.toString()), objectArrIncludes
+                            course, tutor, student: allStudents[objectArrIndex(allStudents, "student", req.query.studentId, "_id")],
+                            time: lessonMap.get(allStudents[objectArrIndex(allStudents, "student", req.query.studentId, "_id")].student._id.toString()), objectArrIndex
                         });
                     }
                     req.flash('error', "You are ge");
@@ -922,7 +926,7 @@ controller.showTutor = async function(req, res) {
 
             return res.render('homework/tutor-show', {
                 course, tutor, students, studentIds, averageRating,
-                lessons: lessonMap, courses: enrolledCourses, objectArrIncludes
+                lessons: lessonMap, courses: enrolledCourses, objectArrIndex
             });
         }
     }

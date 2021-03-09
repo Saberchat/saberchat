@@ -103,7 +103,7 @@
                     <% } else if(comment.author) { %>
                         <!-- Sender message -->
                         <div class="media mb-2">
-                            <img src="<% if (comment.author.imageFile.display) {%> <%= comment.author.imageFile.url%><%} else {%> <%=comment.author.imageUrl.url%><%}%>" alt="user" class="user-image">
+                            <img src="<% if (comment.author.mediaFile.display) {%> <%= comment.author.mediaFile.url%><%} else {%> <%=comment.author.imageUrl.url%><%}%>" alt="user" class="user-image">
                             <div class="media-body ml-3">
                                 <div class="bg-grey rounded py-2 px-3 mb-2 w-65">
                                     <p class="text-small mb-0 text-dark">
@@ -155,7 +155,7 @@
     //set all the variables for the chatInit function
     const userId = '<%= currentUser._id %>';
     const username = '<%= currentUser.username %>';
-    const userImage = '<% if (currentUser.imageFile.display) {%> <%= currentUser.imageFile.url%><%} else {%> <%=currentUser.imageUrl.url%><%}%>';
+    const userImage = '<% if (currentUser.mediaFile.display) {%> <%= currentUser.mediaFile.url%><%} else {%> <%=currentUser.imageUrl.url%><%}%>';
     const messageForm = '#message-form';
     const input = '#m';
     const chatDisplay = '#message-display';

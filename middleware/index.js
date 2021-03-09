@@ -3,7 +3,7 @@
 const Room = require("../models/chat/room");
 const Cafe = require('../models/cafe/cafe')
 const Course = require('../models/homework/course')
-const {objectArrIncludes} = require("../utils/object-operations");
+const {objectArrIndex} = require("../utils/object-operations");
 
 const middleware = {};
 
@@ -137,7 +137,7 @@ middleware.memberOfCourse = async function(req, res, next) {
         return res.redirect('/homework');
     }
 
-    if (course.teacher.equals(req.user._id) || course.students.includes(req.user._id) || objectArrIncludes(course.tutors, "tutor", req.user._id) > -1) {
+    if (course.teacher.equals(req.user._id) || course.students.includes(req.user._id) || objectArrIndex(course.tutors, "tutor", req.user._id) > -1) {
         return next();
     }
 
@@ -153,7 +153,7 @@ middleware.notMemberOfCourse = async function(req, res, next) {
         return res.redirect('/homework')
     }
 
-    if (course.teacher.equals(req.user._id) || course.students.includes(req.user._id) || objectArrIncludes(course.tutors, "tutor", req.user._id) > -1) {
+    if (course.teacher.equals(req.user._id) || course.students.includes(req.user._id) || objectArrIndex(course.tutors, "tutor", req.user._id) > -1) {
         req.flash('error', 'You are already a member of this course');
         return res.redirect('/homework');
     }

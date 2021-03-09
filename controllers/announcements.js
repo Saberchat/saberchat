@@ -1,6 +1,6 @@
 const {sendGridEmail} = require("../services/sendGrid");
 const convertToLink = require("../utils/convert-to-link");
-const {objectArrIncludes} = require("../utils/object-operations");
+const {objectArrIndex, removeIfIncluded} = require("../utils/object-operations");
 
 const path = require('path');
 const dateFormat = require('dateformat');
@@ -39,8 +39,8 @@ controller.markAll = async function(req, res) {
 
 // Ann GET mark one ann as read
 controller.markOne = async function(req, res) {
-    if (objectArrIncludes(req.user.annCount, "announcement", req.params.id) > -1) { //If user's annCount includes announcement, remove it
-        req.user.annCount.splice(objectArrIncludes(req.user.annCount, "announcement", req.params.id), 1);
+    if (objectArrIndex(req.user.annCount, "announcement", req.params.id) > -1) { //If user's annCount includes announcement, remove it
+        req.user.annCount.splice(objectArrIndex(req.user.annCount, "announcement", req.params.id), 1);
         await req.user.save();
     }
     req.flash('success', 'Announcement Marked As Read!');
@@ -64,14 +64,14 @@ controller.show = async function(req, res) {
 
     if(req.user) {
         //If this announcement is new to the user, it is no longer new, so remove it
-        if (objectArrIncludes(req.user.annCount, "announcement", announcement._id, "_id") > -1) {
-            req.user.annCount.splice(objectArrIncludes(req.user.annCount, "announcement", announcement._id, "_id"), 1);
+        if (objectArrIndex(req.user.annCount, "announcement", announcement._id, "_id") > -1) {
+            req.user.annCount.splice(objectArrIndex(req.user.annCount, "announcement", announcement._id, "_id"), 1);
             await req.user.save();
         }
     }
 
     let fileExtensions = new Map(); //Track which file format each attachment is in
-    for (let media of announcement.imageFiles) {
+    for (let media of announcement.mediaFiles) {
         fileExtensions.set(media.url, path.extname(media.url.split("SaberChat/")[1]));
     }
     const convertedText = convertToLink(announcement.text); //Parse and add hrefs to all links in text
@@ -91,7 +91,7 @@ controller.updateForm = async function(req, res) {
     }
 
     let fileExtensions = new Map(); //Track which file format each attachment is in
-    for (let media of announcement.imageFiles) {
+    for (let media of announcement.mediaFiles) {
         fileExtensions.set(media.url, path.extname(media.url.split("SaberChat/")[1]));
     }
     return res.render('announcements/edit', {announcement, fileExtensions});
@@ -117,10 +117,10 @@ controller.create = async function(req, res) {
 
     // if files were uploaded, process them
     if (req.files) {
-        if (req.files.imageFile) {
+        if (req.files.mediaFile) {
             let cloudErr;
             let cloudResult;
-            for (let file of req.files.imageFile) { //Upload each file to cloudinary
+            for (let file of req.files.mediaFile) { //Upload each file to cloudinary
                 if ([".mp3", ".mp4", ".m4a", ".mov"].includes(path.extname(file.originalname).toLowerCase())) {
                     [cloudErr, cloudResult] = await cloudUpload(file, "video");
                 } else if (path.extname(file.originalname).toLowerCase() == ".pdf") {
@@ -133,7 +133,7 @@ controller.create = async function(req, res) {
                     return res.redirect('back');
                 }
 
-                announcement.imageFiles.push({
+                announcement.mediaFiles.push({
                     filename: cloudResult.public_id,
                     url: cloudResult.secure_url,
                     originalName: file.originalname
@@ -201,29 +201,29 @@ controller.updateAnn = async function(req, res) {
     //Iterate through all selected media to remove and delete them
     let cloudErr;
     let cloudResult;
-    for (let i = updatedAnn.imageFiles.length-1; i >= 0; i--) {
-        if (req.body[`deleteUpload-${updatedAnn.imageFiles[i].url}`] && updatedAnn.imageFiles[i] && updatedAnn.imageFiles[i].filename) {
-            if ([".mp3", ".mp4", ".m4a", ".mov"].includes(path.extname(updatedAnn.imageFiles[i].url.split("SaberChat/")[1]).toLowerCase())) {
-                [cloudErr, cloudResult] = await cloudDelete(updatedAnn.imageFiles[i].filename, "video");
-            } else if (path.extname(updatedAnn.imageFiles[i].url.split("SaberChat/")[1]).toLowerCase() == ".pdf") {
-                [cloudErr, cloudResult] = await cloudDelete(updatedAnn.imageFiles[i].filename, "pdf");
+    for (let i = updatedAnn.mediaFiles.length-1; i >= 0; i--) {
+        if (req.body[`deleteUpload-${updatedAnn.mediaFiles[i].url}`] && updatedAnn.mediaFiles[i] && updatedAnn.mediaFiles[i].filename) {
+            if ([".mp3", ".mp4", ".m4a", ".mov"].includes(path.extname(updatedAnn.mediaFiles[i].url.split("SaberChat/")[1]).toLowerCase())) {
+                [cloudErr, cloudResult] = await cloudDelete(updatedAnn.mediaFiles[i].filename, "video");
+            } else if (path.extname(updatedAnn.mediaFiles[i].url.split("SaberChat/")[1]).toLowerCase() == ".pdf") {
+                [cloudErr, cloudResult] = await cloudDelete(updatedAnn.mediaFiles[i].filename, "pdf");
             } else {
-                [cloudErr, cloudResult] = await cloudDelete(updatedAnn.imageFiles[i].filename, "image");
+                [cloudErr, cloudResult] = await cloudDelete(updatedAnn.mediaFiles[i].filename, "image");
             }
             // check for failure
             if (cloudErr || !cloudResult || cloudResult.result !== 'ok') {
                 req.flash('error', 'Error deleting uploaded image');
                 return res.redirect('back');
             }
-            updatedAnn.imageFiles.splice(i, 1);
+            updatedAnn.mediaFiles.splice(i, 1);
         }
     }
 
     // if files were uploaded
     if (req.files) {
-        if (req.files.imageFile) {
+        if (req.files.mediaFile) {
             //Iterate through all new attached media
-            for (let file of req.files.imageFile) {
+            for (let file of req.files.mediaFile) {
                 if ([".mp3", ".mp4", ".m4a", ".mov"].includes(path.extname(file.originalname).toLowerCase())) {
                     [cloudErr, cloudResult] = await cloudUpload(file, "video");
                 } else if (path.extname(file.originalname).toLowerCase() == ".pdf") {
@@ -236,7 +236,7 @@ controller.updateAnn = async function(req, res) {
                     return res.redirect('back');
                 }
 
-                updatedAnn.imageFiles.push({
+                updatedAnn.mediaFiles.push({
                     filename: cloudResult.public_id,
                     url: cloudResult.secure_url,
                     originalName: file.originalname
@@ -263,7 +263,7 @@ controller.updateAnn = async function(req, res) {
         }
 
         //If announcement not already in user's anncount, add it
-        if (objectArrIncludes(user.annCount, "announcement", updatedAnn._id) == -1) {
+        if (objectArrIndex(user.annCount, "announcement", updatedAnn._id) == -1) {
             user.annCount.push({announcement: updatedAnn, version: "updated"});
             await user.save();
         }
@@ -278,23 +278,20 @@ controller.likeAnn = async function(req, res) {
     const announcement = await Announcement.findById(req.body.announcementId);
     if(!announcement) {return res.json({error: 'Error updating announcement.'});}
 
-    if (announcement.likes.includes(req.user._id)) { //Remove like
-        announcement.likes.splice(announcement.likes.indexOf(req.user._id), 1);
+    if (removeIfIncluded(announcements.likes, req.user._id)) { //Remove like
         await announcement.save();
-
         return res.json({
             success: `Removed a like from ${announcement.subject}`,
             likeCount: announcement.likes.length
         });
-    } else {
-        announcement.likes.push(req.user._id);
-        await announcement.save();
-
-        return res.json({
-            success: `Liked ${announcement.subject}`,
-            likeCount: announcement.likes.length
-        });
     }
+    
+    announcement.likes.push(req.user._id);
+    await announcement.save();
+    return res.json({
+        success: `Liked ${announcement.subject}`,
+        likeCount: announcement.likes.length
+    });
 };
 
 // Ann PUT comment
@@ -381,8 +378,7 @@ controller.likeComment = async function(req, res) {
     const comment = await PostComment.findById(req.body.commentId);
     if(!comment) {return res.json({error: 'Error finding comment'});}
 
-    if (comment.likes.includes(req.user._id)) { //Remove Like
-        comment.likes.splice(comment.likes.indexOf(req.user._id), 1);
+    if (removeIfIncluded(comments.likes, req.user._id)) {
         await comment.save();
         return res.json({
             success: `Removed a like`,
@@ -413,7 +409,7 @@ controller.deleteAnn = async function(req, res) {
     // delete any uploads
     let cloudErr;
     let cloudResult;
-    for (let file of announcement.imageFiles) {
+    for (let file of announcement.mediaFiles) {
         if (file && file.filename) {
             if ([".mp3", ".mp4", ".m4a", ".mov"].includes(path.extname(file.url.split("SaberChat/")[1]).toLowerCase())) {
                 [cloudErr, cloudResult] = await cloudDelete(file.filename, "video");
@@ -443,8 +439,8 @@ controller.deleteAnn = async function(req, res) {
     }
 
     for (let user of users) {
-        if (objectArrIncludes(user.annCount, "announcement", deletedAnn._id) > -1) {
-            user.annCount.splice(objectArrIncludes(user.annCount, "announcement", deletedAnn._id), 1);
+        if (objectArrIndex(user.annCount, "announcement", deletedAnn._id) > -1) {
+            user.annCount.splice(objectArrIndex(user.annCount, "announcement", deletedAnn._id), 1);
             await user.save();
         }
     }

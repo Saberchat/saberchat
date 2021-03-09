@@ -4,7 +4,7 @@ var announcementSchema = new mongoose.Schema({
     subject: String,
     sender: {type: mongoose.Schema.Types.ObjectId, ref: "User"},
     images: [{type: String}],
-    imageFiles: [{
+    mediaFiles: [{
         filename: String,
         url: String,
         originalName: String

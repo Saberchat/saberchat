@@ -24,8 +24,8 @@ const comment = ((form, event) => {
                 newComment.style = "text-align: left;";
                 let commentHTML;
                 //Build comment body based on user's image display
-                if (data.comments[data.comments.length - 1].sender.imageFile.display) {
-                     commentHTML = `<img src="${data.comments[data.comments.length - 1].sender.imageFile.url}" alt="user" class="user-image"><div class="media-body ml-3"><div class="bg-primary rounded py-2 px-3 mb-2 w-75"><p class="text-small mb-0 text-white">`;
+                if (data.comments[data.comments.length - 1].sender.mediaFile.display) {
+                     commentHTML = `<img src="${data.comments[data.comments.length - 1].sender.mediaFile.url}" alt="user" class="user-image"><div class="media-body ml-3"><div class="bg-primary rounded py-2 px-3 mb-2 w-75"><p class="text-small mb-0 text-white">`;
                  } else {
                      commentHTML = `<img src="${data.comments[data.comments.length - 1].sender.imageUrl.url}" alt="user" class="user-image"><div class="media-body ml-3"><div class="bg-primary rounded py-2 px-3 mb-2 w-75"><p class="text-small mb-0 text-white">`;
                  }

@@ -13,7 +13,7 @@ const Permission = require('../models/admin/permission');
 const Status = require('../models/admin/status');
 
 const {sendGridEmail} = require("../services/sendGrid");
-const {objectArrIncludes} = require("../utils/object-operations");
+const {objectArrIndex} = require("../utils/object-operations");
 const controller = {}; //Controller object
 
 controller.moderateGet = async function(req, res) { //Show all reported comments
@@ -40,7 +40,7 @@ controller.getContext = async function(req, res) { //Get context for reported co
         return res.json({error: "Unable to find other comments"});
     }
 
-    const commentIndex = objectArrIncludes(allComments, "_id", reportedComment._id); //Get index of reported comment
+    const commentIndex = objectArrIndex(allComments, "_id", reportedComment._id); //Get index of reported comment
     let context = []; //Comments 5 before and 5 after
 
     //Find the comments 5 before and 5 after the reported one, and add to array
@@ -248,19 +248,19 @@ controller.tag = async function(req, res) { //Add/remove status tag to user
             }
 
             for (let course of courses) { //Iterate through courses and see if user is a tutor in any of them
-                if (objectArrIncludes(course.tutors, "tutor", user._id) > -1) {
+                if (objectArrIndex(course.tutors, "tutor", user._id) > -1) {
                     return res.json({error: "User is an Active Tutor"});
                 }
             }
 
             //If there is no error, remove the tag
-            user.tags.splice(user.tags.indexOf(req.body.tag), 1);
+            removeIfIncluded(user.tags, req.body.tag);
             await user.save();
             return res.json({success: "Successfully removed status", tag: req.body.tag})
         }
 
         //Remove the tag
-        user.tags.splice(user.tags.indexOf(req.body.tag), 1);
+        removeIfIncluded(user.tags, req.body.tag);
         await user.save();
         return res.json({success: "Successfully removed status", tag: req.body.tag})
     }

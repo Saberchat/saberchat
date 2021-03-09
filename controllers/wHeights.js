@@ -25,14 +25,14 @@ controller.index = async function(req, res) {
 controller.new = async function(req, res) {
     const students = await User.find({
         authenticated: true,
-        status: {$in: ["7th", "8th", "9th", "10th", "11th", "12th"]}
+        status: {$in: ["7th", "8th", "9th", "10th", "11th", "12th"]} //All students
     });
     if (!students) {
         req.flash('error', "Unable to find students");
         return res.redirect('back');
     }
 
-    const types = await Type.find({});
+    const types = await Type.find({}); //Find list of article types (for sorting)
     if (!types) {
         req.flash('error', "Unable to find article types");
         return res.redirect('back');
@@ -47,20 +47,14 @@ controller.show = async function(req, res) {
         .populate('author')
         .populate({
             path: 'comments',
-            populate: {
-                path: 'sender'
-            }
+            populate: {path: 'sender'}
         });
 
     if (!article) {
         req.flash('error', 'Cannot find article');
         return res.redirect('/articles');
     }
-
-    return res.render('wHeights/show', {
-        article: article,
-        date: dateFormat(article.created_at, "mmm d, yyyy - h:MM TT")
-    });
+    return res.render('wHeights/show', {article});
 }
 
 //Create article
@@ -77,6 +71,7 @@ controller.create = async function(req, res) {
         req.flash('error', "Error creating article");
         return res.redirect('/articles');
     }
+    article.date = dateFormat(article.created_at, "mmm d, yyyy - h:MM TT");
 
     const author = await User.findById(req.body.author);
     if (!author) {
@@ -93,9 +88,9 @@ controller.create = async function(req, res) {
         return res.redirect('back');
     }
 
+    //Add articles to the article category
     type.articles.push(article);
     await type.save();
-
     return res.redirect('/articles');
 }
 
@@ -104,9 +99,7 @@ controller.comment = async function(req, res) {
     const article = await Article.findById(req.body.article)
         .populate({
             path: "comments",
-            populate: {
-                path: "sender"
-            }
+            populate: {path: "sender"}
         });
 
     if (!article) {
@@ -131,6 +124,7 @@ controller.comment = async function(req, res) {
     let users = [];
     let user;
 
+    //Look for any mentioned users in comment text
     for (let line of comment.text.split(" ")) {
         if (line[0] == '@') {
             user = await User.findById(line.split("#")[1].split("_")[0]);
@@ -144,10 +138,7 @@ controller.comment = async function(req, res) {
     }
 
     let notif;
-    let commentEmail;
-
     for (let user of users) {
-
         notif = await Notification.create({
             subject: `New Mention in ${article.title}`,
             sender: req.user,
@@ -172,7 +163,6 @@ controller.comment = async function(req, res) {
         user.msgCount += 1;
         await user.save();
     }
-
     return res.json({success: 'Successful comment', comments: article.comments});
 }
 
@@ -182,23 +172,19 @@ controller.likeComment = async function(req, res) {
         return res.json({error: 'Error updating comment'});
     }
 
-    if (comment.likes.includes(req.user._id)) { //Remove Like
-        comment.likes.splice(comment.likes.indexOf(req.user._id), 1);
+    if (removeIfIncluded(comment.likes, req.user._id)) { //Remove Like
         await comment.save();
         return res.json({
             success: `Removed a like from a comment`,
             likeCount: comment.likes.length
         });
-
-    } else { //Add Like
-        comment.likes.push(req.user._id);
-        await comment.save();
-
-        return res.json({
-            success: `Liked comment`,
-            likeCount: comment.likes.length
-        });
     }
+    comment.likes.push(req.user._id); //Add Like
+    await comment.save();
+    return res.json({
+        success: `Liked comment`,
+        likeCount: comment.likes.length
+    });
 }
 
 module.exports = controller;

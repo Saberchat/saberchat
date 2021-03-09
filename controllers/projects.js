@@ -4,6 +4,7 @@ const {sendGridEmail} = require("../services/sendGrid");
 const convertToLink = require("../utils/convert-to-link");
 const keywordFilter = require('../utils/keywordFilter');
 const {sortByPopularity} = require("../utils/popularity");
+const {removeIfIncluded} = require('../utils/object-operations');
 const {cloudUpload, cloudDelete} = require('../services/cloudinary');
 
 //SCHEMA
@@ -23,9 +24,10 @@ controller.index = async function(req, res) {
         return res.redirect('back');
     }
 
+    //List of media with corresponding file extensions, so they can be displayed properly
     let fileExtensions = new Map();
     for (let project of projects) {
-        for (let media of project.imageFiles) {
+        for (let media of project.mediaFiles) {
             fileExtensions.set(media.url, path.extname(media.url.split("SaberChat/")[1]));
         }
     }
@@ -34,12 +36,13 @@ controller.index = async function(req, res) {
 
 
 controller.newProject = async function(req, res) {
-    let users = await User.find({authenticated: true, status: {$nin: ['alumnus', 'guest', 'parent', 'faculty']}});
-    if (!users) {
-        req.flash('error', "An Error Occurred");
+    //Find all students
+    const students = await User.find({authenticated: true, status: {$nin: ['alumnus', 'guest', 'parent', 'faculty']}}); 
+    if (!students) {
+        req.flash('error', "No Students Found");
         return res.redirect('back');
     }
-    return res.render('projects/new', {students: users});
+    return res.render('projects/new', {students});
 }
 
 
@@ -49,11 +52,11 @@ controller.createProject = async function(req, res) {
     let individual; //Individual Creator ID
 
     if (req.body.creatorInput != '') {
-        let statuses = ['7th', '8th', '9th', '10th', '11th', '12th'];
+        let statuses = ['7th', '8th', '9th', '10th', '11th', '12th']; //Lists of possible 'creators' that include groups of people
 
         for (let creator of req.body.creatorInput.split(',')) {
-            if (statuses.includes(creator)) {
-                statusGroup = await User.find({authenticated: true, status: creator});
+            if (statuses.includes(creator)) { //If the 'creator' is one of the listed status groups
+                statusGroup = await User.find({authenticated: true, status: creator});  //Search for all users with that status
 
                 if (!statusGroup) {
                     req.flash('error', "Unable to find the users you listed");
@@ -88,10 +91,10 @@ controller.createProject = async function(req, res) {
     }
 
     if (req.files) {
-        if (req.files.imageFile) {
+        if (req.files.mediaFile) { //Look for all attached files and upload them
             let cloudErr;
             let cloudResult;
-            for (let file of req.files.imageFile) {
+            for (let file of req.files.mediaFile) {
                 if ([".mp3", ".mp4", ".m4a", ".mov"].includes(path.extname(file.originalname).toLowerCase())) {
                     [cloudErr, cloudResult] = await cloudUpload(file, "video");
                 } else if (path.extname(file.originalname).toLowerCase() == ".pdf") {
@@ -105,7 +108,7 @@ controller.createProject = async function(req, res) {
                     return res.redirect('back');
                 }
 
-                project.imageFiles.push({
+                project.mediaFiles.push({
                     filename: cloudResult.public_id,
                     url: cloudResult.secure_url,
                     originalName: file.originalname
@@ -191,7 +194,7 @@ controller.editProject = async function(req, res) {
     }
 
     let fileExtensions = new Map();
-    for (let media of project.imageFiles) {
+    for (let media of project.mediaFiles) {
         fileExtensions.set(media.url, path.extname(media.url.split("SaberChat/")[1]));
     }
     return res.render('projects/edit', {project, students, creatornames, fileExtensions});
@@ -214,7 +217,7 @@ controller.showProject = async function(req, res) {
     }
 
     let fileExtensions = new Map();
-    for (let media of project.imageFiles) {
+    for (let media of project.mediaFiles) {
         fileExtensions.set(media.url, path.extname(media.url.split("SaberChat/")[1]));
     }
     const convertedText = convertToLink(project.text);
@@ -231,13 +234,10 @@ controller.updateProject = async function(req, res) {
         creators = [];
 
     } else {
-        let statuses = ['7th', '8th', '9th', '11th', '12th'];
-        let creatorInputArray = req.body.creatorInput.split(',');
-
-        for (let creator of creatorInputArray) {
-            if (statuses.includes(creator)) {
+        let statuses = ['7th', '8th', '9th', '11th', '12th']; //Lists of possible 'creators' that include groups of people
+        for (let creator of req.body.creatorInput.split(',')) { //Iterate throguh listed creators
+            if (statuses.includes(creator)) { //If 'creator' is one of the statuses (grades), find all users with that status
                 statusGroup = await User.find({authenticated: true, status: creator});
-
                 if (!statusGroup) {
                     req.flash('error', "Unable to find the users you listed");
                     return res.redirect('back');
@@ -289,28 +289,29 @@ controller.updateProject = async function(req, res) {
 
     let cloudErr;
     let cloudResult;
-    for (let i = updatedProject.imageFiles.length-1; i >= 0; i--) {
-        if (req.body[`deleteUpload-${updatedProject.imageFiles[i].url}`] && updatedProject.imageFiles[i] && updatedProject.imageFiles[i].filename) {
-            if ([".mp3", ".mp4", ".m4a", ".mov"].includes(path.extname(updatedProject.imageFiles[i].url.split("SaberChat/")[1]).toLowerCase())) {
-                [cloudErr, cloudResult] = await cloudDelete(updatedProject.imageFiles[i].filename, "video");
-            } else if (path.extname(updatedProject.imageFiles[i].url.split("SaberChat/")[1]).toLowerCase() == ".pdf") {
-                [cloudErr, cloudResult] = await cloudDelete(updatedProject.imageFiles[i].filename, "pdf");
+    for (let i = updatedProject.mediaFiles.length-1; i >= 0; i--) { //Iterate through each image file and check if that file is checked on form
+        //If checked, delete it
+        if (req.body[`deleteUpload-${updatedProject.mediaFiles[i].url}`] && updatedProject.mediaFiles[i] && updatedProject.mediaFiles[i].filename) {
+            if ([".mp3", ".mp4", ".m4a", ".mov"].includes(path.extname(updatedProject.mediaFiles[i].url.split("SaberChat/")[1]).toLowerCase())) {
+                [cloudErr, cloudResult] = await cloudDelete(updatedProject.mediaFiles[i].filename, "video");
+            } else if (path.extname(updatedProject.mediaFiles[i].url.split("SaberChat/")[1]).toLowerCase() == ".pdf") {
+                [cloudErr, cloudResult] = await cloudDelete(updatedProject.mediaFiles[i].filename, "pdf");
             } else {
-                [cloudErr, cloudResult] = await cloudDelete(updatedProject.imageFiles[i].filename, "image");
+                [cloudErr, cloudResult] = await cloudDelete(updatedProject.mediaFiles[i].filename, "image");
             }
             // check for failure
             if (cloudErr || !cloudResult || cloudResult.result !== 'ok') {
                 req.flash('error', 'Error deleting uploaded image');
                 return res.redirect('back');
             }
-            updatedProject.imageFiles.splice(i, 1);
+            updatedProject.mediaFiles.splice(i, 1);
         }
     }
 
     // if files were uploaded
     if (req.files) {
-        if (req.files.imageFile) {
-            for (let file of req.files.imageFile) {
+        if (req.files.mediaFile) {
+            for (let file of req.files.mediaFile) { //Upload each file to cloudinary basd on format
                 if ([".mp3", ".mp4", ".m4a", ".mov"].includes(path.extname(file.originalname).toLowerCase())) {
                     [cloudErr, cloudResult] = await cloudUpload(file, "video");
                 } else if (path.extname(file.originalname).toLowerCase() == ".pdf") {
@@ -323,7 +324,8 @@ controller.updateProject = async function(req, res) {
                     return res.redirect('back');
                 }
 
-                updatedProject.imageFiles.push({
+                //Add uploaded files to project's image files
+                updatedProject.mediaFiles.push({
                     filename: cloudResult.public_id,
                     url: cloudResult.secure_url,
                     originalName: file.originalname
@@ -357,8 +359,8 @@ controller.deleteProject = async function(req, res) {
     // delete any uploads
     let cloudErr;
     let cloudResult;
-    for (let file of project.imageFiles) {
-        if (file && file.filename) {
+    for (let file of project.mediaFiles) {
+        if (file && file.filename) { //Check for extension and delete accordingly
             if ([".mp3", ".mp4", ".m4a", ".mov"].includes(path.extname(file.url.split("SaberChat/")[1]).toLowerCase())) {
                 [cloudErr, cloudResult] = await cloudDelete(file.filename, "video");
             } else if (path.extname(file.url.split("SaberChat/")[1]).toLowerCase() == ".pdf") {
@@ -383,10 +385,8 @@ controller.likeProject = async function(req, res) {
         return res.json({error: 'Error updating project'});
     }
 
-    if (project.likes.includes(req.user._id)) { //Remove like
-        project.likes.splice(project.likes.indexOf(req.user._id), 1);
+    if (removeIfIncluded(project.likes, req.user._id)) { //Remove like
         await project.save();
-
         return res.json({
             success: `Removed a like from ${project.title}`,
             likeCount: project.likes.length
@@ -430,6 +430,7 @@ controller.comment = async function(req, res) {
 
     let users = [];
     let user;
+    //Search for mentioned users in comment text
     for (let line of comment.text.split(" ")) {
         if (line[0] == '@') {
             user = await User.findById(line.split("#")[1].split("_")[0]);
@@ -481,8 +482,7 @@ controller.likeComment = async function(req, res) {
         return res.json({error: 'Error updating comment'});
     }
 
-    if (comment.likes.includes(req.user._id)) { //Remove Like
-        comment.likes.splice(comment.likes.indexOf(req.user._id), 1);
+    if (removeIfIncluded(comment.likes, req.user._id)) { //Remove Like
         await comment.save();
         return res.json({
             success: `Removed a like from a comment`,
@@ -508,7 +508,7 @@ controller.data = async function(req, res) {
         const {popular, unpopular} = await sortByPopularity(projects, "likes", "created_at", null); //Extract and sort popular projects
         let popularProjectText = "";
         let popularCommentText = "";
-        for (let project of popular) {
+        for (let project of popular) { //Iterate through popular projects and parse out their text
             popularProjectText += `${project.title} ${project.text} `;
             for (let comment of project.comments) {
                 popularCommentText += `${comment.text} `;

@@ -102,14 +102,14 @@
                         <div class="bottom-text">
                             <% if (currentUser) { %>
                                 <a class="announcement-sender" href="../profiles/<%= announcement.sender._id %>">
-                                    <img src="<% if (announcement.sender.imageFile.display) {%> <%= announcement.sender.imageFile.url%><%} else {%> <%=announcement.sender.imageUrl.url%><%}%>" alt="profile pic"
+                                    <img src="<% if (announcement.sender.mediaFile.display) {%> <%= announcement.sender.mediaFile.url%><%} else {%> <%=announcement.sender.imageUrl.url%><%}%>" alt="profile pic"
                                          class="sender-profile-image">
                                     <%= announcement.sender.firstName %> <%= announcement.sender.lastName %>
                                 </a>
 
                             <% } else { %>
                                 <span class="announcement-sender">
-                        <img src="<% if (announcement.sender.imageFile.display) {%> <%= announcement.sender.imageFile.url%><%} else {%> <%=announcement.sender.imageUrl.url%><%}%>" alt="profile pic" class="sender-profile-image">
+                        <img src="<% if (announcement.sender.mediaFile.display) {%> <%= announcement.sender.mediaFile.url%><%} else {%> <%=announcement.sender.imageUrl.url%><%}%>" alt="profile pic" class="sender-profile-image">
                         <%= announcement.sender.firstName %> <%= announcement.sender.lastName %>
                       </span>
                             <% } %>

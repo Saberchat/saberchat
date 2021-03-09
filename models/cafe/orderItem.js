@@ -8,7 +8,7 @@ var orderItemSchema = new mongoose.Schema({
         url: String,
         display: Boolean
     },
-    imageFile: {
+    mediaFile: {
         filename: String,
         url: String,
         originalName: String,

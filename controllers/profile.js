@@ -19,7 +19,7 @@ const filter = new Filter();
 const axios = require('axios');
 const dateFormat = require("dateformat");
 const {cloudUpload, cloudDelete} = require('../services/cloudinary');
-const {objectArrIncludes} = require('../utils/object-operations');
+const {objectArrIndex, removeIfIncluded} = require('../utils/object-operations');
 
 const controller = {};
 
@@ -34,14 +34,14 @@ controller.index = async function(req, res) {
         return res.redirect("back");
     }
 
+    //Display all user login activity
     for (let user of users) {
 		console.log(`\n${user.firstName.toUpperCase()} ${user.lastName.toUpperCase()}'S SABERCHAT LOGIN ACTIVITY`);
 		for (let login of user.logins) {
 			console.log(`${dateFormat(login, "h:MM TT")} on ${dateFormat(login, "mmm d, yyyy")}`);
 		}
 	}
-
-    return res.render("profile/index", {users});
+	return res.render("profile/index", {users});
 }
 
 controller.edit = function(req, res) {
@@ -59,11 +59,12 @@ controller.show = async function(req, res) {
         return res.redirect('back');
     }
 
+    //Build list of current followers and following
     let followerIds = [];
     let following = [];
     let currentUserFollowing = [];
 
-    for (let follower of user.followers) {
+    for (let follower of user.followers) { //Store user's followers' ids
         followerIds.push(follower._id);
     }
 
@@ -73,18 +74,15 @@ controller.show = async function(req, res) {
         return res.redirect('back');
     }
 
-    for (let u of users) {
+    for (let u of users) { //Iterate through all users and see if this user is following them
         if (u.followers.includes(user._id)) {
             following.push(u);
         }
-
         if (u.followers.includes(req.user._id)) {
             currentUserFollowing.push(u);
         }
     }
-
-    const convertedDescription = convertToLink(user.description);
-    res.render('profile/show', {user, following, followerIds, convertedDescription});
+    return res.render('profile/show', {user, following, followerIds, convertedDescription: convertToLink(user.description)});
 }
 
 controller.update = async function(req, res) {
@@ -103,22 +101,22 @@ controller.update = async function(req, res) {
     }
 
     let status;
-    if (req.body.status == '') {
+    if (req.body.status == '') { //If no new status is selected, keep the current user's status
         status = req.user.status;
-    } else {
+    } else { //If a new status is selected, move to that
         status = req.body.status;
     }
 
-    let user = {
+    let user = { //Updated user object
         firstName: req.body.firstName,
         lastName: req.body.lastName,
         username: filter.clean(req.body.username),
         description: filter.clean(req.body.description),
         title: filter.clean(req.body.title),
         status: status.toLowerCase(),
-        imageFile: {
-            url: req.user.imageFile.url,
-            filename: req.user.imageFile.filename,
+        mediaFile: {
+            url: req.user.mediaFile.url,
+            filename: req.user.mediaFile.filename,
             display: req.body.showProfileImage == "upload"
         },
         bannerFile: {
@@ -128,6 +126,7 @@ controller.update = async function(req, res) {
         },
     };
 
+	//Build user's image info based on display options on form
     if (req.body.imageUrl) {
         user.imageUrl = {
             url: req.body.imageUrl,
@@ -141,31 +140,32 @@ controller.update = async function(req, res) {
         };
     }
 
-    if (req.files) {
+    //Upload new images for banner and profile
+	if (req.files) {
         let cloudErr;
         let cloudResult;
-        if (req.files.imageFile) {
-            if (req.user.imageFile.filename) {
-                [cloudErr, cloudResult] = await cloudDelete(req.user.imageFile.filename, "image");
+        if (req.files.mediaFile) { //Profile Image Upload
+            if (req.user.mediaFile.filename) {
+                [cloudErr, cloudResult] = await cloudDelete(req.user.mediaFile.filename, "image");
                 if (cloudErr || !cloudResult || cloudResult.result !== 'ok') {
                     req.flash('error', 'Error deleting uploaded image');
                     return res.redirect('back');
                 }
             }
-            [cloudErr, cloudResult] = await cloudUpload(req.files.imageFile[0], "image");
+            [cloudErr, cloudResult] = await cloudUpload(req.files.mediaFile[0], "image");
             if (cloudErr || !cloudResult) {
                 req.flash('error', 'Upload failed');
                 return res.redirect('back');
             }
-            user.imageFile = {
+            user.mediaFile = { //Update mediaFile info with cloudinary upload URL
                 filename: cloudResult.public_id,
                 url: cloudResult.secure_url,
-                originalName: req.files.imageFile[0].originalname,
+                originalName: req.files.mediaFile[0].originalname,
                 display: req.body.showProfileImage == "upload"
             };
         }
 
-        if (req.files.imageFile2) {
+        if (req.files.mediaFile2) { //Banner Image Upload
             if (req.user.bannerFile.filename) {
                 [cloudErr, cloudResult] = await cloudDelete(req.user.bannerFile.filename, "image");
                 if (cloudErr || !cloudResult || cloudResult.result !== 'ok') {
@@ -174,15 +174,15 @@ controller.update = async function(req, res) {
                 }
             }
 
-            [cloudErr, cloudResult] = await cloudUpload(req.files.imageFile2[0], "image");
+            [cloudErr, cloudResult] = await cloudUpload(req.files.mediaFile2[0], "image");
             if (cloudErr || !cloudResult) {
                 req.flash('error', 'Upload failed');
                 return res.redirect('back');
             }
-            user.bannerFile = {
+            user.bannerFile = { //Update bannerFile info with cloudinary upload URL
                 filename: cloudResult.public_id,
                 url: cloudResult.secure_url,
-                originalName: req.files.imageFile2[0].originalname,
+                originalName: req.files.mediaFile2[0].originalname,
                 display: req.body.showBannerImage == "upload"
             };
         }
@@ -199,98 +199,84 @@ controller.update = async function(req, res) {
 }
 
 controller.tagPut = async function(req, res) {
-    if (req.user.tags.includes(req.body.tag)) {
-      if (req.body.tag == "Tutor") {
-        const courses = await Course.find({});
-        if (!courses) {
-            return res.json({error: 'Error. Could not change'});
-        }
-
-        for (let course of courses) {
-            if (objectArrIncludes(course.tutors, "tutor", req.user._id) > -1) {
-                return res.json({error: "You are an active tutor"});
-            }
-        }
-      }
-      
-      req.user.tags.splice(req.user.tags.indexOf(req.body.tag), 1);
-      await req.user.save();
-      return res.json({success: "Succesfully removed status", tag: req.body.tag, user: req.user._id});
-
-    } else {
-        req.user.tags.push(req.body.tag);
-        await req.user.save();
-        return res.json({success: "Succesfully added status", tag: req.body.tag, user: req.user._id});
-    }
+	if (req.user.tags.includes(req.body.tag)) {
+		if (req.body.tag == "Tutor") { //If tag is for tutor, check that user is not an active tutor
+			const courses = await Course.find({});
+			if (!courses) {
+				return res.json({error: 'Error. Could not change'});
+			}
+			
+			for (let course of courses) {
+				if (objectArrIndex(course.tutors, "tutor", req.user._id) > -1) { //If user is a tutor
+					return res.json({error: "You are an active tutor"});
+				}
+			}
+		}
+		
+    	removeIfIncluded(req.user.tags, req.body.tag); //If no issue, remove tag
+		await req.user.save();
+		return res.json({success: "Succesfully removed status", tag: req.body.tag, user: req.user._id});
+	}
+	req.user.tags.push(req.body.tag);
+	await req.user.save();
+	return res.json({success: "Succesfully added status", tag: req.body.tag, user: req.user._id});
 }
 
-controller.changeEmailPut = async function(req, res) {
+controller.changeEmailPut = async function(req, res) { //Update email
+	//Update receiving emails info
     if (req.body.receiving_emails) {
         req.user.receiving_emails = true;
 
     } else {
         req.user.receiving_emails = false;
     }
-
     await req.user.save();
 
-    if (req.user.email == req.body.email) {
+    if (req.user.email == req.body.email) { //If email is not changed, no need to update
         req.flash('success', "Email sending settings updated");
         return res.redirect(`/profiles/${req.user._id}`);
     }
 
-    const emails = await Email.find({address: req.body.email, version: "accesslist"});
-    if (!emails) {
-        req.flash('error', "Unable to find emails");
-        return res.redirect('back');
-    }
-
-    if (emails.length == 0 && req.body.email.split("@")[1] != "alsionschool.org") {
+	//Check if new email is allowed, not blocked, and not already taken
+    const allowedEmail = await Email.findOne({address: req.body.email, version: "accesslist"});
+    if (!allowedEmail && req.body.email.split("@")[1] != "alsionschool.org") {
         req.flash('error', "New email must be an Alsion-verified email");
         return res.redirect('back');
     }
 
-    const overlap = await User.find({authenticated: true, email: req.body.email, _id: {$ne: req.user._id}});
-    if (!overlap) {
-        req.flash('error', "Unable to find users");
-        return res.redirect('back');
-
-    } else if (overlap.length > 0) {
-        req.flash('error', "Another user already has that email.");
+	const blocked = await Email.findOne({address: req.body.email, version: "blockedlist"});
+    if (blocked) {
+        req.flash('error', "New email must be an Alsion-verified email");
         return res.redirect('back');
     }
 
+    const overlap = await User.findOne({email: req.body.email, _id: {$ne: req.user._id}});
+    if (overlap) {
+        req.flash('error', "Another current or pending user already has that email.");
+        return res.redirect('back');
+	}
+
+	//Send SendGrid confirmation email to new email address
     const url = process.env.SENDGRID_BASE_URL + '/mail/send';
     const data = {
-        "personalizations": [
-            {
-                "to": [
-                    {
-                        "email": req.body.email
-                    }
-                ],
-                "subject": 'Email Update Confirmation'
-            }
-        ],
+        "personalizations": [{
+			"to": [{"email": req.body.email}],
+			"subject": 'Email Update Confirmation'
+		}],
         "from": {
             "email": "noreply.saberchat@gmail.com",
             "name": "SaberChat"
         },
-        "content": [
-            {
-                "type": "text/html",
-                "value": `<p>Hello ${req.user.firstName},</p><p>You are receiving this email because you recently requested to change your Saberchat email to ${req.body.email}.</p><p>Click <a href="https://saberchat.net/profiles/confirm-email/${req.user._id}?token=${req.user.authenticationToken}&email=${req.body.email}">this link</a> to confirm your new email address.`
-            }
-        ]
+        "content": [{
+			"type": "text/html",
+			"value": `<p>Hello ${req.user.firstName},</p><p>You are receiving this email because you recently requested to change your Saberchat email to ${req.body.email}.</p><p>Click <a href="https://saberchat.net/profiles/confirm-email/${req.user._id}?token=${req.user.authenticationToken}&email=${req.body.email}">this link</a> to confirm your new email address.`
+		}]
     }
 
     axios({
         method: 'post',
-        url: url,
-        data: data,
-        headers: {
-            "Authorization": "Bearer " + process.env.SENDGRID_KEY
-        }
+        url, data,
+        headers: {"Authorization": "Bearer " + process.env.SENDGRID_KEY}
     }).then(response => {
         console.log(`Email Sent with status code: ${response.status}`);
     }).catch(error => {
@@ -310,7 +296,6 @@ controller.confirmEmail = async function(req, res) {
 
     //Update authentication token
     let charSetMatrix = [];
-
     charSetMatrix.push('qwertyuiopasdfghjklzxcvbnm'.split(''));
     charSetMatrix.push('QWERTYUIOPASDFGHJKLZXCVBNM'.split(''));
     charSetMatrix.push('1234567890'.split(''));
@@ -326,6 +311,7 @@ controller.confirmEmail = async function(req, res) {
         token += charSet[Math.floor((Math.random() * charSet.length))];
     }
 
+	//If user's authentication matches queried token (meaning origin is correct)
     if (req.query.token.toString() == user.authenticationToken) {
         user.email = req.query.email;
         user.authenticationToken = token;
@@ -340,13 +326,14 @@ controller.confirmEmail = async function(req, res) {
 }
 
 controller.changePasswordPut = async function(req, res) {
-    if (req.body.newPassword == req.body.newPasswordConfirm) {
+    if (req.body.newPassword == req.body.newPasswordConfirm) {  //If confirmation passwords match
         const user = await User.findById(req.user._id);
         if (!user) {
             req.flash('error', 'Error, cannot find user');
             return res.redirect('/');
         }
 
+		//Update user's password
         await user.changePassword(req.body.oldPassword, req.body.newPassword);
         await sendGridEmail(req.user.email, 'Password Update Confirmation', `<p>Hello ${req.user.firstName},</p><p>You are receiving this email because you recently made changes to your Saberchat password. This is a confirmation of your profile.\n\nYour username is ${req.user.username}.\nYour full name is ${req.user.firstName} ${req.user.lastName}.\nYour email is ${req.user.email}\n\nIf you did not recently change your password, reset it immediately and contact a faculty member.</p>`, false);
         req.flash('success', 'Successfully changed your password');
@@ -371,7 +358,6 @@ controller.follow = async function(req, res) {
         return res.json({error: "You may not follow yourself"});
     }
 
-
     user.followers.push(req.user);
     await user.save();
     return res.json({success: "Succesfully followed user", user: req.user});
@@ -383,13 +369,11 @@ controller.unfollow = async function(req, res) {
         return res.json({error: "Error finding user"});
     }
 
-    for (let i = 0; i < user.followers.length; i++) {
-        if (user.followers[i].equals(req.user._id)) {
-            user.followers.splice(i, 1);
-            await user.save();
-            return res.json({success: "Unfollowed user", user: req.user});
-        }
-    }
+	//Try to unfollow; if user is not following person, then do not process
+	if (removeIfIncluded(user.followers, req.user._id)) {
+		await user.save();
+		return res.json({success: "Unfollowed user", user: req.user});
+	}
     return res.json({error: "You are not following this user"});
 }
 
@@ -399,15 +383,15 @@ controller.remove = async function(req, res) {
         return res.json({error: "Error finding user"});
     }
 
-    if (req.user.followers.includes(user._id)) {
-        req.user.followers.splice(req.user.followers.indexOf(user._id), 1);
-        await req.user.save();
-        res.json({success: "Succesfully removed user"});
-    }
-
+	//Try to remove follower from user; if person is not following user, then do not process
+	if (removeIfIncluded(req.user.followers, user._id)) {
+		await req.user.save();
+		return res.json({success: "Succesfully removed user"});
+	}
     return res.json({error: "User is not following you"});
 }
 
+//DELETE ACCOUNT. CURRENTLY DISABLED ROUTE
 controller.deleteAccount = async function(req, res)  {
     const deletedComments = await Comment.deleteMany({author: req.user._id});
 

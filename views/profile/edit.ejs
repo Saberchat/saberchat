@@ -134,16 +134,16 @@
                 <div class="form-group">
                     <br />
                     <label for="profile-input">Profile Image Upload</label><br/>
-                    <input type="file" accept="image/png, image/jpg, image/jpeg" name="imageFile">
-                    <% if (currentUser.imageFile.filename) { %>
+                    <input type="file" accept="image/png, image/jpg, image/jpeg" name="mediaFile">
+                    <% if (currentUser.mediaFile.filename) { %>
                         <div>
-                            <br/><img class="profile-image" src="<%= currentUser.imageFile.url%>" alt="Image Does Not Exist"/>
+                            <br/><img class="profile-image" src="<%= currentUser.mediaFile.url%>" alt="Image Does Not Exist"/>
                         </div>
                     <% } %>
                 </div>
                 <br />
                 <div class="form-group">
-                    <input type="radio" name="showProfileImage" value="upload" id="showUploadedProfile" <% if (currentUser.imageFile.display) {%> checked <%}%>/>
+                    <input type="radio" name="showProfileImage" value="upload" id="showUploadedProfile" <% if (currentUser.mediaFile.display) {%> checked <%}%>/>
                     <label for="showUploadedProfile">Display Uploaded Image</label>
                     <br />
                     <input type="radio" name="showProfileImage" value="url" id="showLinkProfile" <% if (currentUser.imageUrl.display) {%> checked <%}%>/>
@@ -159,7 +159,7 @@
                 <div class="form-group">
                     <br />
                     <label for="profile-input">Banner Image Upload</label><br/>
-                    <input type="file" id="imageInput" accept="image/png, image/jpg, image/jpeg" name="imageFile2">
+                    <input type="file" id="imageInput" accept="image/png, image/jpg, image/jpeg" name="mediaFile2">
                     <% if (currentUser.bannerFile.filename) { %>
                         <br/><br/>
                         <img class="banner-image" src="<%= currentUser.bannerFile.url %>" alt="Image Does Not Exist"/>

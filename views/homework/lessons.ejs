@@ -43,9 +43,9 @@
 <div id="banner" style="background-image: url('<% if (tutor.tutor.bannerFile.display) { %> <%= tutor.tutor.bannerFile.url %> <% } else { %> <%= tutor.tutor.bannerUrl.url %> <% } %>');"></div>
 
 <div class="container mb-5 tutor-info">
-    <a href="../../profiles/<%= tutor.tutor._id %>"><img src="<% if (tutor.tutor.imageFile.display) {%> <%= tutor.tutor.imageFile.url%><%} else {%> <%=tutor.tutor.imageUrl.url%><%}%>" alt="profile image"
+    <a href="../../profiles/<%= tutor.tutor._id %>"><img src="<% if (tutor.tutor.mediaFile.display) {%> <%= tutor.tutor.mediaFile.url%><%} else {%> <%=tutor.tutor.imageUrl.url%><%}%>" alt="profile image"
                                                          class="profile-image"></a>
-    <a href="../../profiles/<%= student.student._id %>"><img src="<% if (student.student.imageFile.display) {%> <%= student.student.imageFile.url%><%} else {%> <%=student.student.imageUrl.url%><%}%>" alt="profile image"
+    <a href="../../profiles/<%= student.student._id %>"><img src="<% if (student.student.mediaFile.display) {%> <%= student.student.mediaFile.url%><%} else {%> <%=student.student.imageUrl.url%><%}%>" alt="profile image"
                                                      class="profile-image"></a>
     <h1 class="username mode"><%= student.student.firstName %>'s Lessons
         with <%= tutor.tutor.firstName %> <%= tutor.tutor.lastName %></h1>

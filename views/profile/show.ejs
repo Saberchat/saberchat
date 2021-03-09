@@ -35,7 +35,7 @@
 <div id="banner" style="background-image: url('<% if (user.bannerFile.display) { %> <%= user.bannerFile.url %> <% } else { %> <%= user.bannerUrl.url %> <% } %>');">
 </div>
 <div class="container mb-5">
-    <img src="<% if (user.imageFile.display) {%> <%= user.imageFile.url%><%} else {%> <%=user.imageUrl.url%><%}%>" alt="profile image" class="profile-image">
+    <img src="<% if (user.mediaFile.display) {%> <%= user.mediaFile.url%><%} else {%> <%=user.imageUrl.url%><%}%>" alt="profile image" class="profile-image">
     <h1 class="username mode"><%= user.username %></h1>
     <div class="col-md-4 col-12 order-md-2 profile-box">
         <section class="profile-card mode">
@@ -166,7 +166,7 @@
                         <span id="follower-<%= follower._id %>" class="follower-block">
 
                             <a href="../profiles/<%= follower._id %>" class="follower-link">
-                              <img class="follower-image" src="<% if (follower.imageFile.display) {%> <%= follower.imageFile.url%><%} else {%> <%=follower.imageUrl.url%><%}%> %>" alt="profile picture">
+                              <img class="follower-image" src="<% if (follower.mediaFile.display) {%> <%= follower.mediaFile.url%><%} else {%> <%=follower.imageUrl.url%><%}%> %>" alt="profile picture">
                               <span class="follower-name"><%= follower.firstName %> <%= follower.lastName %></span> <%= follower.username %>
                             </a>
 
@@ -212,7 +212,7 @@
                         <span id="following-<%= f._id %>" class="following-block">
 
                             <a href="../profiles/<%= f._id %>" class="following-link">
-                              <img class="follower-image" src="<% if (f.imageFile.display) {%> <%=f.imageFile.url%><%} else {%> <%=f.imageUrl.url%><%}%>" alt="profile picture">
+                              <img class="follower-image" src="<% if (f.mediaFile.display) {%> <%=f.mediaFile.url%><%} else {%> <%=f.imageUrl.url%><%}%>" alt="profile picture">
                               <span class="follower-name"><%= f.firstName %> <%= f.lastName %></span> <%= f.username %>
                             </a>
 

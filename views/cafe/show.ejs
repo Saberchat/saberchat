@@ -93,14 +93,14 @@
 
                     <div class="row" id="file-row">
                         <div class="col">
-                            <% if (item.imageFile.filename && [".png", ".jpg", ".jpeg", ".gif"].includes(fileExtensions.get(item.imageFile.url).toLowerCase())) { %>
+                            <% if (item.mediaFile.filename && [".png", ".jpg", ".jpeg", ".gif"].includes(fileExtensions.get(item.mediaFile.url).toLowerCase())) { %>
                                     <div id="file-image">
-                                        <img id="item-image-file" src="<%= item.imageFile.url%>" alt="Image Does Not Exist"/>
+                                        <img id="item-image-file" src="<%= item.mediaFile.url%>" alt="Image Does Not Exist"/>
                                     </div>
                             <% } %>
                             <br />
-                            <label for="imageFile">Image Upload (New Image Replaces Old One)</label>
-                            <input type="file" name="imageFile" class="image-upload form-control-file" accept="image/png, image/jpg, image/jpeg">
+                            <label for="mediaFile">Image Upload (New Image Replaces Old One)</label>
+                            <input type="file" name="mediaFile" class="image-upload form-control-file" accept="image/png, image/jpg, image/jpeg">
                         </div>
                     </div>
                     <br />
@@ -118,7 +118,7 @@
                     </div>
 
                     <div class="form-group">
-                        <input type="radio" name="showImage" value="upload" id="showUploadedImage" <% if (item.imageFile.display) {%> checked <%}%>/>
+                        <input type="radio" name="showImage" value="upload" id="showUploadedImage" <% if (item.mediaFile.display) {%> checked <%}%>/>
                         <label for="showUploadedImage">Display Uploaded Image</label>
                         <br />
                         <input type="radio" name="showImage" value="url" id="showLinkImage" <% if (item.imgUrl.display) {%> checked <%}%>/>

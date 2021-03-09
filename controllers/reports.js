@@ -9,7 +9,7 @@ const controller = {};
 
 // Report GET index
 controller.index = async function(req, res) {
-    const reports = await PostComment.find({type: "report"}).populate('sender').exec();
+    const reports = await PostComment.find({type: "report"}).populate('sender');
     if(!reports) {req.flash('error', 'Cannot find reports.'); return res.redirect('back');}
     return res.render('reports/index', {reports: reports.reverse()});
 };
@@ -25,10 +25,8 @@ controller.show = async function(req, res) {
         .populate('sender')
         .populate({
             path: "comments",
-            populate: {
-                path: "sender"
-            }
-        }).exec();
+            populate: {path: "sender"}
+        });
     if(!report) {req.flash('error', 'Could not find report'); return res.redirect('back');}
 
     const convertedText = convertToLink(report.text);
@@ -48,7 +46,7 @@ controller.updateForm = async function(req, res) {
 
 // Report POST create
 controller.create = async function(req, res) {
-    const report = await PostComment.create({
+    const report = await PostComment.create({ //Build report with error info
         type: "report",
         sender: req.user,
         subject: req.body.subject,
@@ -77,6 +75,7 @@ controller.updateReport = async function(req, res) {
         return res.redirect('back');
     }
 
+    //When report is updated, it might have new info to be handled
     const updatedReport = await PostComment.findByIdAndUpdate(req.params.id, {
         subject: req.body.subject,
         text: req.body.message,
@@ -85,12 +84,6 @@ controller.updateReport = async function(req, res) {
     if (!updatedReport) {
         req.flash('error', "Unable to update report");
         return res.redirect('back');
-    }
-
-    const users = await User.find({authenticated: true, _id: {$ne: req.user._id}});
-    if (!users) {
-        req.flash('error', "An Error Occurred");
-        return res.rediect('back');
     }
 
     req.flash('success', 'Report Updated!');
@@ -112,23 +105,20 @@ controller.likeReport = async function(req, res) {
     const report = await PostComment.findById(req.body.report);
     if(!report) {return res.json({error: 'Error updating report.'});}
 
-    if (report.likes.includes(req.user._id)) { //Remove like
-        report.likes.splice(report.likes.indexOf(req.user._id), 1);
+    if (removeIfIncluded(report.likes, req.user._id)) { //Remove like
         await report.save();
-
         return res.json({
             success: `Removed a like from ${report.subject}`,
             likeCount: report.likes.length
         });
-    } else {
-        report.likes.push(req.user._id);
-        await report.save();
-
-        return res.json({
-            success: `Liked ${report.subject}`,
-            likeCount: report.likes.length
-        });
     }
+
+    report.likes.push(req.user._id); //Add likes to report
+    await report.save();
+    return res.json({
+        success: `Liked ${report.subject}`,
+        likeCount: report.likes.length
+    });
 };
 
 // Report PUT comment
@@ -136,9 +126,7 @@ controller.comment = async function(req, res) {
     const report = await PostComment.findById(req.body.report)
         .populate({
             path: "comments",
-            populate: {
-                path: "sender"
-            }
+            populate: {path: "sender"}
         });
     if (!report) {
         return res.json({
@@ -163,6 +151,7 @@ controller.comment = async function(req, res) {
 
     let users = [];
     let user;
+    //Search for any mentioned users
     for (let line of comment.text.split(" ")) {
         if (line[0] == '@') {
             user = await User.findById(line.split("#")[1].split("_")[0]);
@@ -187,8 +176,7 @@ controller.likeComment = async function(req, res) {
     const comment = await PostComment.findById(req.body.commentId);
     if(!comment) {return res.json({error: 'Error finding comment'});}
 
-    if (comment.likes.includes(req.user._id)) { //Remove Like
-        comment.likes.splice(comment.likes.indexOf(req.user._id), 1);
+    if (removeIfIncluded(comment.likes, req.user._id)) { //Remove Like
         await comment.save();
         return res.json({
             success: `Removed a like`,
@@ -211,7 +199,7 @@ controller.deleteReport = async function(req, res) {
         return res.redirect('back');
     }
 
-    if (report.sender._id.toString() != req.user._id.toString()) {
+    if (report.sender._id.toString() != req.user._id.toString()) { //Doublecheck that deleter is reporter
         req.flash('error', "You can only delete reports that you have posted");
         return res.redirect('back');
     }

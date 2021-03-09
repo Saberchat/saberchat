@@ -6,7 +6,7 @@ var postSchema = new mongoose.Schema({
     sender: {type: mongoose.Schema.Types.ObjectId, ref: 'User'},
     text: String,
     images: [{type: String}],
-    imageFiles: [{
+    mediaFiles: [{
         filename: String,
         url: String,
         originalName: String

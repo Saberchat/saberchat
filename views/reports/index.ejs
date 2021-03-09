@@ -85,7 +85,7 @@
 
                         <div class="bottom-text">
                             <a class="announcement-sender" href="../profiles/<%= report.sender._id %>">
-                                <img src="<% if (report.sender.imageFile.display) {%> <%= report.sender.imageFile.url%><%} else {%> <%=report.sender.imageUrl.url%><%}%>" alt="profile pic"
+                                <img src="<% if (report.sender.mediaFile.display) {%> <%= report.sender.mediaFile.url%><%} else {%> <%=report.sender.imageUrl.url%><%}%>" alt="profile pic"
                                         class="sender-profile-image">
                                 <%= report.sender.firstName %> <%= report.sender.lastName %>
                             </a>

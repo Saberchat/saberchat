@@ -115,7 +115,7 @@
             <li class="list-group-item list-group-item-success mode darkmode-outline">Teacher</li>
             <li class="list-group-item cafe">
               <a href="/profiles/<%=course.teacher._id%>" class="user-element-text cafe">
-                <img class="profile-image" src="<% if (course.teacher.imageFile.display) {%> <%= course.teacher.imageFile.url%><%} else {%> <%=course.teacher.imageUrl.url%><%}%>" alt="profile picture">
+                <img class="profile-image" src="<% if (course.teacher.mediaFile.display) {%> <%= course.teacher.mediaFile.url%><%} else {%> <%=course.teacher.imageUrl.url%><%}%>" alt="profile picture">
                 <span class="username <%=course.teacher.status%> <%=course.teacher.permission%> <%=course.teacher.tags.join(' ')%>"><span class="enrolled-name"><%=course.teacher.firstName%> <%=course.teacher.lastName%></span> <span class="enrolled-username"><%=course.teacher.username%></span></span>
               </a>
             </li>
@@ -128,7 +128,7 @@
               <% for (let student of course.students) { %>
                 <li class="list-group-item cafe" id="item-<%=student._id%>">
                   <a href="../profiles/<%=student._id%>"class="user-element-text cafe">
-                    <img class="profile-image" src="<% if (student.imageFile.display) {%> <%= student.imageFile.url%><%} else {%> <%=student.imageUrl.url%><%}%>" alt="profile picture">
+                    <img class="profile-image" src="<% if (student.mediaFile.display) {%> <%= student.mediaFile.url%><%} else {%> <%=student.imageUrl.url%><%}%>" alt="profile picture">
                     <span class="username <%=student.status%> <%=student.permission%> <%=student.tags.join(' ')%>"><span class="enrolled-name"><%=student.firstName%> <%=student.lastName%></span> <span class="enrolled-username"><%=student.username%></span></span>
                   </a>
                   <% if (course.teacher._id.equals(currentUser._id)) { %>
@@ -166,7 +166,7 @@
               <% for (let tutor of course.tutors) { %>
                 <li class="list-group-item list-group-item-action tutor-profile menu-item cafe" id="item-<%=tutor.tutor._id%>">
                   <a href="/homework/tutors/<%=course._id%>?tutorId=<%=tutor.tutor._id%>" class="user-element-text cafe">
-                    <img class="profile-image" src="<% if (tutor.tutor.imageFile.display) {%> <%= tutor.tutor.imageFile.url%><%} else {%> <%=tutor.tutor.imageUrl.url%><%}%>" alt="profile picture">
+                    <img class="profile-image" src="<% if (tutor.tutor.mediaFile.display) {%> <%= tutor.tutor.mediaFile.url%><%} else {%> <%=tutor.tutor.imageUrl.url%><%}%>" alt="profile picture">
                     <span class="username <%=tutor.tutor.status%> <%=tutor.tutor.permission%> <%=tutor.tutor.tags.join(' ')%>"><span class="enrolled-name"><%=tutor.tutor.firstName%> <%=tutor.tutor.lastName%></span> <span class="enrolled-username"><%=tutor.tutor.username%></span></span>
                   </a>
                   <% if (course.teacher._id.equals(currentUser._id)) { %>
@@ -213,18 +213,18 @@
               <% for (let tutor of course.tutors) { %>
                   <li class="list-group-item list-group-item-action tutor-profile menu-item cafe" id="tutor-<%=tutor.tutor._id%>">
                     <a href="/homework/tutors/<%=course._id%>?tutorId=<%=tutor.tutor._id%>" class="tutor-link cafe">
-                      <img class="profile-image" src="<% if (tutor.tutor.imageFile.display) {%> <%= tutor.tutor.imageFile.url%><%} else {%> <%=tutor.tutor.imageUrl.url%><%}%>" alt="profile picture">
+                      <img class="profile-image" src="<% if (tutor.tutor.mediaFile.display) {%> <%= tutor.tutor.mediaFile.url%><%} else {%> <%=tutor.tutor.imageUrl.url%><%}%>" alt="profile picture">
                       <span class="tutor-name <%=tutor.tutor.status%> <%=tutor.tutor.permission%> <%=tutor.tutor.tags.join(' ')%>"><%=tutor.tutor.firstName%> <%=tutor.tutor.lastName%></span>
                     </a>
 
                     <% if (studentIds.includes(currentUser._id.toString())) { %>
                             <div id="tutor-actions-<%= tutor.tutor._id %>" class="tutor-actions">
-                                <% if (objectArrIncludes(tutor.students.concat(tutor.formerStudents), "student", currentUser._id) > -1) { %>
+                                <% if (objectArrIndex(tutor.students.concat(tutor.formerStudents), "student", currentUser._id) > -1) { %>
                                     <button class="btn btn-warning review-button"
                                             id="review-button-<%= tutor.tutor._id %>"
                                             data-toggle="modal" data-target="#modal-review-<%= tutor.tutor._id %>">Leave A Review
                                     </button>
-                                    <% if (objectArrIncludes(tutor.students, "student", currentUser._id) > -1) { %>
+                                    <% if (objectArrIndex(tutor.students, "student", currentUser._id) > -1) { %>
                                         <button class="btn btn-danger leave-button"
                                                 id="leave-button-<%= tutor.tutor._id %>"
                                                 data-toggle="modal"
@@ -232,7 +232,7 @@
                                         </button>
                                         <a id="chat-button-<%= tutor.tutor._id %>"
                                             class="btn btn-success leave-button"
-                                            href="/chat/<%=tutor.students[objectArrIncludes(tutor.students, 'student', currentUser._id)].room%>">Chat
+                                            href="/chat/<%=tutor.students[objectArrIndex(tutor.students, 'student', currentUser._id)].room%>">Chat
                                         </a>
                                     <% } else { %>
                                         <% if (tutor.available) { %>
@@ -549,8 +549,8 @@
                                name="thumbnail" value="<%= course.thumbnail.url %>" placeholder="Enter Thumbnail Url">
                     </div>
                     <div class="form-group">
-                        <label for="imageFile">Thumbnail Upload</label>
-                        <input type="file" name="imageFile" id="imageFile" class="image-upload form-control-file" accept="image/png, image/jpg, image/jpeg">
+                        <label for="mediaFile">Thumbnail Upload</label>
+                        <input type="file" name="mediaFile" id="mediaFile" class="image-upload form-control-file" accept="image/png, image/jpg, image/jpeg">
                     </div>
                     <div class="form-group">
                         <input type="radio" onchange="changeThumbnailUpload('<%=course.thumbnailFile.url%>', '<%=course.thumbnail.url%>')" name="showThumbnail" value="upload" id="showUploadedImage" <% if (course.thumbnailFile.display) { %>checked<% } %> class="upload"/>
@@ -655,7 +655,7 @@
                         <% for (let b of course.blocked) { %>
                             <li class="list-group-item cafe" id="item-<%= b._id %>">
                                 <a href="../profiles/<%= b._id %>" class="user-element-text cafetext">
-                                    <img class="profile-image" src="<% if (b.imageFile.display) {%> <%= b.imageFile.url%><%} else {%> <%=b.imageUrl.url%><%}%>" alt="profile picture">
+                                    <img class="profile-image" src="<% if (b.mediaFile.display) {%> <%= b.mediaFile.url%><%} else {%> <%=b.imageUrl.url%><%}%>" alt="profile picture">
                                     <span class="username <%= b.status %> <%= b.permission %> <%= b.tags.join(' ') %>"><span
                                                 class="enrolled-name"><%= b.firstName %> <%= b.lastName %></span> <span
                                                 class="enrolled-username"><%= b.username %></span></span>

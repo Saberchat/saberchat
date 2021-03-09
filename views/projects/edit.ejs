@@ -97,7 +97,7 @@
                           required><%= project.text %></textarea>
             </div>
 
-            <% for (let media of project.imageFiles) { %>
+            <% for (let media of project.mediaFiles) { %>
                 <% if(media.filename) { %>
                     <% if ([".png", ".jpg", ".jpeg", ".gif"].includes(fileExtensions.get(media.url).toLowerCase())) { %>
                         <img src="<%= media.url %>" alt="attached image" class="img-fluid rounded past-upload">
@@ -122,7 +122,7 @@
             <% } %>
 
             <div id="media-header">
-                <button type="button" onclick="upload(<%=project.imageFiles.length%>)" class="btn btn-primary"><i class="fas fa-plus"></i> File Upload</button>
+                <button type="button" onclick="upload(<%=project.mediaFiles.length%>)" class="btn btn-primary"><i class="fas fa-plus"></i> File Upload</button>
                 <br/><br/>
               </div>
             <div id="uploads"></div>

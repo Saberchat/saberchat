@@ -1,3 +1,5 @@
+//Convert files to buffers (used with cloudinary uploads)
+
 const DataUriParser = require('datauri/parser');
 const path = require('path');
 

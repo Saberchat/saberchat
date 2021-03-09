@@ -16,11 +16,8 @@ const cloudUploader = util.promisify(cloudinary.uploader.upload);
 const cloudDestroyer = util.promisify(cloudinary.uploader.destroy);
 
 module.exports.cloudUpload = async function (file, type) {
-    // turn buffer into file
-    const imgFile = parseBuffer(file.originalname, file.buffer).content;
-
-    // upload to cloudinary
-    const options = {folder: 'SaberChat'};
+    const imgFile = parseBuffer(file.originalname, file.buffer).content; // turn file into buffer
+    const options = {folder: 'SaberChat'}; // upload to cloudinary
     if (type == "video") {
         options.resource_type = type;
     }
@@ -34,7 +31,6 @@ module.exports.cloudUpload = async function (file, type) {
         .catch(err => {
             error = err;
         });
-
     return [error, cResult];
 }
 
@@ -42,12 +38,10 @@ module.exports.cloudDelete = async function(filename, type) {
     let cResult;
     let error;
     const options = {};
-    if (type == "video") {
+    if (type == "video") { //Video requires differnt parameters
         options.resource_type = type;
     }
-
-    // delete media
-    await cloudDestroyer(filename, options)
+    await cloudDestroyer(filename, options) // delete media
         .catch(err => {
             error = err;
         })

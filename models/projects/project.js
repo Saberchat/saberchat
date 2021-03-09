@@ -4,7 +4,7 @@ var projectSchema = new mongoose.Schema({
     title: String,
     poster: {type: mongoose.Schema.Types.ObjectId, ref: 'User'},
     images: [{type: String}],
-    imageFiles: [{
+    mediaFiles: [{
         filename: String,
         url: String,
         originalName: String

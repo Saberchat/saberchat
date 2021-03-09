@@ -26,7 +26,7 @@ package.equateObjects = function(objects, property) {
 }
 
 //Check if an object which includes a certain property contains a key in that property
-package.objectArrIncludes = function(arr, property, key, subproperty) {
+package.objectArrIndex = function(arr, property, key, subproperty) {
     for (let i = 0; i < arr.length; i ++) {
         if (subproperty) { //If a subproperty needs to be evaluated
             if (arr[i][property][subproperty].toString() == key.toString()) { //Check equality with property and subproperty
@@ -51,14 +51,32 @@ package.parsePropertyArray = function(arr, property) {
 
 package.removeIfIncluded = function(arr, element, property) {
     if (property) { //If a specific property in the element needs to be evaluated, evaluate element's property
-        if (package.objectArrIncludes(arr, property, element) > -1) {
-            arr.splice(package.objectArrIncludes(arr, property, element), 1);
+        if (package.objectArrIndex(arr, property, element) > -1) {
+            arr.splice(package.objectArrIndex(arr, property, element), 1);
+            return true;
         }
+        return false;
     } else { //If no specific property is listed, evaluate element's exact value
         if (arr.includes(element)) {
             arr.splice(arr.indexOf(element), 1);
+            return true;
        }
+       return false;
     }
+}
+
+package.parseKeysOrValues = function(obj, version) { //Take an object and extract either its keys or values
+    let keys = [];
+    let values = [];
+    for (let key in obj) { //Iterate through object and updates both arrays
+        keys.push(key);
+        values.push(obj[key]);
+    }
+    //Depending on return value, return either keys or values
+    if (version == "keys") {
+        return keys;
+    }
+    return values;
 }
 
 module.exports = package;

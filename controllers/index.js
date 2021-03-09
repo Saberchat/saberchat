@@ -8,6 +8,7 @@ const {sendGridEmail} = require("../services/sendGrid");
 const User = require('../models/user');
 const Email = require('../models/admin/email');
 const Announcement = require('../models/announcements/announcement');
+const Item = require('../models/cafe/orderItem');
 
 const controller = {};
 
@@ -128,6 +129,7 @@ controller.authenticate = async function(req, res) {
         token += charSet[Math.floor((Math.random() * charSet.length))];
     }
 
+    //If authentication token is a match
     if (req.query.token.toString() == user.authenticationToken.toString()) {
         user.authenticated = true;
         user.authenticationToken = token;
@@ -184,6 +186,7 @@ controller.forgotPassword = async function(req, res) {
         return res.redirect('/');
     }
 
+    //Build temporary password for user to confirm their identity
     let charSetMatrix = [];
     charSetMatrix.push('qwertyuiopasdfghjklzxcvbnm'.split(''));
     charSetMatrix.push('QWERTYUIOPASDFGHJKLZXCVBNM'.split(''));
@@ -201,6 +204,7 @@ controller.forgotPassword = async function(req, res) {
 
     user.tempPwd = pwd;
     await user.save();
+    //Email with password reset instructions
     await sendGridEmail(user.email, 'Saberchat Password Reset', `<p>Hello ${user.firstName},</p><p>You are receiving this email because you recently requested a password reset.</p><p>Click <a href="https://saberchat.net/reset-password?user=${user._id}">here</a> to reset your password. Use the following character sequence as your temporary password:</p><p>${pwd}</p>`, true);
     req.flash('success', "Check your email for instructions on  how to reset your password");
     return res.redirect('/');
@@ -218,11 +222,12 @@ controller.resetPassword = async function(req, res) {
             return res.redirect('/');
         }
 
-        if (req.body.tempPwd == user.tempPwd) {
+        if (req.body.tempPwd == user.tempPwd) { //Update password is temporary passwords match
             await user.setPassword(req.body.newPwd);
             user.tempPwd = null;
             await user.save();
 
+            //Confirmation email
             await sendGridEmail(user.email, "Password Reset Confirmation", `<p>Hello ${user.firstName},</p><p>You are receiving this email because you recently reset your Saberchat password.</p><p>If you did not recently reset your password, contact a faculty member immediately.</p><p>If you did, you can ignore this message.</p>`, false);
             req.flash('success', "Password reset!");
             return res.redirect('/');
@@ -242,13 +247,12 @@ controller.logout = function(req, res) {
     return res.redirect("/");
 }
 
-controller.contact = async function(req, res) {
+controller.contact = async function(req, res) { //Contact info of teachers and developers
     const faculty = await User.find({authenticated: true, authenticated: true, status: 'faculty'});
     if (!faculty) {
         req.flash('error', "An Error Occurred");
         return res.redirect('back');
     }
-
     return res.render('other/contact', {faculty});
 }
 
@@ -260,7 +264,7 @@ controller.alsion = async function(req, res) {
     }
 
     let teacherNames = [];
-    for (let fac of faculty) {
+    for (let fac of faculty) { //Iterate through faculty and add their name to array
         teacherNames.push(`${fac.firstName} ${fac.lastName}`);
     }
     return res.render('other/alsion_info', {faculty: teacherNames.join(', ')});

@@ -45,7 +45,7 @@
       <div id="banner" style="background-image: url('<% if (tutor.tutor.bannerFile.display) { %> <%= tutor.tutor.bannerFile.url %> <% } else { %> <%= tutor.tutor.bannerUrl.url %> <% } %>');"></div>
       <div class="container mb-5">
         <div class="tutor-info">
-          <a href="../../profiles/<%=tutor.tutor._id%>"><img src="<% if (tutor.tutor.imageFile.display) {%> <%= tutor.tutor.imageFile.url%><%} else {%> <%=tutor.tutor.imageUrl.url%><%}%>" alt="profile image" class="profile-image"></a>
+          <a href="../../profiles/<%=tutor.tutor._id%>"><img src="<% if (tutor.tutor.mediaFile.display) {%> <%= tutor.tutor.mediaFile.url%><%} else {%> <%=tutor.tutor.imageUrl.url%><%}%>" alt="profile image" class="profile-image"></a>
           <h1 class="username mode"><%= tutor.tutor.firstName %> <%= tutor.tutor.lastName %></h1>
         </div>
             <div class="col-md-4 col-12 order-md-2 profile-box">
@@ -115,18 +115,18 @@
 
                 <% if (studentIds.includes(currentUser._id.toString())) { %>
                     <div id="tutor-actions-<%= tutor.tutor._id %>" class="tutor-actions">
-                      <% if (objectArrIncludes(tutor.students.concat(tutor.formerStudents), "student", currentUser._id, "_id") > -1) { %>
+                      <% if (objectArrIndex(tutor.students.concat(tutor.formerStudents), "student", currentUser._id, "_id") > -1) { %>
                             <button class="btn btn-warning action-button" id="review-button-<%= tutor.tutor._id %>"
                                     data-toggle="modal"
                                     data-target="#modal-review-<%= tutor.tutor._id %>">Leave A Review
                             </button>
-                            <% if (objectArrIncludes(tutor.students, "student", currentUser._id, "_id") > -1) { %>
+                            <% if (objectArrIndex(tutor.students, "student", currentUser._id, "_id") > -1) { %>
                                 <button class="btn btn-danger action-button" id="leave-button-<%= tutor.tutor._id %>"
                                         data-toggle="modal"
                                         data-target="#modal-stop-<%= tutor.tutor._id %>">Stop Lessons
                                 </button>
                                 <a id="chat-button-<%= tutor.tutor._id %>" class="btn btn-success action-button"
-                                    href="/chat/<%=tutor.students[objectArrIncludes(tutor.students, 'student', currentUser._id, '_id')].room._id %>" target="_blank">Chat
+                                    href="/chat/<%=tutor.students[objectArrIndex(tutor.students, 'student', currentUser._id, '_id')].room._id %>" target="_blank">Chat
                                 </a>
                             <% } else { %>
                                 <% if (tutor.available) { %>
@@ -361,7 +361,7 @@
                 <a class="nav-link active reviews-heading">Reviews (<span id="reviews-length-<%=tutor.tutor._id%>"><%=tutor.reviews.length%></span>)</a>
               </li>
 
-              <% if (objectArrIncludes(tutor.students, "student", currentUser._id, "_id") > -1 || tutor.tutor._id.equals(currentUser._id) || course.teacher.equals(currentUser._id)) { %>
+              <% if (objectArrIndex(tutor.students, "student", currentUser._id, "_id") > -1 || tutor.tutor._id.equals(currentUser._id) || course.teacher.equals(currentUser._id)) { %>
                 <li class="nav-item tab-header tab" id="students" onclick="changeTab(this, <%=currentUser.darkmode%>)">
                   <a class="nav-link active">Students (<%=tutor.students.length + tutor.formerStudents.length%>)</a>
                 </li>
@@ -377,7 +377,7 @@
                 <div class="col-md-8 col-12">
                     <section class="profile-desc cafe">
                         <div class="desc-head">
-                            <a href="../../profiles/<%=review.review.sender._id%>" class="user-element-text"><h3><img class="follower-image" src="<% if (review.review.sender.imageFile.display) {%> <%= review.review.sender.imageFile.url%><%} else {%> <%=review.review.sender.imageUrl.url%><%}%>"/><span class="review-sender"><%=review.review.sender.firstName%> <%=review.review.sender.lastName%></span></h3></a>
+                            <a href="../../profiles/<%=review.review.sender._id%>" class="user-element-text"><h3><img class="follower-image" src="<% if (review.review.sender.mediaFile.display) {%> <%= review.review.sender.mediaFile.url%><%} else {%> <%=review.review.sender.imageUrl.url%><%}%>"/><span class="review-sender"><%=review.review.sender.firstName%> <%=review.review.sender.lastName%></span></h3></a>
                             <% if (review.review.likes.includes(currentUser._id)) { %>
                               <i id="like-<%=review.review._id%>" class="fas fa-thumbs-up review-liked"
 
@@ -385,7 +385,7 @@
                               <i id="like-<%=review.review._id%>" class="fas fa-thumbs-up review-unliked"
                             <% } %>
 
-                            <% if (objectArrIncludes(tutor.students.concat(tutor.formerStudents), "student", currentUser._id, "_id") > -1) { %>
+                            <% if (objectArrIndex(tutor.students.concat(tutor.formerStudents), "student", currentUser._id, "_id") > -1) { %>
                               onclick="likeReview(this)"
                             <% } %>
                             ></i>
@@ -416,7 +416,7 @@
             <% } %>
         </div>
 
-        <% if (tutor.tutor._id.equals(currentUser._id) || objectArrIncludes(tutor.students, "student", currentUser._id.toString(), "_id") > -1 || course.teacher.equals(currentUser._id)) { %>
+        <% if (tutor.tutor._id.equals(currentUser._id) || objectArrIndex(tutor.students, "student", currentUser._id.toString(), "_id") > -1 || course.teacher.equals(currentUser._id)) { %>
           <div class="students" hidden>
               <% if (students.length > 0) { %>
                 <div class="list-group">
@@ -428,7 +428,7 @@
                   <% for (let student of tutor.students) { %>
                       <div class="list-group-item list-group-item-action user-element cafe">
                           <a href="/profiles/<%=student.student._id%>" class="student-profile user-element-text cafe">
-                              <img class="student-profile-image" src="<% if (student.student.imageFile.display) {%> <%= student.student.imageFile.url%><%} else {%> <%=student.student.imageUrl.url%><%}%>" alt="profile picture">
+                              <img class="student-profile-image" src="<% if (student.student.mediaFile.display) {%> <%= student.student.mediaFile.url%><%} else {%> <%=student.student.imageUrl.url%><%}%>" alt="profile picture">
                               <span class="<%=student.student.permission%> <%=student.student.status%> <%=student.student.tags.join(' ')%> student-block"><span class="span-tag-name"><%=student.student.firstName%> <%=student.student.lastName%></span> <span class="span-tag-username"><%=student.student.username%></span></span>
                         </a>
                         <% if (tutor.tutor._id.equals(currentUser._id) || student.student._id.equals(currentUser._id) || course.teacher.equals(currentUser._id)) { %>
@@ -493,7 +493,7 @@
                   <% for (let student of tutor.formerStudents) { %>
                       <div class="list-group-item list-group-item-action user-element cafe">
                           <a href="/profiles/<%= student.student._id %>" class="student-profile user-element-text cafetext">
-                              <img class="student-profile-image" src="<% if (student.student.imageFile.display) {%> <%= student.student.imageFile.url%><%} else {%> <%=student.student.imageUrl.url%><%}%>" alt="profile picture">
+                              <img class="student-profile-image" src="<% if (student.student.mediaFile.display) {%> <%= student.student.mediaFile.url%><%} else {%> <%=student.student.imageUrl.url%><%}%>" alt="profile picture">
                               <span class="<%= student.student.permission %> <%= student.student.status %> <%= student.student.tags.join(' ') %> student-block"><span
                                           class="span-tag-name"><%= student.student.firstName %> <%= student.student.lastName %></span> <span
                                           class="span-tag-username"><%= student.student.username %></span></span>
@@ -534,7 +534,7 @@
                                   <div class="project-header">
                             <span>
                               <a class="project-info" href="/profiles/<%= c.teacher._id %>">
-                                <img src="<% if (c.teacher.imageFile.display) {%> <%=c.teacher.imageFile.url%> <%} else {%> <%=c.teacher.imageUrl.url%> <%}%>" alt="profile pic" class="sender-profile-image">
+                                <img src="<% if (c.teacher.mediaFile.display) {%> <%=c.teacher.mediaFile.url%> <%} else {%> <%=c.teacher.imageUrl.url%> <%}%>" alt="profile pic" class="sender-profile-image">
                                 <%= c.teacher.firstName %> <%= c.teacher.lastName %>
                               </a>
 

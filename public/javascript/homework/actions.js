@@ -83,7 +83,7 @@ const book = function (button, location, darkmode) {
                     if (student.imageUrl.display) {
                         userElement.innerHTML += `<img class="student-profile-image" src="${student.imageUrl.url}" alt="profile picture"></img>`;
                     } else {
-                        userElement.innerHTML += `<img class="student-profile-image" src="${student.imageFile.url}" alt="profile picture"></img>`;
+                        userElement.innerHTML += `<img class="student-profile-image" src="${student.mediaFile.url}" alt="profile picture"></img>`;
                     }
                     userElement.innerHTML += ` <span class="${student.permission} ${student.status} ${student.tags.join(' ')} student-block cafetext"><span class="span-tag-name">${student.firstName} ${student.lastName}</span> <span class="span-tag-username">${student.username}</span></span></a>`;
 
@@ -114,7 +114,7 @@ const book = function (button, location, darkmode) {
                     if (student.imageUrl.display) {
                         userElement.innerHTML += `<img class="student-profile-image" src="${student.imageUrl.url}" alt="profile picture"></img>`;
                     } else {
-                        userElement.innerHTML += `<img class="student-profile-image" src="${student.imageFile.url}" alt="profile picture"></img>`;
+                        userElement.innerHTML += `<img class="student-profile-image" src="${student.mediaFile.url}" alt="profile picture"></img>`;
                     }
                     userElement.innerHTML += ` <span class="${student.permission} ${student.status} ${student.tags.join(' ')} student-block cafetext"><span class="span-tag-name">${student.firstName} ${student.lastName}</span> <span class="span-tag-username">${student.username}</span></span></a>`;
                     formerStudentsList.appendChild(userElement);
@@ -318,7 +318,7 @@ const removeStudent = function (button, location) {
                 blockedElement.innerHTML += `<img class="profile-image" src="${data.student.imageUrl.url}" alt="profile picture"></img>`;
             } else {
                 console.log("Nah")
-                blockedElement.innerHTML += `<img class="profile-image" src="${data.student.imageFile.url}" alt="profile picture"></img>`;
+                blockedElement.innerHTML += `<img class="profile-image" src="${data.student.mediaFile.url}" alt="profile picture"></img>`;
             }        
             blockedElement.innerHTML += ` <span class="username ${data.student.status} ${data.student.permission} ${data.student.tags.join(' ')}"><span class="enrolled-name">${data.student.firstName} ${data.student.lastName}</span> <span class="enrolled-username">${data.student.username}</span></span> </a> <button class="btn btn-danger leave-button" id="unblock-button-${data.student._id}" data-toggle="modal" data-target="#modal-index-unblock-${data.student._id}">Unblock</button>`;
 
@@ -372,7 +372,7 @@ const removeTutor = function (button, location) {
             if (data.tutor.imageUrl.display) {
                 blockedElement.innerHTML += `<img class="profile-image" src="${data.tutor.imageUrl.url}" alt="profile picture"></img>`;
             } else {
-                blockedElement.innerHTML += `<img class="profile-image" src="${data.tutor.imageFile.url}" alt="profile picture"></img>`;
+                blockedElement.innerHTML += `<img class="profile-image" src="${data.tutor.mediaFile.url}" alt="profile picture"></img>`;
             }
             blockedElement.innerHTML += `<span class="username ${data.tutor.status} ${data.tutor.permission} ${data.tutor.tags.join(' ')}"><span class="enrolled-name">${data.tutor.firstName} ${data.tutor.lastName}</span> <span class="enrolled-username">${data.tutor.username}</span></span> </a> <button class="btn btn-danger leave-button" id="unblock-button-${data.tutor._id}" data-toggle="modal" data-target="#modal-index-unblock-${data.tutor._id}">Unblock</button>`;
 

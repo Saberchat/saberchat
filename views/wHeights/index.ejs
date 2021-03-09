@@ -69,7 +69,7 @@
 
                             <div class="project-header">
                     <span class="edit-button-text">
-                      <img src="<% if (article.author.imageFile.display) {%> <%= article.author.imageFile.url%><%} else {%> <%=article.author.imageUrl.url%><%}%>" alt="profile pic" class="author-profile">
+                      <img src="<% if (article.author.mediaFile.display) {%> <%= article.author.mediaFile.url%><%} else {%> <%=article.author.imageUrl.url%><%}%>" alt="profile pic" class="author-profile">
                       <%= article.author.firstName %> <%= article.author.lastName %>
                     </span>
                                 <% if (currentUser) { %>
@@ -131,7 +131,7 @@
                             <p class="creator-heading">
                                 <span class="creator-head">Creator:</span>
                                 <span>
-                                    <img src="<% if (article.author.imageFile.display) {%> <%= article.author.imageFile.url%><%} else {%> <%=article.author.imageUrl.url%><%}%>" alt="profile pic" class="author-profile">
+                                    <img src="<% if (article.author.mediaFile.display) {%> <%= article.author.mediaFile.url%><%} else {%> <%=article.author.imageUrl.url%><%}%>" alt="profile pic" class="author-profile">
                                 </span>
                                 <span class="author-name"><%= article.author.firstName %> <%= article.author.lastName %></span>
                             </p>

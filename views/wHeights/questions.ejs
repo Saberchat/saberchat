@@ -105,13 +105,13 @@
 
                         <% if (currentUser) { %>
                             <a class="button-text" href="../profiles/<%= announcement.sender._id %>">
-                                <img src="<% if (announcement.sender.imageFile.display) {%> <%= announcement.sender.imageFile.url%><%} else {%> <%=announcement.sender.imageUrl.url%><%}%>" alt="profile pic" class="author-profile">
+                                <img src="<% if (announcement.sender.mediaFile.display) {%> <%= announcement.sender.mediaFile.url%><%} else {%> <%=announcement.sender.imageUrl.url%><%}%>" alt="profile pic" class="author-profile">
                                 <%= announcement.sender.firstName %> <%= announcement.sender.lastName %>
                             </a>
 
                         <% } else { %>
                             <span class="button-text">
-                      <img src="<% if (announcement.sender.imageFile.display) {%> <%= announcement.sender.imageFile.url%><%} else {%> <%=announcement.sender.imageUrl.url%><%}%>" alt="profile pic" class="author-profile">
+                      <img src="<% if (announcement.sender.mediaFile.display) {%> <%= announcement.sender.mediaFile.url%><%} else {%> <%=announcement.sender.imageUrl.url%><%}%>" alt="profile pic" class="author-profile">
                       <%= announcement.sender.firstName %> <%= announcement.sender.lastName %>
                     </span>
                         <% } %>
