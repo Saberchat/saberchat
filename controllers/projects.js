@@ -6,6 +6,7 @@ const keywordFilter = require('../utils/keywordFilter');
 const {sortByPopularity} = require("../utils/popularity");
 const {removeIfIncluded} = require('../utils/object-operations');
 const {cloudUpload, cloudDelete} = require('../services/cloudinary');
+const platformInfo = require("../platform-info");
 
 //SCHEMA
 const User = require('../models/user');
@@ -13,7 +14,12 @@ const Project = require('../models/projects/project');
 const Notification = require('../models/inbox/message');
 const PostComment = require('../models/postComment');
 
+if (process.env.NODE_ENV !== "production") {
+    require('dotenv').config();
+}
+
 const controller = {};
+const platform = platformInfo[process.env.PLATFORM];
 
 controller.index = async function(req, res) {
     const projects = await Project.find({})

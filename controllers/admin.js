@@ -1,3 +1,4 @@
+//SCHEMA
 const Comment = require('../models/chat/comment');
 const User = require("../models/user");
 const Email = require("../models/admin/email");
@@ -12,9 +13,17 @@ const Article = require('../models/wHeights/article');
 const Permission = require('../models/admin/permission');
 const Status = require('../models/admin/status');
 
+//LIBRARIES
 const {sendGridEmail} = require("../services/sendGrid");
 const {objectArrIndex} = require("../utils/object-operations");
-const controller = {}; //Controller object
+const platformInfo = require("../platform-info");
+
+if (process.env.NODE_ENV !== "production") {
+    require('dotenv').config();
+}
+
+const controller = {};
+const platform = platformInfo[process.env.PLATFORM];
 
 controller.moderateGet = async function(req, res) { //Show all reported comments
     const comments = await Comment.find({status: 'flagged'})

@@ -6,13 +6,19 @@ const {sendGridEmail} = require("../services/sendGrid");
 const convertToLink = require("../utils/convert-to-link");
 const { cloudUpload } = require('../services/cloudinary');
 const {objectArrIndex, removeIfIncluded, parseKeysOrValues, parsePropertyArray} = require("../utils/object-operations");
+const platformInfo = require("../platform-info");
 
 const User = require('../models/user');
 const Message = require('../models/inbox/message');
 const AccessReq = require('../models/inbox/accessRequest');
 const Room = require('../models/chat/room');
 
+if (process.env.NODE_ENV !== "production") {
+    require('dotenv').config();
+}
+
 const controller = {};
+const platform = platformInfo[process.env.PLATFORM];
 
 //INBOX MESSAGE ROUTES
 

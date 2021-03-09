@@ -3,6 +3,7 @@ const {sendGridEmail} = require("../services/sendGrid");
 const {sortByPopularity} = require("../utils/popularity");
 const {objectArrIndex, parsePropertyArray, removeIfIncluded} = require("../utils/object-operations");
 const {cloudUpload, cloudDelete} = require('../services/cloudinary');
+const platformInfo = require("../platform-info");
 
 const User = require('../models/user');
 const Notification = require('../models/inbox/message');
@@ -10,7 +11,12 @@ const Course = require('../models/homework/course');
 const PostComment = require('../models/postComment');
 const Room = require('../models/chat/room');
 
+if (process.env.NODE_ENV !== "production") {
+    require('dotenv').config();
+}
+
 const controller = {};
+const platform = platformInfo[process.env.PLATFORM];
 
 controller.index = async function(req, res) {
     const courses = await Course.find({});

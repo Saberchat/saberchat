@@ -10,8 +10,14 @@ const filter = new Filter();
 const dateFormat = require('dateformat');
 const {sendGridEmail} = require("../services/sendGrid");
 const {removeIfIncluded} = require("../utils/object-operations");
+const platformInfo = require("../platform-info");
+
+if (process.env.NODE_ENV !== "production") {
+    require('dotenv').config();
+}
 
 const controller = {};
+const platform = platformInfo[process.env.PLATFORM];
 
 controller.index = async function(req, res) {
     const rooms = await Room.find({}).populate("creator");

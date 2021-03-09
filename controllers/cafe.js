@@ -7,16 +7,22 @@ const convertToLink = require("../utils/convert-to-link");
 const getData = require("../utils/cafe-data");
 const {removeIfIncluded} = require("../utils/object-operations");
 const {cloudUpload, cloudDelete} = require('../services/cloudinary');
+const platformInfo = require("../platform-info");
 
 //SCHEMA
-const User = require('../models/user');
 const Order = require('../models/cafe/order');
 const Item = require('../models/cafe/orderItem');
 const Notification = require('../models/inbox/message');
 const Category = require('../models/cafe/itemType');
 const Cafe = require('../models/cafe/cafe')
 
+if (process.env.NODE_ENV !== "production") {
+    require('dotenv').config();
+}
+
 const controller = {};
+const platform = platformInfo[process.env.PLATFORM];
+
 //-----------GENERAL ROUTES-----------//
 
 //SHOW CAFE HOMEPAGE

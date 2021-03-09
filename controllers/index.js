@@ -3,17 +3,22 @@ const Filter = require('bad-words');
 const filter = new Filter();
 const passport = require('passport');
 const {sendGridEmail} = require("../services/sendGrid");
+const platformInfo = require("../platform-info");
 
 //SCHEMA
 const User = require('../models/user');
 const Email = require('../models/admin/email');
 const Announcement = require('../models/announcements/announcement');
-const Item = require('../models/cafe/orderItem');
+
+if (process.env.NODE_ENV !== "production") {
+    require('dotenv').config();
+}
 
 const controller = {};
+const platform = platformInfo[process.env.PLATFORM];
 
 controller.index = function(req, res) {
-    return res.render('index');
+    return res.render('index', {platform});
 }
 
 controller.register = async function(req, res) {
@@ -247,13 +252,14 @@ controller.logout = function(req, res) {
     return res.redirect("/");
 }
 
-controller.contact = async function(req, res) { //Contact info of teachers and developers
-    const faculty = await User.find({authenticated: true, authenticated: true, status: 'faculty'});
-    if (!faculty) {
+controller.contact = async function(req, res) { //Contact info of highest status and developers
+    const highestStatuses = await User.find({authenticated: true, authenticated: true, status: platform.statusSingular[platform.statusSingular.length-1]});
+    if (!highestStatuses) {
         req.flash('error', "An Error Occurred");
         return res.redirect('back');
     }
-    return res.render('other/contact', {faculty});
+    const highestPermission = platform.permissions[platform.permissions.length-1];
+    return res.render('other/contact', {highestStatuses, highestPermission, platform});
 }
 
 controller.alsion = async function(req, res) {
@@ -267,7 +273,7 @@ controller.alsion = async function(req, res) {
     for (let fac of faculty) { //Iterate through faculty and add their name to array
         teacherNames.push(`${fac.firstName} ${fac.lastName}`);
     }
-    return res.render('other/alsion_info', {faculty: teacherNames.join(', ')});
+    return res.render('other/alsion_info', {faculty: teacherNames.join(', '), platform});
 }
 
 controller.darkmode = async function(req, res) {

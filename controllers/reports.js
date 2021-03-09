@@ -1,12 +1,18 @@
 const convertToLink = require("../utils/convert-to-link");
 const dateFormat = require('dateformat');
-const {objectArrIndex, removeIfIncluded} = require("../utils/object-operations");
+const {removeIfIncluded} = require("../utils/object-operations");
+const platformInfo = require("../platform-info");
 
 //SCHEMA
 const User = require('../models/user');
 const PostComment = require('../models/postComment');
 
+if (process.env.NODE_ENV !== "production") {
+    require('dotenv').config();
+}
+
 const controller = {};
+const platform = platformInfo[process.env.PLATFORM];
 
 // Report GET index
 controller.index = async function(req, res) {

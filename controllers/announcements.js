@@ -5,6 +5,7 @@ const {objectArrIndex, removeIfIncluded} = require("../utils/object-operations")
 const path = require('path');
 const dateFormat = require('dateformat');
 const {cloudUpload, cloudDelete} = require('../services/cloudinary');
+const platformInfo = require("../platform-info");
 
 //SCHEMA
 const User = require('../models/user');
@@ -12,7 +13,12 @@ const Announcement = require('../models/announcements/announcement');
 const Notification = require('../models/inbox/message');
 const PostComment = require('../models/postComment');
 
+if (process.env.NODE_ENV !== "production") {
+    require('dotenv').config();
+}
+
 const controller = {};
+const platform = platformInfo[process.env.PLATFORM];
 
 // Ann GET index
 controller.index = async function(req, res) {

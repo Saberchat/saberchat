@@ -8,15 +8,12 @@ css for the background image and title
 
 #background {
     position: relative;
-
     min-height: 40rem;
 }
 
 #background::before {
     content: "";
     position: absolute;
-    /* background-image: url('../../images/alsion-background.gif'); */
-    background-image: url('https://i.imgur.com/Wnbn7Ei.gif');
     background-position: center;
     background-size: cover;
     filter: brightness(50%);

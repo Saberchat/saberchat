@@ -20,8 +20,14 @@ const axios = require('axios');
 const dateFormat = require("dateformat");
 const {cloudUpload, cloudDelete} = require('../services/cloudinary');
 const {objectArrIndex, removeIfIncluded} = require('../utils/object-operations');
+const platformInfo = require("../platform-info");
+
+if (process.env.NODE_ENV !== "production") {
+  require('dotenv').config();
+}
 
 const controller = {};
+const platform = platformInfo[process.env.PLATFORM];
 
 if (process.env.NODE_ENV !== "production") {
     require('dotenv').config();

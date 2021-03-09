@@ -1,7 +1,7 @@
 //LIBRARIES
 const dateFormat = require('dateformat');
 const {sendGridEmail} = require("../services/sendGrid");
-const convertToLink = require("../utils/convert-to-link");
+const platformInfo = require("../platform-info");
 
 //SCHEMA
 const Article = require('../models/wHeights/article');
@@ -9,7 +9,12 @@ const User = require('../models/user');
 const Type = require('../models/wHeights/articleType');
 const PostComment = require('../models/postComment');
 
+if (process.env.NODE_ENV !== "production") {
+    require('dotenv').config();
+}
+
 const controller = {};
+const platform = platformInfo[process.env.PLATFORM];
 
 // index page
 controller.index = async function(req, res) {
