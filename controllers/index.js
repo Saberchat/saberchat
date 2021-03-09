@@ -8,7 +8,6 @@ const {sendGridEmail} = require("../services/sendGrid");
 const User = require('../models/user');
 const Email = require('../models/admin/email');
 const Announcement = require('../models/announcements/announcement');
-const Item = require('../models/cafe/orderItem');
 
 const controller = {};
 
