@@ -253,27 +253,29 @@ controller.logout = function(req, res) {
 }
 
 controller.contact = async function(req, res) { //Contact info of highest status and developers
-    const highestStatuses = await User.find({authenticated: true, authenticated: true, status: platform.statusSingular[platform.statusSingular.length-1]});
+    //Get users with the highest status (e.g. faculty)
+    const highestStatuses = await User.find({authenticated: true, authenticated: true, status: platform.statusesProperty[platform.statusesProperty.length-1]});
     if (!highestStatuses) {
         req.flash('error', "An Error Occurred");
         return res.redirect('back');
     }
-    const highestPermission = platform.permissions[platform.permissions.length-1];
+
+    const highestPermission = platform.permissionsProperty[platform.permissionsProperty.length-1]; //Get highest permission (e.g. principal)
     return res.render('other/contact', {highestStatuses, highestPermission, platform});
 }
 
 controller.alsion = async function(req, res) {
-    const faculty = await User.find({authenticated: true, status: 'faculty'});
-    if (!faculty) {
+    const highestStatuses = await User.find({authenticated: true, authenticated: true, status: platform.statusesProperty[platform.statusesProperty.length-1]});
+    if (!highestStatuses) {
         req.flash('error', "An Error Occurred");
         return res.redirect('back');
     }
 
-    let teacherNames = [];
-    for (let fac of faculty) { //Iterate through faculty and add their name to array
-        teacherNames.push(`${fac.firstName} ${fac.lastName}`);
+    let names = [];
+    for (let user of highestStatuses) { //Iterate through faculty and add their name to array
+        names.push(`${user.firstName} ${user.lastName}`);
     }
-    return res.render('other/alsion_info', {faculty: teacherNames.join(', '), platform});
+    return res.render('other/alsion_info', {names: names.join(', '), platform});
 }
 
 controller.darkmode = async function(req, res) {

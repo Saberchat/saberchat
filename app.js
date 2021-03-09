@@ -94,11 +94,7 @@ app.use(helmet.contentSecurityPolicy({ // customizations for helmet content secu
         mediaSrc: ["'self'", "https://res.cloudinary.com"],
         workerSrc: ["'self'", "blob:"],
         objectSrc: [],
-        imgSrc: [
-            "https:",
-            "blob:",
-            "data:"
-        ],
+        imgSrc: ["'self'", "https:", "blob:", "data:"],
         fontSrc: ["'self'", "https://ka-f.fontawesome.com/"]
     }
 }));

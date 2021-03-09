@@ -3,9 +3,11 @@
 module.exports = {
     alsion: {
         name: "Alsion",
-        statusSingular: ["7th Grader", "8th Grader", "Freshman", "Sophomore", "Junior", "Senior", "Faculty", "Parent", "Alumnus", "Guest"],
-        statusPlural: ["7th Graders", "8th Graders", "Freshmen", "Sophomores", "Juniors", "Seniors", "Faculty", "Parents", "Alumni", "Guests"],
-        permissions: ["Default", "Moderator", "Administrator", "Principal"],
+        statusesProperty: ["7th", "8th", "9th", "10th", "11th", "12th", "alumnus", "parent",  "guest", "faculty"],
+        statusesSingular: ["7th Grader", "8th Grader", "Freshman", "Sophomore", "Junior", "Senior", "Alumnus", "Parent",  "Guest", "Faculty"],
+        statusesPlural: ["7th Graders", "8th Graders", "Freshmen", "Sophomores", "Juniors", "Seniors", "Alumni", "Parents","Guests", "Faculty"],
+        permissionsProperty: ["default", "mod", "admin", "principal"],
+        permissionsDisplay: ["Default", "Moderator", "Administrator", "Principal"],
         featureRoutes: ["wHeights"],
         featureNames: ["Witherly Heights"],
         imageUrl: "https://i.imgur.com/Wnbn7Ei.gif",
@@ -54,9 +56,11 @@ module.exports = {
 
     generic: {
         name: "Generic Platform",
-        statusSingular: ["Lowest", "Average", "Elite"],
-        statusPlural: ["Lowest", "Average", "Elites"],
-        permissions: ["Default", "Moderator", "Administrator", "Principal"],
+        statusesProperty: ["lowest", "average", "elite"],
+        statusesSingular: ["Lowest", "Average", "Elite"],
+        statusesPlural: ["Lowest", "Average", "Elites"],
+        permissionsProperty: ["default", "mod", "admin", "principal"],
+        permissionsDisplay: ["Default", "Moderator", "Administrator", "Principal"],
         featureRoutes: [],
         featureNames: [],
         imageUrl: "https://cdn.mos.cms.futurecdn.net/ntFmJUZ8tw3ULD3tkBaAtf.jpg",
