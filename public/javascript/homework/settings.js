@@ -1,7 +1,7 @@
 const changeTab = function (tab, darkmode) { //Change the current tab
-    const colorMode = new Map([[true, ["#7FFFD4", "white"]], [false, ["blue", "black"]]]);
+    const colorMode = new Map([[true, ["#7FFFD4", "white"]], [false, ["blue", "black"]]]); //Color change depending on darkmode
 
-    for (let t of document.getElementsByClassName("tab-header")) {
+    for (let t of document.getElementsByClassName("tab-header")) { //Iterate through tabs and change them based on darkmode
         document.getElementsByClassName(t.id)[0].hidden = true;
         t.style.color = colorMode.get(darkmode)[1];
     }
@@ -20,25 +20,25 @@ const changeThumbnailInit = function () { //Display thumbnail during course init
     }
 }
 
-const changeThumbnail = function (input) { //Change thumbnail image based on input
+const changeThumbnail = function (input) { //Display thumbnail image based on radio buttons clicked
     if (document.getElementById("showLinkImage").checked) {
-        document.getElementsByClassName("jumbotron")[0].style.backgroundImage = `url('${input.value}`;
+        document.getElementsByClassName("jumbotron")[0].style.backgroundImage = `url('${input.value}`; //Change jumbotron background image
     } else {
         document.getElementById("thumbnail-backup").src = input.value;
     }
 }
 
-const changeThumbnailUpload = function(url, backup) {
-    if (document.getElementById("showUploadedImage").checked) {
+const changeThumbnailUpload = function(url, backup) { //Display uploaded image based on radio buttons clicked
+    if (document.getElementById("showUploadedImage").checked) { //If display upload is clicked, make main image the upload
         document.getElementsByClassName("jumbotron")[0].style.backgroundImage = `url(${url})`;
         document.getElementById("thumbnail-backup").src = backup;
-    } else {
+    } else { //If not, make it the backup image
         document.getElementsByClassName("jumbotron")[0].style.backgroundImage = `url(${backup})`;
         document.getElementById("thumbnail-backup").src = url;
     }
 }
 
-const changeThumbnailUrl = function(url, backup) {
+const changeThumbnailUrl = function(url, backup) { //Change URL of course thumbnail
     if (document.getElementById("showLinkImage").checked) {
         document.getElementsByClassName("jumbotron")[0].style.backgroundImage = `url(${url})`;
         document.getElementById("thumbnail-backup").src = backup;
@@ -60,21 +60,21 @@ const changeJoinCode = function (courseID, event) { //Change course join code (i
     const url = `/homework/joinCode/${courseID}?_method=put`;
     const data = {};
 
-    $.post(url, data => {
+    $.post(url, data, data => {
         document.getElementById('loading').style.color = "grey";
         document.getElementById('loading').innerText = "Waiting";
 
-        if (data.success) {
+        if (data.success) { //If successful request, update joincode info
             document.getElementById('joinCode').innerText = data.joinCode;
             document.getElementById('loading').hidden = false;
             document.getElementById('loading').style.color = "green";
             document.getElementById('loading').innerText = data.success;
 
-            setTimeout(() => {
+            setTimeout(() => { //Hide loading button
                 document.getElementById('loading').hidden = true;
             }, 1000);
 
-        } else {
+        } else { //If there is an error
             document.getElementById('loading').hidden = false;
             document.getElementById('loading').style.color = "red";
             document.getElementById('loading').innerText = data.error;

@@ -1,4 +1,4 @@
-const upvote = function (button, location) {
+const upvote = function (button, location) { //Upvote a tutor
     const courseId = button.id.split('-')[1];
     const tutorId = button.id.split("-")[2];
     const url = `/homework/upvote/${courseId}?_method=put`;
@@ -6,15 +6,14 @@ const upvote = function (button, location) {
 
     $.post(url, data, data => {
         if (data.success) {
-
-            if (data.success.includes("Downvoted")) {
+            if (data.success.includes("Downvoted")) { //If downvoting tutor, make color grey
                 button.innerHTML = `<span class="not-upvoted"><i class="fas fa-arrow-circle-up"></i><span class="upvote-count" id="upvoteCount-<%=course._id%>-${tutorId}"> ${data.upvoteCount}</span></span>`;
 
             } else {
                 button.innerHTML = `<span class="upvoted"><i class="fas fa-arrow-circle-up"></i><span class="upvote-count" id="upvoteCount-<%=course._id%>-${tutorId}"> ${data.upvoteCount}</span></span>`;
             }
 
-            if (location) {
+            if (location) { //Styling works different on tutor-show page
                 if (location == "show") {
                     button.innerHTML += "<br>"
                 }

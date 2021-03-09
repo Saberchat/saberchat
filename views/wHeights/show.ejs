@@ -89,7 +89,7 @@
                 <article class="ann-container" id="comment-section">
                     <h3 id="comments-heading">Comments (<%= article.comments.length %>)</h3>
 
-                    <form id="form-<%= article._id %>" onsubmit="comment(this, event)">
+                    <form id="form-<%= article._id %>" onsubmit="comment(this, 'article', 'wHeights', event)">
                         <div class="input-group" id="comment-input-box">
                             <input type="text" aria-describedby="send-button"
                                    class="form-control rounded-0 border-0 py-4"
@@ -128,14 +128,14 @@
 
                                         <% if (comment.likes.includes(currentUser._id)) { %>
                                             <span class="liked-comment" id="likeComment-<%= comment._id %>"
-                                                  onclick="likeComment(this)"><i class="fas fa-thumbs-up"></i></span>
+                                                  onclick="likeComment(this, 'article', 'wHeights')"><i class="fas fa-thumbs-up"></i></span>
                                             <span
                                                     class="like-count-comment"
                                                     id="likeCountComment-<%= comment._id %>"><%= comment.likes.length %></span>
 
                                         <% } else { %>
                                             <span class="unliked-comment" id="likeComment-<%= comment._id %>"
-                                                  onclick="likeComment(this)"><i class="fas fa-thumbs-up"></i></span>
+                                                  onclick="likeComment(this, 'article', 'wHeights')"><i class="fas fa-thumbs-up"></i></span>
                                             <span
                                                     class="like-comment-comment"
                                                     id="likeCountComment-<%= comment._id %>"><%= comment.likes.length %></span>
@@ -172,13 +172,13 @@
 
                                     <% if (comment.likes.includes(currentUser._id)) { %>
                                         <span class="liked-comment" id="likeComment-<%= comment._id %>"
-                                              onclick="likeComment(this)"><i class="fas fa-thumbs-up"></i></span> <span
+                                              onclick="likeComment(this, 'article', 'wHeights')"><i class="fas fa-thumbs-up"></i></span> <span
                                                 class="like-count-comment"
                                                 id="likeCountComment-<%= comment._id %>"><%= comment.likes.length %></span>
 
                                     <% } else { %>
                                         <span class="unliked-comment" id="likeComment-<%= comment._id %>"
-                                              onclick="likeComment(this)"><i class="fas fa-thumbs-up"></i></span> <span
+                                              onclick="likeComment(this, 'article', 'wHeights')"><i class="fas fa-thumbs-up"></i></span> <span
                                                 class="like-comment-comment"
                                                 id="likeCountComment-<%= comment._id %>"><%= comment.likes.length %></span>
                                     <% } %>

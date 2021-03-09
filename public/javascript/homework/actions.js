@@ -1,4 +1,4 @@
-const book = function (button, location, darkmode) {
+const book = function (button, location, darkmode) { //Book a tutor
     const courseId = button.id.split('-')[0];
     const tutorId = button.id.split('-')[1];
     const url = `/homework/book/${courseId}?_method=put`;
@@ -7,8 +7,8 @@ const book = function (button, location, darkmode) {
     $.post(url, data, data => {
         if (data.success) {
             $(`#modal-book-${tutorId}`).modal('hide');
-            console.log(data)
 
+            //Remove button to book tutor, start building buttons to review/leave tutor
             const tutorDiv = document.getElementById(`tutor-actions-${tutorId}`);
             tutorDiv.removeChild(document.getElementById(`book-button-${tutorId}`));
 
@@ -16,6 +16,7 @@ const book = function (button, location, darkmode) {
             let leaveButton = document.createElement('button');
             let chatButton = document.createElement('a');
 
+            //Button styling based on page location
             if (location == "show") {
                 reviewButton.className = "review-button action-button btn btn-warning";
                 leaveButton.className = "leave-button action-button btn btn-danger";
@@ -41,27 +42,28 @@ const book = function (button, location, darkmode) {
             chatButton.setAttribute("href", `/chat/${data.room}`);
             chatButton.innerHTML = "Chat";
 
-            if (!data.formerStudent) {
+            if (!data.formerStudent) { //If student was a student earlier, review button was already available. Do not add it in this case
                 tutorDiv.appendChild(reviewButton);
             }
 
             tutorDiv.appendChild(leaveButton);
             tutorDiv.appendChild(chatButton);
 
+            //Update tutor's display info
             document.getElementById("new-count").innerText = `${data.user.newRoomCount.length + data.user.annCount.length}`;
             document.getElementById("new-count").hidden = false;
 
             document.getElementById("new-chat").innerText = `${data.user.newRoomCount.length}`;
             document.getElementById("new-chat").hidden = false;
 
-            if (location == "tutor-show") {
+            if (location == "tutor-show") { //If on tutor-show page, create list which displays all tutor's students
                 let studentHeading = document.createElement("li");
                 studentHeading.className = "nav-item tab-header tab";
                 studentHeading.id = "students";
                 studentHeading.setAttribute("onclick", `changeTab(this, ${darkmode})`);
                 studentHeading.innerHTML = `<a class="nav-link active">Students (${data.tutor.students.length + data.tutor.formerStudents.length})</a>`;
 
-                let lessonCount = 0;
+                let lessonCount = 0; //Track students' lessons
                 for (let student of data.tutor.students) {
                     if (student.student == data.user._id.toString()) {
                         lessonCount = student.lessons.length;
@@ -76,7 +78,7 @@ const book = function (button, location, darkmode) {
                 studentsList.innerHTML = `<li class="list-group-item list-group-item-success status-header darkmode-outline"> <div class="d-flex w-100 justify-content-between"> <h2 class="mb-1 darkmode-header">Students</h2> </div> </li>`;
 
                 let userElement;
-                for (let student of data.students) {
+                for (let student of data.students) { //Build HTML elements for each of the tutor's students
                     userElement = document.createElement("div");
                     userElement.className = "list-group-item list-group-item-action user-element cafe";
                     userElement.innerHTML += `<a href="/profiles/${student._id}" class="student-profile user-element cafetext">`;
@@ -87,7 +89,7 @@ const book = function (button, location, darkmode) {
                     }
                     userElement.innerHTML += ` <span class="${student.permission} ${student.status} ${student.tags.join(' ')} student-block cafetext"><span class="span-tag-name">${student.firstName} ${student.lastName}</span> <span class="span-tag-username">${student.username}</span></span></a>`;
 
-                    if (student._id.toString() == data.user._id.toString()) {
+                    if (student._id.toString() == data.user._id.toString()) { //If student is current user, add button to view lesson history
                         let lessonInfoButton = document.createElement("a");
                         lessonInfoButton.className = "btn btn-info lesson-button";
                         lessonInfoButton.innerText = "Lesson Information";
@@ -107,7 +109,7 @@ const book = function (button, location, darkmode) {
                 formerStudentsList.className = "list-group";
                 formerStudentsList.innerHTML = `<li class="list-group-item list-group-item-success status-header darkmode-outline"> <div class="d-flex w-100 justify-content-between"> <h2 class="mb-1 darkmode-header">Former Students</h2> </div> </li>`;
 
-                for (let student of data.formerStudents) {
+                for (let student of data.formerStudents) { //Build HTML elements for tutor's former students
                     userElement = document.createElement("div");
                     userElement.className = "list-group-item list-group-item-action user-element cafe";
                     userElement.innerHTML += `<a href="/profiles/${student._id}" class="student-profile user-element cafetext">`;
@@ -120,6 +122,7 @@ const book = function (button, location, darkmode) {
                     formerStudentsList.appendChild(userElement);
                 }
 
+                //Add students list and heading to page 
                 studentDiv.appendChild(studentsList);
                 studentDiv.innerHTML += "<br/><br/>"
                 studentDiv.appendChild(formerStudentsList);
@@ -131,7 +134,7 @@ const book = function (button, location, darkmode) {
     });
 }
 
-const leave = function (button, location, darkmode) {
+const leave = function (button, location, darkmode) { //Leave a tutor
     const courseId = button.id.split('-')[0];
     const tutorId = button.id.split('-')[1];
     const url = `/homework/leave/${courseId}?_method=put`;
@@ -141,6 +144,7 @@ const leave = function (button, location, darkmode) {
         if (data.success) {
             $(`#modal-stop-${tutorId}`).modal('hide');
 
+            //Remove buttons to review, leave and chat with tutor
             const tutorDiv = document.getElementById(`tutor-actions-${tutorId}`);
             tutorDiv.removeChild(document.getElementById(`review-button-${tutorId}`));
             tutorDiv.removeChild(document.getElementById(`leave-button-${tutorId}`));
@@ -149,7 +153,7 @@ const leave = function (button, location, darkmode) {
             let reviewButton = document.createElement('button');
             let bookButton = document.createElement('button');
 
-            if (location == "show") {
+            if (location == "show") { //Button styling based on page location
                 reviewButton.className = "review-button action-button btn btn-warning";
                 bookButton.className = "book-button action-button btn btn-info";
 
@@ -158,6 +162,7 @@ const leave = function (button, location, darkmode) {
                 bookButton.className = "action-button btn btn-info";
             }
 
+            //You can still review tutors that you were once a student of
             reviewButton.id = `review-button-${tutorId}`;
             reviewButton.setAttribute("data-toggle", "modal");
             reviewButton.setAttribute("data-target", `#modal-review-${tutorId}`);
@@ -170,6 +175,7 @@ const leave = function (button, location, darkmode) {
             bookButton.innerHTML = "Book This Tutor";
             tutorDiv.appendChild(bookButton);
 
+            //Reset user's displayed newRoomCount
             document.getElementById("new-count").innerText = `${data.user.newRoomCount.length + data.user.annCount.length}`;
             if (data.user.newRoomCount.length + data.user.annCount.length > 0) {
                 document.getElementById("new-count").hidden = false;
@@ -184,7 +190,7 @@ const leave = function (button, location, darkmode) {
                 document.getElementById("new-chat").hidden = true;
             }
 
-            if (location == "tutor-show") {
+            if (location == "tutor-show") { //Change from students tab to reviews tab if on tutor-show page
                 document.getElementById("students").parentNode.removeChild(document.getElementById("students"));
                 document.getElementsByClassName("students")[0].parentNode.removeChild(document.getElementsByClassName("students")[0]);
                 changeTab(document.getElementById("reviews"), darkmode);
@@ -200,11 +206,11 @@ const closeLessons = function (button, location) {
     const data = {tutorId};
 
     $.post(url, data, data => {
-
         if (data.success) {
             $(`#modal-close-${tutorId}`).modal('hide');
             let reopenButton = document.createElement('button');
 
+            //Build button to reopen lessons based on current page
             if (location == "show") {
                 reopenButton.className = "reopen-lessons action-button btn btn-success lesson-action";
             } else if (location == "tutor-show") {
@@ -215,23 +221,24 @@ const closeLessons = function (button, location) {
             reopenButton.setAttribute("data-toggle", "modal");
             reopenButton.setAttribute("data-target", `#modal-reopen-${tutorId}`);
             reopenButton.innerHTML = "Reopen Lessons";
+            //Replace close button with reopen button
             document.getElementById(`close-${courseId}-${tutorId}`).parentNode.replaceChild(reopenButton, document.getElementById(`close-${courseId}-${tutorId}`));
         }
     });
 }
 
-const reopenLessons = function (button, location) {
+const reopenLessons = function (button, location) { //For tutors to reopen lessons that they had closed earlier
     const courseId = button.id.split('-')[0];
     const tutorId = button.id.split('-')[1];
     const url = `/homework/reopen-lessons/${courseId}?_method=put`;
     const data = {tutorId};
 
     $.post(url, data, data => {
-
         if (data.success) {
             $(`#modal-reopen-${tutorId}`).modal('hide');
-            let closeButton = document.createElement('button');
 
+            //Build button to again close lessons based on current page
+            let closeButton = document.createElement('button');
             if (location == "show") {
                 closeButton.className = "close-lessons action-button btn btn-danger lesson-action";
             } else if (location == "tutor-show") {
@@ -243,21 +250,22 @@ const reopenLessons = function (button, location) {
             closeButton.setAttribute("data-target", `#modal-close-${tutorId}`);
             closeButton.innerHTML = "Prevent Further Bookings";
 
+            //Replace reopen button with close button
             document.getElementById(`reopen-${courseId}-${tutorId}`).parentNode.replaceChild(closeButton, document.getElementById(`reopen-${courseId}-${tutorId}`));
         }
     });
 }
 
-const setStudents = function () {
+const setStudents = function () { //For tutors to set how many students they can take in a specific course while joining
     document.getElementById("slots-label").innerText = `Number of Student Slots: ${document.getElementById('slots').value}`;
 }
 
-const setStudentsTutorShow = function (slider) {
+const setStudentsTutorShow = function (slider) { //For tutors to set how many students they can take in a specific course on their own profile page
     const courseId = slider.id.split('-')[1];
     document.getElementById(`slots-label-${courseId}`).innerText = `Number of Student Slots: ${slider.value}`;
 }
 
-const setStudentsShow = function (courseId) {
+const setStudentsShow = function (courseId) { //For tutors to set how many students they can take in a specific course (not while joining)
     const url = `/homework/set-students/${courseId}?_method=put`;
     const slots = document.getElementById('slots').value;
     const data = {courseId, slots};
@@ -288,19 +296,21 @@ const setStudentsShow = function (courseId) {
     });
 }
 
-const removeStudent = function (button, location) {
+const removeStudent = function (button) {
     const courseId = button.id.split('-')[0];
     const studentId = button.id.split('-')[1];
-    const reason = document.getElementById(`reason-${studentId}`).value;
+    const reason = document.getElementById(`reason-${studentId}`).value;  //Listed reason that student is being blocked
     const url = `/homework/remove-student/${courseId}?_method=put`;
     const data = {studentId, reason};
 
     $.post(url, data, data => {
         if (data.success) {
+            //Remove student from list of students
             $(`#modal-index-remove-${studentId}`).modal('hide');
             document.getElementById("students").removeChild(document.getElementById(`item-${studentId}`));
-            if (data.course.blocked.length == 1) {
-                let blockedDiv = document.createElement("ul");
+
+            if (data.course.blocked.length == 1) { //If this person is the only blocked person (meaning there was no list earlier)
+                let blockedDiv = document.createElement("ul"); //Create list with blocked heading 
                 blockedDiv.className = "list-group";
                 blockedDiv.id = "blocked-div";
                 blockedDiv.innerHTML = `<li class="list-group-item list-group-item-success mode darkmode-outline">Blocked</li>`;
@@ -308,16 +318,13 @@ const removeStudent = function (button, location) {
                 document.getElementById("blocked-column").removeChild(document.getElementById("no-blocked"));
             }
 
-            let blockedElement = document.createElement("li");
+            let blockedElement = document.createElement("li"); //Create list element with blocked user's info
             blockedElement.className = "list-group-item cafe";
             blockedElement.id = `item-${data.student._id}`;
             blockedElement.innerHTML += `<a href="/..profiles/${data.student._id}" class="user-element cafetext">`;
-            console.log(data.student.imageUrl.display)
             if (data.student.imageUrl.display) {
-                console.log("Yah")
                 blockedElement.innerHTML += `<img class="profile-image" src="${data.student.imageUrl.url}" alt="profile picture"></img>`;
             } else {
-                console.log("Nah")
                 blockedElement.innerHTML += `<img class="profile-image" src="${data.student.mediaFile.url}" alt="profile picture"></img>`;
             }        
             blockedElement.innerHTML += ` <span class="username ${data.student.status} ${data.student.permission} ${data.student.tags.join(' ')}"><span class="enrolled-name">${data.student.firstName} ${data.student.lastName}</span> <span class="enrolled-username">${data.student.username}</span></span> </a> <button class="btn btn-danger leave-button" id="unblock-button-${data.student._id}" data-toggle="modal" data-target="#modal-index-unblock-${data.student._id}">Unblock</button>`;
@@ -333,31 +340,30 @@ const removeStudent = function (button, location) {
             document.getElementById("blocked-div").appendChild(blockedElement);
             document.getElementById("blocked-div").appendChild(unblockModal);
 
-            if (data.course.students.length == 0) {
+            if (data.course.students.length == 0) { //If there are no more students, replace list with a heading
                 document.getElementById("students").parentNode.removeChild(document.getElementById("students"));
             }
-        } else {
-            console.log(data.error)
         }
     });
 }
 
-const removeTutor = function (button, location) {
+const removeTutor = function (button) { //Remove tutor from course
     const courseId = button.id.split('-')[0];
     const tutorId = button.id.split('-')[1];
-    const reason = document.getElementById(`reason-${tutorId}`).value;
+    const reason = document.getElementById(`reason-${tutorId}`).value; //Listed reason that tutor is being blocked
     const url = `/homework/remove-tutor/${courseId}?_method=put`;
     const data = {tutorId, reason, show: true};
 
     $.post(url, data, data => {
         if (data.success) {
+            //Remove tutor from list of tutors
             $(`#modal-index-remove-${tutorId}`).modal('hide');
             $(`#modal-remove-${tutorId}`).modal('hide');
             document.getElementById("tutor-index").removeChild(document.getElementById(`item-${tutorId}`));
             document.getElementById("tutor-div").removeChild(document.getElementById(`tutor-${tutorId}`));
 
-            if (data.course.blocked.length == 1) {
-                let blockedDiv = document.createElement("ul");
+            if (data.course.blocked.length == 1) { //If this person is the only blocked person (meaning there was no list earlier)
+                let blockedDiv = document.createElement("ul"); //Create list with blocked heading 
                 blockedDiv.className = "list-group";
                 blockedDiv.id = "blocked-div";
                 blockedDiv.innerHTML = `<li class="list-group-item list-group-item-success mode darkmode-outline">Blocked</li>`;
@@ -365,7 +371,7 @@ const removeTutor = function (button, location) {
                 document.getElementById("blocked-column").removeChild(document.getElementById("no-blocked"));
             }
 
-            let blockedElement = document.createElement("li");
+            let blockedElement = document.createElement("li"); //Create list element with blocked user's info
             blockedElement.className = "list-group-item cafe";
             blockedElement.id = `item-${data.tutor._id}`;
             blockedElement.innerHTML += `<a href="../profiles/${data.tutor._id}" class="user-element-text cafetext">`;
@@ -376,6 +382,7 @@ const removeTutor = function (button, location) {
             }
             blockedElement.innerHTML += `<span class="username ${data.tutor.status} ${data.tutor.permission} ${data.tutor.tags.join(' ')}"><span class="enrolled-name">${data.tutor.firstName} ${data.tutor.lastName}</span> <span class="enrolled-username">${data.tutor.username}</span></span> </a> <button class="btn btn-danger leave-button" id="unblock-button-${data.tutor._id}" data-toggle="modal" data-target="#modal-index-unblock-${data.tutor._id}">Unblock</button>`;
 
+            //Modal to unblock user
             let unblockModal = document.createElement("div");
             unblockModal.className = "modal fade";
             unblockModal.id = `modal-index-unblock-${data.tutor._id}`;
@@ -387,7 +394,7 @@ const removeTutor = function (button, location) {
             document.getElementById("blocked-div").appendChild(blockedElement);
             document.getElementById("blocked-div").appendChild(unblockModal);
 
-            if (data.course.tutors.length == 0) {
+            if (data.course.tutors.length == 0) { //If there are no more tutors, replace list with a heading
                 document.getElementById("tutor-index").parentNode.removeChild(document.getElementById("tutor-index"));
                 document.getElementById("tutor-div").parentNode.removeChild(document.getElementById("tutor-div"));
                 let noTutors = document.createElement("div");
@@ -400,19 +407,19 @@ const removeTutor = function (button, location) {
     });
 }
 
-const unblock = function (button) {
+const unblock = function (button) { //Unblock user from course
     const courseId = button.id.split('-')[0];
     const blockedId = button.id.split('-')[1];
     const url = `/homework/unblock/${courseId}?_method=put`;
     const data = {blockedId};
 
     $.post(url, data, data => {
-
-        if (data.success) {
+        if (data.success) { 
+            //Remove blocked user from list of blocked users
             $(`#modal-index-unblock-${blockedId}`).modal('hide');
-            document.getElementById("blocked-div").removeChild(document.getElementById(`item-${blockedId}`));
+            document.getElementById("blocked-div").removeChild(document.getElementById(`item-${blockedId}`)); //Remove element with blocked user's info
 
-            if (data.course.blocked.length == 0) {
+            if (data.course.blocked.length == 0) { //If there are no more blocked users, replace list with a heading
                 document.getElementById("blocked-div").parentNode.removeChild(document.getElementById("blocked-div"));
                 let noBlocked = document.createElement("div");
                 noBlocked.className = "empty-field";
@@ -424,54 +431,45 @@ const unblock = function (button) {
     });
 }
 
-const changeBio = function (button) {
+const changeBio = function (button) { //Change tutor's bio
     const courseId = button.id.split('-')[2];
     const bio = document.getElementById(`edit-bio-field`).value;
     const url = `/homework/bio/${courseId}?_method=put`;
     const data = {bio};
 
     $.post(url, data, data => {
-
         if (data.success) {
             $(`#modal-edit-bio`).modal('hide');
-            document.getElementById("tutor-bio").innerText = bio;
+            document.getElementById("tutor-bio").innerText = bio; //Update displayed bio text
         }
     });
 }
 
-const setTime = function (input) {
+const setTime = function (input) { //Update displayed time based on slider value
     const studentId = input.id.split('-')[1];
     document.getElementById(`time-label-${studentId}`).innerText = input.value;
 }
 
-const getTime = function (experience) {
+const getTime = function (experience) { //Format time in minutes, hours, days, etc. by dividing until there is no remainder
     let result;
     experience = parseInt(experience);
     if (experience < 60) {
         result = `${Math.round(experience * 100) / 100} minute(s)`;
-
     } else {
         experience /= 60;
-
         if (experience < 24) {
             result = `${Math.round(experience * 100) / 100} hour(s)`;
-
         } else {
             experience /= 24;
-
             if (experience < 7) {
                 result = `${Math.round(experience * 100) / 100} day(s)`;
-
             } else {
                 experience /= 7;
-
                 if (experience < 52) {
                     result = `${Math.round(experience * 100) / 100} week(s)`;
-
                 } else {
                     experience /= 52;
                     result = `${Math.round(experience * 100) / 100} year(s)`;
-
                 }
             }
         }
@@ -479,7 +477,7 @@ const getTime = function (experience) {
     return result;
 }
 
-const mark = function (button) {
+const mark = function (button) { //MArk a student's lesson
     const courseId = button.id.split('-')[1];
     const studentId = button.id.split('-')[2];
     const time = parseInt(document.getElementById(`time-${studentId}`).value);
@@ -489,16 +487,16 @@ const mark = function (button) {
 
     $.post(url, data, data => {
         if (data.success) {
-            document.getElementById(`time-${studentId}`).value = "0";
-            document.getElementById("lessons-length").innerText = data.tutor.lessons.length;
-            document.getElementById(`lessons-length-${studentId}`).innerText = parseInt(document.getElementById(`lessons-length-${studentId}`).innerText) + 1;
+            document.getElementById(`time-${studentId}`).value = "0"; //Reset student lessons
+            document.getElementById("lessons-length").innerText = data.tutor.lessons.length; //Increment tutor lessons
+            document.getElementById(`lessons-length-${studentId}`).innerText = parseInt(document.getElementById(`lessons-length-${studentId}`).innerText) + 1; //Increment student lessons
 
             let experience = 0;
             for (let lesson of data.tutor.lessons) {
                 experience += lesson.time;
             }
 
-            document.getElementById("experience").innerText = getTime(experience);
+            document.getElementById("experience").innerText = getTime(experience); //Set tutor's experience to newly formatted experience
             $(`#modal-${studentId}-mark`).modal('hide');
         }
     });

@@ -3,7 +3,6 @@
 const express = require('express');
 const middleware = require('../middleware');
 const {validateCourse} = require('../middleware/validation');
-const {validatePostComment} = require('../middleware/validation');
 const {singleUpload} = require('../middleware/multer');
 const wrapAsync = require('../utils/wrapAsync');
 const hw = require('../controllers/homework'); //Controller
@@ -46,7 +45,7 @@ router.put("/mark/:id", middleware.isLoggedIn, middleware.isTutor, wrapAsync(mid
 router.put('/book/:id', middleware.isLoggedIn, middleware.isStudent, wrapAsync(middleware.memberOfCourse), wrapAsync(hw.bookTutor)); //Book a tutor
 router.put('/leave/:id', middleware.isLoggedIn, middleware.isStudent, wrapAsync(middleware.memberOfCourse), wrapAsync(hw.leaveTutor)); //Leave Tutor
 router.put('/upvote/:id', middleware.isLoggedIn, middleware.isStudent, wrapAsync(middleware.memberOfCourse), wrapAsync(hw.upvoteTutor)); //Upvote a tutor
-router.put('/rate/:id', middleware.isLoggedIn, middleware.isStudent, wrapAsync(middleware.memberOfCourse), validatePostComment, wrapAsync(hw.rateTutor)); //Submit a review for a tutor
+router.put('/rate/:id', middleware.isLoggedIn, middleware.isStudent, wrapAsync(middleware.memberOfCourse), wrapAsync(hw.rateTutor)); //Submit a review for a tutor
 router.put('/like-review/:id', middleware.isLoggedIn, middleware.isStudent, wrapAsync(hw.likeReview)); //Like a tutor's review
 
 module.exports = router;

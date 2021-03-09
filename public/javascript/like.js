@@ -1,7 +1,8 @@
-const like = function (button) { //Like an announcement
-    const announcementId = button.id.split("-")[1];
-    const url = `/announcements/like?_method=put`;
-    const data = {announcementId};
+const like = function (button, object, route) { //Like an object
+    const id = button.id.split("-")[1];
+    const url = `/${route}/like?_method=put`;
+    const data = {};
+    data[`${object}Id`] = id;
     $.post(url, data, data => {
         if (data.success) {
             if (data.success.includes("Removed a like")) { //If response involved removing a like, change button color based on page
@@ -13,14 +14,14 @@ const like = function (button) { //Like an announcement
             } else { //If response involved adding a like, change color
                 button.style.color = "#03a5fc";
             }
-            document.getElementsByClassName(`likeCount-${announcementId}`)[0].innerText = data.likeCount; //Update the number of likes
+            document.getElementsByClassName(`likeCount-${id}`)[0].innerText = data.likeCount; //Update the number of likes
         }
     });
 }
 
-const likeComment = function (button) { //Like a comment on an announcement
+const likeComment = function (button, object, route) { //Like a comment on an object
     const commentId = button.id.split("-")[1];
-    const url = `/announcements/like-comment?_method=put`;
+    const url = `/${route}/like-comment?_method=put`;
     const data = {commentId};
     $.post(url, data, data => {
         if (data.success) {

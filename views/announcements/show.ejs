@@ -117,14 +117,14 @@
                         <div class="announcement-row">
                             <% if (announcement.likes.includes(currentUser._id)) { %>
                                 <span id="announcement-like-row"><i id="like-<%= announcement._id %>-show"
-                                                                    onclick="like(this)"
+                                                                    onclick="like(this, 'announcement', 'announcements')"
                                                                     class="fas fa-thumbs-up liked-announcement"></i> <span
                                             id="like-count"
                                             class="likeCount-<%= announcement._id %>"><%= announcement.likes.length %></span></span>
 
                             <% } else { %>
                                 <span id="announcement-like-row"><i id="like-<%= announcement._id %>-show"
-                                                                    onclick="like(this)"
+                                                                    onclick="like(this, 'announcement', 'announcements')"
                                                                     class="fas fa-thumbs-up unliked-announcement"></i> <span
                                             id="like-count"
                                             class="likeCount-<%= announcement._id %>"><%= announcement.likes.length %></span></span>
@@ -173,7 +173,7 @@
                 <article class="ann-container" id="comment-section">
                     <h3 id="comments-heading">Comments (<%= announcement.comments.length %>)</h3>
 
-                    <form id="form-<%= announcement._id %>" onsubmit="comment(this, event)">
+                    <form id="form-<%= announcement._id %>" onsubmit="comment(this, 'announcement', 'announcements', event)">
                         <div class="input-group comment-input-field">
                             <input type="text" aria-describedby="send-button"
                                    class="form-control rounded-0 border-0 py-4"
@@ -214,14 +214,14 @@
 
                                         <% if (comment.likes.includes(currentUser._id)) { %>
                                             <span class="liked-comment" id="likeComment-<%= comment._id %>"
-                                                  onclick="likeComment(this)"><i class="fas fa-thumbs-up"></i></span>
+                                                  onclick="likeComment(this, 'announcement', 'announcements')"><i class="fas fa-thumbs-up"></i></span>
                                             <span
                                                     class="like-count-comment"
                                                     id="likeCountComment-<%= comment._id %>"><%= comment.likes.length %></span>
 
                                         <% } else { %>
                                             <span class="unliked-comment" id="likeComment-<%= comment._id %>"
-                                                  onclick="likeComment(this)"><i class="fas fa-thumbs-up"></i></span>
+                                                  onclick="likeComment(this, 'announcement', 'announcements')"><i class="fas fa-thumbs-up"></i></span>
                                             <span
                                                     class="like-comment-comment"
                                                     id="likeCountComment-<%= comment._id %>"><%= comment.likes.length %></span>
@@ -258,13 +258,13 @@
 
                                     <% if (comment.likes.includes(currentUser._id)) { %>
                                         <span class="liked-comment" id="likeComment-<%= comment._id %>"
-                                              onclick="likeComment(this)"><i class="fas fa-thumbs-up"></i></span> <span
+                                              onclick="likeComment(this, 'announcement', 'announcements')"><i class="fas fa-thumbs-up"></i></span> <span
                                                 class="like-count-comment"
                                                 id="likeCountComment-<%= comment._id %>"><%= comment.likes.length %></span>
 
                                     <% } else { %>
                                         <span class="unliked-comment" id="likeComment-<%= comment._id %>"
-                                              onclick="likeComment(this)"><i class="fas fa-thumbs-up"></i></span> <span
+                                              onclick="likeComment(this, 'announcement', 'announcements')"><i class="fas fa-thumbs-up"></i></span> <span
                                                 class="like-comment-comment"
                                                 id="likeCountComment-<%= comment._id %>"><%= comment.likes.length %></span>
                                     <% } %>
@@ -282,35 +282,7 @@
     </div>
 </div>
 </body>
-<!-- <script src=".dist/heic2any.js"></script> -->
-<script src="/javascript/announcements/like.js"></script>
-<script src="/javascript/announcements/comment.js"></script>
+<script src="/javascript//like.js"></script>
+<script src="/javascript/comment.js"></script>
 <script src="/javascript/embed.js"></script>
-<!-- <script>
-    const heics = document.getElementsByClassName("heic");
-    console.log(heics);
-
-    const convertToJpeg = async function(image) {
-        await fetch(image.id)
-        .then((res) => res.blob())
-        .then((blob) => heic2any({
-            blob,
-            toType: "image/jpeg",
-            quality: 0.5, // cuts the quality and size by half
-        }))
-        .then((conversionResult) => {
-            const url = URL.createObjectURL(conversionResult);
-            image.href = url;
-            console.log(url);// document.getElementById("target").innerHTML = `<a target="_blank" href="${url}"><img src="${url}"></a>`;
-        })
-        .catch((e) => {
-            console.log(e);
-        })
-    }
-    
-    for (let image of heics) {
-        console.log(image);
-        convertToJpeg(image)
-    }
-</script> -->
 </html>

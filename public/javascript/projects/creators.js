@@ -9,7 +9,7 @@ for (let creator of document.getElementsByClassName('user-tag')) {
     creatorInput.value = creatorList.toString()
 }
 
-const addCreator = function (user) {
+const addCreator = function () { //Add creator to list of creators
     if ((!creatorList.includes(creatorSelect.value)) && !(creatorList.includes(creatorSelect[creatorSelect.selectedIndex].className))) { //Make sure that if the status has been selected, nothing else is selected
         creatorList.push(creatorSelect.value);
         creatorInput.value = creatorList.toString();
@@ -35,12 +35,11 @@ const addCreator = function (user) {
     }
 }
 
-const remCreator = function (btn) {
+const remCreator = function (btn) { //Remove creator from list of creators
     const id = btn.id;
 
     const userTags = document.getElementsByClassName('user-tag');
-    for (let tag of userTags) {
-
+    for (let tag of userTags) { //Iterate through tags until the one with the remove ID is found
         if (tag.id == id) {
             creatorDiv.removeChild(tag);
             creatorList.splice(creatorList.indexOf(id), 1);

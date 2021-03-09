@@ -278,7 +278,7 @@ controller.likeAnn = async function(req, res) {
     const announcement = await Announcement.findById(req.body.announcementId);
     if(!announcement) {return res.json({error: 'Error updating announcement.'});}
 
-    if (removeIfIncluded(announcements.likes, req.user._id)) { //Remove like
+    if (removeIfIncluded(announcement.likes, req.user._id)) { //Remove like
         await announcement.save();
         return res.json({
             success: `Removed a like from ${announcement.subject}`,
@@ -299,19 +299,15 @@ controller.comment = async function(req, res) {
     const announcement = await Announcement.findById(req.body.announcementId)
         .populate({
             path: "comments",
-            populate: {
-                path: "sender"
-            }
+            populate: {path: "sender"}
         });
     if (!announcement) {
-        return res.json({
-            error: 'Error commenting'
-        });
+        return res.json({error: 'Error commenting'});
     }
 
     const comment = await PostComment.create({
         type: "comment",
-        text: req.body.text,
+        text: req.body.text.split('<').join('&lt'),
         sender: req.user
     });
     if (!comment) {
@@ -378,7 +374,7 @@ controller.likeComment = async function(req, res) {
     const comment = await PostComment.findById(req.body.commentId);
     if(!comment) {return res.json({error: 'Error finding comment'});}
 
-    if (removeIfIncluded(comments.likes, req.user._id)) {
+    if (removeIfIncluded(comment.likes, req.user._id)) {
         await comment.save();
         return res.json({
             success: `Removed a like`,

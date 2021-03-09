@@ -1,17 +1,16 @@
-const updateImage = (imageInput => {
-    const imageMap = new Map([['profile-input', 'profile-image'], ['banner-input', 'banner-image']]);
+const updateImage = (imageInput => { //Update profile display image
+    const imageMap = new Map([['profile-input', 'profile-image'], ['banner-input', 'banner-image']]); //Relates the different HTML element ids for images
 
-    if (imageInput.value != '') {
-        document.getElementById(imageMap.get(imageInput.id)).src = imageInput.value;
-        document.getElementById(imageMap.get(imageInput.id)).hidden = false;
+    if (imageInput.value.split(' ').join('') != '') {
+        document.getElementById(imageMap.get(imageInput.id)).src = imageInput.value; //The HTML image element that corresponds to the HTML imput element
+        document.getElementById(imageMap.get(imageInput.id)).hidden = false; //Display image
 
-    } else {
+    } else { //If there is no text, hide the image
         document.getElementById(imageMap.get(imageInput.id)).hidden = true;
     }
 });
 
-// sends put request with data
-const updateTag = (select => {
+const updateTag = (select => { //Update status tags
     const tagGroup = document.getElementById('tag-group');
     const tag = select.value;
     const tags = document.getElementsByClassName('user-tag');

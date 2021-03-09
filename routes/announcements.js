@@ -5,7 +5,6 @@ const express = require('express');
 const middleware = require('../middleware/index');
 const {multipleUpload} = require('../middleware/multer');
 const {validateAnn} = require('../middleware/validation');
-const {validatePostComment} = require('../middleware/validation');
 const wrapAsync = require('../utils/wrapAsync');
 const announcements = require('../controllers/announcements'); // Controller
 const router = express.Router(); //Router
@@ -21,7 +20,7 @@ router.get('/mark/:id', middleware.isLoggedIn, wrapAsync(announcements.markOne))
 
 router.put('/like', middleware.isLoggedIn, wrapAsync(announcements.likeAnn)); //Like announcement
 router.put('/like-comment', middleware.isLoggedIn, wrapAsync(announcements.likeComment)); //Comment on announcement
-router.put('/comment', middleware.isLoggedIn, validatePostComment, wrapAsync(announcements.comment)); //Like a comment on announcement
+router.put('/comment', middleware.isLoggedIn, wrapAsync(announcements.comment)); //Like a comment on announcement
 
 router.route('/:id')
     .get(wrapAsync(announcements.show)) //Show specific announcement

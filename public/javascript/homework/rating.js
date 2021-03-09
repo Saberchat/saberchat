@@ -21,7 +21,7 @@ const rate = function (button, tutorId) {
     }
 }
 
-const submitRating = function (button, location) {
+const submitRating = function (button, location) { //Submit rating with text and stars
     const courseId = button.id.split('-')[0];
     const tutorId = button.id.split("-")[1];
 
@@ -36,11 +36,11 @@ const submitRating = function (button, location) {
         if (data.success) {
             document.getElementById(`review-${tutorId}`).value = "";
 
-            for (let star of document.getElementsByClassName(`star-${tutorId}`)) {
+            for (let star of document.getElementsByClassName(`star-${tutorId}`)) { //Reset all average stars
                 star.style.color = "black";
             }
 
-            for (let average_star of document.getElementsByClassName(`average-rating-${tutorId}`)) {
+            for (let average_star of document.getElementsByClassName(`average-rating-${tutorId}`)) { //Fill stars with gold color based on average rating
                 average_star.style.color = "black";
 
                 if (parseInt(average_star.id) <= data.averageRating) {
@@ -48,10 +48,9 @@ const submitRating = function (button, location) {
                 }
             }
 
-            if (location == "tutor-show") {
+            if (location == "tutor-show") { //On tutor-show page, build review div with text, like button, and stars
                 let newReview = document.createElement('div');
                 newReview.className = "col-md-8 col-12";
-
                 let starString = ``
                 for (let i = 0; i < 5; i += 1) {
                     if (i + 1 <= data.review.rating) {
@@ -61,15 +60,12 @@ const submitRating = function (button, location) {
                     }
                 }
 
+                //Fill div with HTML styling
                 newReview.innerHTML = `<section class="profile-desc cafe"><div class="desc-head"><h3><img class="follower-image" src="${data.user.imageUrl.url}"/><span class="review-sender">${data.user.firstName} ${data.user.lastName}</span></h3> <i id="like-${data.review.review._id}" class="fas fa-thumbs-up review-unliked" onclick="likeReview(this)"></i> <span id="like-count-${data.review.review._id}" class="like-count">${data.review.review.likes.length}</span><div title="Ratings" class="ratings">${starString}</div><div title="date" class="review-date">${data.review.review.date}</div><hr></div><div class="desc-body"><p>${data.review.review.text}</p></div></section><br>`;
-
                 document.getElementsByClassName('reviews')[0].insertBefore(newReview, document.getElementsByClassName('reviews')[0].firstChild);
             }
-
-            document.getElementById(`reviews-length-${tutorId}`).innerText = `${data.reviews_length}`;
-
+            document.getElementById(`reviews-length-${tutorId}`).innerText = `${data.reviews_length}`; //Update displayed reviews length
             $(`#modal-review-${tutorId}`).modal('hide');
-
         }
     });
 }

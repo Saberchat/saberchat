@@ -380,7 +380,7 @@ controller.deleteProject = async function(req, res) {
 }
 
 controller.likeProject = async function(req, res) {
-    let project = await Project.findById(req.body.project);
+    let project = await Project.findById(req.body.projectId);
     if (!project) {
         return res.json({error: 'Error updating project'});
     }
@@ -402,7 +402,7 @@ controller.likeProject = async function(req, res) {
 }
 
 controller.comment = async function(req, res) {
-    const project = await Project.findById(req.body.project)
+    const project = await Project.findById(req.body.projectId)
         .populate({
             path: "comments",
             populate: {
@@ -415,7 +415,7 @@ controller.comment = async function(req, res) {
 
     const comment = await PostComment.create({
         type: "comment",
-        text: req.body.text,
+        text: req.body.text.split('<').join('&lt'),
         sender: req.user,
     });
     if (!comment) {

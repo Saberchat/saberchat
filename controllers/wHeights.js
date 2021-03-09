@@ -107,7 +107,7 @@ controller.comment = async function(req, res) {
     }
 
     const comment = await PostComment.create({
-        text: req.body.text,
+        text: req.body.text.split('<').join('&lt'),
         sender: req.user,
         date: dateFormat(new Date(), "h:MM TT | mmm d")
     });

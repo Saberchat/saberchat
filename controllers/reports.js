@@ -1,5 +1,6 @@
 const convertToLink = require("../utils/convert-to-link");
 const dateFormat = require('dateformat');
+const {objectArrIndex, removeIfIncluded} = require("../utils/object-operations");
 
 //SCHEMA
 const User = require('../models/user');
@@ -102,7 +103,7 @@ controller.handleReport = async function(req, res) {
 
 // Report PUT like report
 controller.likeReport = async function(req, res) {
-    const report = await PostComment.findById(req.body.report);
+    const report = await PostComment.findById(req.body.reportId);
     if(!report) {return res.json({error: 'Error updating report.'});}
 
     if (removeIfIncluded(report.likes, req.user._id)) { //Remove like
@@ -123,7 +124,7 @@ controller.likeReport = async function(req, res) {
 
 // Report PUT comment
 controller.comment = async function(req, res) {
-    const report = await PostComment.findById(req.body.report)
+    const report = await PostComment.findById(req.body.reportId)
         .populate({
             path: "comments",
             populate: {path: "sender"}
@@ -136,7 +137,7 @@ controller.comment = async function(req, res) {
 
     const comment = await PostComment.create({
         type: "comment",
-        text: req.body.text,
+        text: req.body.text.split('<').join('&lt'),
         sender: req.user
     });
     if (!comment) {

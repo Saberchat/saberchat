@@ -1,14 +1,14 @@
-const updateDisplayNewRoom = function () {
+const updateDisplayNewRoom = function () { //Update the list of new users, if room is switched from public to private
     let userSelect = document.getElementById('roomType');
     let display = document.getElementById('user-selection');
-    if (userSelect.checked == true) {
+    if (userSelect.checked == true) { //If any users are selected from dropdown
         display.style.display = "block";
     } else {
         display.style.display = "none";
     }
 }
 
-const searchFunctionNewRoom = function () {
+const searchFunctionNewRoom = function() { //Search for users in new room
     let input = document.getElementById("search-input");
     let filter = input.value.toUpperCase();
     let list = document.getElementById("user-list");

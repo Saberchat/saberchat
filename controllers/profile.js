@@ -32,14 +32,6 @@ controller.index = async function(req, res) {
     if (!users) {
         req.flash("error", "An error occurred");
         return res.redirect("back");
-    }
-
-    //Display all user login activity
-    for (let user of users) {
-		console.log(`\n${user.firstName.toUpperCase()} ${user.lastName.toUpperCase()}'S SABERCHAT LOGIN ACTIVITY`);
-		for (let login of user.logins) {
-			console.log(`${dateFormat(login, "h:MM TT")} on ${dateFormat(login, "mmm d, yyyy")}`);
-		}
 	}
 	return res.render("profile/index", {users});
 }

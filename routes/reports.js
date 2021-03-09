@@ -3,7 +3,6 @@
 //LIBRARIES
 const express = require('express');
 const middleware = require('../middleware/index');
-const {validatePostComment} = require('../middleware/validation');
 const wrapAsync = require('../utils/wrapAsync');
 const reports = require('../controllers/reports'); // Controller
 const router = express.Router(); //Router

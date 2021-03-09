@@ -30,8 +30,8 @@
     <script src="/javascript/nav/userForm.js"></script>
     <script src="/javascript/nav/navbar.js"></script>
     <script src="/javascript/home/index.js"></script>
-    <script src="/javascript/reports/search.js"></script>
-    <script src="/javascript/reports/like.js"></script>
+    <script src="/javascript/search.js"></script>
+    <script src="/javascript/like.js"></script>
 
     <%- include('../partials/navbar') %>
     <%- include('../partials/header') %>
@@ -137,13 +137,13 @@
 
                             <% if (report.likes.includes(currentUser._id)) { %>
                                 <span class="liked-button"><i id="like-<%= report._id %>-index"
-                                                                onclick="like(this)"
+                                                                onclick="like(this, 'report', 'reports')"
                                                                 class="fas fa-thumbs-up"></i></span> <span
                                         class="likeCount-<%= report._id %>"><%= report.likes.length %></span>
 
                             <% } else { %>
                                 <span class="unliked-button"><i id="like-<%= report._id %>-index"
-                                                                onclick="like(this)"
+                                                                onclick="like(this, 'report', 'reports')"
                                                                 class="fas fa-thumbs-up"></i></span> <span
                                         class="likeCount-<%= report._id %>"><%= report.likes.length %></span>
 

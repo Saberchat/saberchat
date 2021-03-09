@@ -30,8 +30,8 @@
     <script src="/javascript/nav/userForm.js"></script>
     <script src="/javascript/nav/navbar.js"></script>
     <script src="/javascript/home/index.js"></script>
-    <script src="/javascript/announcements/search.js"></script>
-    <script src="/javascript/announcements/like.js"></script>
+    <script src="/javascript/search.js"></script>
+    <script src="/javascript/like.js"></script>
 
     <%- include('../partials/navbar') %>
     <%- include('../partials/header') %>
@@ -163,13 +163,13 @@
 
                                 <% if (announcement.likes.includes(currentUser._id)) { %>
                                     <span class="liked-button"><i id="like-<%= announcement._id %>-index"
-                                                                  onclick="like(this)"
+                                                                  onclick="like(this, 'announcement', 'announcements')"
                                                                   class="fas fa-thumbs-up"></i></span> <span
                                             class="likeCount-<%= announcement._id %>"><%= announcement.likes.length %></span>
 
                                 <% } else { %>
                                     <span class="unliked-button"><i id="like-<%= announcement._id %>-index"
-                                                                    onclick="like(this)"
+                                                                    onclick="like(this, 'announcement', 'announcements')"
                                                                     class="fas fa-thumbs-up"></i></span> <span
                                             class="likeCount-<%= announcement._id %>"><%= announcement.likes.length %></span>
 

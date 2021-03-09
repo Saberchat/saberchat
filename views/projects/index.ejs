@@ -136,13 +136,13 @@
 
                                     <% if (project.likes.includes(currentUser._id)) { %>
                                         <span class="liked-button" id="like-<%= project._id %>-index"
-                                              onclick="like(this)"><i
+                                              onclick="like(this, 'project', 'projects')"><i
                                                     class="fas fa-thumbs-up"></i></span> <span
                                                 class="likeCount-<%= project._id %>"><%= project.likes.length %></span>
 
                                     <% } else { %>
                                         <span class="unliked-button" id="like-<%= project._id %>-index"
-                                              onclick="like(this)"><i
+                                              onclick="like(this, 'project', 'projects')"><i
                                                     class="fas fa-thumbs-up"></i></span> <span
                                                 class="likeCount-<%= project._id %>"><%= project.likes.length %></span>
 
@@ -252,26 +252,6 @@
                 <br class="text-break" id="break-<%=project._id%>"/>
             <% }) %>
     </body>
-    <script src="/javascript/projects/like.js"></script>
-    <script>
-
-        const searchFunction = (() => {
-            const projects = document.getElementsByClassName('text-block');
-            const breaks = document.getElementsByClassName('text-break');
-            const searchInput = document.getElementById('search-input');
-            let filter = searchInput.value.toLowerCase();
-
-            for (let i = 0; i < projects.length; i += 1) {
-                if (!projects[i].textContent.replace("(Read More)", "").toLowerCase().includes(filter)) {
-                    $(`#${projects[i].id}`).hide();
-                    $(`#${breaks[i].id}`).hide();
-
-                } else {
-                    $(`#${projects[i].id}`).show();
-                    $(`#${breaks[i].id}`).show();
-                }
-            }
-        })
-
-    </script>
+    <script src="/javascript/like.js"></script>
+    <script src="/javascript/search.js"></script>
 </html>
