@@ -224,11 +224,11 @@ controller.requestJoin = async function(req, res) {
     }
 
     // find if the request already exists to prevent spam
-    const request = await AccessReq.findOne({requester: req.user._id, room: room._id});
-    if (request && request.status != 'pending') {
-        return res.json({error: `Request has already been ${request.status}`});
+    const existingRequest = await AccessReq.findOne({requester: req.user._id, room: room._id});
+    if (existingRequest && existingRequest.status != 'pending') {
+        return res.json({error: `Request has already been ${existingRequest.status}`});
 
-    } else if (request) {
+    } else if (existingRequest) {
         return res.json({error: 'Identical request has already been sent'});
     }
 
