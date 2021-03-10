@@ -5,8 +5,8 @@ module.exports.scriptUrls = [
     "https://code.jquery.com/", // jquery
     "https://unpkg.com/", // popper
     "https://cdnjs.cloudflare.com/", // popper, datetime
-    "https://ajax.googleapis.com/" // jquery
-
+    "https://ajax.googleapis.com/", // jquery
+    "https://www.googletagmanager.com/" // google analytics
 ];
 
 module.exports.styleUrls = [

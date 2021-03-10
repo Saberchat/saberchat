@@ -87,7 +87,7 @@ app.use(helmet()); // Helmet security headers
 app.use(helmet.contentSecurityPolicy({ // customizations for helmet content security policy
     directives: {
         defaultSrc: [],
-        connectSrc: ["'self'", "https://ka-f.fontawesome.com/", "https://res.cloudinary.com"],
+        connectSrc: ["'self'", "https://ka-f.fontawesome.com/", "https://res.cloudinary.com", "https://www.googletagmanager.com"],
         scriptSrc: ["'unsafe-inline'", "'self'", ...scriptUrls],
         styleSrc: ["'self'", "'unsafe-inline'", ...styleUrls],
         mediaSrc: ["'self'", "https://res.cloudinary.com"],
