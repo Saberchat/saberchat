@@ -117,7 +117,8 @@ controller.joinCourse = async function(req, res) {
     }
 
     //Join as student
-    if (['7th', '8th', '9th', '10th', '11th', '12th'].includes(req.user.status)) {
+    const studentStatuses = platform.statusesProperty.slice(0, 6);
+    if (studentStatuses.includes(req.user.status)) {
         const course = await Course.findOne({joinCode: req.body.joincode});
         if (!course) {
             req.flash('error', "No courses matching this join code were found.");

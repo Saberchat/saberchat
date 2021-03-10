@@ -168,11 +168,10 @@ controller.createMsg = async function(req, res) {
     }
 
     //If statuses are selected as 'recipients', find corresponding users
-    const statuses = ['7th', '8th', '9th', '10th', '11th', '12th', 'faculty', 'parent', 'alumnus', 'guest'];
     if(req.body.anonymous != 'true' && !message.toEveryone) {
         let selStatuses = [];
-        for (let i = 0; i < statuses.length; i++) {
-            const status = statuses[i];
+        for (let i = 0; i < platform.statusesProperty.length; i++) {
+            const status = platform.statusesProperty[i];
             if(recipients.includes(status)) {
                 selStatuses.push(status);
                 removeIfIncluded(recipients, status);

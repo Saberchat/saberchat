@@ -112,7 +112,7 @@ controller.statusGet = async function(req, res) { //Show page with all users and
         req.flash('error', 'An Error Occurred');
         return res.redirect('/admin');
     }
-    return res.render('admin/status', {users, tags: ['Cashier', 'Tutor', 'Editor']}); //List of tags that can be added/removed to tutors
+    return res.render('admin/status', {users, tags: platform.tags}); //List of tags that can be added/removed to tutors
 }
 
 controller.permissionsPut = async function (req, res) { //Update a user's permissions

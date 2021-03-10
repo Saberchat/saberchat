@@ -30,7 +30,7 @@ controller.index = async function(req, res) {
 controller.new = async function(req, res) {
     const students = await User.find({
         authenticated: true,
-        status: {$in: ["7th", "8th", "9th", "10th", "11th", "12th"]} //All students
+        status: {$in: platform.statusesProperty.slice(0, 6)} //All students
     });
     if (!students) {
         req.flash('error', "Unable to find students");

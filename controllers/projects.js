@@ -58,10 +58,10 @@ controller.createProject = async function(req, res) {
     let individual; //Individual Creator ID
 
     if (req.body.creatorInput != '') {
-        let statuses = ['7th', '8th', '9th', '10th', '11th', '12th']; //Lists of possible 'creators' that include groups of people
+        const studentStatuses = platform.statusesProperty.slice(0, 6); //Lists of possible 'creators' that include groups of people
 
         for (let creator of req.body.creatorInput.split(',')) {
-            if (statuses.includes(creator)) { //If the 'creator' is one of the listed status groups
+            if (studentStatuses.includes(creator)) { //If the 'creator' is one of the listed status groups
                 statusGroup = await User.find({authenticated: true, status: creator});  //Search for all users with that status
 
                 if (!statusGroup) {
@@ -240,9 +240,9 @@ controller.updateProject = async function(req, res) {
         creators = [];
 
     } else {
-        let statuses = ['7th', '8th', '9th', '11th', '12th']; //Lists of possible 'creators' that include groups of people
+        const studentStatuses = platform.statusesProperty.slice(0, 6); //Lists of possible 'creators' that include groups of people
         for (let creator of req.body.creatorInput.split(',')) { //Iterate throguh listed creators
-            if (statuses.includes(creator)) { //If 'creator' is one of the statuses (grades), find all users with that status
+            if (studentStatuses.includes(creator)) { //If 'creator' is one of the statuses (grades), find all users with that status
                 statusGroup = await User.find({authenticated: true, status: creator});
                 if (!statusGroup) {
                     req.flash('error', "Unable to find the users you listed");

@@ -4,8 +4,14 @@ const Room = require("../models/chat/room");
 const Cafe = require('../models/cafe/cafe')
 const Course = require('../models/homework/course')
 const {objectArrIndex} = require("../utils/object-operations");
+const platformInfo = require("../platform-data");
+
+if (process.env.NODE_ENV !== "production") {
+    require('dotenv').config();
+}
 
 const middleware = {};
+const platform = platformInfo[process.env.PLATFORM];
 
 //checks if user is logged in
 middleware.isLoggedIn = function(req, res, next) {
