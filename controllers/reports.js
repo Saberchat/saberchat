@@ -1,7 +1,7 @@
 const convertToLink = require("../utils/convert-to-link");
 const dateFormat = require('dateformat');
 const {removeIfIncluded} = require("../utils/object-operations");
-const platformInfo = require("../platform-info");
+const platformInfo = require("../platform-data");
 
 //SCHEMA
 const User = require('../models/user');

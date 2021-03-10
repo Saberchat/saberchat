@@ -6,7 +6,7 @@ const keywordFilter = require('../utils/keywordFilter');
 const {sortByPopularity} = require("../utils/popularity");
 const {removeIfIncluded} = require('../utils/object-operations');
 const {cloudUpload, cloudDelete} = require('../services/cloudinary');
-const platformInfo = require("../platform-info");
+const platformInfo = require("../platform-data");
 
 //SCHEMA
 const User = require('../models/user');

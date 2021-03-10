@@ -1,7 +1,7 @@
 //LIBRARIES
 const dateFormat = require('dateformat');
 const {sendGridEmail} = require("../services/sendGrid");
-const platformInfo = require("../platform-info");
+const platformInfo = require("../platform-data");
 
 //SCHEMA
 const Article = require('../models/wHeights/article');

@@ -5,7 +5,7 @@ const {objectArrIndex, removeIfIncluded} = require("../utils/object-operations")
 const path = require('path');
 const dateFormat = require('dateformat');
 const {cloudUpload, cloudDelete} = require('../services/cloudinary');
-const platformInfo = require("../platform-info");
+const platformInfo = require("../platform-data");
 
 //SCHEMA
 const User = require('../models/user');

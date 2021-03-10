@@ -16,7 +16,7 @@ const Status = require('../models/admin/status');
 //LIBRARIES
 const {sendGridEmail} = require("../services/sendGrid");
 const {objectArrIndex} = require("../utils/object-operations");
-const platformInfo = require("../platform-info");
+const platformInfo = require("../platform-data");
 
 if (process.env.NODE_ENV !== "production") {
     require('dotenv').config();

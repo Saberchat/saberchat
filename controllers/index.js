@@ -3,7 +3,7 @@ const Filter = require('bad-words');
 const filter = new Filter();
 const passport = require('passport');
 const {sendGridEmail} = require("../services/sendGrid");
-const platformInfo = require("../platform-info");
+const platformInfo = require("../platform-data");
 
 //SCHEMA
 const User = require('../models/user');

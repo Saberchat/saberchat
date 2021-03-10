@@ -1,7 +1,8 @@
 const mongoose = require("mongoose");
 
+//Superclass post schema, to be implemented with announcements, projects, etc.
 var postSchema = new mongoose.Schema({
-    type: String, //announcement, comment, review, project, report, etc.
+    type: String, //For identical objects with different names (e.g. announcement/project)
     subject: String,
     sender: {type: mongoose.Schema.Types.ObjectId, ref: 'User'},
     text: String,

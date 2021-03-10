@@ -7,7 +7,7 @@ const convertToLink = require("../utils/convert-to-link");
 const getData = require("../utils/cafe-data");
 const {removeIfIncluded} = require("../utils/object-operations");
 const {cloudUpload, cloudDelete} = require('../services/cloudinary');
-const platformInfo = require("../platform-info");
+const platformInfo = require("../platform-data");
 
 //SCHEMA
 const Order = require('../models/cafe/order');

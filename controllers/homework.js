@@ -3,7 +3,7 @@ const {sendGridEmail} = require("../services/sendGrid");
 const {sortByPopularity} = require("../utils/popularity");
 const {objectArrIndex, parsePropertyArray, removeIfIncluded} = require("../utils/object-operations");
 const {cloudUpload, cloudDelete} = require('../services/cloudinary');
-const platformInfo = require("../platform-info");
+const platformInfo = require("../platform-data");
 
 const User = require('../models/user');
 const Notification = require('../models/inbox/message');
