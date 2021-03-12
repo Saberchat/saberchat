@@ -8,7 +8,7 @@ const projects = require('../controllers/projects'); //Controller
 const router = express.Router(); //Router
 
 router.route('/')
-    .get(wrapAsync(projects.index)) //Show all projects
+    .get(middleware.isLoggedIn, wrapAsync(projects.index)) //Show all projects
     .post(middleware.isLoggedIn, middleware.isFaculty, multipleUpload, validateProject, wrapAsync(projects.createProject)); //Create ne wproject
 
 router.get('/new', middleware.isLoggedIn, middleware.isFaculty, wrapAsync(projects.newProject)); //Form to create new project

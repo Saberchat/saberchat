@@ -13,6 +13,10 @@ module.exports = {
         permissionsProperty: ["default", "mod", "admin", "principal"],
         permissionsDisplay: ["Default", "Moderator", "Administrator", "Principal"],
         tags: ["Editor", "Tutor", "Cashier"],
+        publicFeatures: [
+            {route: "projects", name: "Student Projects", icon: "paint-brush", subroutes: ["/"]},
+            {route: "announcements", name: "Announcements", icon: "bullhorn", subroutes: ["/"]},
+        ],
         features: [
             {route: "cafe", name: "No Left Turn Cafe", icon: "coffee"},
             {route: "articles", name: "Witherly Heights", icon: "newspaper"},
@@ -76,6 +80,7 @@ module.exports = {
         permissionsProperty: ["default", "mod", "admin", "principal"],
         permissionsDisplay: ["Default", "Moderator", "Administrator", "Principal"],
         tags: ["Example Tag"],
+        publicFeatures: [],
         features: [],
         imageUrl: "https://cdn.mos.cms.futurecdn.net/ntFmJUZ8tw3ULD3tkBaAtf.jpg",
         displayImages: [

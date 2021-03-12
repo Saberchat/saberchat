@@ -15,7 +15,13 @@ const platform = platformInfo[process.env.PLATFORM];
 
 //checks if user is logged in
 middleware.isLoggedIn = function(req, res, next) {
-    if (req.isAuthenticated()) { return next();}
+    if (req.isAuthenticated()) {return next();}
+    //If user is not logged in, but this feature is available to people without accounts
+    if (objectArrIndex(platform.publicFeatures, "route", req.baseUrl.slice(1)) > -1) {
+        if (platform.publicFeatures[objectArrIndex(platform.publicFeatures, "route", req.baseUrl.slice(1))].subroutes.includes(req.route.path)) {
+            return next();
+        }
+    }
     req.flash('error', 'Please Login');
     return res.redirect('/');
 }

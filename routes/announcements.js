@@ -11,7 +11,7 @@ const router = express.Router(); //Router
 
 //ROUTES
 router.route('/')
-    .get(wrapAsync(announcements.index)) //Show all announcements
+    .get(middleware.isLoggedIn, wrapAsync(announcements.index)) //Show all announcements
     .post(middleware.isLoggedIn, middleware.isMod, multipleUpload, validateAnn, wrapAsync(announcements.create)); //Create announcement
 
 router.get('/new', middleware.isLoggedIn, middleware.isMod, announcements.new); //Form to create new announcement

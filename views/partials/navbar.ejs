@@ -60,13 +60,11 @@
                         </li>
 
                     <% } else { %>
-                        <li class="nav-item">
-                            <a class="nav-link" href="/projects"><i class="fas fa-paint-brush"></i> Projects</a>
-                        </li>
-
-                        <li class="nav-item">
-                            <a class="nav-link" href="/announcements"><i class="fas fa-bullhorn"></i> Announcements</a>
-                        </li>
+                        <% for (let feature of platform.publicFeatures) { %>
+                            <li class="nav-item">
+                                <a class="nav-link" href="/<%=feature.route%>"><i class="fas fa-<%=feature.icon%>"></i> <%=feature.name%>></a>
+                            </li>
+                        <% } %>
                     <% } %>
 
                 </ul>
