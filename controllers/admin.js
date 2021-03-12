@@ -227,7 +227,7 @@ controller.accesslistGet = async function(req, res) { //Show page with all permi
 controller.addEmail = async function (req, res) { //Add email to access list/blocked list
     if (req.body.version === "accesslist") {
         if (platform.emailExtension && req.body.address.split('@')[1] === platform.emailExtension) { //These emails are already verified
-            return res.json({error: "Alsion emails do not need to be added to the Access List"});
+            return res.json({error: `${platform.name} emails do not need to be added to the Access List`});
         }
     }
 

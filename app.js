@@ -108,11 +108,6 @@ app.use(helmet.referrerPolicy({ // customizations for helmet referrer policy
 
 const session = require('express-session'); // Sets up express session for authorization
 const MemoryStore = require('memorystore')(session); // Memorystore package (express-session has memory leaks, bad for production)
-// app.use(require("express-session")({
-// 	secret: "Programming For Alsion Is Cool", // Secret used to encrypt the information
-// 	resave: false,
-// 	saveUninitialized: false
-// }));
 const sessionConfig = {
     name: 'app-ses',
     cookie: {

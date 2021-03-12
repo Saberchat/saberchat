@@ -56,6 +56,9 @@ module.exports = {
             "A project bulletin, where teachers can post unique and exceptional student projects from their classes",
             "Access to Alsion's school journal, Witherly Heights"
         ],
+        community: [
+            "Saberchat reaches out to all members of Alsion's community - students, teachers and parents in both Early College and Middle School. As members of a small, tight-knit school, we value our community deeply. Saberchat will strengthen the relationships between every member of the Alsion community."
+        ],
         contact: {
             heading: "Faculty And Administration",
             description: "Our teachers have helped the Alsion community for years. They are deeply involved in our student's studies and are devoted to giving students a thorough, interesting and entertaining education."
@@ -77,7 +80,8 @@ module.exports = {
         imageUrl: "https://cdn.mos.cms.futurecdn.net/ntFmJUZ8tw3ULD3tkBaAtf.jpg",
         displayImages: [
             "https://images2.minutemediacdn.com/image/upload/c_crop,h_1351,w_2400,x_0,y_0/v1571796144/shape/mentalfloss/604599-gettyimages-1083893950.jpg?itok=om3ZU-xi",
-            "https://www.sciencenewsforstudents.org/wp-content/uploads/2019/11/100819_JL_groundwater_feat-1028x579.jpg"
+            "https://www.sciencenewsforstudents.org/wp-content/uploads/2019/11/100819_JL_groundwater_feat-1028x579.jpg",
+            "https://i.imgur.com/bDQsNAW.jpg"
         ],
         info: [{
             heading: "Lorem Ipsum",
@@ -97,6 +101,9 @@ module.exports = {
         services: [
             "Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium.",
             "Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit."
+        ],
+        community: [
+            "At vero eos et accusamus et iusto odio dignissimos ducimus qui blanditiis praesentium voluptatum deleniti atque corrupti quos dolores et quas molestias excepturi sint occaecati cupiditate non provident, similique sunt in culpa qui officia deserunt mollitia animi, id est laborum et dolorum fuga."
         ],
         contact: {
             heading: "The Elites",

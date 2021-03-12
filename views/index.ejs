@@ -72,8 +72,7 @@
                 </article>
             </div>
             <div class="col-lg-6 block">
-                <img class="image-block" src="<%=platform.displayImages[0]%>"
-                     alt="fancy pic">
+                <img class="image-block" src="<%=platform.displayImages[0]%>" alt="<%=platform.name%> image">
             </div>
         </div>
         <!-- Block 2 -->
@@ -93,7 +92,7 @@
                 </article>
             </div>
             <div class="col-lg-6 block">
-                <img class="image-block" src="<%=platform.displayImages[1]%>" alt="fancy pic">
+                <img class="image-block" src="<%=platform.displayImages[1]%>" alt="<%=platform.name%> image">
             </div>
         </div>
         <!-- Block 3 -->
@@ -104,16 +103,14 @@
                         <h1 style="user-select: none; -moz-user-select: none;">Community</h1>
                     </div>
                     <div class="block-content mode">
-                        <p>Saberchat reaches out to all members of Alsion's community - students, teachers and parents
-                            in both Early College and Middle School.
-                            As members of a small, tight-knit school, we value our community deeply. Saberchat will
-                            strengthen the relationships between every member of the Alsion community.
-                        </p>
+                    <% for (let para of platform.community) { %>
+                        <p><%=para%></p>
+                    <% } %>
                     </div>
                 </article>
             </div>
             <div class="col-lg-6 block">
-                <img class="image-block" src="https://i.imgur.com/bDQsNAW.jpg" alt="fancy pic">
+                <img class="image-block" src="<%=platform.displayImages[2]%>" alt="<%=platform.name%> image">
             </div>
         </div>
     </div>
