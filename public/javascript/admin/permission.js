@@ -7,7 +7,7 @@ const updateRole = function (select) { //Update user's permission
     const url = '/admin/permissions?_method=put';
     const userId = select.id;
     const data = {userId, role};
-    $.post(url, data, data => { 
+    $.post(url, data, (data) => {
         if (data.success) { //If successful, display success info
             loading.style.color = 'green';
             loading.innerHTML = data.success;
@@ -16,7 +16,7 @@ const updateRole = function (select) { //Update user's permission
             loading.innerHTML = data.error;
         }
 
-        setTimeout(() => { //After a minute, hide the message
+        setTimeout(() => { //After a second, hide the message
             loading.style.display = "none";
         }, 1000);
 
@@ -26,6 +26,34 @@ const updateRole = function (select) { //Update user's permission
                     option.selected = true;
                 }
             }
+        }
+    });
+}
+
+const updateBalance = function(input) {
+    const loading = document.getElementById('loading'); //Button which shows request status
+    loading.style.display = 'block';
+    loading.style.color = 'gray';
+    loading.innerHTML = 'Waiting...';
+    const bal = input.value;
+    const url = '/admin/balances?_method=put';
+    const userId = input.id;
+    const data = {userId, bal};
+    $.post(url, data, (data) => {
+        if (data.success) { //If successful, display success info
+            loading.style.color = 'green';
+            loading.innerHTML = data.success;
+        } else if (data.error) { //If unsuccessful, display error message
+            loading.style.color = 'red';
+            loading.innerHTML = data.error;
+        }
+
+        setTimeout(() => { //After a second, hide the message
+            loading.style.display = "none";
+        }, 1000);
+
+        if (data.user) { //If a user was updated, change their displayed permission
+            input.value = data.user.balance;
         }
     });
 }

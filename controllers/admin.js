@@ -553,4 +553,24 @@ controller.permanentDelete = async function(req, res) {
 	return res.redirect('/admin/accesslist');
 }
 
+controller.viewBalances = async function(req, res) {
+    const users = await User.find({});
+    if (!users) {
+        req.flash('error', 'Could not find users');
+        return res.redirect('back');
+    }
+    return res.render('admin/balances.ejs', {users});
+}
+
+controller.updateBalances = async function(req, res) {
+    const user = await User.findById(req.body.userId);
+    if (!user) {
+        return res.json({error: "Error. Could not change"});
+    }
+
+    user.balance = req.body.bal;
+    await user.save();
+    return res.json({success: 'Succesfully changed', user});
+}
+
 module.exports = controller;

@@ -25,6 +25,10 @@ router.route("/accesslist")
 
 router.put('/tag', middleware.isLoggedIn, middleware.isMod, wrapAsync(admin.tag));
 
+router.route('/balances')
+    .get(middleware.isLoggedIn, middleware.isCashier, wrapAsync(admin.viewBalances))
+    .put(middleware.isLoggedIn, middleware.isCashier, wrapAsync(admin.updateBalances));
+
 // router.post('/add-permission', middleware.isPrincipal, wrapAsync(admin.createPermission));
 // router.post('/add-status', middleware.isPrincipal, wrapAsync(admin.createStatus));
 // router.delete('/accesslist/:id', middleware.isLoggedIn, middleware.isPrincipal, wrapAsync(admin.permanentDelete));
