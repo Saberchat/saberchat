@@ -46,36 +46,22 @@
 
                 <li class="list-group-item mode darkmode-outline">
                   <span id="modify-header">Modify Balances</span>
-                  <!-- <form action="/admin/add-permission" method="post" id="add-email-form">
-                    <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#modal" id="delete-button"><i class="fas fa-user"></i> Add Permission</button>
-                    <div class="modal fade" id="modal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
-                      <div class="modal-dialog">
-                        <div class="modal-content mode">
-                          <div class="modal-header mode">
-                            <h5 class="modal-title" id="exampleModalLabel">Add Permission</h5>
-                            <button type="button" class="close mode" data-dismiss="modal" aria-label="Close">
-                              <span aria-hidden="true">&times;</span>
-                            </button>
-                          </div>
-                          <div class="modal-body mode">
-                            <input class="form-control" type="text" name="permission" placeholder="Enter permission name"/>
-                          </div>
-                          <div class="modal-footer mode">
-                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Back</button>
-                            <button type="submit" class="btn btn-primary">Add</button>
-                          </div>
-                        </div>
-                      </div>
-                    </form> -->
                 </li>
 
                 <% for (let user of users) { %>
-
                     <% if(!user._id.equals(currentUser._id)){ %>
-                        <li class="list-group-item user">
-                            <span class="container">$<input type="text" oninput="updateBalance(this)" value="<%=user.balance%>" id="<%=user._id%>"></span>
-                            <%= user.firstName %> <%= user.lastName %>
-                            (<%= user.username %>)
+                      <form onsubmit="updateBalance(this, event)" id="<%=user._id%>">
+                        <li class="list-group-item user cafe">
+                          <div class="col">
+                            <span class="user-balance-info"><%= user.firstName %> <%= user.lastName %> (<%= user.username %>)</span>
+                            <div class="input-group balance-input">
+                                <div class="input-group-prepend">
+                                    <div class="input-group-text mode">$</div>
+                                </div><input class="form-control mode" type="text" id="balance-<%=user._id%>" placeholder="price" maxlength="10" required value="<% if (user.balance == 0) { %>0.00<% } else {%><%= `${(user.balance * 100).toString().slice(0, (user.balance * 100).toString().length - 2)}.${(user.balance * 100).toString().slice((user.balance * 100).toString().length - 2)}`%><% } %>">
+                              </div>
+                          </div>
+                        </li>
+                      </form>
                     <% } %>
 
                 <% } %>

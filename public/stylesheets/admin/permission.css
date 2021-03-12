@@ -32,3 +32,12 @@
 #modify-header {
     font-weight: bold;
 }
+
+.balance-input {
+    width: 20%;
+    margin-top: 10px;
+}
+
+.user-balance-info {
+    display: inline;
+}
