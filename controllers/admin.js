@@ -15,7 +15,7 @@ const Status = require('../models/admin/status');
 
 //LIBRARIES
 const {sendGridEmail} = require("../services/sendGrid");
-const {objectArrIndex} = require("../utils/object-operations");
+const {objectArrIndex, concatMatrix, removeIfIncluded, multiplyArrays} = require("../utils/object-operations");
 const platformInfo = require("../platform-data");
 
 if (process.env.NODE_ENV !== "production") {
@@ -35,7 +35,7 @@ controller.moderateGet = async function(req, res) { //Show all reported comments
         req.flash('error', 'An Error Occurred');
         return res.redirect('/admin');
     }
-    return res.render('admin/mod', {comments});
+    return res.render('admin/mod', {platform, comments});
 }
 
 controller.getContext = async function(req, res) { //Get context for reported comment
@@ -103,7 +103,19 @@ controller.permissionsGet = async function(req, res) { //Show page with all user
         req.flash('error', 'An Error Occurred');
         return res.redirect('/admin');
     }
-    return res.render('admin/permission', {users});
+    
+    return res.render('admin/permission', {
+        platform,
+        users,
+        statusMatrix: concatMatrix([
+            platform.statusesProperty,
+            platform.statusesPlural
+        ]),
+        permMatrix: concatMatrix([
+            platform.permissionsProperty,
+            platform.permissionsDisplay
+        ]).reverse()
+    });
 }
 
 controller.statusGet = async function(req, res) { //Show page with all users and their statuses
@@ -112,7 +124,20 @@ controller.statusGet = async function(req, res) { //Show page with all users and
         req.flash('error', 'An Error Occurred');
         return res.redirect('/admin');
     }
-    return res.render('admin/status', {users, tags: platform.tags}); //List of tags that can be added/removed to tutors
+
+    return res.render('admin/status', {
+        platform,
+        users,
+        tags: platform.tags, //List of tags that can be added/removed to tutors
+        statusMatrix: concatMatrix([
+            platform.statusesProperty,
+            platform.statusesSingular
+        ]).reverse(),
+        permMatrix: concatMatrix([
+			platform.permissionsProperty,
+			platform.permissionsDisplay
+		]).reverse()
+    });
 }
 
 controller.permissionsPut = async function (req, res) { //Update a user's permissions
@@ -147,7 +172,7 @@ controller.statusPut = async function(req, res) { //Update user's status
         return res.json({error: 'Error. Could not change'});
     }
 
-    if (user.status == "faculty") { //If user is currently teaching a course, they cannot lose their faculty status
+    if (user.status == platform.teacherStatus) { //If user is currently teaching a course, they cannot lose their teacher status
         const courses = await Course.find({});
         if (!courses) {
             return res.json({error: "Error. Could not change", user});
@@ -193,15 +218,17 @@ controller.accesslistGet = async function(req, res) { //Show page with all permi
 
     if (req.query.version) { //Display list based on specified version
         if (["accesslist", "blockedlist"].includes(req.query.version)) {
-            return res.render('admin/accesslist', {emails, users, version: req.query.version});
+            return res.render('admin/accesslist', {platform, emails, users, version: req.query.version});
         }
     }
-    return res.render('admin/accesslist', {emails, users, version: "accesslist"});
+    return res.render('admin/accesslist', {platform, emails, users, version: "accesslist"});
 }
 
 controller.addEmail = async function (req, res) { //Add email to access list/blocked list
-    if (req.body.version === "accesslist" && req.body.address.split('@')[1] === "alsionschool.org") { //These emails are already verified
-        return res.json({error: "Alsion emails do not need to be added to the Access List"});
+    if (req.body.version === "accesslist") {
+        if (platform.emailExtension && req.body.address.split('@')[1] === platform.emailExtension) { //These emails are already verified
+            return res.json({error: "Alsion emails do not need to be added to the Access List"});
+        }
     }
 
     const overlap = await Email.findOne({address: req.body.address});

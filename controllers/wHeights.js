@@ -23,14 +23,14 @@ controller.index = async function(req, res) {
         req.flash('error', 'An Error Occurred');
         return res.redirect('/articles');
     }
-    return res.render('wHeights/index', {articles});
+    return res.render('wHeights/index', {platform, articles});
 }
 
 // display form for creating articles
 controller.new = async function(req, res) {
     const students = await User.find({
         authenticated: true,
-        status: {$in: platform.statusesProperty.slice(0, 6)} //All students
+        status: {$in: platform.studentStatuses} //All students
     });
     if (!students) {
         req.flash('error', "Unable to find students");
@@ -43,7 +43,7 @@ controller.new = async function(req, res) {
         return res.redirect('back');
     }
 
-    return res.render('wHeights/new', {students, types});
+    return res.render('wHeights/new', {platform, students, types});
 }
 
 // display specific article
@@ -59,7 +59,7 @@ controller.show = async function(req, res) {
         req.flash('error', 'Cannot find article');
         return res.redirect('/articles');
     }
-    return res.render('wHeights/show', {article});
+    return res.render('wHeights/show', {platform, article});
 }
 
 //Create article

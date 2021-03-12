@@ -17,9 +17,8 @@ const convertToLink = require("../utils/convert-to-link");
 const Filter = require('bad-words');
 const filter = new Filter();
 const axios = require('axios');
-const dateFormat = require("dateformat");
 const {cloudUpload, cloudDelete} = require('../services/cloudinary');
-const {objectArrIndex, removeIfIncluded} = require('../utils/object-operations');
+const {objectArrIndex, removeIfIncluded, concatMatrix, multiplyArrays, parsePropertyArray} = require('../utils/object-operations');
 const platformInfo = require("../platform-data");
 
 if (process.env.NODE_ENV !== "production") {
@@ -39,15 +38,44 @@ controller.index = async function(req, res) {
         req.flash("error", "An error occurred");
         return res.redirect("back");
 	}
-	return res.render("profile/index", {users});
+
+	let statuses = concatMatrix([
+		platform.statusesProperty,
+		platform.statusesPlural,
+		multiplyArrays([], platform.statusesProperty.length)
+	]).reverse();
+
+	for (let status of statuses) {
+		status[2] = [];
+		for (let permission of platform.permissionsProperty) {
+			for (let user of users) {
+				if (status[0] == user.status && permission == user.permission) {
+					status[2].push(user);
+				}
+			}
+		}
+	}
+
+	return res.render("profile/index", {
+		platform, users, statuses,
+		permMap: new Map(concatMatrix([
+			platform.permissionsProperty.slice(1),
+			platform.permissionsDisplay.slice(1)
+		]))
+	});
 }
 
 controller.edit = function(req, res) {
-    return res.render('profile/edit');
+	return res.render('profile/edit', { //Check if user has permissions to change their own tags and statuses
+    platform,
+		statuses: platform.statusesProperty,
+		tags: platform.tags,
+		changeStatus: platform.permissionsProperty.slice(platform.permissionsProperty.length-2, platform.permissionsProperty.length).includes(req.user.permission)
+	});
 }
 
 controller.changeLoginInfo = function(req, res) {
-    return res.render('profile/edit_pwd_email');
+    return res.render('profile/edit_pwd_email', {platform});
 }
 
 controller.show = async function(req, res) {
@@ -58,13 +86,9 @@ controller.show = async function(req, res) {
     }
 
     //Build list of current followers and following
-    let followerIds = [];
+    let followerIds = parsePropertyArray(user.followers, "_id");
     let following = [];
     let currentUserFollowing = [];
-
-    for (let follower of user.followers) { //Store user's followers' ids
-        followerIds.push(follower._id);
-    }
 
     const users = await User.find({authenticated: true});
     if (!users) {
@@ -73,14 +97,16 @@ controller.show = async function(req, res) {
     }
 
     for (let u of users) { //Iterate through all users and see if this user is following them
-        if (u.followers.includes(user._id)) {
-            following.push(u);
-        }
-        if (u.followers.includes(req.user._id)) {
-            currentUserFollowing.push(u);
-        }
+        if (u.followers.includes(user._id)) {following.push(u);}
+        if (u.followers.includes(req.user._id)) {currentUserFollowing.push(u);}
     }
-    return res.render('profile/show', {user, following, followerIds, convertedDescription: convertToLink(user.description)});
+
+    return res.render('profile/show', {
+		platform, user, following, followerIds,
+		convertedDescription: convertToLink(user.description),
+		perms: new Map(concatMatrix([platform.permissionsProperty, platform.permissionsDisplay])),
+		statuses: new Map(concatMatrix([platform.statusesProperty, platform.statusesSingular]))
+    });
 }
 
 controller.update = async function(req, res) {
@@ -237,14 +263,16 @@ controller.changeEmailPut = async function(req, res) { //Update email
 
 	//Check if new email is allowed, not blocked, and not already taken
     const allowedEmail = await Email.findOne({address: req.body.email, version: "accesslist"});
-    if (!allowedEmail && req.body.email.split("@")[1] != "alsionschool.org") {
-        req.flash('error', "New email must be an Alsion-verified email");
-        return res.redirect('back');
+    if (!allowedEmail) {
+		if (platform.emailExtension && req.body.email.split("@")[1] != platform.emailExtension) {
+        	req.flash('error', "New email must be a platform-verified email");
+        	return res.redirect('back');
+		}
     }
 
 	const blocked = await Email.findOne({address: req.body.email, version: "blockedlist"});
     if (blocked) {
-        req.flash('error', "New email must be an Alsion-verified email");
+        req.flash('error', "New email must be a platform-verified email");
         return res.redirect('back');
     }
 
@@ -447,8 +475,6 @@ controller.deleteAccount = async function(req, res)  {
 
     //Remove all messages which are now 'empty', but still have the original sender in the 'recipients' (meaning the person who is being deleted replied to this message)
       if (message.recipients.length == 1 && message.recipients[0].equals(message.sender)) {
-
-
         if (!message.read.includes(message.sender)) {
           messageSender = await User.findById(message.sender);
 

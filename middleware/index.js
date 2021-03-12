@@ -91,13 +91,13 @@ middleware.isMod = function(req, res, next) {
 }
 
 middleware.isFaculty = function(req, res, next) {
-    if (req.user.status == 'faculty') { return next();}
+    if (req.user.status == platform.teacherStatus) { return next();}
     req.flash('error', 'You do not have permission to do that');
     return res.redirect('back');
 }
 
 middleware.isStudent = function(req, res, next) {
-    if (['7th', '8th', '9th', '10th', '11th', '12th'].includes(req.user.status)) {
+    if (platform.studentStatuses.includes(req.user.status)) {
         return next();
     }
     req.flash('error', 'You do not have permission to do that');

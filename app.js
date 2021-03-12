@@ -65,9 +65,12 @@ const http = require('http').createServer(app);
 const io = require('socket.io')(http);
 const port = process.env.PORT || 3000;
 
+//Set up platform
+const platformInfo = require(__dirname + "/platform-data");
+const platform = platformInfo[process.env.PLATFORM];
+
 // connect to db.
-// mongoose.connect(`mongodb+srv://admin_1:${process.env.DATABASE_PASSWORD}@cluster0-cpycz.mongodb.net/${process.env.PLATFORM}Saberchat?retryWrites=true&w=majority`,
-mongoose.connect(process.env.DATABASE_URL,
+mongoose.connect(`mongodb+srv://admin_1:${process.env.DATABASE_PASSWORD}@cluster0-cpycz.mongodb.net/${platform.dbname}?retryWrites=true&w=majority`,
     {
         useNewUrlParser: true,
         useUnifiedTopology: true,

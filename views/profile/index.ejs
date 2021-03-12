@@ -42,19 +42,7 @@
                     <input id="search-input" oninput="searchFunction()" class="form-control search" type="text" placeholder="Search..." title="Type in Username">
                 </div>
                 <div class="list-group mode" id="user-list">
-                  <% let statuses = [ ["faculty", "Faculty", []], ["12th", "Seniors", []], ["11th", "Juniors", []], ["10th", "Sophomores", []], ["9th", "Freshmen", []], ["8th", "8th Graders", []], ["7th", "7th Graders", []], ["alumnus", "Alumni", []], ["parent", "Parents", []], ["guest", "Guests", []] ] %>
-                  <% let permMap = new Map([["principal", ["Principal", "info"]], ["admin", ["Administrator", "danger"]], ["mod", ["Moderator", "secondary"]]])%>
-                  <% let tagMap = new Map([["Tutor", "warning"], ["Cashier", "success"], ["Editor", "primary"]])%>
 
-                <% for (let status of statuses) { %>
-                    <% for (let user of users) { %>
-                        <% if (user.status.toLowerCase() == status[0]) { %>
-                            <% status[2].push(user) %>
-                        <% } %>
-                    <% } %>
-                <% } %>
-
-                <% let sortedUsers = []; %>
                 <% for (let status of statuses) { %>
                     <% if (status[2].length > 0) { %>
                       <li class="list-group-item list-group-item-success status-header mode darkmode-outline" id="<%=status[0]%>-header">
@@ -64,61 +52,50 @@
                         </div>
                       </li>
 
-                      <% sortedUsers = [];%>
-                      <% for (let perm of ["Principal", "Admin", "Mod", "Default"]) { %>
-                        <% for (let user of users) { %>
-                          <% if (user.permission.toLowerCase() == perm.toLowerCase()) { %>
-                            <% sortedUsers.push(user); %>
-                          <% } %>
-                        <% } %>
-                      <% } %>
+                        <% for (let user of status[2]) { %>
+                            <li class="list-group-item list-group-item-action user-element cafe">
 
-                        <% for (let user of sortedUsers) { %>
-                            <% if (user.status.toLowerCase() == status[0]) { %>
-                                <li class="list-group-item list-group-item-action user-element cafe">
+                                <a href="../profiles/<%= user._id %>" class="user-element-text">
+                                    <img class="profile-image" src="<% if (user.mediaFile.display) { %> <%= user.mediaFile.url%> <%} else {%> <%=user.imageUrl.url%><%}%>" alt="profile picture">
+                                    <span class="username <%= status[0] %> <%= status[1] %> <%= user.permission %> <%= user.tags.join(' ') %>"><span
+                                                class="span-tag-name"><%= user.firstName %> <%= user.lastName %></span> <span
+                                                class="span-tag-username"><%= user.username %></span></span>
 
-                                    <a href="../profiles/<%= user._id %>" class="user-element-text">
-                                        <img class="profile-image" src="<% if (user.mediaFile.display) { %> <%= user.mediaFile.url%> <%} else {%> <%=user.imageUrl.url%><%}%>" alt="profile picture">
-                                        <span class="username <%= status[0] %> <%= status[1] %> <%= user.permission %> <%= user.tags.join(' ') %>"><span
-                                                    class="span-tag-name"><%= user.firstName %> <%= user.lastName %></span> <span
-                                                    class="span-tag-username"><%= user.username %></span></span>
-
-                                        <% if (permMap.has(user.permission)) { %>
-                                            <span class="badge badge-<%= permMap.get(user.permission)[1] %>"><%= permMap.get(user.permission)[0] %></span>
-                                        <% } %>
-
-                                        <% if (user._id.toString() == currentUser._id.toString())  { %>
-                                            <span class="badge badge-dark">Me</span>
-                                        <% } %>
-
-                                        <span class="tags"></span>
-
-                                        <% for (let tag of user.tags) { %>
-                                            <span class="tag badge badge-pill badge-<%= tagMap.get(tag) %>"><%= tag %></span>
-                                        <% } %>
-                                    </a>
-
-                                    <% if (!(user._id.toString() == currentUser._id.toString())) { %>
-                                        <div id="follow-div-<%= user._id %>" class="follow-div">
-
-                                            <% if (user.followers.includes(currentUser._id)) { %>
-                                                <button type="button" data-toggle="modal"
-                                                        data-target="#modal-<%= user._id %>-unfollow"
-                                                        id="unfollow-<%= user._id %>"
-                                                        class="btn btn-danger unfollow-button">Unfollow
-                                                </button>
-
-                                            <% } else { %>
-                                                <button type="button" data-toggle="modal"
-                                                        data-target="#modal-<%= user._id %>-follow"
-                                                        id="follow-<%= user._id %>"
-                                                        class="btn btn-primary follow-button">Follow
-                                                </button>
-                                            <% } %>
-                                        </div>
+                                    <% if (permMap.has(user.permission)) { %>
+                                        <span class="badge badge-danger"><%= permMap.get(user.permission) %></span>
                                     <% } %>
-                                </li>
-                            <% } %>
+
+                                    <% if (user._id.toString() == currentUser._id.toString())  { %>
+                                        <span class="badge badge-dark">Me</span>
+                                    <% } %>
+
+                                    <span class="tags"></span>
+
+                                    <% for (let tag of user.tags) { %>
+                                        <span class="tag badge badge-pill badge-warning"><%= tag %></span>
+                                    <% } %>
+                                </a>
+
+                                <% if (!(user._id.toString() == currentUser._id.toString())) { %>
+                                    <div id="follow-div-<%= user._id %>" class="follow-div">
+
+                                        <% if (user.followers.includes(currentUser._id)) { %>
+                                            <button type="button" data-toggle="modal"
+                                                    data-target="#modal-<%= user._id %>-unfollow"
+                                                    id="unfollow-<%= user._id %>"
+                                                    class="btn btn-danger unfollow-button">Unfollow
+                                            </button>
+
+                                        <% } else { %>
+                                            <button type="button" data-toggle="modal"
+                                                    data-target="#modal-<%= user._id %>-follow"
+                                                    id="follow-<%= user._id %>"
+                                                    class="btn btn-primary follow-button">Follow
+                                            </button>
+                                        <% } %>
+                                    </div>
+                                <% } %>
+                            </li>
                         <% } %>
                         <span class="status-page-break" id="<%= status[0] %>-break"><br/><br/></span>
                     <% } %>
@@ -171,6 +148,5 @@
             </div>
         </div>
     <% } %>
-
 </body>
 </html>

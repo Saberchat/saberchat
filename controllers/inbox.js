@@ -36,7 +36,7 @@ controller.index = async function(req, res) {
 		}).execPopulate();
 
     const activeRequests = req.user.requests.filter((req)=>req.status === "pending"); //Find all access requests for user's rooms that have not been handled
-	return res.render('inbox/index', {inbox: req.user.inbox.reverse(), requests: req.user.requests.reverse(), activeRequests});
+	return res.render('inbox/index', {platform, inbox: req.user.inbox.reverse(), requests: req.user.requests.reverse(), activeRequests});
 };
 
 // Inbox GET show message
@@ -70,14 +70,14 @@ controller.showMsg = async function(req, res) {
         fileExtensions.set(media.url, path.extname(media.url.split("SaberChat/")[1]));
     }
     const convertedText = convertToLink(message.text);
-    return res.render('inbox/show', {message: message, convertedText, fileExtensions});
+    return res.render('inbox/show', {platform, message, convertedText, fileExtensions});
 };
 
 // Inbox GET new message form
 controller.newMsgForm = async function(req, res) {
     const users = await User.find({authenticated: true});
 	if(!users) { req.flash('error', 'An Error Occurred.'); return res.redirect('back'); }
-	return res.render('inbox/new', {users}); //Render new message form with all users as recipient options
+	return res.render('inbox/new', {platform, users}); //Render new message form with all users as recipient options
 };
 
 // Inbox GET sent messages
@@ -98,7 +98,7 @@ controller.sent = async function(req, res) {
             }
         }
     }
-    return res.render('inbox/index_sent', {inbox: sent_msgs.reverse()});
+    return res.render('inbox/index_sent', {platform, inbox: sent_msgs.reverse()});
 };
 
 // Inbox POST create messsage
@@ -158,7 +158,7 @@ controller.createMsg = async function(req, res) {
         req.flash('error', 'You cannot send messages to yourself');
         return res.redirect('back');
     } else if(req.body.anonymous == 'true') {
-        const faculty = await User.find({authenticated: true, status: 'faculty', _id: { $in: recipients } });
+        const faculty = await User.find({authenticated: true, status: platform.teacherStatus, _id: { $in: recipients } });
         if(!faculty) {req.flash('error', 'An error occured'); return res.redirect('back');}
         //If message is anonymous without recipients
         if(faculty.length == 0) {req.flash('error', 'You can only select faculty'); return res.redirect('back');}
@@ -366,7 +366,7 @@ controller.showReq = async function(req, res) { //Display access request
     .populate({path: 'requester', select: 'username'})
     .populate({path: 'room', select: ['creator', 'name']});
     if(!request) {req.flash('error', 'An Error Occurred.'); return res.redirect('back');}
-    return res.render('inbox/requests/show', {request});
+    return res.render('inbox/requests/show', {platform, request});
 };
 
 controller.acceptReq = async function(req, res) { //Accept access request

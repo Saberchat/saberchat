@@ -88,7 +88,7 @@ controller.index = async function(req, res) {
             return res.redirect('back');
         }
 
-        return res.render('cafe/newOrder', {categories: sortedCategories, frequentItems});
+        return res.render('cafe/newOrder', {platform, categories: sortedCategories, frequentItems});
     }
 
     if (req.query.menu) { //SHOW MENU
@@ -108,9 +108,9 @@ controller.index = async function(req, res) {
                 }
             }
         }
-        return res.render('cafe/menu', {categories: sortedCategories, itemDescriptions, frequentItems, fileExtensions});
+        return res.render('cafe/menu', {platform, categories: sortedCategories, itemDescriptions, frequentItems, fileExtensions});
     }
-    return res.render('cafe/index', {orders: allOrders});
+    return res.render('cafe/index', {platform, orders: allOrders});
 }
 
 //-----------GENERAL ORDER ROUTES-----------//
@@ -336,7 +336,7 @@ controller.newItem = async function(req, res) {
         return res.redirect("back");
     }
 
-    return res.render('cafe/newOrderItem', {categories});
+    return res.render('cafe/newOrderItem', {platform, categories});
 }
 
 //CREATE NEW ITEM
@@ -425,7 +425,7 @@ controller.viewItem = async function(req, res) {
         fileExtensions.set(item.mediaFile.url, path.extname(item.mediaFile.url.split("SaberChat/")[1]));
     }
 
-    return res.render('cafe/show', {categories, item, fileExtensions});
+    return res.render('cafe/show', {platform, categories, item, fileExtensions});
 }
 
 //UPDATE/UPVOTE ITEM
@@ -506,6 +506,8 @@ controller.manage = async function(req, res) {
     //         req.flash("error", "An Error Occurred");
     //         return res.redirect("back")
     //     }
+    //     data.platform = platform;
+
     //     return res.render("cafe/data", data);
 
     } else { //If route calls to display regular management
@@ -533,7 +535,7 @@ controller.newCategory = async function(req, res) {
         req.flash('error', "Unable to find categories");
         return res.redirect('back');
     }
-    return res.render('cafe/newItemCategory', {categories});
+    return res.render('cafe/newItemCategory', {platform, categories});
 }
 
 //CREATE NEW ITEM CATEGORY
@@ -607,7 +609,7 @@ controller.viewCategory = async function(req, res) {
         req.flash('error', "An Error Occurred");
         return res.redirect('back');
     }
-    return res.render('cafe/editItemCategory', {category, categories});
+    return res.render('cafe/editItemCategory', {platform, category, categories});
 }
 
 //UPDATE ITEM CATEGORY
@@ -835,7 +837,7 @@ controller.manageCafe = async function(req, res) {
         return res.redirect('back');
     }
 
-    return res.render('cafe/manage', {categories: sortedCategories, open: cafe.open});
+    return res.render('cafe/manage', {platform, categories: sortedCategories, open: cafe.open});
 }
 
 controller.manageOrders = async function(req, res) {

@@ -3,14 +3,21 @@
 module.exports = {
     alsion: {
         name: "Alsion",
-        statusesProperty: ["7th", "8th", "9th", "10th", "11th", "12th", "alumnus", "parent",  "guest", "faculty"],
-        statusesSingular: ["7th Grader", "8th Grader", "Freshman", "Sophomore", "Junior", "Senior", "Alumnus", "Parent",  "Guest", "Faculty"],
-        statusesPlural: ["7th Graders", "8th Graders", "Freshmen", "Sophomores", "Juniors", "Seniors", "Alumni", "Parents","Guests", "Faculty"],
+        dbname: "saberOfficial",
+        emailExtension: "alsionschool.org",
+        statusesProperty: ["guest", "parent", "7th", "8th", "9th", "10th", "11th", "12th", "alumnus", "faculty"],
+        statusesSingular: ["Guest", "Parent", "7th Grader", "8th Grader", "Freshman", "Sophomore", "Junior", "Senior", "Alumnus", "Faculty"],
+        statusesPlural: ["Guests", "Parents", "7th Graders", "8th Graders", "Freshmen", "Sophomores", "Juniors", "Seniors", "Alumni", "Faculty"],
+        studentStatuses: ["7th", "8th", "9th", "10th", "11th", "12th"],
+        teacherStatus: "faculty",
         permissionsProperty: ["default", "mod", "admin", "principal"],
         permissionsDisplay: ["Default", "Moderator", "Administrator", "Principal"],
         tags: ["Editor", "Tutor", "Cashier"],
-        featureRoutes: ["wHeights"],
-        featureNames: ["Witherly Heights"],
+        features: [
+            {route: "cafe", name: "No Left Turn Cafe", icon: "coffee"},
+            {route: "articles", name: "Witherly Heights", icon: "newspaper"},
+            {route: "homework", name: "Tutoring Center", icon: "chalkboard-teacher"}
+        ],
         imageUrl: "https://i.imgur.com/Wnbn7Ei.gif",
         displayImages: [
             "https://alsionschool.org/images/middle-school/MiddleSchoolMainPage.jpg",
@@ -57,14 +64,16 @@ module.exports = {
 
     generic: {
         name: "Generic Platform",
-        statusesProperty: ["lowest", "average", "elite"],
-        statusesSingular: ["Lowest", "Average", "Elite"],
-        statusesPlural: ["Lowest", "Average", "Elites"],
+        dbname: "genericSaberchat",
+        statusesProperty: ["guest", "average", "elite"],
+        statusesSingular: ["Guest", "Average", "Elite"],
+        statusesPlural: ["Guests", "Average", "Elites"],
+        studentStatuses: ["guest", "average"],
+        teacherStatus: "elite",
         permissionsProperty: ["default", "mod", "admin", "principal"],
         permissionsDisplay: ["Default", "Moderator", "Administrator", "Principal"],
         tags: ["Example Tag"],
-        featureRoutes: [],
-        featureNames: [],
+        features: [],
         imageUrl: "https://cdn.mos.cms.futurecdn.net/ntFmJUZ8tw3ULD3tkBaAtf.jpg",
         displayImages: [
             "https://images2.minutemediacdn.com/image/upload/c_crop,h_1351,w_2400,x_0,y_0/v1571796144/shape/mentalfloss/604599-gettyimages-1083893950.jpg?itok=om3ZU-xi",

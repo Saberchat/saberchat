@@ -9,7 +9,7 @@ const router = express.Router(); //Router
 router.get('/', index.index); // Index Landing Page
 router.get('/darkmode', middleware.isLoggedIn, index.darkmode); //Set darkmode
 router.get('/contact', middleware.isLoggedIn, wrapAsync(index.contact)); //Contact info and school info
-router.get('/alsion', wrapAsync(index.alsion)); //Alsion info
+router.get('/info', wrapAsync(index.info)); //Platform info
 router.get("/logout", middleware.isLoggedIn, index.logout); //logout route
 
 router.post("/register", validateNewUser, wrapAsync(index.register)); //Register User

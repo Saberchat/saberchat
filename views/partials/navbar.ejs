@@ -19,44 +19,43 @@
                         <li class="nav-item">
                             <a class="nav-link" href="/projects"><i class="fas fa-paint-brush"></i> Projects</a>
                         </li>
-                        <li class="nav-item"></li>
-                        <a class="nav-link" href="/cafe"><i class="fas fa-coffee"></i> Cafe</a>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/announcements"><i class="fas fa-bullhorn"></i>
+                                Announcements
+                                <% if (currentUser.annCount.length > 0) { %>
+                                    <span class="badge badge-pill badge-danger"><%= currentUser.annCount.length %></span>
+                                <% } %>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/profiles"><i class="fas fa-user"></i> Users</a>
+                        </li>
                         <li class="nav-item dropdown">
                         <li class="nav-item"></li>
-                        <a class="nav-link" target="_blank" href="https://witherlyheights.org/"><i
-                                    class="far fa-newspaper"></i> Witherly Heights</a>
                         <li class="nav-item dropdown">
                             <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button"
                                data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                 <i class="fas fa-align-justify"></i> More
                                 <span
-                                <% if (currentUser.annCount.length + currentUser.newRoomCount.length <= 0) { %> hidden
-                                        <% } %>
-                                                                                                                class="badge badge-pill badge-danger"
-                                                                                                                id="new-count"><%= currentUser.annCount.length + currentUser.newRoomCount.length %></span>
+                                    <% if (currentUser.annCount.length + currentUser.newRoomCount.length <= 0) { %> hidden<% } %> 
+                                    class="badge badge-pill badge-danger" id="new-count"><%= currentUser.annCount.length + currentUser.newRoomCount.length %>
+                                </span>
                             </a>
 
                             <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-
-                                <!-- <a class="dropdown-item" href="/articles"><i class="far fa-newspaper"></i> Articles</a> -->
+                                <a class="dropdown-item" href="/profiles"><i class="fas fa-user"></i> Users</a>
+                                <a class="dropdown-item" href="/reports"><i class="fas fa-exclamation-triangle"></i> Error Reports</a>
                                 <a class="dropdown-item" href="/chat"><i class="fas fa-comment-dots"></i> Chat
                                     <span id="new-chat"
-                                    <% if (currentUser.newRoomCount.length <= 0) { %> hidden
-                                            <% } %>
-                                          class="badge badge-pill badge-danger"><%= currentUser.newRoomCount.length %></span>
+                                    <% if (currentUser.newRoomCount.length <= 0) { %> hidden <% } %>
+                                    class="badge badge-pill badge-danger"><%= currentUser.newRoomCount.length %></span>
                                 </a>
-
-                                <a class="dropdown-item" href="/announcements"><i class="fas fa-bullhorn"></i>
-                                    Announcements
-                                    <% if (currentUser.annCount.length > 0) { %>
-                                        <span class="badge badge-pill badge-danger"><%= currentUser.annCount.length %></span>
-                                    <% } %>
-                                </a>
-                                <a class="dropdown-item" href="/homework"><i class="fas fa-chalkboard-teacher"></i>
-                                    Tutoring Center</a>
-                                    <a class="dropdown-item" href="/reports"><i class="fas fa-exclamation-triangle"></i>
-                                        Error Reports</a>
-                                <a class="dropdown-item" href="/profiles"><i class="fas fa-user"></i> Users</a>
+                                <% for (let feature of platform.features) { %>
+                                    <a class="dropdown-item" href="/<%=feature.route%>">
+                                        <i class="fas fa-<%=feature.icon%>"></i>
+                                        <%=feature.name%>
+                                    </a>
+                                <% } %>
                             </div>
 
                         </li>

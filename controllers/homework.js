@@ -37,7 +37,7 @@ controller.index = async function(req, res) {
             }
         }
     }
-    return res.render('homework/index', {courses: courseList});
+    return res.render('homework/index', {platform, courses: courseList, studentStatuses: platform.studentStatuses});
 }
 
 controller.createCourse = async function(req, res) {
@@ -117,8 +117,7 @@ controller.joinCourse = async function(req, res) {
     }
 
     //Join as student
-    const studentStatuses = platform.statusesProperty.slice(0, 6);
-    if (studentStatuses.includes(req.user.status)) {
+    if (platform.studentStatuses.includes(req.user.status)) {
         const course = await Course.findOne({joinCode: req.body.joincode});
         if (!course) {
             req.flash('error', "No courses matching this join code were found.");
@@ -170,12 +169,12 @@ controller.showCourse = async function(req, res) {
     tutors = await sortByPopularity(tutors, "reviews", "dateJoined", null).unpopular
     .concat(sortByPopularity(tutors, "reviews", "dateJoined", null).popular);
 
-    const teachers = await User.find({authenticated: true, status: "faculty", _id: {$ne: req.user._id}});
+    const teachers = await User.find({authenticated: true, status: platform.teacherStatus, _id: {$ne: req.user._id}});
     if (!teachers) {
         req.flash('error', "Unable to find teachers");
         return res.redirect('back');
     }
-    return res.render('homework/show', {course, studentIds, tutorIds, tutors, teachers, objectArrIndex}); //Export function for ejs evaluation
+    return res.render('homework/show', {platform, course, studentIds, tutorIds, tutors, teachers, objectArrIndex}); //Export function for ejs evaluation
 }
 
 controller.unenrollStudent = async function(req, res) {
@@ -919,7 +918,7 @@ controller.showTutor = async function(req, res) {
                     //Check that user is either a student of this tutor, this tutor, or the course's teacher
                     if (allStudents[objectArrIndex(allStudents, "student", req.query.studentId, "_id")].student._id.equals(req.user._id) || tutor.tutor._id.equals(req.user._id) || course.teacher.equals(req.user._id)) {
                         return res.render('homework/lessons', {
-                            course, tutor, student: allStudents[objectArrIndex(allStudents, "student", req.query.studentId, "_id")],
+                            platform, course, tutor, student: allStudents[objectArrIndex(allStudents, "student", req.query.studentId, "_id")],
                             time: lessonMap.get(allStudents[objectArrIndex(allStudents, "student", req.query.studentId, "_id")].student._id.toString()), objectArrIndex
                         });
                     }
@@ -932,7 +931,7 @@ controller.showTutor = async function(req, res) {
             }
 
             return res.render('homework/tutor-show', {
-                course, tutor, students, studentIds, averageRating,
+                platform, course, tutor, students, studentIds, averageRating,
                 lessons: lessonMap, courses: enrolledCourses, objectArrIndex
             });
         }

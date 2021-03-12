@@ -39,9 +39,7 @@ const updateTag = function (select) { //Update a user's status tags
     const userId = select.id;
     const field = document.getElementById(`user-${userId}`); //The row with user's info
     const tags = document.getElementsByClassName(`tag-${userId}`); //Each tag in this user's tag list
-    const tagMap = new Map([["Tutor", "warning"], ["Cashier", "success"], ["Editor", "info"]]); //Map tracks the different button classes for each status tag
 
-    // Send out JSON request
     const data = {userId, tag};
     $.post(url, data, data => {
         if (data.success) { //If data is successfully posted
@@ -50,7 +48,7 @@ const updateTag = function (select) { //Update a user's status tags
 
             if (data.success.includes("added")) { //If a tag has been added, create a new element, give it the bootstrap/CSS/text, and add it
                 let new_tag = document.createElement('span');
-                new_tag.className = `badge badge-pill badge-${tagMap.get(data.tag)} tag-${userId}`;
+                new_tag.className = `badge badge-pill badge-warning tag-${userId}`;
                 new_tag.innerText = data.tag;
                 new_tag.style = "margin-right: 5px;"
                 field.appendChild(new_tag);

@@ -45,38 +45,11 @@
 
                 <li class="list-group-item mode darkmode-outline">
                   <span id="modify-header">Modify Permissions</span>
-                  <!-- <form action="/admin/add-permission" method="post" id="add-email-form">
-                    <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#modal" id="delete-button"><i class="fas fa-user"></i> Add Permission</button>
-                    <div class="modal fade" id="modal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
-                      <div class="modal-dialog">
-                        <div class="modal-content mode">
-                          <div class="modal-header mode">
-                            <h5 class="modal-title" id="exampleModalLabel">Add Permission</h5>
-                            <button type="button" class="close mode" data-dismiss="modal" aria-label="Close">
-                              <span aria-hidden="true">&times;</span>
-                            </button>
-                          </div>
-                          <div class="modal-body mode">
-                            <input class="form-control" type="text" name="permission" placeholder="Enter permission name"/>
-                          </div>
-                          <div class="modal-footer mode">
-                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Back</button>
-                            <button type="submit" class="btn btn-primary">Add</button>
-                          </div>
-                        </div>
-                      </div>
-                    </form> -->
                 </li>
 
-                <% let permMatrix = [["principal", "Principal"], ["admin", "Administrator"], ["mod", "Moderator"], ["default", "Default"]]; %>
-                <% let statusMatrix = [["faculty", "Faculty", []], ["12th", "Seniors", []], ["11th", "Juniors", []], ["10th", "Sophomores", []], ["9th", "Freshmen", []], ["8th", "8th Graders", []], ["7th", "7th Graders", []], ["alumnus", "Alumni", []], ["parent", "Parents", []], ["guest", "Guests", []]] %>
-                <% let statusMap = new Map([["faculty", "Faculty"], ["12th", "Senior"], ["11th", "Junior"], ["10th", "Sophomore"], ["9th", "Freshman"], ["8th", "8th Grader"], ["7th", "7th Grader"], ["alumnus", "Alumnus"], ["parent", "Parent"], ["guest", "Guest"]]); %>
-                <% let tagMap = new Map([["Tutor", "warning"], ["Cashier", "success"], ["Editor", "primary"]]) %>
-
                 <% for (let perm of permMatrix) { %>
-
                     <% for (let user of users) { %>
-                        <% if(!user._id.equals(currentUser._id) && user.permission == perm[0]){ %>
+                        <% if(!user._id.equals(currentUser._id) && user.permission == perm[0]) { %>
                             <% for (let status of statusMatrix) { %>
                               <% if (status[0].toLowerCase() == user.status.toLowerCase())  { %>
                                 <li class="list-group-item user <%=perm[1].toLowerCase()%> <%=status[0].toLowerCase()%> <%=status[1].toLowerCase()%> <%=perm[0]%> <%=user.tags.join(' ')%> cafe" id="<%=user._id%>">
@@ -84,24 +57,17 @@
                               <% } %>
                             <% } %>
 
-                          <select name="permission" class="role-select mode" onchange="updateRole(this)" id="<%= user._id %>">
+                            <select name="permission" class="role-select mode" onchange="updateRole(this)" id="<%= user._id %>">
+                              <% for (let perm of permMatrix) { %>
+                                <% if (user.permission == perm[0]) { %>
+                                  <option value="<%=perm[0]%>" selected><%=perm[1]%></option>
 
-                            <% for (let perm of permMatrix) { %>
-                              <% if (user.permission == perm[0]) { %>
-                                <option value="<%=perm[0]%>" selected><%=perm[1]%></option>
-
-                              <% } else { %>
-                                <option value="<%=perm[0]%>"><%=perm[1]%></option>
-                              <% }%>
-                            <% } %>
-                          </select>
-
-                          <span class="badge badge-secondary user-status"><%=statusMap.get(user.status)%></span>
-
-                          <% for (let tag of user.tags) { %>
-                            <span class="badge badge-pill badge-<%=tagMap.get(tag)%>"><%=tag%></span>
-                          <% } %>
-                        </li>
+                                <% } else { %>
+                                  <option value="<%=perm[0]%>"><%=perm[1]%></option>
+                                <% }%>
+                              <% } %>
+                            </select>
+                          </li>
                       <% } %>
                   <% } %>
 

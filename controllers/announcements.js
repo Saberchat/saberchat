@@ -27,12 +27,12 @@ controller.index = async function(req, res) {
         req.flash('error', 'Cannot find announcements.');
         return res.redirect('back');
     }
-    return res.render('announcements/index', {announcements: announcements.reverse()});
+    return res.render('announcements/index', {platform, announcements: announcements.reverse()});
 };
 
 // Ann GET new ann
 controller.new = function(req, res) {
-    return res.render('announcements/new');
+    return res.render('announcements/new', {platform});
 };
 
 // Ann GET markall ann as read
@@ -81,7 +81,7 @@ controller.show = async function(req, res) {
         fileExtensions.set(media.url, path.extname(media.url.split("SaberChat/")[1]));
     }
     const convertedText = convertToLink(announcement.text); //Parse and add hrefs to all links in text
-    return res.render('announcements/show', {announcement, convertedText, fileExtensions});
+    return res.render('announcements/show', {platform, announcement, convertedText, fileExtensions});
 };
 
 // Ann GET edit form
@@ -100,7 +100,7 @@ controller.updateForm = async function(req, res) {
     for (let media of announcement.mediaFiles) {
         fileExtensions.set(media.url, path.extname(media.url.split("SaberChat/")[1]));
     }
-    return res.render('announcements/edit', {announcement, fileExtensions});
+    return res.render('announcements/edit', {platform, announcement, fileExtensions});
 };
 
 // Ann POST create

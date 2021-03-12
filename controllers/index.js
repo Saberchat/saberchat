@@ -23,9 +23,11 @@ controller.index = function(req, res) {
 
 controller.register = async function(req, res) {
     const accesslistedEmail = await Email.findOne({address: req.body.email, version: "accesslist"});
-    if (!accesslistedEmail && req.body.email.split("@")[1] != "alsionschool.org") {
-        req.flash('error', 'Only members of the Alsion community may sign up');
-        return res.redirect('/');
+    if (!accesslistedEmail) {
+        if (platform.emailExtension && req.body.email.split("@")[1] != platform.emailExtension) {
+            req.flash('error', `Only members of the ${platform.name} community may sign up`);
+            return res.redirect('/');
+        }
     }
 
     const overlap = await User.find({email: req.body.email});
@@ -216,7 +218,7 @@ controller.forgotPassword = async function(req, res) {
 }
 
 controller.resetPasswordForm = function(req, res) {
-    return res.render('profile/reset-password', {user: req.query.user});
+    return res.render('profile/reset-password', {platform, user: req.query.user});
 }
 
 controller.resetPassword = async function(req, res) {
@@ -254,28 +256,28 @@ controller.logout = function(req, res) {
 
 controller.contact = async function(req, res) { //Contact info of highest status and developers
     //Get users with the highest status (e.g. faculty)
-    const highestStatuses = await User.find({authenticated: true, authenticated: true, status: platform.statusesProperty[platform.statusesProperty.length-1]});
-    if (!highestStatuses) {
+    const teachers = await User.find({authenticated: true, authenticated: true, status: platform.teacherStatus});
+    if (!teachers) {
         req.flash('error', "An Error Occurred");
         return res.redirect('back');
     }
 
     const highestPermission = platform.permissionsProperty[platform.permissionsProperty.length-1]; //Get highest permission (e.g. principal)
-    return res.render('other/contact', {highestStatuses, highestPermission, platform});
+    return res.render('other/contact', {platform, teachers, highestPermission});
 }
 
-controller.alsion = async function(req, res) {
-    const highestStatuses = await User.find({authenticated: true, authenticated: true, status: platform.statusesProperty[platform.statusesProperty.length-1]});
-    if (!highestStatuses) {
+controller.info = async function(req, res) {
+    const teachers = await User.find({authenticated: true, authenticated: true, status: platform.teacherStatus});
+    if (!teachers) {
         req.flash('error', "An Error Occurred");
         return res.redirect('back');
     }
 
     let names = [];
-    for (let user of highestStatuses) { //Iterate through faculty and add their name to array
+    for (let user of teachers) { //Iterate through faculty and add their name to array
         names.push(`${user.firstName} ${user.lastName}`);
     }
-    return res.render('other/alsion_info', {names: names.join(', '), platform});
+    return res.render('other/platform-info', {platform, names: names.join(', ')});
 }
 
 controller.darkmode = async function(req, res) {

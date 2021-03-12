@@ -22,6 +22,7 @@ const courseSchema = new mongoose.Schema({
         tutor: {type: mongoose.Schema.Types.ObjectId, ref: 'User'},
         slots: {type: Number, default: 0},
         available: {type: Boolean, default: true},
+        price: Number,
         bio: String,
         dateJoined: Date,
         students: [{

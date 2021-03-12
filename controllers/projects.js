@@ -37,18 +37,18 @@ controller.index = async function(req, res) {
             fileExtensions.set(media.url, path.extname(media.url.split("SaberChat/")[1]));
         }
     }
-    return res.render('projects/index', {projects, fileExtensions});
+    return res.render('projects/index', {platform, projects, fileExtensions});
 }
 
 
 controller.newProject = async function(req, res) {
     //Find all students
-    const students = await User.find({authenticated: true, status: {$nin: ['alumnus', 'guest', 'parent', 'faculty']}}); 
+    const students = await User.find({authenticated: true, status: {$in: platform.studentStatuses}}); 
     if (!students) {
         req.flash('error', "No Students Found");
         return res.redirect('back');
     }
-    return res.render('projects/new', {students});
+    return res.render('projects/new', {platform, students});
 }
 
 
@@ -58,10 +58,8 @@ controller.createProject = async function(req, res) {
     let individual; //Individual Creator ID
 
     if (req.body.creatorInput != '') {
-        const studentStatuses = platform.statusesProperty.slice(0, 6); //Lists of possible 'creators' that include groups of people
-
         for (let creator of req.body.creatorInput.split(',')) {
-            if (studentStatuses.includes(creator)) { //If the 'creator' is one of the listed status groups
+            if (platform.studentStatuses.includes(creator)) { //If the 'creator' is one of the listed status groups
                 statusGroup = await User.find({authenticated: true, status: creator});  //Search for all users with that status
 
                 if (!statusGroup) {
@@ -191,7 +189,7 @@ controller.editProject = async function(req, res) {
 
     const students = await User.find({ //Find all students - all of whom are possible project creators
         authenticated: true,
-        status: {$nin: ['alumnus', 'guest', 'parent', 'faculty']}
+        status: {$in: platform.studentStatuses}
     }); 
 
     if (!students) {
@@ -203,7 +201,7 @@ controller.editProject = async function(req, res) {
     for (let media of project.mediaFiles) {
         fileExtensions.set(media.url, path.extname(media.url.split("SaberChat/")[1]));
     }
-    return res.render('projects/edit', {project, students, creatornames, fileExtensions});
+    return res.render('projects/edit', {platform, project, students, creatornames, fileExtensions});
 }
 
 controller.showProject = async function(req, res) {
@@ -227,7 +225,7 @@ controller.showProject = async function(req, res) {
         fileExtensions.set(media.url, path.extname(media.url.split("SaberChat/")[1]));
     }
     const convertedText = convertToLink(project.text);
-    return res.render('projects/show', {project, convertedText, fileExtensions});
+    return res.render('projects/show', {platform, project, convertedText, fileExtensions});
 }
 
 
@@ -240,9 +238,8 @@ controller.updateProject = async function(req, res) {
         creators = [];
 
     } else {
-        const studentStatuses = platform.statusesProperty.slice(0, 6); //Lists of possible 'creators' that include groups of people
         for (let creator of req.body.creatorInput.split(',')) { //Iterate throguh listed creators
-            if (studentStatuses.includes(creator)) { //If 'creator' is one of the statuses (grades), find all users with that status
+            if (platform.studentStatuses.includes(creator)) { //If 'creator' is one of the statuses (grades), find all users with that status
                 statusGroup = await User.find({authenticated: true, status: creator});
                 if (!statusGroup) {
                     req.flash('error', "Unable to find the users you listed");
@@ -534,7 +531,7 @@ controller.data = async function(req, res) {
         //Map keywords from popular projects and their comments
         const projectKeywords = await keywordFilter(popularProjectText, unpopularProjectText);
         const commentKeywords = await keywordFilter(popularCommentText, unpopularCommentText);
-        return res.render('projects/data', {popularProjects: popular, projectKeywords, commentKeywords});
+        return res.render('projects/data', {platform, popularProjects: popular, projectKeywords, commentKeywords});
 }
 
 module.exports = controller;

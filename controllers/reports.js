@@ -18,12 +18,12 @@ const platform = platformInfo[process.env.PLATFORM];
 controller.index = async function(req, res) {
     const reports = await PostComment.find({type: "report"}).populate('sender');
     if(!reports) {req.flash('error', 'Cannot find reports.'); return res.redirect('back');}
-    return res.render('reports/index', {reports: reports.reverse()});
+    return res.render('reports/index', {platform, reports: reports.reverse()});
 };
 
 // Report GET new report
 controller.new = function(req, res) {
-    return res.render('reports/new');
+    return res.render('reports/new', {platform});
 };
 
 // Report GET show
@@ -37,7 +37,7 @@ controller.show = async function(req, res) {
     if(!report) {req.flash('error', 'Could not find report'); return res.redirect('back');}
 
     const convertedText = convertToLink(report.text);
-    return res.render('reports/show', {report: report, convertedText});
+    return res.render('reports/show', {platform, report, convertedText});
 };
 
 // Report GET edit form
@@ -48,7 +48,7 @@ controller.updateForm = async function(req, res) {
         req.flash('error', 'You do not have permission to do that.');
         return res.redirect('back');
     }
-    return res.render('reports/edit', {report});
+    return res.render('reports/edit', {platform, report});
 };
 
 // Report POST create
