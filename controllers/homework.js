@@ -916,7 +916,7 @@ controller.showTutor = async function(req, res) {
                             time: lessonMap.get(allStudents[objectArrIndex(allStudents, "student", req.query.studentId, "_id")].student._id.toString()), objectArrIndex
                         });
                     }
-                    req.flash('error', "You are ge");
+                    req.flash('error', "You do not have permission to view that student");
                     return res.redirect('back');
                 }
                 
