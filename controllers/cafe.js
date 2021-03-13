@@ -7,7 +7,7 @@ const convertToLink = require("../utils/convert-to-link");
 const getData = require("../utils/cafe-data");
 const {removeIfIncluded} = require("../utils/object-operations");
 const {cloudUpload, cloudDelete} = require('../services/cloudinary');
-const platformInfo = require("../platform-data");
+const platformSetup = require("../platform");
 
 //SCHEMA
 const Order = require('../models/cafe/order');
@@ -16,17 +16,13 @@ const Notification = require('../models/inbox/message');
 const Category = require('../models/cafe/itemType');
 const Cafe = require('../models/cafe/cafe')
 
-if (process.env.NODE_ENV !== "production") {
-    require('dotenv').config();
-}
-
 const controller = {};
-const platform = platformInfo[process.env.PLATFORM];
 
 //-----------GENERAL ROUTES-----------//
 
 //SHOW CAFE HOMEPAGE
 controller.index = async function(req, res) {
+    const platform = await platformSetup();
     const categories = await Category.find({}).populate('items');
     if (!categories) {
         req.flash('error', "Unable to find categories");
@@ -117,6 +113,7 @@ controller.index = async function(req, res) {
 
 //CREATE ORDER
 controller.order = async function(req, res) {
+    const platform = await platformSetup();
     if (!req.body.check) { //If any items are selected
         req.flash('error', "Cannot send empty order"); //If no items were checked
         return res.redirect('back');
@@ -330,6 +327,7 @@ controller.deleteOrder = async function(req, res) {
 
 //FORM TO CREATE NEW ITEM
 controller.newItem = async function(req, res) {
+    const platform = await platformSetup();
     const categories = await Category.find({});
     if (!categories) {
         req.flash('error', "An Error Occurred");
@@ -408,6 +406,7 @@ controller.createItem = async function(req, res) {
 
 //VIEW/EDIT ITEM
 controller.viewItem = async function(req, res) {
+    const platform = await platformSetup();
     const item = await Item.findById(req.params.id);
     if (!item) {
         req.flash('error', "Unable to find item");
@@ -530,6 +529,7 @@ controller.changeStatus = async function(req, res) {
 
 //FORM TO CREATE NEW ITEM CATEGORY
 controller.newCategory = async function(req, res) {
+    const platform = await platformSetup();
     const categories = await Category.find({}).populate('items'); //Collect info on all the items, so that we can give the user the option to add them to that category
     if (!categories) {
         req.flash('error', "Unable to find categories");
@@ -593,6 +593,7 @@ controller.createCategory = async function(req, res) {
 
 //VIEW/EDIT ITEM CATEGORY
 controller.viewCategory = async function(req, res) {
+    const platform = await platformSetup();
     const category = await Category.findById(req.params.id).populate('items'); //Find the specified category
     if (!category) {
         req.flash('error', "An Error Occurred");
@@ -817,6 +818,7 @@ controller.updateItemInfo = async function(req, res) {
 }
 
 controller.manageCafe = async function(req, res) {
+    const platform = await platformSetup();
     const categories = await Category.find({}).populate('items'); //Collect info on all the item categories
     if (!categories) {
         req.flash('error', 'An Error Occurred');
@@ -841,12 +843,13 @@ controller.manageCafe = async function(req, res) {
 }
 
 controller.manageOrders = async function(req, res) {
+    const platform = await platformSetup();
     const orders = await Order.find({present: true}).populate('items.item');
     if (!orders) {
         req.flash('error', 'Could not find orders');
         return res.redirect('back');
     }
-    return res.render('cafe/orderDisplay', {orders});
+    return res.render('cafe/orderDisplay', {platform, orders});
 }
 
 module.exports = controller;

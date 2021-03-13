@@ -1,11 +1,11 @@
+//LIBRARIES
 const {sendGridEmail} = require("../services/sendGrid");
 const convertToLink = require("../utils/convert-to-link");
 const {objectArrIndex, removeIfIncluded} = require("../utils/object-operations");
-
+const platformSetup = require("../platform");
 const path = require('path');
 const dateFormat = require('dateformat');
 const {cloudUpload, cloudDelete} = require('../services/cloudinary');
-const platformInfo = require("../platform-data");
 
 //SCHEMA
 const User = require('../models/user');
@@ -13,15 +13,11 @@ const Announcement = require('../models/announcements/announcement');
 const Notification = require('../models/inbox/message');
 const PostComment = require('../models/postComment');
 
-if (process.env.NODE_ENV !== "production") {
-    require('dotenv').config();
-}
-
 const controller = {};
-const platform = platformInfo[process.env.PLATFORM];
 
 // Ann GET index
 controller.index = async function(req, res) {
+    const platform = await platformSetup();
     const announcements = await Announcement.find({}).populate('sender');
     if(!announcements) {
         req.flash('error', 'Cannot find announcements.');
@@ -31,7 +27,8 @@ controller.index = async function(req, res) {
 };
 
 // Ann GET new ann
-controller.new = function(req, res) {
+controller.new = async function(req, res) {
+    const platform = await platformSetup();
     return res.render('announcements/new', {platform});
 };
 
@@ -55,6 +52,7 @@ controller.markOne = async function(req, res) {
 
 // Ann GET show
 controller.show = async function(req, res) {
+    const platform = await platformSetup();
     const announcement = await Announcement.findById(req.params.id)
         .populate('sender')
         .populate({
@@ -86,6 +84,7 @@ controller.show = async function(req, res) {
 
 // Ann GET edit form
 controller.updateForm = async function(req, res) {
+    const platform = await platformSetup();
     const announcement = await Announcement.findById(req.params.id);
     if(!announcement) {
         req.flash('error', 'Could not find announcement');

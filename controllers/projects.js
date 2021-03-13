@@ -6,7 +6,7 @@ const keywordFilter = require('../utils/keywordFilter');
 const {sortByPopularity} = require("../utils/popularity");
 const {removeIfIncluded, concatMatrix} = require('../utils/object-operations');
 const {cloudUpload, cloudDelete} = require('../services/cloudinary');
-const platformInfo = require("../platform-data");
+const platformSetup = require("../platform");
 
 //SCHEMA
 const User = require('../models/user');
@@ -14,14 +14,10 @@ const Project = require('../models/projects/project');
 const Notification = require('../models/inbox/message');
 const PostComment = require('../models/postComment');
 
-if (process.env.NODE_ENV !== "production") {
-    require('dotenv').config();
-}
-
 const controller = {};
-const platform = platformInfo[process.env.PLATFORM];
 
 controller.index = async function(req, res) {
+    const platform = await platformSetup();
     const projects = await Project.find({})
         .populate('creators')
         .populate('poster')
@@ -42,6 +38,7 @@ controller.index = async function(req, res) {
 
 
 controller.newProject = async function(req, res) {
+    const platform = await platformSetup();
     //Find all students
     const students = await User.find({authenticated: true, status: {$in: platform.studentStatuses}}); 
     if (!students) {
@@ -59,6 +56,7 @@ controller.newProject = async function(req, res) {
 
 
 controller.createProject = async function(req, res) {
+    const platform = await platformSetup();
     let creators = [];
     let statusGroup; //Group of creators by status
     let individual; //Individual Creator ID
@@ -176,6 +174,7 @@ controller.createProject = async function(req, res) {
 
 
 controller.editProject = async function(req, res) {
+    const platform = await platformSetup();
     const project = await Project.findById(req.params.id)
         .populate('poster')
         .populate('creators');
@@ -218,6 +217,7 @@ controller.editProject = async function(req, res) {
 }
 
 controller.showProject = async function(req, res) {
+    const platform = await platformSetup();
     let project = await Project.findById(req.params.id)
         .populate('poster')
         .populate('creators')
@@ -243,6 +243,7 @@ controller.showProject = async function(req, res) {
 
 
 controller.updateProject = async function(req, res) {
+    const platform = await platformSetup();
     let creators = [];
     let statusGroup; //Group of creators by status
     let individual; //Individual Creator ID
@@ -515,6 +516,7 @@ controller.likeComment = async function(req, res) {
 }
 
 controller.data = async function(req, res) {
+    const platform = await platformSetup();
     const projects = await Project.find({poster: req.user._id}).populate("comments");
         if (!projects) {
             req.flash('error', "Unable to find projects");

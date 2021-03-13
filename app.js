@@ -3,7 +3,7 @@ if (process.env.NODE_ENV !== "production") {
     require('dotenv').config();
 }
 
-//Require NodeJS modules
+//NODE.JS MODULES
 //set up and start the express server
 const express = require('express');
 const app = express();
@@ -24,14 +24,12 @@ const dateFormat = require('dateformat');
 const helmet = require('helmet');
 // prevents MongoDB Operator Injection
 const mongoSanitize = require('express-mongo-sanitize');
-
-const {scriptUrls, styleUrls} = require('./srcUrls');
-// const heic2any = require("heic2any");
-
-// pretty up the console
-// const colors = require('colors');
 // add favicon
 const favicon = require('serve-favicon');
+//Source URLs for data security
+const {scriptUrls, styleUrls} = require('./srcUrls');
+//Platform data
+const platformSetup = require("./platform");
 
 // profanity filter
 const Filter = require('bad-words');
@@ -41,8 +39,8 @@ const filter = new Filter();
 const schedule = require('node-schedule');
 
 // require the models for database actions
-const Comment = require('./models/chat/comment');
 const User = require("./models/user");
+const Comment = require('./models/chat/comment');
 const Order = require('./models/cafe/order');
 const Item = require('./models/cafe/orderItem');
 const Cafe = require('./models/cafe/cafe');
@@ -65,12 +63,8 @@ const http = require('http').createServer(app);
 const io = require('socket.io')(http);
 const port = process.env.PORT || 3000;
 
-//Set up platform
-const platformInfo = require(__dirname + "/platform-data");
-const platform = platformInfo[process.env.PLATFORM];
-
 // connect to db.
-mongoose.connect(`mongodb+srv://admin_1:${process.env.DATABASE_PASSWORD}@cluster0-cpycz.mongodb.net/${platform.dbname}?retryWrites=true&w=majority`,
+mongoose.connect(process.env.DATABASE_URL,
     {
         useNewUrlParser: true,
         useUnifiedTopology: true,
@@ -191,26 +185,26 @@ const getRandMessage = (list => {
 // 	});
 // });
 
-// Update all students' statuses on July 1st at midnight, if requested
-if (platform.updateTime) {
-	schedule.scheduleJob(platform.updateTime, async() => {
-		const statuses = platform.studentStatuses.concat(platform.formerStudentStatus);
-	
-		const users = await User.find({authenticated: true, status: {$in: platform.studentStatuses}});
-		if (!users) { return console.log(err);}
-		
-		for (let user of users) {
-			user.status = statuses[statuses.indexOf(user.status)+1];
-			await user.save();
-		}
-	});	
-}
+// Update all students' statuses on update date, if required
+const updateStatuses = async function() {
+    const platform = await platformSetup();
+    if (platform.updateTime) {
+        await schedule.scheduleJob(platform.updateTime, async() => {
+            const statuses = platform.studentStatuses.concat(platform.formerStudentStatus);
+            const users = await User.find({authenticated: true, status: {$in: platform.studentStatuses}});
+            if (!users) { return console.log(err);}  
+            for (let user of users) {
+                user.status = statuses[statuses.indexOf(user.status)+1];
+                await user.save();
+            }
+        });
+    }
+}().catch(err => {
+    console.log(err);
+});
 
 // Socket.io server-side code
 io.on('connect', (socket) => {
-    // console.log("A user connected".cyan);
-    // socket.on('disconnect', () => {
-    // console.log("A user disconnected".cyan);
 
     // When 'switch room' event is detected, leave old room and join 'newroom';
     socket.on('switch room', (newroom) => {

@@ -2,12 +2,6 @@ const BaseJoi = require('joi');
 const {escapeHtmlExtension} = require('./extensions');
 
 const Joi = BaseJoi.extend(escapeHtmlExtension);
-const platformInfo = require("../platform-data");
-if (process.env.NODE_ENV !== "production") {
-    require('dotenv').config();
-}
-
-const platform = platformInfo[process.env.PLATFORM];
 
 const newUserSchema = Joi.object({
     firstName: Joi.string().required().max(50).min(2).escapeHtml().messages({
@@ -67,9 +61,8 @@ const updateUserSchema = Joi.object({
     title: Joi.string().allow('').required().max(50).escapeHtml().messages({
         "string.max": "Title max 50 characters."
     }),
-    status: Joi.string().required().valid(...platform.statusesProperty).messages({
-        "string.empty": "Status is required.",
-        "any.only": "Invalid status."
+    status: Joi.string().required().messages({
+        "string.empty": "Status is required."
     }),
     tags: Joi.string().allow(''),
     imageUrl: Joi.string().pattern(new RegExp(/https:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,4}\b([-a-zA-Z0-9@:%_\+.~#?&//=]*)/)).required().messages({

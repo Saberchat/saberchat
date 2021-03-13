@@ -1,3 +1,8 @@
+//LIBRARIES
+const {sendGridEmail} = require("../services/sendGrid");
+const {objectArrIndex, concatMatrix, removeIfIncluded, multiplyArrays} = require("../utils/object-operations");
+const platformSetup = require("../platform");
+
 //SCHEMA
 const Comment = require('../models/chat/comment');
 const User = require("../models/user");
@@ -13,19 +18,10 @@ const Article = require('../models/wHeights/article');
 const Permission = require('../models/admin/permission');
 const Status = require('../models/admin/status');
 
-//LIBRARIES
-const {sendGridEmail} = require("../services/sendGrid");
-const {objectArrIndex, concatMatrix, removeIfIncluded, multiplyArrays} = require("../utils/object-operations");
-const platformInfo = require("../platform-data");
-
-if (process.env.NODE_ENV !== "production") {
-    require('dotenv').config();
-}
-
 const controller = {};
-const platform = platformInfo[process.env.PLATFORM];
 
 controller.moderateGet = async function(req, res) { //Show all reported comments
+    const platform = await platformSetup();
     const comments = await Comment.find({status: 'flagged'})
     .populate({path: 'author', select: ['username', 'imageUrl']})
     .populate({path: 'statusBy', select: ['username', 'imageUrl']})
@@ -98,6 +94,7 @@ controller.deleteComment = async function(req, res) {
 }
 
 controller.permissionsGet = async function(req, res) { //Show page with all users and their permissions
+    const platform = await platformSetup();
     const users = await User.find({authenticated: true});
     if (!users) {
         req.flash('error', 'An Error Occurred');
@@ -119,6 +116,7 @@ controller.permissionsGet = async function(req, res) { //Show page with all user
 }
 
 controller.statusGet = async function(req, res) { //Show page with all users and their statuses
+    const platform = await platformSetup();
     const users = await User.find({authenticated: true});
     if (!users) {
         req.flash('error', 'An Error Occurred');
@@ -141,6 +139,7 @@ controller.statusGet = async function(req, res) { //Show page with all users and
 }
 
 controller.permissionsPut = async function (req, res) { //Update a user's permissions
+    const platform = await platformSetup();
     const user = await User.findById(req.body.userId);
     if (!user) {
         return res.json({error: "Error. Could not change"});
@@ -167,6 +166,7 @@ controller.permissionsPut = async function (req, res) { //Update a user's permis
 }
 
 controller.statusPut = async function(req, res) { //Update user's status
+    const platform = await platformSetup();
     const user = await User.findById(req.body.userId);
     if (!user) {
         return res.json({error: 'Error. Could not change'});
@@ -194,6 +194,7 @@ controller.statusPut = async function(req, res) { //Update user's status
 }
 
 controller.accesslistGet = async function(req, res) { //Show page with all permitted emails
+    const platform = await platformSetup();
     let emails;
     if (req.query.version) { //If user wants a specific email list
         if (["accesslist", "blockedlist"].includes(req.query.version)) {
@@ -225,6 +226,7 @@ controller.accesslistGet = async function(req, res) { //Show page with all permi
 }
 
 controller.addEmail = async function (req, res) { //Add email to access list/blocked list
+    const platform = await platformSetup();
     if (req.body.version === "accesslist") {
         if (platform.emailExtension && req.body.address.split('@')[1] === platform.emailExtension) { //These emails are already verified
             return res.json({error: `${platform.name} emails do not need to be added to the Access List`});
@@ -272,6 +274,7 @@ controller.deleteEmail = async function (req, res) { //Remove email from access 
 }
 
 controller.tag = async function(req, res) { //Add/remove status tag to user
+    const platform = await platformSetup();
     const user = await User.findById(req.body.userId);
     if (!user) {
         return res.json({error: 'Error. Could not change'});

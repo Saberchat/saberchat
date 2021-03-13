@@ -1,25 +1,21 @@
-//SCHEMAS
-const Comment = require('../models/chat/comment');
-const User = require('../models/user');
-const Room = require('../models/chat/room');
-const AccessReq = require('../models/inbox/accessRequest');
-
 //LIBRARIES
 const Filter = require('bad-words');
 const filter = new Filter();
 const dateFormat = require('dateformat');
 const {sendGridEmail} = require("../services/sendGrid");
 const {removeIfIncluded, concatMatrix, multiplyArrays} = require("../utils/object-operations");
-const platformInfo = require("../platform-data");
+const platformSetup = require("../platform");
 
-if (process.env.NODE_ENV !== "production") {
-    require('dotenv').config();
-}
+//SCHEMA
+const Comment = require('../models/chat/comment');
+const User = require('../models/user');
+const Room = require('../models/chat/room');
+const AccessReq = require('../models/inbox/accessRequest');
 
 const controller = {};
-const platform = platformInfo[process.env.PLATFORM];
 
 controller.index = async function(req, res) {
+    const platform = await platformSetup();
     const rooms = await Room.find({}).populate("creator");
     if (!rooms) {
         req.flash('error', 'Unable to find rooms');
@@ -59,6 +55,7 @@ controller.index = async function(req, res) {
 }
 
 controller.newRoom = async function(req, res) {
+    const platform = await platformSetup();
     const users = await User.find({authenticated: true});
     if (!users) {
         req.flash('error', "An Error Occurred");
@@ -68,6 +65,7 @@ controller.newRoom = async function(req, res) {
 }
 
 controller.showRoom = async function(req, res) {
+    const platform = await platformSetup();
     const room = await Room.findById(req.params.id);
     if (!room) {
         req.flash('error', 'Could not find room');
@@ -92,6 +90,7 @@ controller.showRoom = async function(req, res) {
 }
 
 controller.showMembers = async function(req, res) {
+    const platform = await platformSetup();
     const room = await Room.findById(req.params.id).populate('creator').populate('members');
     if (!room) {
         req.flash('error', "Unable to find room");
@@ -134,6 +133,7 @@ controller.showMembers = async function(req, res) {
 }
 
 controller.editRoom = async function(req, res) {
+    const platform = await platformSetup();
     const room = await Room.findById(req.params.id);
     if (!room) {
         req.flash('error', "Unable to find room");

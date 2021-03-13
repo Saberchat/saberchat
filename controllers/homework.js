@@ -1,24 +1,22 @@
+//LIBARIES
 const dateFormat = require('dateformat');
 const {sendGridEmail} = require("../services/sendGrid");
 const {sortByPopularity} = require("../utils/popularity");
 const {objectArrIndex, parsePropertyArray, removeIfIncluded} = require("../utils/object-operations");
 const {cloudUpload, cloudDelete} = require('../services/cloudinary');
-const platformInfo = require("../platform-data");
+const platformSetup = require("../platform");
 
+//SCHEMA
 const User = require('../models/user');
 const Notification = require('../models/inbox/message');
 const Course = require('../models/homework/course');
 const PostComment = require('../models/postComment');
 const Room = require('../models/chat/room');
 
-if (process.env.NODE_ENV !== "production") {
-    require('dotenv').config();
-}
-
 const controller = {};
-const platform = platformInfo[process.env.PLATFORM];
 
 controller.index = async function(req, res) {
+    const platform = await platformSetup();
     const courses = await Course.find({});
     if (!courses) {
         req.flash('error', "Unable to find courses");
@@ -93,6 +91,7 @@ controller.createCourse = async function(req, res) {
 
 //Join as tutor or as student
 controller.joinCourse = async function(req, res) {
+    const platform = await platformSetup();
     if (req.body.bio) { //Join as tutor
         if (req.user.tags.includes("Tutor")) {
             const course = await Course.findOne({joinCode: req.body.joincode});
@@ -134,6 +133,7 @@ controller.joinCourse = async function(req, res) {
 }
 
 controller.showCourse = async function(req, res) {
+    const platform = await platformSetup();
     const course = await Course.findById(req.params.id).populate('teacher students tutors.tutor tutors.reviews.review blocked');
     if (!course) {
         req.flash('error', "Unable to find course");
@@ -849,6 +849,7 @@ controller.likeReview = async function(req, res) {
 //----OTHER----//
 
 controller.showTutor = async function(req, res) {
+    const platform = await platformSetup();
     const course = await Course.findById(req.params.id).populate("tutors.tutor tutors.students.student tutors.formerStudents.student").populate({
         path: "tutors.reviews.review",
         populate: {path: "sender"}
@@ -922,7 +923,7 @@ controller.showTutor = async function(req, res) {
                             time: lessonMap.get(allStudents[objectArrIndex(allStudents, "student", req.query.studentId, "_id")].student._id.toString()), objectArrIndex
                         });
                     }
-                    req.flash('error', "You are ge");
+                    req.flash('error', "You do not have permission to view that student");
                     return res.redirect('back');
                 }
                 

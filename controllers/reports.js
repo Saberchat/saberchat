@@ -1,33 +1,32 @@
+//LIBRARIES
 const convertToLink = require("../utils/convert-to-link");
 const dateFormat = require('dateformat');
 const {removeIfIncluded} = require("../utils/object-operations");
-const platformInfo = require("../platform-data");
+const platformSetup = require("../platform");
 
 //SCHEMA
 const User = require('../models/user');
 const PostComment = require('../models/postComment');
 
-if (process.env.NODE_ENV !== "production") {
-    require('dotenv').config();
-}
-
 const controller = {};
-const platform = platformInfo[process.env.PLATFORM];
 
 // Report GET index
 controller.index = async function(req, res) {
+    const platform = await platformSetup();
     const reports = await PostComment.find({type: "report"}).populate('sender');
     if(!reports) {req.flash('error', 'Cannot find reports.'); return res.redirect('back');}
     return res.render('reports/index', {platform, reports: reports.reverse()});
 };
 
 // Report GET new report
-controller.new = function(req, res) {
+controller.new = async function(req, res) {
+    const platform = await platformSetup();
     return res.render('reports/new', {platform});
 };
 
 // Report GET show
 controller.show = async function(req, res) {
+    const platform = await platformSetup();
     const report = await PostComment.findById(req.params.id)
         .populate('sender')
         .populate({
@@ -42,6 +41,7 @@ controller.show = async function(req, res) {
 
 // Report GET edit form
 controller.updateForm = async function(req, res) {
+    const platform = await platformSetup();
     const report = await PostComment.findById(req.params.id);
     if(!report) {req.flash('error', 'Could not find report'); return res.redirect('back');}
     if(!report.sender._id.equals(req.user._id)) {

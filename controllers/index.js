@@ -3,25 +3,22 @@ const Filter = require('bad-words');
 const filter = new Filter();
 const passport = require('passport');
 const {sendGridEmail} = require("../services/sendGrid");
-const platformInfo = require("../platform-data");
+const platformSetup = require("../platform");
 
 //SCHEMA
 const User = require('../models/user');
 const Email = require('../models/admin/email');
 const Announcement = require('../models/announcements/announcement');
 
-if (process.env.NODE_ENV !== "production") {
-    require('dotenv').config();
-}
-
 const controller = {};
-const platform = platformInfo[process.env.PLATFORM];
 
-controller.index = function(req, res) {
+controller.index = async function(req, res) {
+    const platform = await platformSetup();
     return res.render('index', {platform});
 }
 
 controller.register = async function(req, res) {
+    const platform = await platformSetup();
     const accesslistedEmail = await Email.findOne({address: req.body.email, version: "accesslist"});
     if (!accesslistedEmail) {
         if (platform.emailExtension && req.body.email.split("@")[1] != platform.emailExtension) {
@@ -157,7 +154,7 @@ controller.authenticate = async function(req, res) {
     return res.redirect('/');
 }
 
-controller.login = async function(req, res, next) { //No need for async as login record can be saved after page reloads
+controller.login = function(req, res, next) { //No need for async as login record can be saved after page reloads
     passport.authenticate('local', (err, user, info) => { //authenticate user with passport
         if (err) { //If an error occurs
             return next(err);
@@ -217,7 +214,8 @@ controller.forgotPassword = async function(req, res) {
     return res.redirect('/');
 }
 
-controller.resetPasswordForm = function(req, res) {
+controller.resetPasswordForm = async function(req, res) {
+    const platform = await platformSetup();
     return res.render('profile/reset-password', {platform, user: req.query.user});
 }
 
@@ -255,6 +253,7 @@ controller.logout = function(req, res) {
 }
 
 controller.contact = async function(req, res) { //Contact info of highest status and developers
+    const platform = await platformSetup();
     //Get users with the highest status (e.g. faculty)
     const teachers = await User.find({authenticated: true, authenticated: true, status: platform.teacherStatus});
     if (!teachers) {
@@ -267,6 +266,7 @@ controller.contact = async function(req, res) { //Contact info of highest status
 }
 
 controller.info = async function(req, res) {
+    const platform = await platformSetup();
     const teachers = await User.find({authenticated: true, authenticated: true, status: platform.teacherStatus});
     if (!teachers) {
         req.flash('error', "An Error Occurred");

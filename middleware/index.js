@@ -4,17 +4,13 @@ const Room = require("../models/chat/room");
 const Cafe = require('../models/cafe/cafe')
 const Course = require('../models/homework/course')
 const {objectArrIndex} = require("../utils/object-operations");
-const platformInfo = require("../platform-data");
-
-if (process.env.NODE_ENV !== "production") {
-    require('dotenv').config();
-}
+const platformSetup = require("../platform");
 
 const middleware = {};
-const platform = platformInfo[process.env.PLATFORM];
 
 //checks if user is logged in
-middleware.isLoggedIn = function(req, res, next) {
+middleware.isLoggedIn = async function(req, res, next) {
+    const platform = await platformSetup();
     if (req.isAuthenticated()) {return next();}
     //If user is not logged in, but this feature is available to people without accounts
     if (objectArrIndex(platform.publicFeatures, "route", req.baseUrl.slice(1)) > -1) {
@@ -96,13 +92,15 @@ middleware.isMod = function(req, res, next) {
     return res.redirect('/');
 }
 
-middleware.isFaculty = function(req, res, next) {
+middleware.isFaculty = async function(req, res, next) {
+    const platform = await platformSetup();
     if (req.user.status == platform.teacherStatus) { return next();}
     req.flash('error', 'You do not have permission to do that');
     return res.redirect('back');
 }
 
-middleware.isStudent = function(req, res, next) {
+middleware.isStudent = async function(req, res, next) {
+    const platform = await platformSetup();
     if (platform.studentStatuses.includes(req.user.status)) {
         return next();
     }

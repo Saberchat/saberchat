@@ -1,17 +1,4 @@
-const User = require('../models/user');
-const Email = require('../models/admin/email');
-
-const Comment = require('../models/chat/comment');
-const Room = require('../models/chat/room');
-const Request = require('../models/inbox/accessRequest');
-
-const Message = require('../models/inbox/message');
-const Announcement = require('../models/announcements/announcement');
-const Project = require('../models/projects/project');
-
-const Order = require('../models/cafe/order');
-const Article = require('../models/wHeights/article');
-const Course = require('../models/homework/course');
+//LIBRARIES
 const {sendGridEmail} = require("../services/sendGrid");
 const convertToLink = require("../utils/convert-to-link");
 const Filter = require('bad-words');
@@ -19,24 +6,33 @@ const filter = new Filter();
 const axios = require('axios');
 const {cloudUpload, cloudDelete} = require('../services/cloudinary');
 const {objectArrIndex, removeIfIncluded, concatMatrix, multiplyArrays, parsePropertyArray} = require('../utils/object-operations');
-const platformInfo = require("../platform-data");
+const platformSetup = require("../platform");
 
-if (process.env.NODE_ENV !== "production") {
-	require('dotenv').config();
-}
+//SCHEMA
+const User = require('../models/user');
+const Email = require('../models/admin/email');
+const Comment = require('../models/chat/comment');
+const Room = require('../models/chat/room');
+const Request = require('../models/inbox/accessRequest');
+const Message = require('../models/inbox/message');
+const Announcement = require('../models/announcements/announcement');
+const Project = require('../models/projects/project');
+const Order = require('../models/cafe/order');
+const Article = require('../models/wHeights/article');
+const Course = require('../models/homework/course');
 
 const controller = {};
-const platform = platformInfo[process.env.PLATFORM];
 
 if (process.env.NODE_ENV !== "production") {
 		require('dotenv').config();
 }
 
 controller.index = async function(req, res) {
-		const users = await User.find({authenticated: true});
-		if (!users) {
-				req.flash("error", "An error occurred");
-				return res.redirect("back");
+	const platform = await platformSetup();
+	const users = await User.find({authenticated: true});
+	if (!users) {
+		req.flash("error", "An error occurred");
+		return res.redirect("back");
 	}
 
 	let statuses = concatMatrix([
@@ -70,7 +66,8 @@ controller.index = async function(req, res) {
 	});
 }
 
-controller.edit = function(req, res) {
+controller.edit = async function(req, res) {
+	const platform = await platformSetup();
 	return res.render('profile/edit', { //Check if user has permissions to change their own tags and statuses
 		platform,
 		statuses: platform.statusesProperty,
@@ -79,39 +76,41 @@ controller.edit = function(req, res) {
 	});
 }
 
-controller.changeLoginInfo = function(req, res) {
+controller.changeLoginInfo = async function(req, res) {
+	const platform = await platformSetup();
 	return res.render('profile/edit_pwd_email', {platform});
 }
 
 controller.show = async function(req, res) {
-		const user = await User.findById(req.params.id).populate('followers');
-		if (!user) {
-				req.flash('error', 'Error. Cannot find user.');
-				return res.redirect('back');
-		}
+	const platform = await platformSetup();
+	const user = await User.findById(req.params.id).populate('followers');
+	if (!user) {
+		req.flash('error', 'Error. Cannot find user.');
+		return res.redirect('back');
+	}
 
-		//Build list of current followers and following
-		let followerIds = parsePropertyArray(user.followers, "_id");
-		let following = [];
-		let currentUserFollowing = [];
+	//Build list of current followers and following
+	let followerIds = parsePropertyArray(user.followers, "_id");
+	let following = [];
+	let currentUserFollowing = [];
 
-		const users = await User.find({authenticated: true});
-		if (!users) {
-				req.flash('error', 'Error. Cannot find users.');
-				return res.redirect('back');
-		}
+	const users = await User.find({authenticated: true});
+	if (!users) {
+		req.flash('error', 'Error. Cannot find users.');
+		return res.redirect('back');
+	}
 
-		for (let u of users) { //Iterate through all users and see if this user is following them
-				if (u.followers.includes(user._id)) {following.push(u);}
-				if (u.followers.includes(req.user._id)) {currentUserFollowing.push(u);}
-		}
+	for (let u of users) { //Iterate through all users and see if this user is following them
+		if (u.followers.includes(user._id)) {following.push(u);}
+		if (u.followers.includes(req.user._id)) {currentUserFollowing.push(u);}
+	}
 
-		return res.render('profile/show', {
-		platform, user, following, followerIds,
-		convertedDescription: convertToLink(user.description),
-		perms: new Map(concatMatrix([platform.permissionsProperty, platform.permissionsDisplay])),
-		statuses: new Map(concatMatrix([platform.statusesProperty, platform.statusesSingular]))
-		});
+	return res.render('profile/show', {
+	platform, user, following, followerIds,
+	convertedDescription: convertToLink(user.description),
+	perms: new Map(concatMatrix([platform.permissionsProperty, platform.permissionsDisplay])),
+	statuses: new Map(concatMatrix([platform.statusesProperty, platform.statusesSingular]))
+	});
 }
 
 controller.update = async function(req, res) {
@@ -242,7 +241,7 @@ controller.tagPut = async function(req, res) {
 			}
 		}
 		
-			removeIfIncluded(req.user.tags, req.body.tag); //If no issue, remove tag
+		removeIfIncluded(req.user.tags, req.body.tag); //If no issue, remove tag
 		await req.user.save();
 		return res.json({success: "Succesfully removed status", tag: req.body.tag, user: req.user._id});
 	}
@@ -252,6 +251,7 @@ controller.tagPut = async function(req, res) {
 }
 
 controller.changeEmailPut = async function(req, res) { //Update email
+	const platform = await platformSetup();
 	//Update receiving emails info
 		if (req.body.receiving_emails) {
 				req.user.receiving_emails = true;
@@ -269,10 +269,10 @@ controller.changeEmailPut = async function(req, res) { //Update email
 	//Check if new email is allowed, not blocked, and not already taken
 		const allowedEmail = await Email.findOne({address: req.body.email, version: "accesslist"});
 		if (!allowedEmail) {
-		if (platform.emailExtension && req.body.email.split("@")[1] != platform.emailExtension) {
-					req.flash('error', "New email must be a platform-verified email");
-					return res.redirect('back');
-		}
+			if (platform.emailExtension && req.body.email.split("@")[1] != platform.emailExtension) {
+				req.flash('error', "New email must be a platform-verified email");
+				return res.redirect('back');
+			}
 		}
 
 	const blocked = await Email.findOne({address: req.body.email, version: "blockedlist"});
@@ -283,9 +283,9 @@ controller.changeEmailPut = async function(req, res) { //Update email
 
 		const overlap = await User.findOne({email: req.body.email, _id: {$ne: req.user._id}});
 		if (overlap) {
-				req.flash('error', "Another current or pending user already has that email.");
-				return res.redirect('back');
-	}
+			req.flash('error', "Another current or pending user already has that email.");
+			return res.redirect('back');
+		}
 
 	//Send SendGrid confirmation email to new email address
 		const url = process.env.SENDGRID_BASE_URL + '/mail/send';

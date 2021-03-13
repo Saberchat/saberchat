@@ -1,7 +1,7 @@
 //LIBRARIES
 const dateFormat = require('dateformat');
 const {sendGridEmail} = require("../services/sendGrid");
-const platformInfo = require("../platform-data");
+const platformSetup = require("../platform");
 
 //SCHEMA
 const Article = require('../models/wHeights/article');
@@ -9,15 +9,11 @@ const User = require('../models/user');
 const Type = require('../models/wHeights/articleType');
 const PostComment = require('../models/postComment');
 
-if (process.env.NODE_ENV !== "production") {
-    require('dotenv').config();
-}
-
 const controller = {};
-const platform = platformInfo[process.env.PLATFORM];
 
 // index page
 controller.index = async function(req, res) {
+    const platform = await platformSetup();
     const articles = await Article.find({}).populate('author');
     if (!articles) {
         req.flash('error', 'An Error Occurred');
@@ -28,6 +24,7 @@ controller.index = async function(req, res) {
 
 // display form for creating articles
 controller.new = async function(req, res) {
+    const platform = await platformSetup();
     const students = await User.find({
         authenticated: true,
         status: {$in: platform.studentStatuses} //All students
@@ -48,6 +45,7 @@ controller.new = async function(req, res) {
 
 // display specific article
 controller.show = async function(req, res) {
+    const platform = await platformSetup();
     const article = await Article.findById(req.params.id)
         .populate('author')
         .populate({
