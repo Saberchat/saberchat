@@ -550,7 +550,7 @@
                                 <% } %>
 
                                 <% if (!included) { %>
-                                    <% if (!c.students.includes(currentUser._id) && currentUser.status != "faculty") { %>
+                                    <% if (!c.students.includes(currentUser._id) && currentUser.status != platform.teacherStatus) { %>
                                         <form action="/homework/join" method="post" id="join-<%= c._id %>"
                                               class="join-course-student">
                                     <button type="button" data-toggle="modal" data-target="#modal-join"
@@ -579,7 +579,7 @@
                                   </form>
                                     <% } %>
 
-                                    <% if (currentUser.tags.includes("Tutor") && !currentUser.status == "faculty") { %>
+                                    <% if (currentUser.tags.includes("Tutor") && !currentUser.status == platform.teacherStatus) { %>
                                         <form action="/homework/join" method="post" id="join-tutor-<%= c._id %>"
                                               class="join-course-tutor">
                                     <button type="button" data-toggle="modal" data-target="#modal-tutor-<%= c._id %>"

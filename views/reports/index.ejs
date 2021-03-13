@@ -72,7 +72,7 @@
                             <% if (report.handled) { %>
                                 <span class="badge badge-pill badge-success" id="marked">Report Has Been Handled</span>
                             <% } else { %>
-                                <% if (["admin", "principal"].includes(currentUser.permission)) { %>
+                                <% if (platform.permissionsProperty.slice(platform.permissionsProperty.length-2).includes(currentUser.permission)) { %>
                                     <a href="/reports/handle/<%= report._id %>">
                                         <span class="badge badge-pill badge-warning" id="mark">Mark As Handled</span>
                                     </a>

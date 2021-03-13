@@ -54,10 +54,14 @@ const searchFunctionFollowing = function() { //Search for users in following tab
     }
 }
 
-const searchFunction = function() { //Search for users on index page
+const searchFunction = function(statusString) { //Search for users on index page
     let statusHeaders = document.getElementsByClassName('status-header')
     let statusBreaks = document.getElementsByClassName('status-page-break')
-    let statuses = [["faculty", "Faculty", []], ["12th", "Seniors", []], ["11th", "Juniors", []], ["10th", "Sophomores", []], ["9th", "Freshmen", []], ["8th", "8th Graders", []], ["7th", "7th Graders", []], ["alumnus", "Alumni", []], ["parent", "Parents", []], ["guest", "Guests", []]]
+    statusString = statusString.split(',');
+    let statuses = [];
+    for (let i = 0; i < statusString.length; i+=3) { //Build statuses array based on platform's stored statuses
+        statuses.push([statusString[i], statusString[i+1], []])
+    }
 
     let input = document.getElementById("search-input");
     let filter = input.value.toUpperCase();

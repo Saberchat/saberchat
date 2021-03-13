@@ -4,7 +4,7 @@ const {sendGridEmail} = require("../services/sendGrid");
 const convertToLink = require("../utils/convert-to-link");
 const keywordFilter = require('../utils/keywordFilter');
 const {sortByPopularity} = require("../utils/popularity");
-const {removeIfIncluded} = require('../utils/object-operations');
+const {removeIfIncluded, concatMatrix} = require('../utils/object-operations');
 const {cloudUpload, cloudDelete} = require('../services/cloudinary');
 const platformInfo = require("../platform-data");
 
@@ -48,7 +48,13 @@ controller.newProject = async function(req, res) {
         req.flash('error', "No Students Found");
         return res.redirect('back');
     }
-    return res.render('projects/new', {platform, students});
+    return res.render('projects/new', {
+        platform, students,
+        statuses: concatMatrix([
+            platform.statusesProperty,
+            platform.statusesPlural
+        ]),
+    });
 }
 
 
@@ -201,7 +207,14 @@ controller.editProject = async function(req, res) {
     for (let media of project.mediaFiles) {
         fileExtensions.set(media.url, path.extname(media.url.split("SaberChat/")[1]));
     }
-    return res.render('projects/edit', {platform, project, students, creatornames, fileExtensions});
+    return res.render('projects/edit', {
+        platform, project, students,
+        creatornames, fileExtensions,
+        statuses: concatMatrix([
+            platform.statusesProperty,
+            platform.statusesPlural
+        ]),
+    });
 }
 
 controller.showProject = async function(req, res) {

@@ -49,24 +49,17 @@
                                 <select id="user-select" class="form-control mode" onchange="addRecipient('user')" required>
                                     <option class="recipient-group" value="" selected disabled>Select User/Group
                                     </option>
-                                    <option class="recipient-group" value="7th">7th Graders</option>
-                                    <option class="recipient-group" value="8th">8th Graders</option>
-                                    <option class="recipient-group" value="9th">9th Graders</option>
-                                    <option class="recipient-group" value="10th">EC Sophomores</option>
-                                    <option class="recipient-group" value="11th">EC Juniors</option>
-                                    <option class="recipient-group" value="12th">EC Seniors</option>
-                                    <option class="recipient-group" value="faculty">Faculty</option>
-                                    <option class="recipient-group" value="parent">Parents</option>
-                                    <option class="recipient-group" value="alumnus">Alumni</option>
-                                    <option class="recipient-group" value="guest">Guests</option>
-                                    <% users.forEach(user => { %>
+                                    <%for (let status of statuses) { %>
+                                        <option class="recipient-group" value="<%=status[0]%>"><%=status[1]%></option>
+                                    <%}%>
+                                    <% for (let user of users) { %>
                                         <% if(!user._id.equals(currentUser._id)) { %>
                                             <option class="<%= user.status %>"
                                                     value="<%= user._id %>"><%= user.username %>
                                                 (<%= user.firstName %> <%= user.lastName %>)
                                             </option>
                                         <% } %>
-                                    <% }) %>
+                                    <% } %>
                                 </select>
                             </div>
                         </div>
@@ -77,7 +70,7 @@
                     <select id="faculty-select" class="form-control mode" onchange="addRecipient('faculty')">
                       <option value="" selected disabled>Select Faculty</option>
                       <% users.forEach(user => { %>
-                        <% if(!user._id.equals(currentUser._id) && user.status == 'faculty') { %>
+                        <% if(!user._id.equals(currentUser._id) && user.status == platform.teacherStatus) { %>
                           <option value="<%= user._id %>"><%= user.username %> (<%= user.firstName%> <%= user.lastName%>)</option>
                         <% } %>
                       <% }) %>

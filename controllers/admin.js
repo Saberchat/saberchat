@@ -146,8 +146,8 @@ controller.permissionsPut = async function (req, res) { //Update a user's permis
         return res.json({error: "Error. Could not change"});
     }
 
-    if (req.body.role == 'admin' || req.body.role == "principal") { //Changing a user to administrator or principal requires specific permissions
-        if (req.user.permission == 'principal') { // check if current user is the principal
+    if (platform.permissionsProperty.slice[platform.permissionsProperty.length-2].includes(req.body.role)) { //Changing a user to higher level permissions requires specific permissions
+        if (req.user.permission == platform.permissionsProperty[platform.permissionsProperty.length-1]) { // check if current user is the highest permission
             user.permission = req.body.role;
             await user.save();
             return res.json({success: "Succesfully changed", user});
@@ -157,7 +157,7 @@ controller.permissionsPut = async function (req, res) { //Update a user's permis
         }
     }
 
-    if ((user.permission == "principal" || user.permission == "admin") && req.user.permission != "principal") { //More permission restructions
+    if ((user.permission == platform.permissionsProperty[platform.permissionsProperty.length-1] || user.permission == platform.permissionsProperty[platform.permissionsProperty.length-2]) && req.user.permission != platform.permissionsProperty[platform.permissionsProperty.length-1]) { //More permission restructions
         return res.json({error: "You do not have permissions to do that", user});
     }
 

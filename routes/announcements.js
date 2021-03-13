@@ -23,7 +23,7 @@ router.put('/like-comment', middleware.isLoggedIn, wrapAsync(announcements.likeC
 router.put('/comment', middleware.isLoggedIn, wrapAsync(announcements.comment)); //Like a comment on announcement
 
 router.route('/:id')
-    .get(wrapAsync(announcements.show)) //Show specific announcement
+    .get(middleware.isLoggedIn, wrapAsync(announcements.show)) //Show specific announcement
     .put(middleware.isLoggedIn, middleware.isMod, multipleUpload, wrapAsync(announcements.updateAnn)) //Update specific announcement
     .delete(middleware.isLoggedIn, middleware.isMod, wrapAsync(announcements.deleteAnn)); //Delete specific announcement
 

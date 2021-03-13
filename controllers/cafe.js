@@ -155,7 +155,7 @@ controller.order = async function(req, res) {
 
     if (!req.body.payingInPerson) {
         if (charge > req.user.balance) { //Check to see if you are ordering more than you can
-            req.flash("error", "You do not have enough money in your account to pay for this order. Contact the principal to update your balance.");
+            req.flash("error", `You do not have enough money in your account to pay for this order. Contact the ${platform.permissionsDisplay[platform.permissionsDisplay.length-1]} to update your balance.`);
             return res.redirect('/cafe');
         }
         req.user.balance -= charge;

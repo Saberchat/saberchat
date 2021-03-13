@@ -191,24 +191,20 @@ const getRandMessage = (list => {
 // 	});
 // });
 
-// Update all students' statuses on July 1st at midnight
-
-// const updateUsers = schedule.scheduleJob('0 0 0 1 7 *', () => {
-
-//   let statuses = ['7th', '8th', '9th', '10th', '11th', '12th', 'alumnus'];
-
-//   User.find({authenticated: true, status: {$in: statuses.slice(0, statuses.length-1)}}, (err, users) => { //Do not include CURRENT alumni in the people who will be updated, only 7th-12th graders
-//     if (err || !users) {
-//       console.log(err);
-
-//     } else {
-//       for (let user of users) {
-//         user.status = statuses[statuses.indexOf(user.status)+1];
-//         user.save();
-//       }
-//     }
-//   });
-// });
+// Update all students' statuses on July 1st at midnight, if requested
+if (platform.updateTime) {
+	schedule.scheduleJob(platform.updateTime, async() => {
+		const statuses = platform.studentStatuses.concat(platform.formerStudentStatus);
+	
+		const users = await User.find({authenticated: true, status: {$in: platform.studentStatuses}});
+		if (!users) { return console.log(err);}
+		
+		for (let user of users) {
+			user.status = statuses[statuses.indexOf(user.status)+1];
+			await user.save();
+		}
+	});	
+}
 
 // Socket.io server-side code
 io.on('connect', (socket) => {

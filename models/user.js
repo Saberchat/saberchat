@@ -46,8 +46,8 @@ var userSchema = new mongoose.Schema({
     inbox: [{type: mongoose.Schema.Types.ObjectId, ref: "Message"}],
     requests: [{type: mongoose.Schema.Types.ObjectId, ref: "AccessRequest"}],
     followers: [{type: mongoose.Schema.Types.ObjectId, ref: "User"}],
-    permission: {type: String, default: "default"}, // for permissions
-    status: {type: String, default: "guest"}, // 7th, 8th, 9th, 10th, 11th, 12th, alumni, parents, faculty, cashier, editor, tutor, etc.
+    permission: {type: String, default: "default"},
+    status: {type: String, default: "guest"},
     tags: [{type: String}], //Cashier, Editor, Tutor, Etc.
     balance: {type: Number, default: 0},
     debt: {type: Number, default: 0},

@@ -5,7 +5,7 @@ const path = require('path');
 const {sendGridEmail} = require("../services/sendGrid");
 const convertToLink = require("../utils/convert-to-link");
 const { cloudUpload } = require('../services/cloudinary');
-const {objectArrIndex, removeIfIncluded, parseKeysOrValues, parsePropertyArray} = require("../utils/object-operations");
+const {objectArrIndex, removeIfIncluded, parseKeysOrValues, parsePropertyArray, concatMatrix} = require("../utils/object-operations");
 const platformInfo = require("../platform-data");
 
 const User = require('../models/user');
@@ -77,7 +77,13 @@ controller.showMsg = async function(req, res) {
 controller.newMsgForm = async function(req, res) {
     const users = await User.find({authenticated: true});
 	if(!users) { req.flash('error', 'An Error Occurred.'); return res.redirect('back'); }
-	return res.render('inbox/new', {platform, users}); //Render new message form with all users as recipient options
+	return res.render('inbox/new', {
+        platform, users,
+        statuses: concatMatrix([
+            platform.statusesProperty,
+            platform.statusesPlural
+        ]),
+    }); //Render new message form with all users as recipient options
 };
 
 // Inbox GET sent messages

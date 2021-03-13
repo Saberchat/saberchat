@@ -19,7 +19,7 @@ router.put('/comment', middleware.isLoggedIn, wrapAsync(projects.comment)); //Co
 router.put('/like-comment', middleware.isLoggedIn, wrapAsync(projects.likeComment)); //Like a comment on project
 
 router.route('/:id')
-    .get(wrapAsync(projects.showProject)) //Show specific project
+    .get(middleware.isLoggedIn, wrapAsync(projects.showProject)) //Show specific project
     .put(middleware.isLoggedIn, middleware.isFaculty, multipleUpload, wrapAsync(projects.updateProject)) //Update specific project
     .delete(middleware.isLoggedIn, middleware.isFaculty, wrapAsync(projects.deleteProject)); //Delete specific project
 

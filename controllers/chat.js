@@ -115,14 +115,18 @@ controller.showMembers = async function(req, res) {
 		}
 	}
 
-
     if (room.private) {
         return res.render('chat/people', {
             platform, room, statuses,
             permMap: new Map(concatMatrix([
                 platform.permissionsProperty.slice(1),
                 platform.permissionsDisplay.slice(1)
-            ]))
+            ])),
+            emptyStatuses: concatMatrix([
+                platform.statusesProperty,
+                platform.statusesPlural,
+                multiplyArrays([], platform.statusesProperty.length)
+            ]).reverse()
         });
     }
     req.flash("error", "Public rooms are open to all users");

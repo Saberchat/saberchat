@@ -110,11 +110,11 @@
                                 </div>
                             </li>
 
-                        <% } else if (currentUser.permission == "principal") { %>
+                        <% } else if (currentUser.permission == platform.permissionsProperty[platform.permissionsProperty.length-1]) { %>
                             <li class="nav-item dropdown">
                                 <a class="nav-link dropdown-toggle" href="" id="navbarDropdownMenuLink" role="button"
                                    data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i
-                                            class="fas fa-align-justify"></i> Principal</a>
+                                            class="fas fa-align-justify"></i> platform.permissionsDisplay[platform.permissionsDisplay.length-1]</a>
                                 <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
                                     <a href="/admin/permissions" class="dropdown-item"><i class="fas fa-user"></i>
                                         Change Permissions</a>
