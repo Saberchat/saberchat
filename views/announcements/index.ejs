@@ -110,7 +110,7 @@
                             <% } else { %>
                                 <span class="announcement-sender">
                         <img src="<% if (announcement.sender.mediaFile.display) {%> <%= announcement.sender.mediaFile.url%><%} else {%> <%=announcement.sender.imageUrl.url%><%}%>" alt="profile pic" class="sender-profile-image">
-                        <%= announcement.sender.firstName %> <%= announcement.sender.lastName %>
+                        <%= announcement.sender.firstName.charAt(0) %>.<%= announcement.sender.lastName.charAt(0)%>.
                       </span>
                             <% } %>
 
