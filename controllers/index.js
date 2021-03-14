@@ -3,6 +3,7 @@ const Filter = require('bad-words');
 const filter = new Filter();
 const passport = require('passport');
 const {sendGridEmail} = require("../services/sendGrid");
+const platformSetup = require("../platform");
 
 //SCHEMA
 const User = require('../models/user');
@@ -11,15 +12,19 @@ const Announcement = require('../models/announcements/announcement');
 
 const controller = {};
 
-controller.index = function(req, res) {
-    return res.render('index');
+controller.index = async function(req, res) {
+    const platform = await platformSetup();
+    return res.render('index', {platform});
 }
 
 controller.register = async function(req, res) {
+    const platform = await platformSetup();
     const accesslistedEmail = await Email.findOne({address: req.body.email, version: "accesslist"});
-    if (!accesslistedEmail && req.body.email.split("@")[1] != "alsionschool.org") {
-        req.flash('error', 'Only members of the Alsion community may sign up');
-        return res.redirect('/');
+    if (!accesslistedEmail) {
+        if (platform.emailExtension && req.body.email.split("@")[1] != platform.emailExtension) {
+            req.flash('error', `Only members of the ${platform.name} community may sign up`);
+            return res.redirect('/');
+        }
     }
 
     const overlap = await User.find({email: req.body.email});
@@ -149,7 +154,7 @@ controller.authenticate = async function(req, res) {
     return res.redirect('/');
 }
 
-controller.login = async function(req, res, next) { //No need for async as login record can be saved after page reloads
+controller.login = function(req, res, next) { //No need for async as login record can be saved after page reloads
     passport.authenticate('local', (err, user, info) => { //authenticate user with passport
         if (err) { //If an error occurs
             return next(err);
@@ -209,8 +214,9 @@ controller.forgotPassword = async function(req, res) {
     return res.redirect('/');
 }
 
-controller.resetPasswordForm = function(req, res) {
-    return res.render('profile/reset-password', {user: req.query.user});
+controller.resetPasswordForm = async function(req, res) {
+    const platform = await platformSetup();
+    return res.render('profile/reset-password', {platform, user: req.query.user});
 }
 
 controller.resetPassword = async function(req, res) {
@@ -246,27 +252,32 @@ controller.logout = function(req, res) {
     return res.redirect("/");
 }
 
-controller.contact = async function(req, res) { //Contact info of teachers and developers
-    const faculty = await User.find({authenticated: true, authenticated: true, status: 'faculty'});
-    if (!faculty) {
+controller.contact = async function(req, res) { //Contact info of highest status and developers
+    const platform = await platformSetup();
+    //Get users with the highest status (e.g. faculty)
+    const teachers = await User.find({authenticated: true, authenticated: true, status: platform.teacherStatus});
+    if (!teachers) {
         req.flash('error', "An Error Occurred");
         return res.redirect('back');
     }
-    return res.render('other/contact', {faculty});
+
+    const highestPermission = platform.permissionsProperty[platform.permissionsProperty.length-1]; //Get highest permission (e.g. principal)
+    return res.render('other/contact', {platform, teachers, highestPermission});
 }
 
-controller.alsion = async function(req, res) {
-    const faculty = await User.find({authenticated: true, status: 'faculty'});
-    if (!faculty) {
+controller.info = async function(req, res) {
+    const platform = await platformSetup();
+    const teachers = await User.find({authenticated: true, authenticated: true, status: platform.teacherStatus});
+    if (!teachers) {
         req.flash('error', "An Error Occurred");
         return res.redirect('back');
     }
 
-    let teacherNames = [];
-    for (let fac of faculty) { //Iterate through faculty and add their name to array
-        teacherNames.push(`${fac.firstName} ${fac.lastName}`);
+    let names = [];
+    for (let user of teachers) { //Iterate through faculty and add their name to array
+        names.push(`${user.firstName} ${user.lastName}`);
     }
-    return res.render('other/alsion_info', {faculty: teacherNames.join(', ')});
+    return res.render('other/platform-info', {platform, names: names.join(', ')});
 }
 
 controller.darkmode = async function(req, res) {

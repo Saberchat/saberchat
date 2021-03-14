@@ -1,7 +1,8 @@
+//LIBRARIES
 const {sendGridEmail} = require("../services/sendGrid");
 const convertToLink = require("../utils/convert-to-link");
 const {objectArrIndex, removeIfIncluded} = require("../utils/object-operations");
-
+const platformSetup = require("../platform");
 const path = require('path');
 const dateFormat = require('dateformat');
 const {cloudUpload, cloudDelete} = require('../services/cloudinary');
@@ -16,17 +17,19 @@ const controller = {};
 
 // Ann GET index
 controller.index = async function(req, res) {
+    const platform = await platformSetup();
     const announcements = await Announcement.find({}).populate('sender');
     if(!announcements) {
         req.flash('error', 'Cannot find announcements.');
         return res.redirect('back');
     }
-    return res.render('announcements/index', {announcements: announcements.reverse()});
+    return res.render('announcements/index', {platform, announcements: announcements.reverse()});
 };
 
 // Ann GET new ann
-controller.new = function(req, res) {
-    return res.render('announcements/new');
+controller.new = async function(req, res) {
+    const platform = await platformSetup();
+    return res.render('announcements/new', {platform});
 };
 
 // Ann GET markall ann as read
@@ -49,6 +52,7 @@ controller.markOne = async function(req, res) {
 
 // Ann GET show
 controller.show = async function(req, res) {
+    const platform = await platformSetup();
     const announcement = await Announcement.findById(req.params.id)
         .populate('sender')
         .populate({
@@ -75,11 +79,12 @@ controller.show = async function(req, res) {
         fileExtensions.set(media.url, path.extname(media.url.split("SaberChat/")[1]));
     }
     const convertedText = convertToLink(announcement.text); //Parse and add hrefs to all links in text
-    return res.render('announcements/show', {announcement, convertedText, fileExtensions});
+    return res.render('announcements/show', {platform, announcement, convertedText, fileExtensions});
 };
 
 // Ann GET edit form
 controller.updateForm = async function(req, res) {
+    const platform = await platformSetup();
     const announcement = await Announcement.findById(req.params.id);
     if(!announcement) {
         req.flash('error', 'Could not find announcement');
@@ -94,7 +99,7 @@ controller.updateForm = async function(req, res) {
     for (let media of announcement.mediaFiles) {
         fileExtensions.set(media.url, path.extname(media.url.split("SaberChat/")[1]));
     }
-    return res.render('announcements/edit', {announcement, fileExtensions});
+    return res.render('announcements/edit', {platform, announcement, fileExtensions});
 };
 
 // Ann POST create

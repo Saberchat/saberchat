@@ -1,7 +1,7 @@
 //LIBRARIES
 const dateFormat = require('dateformat');
 const {sendGridEmail} = require("../services/sendGrid");
-const convertToLink = require("../utils/convert-to-link");
+const platformSetup = require("../platform");
 
 //SCHEMA
 const Article = require('../models/wHeights/article');
@@ -13,19 +13,21 @@ const controller = {};
 
 // index page
 controller.index = async function(req, res) {
+    const platform = await platformSetup();
     const articles = await Article.find({}).populate('author');
     if (!articles) {
         req.flash('error', 'An Error Occurred');
         return res.redirect('/articles');
     }
-    return res.render('wHeights/index', {articles});
+    return res.render('wHeights/index', {platform, articles});
 }
 
 // display form for creating articles
 controller.new = async function(req, res) {
+    const platform = await platformSetup();
     const students = await User.find({
         authenticated: true,
-        status: {$in: ["7th", "8th", "9th", "10th", "11th", "12th"]} //All students
+        status: {$in: platform.studentStatuses} //All students
     });
     if (!students) {
         req.flash('error', "Unable to find students");
@@ -38,11 +40,12 @@ controller.new = async function(req, res) {
         return res.redirect('back');
     }
 
-    return res.render('wHeights/new', {students, types});
+    return res.render('wHeights/new', {platform, students, types});
 }
 
 // display specific article
 controller.show = async function(req, res) {
+    const platform = await platformSetup();
     const article = await Article.findById(req.params.id)
         .populate('author')
         .populate({
@@ -54,7 +57,7 @@ controller.show = async function(req, res) {
         req.flash('error', 'Cannot find article');
         return res.redirect('/articles');
     }
-    return res.render('wHeights/show', {article});
+    return res.render('wHeights/show', {platform, article});
 }
 
 //Create article

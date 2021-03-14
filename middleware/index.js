@@ -4,12 +4,20 @@ const Room = require("../models/chat/room");
 const Cafe = require('../models/cafe/cafe')
 const Course = require('../models/homework/course')
 const {objectArrIndex} = require("../utils/object-operations");
+const platformSetup = require("../platform");
 
 const middleware = {};
 
 //checks if user is logged in
-middleware.isLoggedIn = function(req, res, next) {
-    if (req.isAuthenticated()) { return next();}
+middleware.isLoggedIn = async function(req, res, next) {
+    const platform = await platformSetup();
+    if (req.isAuthenticated()) {return next();}
+    //If user is not logged in, but this feature is available to people without accounts
+    if (objectArrIndex(platform.publicFeatures, "route", req.baseUrl.slice(1)) > -1) {
+        if (platform.publicFeatures[objectArrIndex(platform.publicFeatures, "route", req.baseUrl.slice(1))].subroutes.includes(req.route.path)) {
+            return next();
+        }
+    }
     req.flash('error', 'Please Login');
     return res.redirect('/');
 }
@@ -84,14 +92,16 @@ middleware.isMod = function(req, res, next) {
     return res.redirect('/');
 }
 
-middleware.isFaculty = function(req, res, next) {
-    if (req.user.status == 'faculty') { return next();}
+middleware.isFaculty = async function(req, res, next) {
+    const platform = await platformSetup();
+    if (req.user.status == platform.teacherStatus) { return next();}
     req.flash('error', 'You do not have permission to do that');
     return res.redirect('back');
 }
 
-middleware.isStudent = function(req, res, next) {
-    if (['7th', '8th', '9th', '10th', '11th', '12th'].includes(req.user.status)) {
+middleware.isStudent = async function(req, res, next) {
+    const platform = await platformSetup();
+    if (platform.studentStatuses.includes(req.user.status)) {
         return next();
     }
     req.flash('error', 'You do not have permission to do that');

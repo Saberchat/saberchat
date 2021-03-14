@@ -46,10 +46,9 @@
     <div class="row">
         <div class="col-12">
             <div class="jumbotron text-center header">
-                <% let studentStatuses = ['7th', '8th', '9th', '10th', '11th', '12th'] %>
                 <h1><i class="fas fa-chalkboard-teacher"></i> Tutoring Center </h1>
                 <p>A platform for students to communicate and help each other learn</p>
-                <% if (currentUser.status == 'faculty') { %>
+                <% if (currentUser.status == platform.teacherStatus) { %>
                     <form action="/homework" method="post" id="add-course-form" enctype="multipart/form-data">
                         <button type="button" data-toggle="modal" data-target="#modal-teacher" class="btn btn-info"><i
                                     class="fas fa-chalkboard-teacher"></i> Create Course

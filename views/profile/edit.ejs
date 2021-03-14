@@ -84,15 +84,15 @@
                     <% } %>
                 </div>
                 <div class="form-group">
-                    <% if (currentUser.permission == 'admin' || currentUser.permission == 'principal') { %>
+                    <% if (changeStatus) { %>
                         <label for="status">Select Status</label>
                         <select class="form-control mode" id="status" name="status">
                             <option selected value="<%= currentUser.status %>"><%= currentUser.status %></option>
-                            <% ['7th', '8th', '9th', '10th', '11th', '12th', 'alumnus', 'guest', 'parent', 'faculty'].forEach( status => { %>
+                            <% for (let status of statuses) { %>
                                 <% if (currentUser.status.toLowerCase() != status.toLowerCase()) { %>
                                     <option value="<%= status %>"><%= status %></option>
                                 <% } %>
-                            <% }) %>
+                            <% } %>
                         </select>
                     <% } else { %>
                         <label for="status">Status</label>
@@ -102,23 +102,22 @@
                     <% } %>
                 </div>
 
-                <% if (currentUser.permission == 'admin' || currentUser.permission == 'principal') { %>
-                    <% let tagMap = new Map([["Tutor", "warning"], ["Cashier", "success"], ["Editor", "info"]]); %>
+                <% if (changeStatus) { %>
                     <div class="form-group">
                         <label for="tags">Select Temporary Statuses
                             <span id="tag-group">
                                 <% currentUser.tags.forEach(tag => { %>
-                                    <span class="badge badge-pill badge-<%= tagMap.get(tag) %> user-tag"><%= tag %></span>
+                                    <span class="badge badge-pill badge-warning user-tag"><%= tag %></span>
                                 <% }) %>
                             </span>
                         </label>
                         <select class="form-control mode" id="<%= currentUser.id %>" name="tags" onchange="updateTag(this)">
                             <option value=""></option>
-                            <% ['Cashier', 'Tutor', 'Editor'].forEach(tag => { %>
+                            <% for (let tag of tags) { %>
                                 <option>
                                     <%= tag %>
                                 </option>
-                            <% }) %>
+                            <% } %>
                         </select>
                         <br/>
                     </div>

@@ -50,24 +50,11 @@
             <br/>
             <div class="search-filter">
                 <i class="fas fa-search"></i>
-                <input id="search-input" oninput="searchFunction()" class="form-control mode" type="text"
+                <input id="search-input" oninput="searchFunction('<%=emptyStatuses%>')" class="form-control mode" type="text"
                        placeholder="Search..." title="Type in Username">
             </div>
 
             <div class="list-group" id="user-list">
-                <% let statuses = [["faculty", "Faculty", []], ["12th", "Seniors", []], ["11th", "Juniors", []], ["10th", "Sophomores", []], ["9th", "Freshmen", []], ["8th", "8th Graders", []], ["7th", "7th Graders", []], ["alumnus", "Alumni", []], ["parent", "Parents", []], ["guest", "Guests", []]] %>
-                <% let permMap = new Map([["principal", ["Principal", "info"]], ["admin", ["Administrator", "danger"]], ["mod", ["Moderator", "secondary"]]]) %>
-                <% let tagMap = new Map([["Tutor", "warning"], ["Cashier", "success"], ["Editor", "primary"]]) %>
-
-                <% for (let status of statuses) { %>
-                    <% for (let user of room.members) { %>
-                        <% if (user.status.toLowerCase() == status[0]) { %>
-                            <% status[2].push(user) %>
-                        <% } %>
-                    <% } %>
-                <% } %>
-
-                <% let sortedUsers = []; %>
                 <% for (let status of statuses) { %>
                     <% if (status[2].length > 0) { %>
                         <li class="list-group-item list-group-item-success status-header darkmode-outline" id="<%= status[0] %>-header">
@@ -76,17 +63,7 @@
                                 <span class="darkmode-header"><%= status[2].length %> user(s)</span>
                             </div>
                         </li>
-
-                        <% sortedUsers = []; %>
-                        <% for (let perm of ["Principal", "Admin", "Mod", "Default"]) { %>
-                            <% for (let user of room.members) { %>
-                                <% if (user.permission.toLowerCase() == perm.toLowerCase()) { %>
-                                    <% sortedUsers.push(user) %>
-                                <% } %>
-                            <% } %>
-                        <% } %>
-
-                        <% for (let user of sortedUsers) { %>
+                        <% for (let user of status[2]) { %>
                             <% if (user.status.toLowerCase() == status[0]) { %>
                                 <li class="list-group-item list-group-item-action user-element cafe">
 
@@ -97,17 +74,15 @@
                                                     class="span-tag-username"><%= user.username %></span></span>
 
                                         <% if (permMap.has(user.permission)) { %>
-                                            <span class="badge badge-<%= permMap.get(user.permission)[1] %>"><%= permMap.get(user.permission)[0] %></span>
+                                            <span class="badge badge-danger"><%= permMap.get(user.permission) %></span>
                                         <% } %>
 
                                         <% if (user._id.toString() == currentUser._id.toString())  { %>
                                             <span class="badge badge-dark">Me</span>
                                         <% } %>
 
-                                        <span class="tags"></span>
-
                                         <% for (let tag of user.tags) { %>
-                                            <span class="tag badge badge-pill badge-<%= tagMap.get(tag) %>"><%= tag %></span>
+                                            <span class="tag badge badge-pill badge-warning"><%= tag %></span>
                                         <% } %>
 
                                         <% if (room.creator._id.equals(user._id)) { %>

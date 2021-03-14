@@ -1,19 +1,21 @@
-//SCHEMAS
-const Comment = require('../models/chat/comment');
-const User = require('../models/user');
-const Room = require('../models/chat/room');
-const AccessReq = require('../models/inbox/accessRequest');
-
 //LIBRARIES
 const Filter = require('bad-words');
 const filter = new Filter();
 const dateFormat = require('dateformat');
 const {sendGridEmail} = require("../services/sendGrid");
-const {removeIfIncluded} = require("../utils/object-operations");
+const {removeIfIncluded, concatMatrix, multiplyArrays} = require("../utils/object-operations");
+const platformSetup = require("../platform");
+
+//SCHEMA
+const Comment = require('../models/chat/comment');
+const User = require('../models/user');
+const Room = require('../models/chat/room');
+const AccessReq = require('../models/inbox/accessRequest');
 
 const controller = {};
 
 controller.index = async function(req, res) {
+    const platform = await platformSetup();
     const rooms = await Room.find({}).populate("creator");
     if (!rooms) {
         req.flash('error', 'Unable to find rooms');
@@ -49,19 +51,21 @@ controller.index = async function(req, res) {
         req.flash('error', 'Unable to find access requests');
         return res.redirect('back');
     }
-    return res.render('chat/index', {rooms, requests, commentObject});
+    return res.render('chat/index', {platform, rooms, requests, commentObject});
 }
 
 controller.newRoom = async function(req, res) {
+    const platform = await platformSetup();
     const users = await User.find({authenticated: true});
     if (!users) {
         req.flash('error', "An Error Occurred");
         return res.redirect('back');
     }
-    return res.render('chat/new', {users: users});
+    return res.render('chat/new', {platform, users});
 }
 
 controller.showRoom = async function(req, res) {
+    const platform = await platformSetup();
     const room = await Room.findById(req.params.id);
     if (!room) {
         req.flash('error', 'Could not find room');
@@ -82,23 +86,54 @@ controller.showRoom = async function(req, res) {
         return res.redirect('/chat');
     }
 
-    return res.render('chat/show', {comments, room: room});
+    return res.render('chat/show', {platform, comments, room});
 }
 
 controller.showMembers = async function(req, res) {
+    const platform = await platformSetup();
     const room = await Room.findById(req.params.id).populate('creator').populate('members');
     if (!room) {
         req.flash('error', "Unable to find room");
         return res.redirect('back');
     }
+
+    let statuses = concatMatrix([
+		platform.statusesProperty,
+		platform.statusesPlural,
+		multiplyArrays([], platform.statusesProperty.length)
+	]).reverse();
+
+	for (let status of statuses) {
+		status[2] = [];
+		for (let permission of platform.permissionsProperty) {
+			for (let user of room.members) {
+				if (status[0] == user.status && permission == user.permission) {
+					status[2].push(user);
+				}
+			}
+		}
+	}
+
     if (room.private) {
-        return res.render('chat/people', {room});
+        return res.render('chat/people', {
+            platform, room, statuses,
+            permMap: new Map(concatMatrix([
+                platform.permissionsProperty.slice(1),
+                platform.permissionsDisplay.slice(1)
+            ])),
+            emptyStatuses: concatMatrix([
+                platform.statusesProperty,
+                platform.statusesPlural,
+                multiplyArrays([], platform.statusesProperty.length)
+            ]).reverse()
+        });
     }
     req.flash("error", "Public rooms are open to all users");
     return res.redirect("back");
 }
 
 controller.editRoom = async function(req, res) {
+    const platform = await platformSetup();
     const room = await Room.findById(req.params.id);
     if (!room) {
         req.flash('error', "Unable to find room");
@@ -110,7 +145,7 @@ controller.editRoom = async function(req, res) {
         req.flash('error', 'An Error Occurred');
         return res.redirect('back');
     }
-    return res.render('chat/edit', {users, room});
+    return res.render('chat/edit', {platform, users, room});
 }
 
 controller.createRoom = async function(req, res) {

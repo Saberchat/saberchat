@@ -4,8 +4,9 @@ const {sendGridEmail} = require("../services/sendGrid");
 const convertToLink = require("../utils/convert-to-link");
 const keywordFilter = require('../utils/keywordFilter');
 const {sortByPopularity} = require("../utils/popularity");
-const {removeIfIncluded} = require('../utils/object-operations');
+const {removeIfIncluded, concatMatrix} = require('../utils/object-operations');
 const {cloudUpload, cloudDelete} = require('../services/cloudinary');
+const platformSetup = require("../platform");
 
 //SCHEMA
 const User = require('../models/user');
@@ -16,6 +17,7 @@ const PostComment = require('../models/postComment');
 const controller = {};
 
 controller.index = async function(req, res) {
+    const platform = await platformSetup();
     const projects = await Project.find({})
         .populate('creators')
         .populate('poster')
@@ -31,31 +33,37 @@ controller.index = async function(req, res) {
             fileExtensions.set(media.url, path.extname(media.url.split("SaberChat/")[1]));
         }
     }
-    return res.render('projects/index', {projects, fileExtensions});
+    return res.render('projects/index', {platform, projects, fileExtensions});
 }
 
 
 controller.newProject = async function(req, res) {
+    const platform = await platformSetup();
     //Find all students
-    const students = await User.find({authenticated: true, status: {$nin: ['alumnus', 'guest', 'parent', 'faculty']}}); 
+    const students = await User.find({authenticated: true, status: {$in: platform.studentStatuses}}); 
     if (!students) {
         req.flash('error', "No Students Found");
         return res.redirect('back');
     }
-    return res.render('projects/new', {students});
+    return res.render('projects/new', {
+        platform, students,
+        statuses: concatMatrix([
+            platform.statusesProperty,
+            platform.statusesPlural
+        ]),
+    });
 }
 
 
 controller.createProject = async function(req, res) {
+    const platform = await platformSetup();
     let creators = [];
     let statusGroup; //Group of creators by status
     let individual; //Individual Creator ID
 
     if (req.body.creatorInput != '') {
-        let statuses = ['7th', '8th', '9th', '10th', '11th', '12th']; //Lists of possible 'creators' that include groups of people
-
         for (let creator of req.body.creatorInput.split(',')) {
-            if (statuses.includes(creator)) { //If the 'creator' is one of the listed status groups
+            if (platform.studentStatuses.includes(creator)) { //If the 'creator' is one of the listed status groups
                 statusGroup = await User.find({authenticated: true, status: creator});  //Search for all users with that status
 
                 if (!statusGroup) {
@@ -166,6 +174,7 @@ controller.createProject = async function(req, res) {
 
 
 controller.editProject = async function(req, res) {
+    const platform = await platformSetup();
     const project = await Project.findById(req.params.id)
         .populate('poster')
         .populate('creators');
@@ -185,7 +194,7 @@ controller.editProject = async function(req, res) {
 
     const students = await User.find({ //Find all students - all of whom are possible project creators
         authenticated: true,
-        status: {$nin: ['alumnus', 'guest', 'parent', 'faculty']}
+        status: {$in: platform.studentStatuses}
     }); 
 
     if (!students) {
@@ -197,10 +206,18 @@ controller.editProject = async function(req, res) {
     for (let media of project.mediaFiles) {
         fileExtensions.set(media.url, path.extname(media.url.split("SaberChat/")[1]));
     }
-    return res.render('projects/edit', {project, students, creatornames, fileExtensions});
+    return res.render('projects/edit', {
+        platform, project, students,
+        creatornames, fileExtensions,
+        statuses: concatMatrix([
+            platform.statusesProperty,
+            platform.statusesPlural
+        ]),
+    });
 }
 
 controller.showProject = async function(req, res) {
+    const platform = await platformSetup();
     let project = await Project.findById(req.params.id)
         .populate('poster')
         .populate('creators')
@@ -221,11 +238,12 @@ controller.showProject = async function(req, res) {
         fileExtensions.set(media.url, path.extname(media.url.split("SaberChat/")[1]));
     }
     const convertedText = convertToLink(project.text);
-    return res.render('projects/show', {project, convertedText, fileExtensions});
+    return res.render('projects/show', {platform, project, convertedText, fileExtensions});
 }
 
 
 controller.updateProject = async function(req, res) {
+    const platform = await platformSetup();
     let creators = [];
     let statusGroup; //Group of creators by status
     let individual; //Individual Creator ID
@@ -234,9 +252,8 @@ controller.updateProject = async function(req, res) {
         creators = [];
 
     } else {
-        let statuses = ['7th', '8th', '9th', '11th', '12th']; //Lists of possible 'creators' that include groups of people
         for (let creator of req.body.creatorInput.split(',')) { //Iterate throguh listed creators
-            if (statuses.includes(creator)) { //If 'creator' is one of the statuses (grades), find all users with that status
+            if (platform.studentStatuses.includes(creator)) { //If 'creator' is one of the statuses (grades), find all users with that status
                 statusGroup = await User.find({authenticated: true, status: creator});
                 if (!statusGroup) {
                     req.flash('error', "Unable to find the users you listed");
@@ -499,6 +516,7 @@ controller.likeComment = async function(req, res) {
 }
 
 controller.data = async function(req, res) {
+    const platform = await platformSetup();
     const projects = await Project.find({poster: req.user._id}).populate("comments");
         if (!projects) {
             req.flash('error', "Unable to find projects");
@@ -528,7 +546,7 @@ controller.data = async function(req, res) {
         //Map keywords from popular projects and their comments
         const projectKeywords = await keywordFilter(popularProjectText, unpopularProjectText);
         const commentKeywords = await keywordFilter(popularCommentText, unpopularCommentText);
-        return res.render('projects/data', {popularProjects: popular, projectKeywords, commentKeywords});
+        return res.render('projects/data', {platform, popularProjects: popular, projectKeywords, commentKeywords});
 }
 
 module.exports = controller;

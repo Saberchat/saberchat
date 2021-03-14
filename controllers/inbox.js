@@ -1,3 +1,4 @@
+//LIBRARIES
 const dateFormat = require('dateformat');
 const Filter = require('bad-words');
 const filter = new Filter();
@@ -5,8 +6,10 @@ const path = require('path');
 const {sendGridEmail} = require("../services/sendGrid");
 const convertToLink = require("../utils/convert-to-link");
 const { cloudUpload } = require('../services/cloudinary');
-const {objectArrIndex, removeIfIncluded, parseKeysOrValues, parsePropertyArray} = require("../utils/object-operations");
+const {objectArrIndex, removeIfIncluded, parseKeysOrValues, parsePropertyArray, concatMatrix} = require("../utils/object-operations");
+const platformSetup = require("../platform");
 
+//SCHEMA
 const User = require('../models/user');
 const Message = require('../models/inbox/message');
 const AccessReq = require('../models/inbox/accessRequest');
@@ -18,6 +21,7 @@ const controller = {};
 
 // Inbox GET index page
 controller.index = async function(req, res) {
+    const platform = await platformSetup();
     await req.user.populate({
             path: 'inbox',
 			populate: {path: 'sender', select: ['username', 'imageUrl']}
@@ -30,11 +34,12 @@ controller.index = async function(req, res) {
 		}).execPopulate();
 
     const activeRequests = req.user.requests.filter((req)=>req.status === "pending"); //Find all access requests for user's rooms that have not been handled
-	return res.render('inbox/index', {inbox: req.user.inbox.reverse(), requests: req.user.requests.reverse(), activeRequests});
+	return res.render('inbox/index', {platform, inbox: req.user.inbox.reverse(), requests: req.user.requests.reverse(), activeRequests});
 };
 
 // Inbox GET show message
 controller.showMsg = async function(req, res) {
+    const platform = await platformSetup();
     const message = await Message.findById(req.params.id);
 	if(!message) {req.flash('error','Cannot find message'); return res.redirect('back');}
 
@@ -64,18 +69,26 @@ controller.showMsg = async function(req, res) {
         fileExtensions.set(media.url, path.extname(media.url.split("SaberChat/")[1]));
     }
     const convertedText = convertToLink(message.text);
-    return res.render('inbox/show', {message: message, convertedText, fileExtensions});
+    return res.render('inbox/show', {platform, message, convertedText, fileExtensions});
 };
 
 // Inbox GET new message form
 controller.newMsgForm = async function(req, res) {
+    const platform = await platformSetup();
     const users = await User.find({authenticated: true});
 	if(!users) { req.flash('error', 'An Error Occurred.'); return res.redirect('back'); }
-	return res.render('inbox/new', {users}); //Render new message form with all users as recipient options
+	return res.render('inbox/new', {
+        platform, users,
+        statuses: concatMatrix([
+            platform.statusesProperty,
+            platform.statusesPlural
+        ]),
+    }); //Render new message form with all users as recipient options
 };
 
 // Inbox GET sent messages
 controller.sent = async function(req, res) {
+    const platform = await platformSetup();
     const messages = await Message.find({});
     if(!messages) { req.flash('error', 'An Error Occurred.'); return res.redirect('back');}
 
@@ -92,11 +105,12 @@ controller.sent = async function(req, res) {
             }
         }
     }
-    return res.render('inbox/index_sent', {inbox: sent_msgs.reverse()});
+    return res.render('inbox/index_sent', {platform, inbox: sent_msgs.reverse()});
 };
 
 // Inbox POST create messsage
 controller.createMsg = async function(req, res) {
+    const platform = await platformSetup();
     let message = { //Build message
         subject: filter.clean(req.body.subject),
         text: filter.clean(req.body.message),
@@ -152,7 +166,7 @@ controller.createMsg = async function(req, res) {
         req.flash('error', 'You cannot send messages to yourself');
         return res.redirect('back');
     } else if(req.body.anonymous == 'true') {
-        const faculty = await User.find({authenticated: true, status: 'faculty', _id: { $in: recipients } });
+        const faculty = await User.find({authenticated: true, status: platform.teacherStatus, _id: { $in: recipients } });
         if(!faculty) {req.flash('error', 'An error occured'); return res.redirect('back');}
         //If message is anonymous without recipients
         if(faculty.length == 0) {req.flash('error', 'You can only select faculty'); return res.redirect('back');}
@@ -162,11 +176,10 @@ controller.createMsg = async function(req, res) {
     }
 
     //If statuses are selected as 'recipients', find corresponding users
-    const statuses = ['7th', '8th', '9th', '10th', '11th', '12th', 'faculty', 'parent', 'alumnus', 'guest'];
     if(req.body.anonymous != 'true' && !message.toEveryone) {
         let selStatuses = [];
-        for (let i = 0; i < statuses.length; i++) {
-            const status = statuses[i];
+        for (let i = 0; i < platform.statusesProperty.length; i++) {
+            const status = platform.statusesProperty[i];
             if(recipients.includes(status)) {
                 selStatuses.push(status);
                 removeIfIncluded(recipients, status);
@@ -357,11 +370,12 @@ controller.delete = async function(req, res) {
 // ACCESS REQUEST ROUTES
 
 controller.showReq = async function(req, res) { //Display access request
+    const platform = await platformSetup();
     const request = await AccessReq.findById(req.params.id)
     .populate({path: 'requester', select: 'username'})
     .populate({path: 'room', select: ['creator', 'name']});
     if(!request) {req.flash('error', 'An Error Occurred.'); return res.redirect('back');}
-    return res.render('inbox/requests/show', {request});
+    return res.render('inbox/requests/show', {platform, request});
 };
 
 controller.acceptReq = async function(req, res) { //Accept access request

@@ -53,42 +53,7 @@
 
                   <li class="list-group-item mode darkmode-outline">
                     <span id="modify-header">Modify Statuses</span>
-                    <!-- <form action="/admin/add-status" method="post" id="add-email-form">
-                      <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#modal" id="delete-button"><i class="fas fa-user"></i> Add Status</button>
-                      <div class="modal fade" id="modal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
-                        <div class="modal-dialog">
-                          <div class="modal-content mode">
-                            <div class="modal-header mode">
-                              <h5 class="modal-title" id="exampleModalLabel">Add Status</h5>
-                              <button type="button" class="close mode" data-dismiss="modal" aria-label="Close">
-                                <span aria-hidden="true">&times;</span>
-                              </button>
-                            </div>
-                            <div class="modal-body mode">
-                              <input class="form-control" type="text" name="status" placeholder="Enter status name (e.g. 'Parent')"/><br />
-                              <input class="form-control" type="text" name="plural" placeholder="Enter status plural form (e.g. 'Parents')"/>
-
-                              <input id="position" type="radio" name="version" value="position"/>
-                              <label id="position-label" for="position">Position (e.g. 'faculty', 'parent', '12th grader')</label>
-
-                              <br />
-                              <input type="radio" name="version" value="role" id="role"/>
-                              <label id="role-label" for="role">Temporary Role (e.g. 'cashier', 'tutor', 'editor')</label>
-                            </div>
-                            <div class="modal-footer mode">
-                              <button type="button" class="btn btn-secondary" data-dismiss="modal">Back</button>
-                              <button type="submit" class="btn btn-primary">Add</button>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    </form> -->
                 </li>
-
-                <% let statusMatrix = [["Faculty", "Faculty", []], ["12th", "Seniors", []], ["11th", "Juniors", []], ["10th", "Sophomores", []], ["9th", "Freshmen", []], ["8th", "8th Graders", []], ["7th", "7th Graders", []], ["Alumnus", "Alumni", []], ["Parent", "Parents", []], ["Guest", "Guests", []]] %>
-                <% let permMatrix = [["principal", "Principal"], ["admin", "Administrator"], ["mod", "Moderator"], ["default", "Default"]]; %>
-                <% let permMap = new Map(permMatrix); %>
-                <% let tagMap = new Map([["Tutor", "warning"], ["Cashier", "success"], ["Editor", "info"]]); %>
 
                 <% for (let status of statusMatrix) { %>
                     <% for (let user of users) { %>
@@ -103,10 +68,10 @@
 
                             <% for (let status of statusMatrix) { %>
                               <% if (user.status.toLowerCase() == status[0].toLowerCase()) { %>
-                                <option value="<%=status[0].toLowerCase()%>" selected><%=status[0]%></option>
+                                <option value="<%=status[0]%>" selected><%=status[1]%></option>
 
                               <% } else { %>
-                                <option value="<%=status[0].toLowerCase()%>"><%=status[0]%></option>
+                                <option value="<%=status[0]%>"><%=status[1]%></option>
                               <% }%>
                             <% } %>
                           </select>
@@ -114,24 +79,16 @@
                             <option value=""></option>
 
                             <% for (let tag of tags) { %>
-
-                              <% if (currentUser.tags.includes(tag)) { %>
-                                <option value="<%=tag%>"><%=tag%></option>
-                              <% } else { %>
-                                <option value="<%=tag%>"><%=tag%></option>
-                              <% }%>
-
+                              <option value="<%=tag%>"><%=tag%></option>
                             <% } %>
                           </select>
 
-                          <span class="badge badge-secondary user-permission%>"><%=permMap.get(user.permission)%></span>
-
                           <% for (let tag of user.tags) { %>
-                            <span class="badge badge-pill badge-<%=tagMap.get(tag)%> tag-<%=user._id%> user-tag"><%=tag%></span>
+                            <span class="badge badge-pill badge-warning tag-<%=user._id%> user-tag"><%=tag%></span>
                           <% } %>
                         </li>
                       <% } %>
-                  <% }; %>
+                  <% } %>
                 <% } %>
 
             </ul>

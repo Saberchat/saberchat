@@ -7,9 +7,9 @@ const convertToLink = require("../utils/convert-to-link");
 const getData = require("../utils/cafe-data");
 const {removeIfIncluded} = require("../utils/object-operations");
 const {cloudUpload, cloudDelete} = require('../services/cloudinary');
+const platformSetup = require("../platform");
 
 //SCHEMA
-const User = require('../models/user');
 const Order = require('../models/cafe/order');
 const Item = require('../models/cafe/orderItem');
 const Notification = require('../models/inbox/message');
@@ -17,10 +17,12 @@ const Category = require('../models/cafe/itemType');
 const Cafe = require('../models/cafe/cafe')
 
 const controller = {};
+
 //-----------GENERAL ROUTES-----------//
 
 //SHOW CAFE HOMEPAGE
 controller.index = async function(req, res) {
+    const platform = await platformSetup();
     const categories = await Category.find({}).populate('items');
     if (!categories) {
         req.flash('error', "Unable to find categories");
@@ -82,7 +84,7 @@ controller.index = async function(req, res) {
             return res.redirect('back');
         }
 
-        return res.render('cafe/newOrder', {categories: sortedCategories, frequentItems});
+        return res.render('cafe/newOrder', {platform, categories: sortedCategories, frequentItems});
     }
 
     if (req.query.menu) { //SHOW MENU
@@ -102,15 +104,16 @@ controller.index = async function(req, res) {
                 }
             }
         }
-        return res.render('cafe/menu', {categories: sortedCategories, itemDescriptions, frequentItems, fileExtensions});
+        return res.render('cafe/menu', {platform, categories: sortedCategories, itemDescriptions, frequentItems, fileExtensions});
     }
-    return res.render('cafe/index', {orders: allOrders});
+    return res.render('cafe/index', {platform, orders: allOrders});
 }
 
 //-----------GENERAL ORDER ROUTES-----------//
 
 //CREATE ORDER
 controller.order = async function(req, res) {
+    const platform = await platformSetup();
     if (!req.body.check) { //If any items are selected
         req.flash('error', "Cannot send empty order"); //If no items were checked
         return res.redirect('back');
@@ -149,7 +152,7 @@ controller.order = async function(req, res) {
 
     if (!req.body.payingInPerson) {
         if (charge > req.user.balance) { //Check to see if you are ordering more than you can
-            req.flash("error", "You do not have enough money in your account to pay for this order. Contact the principal to update your balance.");
+            req.flash("error", `You do not have enough money in your account to pay for this order. Contact the ${platform.permissionsDisplay[platform.permissionsDisplay.length-1]} to update your balance.`);
             return res.redirect('/cafe');
         }
         req.user.balance -= charge;
@@ -324,13 +327,14 @@ controller.deleteOrder = async function(req, res) {
 
 //FORM TO CREATE NEW ITEM
 controller.newItem = async function(req, res) {
+    const platform = await platformSetup();
     const categories = await Category.find({});
     if (!categories) {
         req.flash('error', "An Error Occurred");
         return res.redirect("back");
     }
 
-    return res.render('cafe/newOrderItem', {categories});
+    return res.render('cafe/newOrderItem', {platform, categories});
 }
 
 //CREATE NEW ITEM
@@ -402,6 +406,7 @@ controller.createItem = async function(req, res) {
 
 //VIEW/EDIT ITEM
 controller.viewItem = async function(req, res) {
+    const platform = await platformSetup();
     const item = await Item.findById(req.params.id);
     if (!item) {
         req.flash('error', "Unable to find item");
@@ -419,7 +424,7 @@ controller.viewItem = async function(req, res) {
         fileExtensions.set(item.mediaFile.url, path.extname(item.mediaFile.url.split("SaberChat/")[1]));
     }
 
-    return res.render('cafe/show', {categories, item, fileExtensions});
+    return res.render('cafe/show', {platform, categories, item, fileExtensions});
 }
 
 //UPDATE/UPVOTE ITEM
@@ -500,6 +505,8 @@ controller.manage = async function(req, res) {
     //         req.flash("error", "An Error Occurred");
     //         return res.redirect("back")
     //     }
+    //     data.platform = platform;
+
     //     return res.render("cafe/data", data);
 
     } else { //If route calls to display regular management
@@ -522,12 +529,13 @@ controller.changeStatus = async function(req, res) {
 
 //FORM TO CREATE NEW ITEM CATEGORY
 controller.newCategory = async function(req, res) {
+    const platform = await platformSetup();
     const categories = await Category.find({}).populate('items'); //Collect info on all the items, so that we can give the user the option to add them to that category
     if (!categories) {
         req.flash('error', "Unable to find categories");
         return res.redirect('back');
     }
-    return res.render('cafe/newItemCategory', {categories});
+    return res.render('cafe/newItemCategory', {platform, categories});
 }
 
 //CREATE NEW ITEM CATEGORY
@@ -585,6 +593,7 @@ controller.createCategory = async function(req, res) {
 
 //VIEW/EDIT ITEM CATEGORY
 controller.viewCategory = async function(req, res) {
+    const platform = await platformSetup();
     const category = await Category.findById(req.params.id).populate('items'); //Find the specified category
     if (!category) {
         req.flash('error', "An Error Occurred");
@@ -601,7 +610,7 @@ controller.viewCategory = async function(req, res) {
         req.flash('error', "An Error Occurred");
         return res.redirect('back');
     }
-    return res.render('cafe/editItemCategory', {category, categories});
+    return res.render('cafe/editItemCategory', {platform, category, categories});
 }
 
 //UPDATE ITEM CATEGORY
@@ -809,6 +818,7 @@ controller.updateItemInfo = async function(req, res) {
 }
 
 controller.manageCafe = async function(req, res) {
+    const platform = await platformSetup();
     const categories = await Category.find({}).populate('items'); //Collect info on all the item categories
     if (!categories) {
         req.flash('error', 'An Error Occurred');
@@ -829,16 +839,17 @@ controller.manageCafe = async function(req, res) {
         return res.redirect('back');
     }
 
-    return res.render('cafe/manage', {categories: sortedCategories, open: cafe.open});
+    return res.render('cafe/manage', {platform, categories: sortedCategories, open: cafe.open});
 }
 
 controller.manageOrders = async function(req, res) {
+    const platform = await platformSetup();
     const orders = await Order.find({present: true}).populate('items.item');
     if (!orders) {
         req.flash('error', 'Could not find orders');
         return res.redirect('back');
     }
-    return res.render('cafe/orderDisplay', {orders});
+    return res.render('cafe/orderDisplay', {platform, orders});
 }
 
 module.exports = controller;

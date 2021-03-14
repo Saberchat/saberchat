@@ -11,7 +11,7 @@ const courseSchema = new mongoose.Schema({
         display: {type: Boolean, default: false}
     },
     thumbnail: {
-        url: {type: String, default: "https://alsionschool.org/images/community/gallery/Beach.jpg"},
+        url: {type: String, default: "https://img.freepik.com/free-vector/empty-school-class-background-video-conferences_23-2148715222.jpg?size=626&ext=jpg"},
         display: {type: Boolean, default: true}
     },
     active: {type: Boolean, default: true},
@@ -22,6 +22,7 @@ const courseSchema = new mongoose.Schema({
         tutor: {type: mongoose.Schema.Types.ObjectId, ref: 'User'},
         slots: {type: Number, default: 0},
         available: {type: Boolean, default: true},
+        price: Number,
         bio: String,
         dateJoined: Date,
         students: [{

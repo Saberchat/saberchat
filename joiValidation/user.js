@@ -61,11 +61,8 @@ const updateUserSchema = Joi.object({
     title: Joi.string().allow('').required().max(50).escapeHtml().messages({
         "string.max": "Title max 50 characters."
     }),
-    status: Joi.string().required().valid(
-        '7th', '8th', '9th', '10th', '11th', '12th', 'alumnus', 'guest', 'parent', 'faculty'
-    ).messages({
-        "string.empty": "Status is required.",
-        "any.only": "Invalid status."
+    status: Joi.string().required().messages({
+        "string.empty": "Status is required."
     }),
     tags: Joi.string().allow(''),
     imageUrl: Joi.string().pattern(new RegExp(/https:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,4}\b([-a-zA-Z0-9@:%_\+.~#?&//=]*)/)).required().messages({

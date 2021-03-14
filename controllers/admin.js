@@ -1,3 +1,9 @@
+//LIBRARIES
+const {sendGridEmail} = require("../services/sendGrid");
+const {objectArrIndex, concatMatrix, removeIfIncluded, multiplyArrays} = require("../utils/object-operations");
+const platformSetup = require("../platform");
+
+//SCHEMA
 const Comment = require('../models/chat/comment');
 const User = require("../models/user");
 const Email = require("../models/admin/email");
@@ -12,11 +18,10 @@ const Article = require('../models/wHeights/article');
 const Permission = require('../models/admin/permission');
 const Status = require('../models/admin/status');
 
-const {sendGridEmail} = require("../services/sendGrid");
-const {objectArrIndex} = require("../utils/object-operations");
-const controller = {}; //Controller object
+const controller = {};
 
 controller.moderateGet = async function(req, res) { //Show all reported comments
+    const platform = await platformSetup();
     const comments = await Comment.find({status: 'flagged'})
     .populate({path: 'author', select: ['username', 'imageUrl']})
     .populate({path: 'statusBy', select: ['username', 'imageUrl']})
@@ -26,7 +31,7 @@ controller.moderateGet = async function(req, res) { //Show all reported comments
         req.flash('error', 'An Error Occurred');
         return res.redirect('/admin');
     }
-    return res.render('admin/mod', {comments});
+    return res.render('admin/mod', {platform, comments});
 }
 
 controller.getContext = async function(req, res) { //Get context for reported comment
@@ -89,31 +94,59 @@ controller.deleteComment = async function(req, res) {
 }
 
 controller.permissionsGet = async function(req, res) { //Show page with all users and their permissions
+    const platform = await platformSetup();
     const users = await User.find({authenticated: true});
     if (!users) {
         req.flash('error', 'An Error Occurred');
         return res.redirect('/admin');
     }
-    return res.render('admin/permission', {users});
+    
+    return res.render('admin/permission', {
+        platform,
+        users,
+        statusMatrix: concatMatrix([
+            platform.statusesProperty,
+            platform.statusesPlural
+        ]),
+        permMatrix: concatMatrix([
+            platform.permissionsProperty,
+            platform.permissionsDisplay
+        ]).reverse()
+    });
 }
 
 controller.statusGet = async function(req, res) { //Show page with all users and their statuses
+    const platform = await platformSetup();
     const users = await User.find({authenticated: true});
     if (!users) {
         req.flash('error', 'An Error Occurred');
         return res.redirect('/admin');
     }
-    return res.render('admin/status', {users, tags: ['Cashier', 'Tutor', 'Editor']}); //List of tags that can be added/removed to tutors
+
+    return res.render('admin/status', {
+        platform,
+        users,
+        tags: platform.tags, //List of tags that can be added/removed to tutors
+        statusMatrix: concatMatrix([
+            platform.statusesProperty,
+            platform.statusesSingular
+        ]).reverse(),
+        permMatrix: concatMatrix([
+			platform.permissionsProperty,
+			platform.permissionsDisplay
+		]).reverse()
+    });
 }
 
 controller.permissionsPut = async function (req, res) { //Update a user's permissions
+    const platform = await platformSetup();
     const user = await User.findById(req.body.userId);
     if (!user) {
         return res.json({error: "Error. Could not change"});
     }
 
-    if (req.body.role == 'admin' || req.body.role == "principal") { //Changing a user to administrator or principal requires specific permissions
-        if (req.user.permission == 'principal') { // check if current user is the principal
+    if (platform.permissionsProperty.slice[platform.permissionsProperty.length-2].includes(req.body.role)) { //Changing a user to higher level permissions requires specific permissions
+        if (req.user.permission == platform.permissionsProperty[platform.permissionsProperty.length-1]) { // check if current user is the highest permission
             user.permission = req.body.role;
             await user.save();
             return res.json({success: "Succesfully changed", user});
@@ -123,7 +156,7 @@ controller.permissionsPut = async function (req, res) { //Update a user's permis
         }
     }
 
-    if ((user.permission == "principal" || user.permission == "admin") && req.user.permission != "principal") { //More permission restructions
+    if ((user.permission == platform.permissionsProperty[platform.permissionsProperty.length-1] || user.permission == platform.permissionsProperty[platform.permissionsProperty.length-2]) && req.user.permission != platform.permissionsProperty[platform.permissionsProperty.length-1]) { //More permission restructions
         return res.json({error: "You do not have permissions to do that", user});
     }
 
@@ -133,12 +166,13 @@ controller.permissionsPut = async function (req, res) { //Update a user's permis
 }
 
 controller.statusPut = async function(req, res) { //Update user's status
+    const platform = await platformSetup();
     const user = await User.findById(req.body.userId);
     if (!user) {
         return res.json({error: 'Error. Could not change'});
     }
 
-    if (user.status == "faculty") { //If user is currently teaching a course, they cannot lose their faculty status
+    if (user.status == platform.teacherStatus) { //If user is currently teaching a course, they cannot lose their teacher status
         const courses = await Course.find({});
         if (!courses) {
             return res.json({error: "Error. Could not change", user});
@@ -160,6 +194,7 @@ controller.statusPut = async function(req, res) { //Update user's status
 }
 
 controller.accesslistGet = async function(req, res) { //Show page with all permitted emails
+    const platform = await platformSetup();
     let emails;
     if (req.query.version) { //If user wants a specific email list
         if (["accesslist", "blockedlist"].includes(req.query.version)) {
@@ -184,15 +219,18 @@ controller.accesslistGet = async function(req, res) { //Show page with all permi
 
     if (req.query.version) { //Display list based on specified version
         if (["accesslist", "blockedlist"].includes(req.query.version)) {
-            return res.render('admin/accesslist', {emails, users, version: req.query.version});
+            return res.render('admin/accesslist', {platform, emails, users, version: req.query.version});
         }
     }
-    return res.render('admin/accesslist', {emails, users, version: "accesslist"});
+    return res.render('admin/accesslist', {platform, emails, users, version: "accesslist"});
 }
 
 controller.addEmail = async function (req, res) { //Add email to access list/blocked list
-    if (req.body.version === "accesslist" && req.body.address.split('@')[1] === "alsionschool.org") { //These emails are already verified
-        return res.json({error: "Alsion emails do not need to be added to the Access List"});
+    const platform = await platformSetup();
+    if (req.body.version === "accesslist") {
+        if (platform.emailExtension && req.body.address.split('@')[1] === platform.emailExtension) { //These emails are already verified
+            return res.json({error: `${platform.name} emails do not need to be added to the Access List`});
+        }
     }
 
     const overlap = await Email.findOne({address: req.body.address});
@@ -554,12 +592,13 @@ controller.permanentDelete = async function(req, res) {
 }
 
 controller.viewBalances = async function(req, res) {
+    const platform = await platformSetup();
     const users = await User.find({authenticated: true});
     if (!users) {
         req.flash('error', 'Could not find users');
         return res.redirect('back');
     }
-    return res.render('admin/balances.ejs', {users});
+    return res.render('admin/balances.ejs', {platform, users});
 }
 
 controller.updateBalances = async function(req, res) {

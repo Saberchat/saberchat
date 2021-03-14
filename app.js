@@ -3,7 +3,7 @@ if (process.env.NODE_ENV !== "production") {
     require('dotenv').config();
 }
 
-//Require NodeJS modules
+//NODE.JS MODULES
 //set up and start the express server
 const express = require('express');
 const app = express();
@@ -24,14 +24,12 @@ const dateFormat = require('dateformat');
 const helmet = require('helmet');
 // prevents MongoDB Operator Injection
 const mongoSanitize = require('express-mongo-sanitize');
-
-const {scriptUrls, styleUrls} = require('./srcUrls');
-// const heic2any = require("heic2any");
-
-// pretty up the console
-// const colors = require('colors');
 // add favicon
 const favicon = require('serve-favicon');
+//Source URLs for data security
+const {scriptUrls, styleUrls} = require('./srcUrls');
+//Platform data
+const platformSetup = require("./platform");
 
 // profanity filter
 const Filter = require('bad-words');
@@ -41,8 +39,8 @@ const filter = new Filter();
 const schedule = require('node-schedule');
 
 // require the models for database actions
-const Comment = require('./models/chat/comment');
 const User = require("./models/user");
+const Comment = require('./models/chat/comment');
 const Order = require('./models/cafe/order');
 const Item = require('./models/cafe/orderItem');
 const Cafe = require('./models/cafe/cafe');
@@ -93,11 +91,7 @@ app.use(helmet.contentSecurityPolicy({ // customizations for helmet content secu
         mediaSrc: ["'self'", "https://res.cloudinary.com"],
         workerSrc: ["'self'", "blob:"],
         objectSrc: [],
-        imgSrc: [
-            "https:",
-            "blob:",
-            "data:"
-        ],
+        imgSrc: ["'self'", "https:", "blob:", "data:"],
         fontSrc: ["'self'", "https://ka-f.fontawesome.com/"]
     }
 }));
@@ -108,11 +102,6 @@ app.use(helmet.referrerPolicy({ // customizations for helmet referrer policy
 
 const session = require('express-session'); // Sets up express session for authorization
 const MemoryStore = require('memorystore')(session); // Memorystore package (express-session has memory leaks, bad for production)
-// app.use(require("express-session")({
-// 	secret: "Programming For Alsion Is Cool", // Secret used to encrypt the information
-// 	resave: false,
-// 	saveUninitialized: false
-// }));
 const sessionConfig = {
     name: 'app-ses',
     cookie: {
@@ -196,30 +185,26 @@ const getRandMessage = (list => {
 // 	});
 // });
 
-// Update all students' statuses on July 1st at midnight
-
-// const updateUsers = schedule.scheduleJob('0 0 0 1 7 *', () => {
-
-//   let statuses = ['7th', '8th', '9th', '10th', '11th', '12th', 'alumnus'];
-
-//   User.find({authenticated: true, status: {$in: statuses.slice(0, statuses.length-1)}}, (err, users) => { //Do not include CURRENT alumni in the people who will be updated, only 7th-12th graders
-//     if (err || !users) {
-//       console.log(err);
-
-//     } else {
-//       for (let user of users) {
-//         user.status = statuses[statuses.indexOf(user.status)+1];
-//         user.save();
-//       }
-//     }
-//   });
-// });
+// Update all students' statuses on update date, if required
+const updateStatuses = async function() {
+    const platform = await platformSetup();
+    if (platform.updateTime) {
+        await schedule.scheduleJob(platform.updateTime, async() => {
+            const statuses = platform.studentStatuses.concat(platform.formerStudentStatus);
+            const users = await User.find({authenticated: true, status: {$in: platform.studentStatuses}});
+            if (!users) { return console.log(err);}  
+            for (let user of users) {
+                user.status = statuses[statuses.indexOf(user.status)+1];
+                await user.save();
+            }
+        });
+    }
+}().catch(err => {
+    console.log(err);
+});
 
 // Socket.io server-side code
 io.on('connect', (socket) => {
-    // console.log("A user connected".cyan);
-    // socket.on('disconnect', () => {
-    // console.log("A user disconnected".cyan);
 
     // When 'switch room' event is detected, leave old room and join 'newroom';
     socket.on('switch room', (newroom) => {

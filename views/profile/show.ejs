@@ -48,27 +48,21 @@
                 <span><%= user.title %></span>
 
                 <h4 id="role">Role</h4>
-                <% permMatrix = [["principal", "Principal"], ["admin", "Administrator"], ["mod", "Moderator"], ["default", "Default"]] %>
-
-                <% for (let perm of permMatrix) { %>
-                    <% if (user.permission.toLowerCase() == perm[0].toLowerCase()) { %>
-                        <p><%= perm[1] %></p>
-                    <% } %>
-                <% } %>
+                <p><%= perms.get(user.permission) %></p>
 
                 <h4 id="status">Status</h4>
-                <p><%= user.status.charAt(0).toUpperCase() + user.status.slice(1) %></p>
+                <p><%= statuses.get(user.status) %></p>
 
                 <h4 id="email">Email</h4>
                 <p class="embedded-link"><a href="mailto:<%= user.email %>"><%= user.email %></a></p>
 
                 <% if (currentUser._id.toString() == user._id.toString()) { %>
-                    <button class="btn btn-primary edit-button" id="edit-profile"><a class="edit-button-text"
-                                                                                     href="/profiles/edit">Edit Profile
-                            Settings</a></button>
-                    <button class="btn btn-info edit-button" id="edit-account"><a class="edit-button-text"
-                                                                                  href="/profiles/change-login-info">Edit
-                            Account Settings</a></button>
+                    <button class="btn btn-primary edit-button" id="edit-profile">
+						<a class="edit-button-text" href="/profiles/edit">Edit Profile Settings</a>
+					</button>
+					<button class="btn btn-info edit-button" id="edit-account">
+						<a class="edit-button-text" href="/profiles/change-login-info">Edit Account Settings</a>
+					</button>
 
                 <% } else { %>
                     <div id="follow-div-<%= user.id %>">
