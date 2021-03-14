@@ -8,8 +8,11 @@ const router = express.Router(); //Router
 
 //GENERAL ROUTES
 router.route('/')
-    .get(wrapAsync(middleware.isLoggedIn), wrapAsync(middleware.cafeOpen), wrapAsync(cafe.index)) //View homepage, view menu or view new order form
+    .get(wrapAsync(middleware.isLoggedIn), wrapAsync(cafe.index)) //View homepage
     .post(wrapAsync(middleware.isLoggedIn), wrapAsync(middleware.cafeOpen), wrapAsync(cafe.order)); //Create new order
+
+//View menu or view new order form
+router.get('/order', wrapAsync(middleware.isLoggedIn), wrapAsync(middleware.cafeOpen), wrapAsync(cafe.orderForm));
 
 //SPECIFIC ORDER ROUTES
 router.route('/order/:id')

@@ -23,6 +23,17 @@ const controller = {};
 //SHOW CAFE HOMEPAGE
 controller.index = async function(req, res) {
     const platform = await platformSetup();
+    const orders = await Order.find({customer: req.user._id}).populate('items.item'); //Find all of the orders that you have ordered, and populate info on their items
+    if (!orders) {
+        req.flash('error', "Unable to find orders");
+        return res.redirect('back');
+    }
+
+    return res.render('cafe/index', {platform, orders});
+}
+
+controller.orderForm = async function(req, res) {
+    const platform = await platformSetup();
     const categories = await Category.find({}).populate('items');
     if (!categories) {
         req.flash('error', "Unable to find categories");
@@ -106,7 +117,6 @@ controller.index = async function(req, res) {
         }
         return res.render('cafe/menu', {platform, categories: sortedCategories, itemDescriptions, frequentItems, fileExtensions});
     }
-    return res.render('cafe/index', {platform, orders: allOrders});
 }
 
 //-----------GENERAL ORDER ROUTES-----------//
