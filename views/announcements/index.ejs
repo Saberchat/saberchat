@@ -71,31 +71,34 @@
                     <div class="block-header grey">
                         <h5>
 
-                            <a class="announcement-button" href="/announcements/<%= announcement._id %>">
-                                <span class="announcement-subject-header"><%= announcement.subject %></span>
-
-                                <% if (currentUser) { %>
-                                    <% let index = -1 %>
-                                    <% for (let i = 0; i < currentUser.annCount.length; i += 1) { %>
-                                        <% if (currentUser.annCount[i].announcement.toString() == announcement._id.toString()) { %>
-                                            <% index = i; %>
+                            <% if (currentUser) { %>
+                                <a class="announcement-button" href="/announcements/<%= announcement._id %>">
+                                    <span class="announcement-subject-header"><%= announcement.subject %></span>
+                                        <% let index = -1 %>
+                                        <% for (let i = 0; i < currentUser.annCount.length; i += 1) { %>
+                                            <% if (currentUser.annCount[i].announcement.toString() == announcement._id.toString()) { %>
+                                                <% index = i; %>
+                                            <% } %>
                                         <% } %>
-                                    <% } %>
 
-                                    <% if (index != -1) { %>
-                                        <% if (currentUser.annCount[index].version == "new") { %>
-                                            <span class="badge badge-pill badge-danger announcement-button">New!</span>
-                                        <% } else if (currentUser.annCount[index].version == "updated") { %>
-                                            <span class="badge badge-pill badge-info announcement-button">Updated!</span>
+                                        <% if (index != -1) { %>
+                                            <% if (currentUser.annCount[index].version == "new") { %>
+                                                <span class="badge badge-pill badge-danger announcement-button">New!</span>
+                                            <% } else if (currentUser.annCount[index].version == "updated") { %>
+                                                <span class="badge badge-pill badge-info announcement-button">Updated!</span>
+                                            <% } %>
                                         <% } %>
-                                    <% } %>
 
-                                    <% if (index != -1) { %>
-                                        <a href="/announcements/mark/<%= announcement._id %>"><span
-                                                    class="badge badge-pill badge-success announcement-button">Mark As Read</span></a>
-                                    <% } %>
+                                        <% if (index != -1) { %>
+                                            <a href="/announcements/mark/<%= announcement._id %>"><span
+                                                        class="badge badge-pill badge-success announcement-button">Mark As Read</span></a>
+                                        <% } %>
+                                    </a>
+                                <% } else { %>
+                                    <span class="announcement-button">
+                                        <span class="announcement-subject-header"><%= announcement.subject %></span>
+                                    </span>
                                 <% } %>
-                            </a>
                             <span class="float-right announcement-date"><%= announcement.date %></span>
                         </h5>
 
@@ -183,8 +186,7 @@
 
                     <div class="block-content mode">
                         <% if (announcement.text.split(" ").length > 30) { %>
-                            <p class="announcement-text"><%= announcement.text.split(" ").slice(0, 31).join(" ") %> <a
-                                        href="/announcements/<%= announcement._id %>">(Read More)</a></p>
+                            <p class="announcement-text"><%= announcement.text.split(" ").slice(0, 31).join(" ") %> <% if (currentUser) { %><a href="/announcements/<%= announcement._id %>">(Read More)</a><% } else { %><a href="/">(Create Account To Read More)</a><% } %></p>
                         <% } else { %>
                             <p class="announcement-text"><%= announcement.text %></p>
                         <% } %>

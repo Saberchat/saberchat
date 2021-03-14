@@ -22,6 +22,16 @@ middleware.isLoggedIn = async function(req, res, next) {
     return res.redirect('/');
 }
 
+//For platform's individual (private) features, that only certain platforms have access to
+middleware.accessToFeature = async function(req, res, next) {
+    const platform = await platformSetup();
+    if (objectArrIndex(platform.features, "route", req.baseUrl.slice(1)) > -1) {
+        return next();
+    }
+    req.flash('error', 'You do not have permission to view that');
+    return res.redirect('back');
+}
+
 //checks if user is allowed into room
 middleware.checkIfMember = async function(req, res, next) {
     const room = await Room.findById(req.params.id);
