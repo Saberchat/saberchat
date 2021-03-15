@@ -47,7 +47,7 @@
     "passport.socketio": "^3.7.0",
     "sanitize-html": "^2.3.0",
     "serve-favicon": "^2.5.0",
-    "socket.io": "^2.3.0"
+    "socket.io": "^2.4.0"
   },
   "devDependencies": {
     "dotenv": "^8.2.0",
