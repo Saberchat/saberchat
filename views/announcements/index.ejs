@@ -187,15 +187,15 @@
                     <div class="block-content mode">
                         <% if (currentUser) { %>
                             <% if (announcement.text.split(" ").length > 70) { %>
-                                <p class="announcement-text"><%= announcement.text.split(" ").slice(0, 71).join(" ") %> <a href="/announcements/<%= announcement._id %>">(Read More)</a></p>
+                                <p class="announcement-text convertible-text"><%= announcementTexts.get(announcement._id).split(" ").slice(0, 71).join(" ") %> <a href="/announcements/<%= announcement._id %>">(Read More)</a></p>
                             <% } else { %>
-                                <p class="announcement-text"><%= announcement.text %></p>
+                                <p class="announcement-text convertible-text"><%= announcementTexts.get(announcement._id) %></p>
                             <% } %>
                         <% } else { %>
                             <% if (announcement.text.split(" ").length > 70) { %>
-                                <p class="announcement-text"><%= announcementTexts.get(announcement._id).split(" ").slice(0, 71).join(" ") %><a href="/">(Create Account To Read More)</a></p>
+                                <p class="announcement-text convertible-text"><%= announcementTexts.get(announcement._id).split(" ").slice(0, 71).join(" ") %><a href="/">(Create Account To Read More)</a></p>
                             <% } else { %>
-                                <p class="announcement-text"><%= announcementTexts.get(announcement._id) %></p>
+                                <p class="announcement-text convertible-text"><%= announcementTexts.get(announcement._id) %></p>
                             <% } %>
                         <% } %>
 
@@ -206,6 +206,7 @@
         <br class="text-break" id="break-<%= announcement._id %>"/>
 
     <% }) %>
+    <script src="/javascript/embed.js"></script>
 </div>
 </body>
 </html>

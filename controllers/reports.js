@@ -1,5 +1,5 @@
 //LIBRARIES
-const convertToLink = require("../utils/convert-to-link");
+const {convertToLink} = require("../utils/convert-to-link");
 const dateFormat = require('dateformat');
 const {removeIfIncluded} = require("../utils/object-operations");
 const platformSetup = require("../platform");

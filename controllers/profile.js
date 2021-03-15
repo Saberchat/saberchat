@@ -1,6 +1,6 @@
 //LIBRARIES
 const {sendGridEmail} = require("../services/sendGrid");
-const convertToLink = require("../utils/convert-to-link");
+const {convertToLink} = require("../utils/convert-to-link");
 const Filter = require('bad-words');
 const filter = new Filter();
 const axios = require('axios');

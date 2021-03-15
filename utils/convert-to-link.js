@@ -1,4 +1,6 @@
-module.exports = function(text) {
+const package = {};
+
+package.convertToLink = function(text) { //Convert text to contain embedded links
     const delimeter = new RegExp(/[\"\'\r]/, 'g'); //Regex for most troublesome link characters
     const alpha = new RegExp(/[a-z]/, 'g')
     let deformatted = []; //Holds words/links from text
@@ -76,3 +78,42 @@ module.exports = function(text) {
     }
     return convertedText;
 }
+
+package.embedLink = function(user, objects, hide) {
+    let objectTexts = new Map(); //For users without accounts to see - replace names in text with initials
+    let filteredText = "";
+    let containedName;
+    let containedInitial;
+    for (let object of objects) { //Iterate through all objects and encode their text
+        filteredText = "";
+        if (!user) {
+            containedName = "";
+            containedInitial = "";
+            for (let word of object.text.split(' ')) { //Iterate through each word and search for names
+                containedName = "";
+                containedInitial = "";
+                for (let name of hide) { //Iterate through each name
+                    if (word.toLowerCase().includes(name)) {
+                        containedName = name; //Track the name that appears
+                        containedInitial = `${containedName.charAt(0).toUpperCase()}`; //Encode the name as its initial
+                        if (word.charAt(word.length-1) != '.') { //If word does not end with period, add one for end initial
+                            containedInitial += '.';
+                        }
+                    }
+                }
+                if (containedName != '') { //If a name has been found, add processed version to text
+                    filteredText += `${word.toLowerCase().split(containedName).join(containedInitial)} `;
+                } else {
+                    filteredText += `${word} `;
+                }
+            }
+            filteredText = package.convertToLink(filteredText);
+        } else {
+            filteredText = package.convertToLink(object.text);
+        }   
+        objectTexts.set(object._id, filteredText); //Add object to map
+    }
+    return objectTexts;
+}
+
+module.exports = package;

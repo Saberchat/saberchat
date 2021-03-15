@@ -646,8 +646,14 @@ controller.markLesson = async function(req, res) {
     //Find specific tutor and add lesson for their student
     for (let tutor of course.tutors) {
         if (tutor.tutor.equals(req.user._id)) {
+            req.user.balance += (tutor.price * time); //Pay tutor
+            await req.user.save();
+
             for (let student of tutor.students) {
                 if (student.student.equals(req.body.studentId)) {
+                    student.student.balance += (tutor.price * time); //Remove money from student
+                    await student.student.save();
+
                     student.lessons.push({
                         time: req.body.time,
                         date: dateFormat(new Date(), "mmm d"),
