@@ -185,10 +185,18 @@
                     </div>
 
                     <div class="block-content mode">
-                        <% if (announcement.text.split(" ").length > 30) { %>
-                            <p class="announcement-text"><%= announcement.text.split(" ").slice(0, 31).join(" ") %> <% if (currentUser) { %><a href="/announcements/<%= announcement._id %>">(Read More)</a><% } else { %><a href="/">(Create Account To Read More)</a><% } %></p>
+                        <% if (currentUser) { %>
+                            <% if (announcement.text.split(" ").length > 70) { %>
+                                <p class="announcement-text"><%= announcement.text.split(" ").slice(0, 71).join(" ") %> <a href="/announcements/<%= announcement._id %>">(Read More)</a></p>
+                            <% } else { %>
+                                <p class="announcement-text"><%= announcement.text %></p>
+                            <% } %>
                         <% } else { %>
-                            <p class="announcement-text"><%= announcement.text %></p>
+                            <% if (announcement.text.split(" ").length > 70) { %>
+                                <p class="announcement-text"><%= announcementTexts.get(announcement._id).split(" ").slice(0, 71).join(" ") %><a href="/">(Create Account To Read More)</a></p>
+                            <% } else { %>
+                                <p class="announcement-text"><%= announcementTexts.get(announcement._id) %></p>
+                            <% } %>
                         <% } %>
 
                     </div>

@@ -114,6 +114,7 @@ controller.show = async function(req, res) {
 }
 
 controller.update = async function(req, res) {
+	const platform = await platformSetup();
 		const overlap = await User.find({
 				authenticated: true,
 				username: filter.clean(req.body.username),
@@ -129,7 +130,7 @@ controller.update = async function(req, res) {
 		}
 
 		let status;
-		if (req.body.status == '') { //If no new status is selected, keep the current user's status
+		if (req.body.status == '' || !platform.statusesProperty.includes(req.body.status)) { //If no new status is selected, keep the current user's status
 				status = req.user.status;
 		} else { //If a new status is selected, move to that
 				status = req.body.status;

@@ -4,7 +4,7 @@ const {sendGridEmail} = require("../services/sendGrid");
 const convertToLink = require("../utils/convert-to-link");
 const keywordFilter = require('../utils/keywordFilter');
 const {sortByPopularity} = require("../utils/popularity");
-const {removeIfIncluded, concatMatrix} = require('../utils/object-operations');
+const {removeIfIncluded, parsePropertyArray, concatMatrix} = require('../utils/object-operations');
 const {cloudUpload, cloudDelete} = require('../services/cloudinary');
 const platformSetup = require("../platform");
 
@@ -18,12 +18,49 @@ const controller = {};
 
 controller.index = async function(req, res) {
     const platform = await platformSetup();
+    const users = await User.find({});
+    if (!users) {
+        req.flash('error', 'An Error Occurred');
+        return res.redirect('back');
+    }
+
     const projects = await Project.find({})
         .populate('creators')
         .populate('poster')
     if (!projects) {
         req.flash('error', 'An Error Occurred');
         return res.redirect('back');
+    }
+
+    let projectTexts = new Map(); //For users without accounts to see - replace names in text with initials
+    //Extract all users
+    const userNames = await parsePropertyArray(users, "firstName").join(',').toLowerCase().split(',');
+    let filteredText = "";
+    let containedName;
+    let containedInitial;
+    for (let project of projects) { //Iterate through all projects and encode their text
+        filteredText = "";
+        containedName = "";
+        containedInitial = "";
+        for (let word of project.text.split(' ')) { //Iterate through each word and search for names
+            containedName = "";
+            containedInitial = "";
+            for (let name of userNames) { //Iterate through each name
+                if (word.toLowerCase().includes(name)) {
+                    containedName = name; //Track the name that appears
+                    containedInitial = `${containedName.charAt(0).toUpperCase()}`; //Encode the name as its initial
+                    if (word.charAt(word.length-1) != '.') { //If word does not end with period, add one for end initial
+                        containedInitial += '.';
+                    }
+                }
+            }
+            if (containedName != '') { //If a name has been found, add processed version to text
+                filteredText += `${word.toLowerCase().split(containedName).join(containedInitial)} `;
+            } else {
+                filteredText += `${word} `;
+            }
+        }
+        projectTexts.set(project._id, filteredText); //Add project to map
     }
 
     //List of media with corresponding file extensions, so they can be displayed properly
@@ -33,7 +70,7 @@ controller.index = async function(req, res) {
             fileExtensions.set(media.url, path.extname(media.url.split("SaberChat/")[1]));
         }
     }
-    return res.render('projects/index', {platform, projects, fileExtensions});
+    return res.render('projects/index', {platform, projects, fileExtensions, projectTexts});
 }
 
 

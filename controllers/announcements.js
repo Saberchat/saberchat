@@ -1,7 +1,7 @@
 //LIBRARIES
 const {sendGridEmail} = require("../services/sendGrid");
 const convertToLink = require("../utils/convert-to-link");
-const {objectArrIndex, removeIfIncluded} = require("../utils/object-operations");
+const {objectArrIndex, removeIfIncluded, parsePropertyArray} = require("../utils/object-operations");
 const platformSetup = require("../platform");
 const path = require('path');
 const dateFormat = require('dateformat');
@@ -18,12 +18,50 @@ const controller = {};
 // Ann GET index
 controller.index = async function(req, res) {
     const platform = await platformSetup();
+    const users = await User.find({});
+    if (!users) {
+        req.flash('error', 'An Error Occurred');
+        return res.redirect('back');
+    }
+
     const announcements = await Announcement.find({}).populate('sender');
     if(!announcements) {
         req.flash('error', 'Cannot find announcements.');
         return res.redirect('back');
     }
-    return res.render('announcements/index', {platform, announcements: announcements.reverse()});
+
+    let announcementTexts = new Map(); //For users without accounts to see - replace names in text with initials
+    //Extract all users
+    const userNames = await parsePropertyArray(users, "firstName").join(',').toLowerCase().split(',');
+    let filteredText = "";
+    let containedName;
+    let containedInitial;
+    for (let announcement of announcements) { //Iterate through all announcements and encode their text
+        filteredText = "";
+        containedName = "";
+        containedInitial = "";
+        for (let word of announcement.text.split(' ')) { //Iterate through each word and search for names
+            containedName = "";
+            containedInitial = "";
+            for (let name of userNames) { //Iterate through each name
+                if (word.toLowerCase().includes(name)) {
+                    containedName = name; //Track the name that appears
+                    containedInitial = `${containedName.charAt(0).toUpperCase()}`; //Encode the name as its initial
+                    if (word.charAt(word.length-1) != '.') { //If word does not end with period, add one for end initial
+                        containedInitial += '.';
+                    }
+                }
+            }
+            if (containedName != '') { //If a name has been found, add processed version to text
+                filteredText += `${word.toLowerCase().split(containedName).join(containedInitial)} `;
+            } else {
+                filteredText += `${word} `;
+            }
+        }
+        announcementTexts.set(announcement._id, filteredText); //Add announcement to map
+    }
+
+    return res.render('announcements/index', {platform, announcements: announcements.reverse(), announcementTexts});
 };
 
 // Ann GET new ann

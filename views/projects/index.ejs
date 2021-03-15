@@ -244,10 +244,18 @@
 
                             <br/><br/>
 
-                            <% if (project.text.split(" ").length > 70) { %>
-                                <p class="project-description"><%= project.text.split(" ").slice(0, 71).join(" ") %> <% if (currentUser) { %><a href="/projects/<%= project._id %>">(Read More)</a><% } else { %><a href="/">(Create Account To Read More)</a><% } %></p>
+                            <% if (currentUser) { %>
+                                <% if (project.text.split(" ").length > 70) { %>
+                                    <p class="project-description"><%= project.text.split(" ").slice(0, 71).join(" ") %> <a href="/projects/<%= project._id %>">(Read More)</a></p>
+                                <% } else { %>
+                                    <p class="project-description"><%= project.text %></p>
+                                <% } %>
                             <% } else { %>
-                                <p class="project-description"><%= project.text %></p>
+                                <% if (project.text.split(" ").length > 70) { %>
+                                    <p class="project-description"><%= projectTexts.get(project._id).split(" ").slice(0, 71).join(" ") %><a href="/">(Create Account To Read More)</a></p>
+                                <% } else { %>
+                                    <p class="project-description"><%= projectTexts.get(project._id) %></p>
+                                <% } %>
                             <% } %>
 
                             </div>
