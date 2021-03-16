@@ -18,14 +18,14 @@ router.get('/new', wrapAsync(middleware.isLoggedIn), middleware.isMod, wrapAsync
 router.get('/mark-all', wrapAsync(middleware.isLoggedIn), wrapAsync(announcements.markAll)); //Mark all announcements as read
 router.get('/mark/:id', wrapAsync(middleware.isLoggedIn), wrapAsync(announcements.markOne)); //Mark specific announcement as read
 
-router.put('/like', wrapAsync(middleware.isLoggedIn), wrapAsync(announcements.likeAnn)); //Like announcement
+router.put('/like', wrapAsync(middleware.isLoggedIn), wrapAsync(announcements.likeAnnouncement)); //Like announcement
 router.put('/like-comment', wrapAsync(middleware.isLoggedIn), wrapAsync(announcements.likeComment)); //Comment on announcement
 router.put('/comment', wrapAsync(middleware.isLoggedIn), wrapAsync(announcements.comment)); //Like a comment on announcement
 
 router.route('/:id')
     .get(wrapAsync(middleware.isLoggedIn), wrapAsync(announcements.show)) //Show specific announcement
-    .put(wrapAsync(middleware.isLoggedIn), middleware.isMod, multipleUpload, wrapAsync(announcements.updateAnn)) //Update specific announcement
-    .delete(wrapAsync(middleware.isLoggedIn), middleware.isMod, wrapAsync(announcements.deleteAnn)); //Delete specific announcement
+    .put(wrapAsync(middleware.isLoggedIn), middleware.isMod, multipleUpload, wrapAsync(announcements.updateAnnouncement)) //Update specific announcement
+    .delete(wrapAsync(middleware.isLoggedIn), middleware.isMod, wrapAsync(announcements.deleteAnnouncement)); //Delete specific announcement
 
 router.get('/:id/edit', wrapAsync(middleware.isLoggedIn), middleware.isMod, wrapAsync(announcements.updateForm)); //Form to edit specific announcement
 

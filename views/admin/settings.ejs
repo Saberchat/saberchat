@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Saberchat</title>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css">
+        <link rel="stylesheet" href="/stylesheets/main.css">
+        <!-- link css for navbar. Don't need to include public/javascript/userForm.js since user is already logged in and does not need to access login and register forms.  -->
+        <link rel="stylesheet" href="/stylesheets/components/header.css">
+        <link rel="stylesheet" href="/stylesheets/components/navbar.css">
+        <link rel="stylesheet" href="/stylesheets/home/index.css">
+        <link rel="stylesheet" href="/stylesheets/homework/show.css">
+        <link rel="stylesheet" href="/stylesheets/cafe/menu.css">
+        <link rel="stylesheet" href="/stylesheets/announcements/form.css">
+        <%if (currentUser) {%>
+        <%if (currentUser.darkmode) { %>
+            <link rel="stylesheet" href="/stylesheets/darkmode.css">
+            <link rel="stylesheet" href="/stylesheets/homework/homework-dark.css">
+        <%}%>
+        <%}%>
+
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js"></script>
+
+        <script src="/javascript/admin/settings.js"></script>
+
+        <!-- I'm using my fontawesome kit -->
+        <script src="https://kit.fontawesome.com/dccc745c41.js" crossorigin="anonymous"></script>
+        <!-- include the navbar via ejs -->
+        <%- include('../partials/navbar') %>
+        <%- include('../partials/header') %>
+        <%- include('../partials/analytics') %>
+    </head>
+    <body class="mode">
+
+        <div class="container mt-5">
+            <div class="header-section">
+                <div class="row">
+                    <div class="col-12">
+                        <div class="jumbotron text-center" id="course-thumbnail"
+                            style="background-image: url('<%=platform.imageUrl%>');">
+                            <h1 id="courseName"><%= platform.name %> Saberchat</h1>
+                            <h5 id="courseInfo">Edit Platform Settings</h5>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            </ul>
+
+            <div class="row settings">
+                <div class="col-12">
+                    <form id="update-settings" action="/admin/settings?_method=put" method="post">
+                        <h4>Main Information</h4>
+                        <div class="form-group">
+                            <label for="newName">Name</label>
+                            <input id="newName" class="form-control mode" type="text" name="name" value="<%= platform.name %>"
+                                    placeholder="Enter Course Name" oninput="changeName(this)" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="thumbnail-input">Image Url</label><br/>
+                            <input id="thumbnail-input" class="form-control mode" type="text" oninput="changeThumbnail(this)"
+                                    name="imageUrl" value="<%= platform.imageUrl %>" placeholder="Enter Image Url">
+                        </div>
+                        <div class="form-group">
+                            <label for="email-input">Required Email Extension (if left blank, none will be applied)</label><br/>
+                            <input id="email-input" class="form-control mode" type="text"
+                                    name="emailExtension" value="<%= platform.emailExtension %>" placeholder="Enter Required Email Extension">
+                        </div>
+                        <div class="form-group">
+                            <label for="update-time-input">Student Status Update Time (s m h d m w)</label><br/>
+                            <input id="update-time-input" class="form-control mode" type="text"
+                                    name="updateTime" value="<%= platform.updateTime %>" placeholder="Enter Student Status Update Time (s m h d m w)">
+                        </div><br>
+                        <h4>Displayed Information</h4>
+                        <div class="form-group">
+                            <label for="contact-heading">Contact Information Heading</label>
+                            <input id="contact-heading" class="form-control mode" type="text" name="contactHeading" value="<%= platform.contact.heading %>" placeholder="Enter Contact Info Heading" required><br>
+                            <label for="contact-info">Contact Information Blurb</label>
+                            <textarea id="contact-info" rows="5" class="form-control mode" name="contactInfo" placeholder="Enter contact information blurb"><%=platform.contact.description%></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label for="community-info">Platform Community Information</label>
+                            <textarea id="community-info" rows="5" class="form-control mode" name="community" placeholder="Enter contact information blurb"><% for (let para of platform.community) { %><%=para%>&#013;&#010;<% } %></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label for="service-info">Platform Services</label>
+                            <textarea id="service-info" rows="5" class="form-control mode" name="services" placeholder="Enter services, separated by page breaks"><% for (let service of platform.services) { %><%=service%>&#013;&#010;<% } %></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label >Platform Display Images</label>
+                            <div id="image-block">
+                                <% for( let i = 0; i < platform.displayImages.length; i++ ) { %>
+                                    <div class="image-group">
+                                        <div class="input-container" id="display-<%= platform.displayImages.length - (i + 1) %>">
+                                            <input type="text" class="form-control mode"
+                                                   oninput="createImage(this, 'displayimage-<%= platform.displayImages.length - (i + 1) %>')" placeholder="Url..."
+                                                   name="displayImages[<%= platform.displayImages.length - (i + 1) %>]" required
+                                                   value="<%= platform.displayImages[i] %>">
+                                            <img id="displayimage-<%= platform.displayImages.length - (i + 1) %>"
+                                                 style="width: 50%; height: 50%; margin-top: 10px; border-radius: 15px;"
+                                                 src="<%= platform.displayImages[i] %>" alt="Image Does Not Exist"/>
+                                        </div>
+                                    </div>
+                                <% } %>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>Platform Information Blocks</label>
+                            <div id="image-block">
+                                <% for( let i = 0; i < platform.info.length; i++ ) { %>
+                                    <div class="image-group">
+                                        <div class="input-container" id="imageblock-<%= platform.info.length - (i + 1) %>">
+                                            <input type="text" class="form-control mode" name="infoHeading" value="<%=platform.info[i].heading%>"><br>
+                                            <textarea class="form-control mode" name="infoText" rows="10"><% for (let para of platform.info[i].text) { %><%=para%>&#013;&#010;<% } %></textarea><br>
+                                            <input type="text" id="<%= platform.info.length - (i + 1) %>" class="form-control mode"
+                                                   oninput="createImg(this)" placeholder="Url..."
+                                                   name="infoImages[<%= platform.info.length - (i + 1) %>]" required
+                                                   value="<%= platform.info[i].image %>">
+                                            <img id="image-<%= platform.info.length - (i + 1) %>"
+                                                 style="width: 50%; height: 50%; margin-top: 10px; border-radius: 15px;"
+                                                 src="<%= platform.info[i].image %>" alt="Image Does Not Exist"/>
+                                        </div>
+                                    </div><br>
+                                <% } %>
+                            </div>
+                        </div>
+                        <br />
+                        <button type="submit" class="btn btn-lg btn-primary btn-block">Confirm Changes</button>
+                        <br/>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </body>
+    <script src="/javascript/image-url.js"></script>
+    <script src="/javascript/cafe/image.js"></script>
+</html>

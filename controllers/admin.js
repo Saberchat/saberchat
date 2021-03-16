@@ -16,12 +16,50 @@ const Order = require('../models/cafe/order');
 
 const controller = {};
 
+controller.updatePlatformForm = async function(req, res) {
+    const platform = await platformSetup();
+    return res.render("admin/settings", {platform});
+}
+
+controller.updatePlatform = async function(req, res) {
+    const platform = await platformSetup();
+    for (let attr of ["name", "imageUrl", "emailExtension", "updateTime", "displayImages"]) { //Update elements with directly corresponding text
+        platform[attr] = req.body[attr];
+    }
+
+    for (let attr of ["community", "services"]) { //Update elements which are textareas with split text
+        platform[attr] = [];
+        for (let element of req.body[attr].split('\n')) {
+            if (element.split('\r').join('').split(' ').join('') != "") {
+                platform[attr].push(element);
+            }
+        }
+    }
+
+    platform.info = [];
+    let parsedText = [];
+    for (let i = 0; i < req.body.infoHeading.length; i++) { //Update about information
+        parsedText = [];
+        for (let element of req.body.infoText[i].split('\n')) {
+            if (element.split('\r').join('').split(' ').join('') != "") {
+                parsedText.push(element);
+            }
+        }
+        platform.info.push({
+            heading: req.body.infoHeading[i],
+            text: parsedText,
+            image: req.body.infoImages[i]
+        });
+    }
+
+    platform.contact = {heading: req.body.contactHeading, description: req.body.contactInfo};
+    await platform.save();
+    return res.redirect("/settings");
+}
+
 controller.moderateGet = async function(req, res) { //Show all reported comments
     const platform = await platformSetup();
-    const comments = await Comment.find({status: 'flagged'})
-    .populate({path: 'author', select: ['username', 'imageUrl']})
-    .populate({path: 'statusBy', select: ['username', 'imageUrl']})
-    .populate({path: 'room', select: ['name']});
+    const comments = await Comment.find({status: 'flagged'}).populate("author statusBy room");
 
     if (!comments) {
         req.flash('error', 'An Error Occurred');

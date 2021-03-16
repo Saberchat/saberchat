@@ -1,9 +1,9 @@
-const createImage = function (imageInput) { //Create an image based on input
+const createImage = function (imageInput, imageTarget) { //Create an image based on input
     if (imageInput.value.replaceAll(' ', '') != '') {
-        document.getElementById("item-image").src = imageInput.value;
-        document.getElementById("item-image").hidden = false;
+        document.getElementById(imageTarget).src = imageInput.value;
+        document.getElementById(imageTarget).hidden = false;
 
     } else {
-        document.getElementById("item-image").hidden = true;
+        document.getElementById(imageTarget).hidden = true;
     }
 }

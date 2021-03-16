@@ -162,7 +162,7 @@ controller.create = async function(req, res) {
     const users = await User.find({authenticated: true, _id: {$ne: req.user._id}});
     if (!users) {
         req.flash('error', "An Error Occurred");
-        return res.rediect('back');
+        return res.redirect('back');
     }
 
     let imageString = ""; //Build string of all attached images
@@ -263,7 +263,7 @@ controller.updateAnnouncement = async function(req, res) {
     const users = await User.find({authenticated: true, _id: {$ne: req.user._id}});
     if (!users) {
         req.flash('error', "An Error Occurred");
-        return res.rediect('back');
+        return res.redirect('back');
     }
 
     let imageString = "";

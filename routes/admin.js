@@ -23,14 +23,16 @@ router.route("/accesslist")
     .put(wrapAsync(middleware.isLoggedIn), middleware.isMod, wrapAsync(admin.addEmail)) //Update access/blocked list
     .delete(wrapAsync(middleware.isLoggedIn), middleware.isMod, wrapAsync(admin.deleteEmail)); //Remove email from access/blocked list
 
+router.route("/settings")
+    .get(wrapAsync(middleware.isLoggedIn), middleware.isPrincipal, wrapAsync(admin.updatePlatformForm))
+    .put(wrapAsync(middleware.isLoggedIn), middleware.isPrincipal, wrapAsync(admin.updatePlatform));
+
 router.put('/tag', wrapAsync(middleware.isLoggedIn), middleware.isMod, wrapAsync(admin.tag));
 
 router.route('/balances')
     .get(middleware.isLoggedIn, middleware.isCashier, wrapAsync(admin.viewBalances))
     .put(middleware.isLoggedIn, middleware.isCashier, wrapAsync(admin.updateBalances));
 
-// router.post('/add-permission', middleware.isPrincipal, wrapAsync(admin.createPermission));
-// router.post('/add-status', middleware.isPrincipal, wrapAsync(admin.createStatus));
 // router.delete('/accesslist/:id', wrapAsync(middleware.isLoggedIn), middleware.isPrincipal, wrapAsync(admin.permanentDelete));
 
 module.exports = router;

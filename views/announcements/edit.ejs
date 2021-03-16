@@ -92,7 +92,7 @@
                     <% let reversedImages = announcement.images.reverse() %>
                     <% for( let i = 0; i < reversedImages.length; i++ ) { %>
                         <div class="image-group">
-                            <div class="input-container" id="block-<%= reversedImages.length - (i + 1) %>">
+                            <div class="input-container" id="imageblock-<%= reversedImages.length - (i + 1) %>">
                                 <input type="text" id="<%= reversedImages.length - (i + 1) %>" class="form-control"
                                        oninput="createImg(this)" placeholder="Url..."
                                        name="images[<%= reversedImages.length - (i + 1) %>]" required

@@ -110,7 +110,7 @@
                         <div class="col">
                             <label for="usernameInput">Image (URL)</label>
                             <div id="image-block">
-                                <input id="image-input" oninput="createImage(this)" class="form-control mode" type="text"
+                                <input id="image-input" oninput="createImage(this, 'item-image')" class="form-control mode" type="text"
                                        name="image" value="<%= item.imgUrl.url %>" placeholder="Enter URL for Item Image">
                                 <br/>
                                 <img id="item-image" src="<%= item.imgUrl.url %>" alt="Image Does Not Exist"/>
