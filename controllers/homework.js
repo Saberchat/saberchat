@@ -10,7 +10,7 @@ const platformSetup = require("../platform");
 const User = require('../models/user');
 const Notification = require('../models/inbox/message');
 const Course = require('../models/homework/course');
-const PostComment = require('../models/postComment');
+const {Review} = require('../models/post');
 const Room = require('../models/chat/room');
 
 const controller = {};
@@ -805,7 +805,7 @@ controller.rateTutor = async function(req, res) {
     for (let tutor of course.tutors) {
         if (tutor.tutor.equals(req.body.tutorId)) {
             if (objectArrIndex(tutor.students.concat(tutor.formerStudents), "student", req.user._id) > -1) { //Only current/former students of a tutor can upvote them
-                let review = await PostComment.create({type: "review", text: req.body.text.split('<').join('&lt'), sender: req.user}); //Create comment with review
+                let review = await Review.create({text: req.body.text.split('<').join('&lt'), sender: req.user}); //Create comment with review
                 if (!review) {
                     return res.json({error: "Error reviewing tutor"});
                 }
@@ -837,7 +837,7 @@ controller.rateTutor = async function(req, res) {
 }
 
 controller.likeReview = async function(req, res) {
-    const review = await PostComment.findById(req.params.id);
+    const review = await Review.findById(req.params.id);
     if (!review) {
         return res.json({error: "Error accessing review"});
     }

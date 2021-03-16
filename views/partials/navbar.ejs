@@ -37,8 +37,8 @@
                                data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                 <i class="fas fa-align-justify"></i> More
                                 <span
-                                    <% if (currentUser.annCount.length + currentUser.newRoomCount.length <= 0) { %> hidden<% } %> 
-                                    class="badge badge-pill badge-danger" id="new-count"><%= currentUser.annCount.length + currentUser.newRoomCount.length %>
+                                    <% if (currentUser.newRoomCount.length <= 0) { %> hidden<% } %> 
+                                    class="badge badge-pill badge-danger" id="new-count"><%= currentUser.newRoomCount.length %>
                                 </span>
                             </a>
 

@@ -12,13 +12,23 @@ var postSchema = new mongoose.Schema({
         originalName: String
     }],
     date: String,
-    involved: [{type: mongoose.Schema.Types.ObjectId, ref: 'User'}],
     likes: [{type: mongoose.Schema.Types.ObjectId, ref: 'User'}],
-    comments: [{type: mongoose.Schema.Types.ObjectId, ref: 'Post'}], //Project creators/comment @'s
-    processed: {type: Boolean, default: false} //Only for reports
+    comments: [{type: mongoose.Schema.Types.ObjectId, ref: 'Post'}],
 }, {
     timestamps: {createdAt: 'created_at'},
     discriminatorKey: 'type'
 });
 
-module.exports = mongoose.model("Post", postSchema);
+const Post = mongoose.model("Post", postSchema); //Superclass Schema
+
+//Subclass Schema
+module.exports.Announcement = Post.discriminator('Announcement', new mongoose.Schema({}));
+module.exports.Project = Post.discriminator('Project', new mongoose.Schema({
+    creators: [{type: mongoose.Schema.Types.ObjectId, ref: 'User'}]
+}));
+
+module.exports.PostComment = Post.discriminator('PostComment', new mongoose.Schema({}));
+module.exports.Review = Post.discriminator('Review', new mongoose.Schema({}));
+module.exports.Report = Post.discriminator('Report', new mongoose.Schema({
+    handled: {type: Boolean, default: false}
+}));

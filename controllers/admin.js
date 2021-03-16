@@ -1,6 +1,6 @@
 //LIBRARIES
 const {sendGridEmail} = require("../services/sendGrid");
-const {objectArrIndex, concatMatrix, removeIfIncluded, multiplyArrays} = require("../utils/object-operations");
+const {objectArrIndex, concatMatrix, removeIfIncluded} = require("../utils/object-operations");
 const platformSetup = require("../platform");
 
 //SCHEMA
@@ -10,8 +10,7 @@ const Email = require("../models/admin/email");
 const Room = require('../models/chat/room');
 const Request = require('../models/inbox/accessRequest');
 const Message = require('../models/inbox/message');
-const Announcement = require('../models/announcements/announcement');
-const Project = require('../models/projects/project');
+const {Announcement, Project} = require("../models/post");
 const Course = require('../models/homework/course');
 const Order = require('../models/cafe/order');
 const Article = require('../models/wHeights/article');

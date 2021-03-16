@@ -10,9 +10,8 @@ const platformSetup = require("../platform");
 
 //SCHEMA
 const User = require('../models/user');
-const Project = require('../models/projects/project');
+const {Project, PostComment} = require('../models/post');
 const Notification = require('../models/inbox/message');
-const PostComment = require('../models/postComment');
 
 const controller = {};
 
@@ -26,7 +25,7 @@ controller.index = async function(req, res) {
 
     const projects = await Project.find({})
         .populate('creators')
-        .populate('poster')
+        .populate('sender')
     if (!projects) {
         req.flash('error', 'An Error Occurred');
         return res.redirect('back');
@@ -95,7 +94,7 @@ controller.createProject = async function(req, res) {
         }
     }
 
-    const project = await Project.create({title: req.body.title, text: req.body.text, poster: req.user, creators}); //Create a new project with all the provided data
+    const project = await Project.create({title: req.body.title, text: req.body.text, sender: req.user, creators}); //Create a new project with all the provided data
     if (!project) {
         req.flash('error', "Unable to create project");
         return res.redirect('back');
@@ -166,10 +165,10 @@ controller.createProject = async function(req, res) {
         }
 
         notif.date = dateFormat(notif.created_at, "h:MM TT | mmm d");
-        notif.text = `Hello ${user.firstName},\n\n${req.user.firstName} ${req.user.lastName} recently posted a new project: "${project.title}". Check it out!`;
+        notif.text = `Hello ${user.firstName},\n\n${req.user.firstName} ${req.user.lastName} recently posted a new project: "${project.subject}". Check it out!`;
         await notif.save();
         if (user.receiving_emails) {
-            await sendGridEmail(user.email, `New Project Post - ${project.title}`, `<p>Hello ${user.firstName},</p><p>${req.user.firstName} ${req.user.lastName} recently posted a new project: <strong>${project.title}</strong>. Check it out!</p>${imageString}`, false);
+            await sendGridEmail(user.email, `New Project Post - ${project.subject}`, `<p>Hello ${user.firstName},</p><p>${req.user.firstName} ${req.user.lastName} recently posted a new project: <strong>${project.subject}</strong>. Check it out!</p>${imageString}`, false);
         }
 
         user.inbox.push(notif); //Add notif to user's inbox
@@ -185,13 +184,13 @@ controller.createProject = async function(req, res) {
 controller.editProject = async function(req, res) {
     const platform = await platformSetup();
     const project = await Project.findById(req.params.id)
-        .populate('poster')
+        .populate('sender')
         .populate('creators');
     if (!project) {
         req.flash('error', 'Unable to find project');
         res.redirect('back');
 
-    } else if (project.poster._id.toString() != req.user._id.toString()) { //If you didn't post the project, you can't edit it
+    } else if (project.sender._id.toString() != req.user._id.toString()) { //If you didn't post the project, you can't edit it
         req.flash('error', "You may only delete projects that you have posted");
         return res.redirect('back');
     }
@@ -228,7 +227,7 @@ controller.editProject = async function(req, res) {
 controller.showProject = async function(req, res) {
     const platform = await platformSetup();
     let project = await Project.findById(req.params.id)
-        .populate('poster')
+        .populate('sender')
         .populate('creators')
         .populate({
             path: "comments",
@@ -284,13 +283,13 @@ controller.updateProject = async function(req, res) {
         }
     }
 
-    const project = await Project.findById(req.params.id).populate('poster');
+    const project = await Project.findById(req.params.id).populate('sender');
     if (!project) {
         req.flash('error', "Unable to find project");
         return res.redirect('back');
     }
 
-    if (project.poster._id.toString() != req.user._id.toString()) {
+    if (project.sender._id.toString() != req.user._id.toString()) {
         req.flash('error', "You may only update projects that you have posted");
         return res.redirect('back');
     }
@@ -371,7 +370,7 @@ controller.deleteProject = async function(req, res) {
         req.flash('error', "Unable to access project");
         return res.redirect('back');
 
-    } else if (project.poster._id.toString() != req.user._id.toString()) { //If you didn't post the project, you can't delete it
+    } else if (project.sender._id.toString() != req.user._id.toString()) { //If you didn't post the project, you can't delete it
         req.flash('error', "You may only delete projects that you have posted");
         return res.redirect('back');
     }
@@ -414,7 +413,7 @@ controller.likeProject = async function(req, res) {
     if (removeIfIncluded(project.likes, req.user._id)) { //Remove like
         await project.save();
         return res.json({
-            success: `Removed a like from ${project.title}`,
+            success: `Removed a like from ${project.subject}`,
             likeCount: project.likes.length
         });
     }
@@ -422,7 +421,7 @@ controller.likeProject = async function(req, res) {
     project.likes.push(req.user._id); //Add like
     await project.save();
     return res.json({
-        success: `Liked ${project.title}`,
+        success: `Liked ${project.subject}`,
         likeCount: project.likes.length
     });
 }
@@ -440,7 +439,6 @@ controller.comment = async function(req, res) {
     }
 
     const comment = await PostComment.create({
-        type: "comment",
         text: req.body.text.split('<').join('&lt'),
         sender: req.user,
     });
@@ -470,7 +468,7 @@ controller.comment = async function(req, res) {
     let notif;
     for (let user of users) {
         notif = await Notification.create({
-            subject: `New Mention in ${project.title}`,
+            subject: `New Mention in ${project.subject}`,
             sender: req.user,
             noReply: true,
             recipients: [user],
@@ -484,11 +482,11 @@ controller.comment = async function(req, res) {
         }
 
         notif.date = dateFormat(notif.created_at, "h:MM TT | mmm d");
-        notif.text = `Hello ${user.firstName},\n\n${req.user.firstName} ${req.user.lastName} mentioned you in a comment on "${project.title}":\n${comment.text}`;
+        notif.text = `Hello ${user.firstName},\n\n${req.user.firstName} ${req.user.lastName} mentioned you in a comment on "${project.subject}":\n${comment.text}`;
 
         await notif.save();
         if (user.receiving_emails) {
-            await sendGridEmail(user.email, `New Mention in ${project.title}`, `<p>Hello ${user.firstName},</p><p>${req.user.firstName} ${req.user.lastName} mentioned you in a comment on <strong>${project.title}</strong>.<p>${comment.text}</p>`, false);
+            await sendGridEmail(user.email, `New Mention in ${project.subject}`, `<p>Hello ${user.firstName},</p><p>${req.user.firstName} ${req.user.lastName} mentioned you in a comment on <strong>${project.subject}</strong>.<p>${comment.text}</p>`, false);
         }
 
         user.inbox.push(notif); //Add notif to user's inbox
@@ -526,7 +524,7 @@ controller.likeComment = async function(req, res) {
 
 controller.data = async function(req, res) {
     const platform = await platformSetup();
-    const projects = await Project.find({poster: req.user._id}).populate("comments");
+    const projects = await Project.find({sender: req.user._id}).populate("comments");
         if (!projects) {
             req.flash('error', "Unable to find projects");
             return res.redirect('back');
@@ -536,7 +534,7 @@ controller.data = async function(req, res) {
         let popularProjectText = "";
         let popularCommentText = "";
         for (let project of popular) { //Iterate through popular projects and parse out their text
-            popularProjectText += `${project.title} ${project.text} `;
+            popularProjectText += `${project.subject} ${project.text} `;
             for (let comment of project.comments) {
                 popularCommentText += `${comment.text} `;
             }
@@ -546,7 +544,7 @@ controller.data = async function(req, res) {
         let unpopularProjectText = "";
         let unpopularCommentText = "";
         for (let project of unpopular) {
-            unpopularProjectText += `${project.title} ${project.text} `;
+            unpopularProjectText += `${project.subject} ${project.text} `;
             for (let comment of project.comments) {
                 unpopularCommentText += `${comment.text} `;
             }

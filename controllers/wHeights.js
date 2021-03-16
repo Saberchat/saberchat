@@ -7,7 +7,7 @@ const platformSetup = require("../platform");
 const Article = require('../models/wHeights/article');
 const User = require('../models/user');
 const Type = require('../models/wHeights/articleType');
-const PostComment = require('../models/postComment');
+const {PostComment} = require('../models/post');
 
 const controller = {};
 

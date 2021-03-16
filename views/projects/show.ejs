@@ -52,16 +52,16 @@
         <div class="col-12">
             <article class="ann-container">
                 <div class="ann-head">
-                    <h1><%= project.title %></h1>
-                    <a class="project-info" href="../profiles/<%= project.poster._id %>">
-                        <img src="<% if (project.poster.mediaFile.display) {%> <%= project.poster.mediaFile.url%><%} else {%> <%=project.poster.imageUrl.url%><%}%>" alt="profile pic" id="poster-profile">
-                        <%= project.poster.firstName %> <%= project.poster.lastName %>
+                    <h1><%= project.subject %></h1>
+                    <a class="project-info" href="../profiles/<%= project.sender._id %>">
+                        <img src="<% if (project.sender.mediaFile.display) {%> <%= project.sender.mediaFile.url%><%} else {%> <%=project.sender.imageUrl.url%><%}%>" alt="profile pic" id="sender-profile">
+                        <%= project.sender.firstName %> <%= project.sender.lastName %>
                     </a>
                     <br/><br/>
 
                     <span id="project-date"><%= project.date %></span>
 
-                    <% if (currentUser.username == project.poster.username) { %>
+                    <% if (currentUser.username == project.sender.username) { %>
                         <div id="edit-div">
                             <button id="edit-button" type="button" class="btn btn-info"><a class="edit-button-text"
                                                                                             href="<%= project._id %>/edit"><i

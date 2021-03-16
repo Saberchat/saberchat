@@ -73,31 +73,31 @@
                         <div class="block-header grey">
                             <h5>
                                 <% if (currentUser) { %>
-                                    <a class="project-info" href="projects/<%= project._id %>"><%= project.title %></a>
+                                    <a class="project-info" href="projects/<%= project._id %>"><%= project.subject %></a>
                                     <span class="float-right project-info date"><%= project.date %></span>
                                 <% } else { %>
-                                    <span class="project-info"><%= project.title %></span>
+                                    <span class="project-info"><%= project.subject %></span>
                                     <span class="float-right project-info date"><%= project.date %></span>
                                 <% } %>
                             </h5>
 
                             <div class="project-header">
                                 <% if (currentUser) { %>
-                                    <a class="project-info" href="../profiles/<%= project.poster._id %>">
-                                        <img src="<% if (project.poster.mediaFile.display) {%> <%= project.poster.mediaFile.url%><%} else {%> <%=project.poster.imageUrl.url%><%}%>" alt="profile pic"
-                                             class="poster-profile mode">
-                                        <%= project.poster.firstName %> <%= project.poster.lastName %>
+                                    <a class="project-info" href="../profiles/<%= project.sender._id %>">
+                                        <img src="<% if (project.sender.mediaFile.display) {%> <%= project.sender.mediaFile.url%><%} else {%> <%=project.sender.imageUrl.url%><%}%>" alt="profile pic"
+                                             class="sender-profile mode">
+                                        <%= project.sender.firstName %> <%= project.sender.lastName %>
                                     </a>
 
                                 <% } else { %>
                                     <span class="project-info">
-                                        <img src="<% if (project.poster.mediaFile.display) {%> <%= project.poster.mediaFile.url%><%} else {%> <%=project.poster.imageUrl.url%><%}%>" alt="profile pic" class="poster-profile">
-                                        <%= project.poster.firstName.charAt(0) %>.<%= project.poster.lastName.charAt(0) %>.
+                                        <img src="<% if (project.sender.mediaFile.display) {%> <%= project.sender.mediaFile.url%><%} else {%> <%=project.sender.imageUrl.url%><%}%>" alt="profile pic" class="sender-profile">
+                                        <%= project.sender.firstName.charAt(0) %>.<%= project.sender.lastName.charAt(0) %>.
                                     </span>
                                 <% } %>
 
                                 <% if (currentUser) { %>
-                                    <% if (currentUser._id.toString() == project.poster._id.toString()) { %>
+                                    <% if (currentUser._id.toString() == project.sender._id.toString()) { %>
                                         <button type="button" class="btn btn-info edit-button"><a class="project-info"
                                                                                                   href="projects/<%= project._id %>/edit"><i
                                                         class="fas fa-cog"></i> Edit</a></button>

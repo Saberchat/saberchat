@@ -9,7 +9,7 @@
     color: black;
 }
 
-#poster-profile, .creator-profile {
+#sender-profile, .creator-profile {
     width: 30px;
     height: 30px;
     object-fit: cover;

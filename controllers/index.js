@@ -8,7 +8,7 @@ const platformSetup = require("../platform");
 //SCHEMA
 const User = require('../models/user');
 const Email = require('../models/admin/email');
-const Announcement = require('../models/announcements/announcement');
+const {Announcement} = require('../models/post');
 
 const controller = {};
 

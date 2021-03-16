@@ -6,14 +6,14 @@ const platformSetup = require("../platform");
 
 //SCHEMA
 const User = require('../models/user');
-const PostComment = require('../models/postComment');
+const {Report, PostComment} = require('../models/post');
 
 const controller = {};
 
 // Report GET index
 controller.index = async function(req, res) {
     const platform = await platformSetup();
-    const reports = await PostComment.find({type: "report"}).populate('sender');
+    const reports = await Report.find({}).populate('sender');
     if(!reports) {req.flash('error', 'Cannot find reports.'); return res.redirect('back');}
     return res.render('reports/index', {platform, reports: reports.reverse()});
 };
@@ -27,7 +27,7 @@ controller.new = async function(req, res) {
 // Report GET show
 controller.show = async function(req, res) {
     const platform = await platformSetup();
-    const report = await PostComment.findById(req.params.id)
+    const report = await Report.findById(req.params.id)
         .populate('sender')
         .populate({
             path: "comments",
@@ -42,7 +42,7 @@ controller.show = async function(req, res) {
 // Report GET edit form
 controller.updateForm = async function(req, res) {
     const platform = await platformSetup();
-    const report = await PostComment.findById(req.params.id);
+    const report = await Report.findById(req.params.id);
     if(!report) {req.flash('error', 'Could not find report'); return res.redirect('back');}
     if(!report.sender._id.equals(req.user._id)) {
         req.flash('error', 'You do not have permission to do that.');
@@ -53,8 +53,7 @@ controller.updateForm = async function(req, res) {
 
 // Report POST create
 controller.create = async function(req, res) {
-    const report = await PostComment.create({ //Build report with error info
-        type: "report",
+    const report = await Report.create({ //Build report with error info
         sender: req.user,
         subject: req.body.subject,
         text: req.body.message
@@ -71,7 +70,7 @@ controller.create = async function(req, res) {
 };
 
 controller.updateReport = async function(req, res) {
-    const report = await PostComment.findById(req.params.id).populate('sender');
+    const report = await Report.findById(req.params.id).populate('sender');
     if (!report) {
         req.flash('error', "Unable to access report");
         return res.redirect('back');
@@ -83,7 +82,7 @@ controller.updateReport = async function(req, res) {
     }
 
     //When report is updated, it might have new info to be handled
-    const updatedReport = await PostComment.findByIdAndUpdate(req.params.id, {
+    const updatedReport = await Report.findByIdAndUpdate(req.params.id, {
         subject: req.body.subject,
         text: req.body.message,
         handled: false
@@ -98,7 +97,7 @@ controller.updateReport = async function(req, res) {
 }
 
 controller.handleReport = async function(req, res) {
-    const report = await PostComment.findByIdAndUpdate(req.params.id, {handled: true});
+    const report = await Report.findByIdAndUpdate(req.params.id, {handled: true});
     if (!report) {
         req.flash("error", "Unable to access report");
         return res.redirect("back");
@@ -109,7 +108,7 @@ controller.handleReport = async function(req, res) {
 
 // Report PUT like report
 controller.likeReport = async function(req, res) {
-    const report = await PostComment.findById(req.body.reportId);
+    const report = await Report.findById(req.body.reportId);
     if(!report) {return res.json({error: 'Error updating report.'});}
 
     if (removeIfIncluded(report.likes, req.user._id)) { //Remove like
@@ -130,7 +129,7 @@ controller.likeReport = async function(req, res) {
 
 // Report PUT comment
 controller.comment = async function(req, res) {
-    const report = await PostComment.findById(req.body.reportId)
+    const report = await Report.findById(req.body.reportId)
         .populate({
             path: "comments",
             populate: {path: "sender"}
@@ -142,7 +141,6 @@ controller.comment = async function(req, res) {
     }
 
     const comment = await PostComment.create({
-        type: "comment",
         text: req.body.text.split('<').join('&lt'),
         sender: req.user
     });
@@ -180,7 +178,7 @@ controller.comment = async function(req, res) {
 
 // Report PUT like comment
 controller.likeComment = async function(req, res) {
-    const comment = await PostComment.findById(req.body.commentId);
+    const comment = await Report.findById(req.body.commentId);
     if(!comment) {return res.json({error: 'Error finding comment'});}
 
     if (removeIfIncluded(comment.likes, req.user._id)) { //Remove Like
@@ -200,7 +198,7 @@ controller.likeComment = async function(req, res) {
 }
 
 controller.deleteReport = async function(req, res) {
-    const report = await PostComment.findById(req.params.id).populate('sender');
+    const report = await Report.findById(req.params.id).populate('sender');
     if (!report) {
         req.flash('error', "Unable to access report");
         return res.redirect('back');
@@ -211,7 +209,7 @@ controller.deleteReport = async function(req, res) {
         return res.redirect('back');
     }
 
-    const deletedReport = await PostComment.findByIdAndDelete(report._id);
+    const deletedReport = await Report.findByIdAndDelete(report._id);
     if (!deletedReport) {
         req.flash('error', "Unable to delete report");
         return res.redirect('back');
