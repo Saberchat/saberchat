@@ -145,6 +145,31 @@
                 <div class="ann-body">
                     <p class="announcement-text convertible-text"><%= convertedText %></p>
                     <hr>
+                    <div class="ann-images">
+                        <% for (let img of report.images) { %>
+                            <img src="<%= img %>" alt="Attached Image" class="img-fluid rounded">
+                        <% } %>
+                        <% for (let media of report.mediaFiles) { %>
+                            <% if (media.filename) { %>
+                                <% if ([".png", ".jpg", ".jpeg", ".gif"].includes(fileExtensions.get(media.url).toLowerCase())) { %>
+                                    <img src="<%= media.url %>" alt="Attached Image" class="img-fluid rounded">
+                                <% } else if ([".mp3", ".m4a"].includes(fileExtensions.get(media.url).toLowerCase())) { %>
+                                    <audio controls>
+                                        <source src="<%=media.url%>" type="audio/mpeg"></source>
+                                    </audio>
+                                <% } else if (fileExtensions.get(media.url).toLowerCase() == ".mp4") {%>
+                                    <video width="800px" height="500px" src="<%=media.url%>" type="video/*" controls></video>
+                                <% } else if (fileExtensions.get(media.url).toLowerCase() == ".mov") {%>
+                                    <a href="<%=media.url%>" download><h5><i class="fas fa-paperclip"></i> Download "<%=media.originalName%>"</h5></a>
+                                <% } else if (fileExtensions.get(media.url).toLowerCase() == ".heic") {%>
+                                    <a href="<%=media.url%>" id="<%=media.url%>" class="heic coolcool" download><h5><i class="fas fa-paperclip"></i> Download "<%=media.originalName%>"</h5></a>
+                                <% } else if (fileExtensions.get(media.url).toLowerCase() == ".pdf") {%>
+                                    <a href="<%=media.url%>" target="_blank"><h5>Open "<%=media.originalName%>" In New Tab  </h5></a>
+                                <% } %>
+                                <br/><br/>
+                            <% } %>
+                        <% } %>
+                    </div>
                 </div>
             </article>
 

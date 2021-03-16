@@ -11,7 +11,7 @@
 
     <link rel="stylesheet" href="/stylesheets/components/navbar.css">
     <link rel="stylesheet" href="/stylesheets/components/header.css">
-    <link rel="stylesheet" href="/stylesheets/reports/form.css">
+    <link rel="stylesheet" href="/stylesheets/announcements/form.css">
     <%if (currentUser) {%>
       <%if (currentUser.darkmode) { %>
         <link rel="stylesheet" href="/stylesheets/darkmode.css">
@@ -50,7 +50,7 @@
 <div class="row">
 	<div class="col-md-8 offset-md-2 col-12">
 		<div class="form-container">
-			<form action="/reports/" method="post">
+			<form action="/reports/" method="post" enctype="multipart/form-data">
 				<div class="form-group mode">
 					<label for="subject">Subject</label>
 					<input type="text" class="form-control mode" name="subject" placeholder="Report Subject" maxlength="50" required>
@@ -61,12 +61,25 @@
 					<textarea minlength="50" class="form-control mode" name="message" rows="5" placeholder="Describe The Issue" required></textarea>
 				</div>
         <br>
+
+        <div id="media-header">
+					<button type="button" onclick="upload()" class="btn btn-primary"><i class="fas fa-plus"></i> File Upload</button>
+					<br/><br/>
+				</div>
+				<div id="uploads"></div>
+				
+				<div id="image-header">
+					<button type="button" onclick="addImg()" class="btn btn-primary"><i class="fas fa-plus"></i> Image URL</button>
+					<br/><br/>
+				</div>
+				<div id="image-block"></div>
 				
 				<button type="submit" class="btn btn-primary btn-block">Post</button>
 				<br/>
 			</form>
 		</div>
 	</div>
-</div>
+  <script src="/javascript/upload-input.js"></script>
+  <script src="/javascript/image-url.js"></script></div>
 </body>
 </html>

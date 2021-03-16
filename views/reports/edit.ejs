@@ -44,7 +44,7 @@
     </div>
     <div class="row">
         <div class="col-md-8 offset-md-2 col-12">
-          <form action="/reports/<%= report._id %>?_method=put" method="post">
+          <form action="/reports/<%= report._id %>?_method=put" method="post" enctype="multipart/form-data">
             <div class="form-group mode">
               <label for="subject">Subject</label>
               <input type="text" class="form-control mode" name="subject" placeholder="A short title..." maxlength="50" required value="<%= report.subject %>">
@@ -53,11 +53,67 @@
               <label for="message">Message</label>
               <textarea class="form-control mode" name="message" rows="5" placeholder="What it is about..." required><%= report.text %></textarea>
             </div>
+            <% for (let media of report.mediaFiles) { %>
+              <% if(media.filename) { %>
+                  <% if ([".png", ".jpg", ".jpeg", ".gif"].includes(fileExtensions.get(media.url).toLowerCase())) { %>
+                      <img src="<%= media.url %>" alt="attached image" class="img-fluid rounded past-upload">
+                  <% } else if ([".mp3", ".m4a"].includes(fileExtensions.get(media.url).toLowerCase())) { %>
+                      <audio controls>
+                          <source src="<%=media.url%>" type="audio/mpeg"></source>
+                      </audio>
+                  <% } else if (fileExtensions.get(media.url).toLowerCase() == ".mp4") {%>
+                      <video width="800px" height="500px" src="<%=media.url%>" type="video/*" controls></video>
+                  <% } else if ([".mov", ".heic"].includes(fileExtensions.get(media.url).toLowerCase())) {%>
+                      <a href="<%=media.url%>" download><h5><i class="fas fa-paperclip"></i> Download "<%=media.originalName%>"</h5></a>
+                  <% } else if (fileExtensions.get(media.url).toLowerCase() == ".pdf") {%>
+                      <a href="<%=media.url%>" target="_blank"><h5>Open "<%=media.originalName%>" In New Tab  </h5></a>
+                  <% } %>
+                  <div class="form-check">
+                      <input type="checkbox" name="deleteUpload-<%=media.url%>" id="deleteUpload-<%=media.url%>" class="form-check-input">
+                      <label class="form-check-label" for="deleteUpload-<%=media.url%>">Remove uploaded media</label>
+                  </div>
+                  <br />
+              <% } %>
+          <% } %>
+
+          <div id="media-header">
+              <button type="button" onclick="upload(<%=report.mediaFiles.length%>)" class="btn btn-primary"><i class="fas fa-plus"></i> File Upload</button>
+              <br/><br/>
+            </div>
+          <div id="uploads"></div>
+
+          <div id="image-header">
+              <button type="button" onclick="addImg()" class="btn btn-primary"><i class="fas fa-plus"></i> Image URL</button>
+              <br/><br/>
+          </div>
+
+          <div id="image-block">
+              <% let reversedImages = report.images.reverse() %>
+              <% for( let i = 0; i < reversedImages.length; i++ ) { %>
+                  <div class="image-group">
+                      <div class="input-container" id="imageblock-<%= reversedImages.length - (i + 1) %>">
+                          <input type="text" id="<%= reversedImages.length - (i + 1) %>" class="form-control"
+                                 oninput="createImg(this)" placeholder="Url..."
+                                 name="images[<%= reversedImages.length - (i + 1) %>]" required
+                                 value="<%= reversedImages[i] %>">
+                          <img id="image-<%= reversedImages.length - (i + 1) %>"
+                               style="width: 50%; height: 50%; margin-top: 10px; border-radius: 15px;"
+                               src="<%= reversedImages[i] %>" alt="Image Does Not Exist"/>
+                      </div>
+                      <button type="button" onclick="deleteImg(this)" class="btn btn-danger">
+                          <i class="fas fa-minus"></i>
+                      </button>
+                  </div>
+              <% } %>
+          </div>
+
             <button type="submit" class="btn btn-info btn-block">Save Changes</button>
         </form>
     </div>
   </div>
 </div>
 </div>
+<script src="/javascript/upload-input.js"></script>
+<script src="/javascript/image-url.js"></script>
 </body>
 </html>

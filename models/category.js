@@ -8,7 +8,6 @@ const Category = mongoose.model("Category", new mongoose.Schema({
     discriminatorKey: "type"
 }));
 
-//NOT YET IMPLEMENTED. DO BEFORE FRIDAY
 module.exports = {
     ItemCategory: Category.discriminator("ItemCategory", new mongoose.Schema({
         items: [{type: mongoose.Schema.Types.ObjectId, ref: "OrderItem"}]

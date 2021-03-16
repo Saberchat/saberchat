@@ -1,8 +1,10 @@
 //LIBRARIES
 const {convertToLink} = require("../utils/convert-to-link");
 const dateFormat = require('dateformat');
+const path = require('path');
 const {removeIfIncluded} = require("../utils/object-operations");
 const platformSetup = require("../platform");
+const {cloudUpload, cloudDelete} = require('../services/cloudinary');
 
 //SCHEMA
 const User = require('../models/user');
@@ -35,8 +37,12 @@ controller.show = async function(req, res) {
         });
     if(!report) {req.flash('error', 'Could not find report'); return res.redirect('back');}
 
-    const convertedText = convertToLink(report.text);
-    return res.render('reports/show', {platform, report, convertedText});
+    let fileExtensions = new Map(); //Track which file format each attachment is in
+    for (let media of report.mediaFiles) {
+        fileExtensions.set(media.url, path.extname(media.url.split("SaberChat/")[1]));
+    }
+    const convertedText = convertToLink(report.text); //Parse and add hrefs to all links in text
+    return res.render('reports/show', {platform, report, convertedText, fileExtensions});
 };
 
 // Report GET edit form
@@ -48,7 +54,12 @@ controller.updateForm = async function(req, res) {
         req.flash('error', 'You do not have permission to do that.');
         return res.redirect('back');
     }
-    return res.render('reports/edit', {platform, report});
+
+    let fileExtensions = new Map(); //Track which file format each attachment is in
+    for (let media of report.mediaFiles) {
+        fileExtensions.set(media.url, path.extname(media.url.split("SaberChat/")[1]));
+    }
+    return res.render('reports/edit', {platform, report, fileExtensions});
 };
 
 // Report POST create
@@ -62,6 +73,40 @@ controller.create = async function(req, res) {
         req.flash('error', 'Unable to create report');
         return res.redirect('back');
     }
+
+    if (req.body.images) { //If any images were added (if not, the 'images' property is null)
+        for (const image in req.body.images) {
+            report.images.push(req.body.images[image]);
+        }
+    }
+
+        // if files were uploaded, process them
+    if (req.files) {
+        if (req.files.mediaFile) {
+            let cloudErr;
+            let cloudResult;
+            for (let file of req.files.mediaFile) { //Upload each file to cloudinary
+                if ([".mp3", ".mp4", ".m4a", ".mov"].includes(path.extname(file.originalname).toLowerCase())) {
+                    [cloudErr, cloudResult] = await cloudUpload(file, "video");
+                } else if (path.extname(file.originalname).toLowerCase() == ".pdf") {
+                    [cloudErr, cloudResult] = await cloudUpload(file, "pdf");
+                } else {
+                    [cloudErr, cloudResult] = await cloudUpload(file, "image");
+                }
+                if (cloudErr || !cloudResult) {
+                    req.flash('error', 'Upload failed');
+                    return res.redirect('back');
+                }
+
+                report.mediaFiles.push({
+                    filename: cloudResult.public_id,
+                    url: cloudResult.secure_url,
+                    originalName: file.originalname
+                });
+            }
+        }
+    }
+
     report.date = dateFormat(report.created_at, "h:MM TT | mmm d");
     await report.save();
 
@@ -92,6 +137,61 @@ controller.updateReport = async function(req, res) {
         return res.redirect('back');
     }
 
+    updatedReport.images = []; //Empty image array so that you can fill it with whatever images are added (all images are there, not just new ones)
+    if (req.body.images) { //Only add images if any are provided
+        for (const image in req.body.images) {
+            updatedReport.images.push(req.body.images[image]);
+        }
+    }
+
+    //Iterate through all selected media to remove and delete them
+    let cloudErr;
+    let cloudResult;
+    for (let i = updatedReport.mediaFiles.length-1; i >= 0; i--) {
+        if (req.body[`deleteUpload-${updatedReport.mediaFiles[i].url}`] && updatedReport.mediaFiles[i] && updatedReport.mediaFiles[i].filename) {
+            if ([".mp3", ".mp4", ".m4a", ".mov"].includes(path.extname(updatedReport.mediaFiles[i].url.split("SaberChat/")[1]).toLowerCase())) {
+                [cloudErr, cloudResult] = await cloudDelete(updatedReport.mediaFiles[i].filename, "video");
+            } else if (path.extname(updatedReport.mediaFiles[i].url.split("SaberChat/")[1]).toLowerCase() == ".pdf") {
+                [cloudErr, cloudResult] = await cloudDelete(updatedReport.mediaFiles[i].filename, "pdf");
+            } else {
+                [cloudErr, cloudResult] = await cloudDelete(updatedReport.mediaFiles[i].filename, "image");
+            }
+            // check for failure
+            if (cloudErr || !cloudResult || cloudResult.result !== 'ok') {
+                req.flash('error', 'Error deleting uploaded image');
+                return res.redirect('back');
+            }
+            updatedReport.mediaFiles.splice(i, 1);
+        }
+    }
+
+    // if files were uploaded
+    if (req.files) {
+        if (req.files.mediaFile) {
+            //Iterate through all new attached media
+            for (let file of req.files.mediaFile) {
+                if ([".mp3", ".mp4", ".m4a", ".mov"].includes(path.extname(file.originalname).toLowerCase())) {
+                    [cloudErr, cloudResult] = await cloudUpload(file, "video");
+                } else if (path.extname(file.originalname).toLowerCase() == ".pdf") {
+                    [cloudErr, cloudResult] = await cloudUpload(file, "pdf");
+                } else {
+                    [cloudErr, cloudResult] = await cloudUpload(file, "image");
+                }
+                if (cloudErr || !cloudResult) {
+                    req.flash('error', 'Upload failed');
+                    return res.redirect('back');
+                }
+
+                updatedReport.mediaFiles.push({
+                    filename: cloudResult.public_id,
+                    url: cloudResult.secure_url,
+                    originalName: file.originalname
+                });
+            }
+        }
+    }
+    
+    await updatedReport.save();
     req.flash('success', 'Report Updated!');
     return res.redirect(`/reports/${updatedReport._id}`);
 }
@@ -207,6 +307,26 @@ controller.deleteReport = async function(req, res) {
     if (report.sender._id.toString() != req.user._id.toString()) { //Doublecheck that deleter is reporter
         req.flash('error', "You can only delete reports that you have posted");
         return res.redirect('back');
+    }
+
+    // delete any uploads
+    let cloudErr;
+    let cloudResult;
+    for (let file of report.mediaFiles) {
+        if (file && file.filename) {
+            if ([".mp3", ".mp4", ".m4a", ".mov"].includes(path.extname(file.url.split("SaberChat/")[1]).toLowerCase())) {
+                [cloudErr, cloudResult] = await cloudDelete(file.filename, "video");
+            } else if (path.extname(file.url.split("SaberChat/")[1]).toLowerCase() == ".pdf") {
+                [cloudErr, cloudResult] = await cloudDelete(file.filename, "pdf");
+            } else {
+                [cloudErr, cloudResult] = await cloudDelete(file.filename, "image");
+            }
+            // check for failure
+            if (cloudErr || !cloudResult || cloudResult.result !== 'ok') {
+                req.flash('error', 'Error deleting uploaded image');
+                return res.redirect('back');
+            }
+        }
     }
 
     const deletedReport = await Report.findByIdAndDelete(report._id);

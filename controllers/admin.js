@@ -54,7 +54,8 @@ controller.updatePlatform = async function(req, res) {
 
     platform.contact = {heading: req.body.contactHeading, description: req.body.contactInfo};
     await platform.save();
-    return res.redirect("/settings");
+    req.flash("success", "Updated platform settings!");
+    return res.redirect("/admin/settings");
 }
 
 controller.moderateGet = async function(req, res) { //Show all reported comments

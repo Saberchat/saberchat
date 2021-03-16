@@ -5,9 +5,17 @@ const addImg = function () { //Add image input field
     const img = document.createElement('div');
     img.classList.add('image-group');
     img.id = `imageblock-${i}`;
-    img.style.display = "block";
     img.innerHTML = `<div class="input-container"><input type="text" id="${i}" class="form-control mode" oninput="createImg(this)" placeholder="Url..." name="images[${i}]" required></div><button type="button" onclick="deleteImg(this)" style="display: inline;" class="btn btn-danger"><i class="fas fa-minus"></i></button>`;
     imgContainer.prepend(img);
+    i++;
+}
+
+const addBlock = function() {
+    const img = document.createElement('div');
+    img.classList.add('image-group');
+    img.id = `imageblock-${i}`;
+    img.innerHTML = `<div class="input-container" id="display-${i}" ><input type="text" placeholder="Heading..." class="form-control mode" name="infoHeading"><br><textarea class="form-control mode" placeholder="Text..." name="infoText" rows="10"></textarea><br><input type="text" class="form-control mode" oninput="createImg(this)" id="${i}" placeholder="Url..." name="infoImages[${i}]" required></div><button type="button" onclick="deleteImg(this)" style="display: inline;" class="btn btn-danger"><i class="fas fa-minus"></i></button><br>`;
+    imgContainer.append(img);
     i++;
 }
 
