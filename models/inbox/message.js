@@ -1,6 +1,7 @@
 const mongoose = require('mongoose');
 
-var messageSchema = new mongoose.Schema({
+//Inbox message
+module.exports = mongoose.model("Message", new mongoose.Schema({
     subject: String,
     images: [{type: String}],
     mediaFiles: [{
@@ -22,6 +23,5 @@ var messageSchema = new mongoose.Schema({
         images: [{type: String}],
         date: String
     }]
-}, {timestamps: {createdAt: 'created_at'}});
-
-module.exports = mongoose.model("Message", messageSchema);
+}, {timestamps: {createdAt: 'created_at'}
+}));

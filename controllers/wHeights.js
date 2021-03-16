@@ -4,17 +4,16 @@ const {sendGridEmail} = require("../services/sendGrid");
 const platformSetup = require("../platform");
 
 //SCHEMA
-const Article = require('../models/wHeights/article');
+const {Article, PostComment} = require('../models/post');
 const User = require('../models/user');
 const Type = require('../models/wHeights/articleType');
-const {PostComment} = require('../models/post');
 
 const controller = {};
 
 // index page
 controller.index = async function(req, res) {
     const platform = await platformSetup();
-    const articles = await Article.find({}).populate('author');
+    const articles = await Article.find({}).populate('sender');
     if (!articles) {
         req.flash('error', 'An Error Occurred');
         return res.redirect('/articles');
@@ -47,7 +46,7 @@ controller.new = async function(req, res) {
 controller.show = async function(req, res) {
     const platform = await platformSetup();
     const article = await Article.findById(req.params.id)
-        .populate('author')
+        .populate('sender')
         .populate({
             path: 'comments',
             populate: {path: 'sender'}
@@ -76,13 +75,13 @@ controller.create = async function(req, res) {
     }
     article.date = dateFormat(article.created_at, "mmm d, yyyy - h:MM TT");
 
-    const author = await User.findById(req.body.author);
-    if (!author) {
-        req.flash('error', "Unable to find author");
+    const sender = await User.findById(req.body.sender);
+    if (!sender) {
+        req.flash('error', "Unable to find sender");
         return res.redirect('back');
     }
 
-    article.author = author;
+    article.sender = sender;
     await article.save();
 
     const type = await Type.findById(req.body.type);

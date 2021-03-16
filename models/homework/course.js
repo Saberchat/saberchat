@@ -1,6 +1,7 @@
 const mongoose = require('mongoose');
 
-const courseSchema = new mongoose.Schema({
+//Course schema stores information for tutoring center courses
+module.exports = mongoose.model("Course", new mongoose.Schema({
     name: String,
     joinCode: String,
     description: String,
@@ -40,6 +41,5 @@ const courseSchema = new mongoose.Schema({
             rating: Number
         }],
     }],
-}, {timestamps: {createdAt: 'created_at'}});
-
-module.exports = mongoose.model('Course', courseSchema);
+}, {timestamps: {createdAt: 'created_at'}
+}));

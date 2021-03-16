@@ -1,6 +1,7 @@
 const mongoose = require('mongoose');
 
-var orderItemSchema = new mongoose.Schema({
+//Order Item to be purchased in orders
+module.exports = mongoose.model("OrderItem", new mongoose.Schema({
     name: String,
     description: String,
     price: Number,
@@ -17,6 +18,5 @@ var orderItemSchema = new mongoose.Schema({
     availableItems: Number,
     upvotes: [{type: mongoose.Schema.Types.ObjectId, ref: 'User'}],
     cafe: {type: mongoose.Schema.Types.ObjectId, ref: "Cafe"}
-}, {timestamps: {createdAt: 'created_at'}});
-
-module.exports = mongoose.model('OrderItem', orderItemSchema);
+}, {timestamps: {createdAt: 'created_at'}
+}));

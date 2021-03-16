@@ -10,12 +10,9 @@ const Email = require("../models/admin/email");
 const Room = require('../models/chat/room');
 const Request = require('../models/inbox/accessRequest');
 const Message = require('../models/inbox/message');
-const {Announcement, Project} = require("../models/post");
+const {Announcement, Project, Article} = require("../models/post");
 const Course = require('../models/homework/course');
 const Order = require('../models/cafe/order');
-const Article = require('../models/wHeights/article');
-const Permission = require('../models/admin/permission');
-const Status = require('../models/admin/status');
 
 const controller = {};
 
@@ -306,32 +303,6 @@ controller.tag = async function(req, res) { //Add/remove status tag to user
     user.tags.push(req.body.tag);
     await user.save();
     return res.json({success: "Successfully added status", tag: req.body.tag})
-}
-
-controller.createPermission = async function(req, res) { //Create a permission
-    const permission = await Permission.create({title: req.body.permission});
-    if (!permission) {
-        req.flash('error', "Unable to create permission");
-        return res.redirect('back');
-    }
-
-    req.flash('success', "Permission created!");
-    return res.redirect('/admin/permissions');
-}
-
-controller.createStatus = async function(req, res) { //Create a status
-    const status = await Status.create({
-        title: req.body.status,
-        plural: req.body.plural,
-        version: req.body.version
-    });
-    if (!status) {
-        req.flash('error', "Unable to create status");
-        return res.redirect('back');
-    }
-
-    req.flash('success', "Status created!");
-    return res.redirect('/admin/status');
 }
 
 controller.permanentDelete = async function(req, res) {

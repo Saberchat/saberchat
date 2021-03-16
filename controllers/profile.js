@@ -15,9 +15,8 @@ const Comment = require('../models/chat/comment');
 const Room = require('../models/chat/room');
 const Request = require('../models/inbox/accessRequest');
 const Message = require('../models/inbox/message');
-const {Announcement, Project} = require('../models/post');
+const {Announcement, Project, Article} = require('../models/post');
 const Order = require('../models/cafe/order');
-const Article = require('../models/wHeights/article');
 const Course = require('../models/homework/course');
 
 const controller = {};

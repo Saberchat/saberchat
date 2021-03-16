@@ -1,8 +1,8 @@
 const mongoose = require("mongoose");
 const passportLocalMongoose = require("passport-local-mongoose");
 
-// user will have email, pswrd, name, desc., title, url to profile pic, and timestamp
-var userSchema = new mongoose.Schema({
+// Users that have accounts on the platform
+module.exports = mongoose.model("User", new mongoose.Schema({
     username: String,
     email: String,
     password: String,
@@ -48,14 +48,10 @@ var userSchema = new mongoose.Schema({
     followers: [{type: mongoose.Schema.Types.ObjectId, ref: "User"}],
     permission: {type: String, default: "default"},
     status: {type: String, default: "guest"},
-    tags: [{type: String}], //Cashier, Editor, Tutor, Etc.
+    tags: [{type: String}],
     balance: {type: Number, default: 0},
     debt: {type: Number, default: 0},
     darkmode: {type: Boolean, default: false},
     logins: [{type: Date}]
-}, {timestamps: {createdAt: 'created_at'}});
-
-//adds authentication functionality
-userSchema.plugin(passportLocalMongoose, {usernameField: 'email'});
-
-module.exports = mongoose.model("User", userSchema);
+}, {timestamps: {createdAt: 'created_at'}
+}).plugin(passportLocalMongoose, {usernameField: 'email'}));

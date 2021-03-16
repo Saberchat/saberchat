@@ -1,6 +1,7 @@
 const mongoose = require('mongoose');
 
-const orderSchema = new mongoose.Schema({
+//Orders made from item-selling services like the cafe
+module.exports = mongoose.model("Order", new mongoose.Schema({
     customer: {type: mongoose.Schema.Types.ObjectId, ref: 'User'},
     name: String,
     items: [{
@@ -14,6 +15,5 @@ const orderSchema = new mongoose.Schema({
     date: String,
     present: Boolean,
     payingInPerson: Boolean,
-}, {timestamps: {createdAt: 'created_at'}});
-
-module.exports = mongoose.model('Order', orderSchema);
+}, {timestamps: {createdAt: 'created_at'}
+}));

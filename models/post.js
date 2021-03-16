@@ -1,9 +1,9 @@
 const mongoose = require("mongoose");
 
-//Superclass post schema, to be implemented with announcements, projects, etc.
-var postSchema = new mongoose.Schema({
+//Superclass Post schema
+const Post = mongoose.model("Post", new mongoose.Schema({
     subject: String,
-    sender: {type: mongoose.Schema.Types.ObjectId, ref: 'User'},
+    sender: {type: mongoose.Schema.Types.ObjectId, ref: "User"},
     text: String,
     images: [{type: String}],
     mediaFiles: [{
@@ -12,23 +12,26 @@ var postSchema = new mongoose.Schema({
         originalName: String
     }],
     date: String,
-    likes: [{type: mongoose.Schema.Types.ObjectId, ref: 'User'}],
-    comments: [{type: mongoose.Schema.Types.ObjectId, ref: 'Post'}],
+    likes: [{type: mongoose.Schema.Types.ObjectId, ref: "User"}],
+    comments: [{type: mongoose.Schema.Types.ObjectId, ref: "PostComment"}],
 }, {
-    timestamps: {createdAt: 'created_at'},
-    discriminatorKey: 'type'
-});
-
-const Post = mongoose.model("Post", postSchema); //Superclass Schema
-
-//Subclass Schema
-module.exports.Announcement = Post.discriminator('Announcement', new mongoose.Schema({}));
-module.exports.Project = Post.discriminator('Project', new mongoose.Schema({
-    creators: [{type: mongoose.Schema.Types.ObjectId, ref: 'User'}]
+    timestamps: {createdAt: "created_at"},
+    discriminatorKey: "type"
 }));
 
-module.exports.PostComment = Post.discriminator('PostComment', new mongoose.Schema({}));
-module.exports.Review = Post.discriminator('Review', new mongoose.Schema({}));
-module.exports.Report = Post.discriminator('Report', new mongoose.Schema({
-    handled: {type: Boolean, default: false}
-}));
+module.exports = { //All subclass Schema
+    Announcement: Post.discriminator("Announcement", new mongoose.Schema({})), //Faculty/administrator announcements
+    PostComment: Post.discriminator("PostComment", new mongoose.Schema({})), //Comments on projects/announcements/reports
+    Review: Post.discriminator("Review", new mongoose.Schema({})), //Reviews for course tutors
+
+    //Subclasses with appended fields
+    Project: Post.discriminator("Project", new mongoose.Schema({ //Student projects
+        creators: [{type: mongoose.Schema.Types.ObjectId, ref: "User"}]
+    })),
+    Report: Post.discriminator("Report", new mongoose.Schema({ //Error reports/new feature requests
+        handled: {type: Boolean, default: false}
+    })),
+    Article: Post.discriminator("Article", new mongoose.Schema({ //School/organization news journal articles
+        content: [{type: String, data: {}}]
+    }))
+};
