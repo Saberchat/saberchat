@@ -18,11 +18,12 @@ const controller = {};
 
 controller.updatePlatformForm = async function(req, res) {
     const platform = await platformSetup();
-    return res.render("admin/settings", {platform});
+    return res.render("admin/settings", {platform, objectArrIndex});
 }
 
 controller.updatePlatform = async function(req, res) {
     const platform = await platformSetup();
+    const oldAddress = platform.emailExtension;
     for (let attr of ["name", "imageUrl", "emailExtension", "displayImages"]) { //Update elements with directly corresponding text
         platform[attr] = req.body[attr];
     }
@@ -54,7 +55,53 @@ controller.updatePlatform = async function(req, res) {
 
     platform.updateTime = `${req.body.day} ${req.body.month}`;
     platform.contact = {heading: req.body.contactHeading, description: req.body.contactInfo};
+
+    if (req.body.displayProjects) {
+        if (objectArrIndex(platform.publicFeatures, "name", "Student Projects") == -1) {
+            platform.publicFeatures.push({route: "projects", name: "Student Projects", icon: "paint-brush", subroutes: ["/"]});
+        }
+    } else {
+        platform.publicFeatures.splice(objectArrIndex(platform.publicFeatures, "name", "Student Projects"), 1);
+    }
     
+    if (req.body.displayAnns) {
+        if (objectArrIndex(platform.publicFeatures, "name", "Announcements") == -1) {
+            platform.publicFeatures.push({route: "announcements", name: "Announcements", icon: "bullhorn", subroutes: ["/"]});
+        }
+    } else {
+        platform.publicFeatures.splice(objectArrIndex(platform.publicFeatures, "name", "Announcements"), 1);
+    }
+
+    for (let i = 0; i < platform.features.length; i++) {
+        platform.features[i].name = req.body.feature[i];
+        platform.features[i].icon = req.body.icon[i];
+    }
+
+    if (oldAddress != req.body.emailExtension) { //Update all users who were by default allowed earlier
+        let email;
+        const users = await User.find({});
+        for (let user of users) {
+            if (user.email.split('@')[1] == oldAddress) {
+                email = await Email.create({address: user.email, version: "accesslist"});
+                if (!email) {
+                    req.flash("error", "Unable to create new email");
+                    return res.redirect("back");
+                }
+            }
+        }
+
+        const emails = await Email.find({version: "accesslist"});
+        for (let email of emails) {
+            if (email.address.split('@')[1] == req.body.emailExtension) { //Remove now-unnecessary emails from access list
+                email = await Email.findByIdAndDelete(email._id);
+                if (!email) {
+                    req.flash("error", "Unable to delete email");
+                    return res.redirect("back");
+                }
+            }
+        }
+    }
+
     await platform.save();
     req.flash("success", "Updated platform settings!");
     return res.redirect("/admin/settings");
