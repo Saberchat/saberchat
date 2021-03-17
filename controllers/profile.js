@@ -268,7 +268,7 @@ controller.changeEmailPut = async function(req, res) { //Update email
 	//Check if new email is allowed, not blocked, and not already taken
 		const allowedEmail = await Email.findOne({address: req.body.email, version: "accesslist"});
 		if (!allowedEmail) {
-			if (platform.emailExtension && req.body.email.split("@")[1] != platform.emailExtension) {
+			if (platform.emailExtension != '' && req.body.email.split("@")[1] != platform.emailExtension) {
 				req.flash('error', "New email must be a platform-verified email");
 				return res.redirect('back');
 			}

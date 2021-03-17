@@ -2,31 +2,30 @@ const mongoose = require("mongoose");
 
 //Platform schema holds all data for individual platform's settings
 var platformSchema = new mongoose.Schema({
-    name: String, //Done
-    imageUrl: String, //Done
-    emailExtension: String, //Done
+    name: String,
+    imageUrl: String,
+    emailExtension: {type: String, default: ''},
+    updateTime: {type: String, default: "0 0"},
 
+    //TODO: Starts here
+    permissionsProperty: [{type: String}],
+    permissionsDisplay: [{type: String}],
     statusesProperty: [{type: String}],
     statusesSingular: [{type: String}],
     statusesPlural: [{type: String}],
     studentStatuses: [{type: String}],
     formerStudentStatus: String,
     teacherStatus: String,
-    updateTime: String, //Done
-    permissionsProperty: [{type: String}],
-    permissionsDisplay: [{type: String}],
     tags: [{type: String}],
+    //ENDS HERE
 
-    //DO NOT DO
     publicFeatures: [{route: String, name: String, icon: String, subroutes: [{type: String}]}],
     features: [{route: String, name: String, icon: String}],
-
-    displayImages: [{type: String}], //Done
-    info: [{heading: String, text: [{type: String}], image: String}], //Done
-
-    services: [{type: String}], //Done
-    community: [{type: String}], //Done
-    contact: {heading: String, description: String} //Done
+    displayImages: [{type: String}],
+    info: [{heading: String, text: [{type: String}], image: String}],
+    services: [{type: String}],
+    community: [{type: String}],
+    contact: {heading: String, description: String}
 }, {timestamps: {createdAt: 'created_at'}});
 
 module.exports = mongoose.model("Platform", platformSchema);

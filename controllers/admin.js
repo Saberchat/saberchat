@@ -23,7 +23,7 @@ controller.updatePlatformForm = async function(req, res) {
 
 controller.updatePlatform = async function(req, res) {
     const platform = await platformSetup();
-    for (let attr of ["name", "imageUrl", "emailExtension", "updateTime", "displayImages"]) { //Update elements with directly corresponding text
+    for (let attr of ["name", "imageUrl", "emailExtension", "displayImages"]) { //Update elements with directly corresponding text
         platform[attr] = req.body[attr];
     }
 
@@ -52,7 +52,9 @@ controller.updatePlatform = async function(req, res) {
         });
     }
 
+    platform.updateTime = `${req.body.day} ${req.body.month}`;
     platform.contact = {heading: req.body.contactHeading, description: req.body.contactInfo};
+    
     await platform.save();
     req.flash("success", "Updated platform settings!");
     return res.redirect("/admin/settings");
@@ -263,7 +265,7 @@ controller.accesslistGet = async function(req, res) { //Show page with all permi
 controller.addEmail = async function (req, res) { //Add email to access list/blocked list
     const platform = await platformSetup();
     if (req.body.version === "accesslist") {
-        if (platform.emailExtension && req.body.address.split('@')[1] === platform.emailExtension) { //These emails are already verified
+        if (platform.emailExtension != '' && req.body.address.split('@')[1] === platform.emailExtension) { //These emails are already verified
             return res.json({error: `${platform.name} emails do not need to be added to the Access List`});
         }
     }

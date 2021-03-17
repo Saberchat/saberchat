@@ -23,12 +23,16 @@ module.exports = mongoose.model("Course", new mongoose.Schema({
         tutor: {type: mongoose.Schema.Types.ObjectId, ref: 'User'},
         slots: {type: Number, default: 0},
         available: {type: Boolean, default: true},
-        price: Number,
+        cost: {type: Number, default: 20},
         bio: String,
         dateJoined: Date,
         students: [{
             student: {type: mongoose.Schema.Types.ObjectId, ref: 'User'},
-            lessons: [{time: Number, date: String, summary: String}],
+            lessons: [{
+                time: Number, date: String, summary: String,
+                approved: {type: Boolean, default: false},
+                paid: {type: Boolean, default: false}
+            }],
             room: {type: mongoose.Schema.Types.ObjectId, ref: 'Room'}
         }],
         formerStudents: [{
@@ -37,7 +41,7 @@ module.exports = mongoose.model("Course", new mongoose.Schema({
         }],
         upvotes: [{type: mongoose.Schema.Types.ObjectId, ref: 'User'}],
         reviews: [{
-            review: {type: mongoose.Schema.Types.ObjectId, ref: 'PostComment'},
+            review: {type: mongoose.Schema.Types.ObjectId, ref: 'Review'},
             rating: Number
         }],
     }],

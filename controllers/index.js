@@ -21,7 +21,7 @@ controller.register = async function(req, res) {
     const platform = await platformSetup();
     const accesslistedEmail = await Email.findOne({address: req.body.email, version: "accesslist"});
     if (!accesslistedEmail) {
-        if (platform.emailExtension && req.body.email.split("@")[1] != platform.emailExtension) {
+        if (platform.emailExtension != '' && req.body.email.split("@")[1] != platform.emailExtension) {
             req.flash('error', `Only members of the ${platform.name} community may sign up`);
             return res.redirect('/');
         }

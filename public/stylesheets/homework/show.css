@@ -143,27 +143,31 @@
     font-weight: bold;
 }
 
-.reviews-length, .reviews-length:hover {
+.reviews-length, .reviews-length:hover, .cost-info {
     margin-left: 20px;
     font-size: 120%;
     font-weight: bold;
     text-decoration: none;
 }
 
+.cost-info {
+    color: #d62edb;
+}
+
 #rating-label, #join-code-heading, .list-group-item-success {
     font-weight: bold;
 }
 
-#slots-heading {
+#slots-heading, #cost-heading {
     font-weight: bold;
 }
 
-#slots-label {
+#slots-label, #cost-label {
     margin-top: 20px;
     font-style: italic;
 }
 
-#slots {
+#slots, #cost {
     width: 90%;
 }
 

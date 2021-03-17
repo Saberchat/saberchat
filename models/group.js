@@ -23,11 +23,18 @@ const Group = mongoose.model("Group", new mongoose.Schema({
 }));
 
 module.exports = {
-    Room: Group.discriminator("ChatRoom", new mongoose.Schema({ //Chat rooms
+    Room: Group.discriminator("Room", new mongoose.Schema({ //Chat rooms
         moderate: {type: Boolean, default: true},
         mutable: {type: Boolean, default: true},
         confirmed: [{type: mongoose.Schema.Types.ObjectId, ref: "User"}],
         comments: [{type: mongoose.Schema.Types.ObjectId, ref: "Comment"}]
+    })),
+
+    Cafe: Group.discriminator("Cafe", new mongoose.Schema({
+        open: {type: Boolean, default: false},
+        revenue: {type: Number, default: 0},
+        expenditures: {type: Number, default: 0},
+        types: [{type: mongoose.Schema.Types.ObjectId, ref: 'ItemType'}]
     })),
 
     Course: Group.discriminator("Course", new mongoose.Schema({ //Tutoring center courses
@@ -42,7 +49,11 @@ module.exports = {
             dateJoined: Date,
             students: [{
                 student: {type: mongoose.Schema.Types.ObjectId, ref: 'User'},
-                lessons: [{time: Number, date: String, summary: String}],
+                lessons: [{
+                    time: Number, date: String, summary: String,
+                    validated: {type: Boolean, default: false},
+                    paid: {type: Boolean, default: false}
+                }],
                 room: {type: mongoose.Schema.Types.ObjectId, ref: 'Room'}
             }],
             formerStudents: [{
@@ -51,7 +62,7 @@ module.exports = {
             }],
             upvotes: [{type: mongoose.Schema.Types.ObjectId, ref: 'User'}],
             reviews: [{
-                review: {type: mongoose.Schema.Types.ObjectId, ref: 'PostComment'},
+                review: {type: mongoose.Schema.Types.ObjectId, ref: 'Review'},
                 rating: Number
             }],
         }],

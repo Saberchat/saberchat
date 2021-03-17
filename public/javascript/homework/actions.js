@@ -199,6 +199,52 @@ const leave = function (button, location, darkmode) { //Leave a tutor
     });
 }
 
+const approve = function(button) {
+    const courseId = button.id.split('-')[0];
+    const tutorId = button.id.split('-')[1];
+    const index = button.id.split('-')[2];
+    const url = `/homework/approve-lesson/${courseId}?_method=put`;
+    const data = {tutorId, index};
+
+    $.post(url, data, data => {
+        if (data.success) {
+            if (button.innerText == "Reject Lesson") {
+                button.className = "btn btn-success";
+                button.innerText = "Approve Lesson";
+            } else {
+                button.className = "btn btn-danger";
+                button.innerText = "Reject Lesson";
+            }
+            document.getElementById("time-count").innerText = `${data.time} minutes`;
+            document.getElementById("cost").innerText = data.cost;
+            document.getElementById("time-count").innerText = getTime(document.getElementById("time-count").innerText.split(' ')[0]);
+        }
+    });
+}
+
+const markPayment = function(button) {
+    const courseId = button.id.split('-')[0];
+    const studentId = button.id.split('-')[1];
+    const index = button.id.split('-')[2];
+    const url = `/homework/mark-payment/${courseId}?_method=put`;
+    const data = {studentId, index};
+
+    $.post(url, data, data => {
+        if (data.success) {
+            if (button.innerText == "Cancel Payment") {
+                button.className = "btn btn-success";
+                button.innerText = "Approve Payment";
+            } else {
+                button.className = "btn btn-danger";
+                button.innerText = "Cancel Payment";
+            }
+            document.getElementById("cost").innerText = data.cost;
+        } else {
+            console.log(data.error);
+        }
+    });
+}
+
 const closeLessons = function (button, location) {
     const courseId = button.id.split('-')[0];
     const tutorId = button.id.split('-')[1];
@@ -260,9 +306,31 @@ const setStudents = function () { //For tutors to set how many students they can
     document.getElementById("slots-label").innerText = `Number of Student Slots: ${document.getElementById('slots').value}`;
 }
 
+const setCost = function () { //For tutors to set their price while joining course
+    document.getElementById("cost-label").innerText = `Hourly Cost: $${document.getElementById('cost').value}.00`;
+}
+
 const setStudentsTutorShow = function (slider) { //For tutors to set how many students they can take in a specific course on their own profile page
     const courseId = slider.id.split('-')[1];
     document.getElementById(`slots-label-${courseId}`).innerText = `Number of Student Slots: ${slider.value}`;
+}
+
+const setCostTutorShow = function (slider) { //For tutors to set their price on their own profile page
+    const courseId = slider.id.split('-')[1];
+    document.getElementById(`cost-label-${courseId}`).innerText = `Hourly Cost: $${slider.value}.00`;
+}
+
+const setCostShow = function (courseId) { //For tutors to set their price (not while joining course)
+    const url = `/homework/set-cost/${courseId}?_method=put`;
+    const cost = document.getElementById('cost').value;
+    const data = {courseId, cost};
+
+    $.post(url, data, data => {
+        if (data.success) {
+            document.getElementById("cost-count").innerText = `$${data.tutor.cost}.00`;
+            document.getElementById(`cost-info-${data.tutor.tutor}`).innerText = `$${data.tutor.cost}.00`;
+        }
+    });
 }
 
 const setStudentsShow = function (courseId) { //For tutors to set how many students they can take in a specific course (not while joining)

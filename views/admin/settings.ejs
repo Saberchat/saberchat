@@ -70,9 +70,21 @@
                                     name="emailExtension" value="<%= platform.emailExtension %>" placeholder="Enter Required Email Extension">
                         </div>
                         <div class="form-group">
-                            <label for="update-time-input">Student Status Update Time (s m h d m w)</label><br/>
-                            <input id="update-time-input" class="form-control mode" type="text"
-                                    name="updateTime" value="<%= platform.updateTime %>" placeholder="Enter Student Status Update Time (s m h d m w)">
+                            <label for="update-time-input">Student Status Update Time</label><br/>
+                            <select name="month" class="mode" style="width: 30%;">
+                            <% let months = ["None", "January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];%>
+                            <% for (let month of months) { %>
+                                <option value="<%=months.indexOf(month)%>" <%if (parseInt(platform.updateTime.split(' ')[1]) == months.indexOf(month)) {%> selected <% } %>>
+                                    <%=month%>
+                                </option>
+                            <% } %>
+                            </select>
+                            <select name="day" class="mode" style="width: 10%;">
+                                <option value="0">None</option>
+                            <% for (let i = 1; i < 31; i++) { %>
+                                <option value="<%=i%>" <%if (parseInt(platform.updateTime.split(' ')[0]) == i) {%> selected <% } %>><%=i%></option>
+                            <% } %>
+                            </select>
                         </div><br>
                         <h4>Displayed Information</h4>
                         <div class="form-group">

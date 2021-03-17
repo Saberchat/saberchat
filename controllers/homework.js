@@ -104,6 +104,7 @@ controller.joinCourse = async function(req, res) {
                 tutor: req.user,
                 bio: req.body.bio,
                 slots: parseInt(req.body.slots),
+                cost: parseInt(req.body.cost),
                 available: (parseInt(req.body.slots) > 0),
                 dateJoined: new Date(Date.now())
             });
@@ -570,6 +571,45 @@ controller.unblock = async function(req, res) { //Unblock a previously blocked u
 
 //-----------TUTOR ROUTES -----------//
 
+controller.markPayment = async function(req, res) {
+    const course = await Course.findById(req.params.id);
+    if (!course) {
+        return res.json({error: "Unable to find course"});
+    }
+    for (let tutor of course.tutors) {
+        if (tutor.tutor.equals(req.user._id)) {
+            for (let student of tutor.students) {
+                if (student.student.equals(req.body.studentId)) {
+                    if (student.lessons[req.body.index]) {
+                        student.lessons[req.body.index].paid = !student.lessons[req.body.index].paid;
+                        await course.save();
+
+                        let cost = 0;
+                        let time = 0;
+                        let costString;
+                        for (let lesson of student.lessons) {
+                            if (lesson.approved) {
+                                time += lesson.time;
+                                if (!lesson.paid) {
+                                    cost += (lesson.time/60)*tutor.cost;
+                                }
+                            }
+                        }
+                        if (cost == 0) {
+                            costString = `0.00`;
+                        } else {
+                            costString = `${(Math.round(cost*100)).toString().slice(0, -2)}.${(Math.round(cost*100)).toString().slice(-2)}`;
+                        }
+                        return res.json({success: "Successfully changed", time, cost: costString});
+                    }
+                }
+            }
+            return res.json({error: "Student not found"});
+        }
+    }
+    return res.json({error: "Tutor not found"});
+}
+
 controller.updateBio = async function(req, res) {
     const course = await Course.findById(req.params.id);
     if (!course) {
@@ -621,10 +661,8 @@ controller.setStudents = async function(req, res) {
         return res.json({error: "Error accessing course"});
     }
 
-    let found = false;
     for (let tutor of course.tutors) { //Search through tutors to find requested tutor
         if (tutor.tutor.equals(req.user._id)) {
-            found = true;
             tutor.slots = parseInt(req.body.slots) - tutor.students.length; //Update slots based on data
             if ((parseInt(req.body.slots) - tutor.students.length) == 0) { //Update availability based on new slot info
                 tutor.available = false;
@@ -633,9 +671,23 @@ controller.setStudents = async function(req, res) {
             return res.json({success: "Succesfully changed", tutor});
         }
     }
-    if (!found) {
-        return res.json({error: "Unable to find tutor"});
+    return res.json({error: "Unable to find tutor"});
+}
+
+controller.setCost = async function(req, res) {
+    const course = await Course.findById(req.params.id);
+    if (!course) {
+        return res.json({error: "Error accessing course"});
     }
+
+    for (let tutor of course.tutors) { //Search through tutors to find requested tutor
+        if (tutor.tutor.equals(req.user._id)) {
+            tutor.cost = parseInt(req.body.cost);
+            await course.save();
+            return res.json({success: "Succesfully changed", tutor});
+        }
+    }
+    return res.json({error: "Unable to find tutor"});
 }
 
 controller.markLesson = async function(req, res) {
@@ -646,13 +698,9 @@ controller.markLesson = async function(req, res) {
     //Find specific tutor and add lesson for their student
     for (let tutor of course.tutors) {
         if (tutor.tutor.equals(req.user._id)) {
-            req.user.balance += (tutor.price * time); //Pay tutor
-            await req.user.save();
 
             for (let student of tutor.students) {
                 if (student.student.equals(req.body.studentId)) {
-                    student.student.balance += (tutor.price * time); //Remove money from student
-                    await student.student.save();
 
                     student.lessons.push({
                         time: req.body.time,
@@ -852,6 +900,46 @@ controller.likeReview = async function(req, res) {
     return res.json({success: "Liked", likeCount: review.likes.length});
 }
 
+controller.approveLesson = async function(req, res) {
+    const course = await Course.findById(req.params.id);
+    if (!course) {
+        return res.json({error: "Unable to find course"});
+    }
+    for (let tutor of course.tutors) {
+        if (tutor.tutor.equals(req.body.tutorId)) {
+            for (let student of tutor.students) {
+                if (student.student.equals(req.user._id)) {
+                    if (student.lessons[req.body.index]) {
+                        student.lessons[req.body.index].approved = !student.lessons[req.body.index].approved;
+                        await course.save();
+
+                        let cost = 0;
+                        let time = 0;
+                        let costString;
+                        for (let lesson of student.lessons) {
+                            if (lesson.approved) {
+                                time += lesson.time;
+                                if (!lesson.paid) {
+                                    cost += (lesson.time/60)*tutor.cost;
+                                }
+                            }
+                        }
+                        if (cost == 0) {
+                            costString = `0.00`;
+                        } else {
+                            costString = `${(Math.round(cost*100)).toString().slice(0, -2)}.${(Math.round(cost*100)).toString().slice(-2)}`;
+                        }
+
+                        return res.json({success: "Successfully changed", time, cost: costString});
+                    }
+                }
+            }
+            return res.json({error: "Student not found"});
+        }
+    }
+    return res.json({error: "Tutor not found"});
+}
+
 //----OTHER----//
 
 controller.showTutor = async function(req, res) {
@@ -877,7 +965,7 @@ controller.showTutor = async function(req, res) {
 
     for (let tutor of course.tutors) {
         if (tutor.tutor._id.equals(req.query.tutorId)) {
-            let studentIds = []; //Collect info on all students who are members of this tutor
+            let studentIds = []; //Collect info on all course students 
             for (let student of course.students) {
                 studentIds.push(student.toString());
             }
@@ -889,10 +977,10 @@ controller.showTutor = async function(req, res) {
                 return res.redirect('back');
             }
 
-            for (let course of courses) {
-                for (let t of course.tutors) {
+            for (let c of courses) {
+                for (let t of c.tutors) {
                     if (t.tutor.equals(tutor.tutor._id)) {
-                        enrolledCourses.push(course);
+                        enrolledCourses.push(c);
                     }
                 }
             }
@@ -902,7 +990,8 @@ controller.showTutor = async function(req, res) {
                 averageRating += review.rating;
             }
             averageRating = Math.round(averageRating / tutor.reviews.length);
-
+            
+            //Collect info on all students who are members of this tutor
             const students = await User.find({authenticated: true, _id: {$in: parsePropertyArray(tutor.students, "student")}});
             if (!students) {
                 req.flash('error', "Unable to find students");
@@ -910,13 +999,26 @@ controller.showTutor = async function(req, res) {
             }
 
             let lessonMap = new Map(); //Track all lessons of this tutor's students
+            let costMap = new Map();
             let time = 0;
+            let cost = 0;
             for (let student of tutor.students.concat(tutor.formerStudents)) {
                 time = 0;
+                cost = 0;
                 for (let lesson of student.lessons) {
-                    time += lesson.time;
+                    if (lesson.approved) {
+                        time += lesson.time;
+                        if (!lesson.paid) {
+                            cost += (lesson.time/60)*tutor.cost;
+                        }
+                    }
                 }
                 lessonMap.set(student.student._id.toString(), time);
+                if (cost == 0) {
+                    costMap.set(student.student._id.toString(), `0.00`);
+                } else {
+                    costMap.set(student.student._id.toString(), `${(Math.round(cost*100)).toString().slice(0, -2)}.${(Math.round(cost*100)).toString().slice(-2)}`);
+                }
             }
 
             if (req.query.studentId) { //If query is to show a tutor's lessons with a specific student
@@ -925,8 +1027,9 @@ controller.showTutor = async function(req, res) {
                     //Check that user is either a student of this tutor, this tutor, or the course's teacher
                     if (allStudents[objectArrIndex(allStudents, "student", req.query.studentId, "_id")].student._id.equals(req.user._id) || tutor.tutor._id.equals(req.user._id) || course.teacher.equals(req.user._id)) {
                         return res.render('homework/lessons', {
-                            platform, course, tutor, student: allStudents[objectArrIndex(allStudents, "student", req.query.studentId, "_id")],
-                            time: lessonMap.get(allStudents[objectArrIndex(allStudents, "student", req.query.studentId, "_id")].student._id.toString()), objectArrIndex
+                            platform, course, tutor, student: allStudents[objectArrIndex(allStudents, "student", req.query.studentId, "_id")], objectArrIndex,
+                            time: lessonMap.get(allStudents[objectArrIndex(allStudents, "student", req.query.studentId, "_id")].student._id.toString()), 
+                            cost: costMap.get(allStudents[objectArrIndex(allStudents, "student", req.query.studentId, "_id")].student._id.toString()), 
                         });
                     }
                     req.flash('error', "You do not have permission to view that student");

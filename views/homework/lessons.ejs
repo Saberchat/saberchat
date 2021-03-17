@@ -57,24 +57,53 @@
         <ul id="lesson-info-<%= student.student._id %>" class="list-group">
             <li class="list-group-item list-group-item-success status-header darkmode-outline">
                 <div class="d-flex w-100 justify-content-between">
-                    <h2 class="mb-1 darkmode-header">Lessons (<%= student.lessons.length %>)</h2>
-                    <p id="time-count" class="darkmode-header">
-                        <%=time%> minutes
-                    </p>
+                    <h2 class="mb-1 darkmode-header"><%= student.lessons.length %> Lessons ($<span id="cost"><%=cost%></span> Owed)</h2>
+                    <p id="time-count" class="darkmode-header"><%=time%> minutes</p>
                 </div>
             </li>
 
-            <% for (let lesson of student.lessons.reverse()) { %>
+            <% let lesson;%>
+            <% for (let i = student.lessons.length-1; i >= 0; i--) { %>
+                <% lesson = student.lessons[i];%>
                 <li class="list-group-item list-group-item-action tutor-profile menu-item cafe">
                     <span class="lesson-info"><%= lesson.date %> | <%= lesson.time %> minute(s)</span><br/>
                     <p>
                         <%= lesson.summary %>
                     </p>
+
+                    <% if (student.student._id.equals(currentUser._id)) { %>
+                        <% if (lesson.approved) { %>
+                            <button onclick="approve(this)" id="<%=course._id%>-<%=tutor.tutor._id%>-<%=i%>" class="btn btn-danger" style="float: right;">Reject Lesson</button>
+                        <% } else {%>
+                            <button onclick="approve(this)" id="<%=course._id%>-<%=tutor.tutor._id%>-<%=i%>" class="btn btn-success" style="float: right;">Approve Lesson</button>
+                        <% } %>
+                    <% } else { %>
+                        <% if (lesson.approved) { %>
+                            <span style="font-weight: bold; color: green;">Lesson Approved</span>
+                        <% } else { %>
+                            <span style="font-weight: bold; color: red;">Lesson Has Not Been Approved</span>
+                        <% } %>
+                    <% } %>
+
+                    <% if (tutor.tutor._id.equals(currentUser._id)) { %>
+                        <% if (lesson.paid) { %>
+                            <button onclick="markPayment(this)" id="<%=course._id%>-<%=student.student._id%>-<%=i%>" class="btn btn-danger" style="float: right;">Cancel Payment</button>
+                        <% } else {%>
+                            <button onclick="markPayment(this)" id="<%=course._id%>-<%=student.student._id%>-<%=i%>" class="btn btn-success" style="float: right;">Accept Payment</button>
+                        <% } %>
+                    <% } else { %>
+                        <br>
+                        <% if (lesson.paid) { %>
+                            <span style="font-weight: bold; color: green;">Lesson Paid</span>
+                        <% } else { %>
+                            <span style="font-weight: bold; color: red;">Lesson Has Not Been Paid For</span>
+                        <% } %>
+                    <% } %>
                 </li>
             <% } %>
         </ul>
     <% } else { %>
-        <h1 id="no-lessons">No Lessons</h1>
+        <h1 id="no-lessons">No Lessons ($0.00)</h1>
     <% } %>
 </div>
 </body>

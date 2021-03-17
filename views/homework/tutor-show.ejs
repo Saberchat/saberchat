@@ -108,6 +108,9 @@
                       <h4 id="darkmode-header">Lessons</h4>
                       <p id="lessons-length"><%=lessons%></p>
 
+                      <h4 id="darkmode-header">Hourly Cost</h4>
+                      <p>$<%= tutor.cost %>.00</p>
+
                       <h4 id="darkmode-header">Status</h4>
                       <p><%= tutor.tutor.status.charAt(0).toUpperCase() + tutor.tutor.status.slice(1) %></p>
 
@@ -443,8 +446,7 @@
                       <% } %>
                       <% if (tutor.tutor._id.equals(currentUser._id) || student.student._id.equals(currentUser._id) || course.teacher._id.equals(currentUser._id)) { %>
                           <span class="lessons-length">
-                              <span id="lessons-length-<%= student.student._id %>"><%= student.lessons.length%></span>
-                          lesson(s)</span>
+                              <span id="lessons-length-<%= student.student._id %>"><%= student.lessons.length%></span> lesson(s)</span>
                       <% } %>
                   </div>
                   <div class="modal fade" id="modal-<%= student.student._id %>-mark" tabindex="-1"
@@ -506,8 +508,9 @@
                           <% } %>
 
                           <% if (tutor.tutor._id.equals(currentUser._id) || student.student._id.equals(currentUser._id) || course.teacher._id.equals(currentUser._id)) { %>
-                              <span class="lessons-length"><span
-                                          id="lessons-length-<%= student.student._id %>"><%= student.lessons.length%></span> lesson(s)</span>
+                              <span class="lessons-length">
+                                <span id="lessons-length-<%= student.student._id %>"><%= student.lessons.length%></span> lesson(s) </span>
+                              </span>
                           <% } %>
                       </div>
                   <% } %>
@@ -580,7 +583,7 @@
                                   </form>
                                     <% } %>
 
-                                    <% if (currentUser.tags.includes("Tutor") && !currentUser.status == platform.teacherStatus) { %>
+                                    <% if (currentUser.tags.includes("Tutor") && currentUser.status != platform.teacherStatus) { %>
                                         <form action="/homework/join" method="post" id="join-tutor-<%= c._id %>"
                                               class="join-course-tutor">
                                     <button type="button" data-toggle="modal" data-target="#modal-tutor-<%= c._id %>"
@@ -602,6 +605,9 @@
                                             <input type="range" min="0" max="5" value="0" class="slider"
                                                   id="slots-<%= c._id %>" name="slots"
                                                   onchange="setStudentsTutorShow(this)">
+                                            <br><label for="cost" id="cost-label-<%=c._id%>">Hourly Cost: $10.00</label><br/>
+                                            <input type="range" min="10" max="30" value="10" class="slider mode" id="cost-<%=c._id%>"
+                                                    name="cost" onchange="setCostTutorShow(this)">
                                             <textarea rows="5" minlength="20" maxlength="500" class="form-control mode"
                                                       name="bio" placeholder="A Short Bio About Yourself"></textarea>
                                           </div>

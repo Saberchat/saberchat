@@ -172,13 +172,12 @@ const getRandMessage = (list => {
 
 // const manageComments = schedule.scheduleJob('0 0 0 * * *', () => {
 // 	Comment.find({}, (err, comments) => {
-// 		if(err) {
+// 		if(err || !comments) {
 // 			console.log(err);
 // 		} else {
 // 			comments.map((comment) => {
 // 				if(true) {
 // 					comment.remove();
-// 					console.log('removed comments');
 // 				}
 // 			});
 // 		}
@@ -188,8 +187,8 @@ const getRandMessage = (list => {
 // Update all students' statuses on update date, if required
 const updateStatuses = async function() {
   const platform = await platformSetup();
-  if (platform.updateTime) {
-      await schedule.scheduleJob(platform.updateTime, async() => {
+  if (platform.updateTime.split(' ')[0] != "0" && platform.updateTime.split(' ')[1] != "0") { //If there is an update time
+      await schedule.scheduleJob(`0 0 0 ${platform.updateTime.split(' ')[0]} ${platform.updateTime.split(' ')[1]} *`, async() => {
           const statuses = platform.studentStatuses.concat(platform.formerStudentStatus);
           const users = await User.find({authenticated: true, status: {$in: platform.studentStatuses}});
           if (!users) { return console.log(err);}  

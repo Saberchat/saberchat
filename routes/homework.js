@@ -38,8 +38,10 @@ router.put('/unblock/:id', wrapAsync(middleware.isLoggedIn), wrapAsync(middlewar
 router.put("/bio/:id", wrapAsync(middleware.isLoggedIn), wrapAsync(middleware.accessToFeature), middleware.isTutor, wrapAsync(hw.updateBio)); //Edit tutor bio
 router.put('/close-lessons/:id', wrapAsync(middleware.isLoggedIn), wrapAsync(middleware.accessToFeature), wrapAsync(middleware.memberOfCourse), wrapAsync(hw.closeLessons)); //For a tutor to make themself unavailable
 router.put('/reopen-lessons/:id', wrapAsync(middleware.isLoggedIn), wrapAsync(middleware.accessToFeature), wrapAsync(middleware.memberOfCourse), wrapAsync(hw.reopenLessons)); //For a tutor to make themself available to students
+router.put('/set-cost/:id', middleware.isTutor, wrapAsync(middleware.accessToFeature), wrapAsync(middleware.memberOfCourse), wrapAsync(hw.setCost)); //For tutors to update their costs
 router.put('/set-students/:id', middleware.isTutor, wrapAsync(middleware.accessToFeature), wrapAsync(middleware.memberOfCourse), wrapAsync(hw.setStudents)); //For tutors to set student capacity
 router.put("/mark/:id", wrapAsync(middleware.isLoggedIn), wrapAsync(middleware.accessToFeature), middleware.isTutor, wrapAsync(middleware.memberOfCourse), wrapAsync(hw.markLesson)); //Mark a student's lesson
+router.put('/mark-payment/:id', wrapAsync(middleware.isLoggedIn), wrapAsync(middleware.accessToFeature), middleware.isTutor, wrapAsync(hw.markPayment)); //Mark student's payment
 
 //Student put requests
 router.put('/book/:id', wrapAsync(middleware.isLoggedIn), wrapAsync(middleware.accessToFeature), wrapAsync(middleware.isStudent), wrapAsync(middleware.memberOfCourse), wrapAsync(hw.bookTutor)); //Book a tutor
@@ -47,5 +49,6 @@ router.put('/leave/:id', wrapAsync(middleware.isLoggedIn), wrapAsync(middleware.
 router.put('/upvote/:id', wrapAsync(middleware.isLoggedIn), wrapAsync(middleware.accessToFeature), wrapAsync(middleware.isStudent), wrapAsync(middleware.memberOfCourse), wrapAsync(hw.upvoteTutor)); //Upvote a tutor
 router.put('/rate/:id', wrapAsync(middleware.isLoggedIn), wrapAsync(middleware.accessToFeature), wrapAsync(middleware.isStudent), wrapAsync(middleware.memberOfCourse), wrapAsync(hw.rateTutor)); //Submit a review for a tutor
 router.put('/like-review/:id', wrapAsync(middleware.isLoggedIn), wrapAsync(middleware.accessToFeature), wrapAsync(middleware.isStudent), wrapAsync(hw.likeReview)); //Like a tutor's review
+router.put('/approve-lesson/:id', wrapAsync(middleware.isLoggedIn), wrapAsync(middleware.accessToFeature), wrapAsync(middleware.isStudent), wrapAsync(hw.approveLesson)); //Approve Lesson
 
 module.exports = router;

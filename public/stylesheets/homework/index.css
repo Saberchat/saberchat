@@ -40,7 +40,7 @@
     display: inline;
 }
 
-#slots {
+#slots, #cost {
     margin-bottom: 20px;
     width: 90%;
 }
