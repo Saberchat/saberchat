@@ -14,9 +14,7 @@ const scrollToElement = function (innerElement) {
 const report = function (element) {
     let id = element.id;
     let url = '/chat/comments/' + id + '/report?_method=put'
-    let data = {
-        user: userId
-    };
+    let data = {user: userId, roomId: room};
     let parent = element.parentNode;
     element.remove();
     $(parent).append(`<p class="flag">Waiting...</p>`);

@@ -6,9 +6,10 @@ const filter = new Filter();
 const axios = require('axios');
 const {cloudUpload, cloudDelete} = require('../services/cloudinary');
 const {objectArrIndex, removeIfIncluded, concatMatrix, multiplyArrays, parsePropertyArray} = require('../utils/object-operations');
-const platformSetup = require("../platform");
+const setup = require("../utils/setup");
 
 //SCHEMA
+const Platform = require("../models/platform");
 const User = require('../models/user');
 const Email = require('../models/admin/email');
 const Comment = require('../models/chat/comment');
@@ -17,7 +18,7 @@ const Request = require('../models/inbox/accessRequest');
 const Message = require('../models/inbox/message');
 const {Announcement, Project, Article} = require('../models/post');
 const Order = require('../models/cafe/order');
-const Course = require('../models/homework/course');
+const {Course} = require('../models/group');
 
 const controller = {};
 
@@ -26,7 +27,7 @@ if (process.env.NODE_ENV !== "production") {
 }
 
 controller.index = async function(req, res) {
-	const platform = await platformSetup();
+	const platform = await setup(Platform);
 	const users = await User.find({authenticated: true});
 	if (!users) {
 		req.flash("error", "An error occurred");
@@ -65,7 +66,7 @@ controller.index = async function(req, res) {
 }
 
 controller.edit = async function(req, res) {
-	const platform = await platformSetup();
+	const platform = await setup(Platform);
 	return res.render('profile/edit', { //Check if user has permissions to change their own tags and statuses
 		platform,
 		statuses: platform.statusesProperty,
@@ -75,12 +76,12 @@ controller.edit = async function(req, res) {
 }
 
 controller.changeLoginInfo = async function(req, res) {
-	const platform = await platformSetup();
+	const platform = await setup(Platform);
 	return res.render('profile/edit_pwd_email', {platform});
 }
 
 controller.show = async function(req, res) {
-	const platform = await platformSetup();
+	const platform = await setup(Platform);
 	const user = await User.findById(req.params.id).populate('followers');
 	if (!user) {
 		req.flash('error', 'Error. Cannot find user.');
@@ -112,7 +113,7 @@ controller.show = async function(req, res) {
 }
 
 controller.update = async function(req, res) {
-	const platform = await platformSetup();
+	const platform = await setup(Platform);
 		const overlap = await User.find({
 				authenticated: true,
 				username: filter.clean(req.body.username),
@@ -131,7 +132,22 @@ controller.update = async function(req, res) {
 		if (req.body.status == '' || !platform.statusesProperty.includes(req.body.status)) { //If no new status is selected, keep the current user's status
 				status = req.user.status;
 		} else { //If a new status is selected, move to that
+			if (req.user.status == platform.teacherStatus) { //If user is currently teaching a course, they cannot lose their teacher status
+				const courses = await Course.find({});
+				if (!courses) {
+					req.flash('error', "Could not find courses");
+					return res.redirect('back');
+				}
+		
+				for (let course of courses) {
+					if (course.creator.equals(user._id)) {
+						req.flash('error', "You are currently teaching a course, and cannot lose your status");
+						return res.redirect('back');
+					}
+				}
 				status = req.body.status;
+			}
+			status = req.body.status;
 		}
 
 		let user = { //Updated user object
@@ -250,7 +266,7 @@ controller.tagPut = async function(req, res) {
 }
 
 controller.changeEmailPut = async function(req, res) { //Update email
-	const platform = await platformSetup();
+	const platform = await setup(Platform);
 	//Update receiving emails info
 		if (req.body.receiving_emails) {
 				req.user.receiving_emails = true;

@@ -22,14 +22,16 @@ const Post = mongoose.model("Post", new mongoose.Schema({
 module.exports = { //All subclass Schema
     Announcement: Post.discriminator("Announcement", new mongoose.Schema({})), //Faculty/administrator announcements
     PostComment: Post.discriminator("PostComment", new mongoose.Schema({})), //Comments on projects/announcements/reports
-    Review: Post.discriminator("Review", new mongoose.Schema({})), //Reviews for course tutors
-
-    //Subclasses with appended fields
+    
+    //SUBCLASSES WITH APPENDED FIELDS
     Project: Post.discriminator("Project", new mongoose.Schema({ //Student projects
         creators: [{type: mongoose.Schema.Types.ObjectId, ref: "User"}]
     })),
     Report: Post.discriminator("Report", new mongoose.Schema({ //Error reports/new feature requests
         handled: {type: Boolean, default: false}
+    })),
+    Review: Post.discriminator("Review", new mongoose.Schema({ //Reviews for course tutors
+        rating: {type: Number, default: 0}
     })),
     Article: Post.discriminator("Article", new mongoose.Schema({ //School/organization news journal articles
         content: [{type: String, data: {}}]

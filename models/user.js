@@ -41,7 +41,7 @@ module.exports = mongoose.model("User", new mongoose.Schema({
         announcement: {type: mongoose.Schema.Types.ObjectId, ref: "Announcement"},
         version: String
     }],
-    newRoomCount: [{type: mongoose.Schema.Types.ObjectID, ref: "Room"}],
+    newRoomCount: [{type: mongoose.Schema.Types.ObjectID, ref: "ChatRoom"}],
     reqCount: {type: Number, default: 0},
     inbox: [{type: mongoose.Schema.Types.ObjectId, ref: "Message"}],
     requests: [{type: mongoose.Schema.Types.ObjectId, ref: "AccessRequest"}],

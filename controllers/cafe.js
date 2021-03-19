@@ -1,20 +1,21 @@
 //LIBRARIES
-const dateFormat = require('dateformat');
-const path = require('path');
+const dateFormat = require("dateformat");
+const path = require("path");
 const {sendGridEmail} = require("../services/sendGrid");
 const { sortByPopularity } = require("../utils/popularity");
 const {convertToLink} = require("../utils/convert-to-link");
 const getData = require("../utils/cafe-data");
 const {removeIfIncluded} = require("../utils/object-operations");
-const {cloudUpload, cloudDelete} = require('../services/cloudinary');
-const platformSetup = require("../platform");
+const {cloudUpload, cloudDelete} = require("../services/cloudinary");
+const setup = require("../utils/setup");
 
 //SCHEMA
-const Order = require('../models/cafe/order');
-const Item = require('../models/cafe/orderItem');
-const Notification = require('../models/inbox/message');
-const Category = require('../models/cafe/itemType');
-const Cafe = require('../models/cafe/cafe')
+const Platform = require("../models/platform");
+const Order = require("../models/cafe/order");
+const Item = require("../models/cafe/orderItem");
+const Notification = require("../models/inbox/message");
+const {ItemCategory} = require("../models/category");
+const {Market} = require("../models/group");
 
 const controller = {};
 
@@ -22,28 +23,28 @@ const controller = {};
 
 //SHOW CAFE HOMEPAGE
 controller.index = async function(req, res) {
-    const platform = await platformSetup();
-    const orders = await Order.find({customer: req.user._id}).populate('items.item'); //Find all of the orders that you have ordered, and populate info on their items
+    const platform = await setup(Platform);
+    const orders = await Order.find({customer: req.user._id}).populate("items.item"); //Find all of the orders that you have ordered, and populate info on their items
     if (!orders) {
-        req.flash('error', "Unable to find orders");
-        return res.redirect('back');
+        req.flash("error", "Unable to find orders");
+        return res.redirect("back");
     }
-
-    return res.render('cafe/index', {platform, orders});
+    return res.render("cafe/index", {platform, orders});
 }
 
 controller.orderForm = async function(req, res) {
-    const platform = await platformSetup();
-    const categories = await Category.find({}).populate('items');
+    const platform = await setup(Platform);
+    const cafe = await setup(Market);
+    const categories = await ItemCategory.find({_id: {$in: cafe.categories}}).populate("items");
     if (!categories) {
-        req.flash('error', "Unable to find categories");
-        return res.redirect('back');
+        req.flash("error", "Unable to find categories");
+        return res.redirect("back");
     }
 
-    const allOrders = await Order.find({customer: req.user._id}).populate('items.item'); //Find all of the orders that you have ordered, and populate info on their items
+    const allOrders = await Order.find({customer: req.user._id}).populate("items.item"); //Find all of the orders that you have ordered, and populate info on their items
     if (!allOrders) {
-        req.flash('error', "Unable to find orders");
-        return res.redirect('back');
+        req.flash("error", "Unable to find orders");
+        return res.redirect("back");
     }
 
     let sortedCategories = [];
@@ -85,24 +86,24 @@ controller.orderForm = async function(req, res) {
     const frequentItems = sortByPopularity(orderedItems, "totalOrdered", "created_at", ["item"]).popular;
 
     if (req.query.order) { //SHOW NEW ORDER FORM
-        const sentOrders = await Order.find({name: `${req.user.firstName} ${req.user.lastName}`, present: true}); //Find all of this user's orders that are currently active
+        const sentOrders = await Order.find({name: `${req.user.firstName} ${req.user.lastName}`, present: true}); //Find all of this user"s orders that are currently active
         if (!sentOrders) {
-            req.flash('error', "Unable to find orders");
-            return res.redirect('back');
+            req.flash("error", "Unable to find orders");
+            return res.redirect("back");
 
         } else if (sentOrders.length > 2) {
-            req.flash('error', "You have made the maximum number of orders for the day");
-            return res.redirect('back');
+            req.flash("error", "You have made the maximum number of orders for the day");
+            return res.redirect("back");
         }
 
-        return res.render('cafe/newOrder', {platform, categories: sortedCategories, frequentItems});
+        return res.render("cafe/newOrder", {platform, categories: sortedCategories, frequentItems});
     }
 
     if (req.query.menu) { //SHOW MENU
-        const categories = await Category.find({}).populate('items'); //Collects info on every item category, to render (in frontend, the ejs checks each item inside category, and only shows it if it's available)
+        const categories = await ItemCategory.find({_id: {$in: cafe.categories}}).populate("items"); //Collects info on every item category, to render (in frontend, the ejs checks each item inside category, and only shows it if it"s available)
         if (!categories) {
-            req.flash('error', "An Error Occurred");
-            return res.redirect('back');
+            req.flash("error", "An Error Occurred");
+            return res.redirect("back");
         }
 
         let fileExtensions = new Map();
@@ -115,7 +116,7 @@ controller.orderForm = async function(req, res) {
                 }
             }
         }
-        return res.render('cafe/menu', {platform, categories: sortedCategories, itemDescriptions, frequentItems, fileExtensions});
+        return res.render("cafe/menu", {platform, categories: sortedCategories, itemDescriptions, frequentItems, fileExtensions});
     }
 }
 
@@ -123,33 +124,33 @@ controller.orderForm = async function(req, res) {
 
 //CREATE ORDER
 controller.order = async function(req, res) {
-    const platform = await platformSetup();
+    const platform = await setup(Platform);
     if (!req.body.check) { //If any items are selected
-        req.flash('error', "Cannot send empty order"); //If no items were checked
-        return res.redirect('back');
+        req.flash("error", "Cannot send empty order"); //If no items were checked
+        return res.redirect("back");
     }
 
     const sentOrders = await Order.find({name: `${req.user.firstName} ${req.user.lastName}`, present: true});
     if (!sentOrders) {
-        req.flash('error', "Unable to find orders");
-        return res.redirect('back');
+        req.flash("error", "Unable to find orders");
+        return res.redirect("back");
     }
 
     if (sentOrders.length > 2) { //If more than two orders are already made, you cannot order again
-        req.flash('error', "You have made the maximum number of orders for the day");
-        return res.redirect('back');
+        req.flash("error", "You have made the maximum number of orders for the day");
+        return res.redirect("back");
     }
 
     const orderedItems = await Item.find({_id: {$in: Object.keys(req.body.check)}}); //Find all ordered items
     if (!orderedItems) {
-        req.flash('error', 'No items found');
-        return res.redirect('back');
+        req.flash("error", "No items found");
+        return res.redirect("back");
     }
 
     for (let item of orderedItems) { //Search for unavailable items
         if (item.availableItems < parseInt(req.body[item.name])) {
             req.flash("error", "Some items are unavailable in the quantities you requested. Please order again.");
-            return res.redirect('back');
+            return res.redirect("back");
         }
     }
 
@@ -163,7 +164,7 @@ controller.order = async function(req, res) {
     if (!req.body.payingInPerson) {
         if (charge > req.user.balance) { //Check to see if you are ordering more than you can
             req.flash("error", `You do not have enough money in your account to pay for this order. Contact the ${platform.permissionsDisplay[platform.permissionsDisplay.length-1]} to update your balance.`);
-            return res.redirect('/cafe');
+            return res.redirect("/cafe");
         }
         req.user.balance -= charge;
         req.user.debt += charge;
@@ -171,16 +172,16 @@ controller.order = async function(req, res) {
     }
 
     req.flash("success", "Order Sent!");
-    return res.redirect('/cafe');
+    return res.redirect("/cafe");
 }
 
 //-----------ROUTES FOR SPECIFIC ORDERS-------------//
 
 //PROCESS AND CONFIRM ORDER
 controller.processOrder = async function(req, res) {
-    const order = await Order.findById(req.params.id).populate('items.item').populate('customer'); //Find the order that is currently being handled based on id, and populate info about its items
+    const order = await Order.findById(req.params.id).populate("items.item").populate("customer"); //Find the order that is currently being handled based on id, and populate info about its items
     if (!order) {
-        return res.json({error: 'Could not find order'});
+        return res.json({error: "Could not find order"});
     }
 
     const notif = await Notification.create({
@@ -193,7 +194,7 @@ controller.processOrder = async function(req, res) {
     });
 
     if (!notif) {
-        return res.json({error: 'Unable to send notification'});
+        return res.json({error: "Unable to send notification"});
     }
 
     notif.date = dateFormat(notif.created_at, "h:MM TT | mmm d");
@@ -208,37 +209,37 @@ controller.processOrder = async function(req, res) {
     notif.text = `Your order is ready to pick up:\n ${itemText.join("\n")} \n\nExtra Instructions: ${order.instructions} \nTotal Cost: ${formattedCharge}`;
     await notif.save();
     if (order.customer.receiving_emails) {
-        await sendGridEmail(order.customer.email, 'Cafe Order Ready', `<p>Hello ${order.customer.firstName},</p><p>${notif.text}</p>`, false);
+        await sendGridEmail(order.customer.email, "Cafe Order Ready", `<p>Hello ${order.customer.firstName},</p><p>${notif.text}</p>`, false);
     }
 
-    order.customer.inbox.push(notif); //Add notif to user's inbox
+    order.customer.inbox.push(notif); //Add notif to user"s inbox
     order.customer.msgCount++;
     await order.customer.save();
 
     order.present = false; //Order is not active anymore
     await order.save();
 
-    const cafe = await Cafe.findOne({});
+    const cafe = await Market.findOne({});
     if (!cafe) {
-        return res.json({error: 'Could not find cafe info'});
+        return res.json({error: "Could not find cafe info"});
     }
 
     cafe.revenue += order.charge;
     await cafe.save();
-    return res.json({success: 'Successfully confirmed order'});
+    return res.json({success: "Successfully confirmed order"});
 }
 
 //REJECT OR CANCEL ORDER
 controller.deleteOrder = async function(req, res) {
     if (req.body.rejectionReason) {
         if (!req.user.tags.includes("Cashier")) {
-            req.flash('error', 'You do not have permission to do that');
-            return res.redirect('back');
+            req.flash("error", "You do not have permission to do that");
+            return res.redirect("back");
         }
 
-        const order = await Order.findById(req.params.id).populate('items.item').populate('customer');
+        const order = await Order.findById(req.params.id).populate("items.item").populate("customer");
         if (!order) {
-            return res.json({error: 'Could not find order'});
+            return res.json({error: "Could not find order"});
         }
 
         for (let i of order.items) { //Iterate over each item/quantity object
@@ -255,7 +256,7 @@ controller.deleteOrder = async function(req, res) {
             images: []
         });
         if (!notif) {
-            return res.json({error: 'Could not send notification'});
+            return res.json({error: "Could not send notification"});
         }
 
         notif.date = dateFormat(notif.created_at, "h:MM TT | mmm d");
@@ -267,7 +268,7 @@ controller.deleteOrder = async function(req, res) {
 
         //Formats the charge in money format
         const formattedCharge = `$${(order.charge * 100).toString().slice(0, (order.charge * 100).toString().length - 2)}.${(order.charge * 100).toString().slice((order.charge * 100).toString().length - 2)}`;
-        if (req.body.rejectionReason == "") {
+        if (req.body.rejectionReason == '') {
             notif.text = `Your order was rejected. This is most likely because we suspect your order is not genuine. Contact us if you think there has been a mistake. No reason was provided for rejection.\n ${itemText.join("\n")} \n\nExtra Instructions: ${order.instructions} \nTotal Cost: ${formattedCharge}`;
         } else {
             notif.text = `Your order was rejected. This is most likely because we suspect your order is not genuine. Contact us if you think there has been a mistake. The reason was provided for rejection was the following: \"${req.body.rejectionReason}\"\n ${itemText.join("\n")} \n\nExtra Instructions: ${order.instructions} \nTotal Cost: ${formattedCharge}`;
@@ -275,7 +276,7 @@ controller.deleteOrder = async function(req, res) {
 
         await notif.save();
         if (order.customer.receiving_emails) {
-            await sendGridEmail(order.customer.email, 'Cafe Order Rejected', `<p>Hello ${order.customer.firstName},</p><p>${notif.text}</p>`, false);
+            await sendGridEmail(order.customer.email, "Cafe Order Rejected", `<p>Hello ${order.customer.firstName},</p><p>${notif.text}</p>`, false);
         }
 
         //Refund if the transaction is via online balance
@@ -284,40 +285,40 @@ controller.deleteOrder = async function(req, res) {
             order.customer.debt -= order.charge;
         }
 
-        order.customer.inbox.push(notif); //Add notif to user's inbox
+        order.customer.inbox.push(notif); //Add notif to user"s inbox
         order.customer.msgCount++;
         await order.customer.save();
 
-        const deletedOrder = await Order.findByIdAndDelete(order._id).populate('items.item').populate('customer');
+        const deletedOrder = await Order.findByIdAndDelete(order._id).populate("items.item").populate("customer");
         if (!deletedOrder) {
-            return res.json({error: 'Could not delete order'});
+            return res.json({error: "Could not delete order"});
         }
-        return res.json({success: 'Successfully rejected order'});
+        return res.json({success: "Successfully rejected order"});
     }
 
     //Cancellation starts here
 
-    const cafe = await Cafe.findOne({});
+    const cafe = await Market.findOne({});
     if (!cafe) {
-        return res.json({error: 'Could not access cafe'});
+        return res.json({error: "Could not access cafe"});
     }
 
     if (!cafe.open) {
-        return res.json({error: 'The cafe is currently not taking orders'});
+        return res.json({error: "The cafe is currently not taking orders"});
     }
 
     const order = await Order.findById(req.params.id);
     if (!order) {
-        return res.json({error: 'Could not find order'});
+        return res.json({error: "Could not find order"});
     }
 
     if (!order.customer.equals(req.user._id)) {
-        return res.json({error: 'You can only delete your own orders'});
+        return res.json({error: "You can only delete your own orders"});
     }
 
     const deletedOrder = await Order.findByIdAndDelete(req.params.id).populate("items.item");
     if (!deletedOrder) {
-        return res.json({error: 'Could not find order'});
+        return res.json({error: "Could not find order"});
     }
 
     if (!deletedOrder.payingInPerson) { //Refund balance
@@ -326,38 +327,39 @@ controller.deleteOrder = async function(req, res) {
         await req.user.save();
     }
 
-    for (let item of deletedOrder.items) { //For each of the order's items, add the number ordered back to that item. (If there are 12 available quesadillas and the  user ordered 3, there are now 15)
+    for (let item of deletedOrder.items) { //For each of the order"s items, add the number ordered back to that item. (If there are 12 available quesadillas and the  user ordered 3, there are now 15)
         item.item.availableItems += item.quantity;
         await item.item.save();
     }
-    return res.json({success: 'Successfully canceled'});
+    return res.json({success: "Successfully canceled"});
 }
 
 //-----------ROUTES FOR GENERAL ITEMS-------------//
 
 //FORM TO CREATE NEW ITEM
 controller.newItem = async function(req, res) {
-    const platform = await platformSetup();
-    const categories = await Category.find({});
+    const platform = await setup(Platform);
+    const cafe = await setup(Market);
+    const categories = await ItemCategory.find({});
     if (!categories) {
-        req.flash('error', "An Error Occurred");
+        req.flash("error", "An Error Occurred");
         return res.redirect("back");
     }
 
-    return res.render('cafe/newOrderItem', {platform, categories});
+    return res.render("cafe/newOrderItem", {platform, categories});
 }
 
 //CREATE NEW ITEM
 controller.createItem = async function(req, res) {
     const overlap = await Item.find({name: req.body.name});
     if (!overlap) {
-        req.flash('error', "Unable to find items");
-        return res.redirect('back');
+        req.flash("error", "Unable to find items");
+        return res.redirect("back");
     }
 
     if (overlap.length > 0) {
-        req.flash('error', "Item already exists");
-        return res.redirect('back');
+        req.flash("error", "Item already exists");
+        return res.redirect("back");
     }
 
     const item = await Item.create({
@@ -368,8 +370,8 @@ controller.createItem = async function(req, res) {
     });
 
     if (!item) {
-        req.flash('error', "Unable to create item");
-        return res.redirect('back');
+        req.flash("error", "Unable to create item");
+        return res.redirect("back");
     }
 
     item.mediaFile.display = req.body.showImage == "upload";
@@ -378,8 +380,8 @@ controller.createItem = async function(req, res) {
         if (req.files.mediaFile) {
             const [cloudErr, cloudResult] = await cloudUpload(req.files.mediaFile[0]);
             if (cloudErr || !cloudResult) {
-                req.flash('error', 'Upload failed');
-                return res.redirect('back');
+                req.flash("error", "Upload failed");
+                return res.redirect("back");
             }
 
             // Add info to image file
@@ -392,7 +394,7 @@ controller.createItem = async function(req, res) {
         }
     }
 
-    //Create charge; once created, add to item's info
+    //Create charge; once created, add to item"s info
     if (parseFloat(req.body.price)) {
         item.price = parseFloat(req.body.price);
 
@@ -400,33 +402,33 @@ controller.createItem = async function(req, res) {
         item.price = 0.00;
     }
 
-    const category = await Category.findOne({name: req.body.category}); //Find the category specified in the form
+    const category = await ItemCategory.findOne({name: req.body.category}); //Find the category specified in the form
     if (!category) {
-        req.flash('error', "Unable to find correct item category");
-        return res.redirect('back');
+        req.flash("error", "Unable to find correct item category");
+        return res.redirect("back");
     }
 
     await item.save();
-    category.items.push(item); //Push this item to that category's item list
+    category.items.push(item); //Push this item to that category"s item list
     await category.save();
-    return res.redirect('/cafe/manage');
+    return res.redirect("/cafe/manage");
 }
 
 //-----------ROUTES FOR SPECIFIC ITEMS-------------//
 
 //VIEW/EDIT ITEM
 controller.viewItem = async function(req, res) {
-    const platform = await platformSetup();
+    const platform = await setup(Platform);
     const item = await Item.findById(req.params.id);
     if (!item) {
-        req.flash('error', "Unable to find item");
-        return res.redirect('back')
+        req.flash("error", "Unable to find item");
+        return res.redirect("back")
     }
 
-    const categories = await Category.find({});
+    const categories = await ItemCategory.find({});
     if (!categories) {
-        req.flash('error', "Unable to find item categories");
-        return res.redirect('back');
+        req.flash("error", "Unable to find item categories");
+        return res.redirect("back");
     }
 
     let fileExtensions = new Map();
@@ -434,7 +436,7 @@ controller.viewItem = async function(req, res) {
         fileExtensions.set(item.mediaFile.url, path.extname(item.mediaFile.url.split("SaberChat/")[1]));
     }
 
-    return res.render('cafe/show', {platform, categories, item, fileExtensions});
+    return res.render("cafe/show", {platform, categories, item, fileExtensions});
 }
 
 //UPDATE/UPVOTE ITEM
@@ -448,39 +450,40 @@ controller.updateItem = async function(req, res) {
 
 //DELETE ITEM
 controller.deleteItem = async function(req, res) {
+    const cafe = await setup(Market);
     const item = await Item.findByIdAndDelete(req.params.id); //Delete item based on specified ID
     if (!item) {
-        req.flash('error', 'Could not delete item');
-        return res.redirect('back');
+        req.flash("error", "Could not delete item");
+        return res.redirect("back");
     }
 
     // delete any uploads
     if (item.mediaFile && item.mediaFile.filename) {
         [cloudErr, cloudResult] = await cloudDelete(item.mediaFile.filename, "image");
-        if (cloudErr || !cloudResult || cloudResult.result !== 'ok') {
-            req.flash('error', 'Error deleting uploaded image');
-            return res.redirect('back');
+        if (cloudErr || !cloudResult || cloudResult.result !== "ok") {
+            req.flash("error", "Error deleting uploaded image");
+            return res.redirect("back");
         }
     }
 
-    const categories = await Category.find({});
+    const categories = await ItemCategory.find({_id: {$in: cafe.categories}});
     if (!categories) {
-        req.flash('error', "Could not remove item from list of item categories");
-        return res.redirect('back');
+        req.flash("error", "Could not remove item from list of item categories");
+        return res.redirect("back");
     }
 
-    for (let category of categories) { //If the category includes this item, remove the item from that category's item list
+    for (let category of categories) { //If the category includes this item, remove the item from that category"s item list
         removeIfIncluded(category.items, item._id);
         await category.save();
     }
 
-    const orders = await Order.find({}).populate('items.item');
+    const orders = await Order.find({}).populate("items.item");
     if (!orders) {
-        req.flash('error', 'Could not find orders');
-        return res.redirect('back');
+        req.flash("error", "Could not find orders");
+        return res.redirect("back");
     }
 
-    for (let order of orders) { //If the order includes this item, remove the item from that order's item list
+    for (let order of orders) { //If the order includes this item, remove the item from that order"s item list
         for (let i of order.items) {
             if (!i.item) {
                 order.items.splice(i, 1);
@@ -494,8 +497,8 @@ controller.deleteItem = async function(req, res) {
         await order.save();
     }
 
-    req.flash('success', 'Deleted Item!');
-    return res.redirect('/cafe/manage');
+    req.flash("success", "Deleted Item!");
+    return res.redirect("/cafe/manage");
 }
 
 //-----------ROUTES TO MANAGE CAFE -------------//
@@ -526,7 +529,7 @@ controller.manage = async function(req, res) {
 
 //OPEN/CLOSE CAFE
 controller.changeStatus = async function(req, res) {
-    const cafe = await Cafe.findOne({});
+    const cafe = await Market.findOne({});
     if (!cafe) {
         return res.json({error: "An error occurred"});
     }
@@ -539,41 +542,46 @@ controller.changeStatus = async function(req, res) {
 
 //FORM TO CREATE NEW ITEM CATEGORY
 controller.newCategory = async function(req, res) {
-    const platform = await platformSetup();
-    const categories = await Category.find({}).populate('items'); //Collect info on all the items, so that we can give the user the option to add them to that category
+    const platform = await setup(Platform);
+    const cafe = await setup(Market);
+    const categories = await ItemCategory.find({_id: {$in: cafe.categories}}).populate("items"); //Collect info on all the items, so that we can give the user the option to add them to that category
     if (!categories) {
-        req.flash('error', "Unable to find categories");
-        return res.redirect('back');
+        req.flash("error", "Unable to find categories");
+        return res.redirect("back");
     }
-    return res.render('cafe/newItemCategory', {platform, categories});
+    return res.render("cafe/newItemCategory", {platform, categories});
 }
 
 //CREATE NEW ITEM CATEGORY
 controller.createCategory = async function(req, res) {
-    const overlap = await Category.find({name: req.body.name}); //Find all item categories with this name that already exist
+    const cafe = await setup(Market);
+    const overlap = await ItemCategory.find({_id: {$in: cafe.categories}, name: req.body.name}); //Find all item categories with this name that already exist
     if (!overlap) {
-        req.flash('error', "Unable to find item categories");
-        return res.redirect('back');
+        req.flash("error", "Unable to find item categories");
+        return res.redirect("back");
     }
 
     if (overlap.length > 0) { //If there are overlapping items
-        req.flash('error', "Item Category Already Exists.");
-        return res.redirect('back');
+        req.flash("error", "Item Category Already Exists.");
+        return res.redirect("back");
     }
 
-    const category = await Category.create({name: req.body.name, items: []});
+    const category = await ItemCategory.create({name: req.body.name, items: []});
     if (!category) {
-        req.flash('error', "Item Category could not be created");
-        return res.redirect('back');
+        req.flash("error", "Item Category could not be created");
+        return res.redirect("back");
     }
 
-    const categories = await Category.find({}); //Found categories, but represents all item categories
+    cafe.categories.push(category); //Add category to cafe's settings
+    await cafe.save();
+
+    const categories = await ItemCategory.find({_id: {$in: cafe.categories}}); //Found categories, but represents all item categories
     if (!categories) {
-        req.flash('error', "Could not find item categories");
-        return res.redirect('back');
+        req.flash("error", "Could not find item categories");
+        return res.redirect("back");
     }
 
-    for (let t of categories) { //Now that we've created the category, we have to remove the newly selected items from all other categories
+    for (let t of categories) { //Now that we"ve created the category, we have to remove the newly selected items from all other categories
         for (let i = 0; i < t.items.length; i++) {
             if (req.body[t.items[i].toString()]) {
                 t.items.splice(i, 1);
@@ -584,74 +592,76 @@ controller.createCategory = async function(req, res) {
 
     const items = await Item.find({}); //Find all items
     if (!items) {
-        req.flash('error', 'Could not find items');
-        return res.redirect('back');
+        req.flash("error", "Could not find items");
+        return res.redirect("back");
     }
 
-    for (let item of items) { //If the item is selected, add it to this category (now that we've removed it from all other categories)
+    for (let item of items) { //If the item is selected, add it to this category (now that we"ve removed it from all other categories)
         if (req.body[item._id.toString()]) {
             category.items.push(item);
         }
     }
 
     await category.save();
-    req.flash('success', "Item Category Created!");
-    return res.redirect('/cafe/manage');
+    req.flash("success", "Item Category Created!");
+    return res.redirect("/cafe/manage");
 }
 
 //-----------ROUTES FOR SPECIFIC ITEM CATEGORIES-------------//
 
 //VIEW/EDIT ITEM CATEGORY
 controller.viewCategory = async function(req, res) {
-    const platform = await platformSetup();
-    const category = await Category.findById(req.params.id).populate('items'); //Find the specified category
+    const platform = await setup(Platform);
+    const cafe = await setup(Market);
+    const category = await ItemCategory.findById(req.params.id).populate("items"); //Find the specified category
     if (!category) {
-        req.flash('error', "An Error Occurred");
-        return res.redirect('back');
+        req.flash("error", "An Error Occurred");
+        return res.redirect("back");
     }
 
     if (category.name == "Other") {
-        req.flash('error', "You cannot modify that category");
-        return res.redirect('/cafe/manage');
+        req.flash("error", "You cannot modify that category");
+        return res.redirect("/cafe/manage");
     }
 
-    const categories = await Category.find({_id: {$ne: category._id}}).populate('items'); //Find all items
+    const categories = await ItemCategory.find({_id: {$ne: category._id}}).populate("items"); //Find all items
     if (!categories) {
-        req.flash('error', "An Error Occurred");
-        return res.redirect('back');
+        req.flash("error", "An Error Occurred");
+        return res.redirect("back");
     }
-    return res.render('cafe/editItemCategory', {platform, category, categories});
+    return res.render("cafe/editItemCategory", {platform, category, categories});
 }
 
 //UPDATE ITEM CATEGORY
 controller.updateCategory = async function(req, res) {
-    const overlap = await Category.find({_id: {$ne: req.params.id}, name: req.body.name}); //Find all categories besides the one we are editing with the same name
+    const cafe = await setup(Market);
+    const overlap = await ItemCategory.find({_id: {$in: cafe.categories, $ne: req.params.id}, name: req.body.name}); //Find all categories besides the one we are editing with the same name
     if (!overlap) {
-        req.flash('error', "An Error Occurred");
-        return res.redirect('back');
+        req.flash("error", "An Error Occurred");
+        return res.redirect("back");
     }
 
     if (overlap.length > 0) { //If there is overlap
-        req.flash('error', "Item category already in database");
-        return res.redirect('back');
+        req.flash("error", "Item category already in database");
+        return res.redirect("back");
     }
 
-    const category = await Category.findByIdAndUpdate(req.params.id, {name: req.body.name}); //Update this item category based on the id
+    const category = await ItemCategory.findByIdAndUpdate(req.params.id, {name: req.body.name}); //Update this item category based on the id
     if (!category) {
-        req.flash('error', "Unable to update item category");
-        return res.redirect('back');
+        req.flash("error", "Unable to update item category");
+        return res.redirect("back");
     }
 
-    const otherCategories = await Category.find({_id: {$ne: category._id}}); //Find all other categories
+    const otherCategories = await ItemCategory.find({_id: {$in: cafe.categories, $ne: category._id}}); //Find all other categories
     if (!otherCategories) {
-        req.flash('error', "Unable to find item categories");
-        return res.redirect('back');
+        req.flash("error", "Unable to find item categories");
+        return res.redirect("back");
     }
 
     const items = await Item.find({}); //Find all items
     if (!items) {
-        req.flash('error', 'Unable to find items');
-        return res.redirect('back');
+        req.flash("error", "Unable to find items");
+        return res.redirect("back");
     }
 
     for (let otherCategory of otherCategories) { //Iterate over other categories
@@ -663,15 +673,15 @@ controller.updateCategory = async function(req, res) {
         await otherCategory.save();
     }
 
-    const other = await Category.findOne({name: "Other"}); //Find category 'other'
+    const other = await ItemCategory.findOne({_id: {$in: cafe.categories}, _name: "Other"}); //Find category "other"
     if (!other) {
-        req.flash('error', "Unable to find item category 'Other', please add it'");
-        return res.redirect('back'); //There's nowhere for the category-less items to go unless 'Other' exists
+        req.flash("error", "Unable to find item category 'Other', please add it");
+        return res.redirect("back"); //There"s nowhere for the category-less items to go unless "Other" exists
     }
 
     for (let item of category.items) {
         if (!req.body[item._id.toString()]) { //Item is no longer checked
-            other.items.push(item); //Move that item to 'Other'
+            other.items.push(item); //Move that item to "Other"
         }
     }
     await other.save();
@@ -684,31 +694,35 @@ controller.updateCategory = async function(req, res) {
     }
 
     await category.save();
-    req.flash('success', "Item category updated!");
-    return res.redirect('/cafe/manage');
+    req.flash("success", "Item category updated!");
+    return res.redirect("/cafe/manage");
 }
 
 //DELETE ITEM CATEGORY
 controller.deleteCategory = async function(req, res) {
-    const other = await Category.findOne({name: "Other"}); //Find the category with name 'Other' - we've created this category so that any unselected items go here
+    const cafe = await setup(Market);
+    const other = await ItemCategory.findOne({_id: {$in: cafe.categories}, name: "Other"}); //Find the category with name "Other" - we"ve created this category so that any unselected items go here
     if (!other) {
-        req.flash('error', "Unable to find item category 'Other', please add it");
-        return res.redirect('back');
+        req.flash("error", "Unable to find item category 'Other', please add it");
+        return res.redirect("back");
     }
 
-    const category = await Category.findByIdAndDelete(req.params.id); //Delete category based on specified ID
+    const category = await ItemCategory.findByIdAndDelete(req.params.id); //Delete category based on specified ID
     if (!category) {
-        req.flash('error', "Unable to find item category");
-        return res.redirect('back');
+        req.flash("error", "Unable to find item category");
+        return res.redirect("back");
     }
+
+    removeIfIncluded(cafe.categories, category._id);
+    await cafe.save();
 
     for (let item of category.items) {
         other.items.push(item);
     }
 
     await other.save();
-    req.flash('success', "Item category deleted!");
-    return res.redirect('/cafe/manage');
+    req.flash("success", "Item category deleted!");
+    return res.redirect("/cafe/manage");
 }
 
 controller.upvoteItem = async function(req, res) {
@@ -728,20 +742,21 @@ controller.upvoteItem = async function(req, res) {
 }
 
 controller.updateItemInfo = async function(req, res) {
+    const cafe = await setup(Market);
     if (!req.user.tags.includes("Cashier")) {
-        req.flash('error', 'You do not have permission to do that');
-        return res.redirect('back');
+        req.flash("error", "You do not have permission to do that");
+        return res.redirect("back");
     }
 
     const overlap = await Item.find({_id: {$ne: req.params.id}, name: req.body.name});
     if (!overlap) {
-        req.flash('error', 'Item Not Found');
-        return res.redirect('back');
+        req.flash("error", "Item Not Found");
+        return res.redirect("back");
     }
 
     if (overlap.length > 0) {
-        req.flash('error', 'Item With This Name Exists');
-        return res.redirect('back');
+        req.flash("error", "Item With This Name Exists");
+        return res.redirect("back");
     }
 
     const item = await Item.findByIdAndUpdate(req.params.id, {
@@ -752,8 +767,8 @@ controller.updateItemInfo = async function(req, res) {
         imgUrl: {url: req.body.image, display: req.body.showImage == "url"},
     });
     if (!item) {
-        req.flash('error', 'item not found');
-        return res.redirect('back');
+        req.flash("error", "item not found");
+        return res.redirect("back");
     }
 
     item.mediaFile.display = req.body.showImage == "upload";
@@ -764,16 +779,16 @@ controller.updateItemInfo = async function(req, res) {
             if (item.mediaFile && item.mediaFile.filename) {
                 [cloudErr, cloudResult] = await cloudDelete(item.mediaFile.filename, "image");
                 // check for failure
-                if (cloudErr || !cloudResult || cloudResult.result !== 'ok') {
-                    req.flash('error', 'Error deleting uploaded image');
-                    return res.redirect('back');
+                if (cloudErr || !cloudResult || cloudResult.result !== "ok") {
+                    req.flash("error", "Error deleting uploaded image");
+                    return res.redirect("back");
                 }
             }
 
             [cloudErr, cloudResult] = await cloudUpload(req.files.mediaFile[0]);
             if (cloudErr || !cloudResult) {
-                req.flash('error', 'Upload failed');
-                return res.redirect('back');
+                req.flash("error", "Upload failed");
+                return res.redirect("back");
             }
 
             item.mediaFile = {
@@ -786,14 +801,14 @@ controller.updateItemInfo = async function(req, res) {
         await item.save();
     }
 
-    const activeOrders = await Order.find({present: true}).populate('items.item'); //Any orders that are active will need to change, to accomodate the item changes.
+    const activeOrders = await Order.find({present: true}).populate("items.item"); //Any orders that are active will need to change, to accomodate the item changes.
     if (!activeOrders) {
-        req.flash('error', "Unable to find active orders");
-        return res.redirect('back');
+        req.flash("error", "Unable to find active orders");
+        return res.redirect("back");
     }
 
     for (let order of activeOrders) {
-        order.charge = 0; //Reset the order's charge, we will have to recalculate
+        order.charge = 0; //Reset the order"s charge, we will have to recalculate
 
         for (let i = 0; i < order.items.length; i++) { //Iterate over each order, and change its price to match the new item prices
             order.charge += order.items[i].item.price * order.items[i].quantity;
@@ -802,37 +817,38 @@ controller.updateItemInfo = async function(req, res) {
         await order.save();
     }
 
-    const categories = await Category.find({name: {$ne: req.body.category}}); //Collect all item categories
+    const categories = await ItemCategory.find({_id: {$in: cafe.categories}, name: {$ne: req.body.category}}); //Collect all item categories
     if (!categories) {
-        req.flash('error', "Unable to find item categories");
-        return res.redirect('back');
+        req.flash("error", "Unable to find item categories");
+        return res.redirect("back");
     }
 
-    for (let t of categories) { //Remove this item from its old item category (if the category has not changed, it's fine because we' add it back in a moment anyway)
+    for (let t of categories) { //Remove this item from its old item category (if the category has not changed, it"s fine because we" add it back in a moment anyway)
         removeIfIncluded(t.items, item._id);
         await t.save();
     }
 
-    const category = await Category.findOne({name: req.body.category});  //Add the item to the category which is now specified
+    const category = await ItemCategory.findOne({_id: {$in: cafe.categories}, name: req.body.category});  //Add the item to the category which is now specified
     if (!category) {
-        req.flash('error', 'Unable to find item category');
+        req.flash("error", "Unable to find item category");
         return res.redirect("back");
     }
 
-    removeIfIncluded(category.items, item._id); //If item is already in category, remove it so you can put the updated category back (we don't know whether the category will be there or not, so it's better to just cover all bases)
+    removeIfIncluded(category.items, item._id); //If item is already in category, remove it so you can put the updated category back (we don"t know whether the category will be there or not, so it"s better to just cover all bases)
     category.items.push(item);
     await category.save();
 
-    req.flash('success', "Item updated!");
-    return res.redirect('/cafe/manage');
+    req.flash("success", "Item updated!");
+    return res.redirect("/cafe/manage");
 }
 
 controller.manageCafe = async function(req, res) {
-    const platform = await platformSetup();
-    const categories = await Category.find({}).populate('items'); //Collect info on all the item categories
+    const platform = await setup(Platform);
+    const cafe = await setup(Market);
+    const categories = await ItemCategory.find({_id: {$in: cafe.categories}}).populate("items"); //Collect info on all the item categories
     if (!categories) {
-        req.flash('error', 'An Error Occurred');
-        return res.redirect('back');
+        req.flash("error", "An Error Occurred");
+        return res.redirect("back");
     }
 
     let sortedCategories = [];
@@ -843,23 +859,17 @@ controller.manageCafe = async function(req, res) {
         sortedCategories.push(sortedCategory);
     }
 
-    const cafe = await Cafe.findOne({});
-    if (!cafe) {
-        req.flash('error', "An Error Occurred");
-        return res.redirect('back');
-    }
-
-    return res.render('cafe/manage', {platform, categories: sortedCategories, open: cafe.open});
+    return res.render("cafe/manage", {platform, categories: sortedCategories, open: cafe.open});
 }
 
 controller.manageOrders = async function(req, res) {
-    const platform = await platformSetup();
-    const orders = await Order.find({present: true}).populate('items.item');
+    const platform = await setup(Platform);
+    const orders = await Order.find({present: true}).populate("items.item");
     if (!orders) {
-        req.flash('error', 'Could not find orders');
-        return res.redirect('back');
+        req.flash("error", "Could not find orders");
+        return res.redirect("back");
     }
-    return res.render('cafe/orderDisplay', {platform, orders});
+    return res.render("cafe/orderDisplay", {platform, orders});
 }
 
 module.exports = controller;

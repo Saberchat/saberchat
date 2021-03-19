@@ -16,9 +16,9 @@ var platformSchema = new mongoose.Schema({
     studentStatuses: [{type: String}],
     formerStudentStatus: String,
     teacherStatus: String,
-    tags: [{type: String}],
     //ENDS HERE
 
+    tags: [{type: String}],
     publicFeatures: [{route: String, name: String, icon: String, subroutes: [{type: String}]}],
     features: [{route: String, name: String, icon: String}],
     displayImages: [{type: String}],

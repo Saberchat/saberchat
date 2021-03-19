@@ -3,9 +3,10 @@ const Filter = require('bad-words');
 const filter = new Filter();
 const passport = require('passport');
 const {sendGridEmail} = require("../services/sendGrid");
-const platformSetup = require("../platform");
+const setup = require("../utils/setup");
 
 //SCHEMA
+const Platform = require("../models/platform");
 const User = require('../models/user');
 const Email = require('../models/admin/email');
 const {Announcement} = require('../models/post');
@@ -13,12 +14,12 @@ const {Announcement} = require('../models/post');
 const controller = {};
 
 controller.index = async function(req, res) {
-    const platform = await platformSetup();
+    const platform = await setup(Platform);
     return res.render('index', {platform});
 }
 
 controller.register = async function(req, res) {
-    const platform = await platformSetup();
+    const platform = await setup(Platform);
     const accesslistedEmail = await Email.findOne({address: req.body.email, version: "accesslist"});
     if (!accesslistedEmail) {
         if (platform.emailExtension != '' && req.body.email.split("@")[1] != platform.emailExtension) {
@@ -215,7 +216,7 @@ controller.forgotPassword = async function(req, res) {
 }
 
 controller.resetPasswordForm = async function(req, res) {
-    const platform = await platformSetup();
+    const platform = await setup(Platform);
     return res.render('profile/reset-password', {platform, user: req.query.user});
 }
 
@@ -253,7 +254,7 @@ controller.logout = function(req, res) {
 }
 
 controller.contact = async function(req, res) { //Contact info of highest status and developers
-    const platform = await platformSetup();
+    const platform = await setup(Platform);
     //Get users with the highest status (e.g. faculty)
     const teachers = await User.find({authenticated: true, authenticated: true, status: platform.teacherStatus});
     if (!teachers) {
@@ -266,7 +267,7 @@ controller.contact = async function(req, res) { //Contact info of highest status
 }
 
 controller.info = async function(req, res) {
-    const platform = await platformSetup();
+    const platform = await setup(Platform);
     const teachers = await User.find({authenticated: true, authenticated: true, status: platform.teacherStatus});
     if (!teachers) {
         req.flash('error', "An Error Occurred");

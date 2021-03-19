@@ -83,7 +83,7 @@
             <button class="btn-scrolldown darkmode-outline" onclick="scrollBottom()">Scroll To <i class="fas fa-arrow-down"></i></button>
             <div class="px-4 chat-box <% if (!currentUser.darkmode) {%> bg-white <%}%> darkmode-outline" id="message-display">
                 <!-- reverse it to get correct order -->
-                <% comments.reverse().forEach(comment => { %>
+                <% room.comments.forEach(comment => { %>
                     <% if (comment.author && comment.author._id.equals(currentUser._id)) { %>
                         <!-- Reciever Message-->
                         <div class="media w-65 ml-auto mb-2">

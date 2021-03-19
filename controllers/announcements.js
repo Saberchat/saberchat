@@ -2,12 +2,13 @@
 const {sendGridEmail} = require("../services/sendGrid");
 const {convertToLink, embedLink} = require("../utils/convert-to-link");
 const {objectArrIndex, removeIfIncluded, parsePropertyArray} = require("../utils/object-operations");
-const platformSetup = require("../platform");
+const setup = require("../utils/setup");
 const path = require('path');
 const dateFormat = require('dateformat');
 const {cloudUpload, cloudDelete} = require('../services/cloudinary');
 
 //SCHEMA
+const Platform = require("../models/platform");
 const User = require('../models/user');
 const {Announcement, PostComment} = require('../models/post');
 const Notification = require('../models/inbox/message');
@@ -16,7 +17,7 @@ const controller = {};
 
 // Announcement GET index
 controller.index = async function(req, res) {
-    const platform = await platformSetup();
+    const platform = await setup(Platform);
     const users = await User.find({});
     if (!users) {
         req.flash('error', 'An Error Occurred');
@@ -37,7 +38,7 @@ controller.index = async function(req, res) {
 
 // Announcement GET new ann
 controller.new = async function(req, res) {
-    const platform = await platformSetup();
+    const platform = await setup(Platform);
     return res.render('announcements/new', {platform});
 };
 
@@ -61,7 +62,7 @@ controller.markOne = async function(req, res) {
 
 // Announcement GET show
 controller.show = async function(req, res) {
-    const platform = await platformSetup();
+    const platform = await setup(Platform);
     const announcement = await Announcement.findById(req.params.id)
         .populate('sender')
         .populate({
@@ -93,7 +94,7 @@ controller.show = async function(req, res) {
 
 // Announcement GET edit form
 controller.updateForm = async function(req, res) {
-    const platform = await platformSetup();
+    const platform = await setup(Platform);
     const announcement = await Announcement.findById(req.params.id);
     if(!announcement) {
         req.flash('error', 'Could not find announcement');

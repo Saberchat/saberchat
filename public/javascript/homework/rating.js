@@ -68,7 +68,7 @@ const submitRating = function (button, location) { //Submit rating with text and
                 }
 
                 //Fill div with HTML styling
-                newReview.innerHTML = `<section class="profile-desc cafe"><div class="desc-head"><h3><img class="follower-image" src="${imageUrl}"/><span class="review-sender">${data.user.firstName} ${data.user.lastName}</span></h3> <i id="like-${data.review.review._id}" class="fas fa-thumbs-up review-unliked" onclick="likeReview(this)"></i> <span id="like-count-${data.review.review._id}" class="like-count">${data.review.review.likes.length}</span><div title="Ratings" class="ratings">${starString}</div><div title="date" class="review-date">${data.review.review.date}</div><hr></div><div class="desc-body"><p>${data.review.review.text}</p></div></section><br>`;
+                newReview.innerHTML = `<section class="profile-desc cafe"><div class="desc-head"><h3><img class="follower-image" src="${imageUrl}"/><span class="review-sender">${data.user.firstName} ${data.user.lastName}</span></h3> <i id="like-${data.review._id}" class="fas fa-thumbs-up review-unliked" onclick="likeReview(this)"></i> <span id="like-count-${data.review._id}" class="like-count">${data.review.likes.length}</span><div title="Ratings" class="ratings">${starString}</div><div title="date" class="review-date">${data.review.date}</div><hr></div><div class="desc-body"><p>${data.review.text}</p></div></section><br>`;
                 document.getElementsByClassName('reviews')[0].insertBefore(newReview, document.getElementsByClassName('reviews')[0].firstChild);
             }
             document.getElementById(`reviews-length-${tutorId}`).innerText = `${data.reviews_length}`; //Update displayed reviews length

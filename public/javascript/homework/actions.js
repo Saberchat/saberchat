@@ -556,13 +556,17 @@ const mark = function (button) { //MArk a student's lesson
     $.post(url, data, data => {
         if (data.success) {
             document.getElementById(`time-${studentId}`).value = "0"; //Reset student lessons
-            document.getElementById("lessons-length").innerText = data.tutor.lessons.length; //Increment tutor lessons
+            document.getElementById("lessons-length").innerText = data.lessons.length; //Increment tutor lessons
             document.getElementById(`lessons-length-${studentId}`).innerText = parseInt(document.getElementById(`lessons-length-${studentId}`).innerText) + 1; //Increment student lessons
 
             let experience = 0;
-            for (let lesson of data.tutor.lessons) {
+            for (let lesson of data.lessons) {
+                console.log(lesson)
+                console.log(lesson.time)
                 experience += lesson.time;
+                console.log(experience)
             }
+            console.log(experience)
 
             document.getElementById("experience").innerText = getTime(experience); //Set tutor's experience to newly formatted experience
             $(`#modal-${studentId}-mark`).modal('hide');

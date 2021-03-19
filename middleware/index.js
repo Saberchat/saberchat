@@ -1,16 +1,15 @@
 // Executes before the code in route requests
 
-const Room = require("../models/chat/room");
-const Cafe = require('../models/cafe/cafe')
-const Course = require('../models/homework/course')
+const Platform = require("../models/platform");
+const {ChatRoom, Market, Course} = require('../models/group');
 const {objectArrIndex} = require("../utils/object-operations");
-const platformSetup = require("../platform");
+const setup = require("../utils/setup");
 
 const middleware = {};
 
 //checks if user is logged in
 middleware.isLoggedIn = async function(req, res, next) {
-    const platform = await platformSetup();
+    const platform = await setup(Platform);
     if (req.isAuthenticated()) {return next();}
     //If user is not logged in, but this feature is available to people without accounts
     if (objectArrIndex(platform.publicFeatures, "route", req.baseUrl.slice(1)) > -1) {
@@ -24,7 +23,7 @@ middleware.isLoggedIn = async function(req, res, next) {
 
 //For platform's individual (private) features, that only certain platforms have access to
 middleware.accessToFeature = async function(req, res, next) {
-    const platform = await platformSetup();
+    const platform = await setup(Platform);
     if (objectArrIndex(platform.features, "route", req.baseUrl.slice(1)) > -1) {
         return next();
     }
@@ -34,7 +33,7 @@ middleware.accessToFeature = async function(req, res, next) {
 
 //checks if user is allowed into room
 middleware.checkIfMember = async function(req, res, next) {
-    const room = await Room.findById(req.params.id);
+    const room = await ChatRoom.findById(req.params.id);
     if (!room) {
         req.flash('error', 'Room cannot be found or does not exist');
         return res.redirect('/chat')
@@ -49,7 +48,7 @@ middleware.checkIfMember = async function(req, res, next) {
 
 // checks for if the user can leave from a room
 middleware.checkForLeave = async function(req, res, next) {
-    const room = await Room.findById(req.params.id);
+    const room = await ChatRoom.findById(req.params.id);
     if (!room) {
         req.flash('error', 'Room cannot be found or does not exist');
         return res.redirect('/chat')
@@ -69,7 +68,7 @@ middleware.checkForLeave = async function(req, res, next) {
 
 // check if room owner
 middleware.checkRoomOwnership = async function(req, res, next) {
-    const room = await Room.findById(req.params.id);
+    const room = await ChatRoom.findById(req.params.id);
     if (!room) {
         req.flash('error', 'Room cannot be found or does not exist');
         return res.redirect('/chat')
@@ -103,14 +102,14 @@ middleware.isMod = function(req, res, next) {
 }
 
 middleware.isFaculty = async function(req, res, next) {
-    const platform = await platformSetup();
+    const platform = await setup(Platform);
     if (req.user.status == platform.teacherStatus) { return next();}
     req.flash('error', 'You do not have permission to do that');
     return res.redirect('back');
 }
 
 middleware.isStudent = async function(req, res, next) {
-    const platform = await platformSetup();
+    const platform = await setup(Platform);
     if (platform.studentStatuses.includes(req.user.status)) {
         return next();
     }
@@ -138,7 +137,7 @@ middleware.isEditor = function(req, res, next) {
 
 //Whether cafe is open to orders
 middleware.cafeOpen = async function(req, res, next) {
-    const cafe = await Cafe.findOne({});
+    const cafe = await Market.findOne({});
     if (!cafe) {
         req.flash('error', "An Error Occurred")
         return res.redirect('back')
@@ -157,7 +156,7 @@ middleware.memberOfCourse = async function(req, res, next) {
         return res.redirect('/homework');
     }
 
-    if (course.teacher.equals(req.user._id) || course.students.includes(req.user._id) || objectArrIndex(course.tutors, "tutor", req.user._id) > -1) {
+    if (course.creator.equals(req.user._id) || course.members.includes(req.user._id) || objectArrIndex(course.tutors, "tutor", req.user._id) > -1) {
         return next();
     }
 
@@ -173,7 +172,7 @@ middleware.notMemberOfCourse = async function(req, res, next) {
         return res.redirect('/homework')
     }
 
-    if (course.teacher.equals(req.user._id) || course.students.includes(req.user._id) || objectArrIndex(course.tutors, "tutor", req.user._id) > -1) {
+    if (course.creator.equals(req.user._id) || course.members.includes(req.user._id) || objectArrIndex(course.tutors, "tutor", req.user._id) > -1) {
         req.flash('error', 'You are already a member of this course');
         return res.redirect('/homework');
     }
@@ -182,7 +181,6 @@ middleware.notMemberOfCourse = async function(req, res, next) {
         req.flash('error', 'You are blocked from joining this course');
         return res.redirect('/homework');
     }
-
     return next();
 }
 

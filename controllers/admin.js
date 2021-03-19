@@ -1,9 +1,10 @@
 //LIBRARIES
 const {sendGridEmail} = require("../services/sendGrid");
 const {objectArrIndex, concatMatrix, removeIfIncluded} = require("../utils/object-operations");
-const platformSetup = require("../platform");
+const setup = require("../utils/setup");
 
 //SCHEMA
+const Platform = require("../models/platform");
 const Comment = require('../models/chat/comment');
 const User = require("../models/user");
 const Email = require("../models/admin/email");
@@ -11,18 +12,18 @@ const Room = require('../models/chat/room');
 const Request = require('../models/inbox/accessRequest');
 const Message = require('../models/inbox/message');
 const {Announcement, Project, Article} = require("../models/post");
-const Course = require('../models/homework/course');
+const {Course} = require('../models/group');
 const Order = require('../models/cafe/order');
 
 const controller = {};
 
 controller.updatePlatformForm = async function(req, res) {
-    const platform = await platformSetup();
+    const platform = await setup(Platform);
     return res.render("admin/settings", {platform, objectArrIndex});
 }
 
 controller.updatePlatform = async function(req, res) {
-    const platform = await platformSetup();
+    const platform = await setup(Platform);
     const oldAddress = platform.emailExtension;
     for (let attr of ["name", "imageUrl", "emailExtension", "displayImages"]) { //Update elements with directly corresponding text
         platform[attr] = req.body[attr];
@@ -108,7 +109,7 @@ controller.updatePlatform = async function(req, res) {
 }
 
 controller.moderateGet = async function(req, res) { //Show all reported comments
-    const platform = await platformSetup();
+    const platform = await setup(Platform);
     const comments = await Comment.find({status: 'flagged'}).populate("author statusBy room");
 
     if (!comments) {
@@ -178,7 +179,7 @@ controller.deleteComment = async function(req, res) {
 }
 
 controller.permissionsGet = async function(req, res) { //Show page with all users and their permissions
-    const platform = await platformSetup();
+    const platform = await setup(Platform);
     const users = await User.find({authenticated: true});
     if (!users) {
         req.flash('error', 'An Error Occurred');
@@ -200,7 +201,7 @@ controller.permissionsGet = async function(req, res) { //Show page with all user
 }
 
 controller.statusGet = async function(req, res) { //Show page with all users and their statuses
-    const platform = await platformSetup();
+    const platform = await setup(Platform);
     const users = await User.find({authenticated: true});
     if (!users) {
         req.flash('error', 'An Error Occurred');
@@ -223,7 +224,7 @@ controller.statusGet = async function(req, res) { //Show page with all users and
 }
 
 controller.permissionsPut = async function (req, res) { //Update a user's permissions
-    const platform = await platformSetup();
+    const platform = await setup(Platform);
     const user = await User.findById(req.body.userId);
     if (!user) {
         return res.json({error: "Error. Could not change"});
@@ -250,7 +251,7 @@ controller.permissionsPut = async function (req, res) { //Update a user's permis
 }
 
 controller.statusPut = async function(req, res) { //Update user's status
-    const platform = await platformSetup();
+    const platform = await setup(Platform);
     const user = await User.findById(req.body.userId);
     if (!user) {
         return res.json({error: 'Error. Could not change'});
@@ -263,7 +264,7 @@ controller.statusPut = async function(req, res) { //Update user's status
         }
 
         for (let course of courses) {
-            if (course.teacher.equals(user._id)) {
+            if (course.creator.equals(user._id)) {
                 return res.json({error: "User is an active teacher", user});
             }
         }
@@ -278,7 +279,7 @@ controller.statusPut = async function(req, res) { //Update user's status
 }
 
 controller.accesslistGet = async function(req, res) { //Show page with all permitted emails
-    const platform = await platformSetup();
+    const platform = await setup(Platform);
     let emails;
     if (req.query.version) { //If user wants a specific email list
         if (["accesslist", "blockedlist"].includes(req.query.version)) {
@@ -310,7 +311,7 @@ controller.accesslistGet = async function(req, res) { //Show page with all permi
 }
 
 controller.addEmail = async function (req, res) { //Add email to access list/blocked list
-    const platform = await platformSetup();
+    const platform = await setup(Platform);
     if (req.body.version === "accesslist") {
         if (platform.emailExtension != '' && req.body.address.split('@')[1] === platform.emailExtension) { //These emails are already verified
             return res.json({error: `${platform.name} emails do not need to be added to the Access List`});
@@ -650,7 +651,7 @@ controller.permanentDelete = async function(req, res) {
 }
 
 controller.viewBalances = async function(req, res) {
-    const platform = await platformSetup();
+    const platform = await setup(Platform);
     const users = await User.find({authenticated: true});
     if (!users) {
         req.flash('error', 'Could not find users');

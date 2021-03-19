@@ -97,7 +97,7 @@
             <a class="nav-link">Tutors</a>
         </li>
 
-        <% if (course.teacher._id.equals(currentUser._id)) { %>
+        <% if (course.creator._id.equals(currentUser._id)) { %>
             <li class="nav-item tab-header tab" id="settings" onclick="changeTab(this, <%=currentUser.darkmode%>)">
                 <a class="nav-link">Settings</a>
             </li>
@@ -114,24 +114,24 @@
           <ul class="list-group">
             <li class="list-group-item list-group-item-success mode darkmode-outline">Teacher</li>
             <li class="list-group-item cafe">
-              <a href="/profiles/<%=course.teacher._id%>" class="user-element-text cafe">
-                <img class="profile-image" src="<% if (course.teacher.mediaFile.display) {%> <%= course.teacher.mediaFile.url%><%} else {%> <%=course.teacher.imageUrl.url%><%}%>" alt="profile picture">
-                <span class="username <%=course.teacher.status%> <%=course.teacher.permission%> <%=course.teacher.tags.join(' ')%>"><span class="enrolled-name"><%=course.teacher.firstName%> <%=course.teacher.lastName%></span> <span class="enrolled-username"><%=course.teacher.username%></span></span>
+              <a href="/profiles/<%=course.creator._id%>" class="user-element-text cafe">
+                <img class="profile-image" src="<% if (course.creator.mediaFile.display) {%> <%= course.creator.mediaFile.url%><%} else {%> <%=course.creator.imageUrl.url%><%}%>" alt="profile picture">
+                <span class="username <%=course.creator.status%> <%=course.creator.permission%> <%=course.creator.tags.join(' ')%>"><span class="enrolled-name"><%=course.creator.firstName%> <%=course.creator.lastName%></span> <span class="enrolled-username"><%=course.creator.username%></span></span>
               </a>
             </li>
           </ul>
           <br />
 
-          <% if (course.students.length > 0) { %>
+          <% if (course.members.length > 0) { %>
             <ul class="list-group" id="students">
               <li class="list-group-item list-group-item-success mode darkmode-outline" id="students-heading">Students</li>
-              <% for (let student of course.students) { %>
+              <% for (let student of course.members) { %>
                 <li class="list-group-item cafe" id="item-<%=student._id%>">
                   <a href="../profiles/<%=student._id%>"class="user-element-text cafe">
                     <img class="profile-image" src="<% if (student.mediaFile.display) {%> <%= student.mediaFile.url%><%} else {%> <%=student.imageUrl.url%><%}%>" alt="profile picture">
                     <span class="username <%=student.status%> <%=student.permission%> <%=student.tags.join(' ')%>"><span class="enrolled-name"><%=student.firstName%> <%=student.lastName%></span> <span class="enrolled-username"><%=student.username%></span></span>
                   </a>
-                  <% if (course.teacher._id.equals(currentUser._id)) { %>
+                  <% if (course.creator._id.equals(currentUser._id)) { %>
                     <button class="btn btn-danger leave-button" id="remove-button-<%=student._id%>" data-toggle="modal" data-target="#modal-index-remove-<%=student._id%>">Remove Student</button>
                   <% } %>
                 </li>
@@ -169,7 +169,7 @@
                     <img class="profile-image" src="<% if (tutor.tutor.mediaFile.display) {%> <%= tutor.tutor.mediaFile.url%><%} else {%> <%=tutor.tutor.imageUrl.url%><%}%>" alt="profile picture">
                     <span class="username <%=tutor.tutor.status%> <%=tutor.tutor.permission%> <%=tutor.tutor.tags.join(' ')%>"><span class="enrolled-name"><%=tutor.tutor.firstName%> <%=tutor.tutor.lastName%></span> <span class="enrolled-username"><%=tutor.tutor.username%></span></span>
                   </a>
-                  <% if (course.teacher._id.equals(currentUser._id)) { %>
+                  <% if (course.creator._id.equals(currentUser._id)) { %>
                     <button class="btn btn-danger leave-button" id="remove-button-<%=tutor.tutor._id%>" data-toggle="modal" data-target="#modal-index-remove-<%=tutor.tutor._id%>">Remove Tutor</button>
                   <% } %>
                 </li>
@@ -219,12 +219,12 @@
 
                     <% if (studentIds.includes(currentUser._id.toString())) { %>
                             <div id="tutor-actions-<%= tutor.tutor._id %>" class="tutor-actions">
-                                <% if (objectArrIndex(tutor.students.concat(tutor.formerStudents), "student", currentUser._id) > -1) { %>
+                                <% if (objectArrIndex(tutor.members.concat(tutor.formerStudents), "student", currentUser._id) > -1) { %>
                                     <button class="btn btn-warning review-button"
                                             id="review-button-<%= tutor.tutor._id %>"
                                             data-toggle="modal" data-target="#modal-review-<%= tutor.tutor._id %>">Leave A Review
                                     </button>
-                                    <% if (objectArrIndex(tutor.students, "student", currentUser._id) > -1) { %>
+                                    <% if (objectArrIndex(tutor.members, "student", currentUser._id) > -1) { %>
                                         <button class="btn btn-danger leave-button"
                                                 id="leave-button-<%= tutor.tutor._id %>"
                                                 data-toggle="modal"
@@ -232,7 +232,7 @@
                                         </button>
                                         <a id="chat-button-<%= tutor.tutor._id %>"
                                             class="btn btn-success leave-button"
-                                            href="/chat/<%=tutor.students[objectArrIndex(tutor.students, 'student', currentUser._id)].room%>">Chat
+                                            href="/chat/<%=tutor.members[objectArrIndex(tutor.members, 'student', currentUser._id)].room%>">Chat
                                         </a>
                                     <% } else { %>
                                         <% if (tutor.available) { %>
@@ -257,7 +257,7 @@
                                     <% } %>
                                 <% } %>
                             </div>
-                    <% } else if (course.teacher._id.equals(currentUser._id)){ %>
+                    <% } else if (course.creator._id.equals(currentUser._id)){ %>
                         <div id="tutor-actions-<%= tutor.tutor._id %>" class="tutor-actions">
                             <button class="btn btn-danger leave-button"
                                     id="remove-button-<%= tutor.tutor._id %>"
@@ -314,13 +314,13 @@
                                 <br/>
                                 <label for="slots" id="slots-label" class="darkmode-header"><span
                                             id="slots-heading">Number of Student Slots:</span>
-                                    <span id="slots-count"><%= tutor.slots + tutor.students.length %></span></label>
+                                    <span id="slots-count"><%= tutor.slots + tutor.members.length %></span></label>
                             
                                 <span id="change-message" hidden></span>
                                 <br/>
-                                <input type="range" min="<%= tutor.students.length %>"
-                                       max="<%= tutor.slots + tutor.students.length + 10 %>"
-                                       value="<%= tutor.slots + tutor.students.length %>" class="slider" id="slots"
+                                <input type="range" min="<%= tutor.members.length %>"
+                                       max="<%= tutor.slots + tutor.members.length + 10 %>"
+                                       value="<%= tutor.slots + tutor.members.length %>" class="slider" id="slots"
                                        name="slots"
                                        onchange="setStudentsShow('<%= course._id %>')">
 
@@ -522,7 +522,7 @@
         </div>
     </div>
 
-    <% if (course.teacher._id.equals(currentUser._id)) { %>
+    <% if (course.creator._id.equals(currentUser._id)) { %>
         <div class="row settings" hidden><br/>
             <div class="col-12">
                 <h4>Course Settings</h4>

@@ -1,18 +1,20 @@
 //LIBRARIES
 const dateFormat = require('dateformat');
 const {sendGridEmail} = require("../services/sendGrid");
-const platformSetup = require("../platform");
+const setup = require("../utils/setup");
 
 //SCHEMA
-const {Article, PostComment} = require('../models/post');
+const Platform = require("../models/platform");
 const User = require('../models/user');
-const Type = require('../models/wHeights/articleType');
+const {Article, PostComment} = require('../models/post');
+const {PostOrg} = require('../models/group');
+const {PostCategory} = require('../models/category');
 
 const controller = {};
 
 // index page
 controller.index = async function(req, res) {
-    const platform = await platformSetup();
+    const platform = await setup(Platform);
     const articles = await Article.find({}).populate('sender');
     if (!articles) {
         req.flash('error', 'An Error Occurred');
@@ -23,7 +25,9 @@ controller.index = async function(req, res) {
 
 // display form for creating articles
 controller.new = async function(req, res) {
-    const platform = await platformSetup();
+    const platform = await setup(Platform);
+    const wHeightsOrg = await setup(PostOrg);
+
     const students = await User.find({
         authenticated: true,
         status: {$in: platform.studentStatuses} //All students
@@ -33,18 +37,18 @@ controller.new = async function(req, res) {
         return res.redirect('back');
     }
 
-    const types = await Type.find({}); //Find list of article types (for sorting)
-    if (!types) {
-        req.flash('error', "Unable to find article types");
+    const categories = await PostCategory.find({_id: {$in: wHeightsOrg.categories}}); //Find list of article categories (for sorting)
+    if (!categories) {
+        req.flash('error', "Unable to find article categories");
         return res.redirect('back');
     }
 
-    return res.render('wHeights/new', {platform, students, types});
+    return res.render('wHeights/new', {platform, students, categories});
 }
 
 // display specific article
 controller.show = async function(req, res) {
-    const platform = await platformSetup();
+    const platform = await setup(Platform);
     const article = await Article.findById(req.params.id)
         .populate('sender')
         .populate({
@@ -84,15 +88,15 @@ controller.create = async function(req, res) {
     article.sender = sender;
     await article.save();
 
-    const type = await Type.findById(req.body.type);
-    if (!type) {
-        req.flash('error', "Unable to find specified type");
+    const category = await PostCategory.findById(req.body.category);
+    if (!category) {
+        req.flash('error', "Unable to find specified category");
         return res.redirect('back');
     }
 
     //Add articles to the article category
-    type.articles.push(article);
-    await type.save();
+    category.articles.push(article);
+    await category.save();
     return res.redirect('/articles');
 }
 

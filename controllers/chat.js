@@ -4,43 +4,35 @@ const filter = new Filter();
 const dateFormat = require('dateformat');
 const {sendGridEmail} = require("../services/sendGrid");
 const {removeIfIncluded, concatMatrix, multiplyArrays} = require("../utils/object-operations");
-const platformSetup = require("../platform");
+const setup = require("../utils/setup");
 
 //SCHEMA
+const Platform = require("../models/platform");
 const Comment = require('../models/chat/comment');
 const User = require('../models/user');
-const Room = require('../models/chat/room');
 const AccessReq = require('../models/inbox/accessRequest');
+const {ChatRoom} = require('../models/group');
 
 const controller = {};
 
 controller.index = async function(req, res) {
-    const platform = await platformSetup();
-    const rooms = await Room.find({}).populate("creator");
+    const platform = await setup(Platform);
+    const rooms = await ChatRoom.find({}).populate("creator").populate({
+        path: "comments",
+        populate: {path: "author"}
+    });
     if (!rooms) {
         req.flash('error', 'Unable to find rooms');
         return res.redirect('back');
     }
 
     let commentObject = {};
-    let roomComments;
     for (let room of rooms) {
-        roomComments = await Comment.find({room: room._id, status: {$in: ["none", "ignored"]}}).populate("author");
-        if (!roomComments) {
-            req.flash('error', 'Unable to find comments');
-            return res.redirect('back');
-        }
-
-        if (roomComments.length == 0) {
-            commentObject[room._id.toString()] = null;
-
-        //Find latest comment
-        } else {
-            for (let i = roomComments.length - 1; i >= 0; i -= 1) {
-                if (roomComments[i].author) {
-                    commentObject[room._id.toString()] = roomComments[i];
-                    break;
-                }
+        commentObject[room._id.toString()] = null;
+        for (let comment of room.comments.reverse()) {
+            if (comment.status != "deleted") {
+                commentObject[room._id.toString()] = comment;
+                break;
             }
         }
     }
@@ -55,7 +47,7 @@ controller.index = async function(req, res) {
 }
 
 controller.newRoom = async function(req, res) {
-    const platform = await platformSetup();
+    const platform = await setup(Platform);
     const users = await User.find({authenticated: true});
     if (!users) {
         req.flash('error', "An Error Occurred");
@@ -65,8 +57,11 @@ controller.newRoom = async function(req, res) {
 }
 
 controller.showRoom = async function(req, res) {
-    const platform = await platformSetup();
-    const room = await Room.findById(req.params.id);
+    const platform = await setup(Platform);
+    const room = await ChatRoom.findById(req.params.id).populate({
+        path: "comments",
+        populate: {path: "author"}
+    });
     if (!room) {
         req.flash('error', 'Could not find room');
         return res.redirect('/chat');
@@ -79,19 +74,12 @@ controller.showRoom = async function(req, res) {
     removeIfIncluded(req.user.newRoomCount, room._id); //If user has not seen room before, remove it
     await req.user.save();
 
-    const comments = await Comment.find({room: room._id}).sort({_id: -1}).limit(30)
-    .populate({path: 'author', select: ['username', 'imageUrl']});
-    if (!comments) {
-        req.flash('error', 'Could not find comments');
-        return res.redirect('/chat');
-    }
-
-    return res.render('chat/show', {platform, comments, room});
+    return res.render('chat/show', {platform, room});
 }
 
 controller.showMembers = async function(req, res) {
-    const platform = await platformSetup();
-    const room = await Room.findById(req.params.id).populate('creator').populate('members');
+    const platform = await setup(Platform);
+    const room = await ChatRoom.findById(req.params.id).populate('creator').populate('members');
     if (!room) {
         req.flash('error', "Unable to find room");
         return res.redirect('back');
@@ -133,8 +121,8 @@ controller.showMembers = async function(req, res) {
 }
 
 controller.editRoom = async function(req, res) {
-    const platform = await platformSetup();
-    const room = await Room.findById(req.params.id);
+    const platform = await setup(Platform);
+    const room = await ChatRoom.findById(req.params.id);
     if (!room) {
         req.flash('error', "Unable to find room");
         return res.redirect('back');
@@ -149,7 +137,7 @@ controller.editRoom = async function(req, res) {
 }
 
 controller.createRoom = async function(req, res) {
-    const rooms = await Room.find({});
+    const rooms = await ChatRoom.find({});
     if (!rooms) {
         req.flash('error', "Unable to access data");
         return res.redirect('back');
@@ -173,7 +161,7 @@ controller.createRoom = async function(req, res) {
         members: [req.user._id]
     };
 
-    const room = await Room.create(roomObject);
+    const room = await ChatRoom.create(roomObject);
     if (!room) {
         req.flash('error', 'Room could not be created');
         return res.redirect('/chat/new');
@@ -215,7 +203,7 @@ controller.createRoom = async function(req, res) {
 }
 
 controller.leaveRoom = async function(req, res) {
-    const room = await Room.findById(req.params.id);
+    const room = await ChatRoom.findById(req.params.id);
     if (!room) {
         req.flash('error', 'Room does not exist');
         return res.redirect('back');
@@ -246,7 +234,7 @@ controller.leaveRoom = async function(req, res) {
 }
 
 controller.requestJoin = async function(req, res) {
-    const room = await Room.findById(req.params.id); // find the room
+    const room = await ChatRoom.findById(req.params.id); // find the room
     if (!room) {
         return res.json({error: 'Room does not Exist'});
     }
@@ -295,7 +283,7 @@ controller.requestJoin = async function(req, res) {
 }
 
 controller.requestCancel = async function(req, res) {
-    const room = await Room.findById(req.params.id).populate("creator");
+    const room = await ChatRoom.findById(req.params.id).populate("creator");
     if (!room) {
         return res.json({error: "Unable to find room"});
     }
@@ -313,7 +301,7 @@ controller.requestCancel = async function(req, res) {
 }
 
 controller.updateRoom = async function(req, res) {
-    const room = await Room.findByIdAndUpdate(req.params.id, {
+    const room = await ChatRoom.findByIdAndUpdate(req.params.id, {
         name: filter.clean(req.body.name),
         description: filter.clean(req.body.description)
     });
@@ -347,7 +335,7 @@ controller.updateRoom = async function(req, res) {
 }
 
 controller.deleteRoom = async function(req, res) {
-    const room = await Room.findById(req.params.id).populate("creator");
+    const room = await ChatRoom.findById(req.params.id).populate("creator");
     if (!room) {
         req.flash('error', 'An error occured');
         return res.redirect('back');
@@ -358,7 +346,7 @@ controller.deleteRoom = async function(req, res) {
         return res.redirect('back');
     }
 
-    const deletedComments = await Comment.deleteMany({room: room._id});
+    const deletedComments = await Comment.deleteMany({_id: {$in: room.comments}});
     if (!deletedComments) {
         req.flash('error', 'Unable to delete comments');
         return res.redirect('back');
@@ -381,14 +369,14 @@ controller.deleteRoom = async function(req, res) {
     }
     await room.creator.save();
 
-    const deletedRoom = await Room.findByIdAndDelete(req.params.id).populate("members");
+    const deletedRoom = await ChatRoom.findByIdAndDelete(req.params.id).populate("members");
     if (!deletedRoom) {
         req.flash('error', 'A problem occured');
         return res.redirect('back');
     }
 
-    for (let member of deletedRoom.members) { //Remove room from all members' newRoomCounts
-        removeIfIncluded(member.newRoomCount, deletedRoom._id);
+    for (let member of deletedChatRoom.members) { //Remove room from all members' newRoomCounts
+        removeIfIncluded(member.newRoomCount, deletedChatRoom._id);
         await member.save();
     }
     req.flash('success', 'Deleted room');
@@ -396,14 +384,25 @@ controller.deleteRoom = async function(req, res) {
 }
 
 controller.reportComment = async function(req, res) {
-    const comment = await Comment.findById(req.params.id).populate({path: 'room', select: 'moderate'});
+    const comment = await Comment.findById(req.params.id);
     if (!comment) {
         return res.json('Error finding comment');
-    } else if (!comment.room.moderate) {
+    }
+
+    const room = await ChatRoom.findById(req.body.roomId);
+    if (!room) {
+        return res.json("Error finding comment");
+    }
+
+    if (!room.moderate) {
         return res.json('Reporting Is Disabled');
-    } else if (comment.status == 'flagged') {
+    }
+    
+    if (comment.status == 'flagged') {
         return res.json('Already Reported');
-    } else if (comment.status == 'ignored') {
+    }
+    
+    if (comment.status == 'ignored') {
         return res.json('Report Ignored by Mod');
     }
     

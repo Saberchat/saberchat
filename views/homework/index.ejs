@@ -178,9 +178,9 @@
                         </h5>
 
                         <span class="card-text user-position">
-                            <% if (course.teacher.equals(currentUser._id)) { %>
+                            <% if (course.creator.equals(currentUser._id)) { %>
                                 Teacher
-                            <% } else if (course.students.includes(currentUser._id)) { %>
+                            <% } else if (course.members.includes(currentUser._id)) { %>
                                 Student
                             <% } else { %>
                                 <% for (let tutor of course.tutors) { %>

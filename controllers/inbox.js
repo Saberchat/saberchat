@@ -7,9 +7,10 @@ const {sendGridEmail} = require("../services/sendGrid");
 const {convertToLink} = require("../utils/convert-to-link");
 const { cloudUpload } = require('../services/cloudinary');
 const {objectArrIndex, removeIfIncluded, parseKeysOrValues, parsePropertyArray, concatMatrix} = require("../utils/object-operations");
-const platformSetup = require("../platform");
+const setup = require("../utils/setup");
 
 //SCHEMA
+const Platform = require("../models/platform");
 const User = require('../models/user');
 const Message = require('../models/inbox/message');
 const AccessReq = require('../models/inbox/accessRequest');
@@ -21,7 +22,7 @@ const controller = {};
 
 // Inbox GET index page
 controller.index = async function(req, res) {
-    const platform = await platformSetup();
+    const platform = await setup(Platform);
     await req.user.populate({
             path: 'inbox',
 			populate: {path: 'sender', select: ['username', 'imageUrl']}
@@ -39,7 +40,7 @@ controller.index = async function(req, res) {
 
 // Inbox GET show message
 controller.showMsg = async function(req, res) {
-    const platform = await platformSetup();
+    const platform = await setup(Platform);
     const message = await Message.findById(req.params.id);
 	if(!message) {req.flash('error','Cannot find message'); return res.redirect('back');}
 
@@ -74,7 +75,7 @@ controller.showMsg = async function(req, res) {
 
 // Inbox GET new message form
 controller.newMsgForm = async function(req, res) {
-    const platform = await platformSetup();
+    const platform = await setup(Platform);
     const users = await User.find({authenticated: true});
 	if(!users) { req.flash('error', 'An Error Occurred.'); return res.redirect('back'); }
 	return res.render('inbox/new', {
@@ -88,7 +89,7 @@ controller.newMsgForm = async function(req, res) {
 
 // Inbox GET sent messages
 controller.sent = async function(req, res) {
-    const platform = await platformSetup();
+    const platform = await setup(Platform);
     const messages = await Message.find({});
     if(!messages) { req.flash('error', 'An Error Occurred.'); return res.redirect('back');}
 
@@ -110,7 +111,7 @@ controller.sent = async function(req, res) {
 
 // Inbox POST create messsage
 controller.createMsg = async function(req, res) {
-    const platform = await platformSetup();
+    const platform = await setup(Platform);
     let message = { //Build message
         subject: filter.clean(req.body.subject),
         text: filter.clean(req.body.message),
@@ -370,7 +371,7 @@ controller.delete = async function(req, res) {
 // ACCESS REQUEST ROUTES
 
 controller.showReq = async function(req, res) { //Display access request
-    const platform = await platformSetup();
+    const platform = await setup(Platform);
     const request = await AccessReq.findById(req.params.id)
     .populate({path: 'requester', select: 'username'})
     .populate({path: 'room', select: ['creator', 'name']});

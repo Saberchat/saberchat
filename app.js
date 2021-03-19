@@ -29,7 +29,7 @@ const favicon = require('serve-favicon');
 //Source URLs for data security
 const {scriptUrls, styleUrls} = require('./srcUrls');
 //Platform data
-const platformSetup = require("./platform");
+const setup = require("./utils/setup");
 
 // profanity filter
 const Filter = require('bad-words');
@@ -39,11 +39,12 @@ const filter = new Filter();
 const schedule = require('node-schedule');
 
 // require the models for database actions
+const Platform = require('./models/platform');
 const User = require("./models/user");
 const Comment = require('./models/chat/comment');
 const Order = require('./models/cafe/order');
 const Item = require('./models/cafe/orderItem');
-const Cafe = require('./models/cafe/cafe');
+const {Market, ChatRoom} = require('./models/group');
 
 // require the routes
 const indexRoutes = require('./routes/index');
@@ -101,6 +102,7 @@ app.use(helmet.referrerPolicy({ // customizations for helmet referrer policy
 }));
 
 const session = require('express-session'); // Sets up express session for authorization
+const room = require('./models/chat/room');
 const MemoryStore = require('memorystore')(session); // Memorystore package (express-session has memory leaks, bad for production)
 const sessionConfig = {
   name: 'app-ses',
@@ -186,7 +188,7 @@ const getRandMessage = (list => {
 
 // Update all students' statuses on update date, if required
 const updateStatuses = async function() {
-  const platform = await platformSetup();
+  const platform = await setup(Platform);
   if (platform.updateTime.split(' ')[0] != "0" && platform.updateTime.split(' ')[1] != "0") { //If there is an update time
       await schedule.scheduleJob(`0 0 0 ${platform.updateTime.split(' ')[0]} ${platform.updateTime.split(' ')[1]} *`, async() => {
           const statuses = platform.studentStatuses.concat(platform.formerStudentStatus);
@@ -213,61 +215,57 @@ io.on('connect', (socket) => {
   });
 
   // When 'chat message' event is detected, emit msg to all clients in room
-  socket.on('chat message', (msg) => {
-      let profanity;
-      // clean the message
-      if (msg.text != filter.clean(msg.text)) {
-          msg.text = filter.clean(msg.text);
-          profanity = true;
-      }
-      // create/save comment to db
-      Comment.create({
-          text: msg.text,
-          room: socket.room,
-          author: msg.authorId
-      }, (err, comment) => {
-          if (err) {
-              // sends error msg if comment could not be created
-              console.log(err);
-          } else {
-              // set msg id
-              msg.id = comment._id;
-              // broadcast message to all connected users in the room
-              socket.to(socket.room).emit('chat message', msg);
-              // format the date in the form we want.
-              comment.date = dateFormat(comment.created_at, "h:MM TT | mmm d");
-              // saves changes
-              comment.save();
-              // checks if bad language was used
-              if (profanity) {
-                  // console.log('detected bad words'.green);
-                  let notif = {
-                      text: getRandMessage(curseResponse),
-                      status: 'notif'
-                  };
-                  // send announcement to all
-                  io.in(socket.room).emit('announcement', notif);
-                  // create announcement in db
-                  Comment.create({
-                      text: notif,
-                      room: socket.room,
-                      status: notif.status
-                  }, (err, comment) => {
-                      if (err) {
-                          console.log(err);
-                      } else {
-                          comment.date = dateFormat(comment.created_at, "h:MM TT | mmm d");
-                          comment.save();
-                      }
-                  });
-              }
-          }
-      });
+  socket.on('chat message', async(msg) => {
+      try {
+        let profanity;
+        // clean the message
+        if (msg.text != filter.clean(msg.text)) {
+            msg.text = filter.clean(msg.text);
+            profanity = true;
+        }
+        // create/save comment to db
+        const room = await ChatRoom.findById(socket.room);
+		if (!room) {
+			return console.log(err);
+		}
+
+        const comment = await Comment.create({text: msg.text, author: msg.authorId});
+		if (!comment) {
+			return console.log(err); // sends error msg if comment could not be created
+		}
+
+		msg.id = comment._id;
+		socket.to(socket.room).emit('chat message', msg); // broadcast message to all connected users in the room
+		comment.date = dateFormat(comment.created_at, "h:MM TT | mmm d");
+		await comment.save();
+		room.comments.push(comment._id);
+		await room.save();
+
+		if (profanity) { // checks if bad language was used
+			let notif = {
+				text: getRandMessage(curseResponse),
+				status: 'notif'
+			};
+			
+			await io.in(socket.room).emit('announcement', notif);
+			
+			const newComment = await Comment.create({text: notif, status: notif.status});
+			if (!newComment) {
+				console.log(err);
+			}
+
+			newComment.date = dateFormat(comment.created_at, "h:MM TT | mmm d");
+			await newComment.save();
+		}
+	
+	} catch(err) {
+		console.log(err);
+	}
   });
 
   socket.on('order', async(itemList, itemCount, instructions, payingInPerson, customerId) => { //If an order is sent, handle it here (determined from cafe-socket frontend)
       try {
-          const cafe = await Cafe.findOne({}); //Collect data on cafe to figure out whether it's open or not
+          const cafe = await Market.findOne({}); //Collect data on cafe to figure out whether it's open or not
           if (!cafe) {
               return console.log('error accessing cafe');
           }

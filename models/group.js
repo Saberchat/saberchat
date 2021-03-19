@@ -9,34 +9,39 @@ const Group = mongoose.model("Group", new mongoose.Schema({
     creator: {type: mongoose.Schema.Types.ObjectId, ref: "User"},
     members: [{type: mongoose.Schema.Types.ObjectId, ref: "User"}],
     blocked: [{type: mongoose.Schema.Types.ObjectId, ref: 'User'}],
-    imageUrl: {
+    thumbnail: {
         url: {type: String, default: "https://wallpaper.dog/large/11001671.jpg"},
         display: {type: Boolean, default: true}
     },
-    imageFile: {
+    thumbnailFile: {
         filename: String,
         url: String,
         originalName: String,
         display: {type: Boolean, default: false}
     }
-}, {timestamps: {createdAt: 'created_at'}
+}, {
+    timestamps: {createdAt: 'created_at'},
+    discriminatorKey: "type"
 }));
 
-module.exports = {
-    Room: Group.discriminator("Room", new mongoose.Schema({ //Chat rooms
+module.exports = { //All subclasses
+
+    //SUBCLASSES WITH APPENDED FIELDS
+    ChatRoom: Group.discriminator("ChatRoom", new mongoose.Schema({ //Chat rooms
         moderate: {type: Boolean, default: true},
         mutable: {type: Boolean, default: true},
         confirmed: [{type: mongoose.Schema.Types.ObjectId, ref: "User"}],
         comments: [{type: mongoose.Schema.Types.ObjectId, ref: "Comment"}]
     })),
-
-    Cafe: Group.discriminator("Cafe", new mongoose.Schema({
+    PostOrg: Group.discriminator("PostOrg", new mongoose.Schema({ //For organizations like wHeights that post content without profit
+        categories: [{type: mongoose.Schema.Types.ObjectId, ref: "PostCategory"}]
+    })),
+    Market: Group.discriminator("Market", new mongoose.Schema({ //Cafe, Fundraising Platforms, etc.
         open: {type: Boolean, default: false},
         revenue: {type: Number, default: 0},
         expenditures: {type: Number, default: 0},
-        types: [{type: mongoose.Schema.Types.ObjectId, ref: 'ItemType'}]
+        categories: [{type: mongoose.Schema.Types.ObjectId, ref: "ItemCategory"}]
     })),
-
     Course: Group.discriminator("Course", new mongoose.Schema({ //Tutoring center courses
         joinCode: String,
         active: {type: Boolean, default: true},
@@ -44,10 +49,10 @@ module.exports = {
             tutor: {type: mongoose.Schema.Types.ObjectId, ref: 'User'},
             slots: {type: Number, default: 0},
             available: {type: Boolean, default: true},
-            price: {type: Number, default: 20},
+            cost: {type: Number, default: 20},
             bio: String,
             dateJoined: Date,
-            students: [{
+            members: [{
                 student: {type: mongoose.Schema.Types.ObjectId, ref: 'User'},
                 lessons: [{
                     time: Number, date: String, summary: String,
@@ -61,10 +66,7 @@ module.exports = {
                 lessons: [{time: Number, date: String, summary: String}],
             }],
             upvotes: [{type: mongoose.Schema.Types.ObjectId, ref: 'User'}],
-            reviews: [{
-                review: {type: mongoose.Schema.Types.ObjectId, ref: 'Review'},
-                rating: Number
-            }],
+            reviews: [{type: mongoose.Schema.Types.ObjectId, ref: 'Review'}]
         }],
     })),
 };

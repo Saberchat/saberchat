@@ -3,10 +3,11 @@ const {convertToLink} = require("../utils/convert-to-link");
 const dateFormat = require('dateformat');
 const path = require('path');
 const {removeIfIncluded} = require("../utils/object-operations");
-const platformSetup = require("../platform");
+const setup = require("../utils/setup");
 const {cloudUpload, cloudDelete} = require('../services/cloudinary');
 
 //SCHEMA
+const Platform = require("../models/platform");
 const User = require('../models/user');
 const {Report, PostComment} = require('../models/post');
 
@@ -14,7 +15,7 @@ const controller = {};
 
 // Report GET index
 controller.index = async function(req, res) {
-    const platform = await platformSetup();
+    const platform = await setup(Platform);
     const reports = await Report.find({}).populate('sender');
     if(!reports) {req.flash('error', 'Cannot find reports.'); return res.redirect('back');}
     return res.render('reports/index', {platform, reports: reports.reverse()});
@@ -22,13 +23,13 @@ controller.index = async function(req, res) {
 
 // Report GET new report
 controller.new = async function(req, res) {
-    const platform = await platformSetup();
+    const platform = await setup(Platform);
     return res.render('reports/new', {platform});
 };
 
 // Report GET show
 controller.show = async function(req, res) {
-    const platform = await platformSetup();
+    const platform = await setup(Platform);
     const report = await Report.findById(req.params.id)
         .populate('sender')
         .populate({
@@ -47,7 +48,7 @@ controller.show = async function(req, res) {
 
 // Report GET edit form
 controller.updateForm = async function(req, res) {
-    const platform = await platformSetup();
+    const platform = await setup(Platform);
     const report = await Report.findById(req.params.id);
     if(!report) {req.flash('error', 'Could not find report'); return res.redirect('back');}
     if(!report.sender._id.equals(req.user._id)) {
