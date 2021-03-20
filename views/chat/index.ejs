@@ -56,7 +56,7 @@
                 <p class="mb-1 darkmode-header">Rooms you are a member of.</p>
             </li>
             <% rooms.forEach(room => { %>
-                <% if (room.type == 'public' || room.members.includes(currentUser._id)) { %>
+                <% if (!room.private || room.members.includes(currentUser._id)) { %>
                     <a href="chat/<%= room._id %>" class="list-group-item list-group-item-action cafe">
                         <% if (commentObject[room._id.toString()]) { %>
                             <img src="<% if (commentObject[room._id.toString()].author.mediaFile.display) {%> <%= commentObject[room._id.toString()].author.mediaFile.url%><%} else {%> <%=commentObject[room._id.toString()].author.imageUrl.url%><%}%>" alt="user"

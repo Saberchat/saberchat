@@ -13,7 +13,7 @@ const setup = require("../utils/setup");
 const Platform = require("../models/platform");
 const Order = require("../models/cafe/order");
 const Item = require("../models/cafe/orderItem");
-const Notification = require("../models/inbox/message");
+const {InboxMessage} = require("../models/notification");
 const {ItemCategory} = require("../models/category");
 const {Market} = require("../models/group");
 
@@ -184,9 +184,9 @@ controller.processOrder = async function(req, res) {
         return res.json({error: "Could not find order"});
     }
 
-    const notif = await Notification.create({
+    const notif = await InboxMessage.create({
         subject: "Cafe Order Ready",
-        sender: req.user,
+        author: req.user,
         noReply: true,
         recipients: [order.customer],
         read: [],
@@ -247,9 +247,9 @@ controller.deleteOrder = async function(req, res) {
             await i.item.save();
         }
 
-        const notif = await Notification.create({
+        const notif = await InboxMessage.create({
             subject: "Cafe Order Rejected",
-            sender: req.user,
+            author: req.user,
             noReply: true,
             recipients: [order.customer],
             read: [],

@@ -41,7 +41,7 @@ const schedule = require('node-schedule');
 // require the models for database actions
 const Platform = require('./models/platform');
 const User = require("./models/user");
-const Comment = require('./models/chat/comment');
+const {ChatMessage} = require('./models/notification');
 const Order = require('./models/cafe/order');
 const Item = require('./models/cafe/orderItem');
 const {Market, ChatRoom} = require('./models/group');
@@ -102,7 +102,6 @@ app.use(helmet.referrerPolicy({ // customizations for helmet referrer policy
 }));
 
 const session = require('express-session'); // Sets up express session for authorization
-const room = require('./models/chat/room');
 const MemoryStore = require('memorystore')(session); // Memorystore package (express-session has memory leaks, bad for production)
 const sessionConfig = {
   name: 'app-ses',
@@ -173,7 +172,7 @@ const getRandMessage = (list => {
 // deletes all comments at midnight
 
 // const manageComments = schedule.scheduleJob('0 0 0 * * *', () => {
-// 	Comment.find({}, (err, comments) => {
+// 	ChatMessage.find({}, (err, comments) => {
 // 		if(err || !comments) {
 // 			console.log(err);
 // 		} else {
@@ -229,7 +228,7 @@ io.on('connect', (socket) => {
 			return console.log(err);
 		}
 
-        const comment = await Comment.create({text: msg.text, author: msg.authorId});
+        const comment = await ChatMessage.create({text: msg.text, author: msg.authorId});
 		if (!comment) {
 			return console.log(err); // sends error msg if comment could not be created
 		}
@@ -249,13 +248,13 @@ io.on('connect', (socket) => {
 			
 			await io.in(socket.room).emit('announcement', notif);
 			
-			const newComment = await Comment.create({text: notif, status: notif.status});
+			const newComment = await ChatMessage.create({text: notif, status: notif.status});
 			if (!newComment) {
 				console.log(err);
 			}
 
-			newComment.date = dateFormat(comment.created_at, "h:MM TT | mmm d");
-			await newComment.save();
+			newChatMessage.date = dateFormat(comment.created_at, "h:MM TT | mmm d");
+			await newChatMessage.save();
 		}
 	
 	} catch(err) {

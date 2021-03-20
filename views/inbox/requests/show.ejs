@@ -40,9 +40,9 @@
                 <h1>Access Request</h1>
                 <h4><%= request.room.name %></h4>
                 <p>From:
-                    <a href="/profiles/<%= request.requester._id %>" class="user-link">
+                    <a href="/profiles/<%= request.author._id %>" class="user-link">
                             <span class="badge badge-pill badge-primary">
-                              <%= request.requester.username %>
+                              <%= request.author.username %>
                             </span>
                     </a>
                 </p>
@@ -62,7 +62,7 @@
                 <a id="back-button" href="/inbox" class="btn btn-primary back-btn"><i class="fas fa-arrow-left"></i>
                     Back</a><br/>
 
-                <% if(request.receiver.equals(currentUser._id) && request.status == 'pending') { %>
+                <% if(request.recipients[0].equals(currentUser._id) && request.status == 'pending') { %>
                     <form action="/inbox/requests/<%= request._id %>/reject" method="post" class="evaluate-request">
                         <button type="submit" class="btn btn-danger"><i class="fas fa-thumbs-down"></i> Reject</button>
                     </form>

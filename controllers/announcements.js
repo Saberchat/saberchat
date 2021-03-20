@@ -11,7 +11,7 @@ const {cloudUpload, cloudDelete} = require('../services/cloudinary');
 const Platform = require("../models/platform");
 const User = require('../models/user');
 const {Announcement, PostComment} = require('../models/post');
-const Notification = require('../models/inbox/message');
+const {InboxMessage} = require('../models/notification');
 
 const controller = {};
 
@@ -351,9 +351,9 @@ controller.comment = async function(req, res) {
 
     let notif;
     for (let user of users) {
-        notif = await Notification.create({
+        notif = await InboxMessage.create({
             subject: `New Mention in ${announcement.subject}`,
-            sender: req.user,
+            author: req.user,
             noReply: true,
             recipients: [user],
             read: [],

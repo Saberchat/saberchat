@@ -9,7 +9,7 @@ const setup = require("../utils/setup");
 //SCHEMA
 const Platform = require("../models/platform");
 const User = require('../models/user');
-const Notification = require('../models/inbox/message');
+const {InboxMessage} = require('../models/notification');
 const {Course, ChatRoom} = require('../models/group');
 const {Review} = require('../models/post');
 
@@ -411,10 +411,10 @@ controller.removeStudent = async function(req, res) {
         }
     }
 
-    const notif = await Notification.create({  //Create a notification to alert the student that they have been blocked
+    const notif = await InboxMessage.create({  //Create a notification to alert the student that they have been blocked
         subject: `Removal from ${course.name}`,
         text: `You were removed from ${course.name} for the following reason:\n"${req.body.reason}"`,
-        sender: req.user,
+        author: req.user,
         noReply: true,
         recipients: [studentId],
         read: [],
@@ -484,10 +484,10 @@ controller.removeTutor = async function(req, res) { //Remove tutor from course
                 await tutorId.save();
             }
 
-            const notif = await Notification.create({ //Create a notification to alert tutor that they have been removed
+            const notif = await InboxMessage.create({ //Create a notification to alert tutor that they have been removed
                 subject: `Removal from ${course.name}`,
                 text: `You were removed from ${course.name} for the following reason:\n"${req.body.reason}"`,
-                sender: req.user,
+                author: req.user,
                 noReply: true,
                 recipients: [tutorId],
                 read: [],
@@ -543,10 +543,10 @@ controller.unblock = async function(req, res) { //Unblock a previously blocked u
     
     removeIfIncluded(course.blocked, blockedId._id); //Unblock user
     await course.save();
-    const notif = await Notification.create({  //Create a notification to alert the user
+    const notif = await InboxMessage.create({  //Create a notification to alert the user
         subject: `Unblocked from ${course.name}`,
         text: `You have been unblocked from ${course.name}. You can rejoin with the join code now whenever you need to.`,
-        sender: req.user,
+        author: req.user,
         noReply: true,
         recipients: [blockedId],
         read: [],

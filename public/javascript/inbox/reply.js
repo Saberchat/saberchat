@@ -33,7 +33,7 @@ const sendReply = function (msg, event) {
             let newReply = document.createElement('article');
             newReply.className = "msg-container replies";
             newReply.style = "padding: 20px";
-            newReply.innerHTML = `<h4>Reply From <a style="color: ${modes.get(data.darkmode)};" href="../../profiles/${data.message.replies[data.message.replies.length - 1].sender._id}">${data.message.replies[data.message.replies.length - 1].sender.username}</a></h4><p>${data.message.replies[data.message.replies.length - 1].date}</p><p>${data.message.replies[data.message.replies.length - 1].text}</p>${imageString}`;
+            newReply.innerHTML = `<h4>Reply From <a style="color: ${modes.get(data.darkmode)};" href="../../profiles/${data.message.replies[data.message.replies.length - 1].author._id}">${data.message.replies[data.message.replies.length - 1].author.username}</a></h4><p>${data.message.replies[data.message.replies.length - 1].date}</p><p>${data.message.replies[data.message.replies.length - 1].text}</p>${imageString}`;
             replyContainer.appendChild(newReply);
 
             //Clear all fields in the reply field, and hide reply container

@@ -5,14 +5,11 @@ const setup = require("../utils/setup");
 
 //SCHEMA
 const Platform = require("../models/platform");
-const Comment = require('../models/chat/comment');
+const {ChatMessage, AccessRequest, InboxMessage} = require('../models/notification');
 const User = require("../models/user");
 const Email = require("../models/admin/email");
-const Room = require('../models/chat/room');
-const Request = require('../models/inbox/accessRequest');
-const Message = require('../models/inbox/message');
 const {Announcement, Project, Article} = require("../models/post");
-const {Course} = require('../models/group');
+const {Course, ChatRoom} = require('../models/group');
 const Order = require('../models/cafe/order');
 
 const controller = {};
@@ -110,7 +107,7 @@ controller.updatePlatform = async function(req, res) {
 
 controller.moderateGet = async function(req, res) { //Show all reported comments
     const platform = await setup(Platform);
-    const comments = await Comment.find({status: 'flagged'}).populate("author statusBy room");
+    const comments = await ChatMessage.find({status: 'flagged'}).populate("author statusBy room");
 
     if (!comments) {
         req.flash('error', 'An Error Occurred');
@@ -120,17 +117,17 @@ controller.moderateGet = async function(req, res) { //Show all reported comments
 }
 
 controller.getContext = async function(req, res) { //Get context for reported comment
-    const reportedComment = await Comment.findById(req.body.commentId).populate("author");
+    const reportedComment = await ChatMessage.findById(req.body.commentId).populate("author");
     if (!reportedComment) {
         return res.json({error: "Unable to find comment"});
     }
 
-    const allComments = await Comment.find({room: reportedComment.room}).populate("author"); //All comments from the reported comment's room
+    const allComments = await ChatMessage.find({room: reportedChatMessage.room}).populate("author"); //All comments from the reported comment's room
     if (!allComments) {
         return res.json({error: "Unable to find other comments"});
     }
 
-    const commentIndex = objectArrIndex(allComments, "_id", reportedComment._id); //Get index of reported comment
+    const commentIndex = objectArrIndex(allComments, "_id", reportedChatMessage._id); //Get index of reported comment
     let context = []; //Comments 5 before and 5 after
 
     //Find the comments 5 before and 5 after the reported one, and add to array
@@ -145,7 +142,7 @@ controller.getContext = async function(req, res) { //Get context for reported co
 }
 
 controller.ignoreComment = async function(req, res) { //Ignore comment
-    const comment = await Comment.findById(req.body.commentId).populate('statusBy');
+    const comment = await ChatMessage.findById(req.body.commentId).populate('statusBy');
     if (!comment) { return res.json({error: 'Could not find comment'});}
 
     //Users cannot handle comments that they have written/reported
@@ -161,7 +158,7 @@ controller.ignoreComment = async function(req, res) { //Ignore comment
 }
 
 controller.deleteComment = async function(req, res) {
-    const comment = await Comment.findById(req.body.commentId).populate("author");
+    const comment = await ChatMessage.findById(req.body.commentId).populate("author");
     if (!comment) {
         return res.json({error: 'Could not find comment'});
     }
@@ -445,21 +442,21 @@ controller.permanentDelete = async function(req, res) {
     let emptyProjects = null
 
     for (let user of users) {
-        deletedComments = await Comment.deleteMany({author: user._id});
+        deletedComments = await ChatMessage.deleteMany({author: user._id});
 
     if (!deletedComments) {
         req.flash('error', "Unable to delete your comments");
         return res.redirect('back');
     }
 
-    deletedMessages = await Message.deleteMany({sender: user._id});
+    deletedMessages = await InboxMessage.deleteMany({author: user._id});
 
     if (!deletedMessages) {
         req.flash('error', "Unable to delete your messages");
         return res.redirect('back');
     }
 
-    messagesReceived = await Message.find({});
+    messagesReceived = await InboxMessage.find({});
     if (!messagesReceived) {
         req.flash('error', "Unable to find your messages");
         return res.redirect('back');
@@ -467,7 +464,7 @@ controller.permanentDelete = async function(req, res) {
 
     for (let message of messagesReceived) {
         if (message.recipients.includes(user._id)) {
-            messageUpdate = await Message.findByIdAndUpdate(message._id, {$pull: {recipients: user._id, read: req.user._id}});
+            messageUpdate = await InboxMessage.findByIdAndUpdate(message._id, {$pull: {recipients: user._id, read: req.user._id}});
 
             if (!messageUpdate) {
                 req.flash('error', "Unable to update your messages");
@@ -475,20 +472,20 @@ controller.permanentDelete = async function(req, res) {
             }
 
     for (let i = message.replies.length; i > 0; i--) {
-        if (message.replies[i].sender.equals(user._id)) {
+        if (message.replies[i].author.equals(user._id)) {
             message.replies.splice(i, 1);
         }
     }
         }
     }
 
-    //Remove all messages which are now 'empty', but still have the original sender in the 'recipients' (meaning the person who is being deleted replied to this message)
+    //Remove all messages which are now 'empty', but still have the original author in the 'recipients' (meaning the person who is being deleted replied to this message)
     for (let message of messagesReceived) {
-      if (message.recipients.length == 1 && message.recipients[0].equals(message.sender)) {
+      if (message.recipients.length == 1 && message.recipients[0].equals(message.author)) {
 
-        //Remove 1 from the original sender's read (if they haven't read this message yet)
-        if (!message.read.includes(message.sender)) {
-          messageSender = await User.findById(message.sender);
+        //Remove 1 from the original author's read (if they haven't read this message yet)
+        if (!message.read.includes(message.author)) {
+          messageSender = await User.findById(message.author);
 
           if (!messageSender) {
             req.flash('error', "Unable to update your messages");
@@ -499,7 +496,7 @@ controller.permanentDelete = async function(req, res) {
           await messageSender.save();
         }
 
-        messageUpdate = await Message.findByIdAndDelete(message._id);
+        messageUpdate = await InboxMessage.findByIdAndDelete(message._id);
 
         if (!messageUpdate) {
           req.flash('error', "Unable to update your messages");
@@ -508,13 +505,13 @@ controller.permanentDelete = async function(req, res) {
       }
     }
 
-    emptyMessages = await Message.deleteMany({recipients: []});
+    emptyMessages = await InboxMessage.deleteMany({recipients: []});
     if (!emptyMessages) {
         req.flash('error', "Unable to delete your messages");
         return res.redirect('back');
     }
 
-    anns = await Announcement.find({sender: user._id});
+    anns = await Announcement.find({author: user._id});
     if (!anns) {
         req.flash('error', "Unable to delete your announcements");
         return res.redirect('back');
@@ -531,7 +528,7 @@ controller.permanentDelete = async function(req, res) {
       }
     }
 
-    deletedAnns = await Announcement.deleteMany({sender: user._id});
+    deletedAnns = await Announcement.deleteMany({author: user._id});
     if (!deletedAnns) {
         req.flash('error', "Unable to delete your announcements");
         return res.redirect('back');
@@ -543,7 +540,7 @@ controller.permanentDelete = async function(req, res) {
         return res.redirect('back');
     }
 
-    deletedRequests = await Request.deleteMany({requester: user._id});
+    deletedRequests = await AccessRequest.deleteMany({author: user._id});
     if (!deletedRequests) {
         req.flash('error', "Unable to delete your requests");
         return res.redirect('back');
@@ -571,7 +568,7 @@ controller.permanentDelete = async function(req, res) {
       }
     }
 
-    roomsCreated = await Room.find({});
+    roomsCreated = await ChatRoom.find({});
     if (!roomsCreated) {
       req.flash('error', "Unable to delete your rooms");
       return res.redirect('back');
@@ -579,7 +576,7 @@ controller.permanentDelete = async function(req, res) {
 
     for (let room of roomsCreated) {
         if (room.creator.toString() == user._id.toString()) {
-      	deletedRoomCreated = await Room.findByIdAndDelete(room._id);
+      	deletedRoomCreated = await ChatRoom.findByIdAndDelete(room._id);
             if (!deletedRoomCreated) {
                 req.flash('error', "Unable to delete your rooms");
                 return res.redirect('back');
@@ -587,7 +584,7 @@ controller.permanentDelete = async function(req, res) {
         }
     }
 
-    roomsPartOf = await Room.find({});
+    roomsPartOf = await ChatRoom.find({});
     if (!roomsPartOf) {
         req.flash('error', "Unable to find your rooms");
         return res.redirect('back');
@@ -601,7 +598,7 @@ controller.permanentDelete = async function(req, res) {
     }
 
     for (let room of roomUpdates) {
-        updatedRoom = await Room.findByIdAndUpdate(room, {$pull: {members: user._id}});
+        updatedRoom = await ChatRoom.findByIdAndUpdate(room, {$pull: {members: user._id}});
         if (!updatedRoom) {
             req.flash('error', "Unable to access your rooms");
             return res.redirect('back');

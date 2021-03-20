@@ -12,7 +12,7 @@ const setup = require("../utils/setup");
 const Platform = require("../models/platform");
 const User = require('../models/user');
 const {Project, PostComment} = require('../models/post');
-const Notification = require('../models/inbox/message');
+const {InboxMessage} = require('../models/notification');
 
 const controller = {};
 
@@ -151,9 +151,9 @@ controller.createProject = async function(req, res) {
     }
 
     for (let user of users) {
-        notif = await Notification.create({
+        notif = await  InboxMessage.create({
             subject: "New Project Post",
-            sender: req.user,
+            author: req.user,
             noReply: true,
             recipients: [user],
             read: [],
@@ -468,9 +468,9 @@ controller.comment = async function(req, res) {
 
     let notif;
     for (let user of users) {
-        notif = await Notification.create({
+        notif = await  InboxMessage.create({
             subject: `New Mention in ${project.subject}`,
-            sender: req.user,
+            author: req.user,
             noReply: true,
             recipients: [user],
             read: [],

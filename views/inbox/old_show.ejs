@@ -73,12 +73,12 @@
 
                     <p id="notif-date"><%= notif.date.split(', ')[1] %> | <%= notif.date.split(', ')[0] %></p>
 
-                    <% if (notif.sender == null) { %>
+                    <% if (!notif.author) { %>
                         <span class="sender-receiver-info">From</span>: <span>Anonymous</span><br/>
 
-                    <% } else if (currentUser._id.toString() != notif.sender._id.toString()) { %>
+                    <% } else if (currentUser._id.toString() != notif.author._id.toString()) { %>
                         <span class="sender-receiver-info">From</span>: <a id="message-from"
-                                                                           href="/profiles/<%= notif.sender._id %>"><%= notif.sender.username %></a>
+                                                                           href="/profiles/<%= notif.author._id %>"><%= notif.author.username %></a>
                         <br/>
 
                     <% } else { %>
@@ -89,12 +89,12 @@
 
                     <!-- To everyone  -->
 
-                    <% if (notif.toEveryone == true && notif.sender != null) { %>
+                    <% if (notif.toEveryone == true && notif.author != null) { %>
                         <span class="sender-receiver-info">To:</span><span> everyone</span>
 
                         <!-- To a group including the user  -->
 
-                    <% } else if ((notif.sender != null) && (currentUser._id.toString() != notif.sender._id.toString())) { %>
+                    <% } else if ((notif.author != null) && (currentUser._id.toString() != notif.author._id.toString())) { %>
                         <span class="sender-receiver-info">To:</span>
 
                         <% let tempRecipients = recipient_profiles.slice(0, recipient_profiles.length - 1) %>

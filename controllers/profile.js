@@ -12,13 +12,10 @@ const setup = require("../utils/setup");
 const Platform = require("../models/platform");
 const User = require('../models/user');
 const Email = require('../models/admin/email');
-const Comment = require('../models/chat/comment');
-const Room = require('../models/chat/room');
-const Request = require('../models/inbox/accessRequest');
-const Message = require('../models/inbox/message');
+const {ChatMessage, AccessRequest, InboxMessage} = require('../models/notification');
 const {Announcement, Project, Article} = require('../models/post');
 const Order = require('../models/cafe/order');
-const {Course} = require('../models/group');
+const {Course, ChatRoom} = require('../models/group');
 
 const controller = {};
 
@@ -439,14 +436,14 @@ controller.remove = async function(req, res) {
 
 //DELETE ACCOUNT. CURRENTLY DISABLED ROUTE
 controller.deleteAccount = async function(req, res)  {
-		const deletedComments = await Comment.deleteMany({author: req.user._id});
+		const deletedComments = await ChatMessage.deleteMany({author: req.user._id});
 
 		if (!deletedComments) {
 			req.flash('error', "Unable to delete your comments");
 			return res.redirect('back');
 		}
 
-		const messagesSent = await Message.find({sender: req.user._id}).populate('read');
+		const messagesSent = await InboxMessage.find({sender: req.user._id}).populate('read');
 
 		if (!messagesSent) {
 			req.flash('error', "Unable to delete your messages");
@@ -460,14 +457,14 @@ controller.deleteAccount = async function(req, res)  {
 			}
 		}
 
-		const deletedMessagesSent = await Message.deleteMany({sender: req.user._id});
+		const deletedMessagesSent = await InboxMessage.deleteMany({sender: req.user._id});
 
 		if (!deletedMessagesSent) {
 			req.flash('error', "Unable to delete your messages");
 			return res.redirect('back');
 		}
 
-		const messagesReceived = await Message.find({});
+		const messagesReceived = await InboxMessage.find({});
 
 		if (!messagesReceived) {
 			req.flash('error', "Unable to delete your messages");
@@ -479,7 +476,7 @@ controller.deleteAccount = async function(req, res)  {
 
 		for (let message of messagesReceived) {
 			if (message.recipients.includes(req.user._id)) {
-				messageUpdate = await Message.findByIdAndUpdate(message._id, {$pull: {recipients: req.user._id, read: req.user._id}});
+				messageUpdate = await InboxMessage.findByIdAndUpdate(message._id, {$pull: {recipients: req.user._id, read: req.user._id}});
 
 				if (!messageUpdate) {
 					req.flash('error', "Unable to update your messages");
@@ -507,7 +504,7 @@ controller.deleteAccount = async function(req, res)  {
 					await messageSender.save();
 				}
 
-				messageUpdate = await Message.findByIdAndDelete(message._id);
+				messageUpdate = await InboxMessage.findByIdAndDelete(message._id);
 				if (!messageUpdate) {
 					req.flash('error', "Unable to update your messages");
 					return res.redirect('back');
@@ -515,7 +512,7 @@ controller.deleteAccount = async function(req, res)  {
 			}
 		}
 
-		const emptyMessages = await Message.deleteMany({recipients: []});
+		const emptyMessages = await InboxMessage.deleteMany({recipients: []});
 
 		if (!emptyMessages) {
 			req.flash('error', "Unable to delete your messages");
@@ -556,7 +553,7 @@ controller.deleteAccount = async function(req, res)  {
 			return res.redirect('back');
 		}
 
-		const deletedRequests = await Request.deleteMany({requester: req.user._id});
+		const deletedRequests = await AccessRequest.deleteMany({author: req.user._id});
 
 		if (!deletedRequests) {
 			req.flash('error', "Unable to delete your requests");
@@ -588,7 +585,7 @@ controller.deleteAccount = async function(req, res)  {
 			}
 		}
 
-		const roomsCreated = await Room.find({});
+		const roomsCreated = await ChatRoom.find({});
 
 		if (!roomsCreated) {
 			req.flash('error', "Unable to delete your rooms");
@@ -599,7 +596,7 @@ controller.deleteAccount = async function(req, res)  {
 
 		for (let room of roomsCreated) {
 			if (room.creator.toString() == req.user._id.toString()) {
-				deletedRoomCreated = await Room.findByIdAndDelete(room._id);
+				deletedRoomCreated = await ChatRoom.findByIdAndDelete(room._id);
 
 				if (!deletedRoomCreated) {
 					req.flash('error', "Unable to delete your rooms");
@@ -608,7 +605,7 @@ controller.deleteAccount = async function(req, res)  {
 			}
 		}
 
-		const roomsPartOf = await Room.find({});
+		const roomsPartOf = await ChatRoom.find({});
 
 		if (!roomsPartOf) {
 			req.flash('error', "Unable to find your rooms");
@@ -624,7 +621,7 @@ controller.deleteAccount = async function(req, res)  {
 		}
 
 		for (let room of roomUpdates) {
-			updatedRoom = await Room.findByIdAndUpdate(room, {$pull: {members: req.user._id}});
+			updatedRoom = await ChatRoom.findByIdAndUpdate(room, {$pull: {members: req.user._id}});
 
 			if (!updatedRoom) {
 				req.flash('error', "Unable to access your rooms");

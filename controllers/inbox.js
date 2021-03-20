@@ -12,9 +12,8 @@ const setup = require("../utils/setup");
 //SCHEMA
 const Platform = require("../models/platform");
 const User = require('../models/user');
-const Message = require('../models/inbox/message');
-const AccessReq = require('../models/inbox/accessRequest');
-const Room = require('../models/chat/room');
+const {ChatRoom} = require('../models/group');
+const {AccessRequest, InboxMessage} = require("../models/notification");
 
 const controller = {};
 
@@ -25,11 +24,11 @@ controller.index = async function(req, res) {
     const platform = await setup(Platform);
     await req.user.populate({
             path: 'inbox',
-			populate: {path: 'sender', select: ['username', 'imageUrl']}
+			populate: {path: 'author', select: ['username', 'imageUrl']}
         }).populate({
 			path: 'requests',
 			populate: [
-                {path: 'requester', select: ['username', 'imageUrl']},
+                {path: 'author', select: ['username', 'imageUrl']},
                 {path: 'room', select: 'name'}
 			]
 		}).execPopulate();
@@ -41,11 +40,11 @@ controller.index = async function(req, res) {
 // Inbox GET show message
 controller.showMsg = async function(req, res) {
     const platform = await setup(Platform);
-    const message = await Message.findById(req.params.id);
+    const message = await InboxMessage.findById(req.params.id);
 	if(!message) {req.flash('error','Cannot find message'); return res.redirect('back');}
 
     //Check message view permissions
-    if(!message.toEveryone && !message.recipients.includes(req.user._id) && !message.sender.equals(req.user._id)) {
+    if(!message.toEveryone && !message.recipients.includes(req.user._id) && !message.author.equals(req.user._id)) {
         req.flash('error', 'You do not have permission to view this message');
         return res.redirect('back');
     }
@@ -58,10 +57,10 @@ controller.showMsg = async function(req, res) {
         await message.save();
     }
 
-    await message.populate({path: 'sender', select: 'username'})
+    await message.populate({path: 'author', select: 'username'})
         .populate({path:'recipients', select: 'username'})
         .populate({path: 'read', select: 'username'})
-        .populate({path: 'replies.sender'})
+        .populate({path: 'replies.author'})
         .execPopulate();
 
     //Map of file extensions to ensure correct media format is rendered
@@ -90,18 +89,18 @@ controller.newMsgForm = async function(req, res) {
 // Inbox GET sent messages
 controller.sent = async function(req, res) {
     const platform = await setup(Platform);
-    const messages = await Message.find({});
+    const messages = await InboxMessage.find({});
     if(!messages) { req.flash('error', 'An Error Occurred.'); return res.redirect('back');}
 
     let sent_msgs = []; // array of user's sent messages
     for(let message of messages) { // if user sent the message, push and continue
-        if(message.sender.equals(req.user._id)) {
+        if(message.author.equals(req.user._id)) {
             sent_msgs.push(message);
             continue;
         }
 
         for(let reply of message.replies.reverse()) { // else check for user's replies by most recent
-            if(reply.sender.equals(req.user._id)) { // push most recent reply by user
+            if(reply.author.equals(req.user._id)) { // push most recent reply by user
                 break;
             }
         }
@@ -148,7 +147,7 @@ controller.createMsg = async function(req, res) {
             }
         }
     }
-    message.sender = req.user._id;
+    message.author = req.user._id;
     message.noReply = (req.body.noreply == "true");
 
     //Builds recipient list based on front-end input
@@ -173,7 +172,7 @@ controller.createMsg = async function(req, res) {
         if(faculty.length == 0) {req.flash('error', 'You can only select faculty'); return res.redirect('back');}
         recipients = parsePropertyArray(faculty, "_id");
         message.anonymous = true;
-        delete message.sender;
+        delete message.author;
     }
 
     //If statuses are selected as 'recipients', find corresponding users
@@ -203,7 +202,7 @@ controller.createMsg = async function(req, res) {
     }
     message.recipients = recipients;
 
-    const newMessage = await Message.create(message);
+    const newMessage = await InboxMessage.create(message);
     if(!newMessage) {
         req.flash('error', 'Message could not be created'); return res.redirect('back');
     }
@@ -268,7 +267,7 @@ controller.createMsg = async function(req, res) {
 
 // Inbox PUT mark all messages as read
 controller.markReadAll = async function(req, res) {
-    const result = await Message.updateMany(
+    const result = await InboxMessage.updateMany(
         {_id: {$in: req.user.inbox}, read: {$ne: req.user._id}},
         {$push: {read: req.user._id}}
     );
@@ -280,7 +279,7 @@ controller.markReadAll = async function(req, res) {
 
 // Inbox PUT mark selected messages as read
 controller.markReadSelected = async function(req, res) {
-    const result = await Message.updateMany(
+    const result = await InboxMessage.updateMany(
         {_id: {$in: parseKeysOrValues(req.body, "body")}, read: {$ne: req.user._id}},
         {$push: {read: req.user._id}}
     );
@@ -301,7 +300,7 @@ controller.clear = async function(req, res) {
 
 // Inbox PUT reply to message
 controller.reply = async function(req, res) {
-    const message = await Message.findById(req.body.message).populate('recipients').populate('sender');
+    const message = await InboxMessage.findById(req.body.message).populate('recipients').populate('author');
     if(!message) {
         return res.json({error: 'Error finding message'});
     } else if(message.anonymous || message.noReply) { //In either of these cases, you cannot reply to the message
@@ -309,7 +308,7 @@ controller.reply = async function(req, res) {
     }
 
     const reply = { //Build reply object
-        sender: req.user,
+        author: req.user,
         text: req.body.text,
         images: req.body.images,
         date: dateFormat(new Date(), "h:MM TT | mmm d")
@@ -326,13 +325,13 @@ controller.reply = async function(req, res) {
 
     let readRecipients = message.read; //Users who have read the original message will need to have their msgCount incremented again
 
-    //Iterates through the recipients and sees if the sender is part of them. If not, then no reply has been sent yet, but since the sender has sent the message, they have 'read' it. Hence, they are added to the readRecipients array.
-    if (objectArrIndex(message.recipients, "_id", message.sender._id) == -1) {
-        readRecipients.push(message.sender);
+    //Iterates through the recipients and sees if the author is part of them. If not, then no reply has been sent yet, but since the author has sent the message, they have 'read' it. Hence, they are added to the readRecipients array.
+    if (objectArrIndex(message.recipients, "_id", message.author._id) == -1) {
+        readRecipients.push(message.author);
     }
-    removeIfIncluded(message.recipients, message.sender._id, "_id"); //If the original sender is already part of the recipients, remove them just in case
+    removeIfIncluded(message.recipients, message.author._id, "_id"); //If the original author is already part of the recipients, remove them just in case
 
-    message.recipients.push(message.sender); //Add original sender to recipient list (code above ensures that they are not added multiple times)
+    message.recipients.push(message.author); //Add original author to recipient list (code above ensures that they are not added multiple times)
     message.read = [req.user]; //Since the current user replied to this message, they've seen the completely updated message. Nobody else has
     await message.save();
 
@@ -340,7 +339,7 @@ controller.reply = async function(req, res) {
         removeIfIncluded(recipient.inbox, message._id); //Remove message from recipient's inbox
         recipient.inbox.push(message._id); //Add it to the front of the recipient's inbox
 
-        //If the recipient has already read this message and it is not the person sending the reply (or the recipient is the original message sender), increment their message count again
+        //If the recipient has already read this message and it is not the person sending the reply (or the recipient is the original message author), increment their message count again
         if (readRecipients.includes(recipient._id) && !(recipient._id.equals(req.user._id))) {
             recipient.msgCount += 1;
         }
@@ -355,7 +354,7 @@ controller.reply = async function(req, res) {
 
 // Inbox DELETE messages
 controller.delete = async function(req, res) {
-    const messages = await Message.find({_id: {$in: parseKeysOrValues(req.body, "keys")}}); //Extract message ids from form body
+    const messages = await InboxMessage.find({_id: {$in: parseKeysOrValues(req.body, "keys")}}); //Extract message ids from form body
     if(!messages) {req.flash('error', 'Could not find messages'); return res.redirect('back');}
 
     messages.forEach( message => { //Iterate through messages and remove any selected ones from user's inbox
@@ -372,16 +371,16 @@ controller.delete = async function(req, res) {
 
 controller.showReq = async function(req, res) { //Display access request
     const platform = await setup(Platform);
-    const request = await AccessReq.findById(req.params.id)
-    .populate({path: 'requester', select: 'username'})
+    const request = await AccessRequest.findById(req.params.id)
+    .populate({path: 'author', select: 'username'})
     .populate({path: 'room', select: ['creator', 'name']});
     if(!request) {req.flash('error', 'An Error Occurred.'); return res.redirect('back');}
     return res.render('inbox/requests/show', {platform, request});
 };
 
 controller.acceptReq = async function(req, res) { //Accept access request
-    const request = await AccessReq.findById(req.params.id)
-    .populate({path: 'room', select: ['creator']}).populate('requester');
+    const request = await AccessRequest.findById(req.params.id)
+    .populate({path: 'room', select: ['creator']}).populate('author');
 
     if(!request) {
         req.flash("error", "An Error Occurred");
@@ -397,9 +396,9 @@ controller.acceptReq = async function(req, res) { //Accept access request
     }
 
     //If request is accepted, add user to room and save it
-    const room = await Room.findById(request.room._id);
+    const room = await ChatRoom.findById(request.room._id);
     if(!room) { req.flash("error", "An Error Occurred");return res.redirect('back'); }
-    room.members.push(request.requester);
+    room.members.push(request.author);
     request.status = 'accepted'; //Update request status
     req.user.reqCount --;
     await room.save();
@@ -407,9 +406,9 @@ controller.acceptReq = async function(req, res) { //Accept access request
     await req.user.save();
 
     //Send notification alerting user that they have been accepted
-    if(request.requester.receiving_emails) {
-        const emailText = `<p>Hello ${request.requester.firstName},</p><p>Your request to join chat room <strong>${room.name}</strong> has been accepted!<p><p>You can access the room at https://saberchat.net</p>`;
-        await sendGridEmail(request.requester.email, `Room Request Accepted - ${room.name}`, emailText, false);
+    if(request.author.receiving_emails) {
+        const emailText = `<p>Hello ${request.author.firstName},</p><p>Your request to join chat room <strong>${room.name}</strong> has been accepted!<p><p>You can access the room at https://saberchat.net</p>`;
+        await sendGridEmail(request.author.email, `Room Request Accepted - ${room.name}`, emailText, false);
     }
 
     req.flash('success', 'Request accepted');
@@ -417,7 +416,7 @@ controller.acceptReq = async function(req, res) { //Accept access request
 };
 
 controller.rejectReq = async function(req, res) { //Reject access request
-    const request = await AccessReq.findById(req.params.id).populate('room').populate('requester');
+    const request = await AccessRequest.findById(req.params.id).populate('room').populate('author');
     if(!request) {
         req.flash("error", "An Error Occurred");
         return res.redirect('back');
@@ -439,9 +438,9 @@ controller.rejectReq = async function(req, res) { //Reject access request
     await request.save();
     await req.user.save();
 
-    if(request.requester.receiving_emails) {
-        const emailText = `<p>Hello ${request.requester.firstName},</p><p>Your request to join chat room <strong>${request.room.name}</strong> has been rejected. Contact the room creator, <strong>${request.room.creator.username}</strong>, if you think that there has been a mistake.</p>`;
-        await sendGridEmail(request.requester.email, `Room Request Rejected - ${request.room.name}`, emailText, false);
+    if(request.author.receiving_emails) {
+        const emailText = `<p>Hello ${request.author.firstName},</p><p>Your request to join chat room <strong>${request.room.name}</strong> has been rejected. Contact the room creator, <strong>${request.room.creator.username}</strong>, if you think that there has been a mistake.</p>`;
+        await sendGridEmail(request.author.email, `Room Request Rejected - ${request.room.name}`, emailText, false);
     }
 
     req.flash('success', 'Request rejected');

@@ -8,9 +8,8 @@ const setup = require("../utils/setup");
 
 //SCHEMA
 const Platform = require("../models/platform");
-const Comment = require('../models/chat/comment');
 const User = require('../models/user');
-const AccessReq = require('../models/inbox/accessRequest');
+const {ChatMessage, AccessRequest} = require("../models/notification");
 const {ChatRoom} = require('../models/group');
 
 const controller = {};
@@ -37,8 +36,8 @@ controller.index = async function(req, res) {
         }
     }
 
-    //Track all of the current user's beliefs
-    const requests = await AccessReq.find({requester: req.user._id, status: "pending"});
+    //Track all of the current user's requests
+    const requests = await AccessRequest.find({author: req.user._id, status: "pending"});
     if (!requests) {
         req.flash('error', 'Unable to find access requests');
         return res.redirect('back');
@@ -219,7 +218,7 @@ controller.leaveRoom = async function(req, res) {
         return res.redirect('back');
     }
 
-    const request = await AccessReq.findOne({requester: req.user._id, room: room._id, status: 'accepted'});
+    const request = await AccessRequest.findOne({author: req.user._id, room: room._id, status: 'accepted'});
     if (request) { // will delete past request for now
         await request.remove();
     }
@@ -247,7 +246,7 @@ controller.requestJoin = async function(req, res) {
     }
 
     // find if the request already exists to prevent spam
-    const existingRequest = await AccessReq.findOne({requester: req.user._id, room: room._id});
+    const existingRequest = await AccessRequest.findOne({author: req.user._id, room: room._id});
     if (existingRequest && existingRequest.status != 'pending') {
         return res.json({error: `Request has already been ${existingRequest.status}`});
 
@@ -256,14 +255,15 @@ controller.requestJoin = async function(req, res) {
     }
 
     const request = {
-        requester: req.user._id,
+        author: req.user._id,
         room: room._id,
-        receiver: room.creator
+        status: "pending",
+        recipients: [room.creator]
     };
 
     // create the request and find the room creator
     const [createdReq, roomCreator] = await Promise.all([
-        AccessReq.create(request),
+        AccessRequest.create(request),
         User.findById(room.creator)
     ]);
 
@@ -288,7 +288,7 @@ controller.requestCancel = async function(req, res) {
         return res.json({error: "Unable to find room"});
     }
 
-    const deletedReq = await AccessReq.deleteOne({room: room._id, requester: req.user._id, status: "pending"});
+    const deletedReq = await AccessRequest.deleteOne({room: room._id, author: req.user._id, status: "pending"});
     if (!deletedReq) {
         return res.json({error: "Unable to find request"});
     }
@@ -346,13 +346,13 @@ controller.deleteRoom = async function(req, res) {
         return res.redirect('back');
     }
 
-    const deletedComments = await Comment.deleteMany({_id: {$in: room.comments}});
+    const deletedComments = await ChatMessage.deleteMany({_id: {$in: room.comments}});
     if (!deletedComments) {
         req.flash('error', 'Unable to delete comments');
         return res.redirect('back');
     }
 
-    const requests = await AccessReq.find({room: room._id});
+    const requests = await AccessRequest.find({room: room._id});
     if (!requests) {
         req.flash('error', 'Unable to find requests');
         return res.redirect('back');
@@ -361,7 +361,7 @@ controller.deleteRoom = async function(req, res) {
     let deletedRequest; 
     for (let request of requests) { //Iterate through all active join requests and remove them from room creator's inbox
         removeIfIncluded(room.creator.requests, request._id);
-        deletedRequest = await AccessReq.findByIdAndDelete(request._id);
+        deletedRequest = await AccessRequest.findByIdAndDelete(request._id);
         if (!deletedRequest) {
             req.flash('error', 'Unable to delete requests');
             return res.redirect('back');
@@ -384,7 +384,7 @@ controller.deleteRoom = async function(req, res) {
 }
 
 controller.reportComment = async function(req, res) {
-    const comment = await Comment.findById(req.params.id);
+    const comment = await ChatMessage.findById(req.params.id);
     if (!comment) {
         return res.json('Error finding comment');
     }

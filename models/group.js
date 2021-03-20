@@ -31,7 +31,7 @@ module.exports = { //All subclasses
         moderate: {type: Boolean, default: true},
         mutable: {type: Boolean, default: true},
         confirmed: [{type: mongoose.Schema.Types.ObjectId, ref: "User"}],
-        comments: [{type: mongoose.Schema.Types.ObjectId, ref: "Comment"}]
+        comments: [{type: mongoose.Schema.Types.ObjectId, ref: "ChatMessage"}]
     })),
     PostOrg: Group.discriminator("PostOrg", new mongoose.Schema({ //For organizations like wHeights that post content without profit
         categories: [{type: mongoose.Schema.Types.ObjectId, ref: "PostCategory"}]

@@ -40,12 +40,12 @@
                 <div class="msg-head">
                     <h1><%= message.subject %></h1>
                     <p>From:
-                        <a href="/profiles/<%= message.sender._id %>" class="user-link">
+                        <a href="/profiles/<%= message.author._id %>" class="user-link">
                     <span class="badge badge-pill badge-primary">
-                        <% if(message.sender._id.equals(currentUser._id)) { %>
+                        <% if(message.author._id.equals(currentUser._id)) { %>
                             me
                         <% } else { %>
-                            <%= message.sender.username %>
+                            <%= message.author.username %>
                         <% } %>
                     </span>
                         </a>
@@ -56,7 +56,7 @@
                         <% } else { %>
                             <% message.recipients.forEach(user => { %>
 
-                                <% if (!user._id.equals(message.sender._id)) { %>
+                                <% if (!user._id.equals(message.author._id)) { %>
                                     <a href="/profiles/<%= user._id %>" class="user-link">
                           <span class="badge badge-pill badge-secondary">
                               <% if(user._id.equals(currentUser._id)) { %>
@@ -116,7 +116,7 @@
                     <article class="msg-container replies">
                         <h4>
                             Reply From <a class="reply-sender darkmode-header"
-                                          href="../../profiles/<%= reply.sender._id %>"><%= reply.sender.username %></a>
+                                          href="../../profiles/<%= reply.author._id %>"><%= reply.author.username %></a>
                         </h4>
 
                         <p>

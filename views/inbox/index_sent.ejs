@@ -72,7 +72,7 @@
                       <% inbox.forEach((notif) => { %>
                         <li class="list-group-item list-group-item-action read mode">
 
-                          <% if (notif.sender == null) { %>
+                          <% if (!notif.author) { %>
                             <div class="message-check mode">
                               <input class="del-form-input" type="checkbox" name="<%= notif._id %>" value="" onchange="updateDelete()">
                             </div>
@@ -91,7 +91,7 @@
                               </div>
                             </a>
 
-                          <% } else if (notif.sender._id.toString() == currentUser._id.toString()) { %>
+                          <% } else if (notif.author._id.toString() == currentUser._id.toString()) { %>
 
                             <a href="/inbox/<%= notif._id %>" class="message-body mode">
                               <div class="message-head mode">
@@ -99,7 +99,7 @@
                                 (<%=1 + notif.replies.length%>) <%= notif.subject %>
                                 </div>
                                 <div class="message-from mode">
-                                  <%= notif.sender.username %>
+                                  <%= notif.author.username %>
                                 </div>
                               </div>
                               <div class="message-text mode">
@@ -107,7 +107,7 @@
 
                                 <% for (let reply of notif.replies.reverse()) { %>
 
-                                  <% if (reply.sender.equals(currentUser._id)) { %>
+                                  <% if (reply.author.equals(currentUser._id)) { %>
                                     <%=reply.text%>
                                     <% replied = true%>
                                     <% break%>
@@ -132,7 +132,7 @@
                                     (<%=1 + notif.replies.length%>) <%= notif.subject %>
                                   </div>
                                   <div class="message-from mode">
-                                    <%= notif.sender.username %>
+                                    <%= notif.author.username %>
                                   </div>
                                 </div>
                                 <div class="message-text mode">
@@ -140,7 +140,7 @@
 
                                   <% for (let reply  of notif.replies.reverse()) { %>
 
-                                    <% if (reply.sender.equals(currentUser._id)) { %>
+                                    <% if (reply.author.equals(currentUser._id)) { %>
                                       <%=reply.text%>
                                       <% replied = true%>
                                       <% break%>
@@ -161,7 +161,7 @@
                                     (<%=1 + notif.replies.length%>) <%= notif.subject %>
                                   </div>
                                   <div class="message-from mode">
-                                    <%= notif.sender.username %>
+                                    <%= notif.author.username %>
                                   </div>
                                 </div>
                                 <div class="message-text mode">
@@ -169,7 +169,7 @@
 
                                   <% for (let reply  of notif.replies.reverse()) { %>
 
-                                    <% if (reply.sender.equals(currentUser._id)) { %>
+                                    <% if (reply.author.equals(currentUser._id)) { %>
                                       <%=reply.text%>
                                       <% replied = true%>
                                       <% break%>
