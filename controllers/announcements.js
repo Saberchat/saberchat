@@ -19,7 +19,7 @@ const controller = {};
 controller.index = async function(req, res) {
     const platform = await setup(Platform);
     const users = await User.find({});
-    if (!users) {
+    if (!platform || !users) {
         req.flash('error', 'An Error Occurred');
         return res.redirect('back');
     }
@@ -39,6 +39,10 @@ controller.index = async function(req, res) {
 // Announcement GET new ann
 controller.new = async function(req, res) {
     const platform = await setup(Platform);
+    if (!platform) {
+        req.flash("error", "An Error Occurred");
+        return res.redirect("back");
+    }
     return res.render('announcements/new', {platform});
 };
 
@@ -67,11 +71,9 @@ controller.show = async function(req, res) {
         .populate('sender')
         .populate({
             path: "comments",
-            populate: {
-                path: "sender"
-            }
+            populate: {path: "sender"}
         });
-    if(!announcement) {
+    if(!platform || !announcement) {
         req.flash('error', 'Could not find announcement');
         return res.redirect('back');
     }
@@ -96,11 +98,11 @@ controller.show = async function(req, res) {
 controller.updateForm = async function(req, res) {
     const platform = await setup(Platform);
     const announcement = await Announcement.findById(req.params.id);
-    if(!announcement) {
+    if(!platform || !announcement) {
         req.flash('error', 'Could not find announcement');
         return res.redirect('back');
     }
-    if(!announcement.sender._id.equals(req.user._id)) { //Only the sender may edit the announcement
+    if(!announcement.sender.equals(req.user._id)) { //Only the sender may edit the announcement
         req.flash('error', 'You do not have permission to do that.');
         return res.redirect('back');
     }
@@ -372,8 +374,7 @@ controller.comment = async function(req, res) {
             await sendGridEmail(user.email, `New Mention in ${announcement.subject}`, `<p>Hello ${user.firstName},</p><p>${req.user.firstName} ${req.user.lastName} mentioned you in a comment on <strong>${announcement.subject}</strong>.<p>${comment.text}</p>`, false);
         }
 
-        user.inbox.push(notif); //Add notif to user's inbox
-        user.msgCount += 1;
+        user.inbox.push({message: notif, new: true}); //Add notif to user's inbox
         await user.save();
     }
 

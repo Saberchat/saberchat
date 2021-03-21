@@ -10,6 +10,11 @@ const middleware = {};
 //checks if user is logged in
 middleware.isLoggedIn = async function(req, res, next) {
     const platform = await setup(Platform);
+    if (!platform) {
+        req.flash("error", "An error occurred");
+        return res.redirect("/");
+    }
+
     if (req.isAuthenticated()) {return next();}
     //If user is not logged in, but this feature is available to people without accounts
     if (objectArrIndex(platform.publicFeatures, "route", req.baseUrl.slice(1)) > -1) {
@@ -24,6 +29,11 @@ middleware.isLoggedIn = async function(req, res, next) {
 //For platform's individual (private) features, that only certain platforms have access to
 middleware.accessToFeature = async function(req, res, next) {
     const platform = await setup(Platform);
+    if (!platform) {
+        req.flash("error", "An error occurred");
+        return res.redirect("back");
+    }
+
     if (objectArrIndex(platform.features, "route", req.baseUrl.slice(1)) > -1) {
         return next();
     }
@@ -110,6 +120,11 @@ middleware.isFaculty = async function(req, res, next) {
 
 middleware.isStudent = async function(req, res, next) {
     const platform = await setup(Platform);
+    if (!platform) {
+        req.flash("error", "An error occurred");
+        return res.redirect("back");
+    }
+    
     if (platform.studentStatuses.includes(req.user.status)) {
         return next();
     }

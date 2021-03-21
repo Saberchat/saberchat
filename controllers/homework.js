@@ -18,7 +18,7 @@ const controller = {};
 controller.index = async function(req, res) {
     const platform = await setup(Platform);
     const courses = await Course.find({});
-    if (!courses) {
+    if (!platform || !courses) {
         req.flash('error', "Unable to find courses");
         return res.redirect('back');
     }
@@ -92,6 +92,11 @@ controller.createCourse = async function(req, res) {
 //Join as tutor or as student
 controller.joinCourse = async function(req, res) {
     const platform = await setup(Platform);
+    if (!platform) {
+        req.flash("error", "An Error Occurred");
+        return res.redirect("back");
+    }
+
     if (req.body.bio) { //Join as tutor
         if (req.user.tags.includes("Tutor")) {
             const course = await Course.findOne({joinCode: req.body.joincode});
@@ -136,7 +141,7 @@ controller.joinCourse = async function(req, res) {
 controller.showCourse = async function(req, res) {
     const platform = await setup(Platform);
     const course = await Course.findById(req.params.id).populate('creator members tutors.tutor tutors.reviews blocked');
-    if (!course) {
+    if (!platform || !course) {
         req.flash('error', "Unable to find course");
         return res.redirect('back');
     }
@@ -426,8 +431,7 @@ controller.removeStudent = async function(req, res) {
 
     notif.date = dateFormat(notif.created_at, "h:MM TT | mmm d");
     await notif.save()
-    studentId.inbox.push(notif);
-    studentId.msgCount++;
+    studentId.inbox.push({message: notif, new: true});
     await studentId.save();
     if (studentId.receiving_emails) {
         await sendGridEmail(studentId.email, `Removal from ${course.name}`, `<p>Hello ${studentId.firstName},</p><p>${notif.text}</p>`, false);
@@ -505,8 +509,7 @@ controller.removeTutor = async function(req, res) { //Remove tutor from course
             notif.date = dateFormat(notif.created_at, "h:MM TT | mmm d");
             await notif.save();
 
-            tutorId.inbox.push(notif);
-            tutorId.msgCount++;
+            tutorId.inbox.push({message: notif, new: true});
             await tutorId.save();
             if (tutorId.receiving_emails) {
                 await sendGridEmail(tutorId.email, `Removal from ${course.name}`, `<p>Hello ${tutorId.firstName},</p><p>${notif.text}</p>`, false);
@@ -560,8 +563,7 @@ controller.unblock = async function(req, res) { //Unblock a previously blocked u
     notif.date = dateFormat(notif.created_at, "h:MM TT | mmm d");
     await notif.save();
 
-    blockedId.inbox.push(notif);
-    blockedId.msgCount++;
+    blockedId.inbox.push({message: notif, new: true});
     await blockedId.save();
     if (blockedId.receiving_emails) {
         await sendGridEmail(blockedId.email, `Removal from ${course.name}`, `<p>Hello ${blockedId.firstName},</p><p>${notif.text}</p>`, false);
@@ -952,7 +954,7 @@ controller.showTutor = async function(req, res) {
         path: "tutors.reviews",
         populate: {path: "sender"}
     });
-    if (!course) {
+    if (!platform || !course) {
         req.flash('error', "Unable to find course");
         return res.redirect('back');
     }

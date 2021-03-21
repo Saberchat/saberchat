@@ -17,13 +17,17 @@ const controller = {};
 controller.index = async function(req, res) {
     const platform = await setup(Platform);
     const reports = await Report.find({}).populate('sender');
-    if(!reports) {req.flash('error', 'Cannot find reports.'); return res.redirect('back');}
+    if(!platform || !reports) {req.flash('error', 'Cannot find reports.'); return res.redirect('back');}
     return res.render('reports/index', {platform, reports: reports.reverse()});
 };
 
 // Report GET new report
 controller.new = async function(req, res) {
     const platform = await setup(Platform);
+    if (!platform) {
+        req.flash("error", "An error occurred");
+        return res.redirect("back");
+    }
     return res.render('reports/new', {platform});
 };
 
@@ -36,7 +40,7 @@ controller.show = async function(req, res) {
             path: "comments",
             populate: {path: "sender"}
         });
-    if(!report) {req.flash('error', 'Could not find report'); return res.redirect('back');}
+    if(!platform || !report) {req.flash('error', 'Could not find report'); return res.redirect('back');}
 
     let fileExtensions = new Map(); //Track which file format each attachment is in
     for (let media of report.mediaFiles) {
@@ -50,7 +54,7 @@ controller.show = async function(req, res) {
 controller.updateForm = async function(req, res) {
     const platform = await setup(Platform);
     const report = await Report.findById(req.params.id);
-    if(!report) {req.flash('error', 'Could not find report'); return res.redirect('back');}
+    if(!platform || !report) {req.flash('error', 'Could not find report'); return res.redirect('back');}
     if(!report.sender._id.equals(req.user._id)) {
         req.flash('error', 'You do not have permission to do that.');
         return res.redirect('back');

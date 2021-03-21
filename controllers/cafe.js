@@ -25,7 +25,7 @@ const controller = {};
 controller.index = async function(req, res) {
     const platform = await setup(Platform);
     const orders = await Order.find({customer: req.user._id}).populate("items.item"); //Find all of the orders that you have ordered, and populate info on their items
-    if (!orders) {
+    if (!platform || !orders) {
         req.flash("error", "Unable to find orders");
         return res.redirect("back");
     }
@@ -36,7 +36,7 @@ controller.orderForm = async function(req, res) {
     const platform = await setup(Platform);
     const cafe = await setup(Market);
     const categories = await ItemCategory.find({_id: {$in: cafe.categories}}).populate("items");
-    if (!categories) {
+    if (!platform || !cafe || !categories) {
         req.flash("error", "Unable to find categories");
         return res.redirect("back");
     }
@@ -125,6 +125,10 @@ controller.orderForm = async function(req, res) {
 //CREATE ORDER
 controller.order = async function(req, res) {
     const platform = await setup(Platform);
+    if (!platform) {
+        req.flash("error", "An Error Occurred");
+        return res.redirect("back");
+    }
     if (!req.body.check) { //If any items are selected
         req.flash("error", "Cannot send empty order"); //If no items were checked
         return res.redirect("back");
@@ -212,10 +216,8 @@ controller.processOrder = async function(req, res) {
         await sendGridEmail(order.customer.email, "Cafe Order Ready", `<p>Hello ${order.customer.firstName},</p><p>${notif.text}</p>`, false);
     }
 
-    order.customer.inbox.push(notif); //Add notif to user"s inbox
-    order.customer.msgCount++;
+    order.customer.inbox.push({message: notif, new: true}); //Add notif to user"s inbox
     await order.customer.save();
-
     order.present = false; //Order is not active anymore
     await order.save();
 
@@ -285,8 +287,7 @@ controller.deleteOrder = async function(req, res) {
             order.customer.debt -= order.charge;
         }
 
-        order.customer.inbox.push(notif); //Add notif to user"s inbox
-        order.customer.msgCount++;
+        order.customer.inbox.push({message: notif, new: true}); //Add notif to user"s inbox
         await order.customer.save();
 
         const deletedOrder = await Order.findByIdAndDelete(order._id).populate("items.item").populate("customer");
@@ -339,9 +340,8 @@ controller.deleteOrder = async function(req, res) {
 //FORM TO CREATE NEW ITEM
 controller.newItem = async function(req, res) {
     const platform = await setup(Platform);
-    const cafe = await setup(Market);
     const categories = await ItemCategory.find({});
-    if (!categories) {
+    if (!platform || !categories) {
         req.flash("error", "An Error Occurred");
         return res.redirect("back");
     }
@@ -420,7 +420,7 @@ controller.createItem = async function(req, res) {
 controller.viewItem = async function(req, res) {
     const platform = await setup(Platform);
     const item = await Item.findById(req.params.id);
-    if (!item) {
+    if (!platform || !item) {
         req.flash("error", "Unable to find item");
         return res.redirect("back")
     }
@@ -545,7 +545,7 @@ controller.newCategory = async function(req, res) {
     const platform = await setup(Platform);
     const cafe = await setup(Market);
     const categories = await ItemCategory.find({_id: {$in: cafe.categories}}).populate("items"); //Collect info on all the items, so that we can give the user the option to add them to that category
-    if (!categories) {
+    if (!platform || !cafe || !categories) {
         req.flash("error", "Unable to find categories");
         return res.redirect("back");
     }
@@ -612,9 +612,8 @@ controller.createCategory = async function(req, res) {
 //VIEW/EDIT ITEM CATEGORY
 controller.viewCategory = async function(req, res) {
     const platform = await setup(Platform);
-    const cafe = await setup(Market);
     const category = await ItemCategory.findById(req.params.id).populate("items"); //Find the specified category
-    if (!category) {
+    if (!platform || !category) {
         req.flash("error", "An Error Occurred");
         return res.redirect("back");
     }
@@ -846,7 +845,7 @@ controller.manageCafe = async function(req, res) {
     const platform = await setup(Platform);
     const cafe = await setup(Market);
     const categories = await ItemCategory.find({_id: {$in: cafe.categories}}).populate("items"); //Collect info on all the item categories
-    if (!categories) {
+    if (!platform || !cafe || !categories) {
         req.flash("error", "An Error Occurred");
         return res.redirect("back");
     }
@@ -865,7 +864,7 @@ controller.manageCafe = async function(req, res) {
 controller.manageOrders = async function(req, res) {
     const platform = await setup(Platform);
     const orders = await Order.find({present: true}).populate("items.item");
-    if (!orders) {
+    if (!platform || !orders) {
         req.flash("error", "Could not find orders");
         return res.redirect("back");
     }

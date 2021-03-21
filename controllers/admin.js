@@ -16,11 +16,19 @@ const controller = {};
 
 controller.updatePlatformForm = async function(req, res) {
     const platform = await setup(Platform);
+    if (!platform) {
+        req.flash("error", "An Error Occurred");
+        return res.redirect("back");
+    }
     return res.render("admin/settings", {platform, objectArrIndex});
 }
 
 controller.updatePlatform = async function(req, res) {
     const platform = await setup(Platform);
+    if (!platform) {
+        req.flash("error", "An Error Occurred");
+        return res.redirect("back");
+    }
     const oldAddress = platform.emailExtension;
     for (let attr of ["name", "imageUrl", "emailExtension", "displayImages"]) { //Update elements with directly corresponding text
         platform[attr] = req.body[attr];
@@ -108,8 +116,7 @@ controller.updatePlatform = async function(req, res) {
 controller.moderateGet = async function(req, res) { //Show all reported comments
     const platform = await setup(Platform);
     const comments = await ChatMessage.find({status: 'flagged'}).populate("author statusBy room");
-
-    if (!comments) {
+    if (!platform || !comments) {
         req.flash('error', 'An Error Occurred');
         return res.redirect('/admin');
     }
@@ -178,7 +185,7 @@ controller.deleteComment = async function(req, res) {
 controller.permissionsGet = async function(req, res) { //Show page with all users and their permissions
     const platform = await setup(Platform);
     const users = await User.find({authenticated: true});
-    if (!users) {
+    if (!platform || !users) {
         req.flash('error', 'An Error Occurred');
         return res.redirect('/admin');
     }
@@ -200,7 +207,7 @@ controller.permissionsGet = async function(req, res) { //Show page with all user
 controller.statusGet = async function(req, res) { //Show page with all users and their statuses
     const platform = await setup(Platform);
     const users = await User.find({authenticated: true});
-    if (!users) {
+    if (!platform || !users) {
         req.flash('error', 'An Error Occurred');
         return res.redirect('/admin');
     }
@@ -223,7 +230,7 @@ controller.statusGet = async function(req, res) { //Show page with all users and
 controller.permissionsPut = async function (req, res) { //Update a user's permissions
     const platform = await setup(Platform);
     const user = await User.findById(req.body.userId);
-    if (!user) {
+    if (!platform || !user) {
         return res.json({error: "Error. Could not change"});
     }
 
@@ -250,7 +257,7 @@ controller.permissionsPut = async function (req, res) { //Update a user's permis
 controller.statusPut = async function(req, res) { //Update user's status
     const platform = await setup(Platform);
     const user = await User.findById(req.body.userId);
-    if (!user) {
+    if (!platform || !user) {
         return res.json({error: 'Error. Could not change'});
     }
 
@@ -277,6 +284,11 @@ controller.statusPut = async function(req, res) { //Update user's status
 
 controller.accesslistGet = async function(req, res) { //Show page with all permitted emails
     const platform = await setup(Platform);
+    if (!platform) {
+        req.flash("error", "An Error Occurred");
+        return res.redirect("back");
+    }
+
     let emails;
     if (req.query.version) { //If user wants a specific email list
         if (["accesslist", "blockedlist"].includes(req.query.version)) {
@@ -309,6 +321,10 @@ controller.accesslistGet = async function(req, res) { //Show page with all permi
 
 controller.addEmail = async function (req, res) { //Add email to access list/blocked list
     const platform = await setup(Platform);
+    if (!platform) {
+        return res.json({error: "Unable to find platform"});
+    }
+
     if (req.body.version === "accesslist") {
         if (platform.emailExtension != '' && req.body.address.split('@')[1] === platform.emailExtension) { //These emails are already verified
             return res.json({error: `${platform.name} emails do not need to be added to the Access List`});
@@ -492,7 +508,6 @@ controller.permanentDelete = async function(req, res) {
             return res.redirect('back');
           }
 
-          messageSender.msgCount -= 1;
           await messageSender.save();
         }
 
@@ -650,7 +665,7 @@ controller.permanentDelete = async function(req, res) {
 controller.viewBalances = async function(req, res) {
     const platform = await setup(Platform);
     const users = await User.find({authenticated: true});
-    if (!users) {
+    if (!platform || !users) {
         req.flash('error', 'Could not find users');
         return res.redirect('back');
     }

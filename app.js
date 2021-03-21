@@ -188,6 +188,9 @@ const getRandMessage = (list => {
 // Update all students' statuses on update date, if required
 const updateStatuses = async function() {
   const platform = await setup(Platform);
+  if (!platform) {
+      return console.log("error");
+  }
   if (platform.updateTime.split(' ')[0] != "0" && platform.updateTime.split(' ')[1] != "0") { //If there is an update time
       await schedule.scheduleJob(`0 0 0 ${platform.updateTime.split(' ')[0]} ${platform.updateTime.split(' ')[1]} *`, async() => {
           const statuses = platform.studentStatuses.concat(platform.formerStudentStatus);

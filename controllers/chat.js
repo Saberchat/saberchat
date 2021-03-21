@@ -20,7 +20,7 @@ controller.index = async function(req, res) {
         path: "comments",
         populate: {path: "author"}
     });
-    if (!rooms) {
+    if (!platform || !rooms) {
         req.flash('error', 'Unable to find rooms');
         return res.redirect('back');
     }
@@ -48,7 +48,7 @@ controller.index = async function(req, res) {
 controller.newRoom = async function(req, res) {
     const platform = await setup(Platform);
     const users = await User.find({authenticated: true});
-    if (!users) {
+    if (!platform || !users) {
         req.flash('error', "An Error Occurred");
         return res.redirect('back');
     }
@@ -61,7 +61,7 @@ controller.showRoom = async function(req, res) {
         path: "comments",
         populate: {path: "author"}
     });
-    if (!room) {
+    if (!platform || !room) {
         req.flash('error', 'Could not find room');
         return res.redirect('/chat');
     }
@@ -79,7 +79,7 @@ controller.showRoom = async function(req, res) {
 controller.showMembers = async function(req, res) {
     const platform = await setup(Platform);
     const room = await ChatRoom.findById(req.params.id).populate('creator').populate('members');
-    if (!room) {
+    if (!platform || !room) {
         req.flash('error', "Unable to find room");
         return res.redirect('back');
     }
@@ -122,7 +122,7 @@ controller.showMembers = async function(req, res) {
 controller.editRoom = async function(req, res) {
     const platform = await setup(Platform);
     const room = await ChatRoom.findById(req.params.id);
-    if (!room) {
+    if (!platform || !room) {
         req.flash('error', "Unable to find room");
         return res.redirect('back');
     }
@@ -273,7 +273,6 @@ controller.requestJoin = async function(req, res) {
 
     //Add access request to room creator's inbox
     roomCreator.requests.push(createdReq._id);
-    roomCreator.reqCount ++;
     await roomCreator.save();
 
     if (roomCreator.receiving_emails) {
@@ -295,7 +294,6 @@ controller.requestCancel = async function(req, res) {
 
     //Remove Access Request From from creator's inbox
     removeIfIncluded(room.creator.requests, deletedReq._id);
-    room.creator.reqCount --;
     await room.creator.save();
     return res.json({success: "Successfully deleted request"});
 }

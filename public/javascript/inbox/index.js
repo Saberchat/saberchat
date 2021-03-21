@@ -65,30 +65,6 @@ const submitDelete = function () { // sends form info for deleting selected mess
     delSelForm.submit();
 }
 
-const seeCurrentReq = function () { // changes req inbox to current
-    if (reqDisplay == 'history') {
-        currentReq.classList.add('display');
-        pastReq.classList.remove('display');
-
-        currentReqBtn.disabled = true;
-        pastReqBtn.disabled = false;
-
-        reqDisplay = 'current';
-    }
-}
-
-const seePastReq = function () { // changes req inbox to history
-    if (reqDisplay == 'current') {
-        pastReq.classList.add('display');
-        currentReq.classList.remove('display');
-
-        pastReqBtn.disabled = true;
-        currentReqBtn.disabled = false;
-
-        reqDisplay = 'history';
-    }
-}
-
 const updateDelete = function () { // switches between delete all to delete selected
     const inputs = document.getElementsByClassName('del-form-input');
     let selected = false;

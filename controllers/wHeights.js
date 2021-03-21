@@ -16,7 +16,7 @@ const controller = {};
 controller.index = async function(req, res) {
     const platform = await setup(Platform);
     const articles = await Article.find({}).populate('sender');
-    if (!articles) {
+    if (!platform || !articles) {
         req.flash('error', 'An Error Occurred');
         return res.redirect('/articles');
     }
@@ -32,7 +32,7 @@ controller.new = async function(req, res) {
         authenticated: true,
         status: {$in: platform.studentStatuses} //All students
     });
-    if (!students) {
+    if (!platform || !wHeightsOrg || !students) {
         req.flash('error', "Unable to find students");
         return res.redirect('back');
     }
@@ -56,7 +56,7 @@ controller.show = async function(req, res) {
             populate: {path: 'sender'}
         });
 
-    if (!article) {
+    if (!platform || !article) {
         req.flash('error', 'Cannot find article');
         return res.redirect('/articles');
     }
@@ -165,8 +165,7 @@ controller.comment = async function(req, res) {
             await sendGridEmail(user.email, `New Mention in ${article.title}`, `<p>Hello ${user.firstName},</p><p>${req.user.firstName} ${req.user.lastName} mentioned you in a comment on <strong>${article.title}</strong>.<p>${comment.text}</p>`, false);
         }
 
-        user.inbox.push(notif); //Add notif to user's inbox
-        user.msgCount += 1;
+        user.inbox.push({message: notif, new: true}); //Add notif to user's inbox
         await user.save();
     }
     return res.json({success: 'Successful comment', comments: article.comments});

@@ -19,7 +19,7 @@ const controller = {};
 controller.index = async function(req, res) {
     const platform = await setup(Platform);
     const users = await User.find({});
-    if (!users) {
+    if (!platform || !users) {
         req.flash('error', 'An Error Occurred');
         return res.redirect('back');
     }
@@ -50,7 +50,7 @@ controller.newProject = async function(req, res) {
     const platform = await setup(Platform);
     //Find all students
     const students = await User.find({authenticated: true, status: {$in: platform.studentStatuses}}); 
-    if (!students) {
+    if (!platform || !students) {
         req.flash('error', "No Students Found");
         return res.redirect('back');
     }
@@ -66,6 +66,10 @@ controller.newProject = async function(req, res) {
 
 controller.createProject = async function(req, res) {
     const platform = await setup(Platform);
+    if (!platform) {
+        req.flash("error", "An error occurred");
+        return res.redirect("back");
+    }
     let creators = [];
     let statusGroup; //Group of creators by status
     let individual; //Individual Creator ID
@@ -172,8 +176,7 @@ controller.createProject = async function(req, res) {
             await sendGridEmail(user.email, `New Project Post - ${project.subject}`, `<p>Hello ${user.firstName},</p><p>${req.user.firstName} ${req.user.lastName} recently posted a new project: <strong>${project.subject}</strong>. Check it out!</p>${imageString}`, false);
         }
 
-        user.inbox.push(notif); //Add notif to user's inbox
-        user.msgCount += 1;
+        user.inbox.push({message: notif, new: true}); //Add notif to user's inbox
         await user.save();
     }
 
@@ -187,7 +190,7 @@ controller.editProject = async function(req, res) {
     const project = await Project.findById(req.params.id)
         .populate('sender')
         .populate('creators');
-    if (!project) {
+    if (!platform || !project) {
         req.flash('error', 'Unable to find project');
         res.redirect('back');
 
@@ -227,17 +230,14 @@ controller.editProject = async function(req, res) {
 
 controller.showProject = async function(req, res) {
     const platform = await setup(Platform);
-    let project = await Project.findById(req.params.id)
+    const project = await Project.findById(req.params.id)
         .populate('sender')
         .populate('creators')
         .populate({
             path: "comments",
-            populate: {
-                path: "sender"
-            }
+            populate: {path: "sender"}
         });
-
-    if (!project) {
+    if (!platform || !project) {
         req.flash('error', "An Error Occurred");
         res.redirect('back');
     }
@@ -253,6 +253,10 @@ controller.showProject = async function(req, res) {
 
 controller.updateProject = async function(req, res) {
     const platform = await setup(Platform);
+    if (!platform) {
+        req.flash("error", "An error occurred");
+        return res.redirect("back");
+    }
     let creators = [];
     let statusGroup; //Group of creators by status
     let individual; //Individual Creator ID
@@ -490,8 +494,7 @@ controller.comment = async function(req, res) {
             await sendGridEmail(user.email, `New Mention in ${project.subject}`, `<p>Hello ${user.firstName},</p><p>${req.user.firstName} ${req.user.lastName} mentioned you in a comment on <strong>${project.subject}</strong>.<p>${comment.text}</p>`, false);
         }
 
-        user.inbox.push(notif); //Add notif to user's inbox
-        user.msgCount += 1;
+        user.inbox.push({message: notif, new: true}); //Add notif to user's inbox
         await user.save();
     }
 
@@ -526,35 +529,35 @@ controller.likeComment = async function(req, res) {
 controller.data = async function(req, res) {
     const platform = await setup(Platform);
     const projects = await Project.find({sender: req.user._id}).populate("comments");
-        if (!projects) {
-            req.flash('error', "Unable to find projects");
-            return res.redirect('back');
-        }
+    if (!platform || !projects) {
+        req.flash('error', "Unable to find projects");
+        return res.redirect('back');
+    }
 
-        const {popular, unpopular} = await sortByPopularity(projects, "likes", "created_at", null); //Extract and sort popular projects
-        let popularProjectText = "";
-        let popularCommentText = "";
-        for (let project of popular) { //Iterate through popular projects and parse out their text
-            popularProjectText += `${project.subject} ${project.text} `;
-            for (let comment of project.comments) {
-                popularCommentText += `${comment.text} `;
-            }
+    const {popular, unpopular} = await sortByPopularity(projects, "likes", "created_at", null); //Extract and sort popular projects
+    let popularProjectText = "";
+    let popularCommentText = "";
+    for (let project of popular) { //Iterate through popular projects and parse out their text
+        popularProjectText += `${project.subject} ${project.text} `;
+        for (let comment of project.comments) {
+            popularCommentText += `${comment.text} `;
         }
+    }
 
-        //Build string of projects and comments text
-        let unpopularProjectText = "";
-        let unpopularCommentText = "";
-        for (let project of unpopular) {
-            unpopularProjectText += `${project.subject} ${project.text} `;
-            for (let comment of project.comments) {
-                unpopularCommentText += `${comment.text} `;
-            }
+    //Build string of projects and comments text
+    let unpopularProjectText = "";
+    let unpopularCommentText = "";
+    for (let project of unpopular) {
+        unpopularProjectText += `${project.subject} ${project.text} `;
+        for (let comment of project.comments) {
+            unpopularCommentText += `${comment.text} `;
         }
+    }
 
-        //Map keywords from popular projects and their comments
-        const projectKeywords = await keywordFilter(popularProjectText, unpopularProjectText);
-        const commentKeywords = await keywordFilter(popularCommentText, unpopularCommentText);
-        return res.render('projects/data', {platform, popularProjects: popular, projectKeywords, commentKeywords});
+    //Map keywords from popular projects and their comments
+    const projectKeywords = await keywordFilter(popularProjectText, unpopularProjectText);
+    const commentKeywords = await keywordFilter(popularCommentText, unpopularCommentText);
+    return res.render('projects/data', {platform, popularProjects: popular, projectKeywords, commentKeywords});
 }
 
 module.exports = controller;

@@ -36,16 +36,18 @@ module.exports = mongoose.model("User", new mongoose.Schema({
     },
     reportedCount: {type: Number, default: 0},
     falseReportCount: {type: Number, default: 0},
-    msgCount: {type: Number, default: 0}, //REMOVE
     annCount: [{
         announcement: {type: mongoose.Schema.Types.ObjectId, ref: "Announcement"},
         version: String
     }],
+    inbox: [{
+        message: {type: mongoose.Schema.Types.ObjectId, ref: "InboxMessage"},
+        new: Boolean
+    }],
     newRoomCount: [{type: mongoose.Schema.Types.ObjectID, ref: "ChatRoom"}],
-    reqCount: {type: Number, default: 0}, //REMOVE
-    inbox: [{type: mongoose.Schema.Types.ObjectId, ref: "InboxMessage"}], //REPLACE WITH OBJECT LIKE ANNCOUNT
-    requests: [{type: mongoose.Schema.Types.ObjectId, ref: "AccessRequest"}], //REPLACE WITH OBJECT LIKE ANNCOUNT
+    requests: [{type: mongoose.Schema.Types.ObjectId, ref: "AccessRequest"}],
     followers: [{type: mongoose.Schema.Types.ObjectId, ref: "User"}],
+    blocked: [{type: mongoose.Schema.Types.ObjectId, ref: "User"}],
     permission: {type: String, default: "default"},
     status: {type: String, default: "guest"},
     tags: [{type: String}],

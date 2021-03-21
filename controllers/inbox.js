@@ -22,8 +22,12 @@ const controller = {};
 // Inbox GET index page
 controller.index = async function(req, res) {
     const platform = await setup(Platform);
+    if (!platform) {
+        req.flash("error", "An Error Occurred");
+        return res.redirect("back");
+    }
     await req.user.populate({
-            path: 'inbox',
+            path: 'inbox.message',
 			populate: {path: 'author', select: ['username', 'imageUrl']}
         }).populate({
 			path: 'requests',
@@ -41,7 +45,7 @@ controller.index = async function(req, res) {
 controller.showMsg = async function(req, res) {
     const platform = await setup(Platform);
     const message = await InboxMessage.findById(req.params.id);
-	if(!message) {req.flash('error','Cannot find message'); return res.redirect('back');}
+	if(!platform || !message) {req.flash('error','Cannot find message'); return res.redirect('back');}
 
     //Check message view permissions
     if(!message.toEveryone && !message.recipients.includes(req.user._id) && !message.author.equals(req.user._id)) {
@@ -51,7 +55,7 @@ controller.showMsg = async function(req, res) {
 
     //If message has not been read yet, mark it as read
     if(!message.read.includes(req.user._id) && message.recipients.includes(req.user._id)) {
-        req.user.msgCount -= 1;
+        req.user.inbox[objectArrIndex(req.user.inbox, "message", message._id)].new = false;
         message.read.push(req.user._id);
         await req.user.save();
         await message.save();
@@ -76,7 +80,7 @@ controller.showMsg = async function(req, res) {
 controller.newMsgForm = async function(req, res) {
     const platform = await setup(Platform);
     const users = await User.find({authenticated: true});
-	if(!users) { req.flash('error', 'An Error Occurred.'); return res.redirect('back'); }
+	if(!platform || !users) { req.flash('error', 'An Error Occurred.'); return res.redirect('back'); }
 	return res.render('inbox/new', {
         platform, users,
         statuses: concatMatrix([
@@ -90,7 +94,7 @@ controller.newMsgForm = async function(req, res) {
 controller.sent = async function(req, res) {
     const platform = await setup(Platform);
     const messages = await InboxMessage.find({});
-    if(!messages) { req.flash('error', 'An Error Occurred.'); return res.redirect('back');}
+    if(!platform || !messages) { req.flash('error', 'An Error Occurred.'); return res.redirect('back');}
 
     let sent_msgs = []; // array of user's sent messages
     for(let message of messages) { // if user sent the message, push and continue
@@ -111,6 +115,11 @@ controller.sent = async function(req, res) {
 // Inbox POST create messsage
 controller.createMsg = async function(req, res) {
     const platform = await setup(Platform);
+    if (!platform) {
+        req.flash("error", "An Error Occurred");
+        return res.redirect("back");
+    }
+
     let message = { //Build message
         subject: filter.clean(req.body.subject),
         text: filter.clean(req.body.message),
@@ -214,18 +223,14 @@ controller.createMsg = async function(req, res) {
     if(message.toEveryone) {
         await User.updateMany(
             { _id: { $ne: req.user._id } },
-            {
-                $push: { inbox: newMessage },
-                $inc: { msgCount: 1 }
-            });
+            {$push: { inbox: {message: newMessage, new: true}}
+        });
 
     } else {
         await User.updateMany(
             { _id: { $in: recipients } },
-            {
-                $push: { inbox: newMessage },
-                $inc: { msgCount: 1 }
-            });
+            {$push: { inbox: {message: newMessage, new: true}}
+        });
     }
 
     const recipientList = await User.find({authenticated: true, _id: { $in: recipients}});
@@ -267,11 +272,13 @@ controller.createMsg = async function(req, res) {
 
 // Inbox PUT mark all messages as read
 controller.markReadAll = async function(req, res) {
-    const result = await InboxMessage.updateMany(
-        {_id: {$in: req.user.inbox}, read: {$ne: req.user._id}},
+    await InboxMessage.updateMany(
+        {_id: {$in: parsePropertyArray(req.user.inbox, "message")}, read: {$ne: req.user._id}},
         {$push: {read: req.user._id}}
     );
-    req.user.msgCount -= result.nModified; //Subtract the number of modified messages from new message count
+    for (let message of req.user.inbox) {
+        message.new = false;
+    }
     await req.user.save();
     req.flash('success', 'Marked all as read.');
     return res.redirect('back');
@@ -283,7 +290,12 @@ controller.markReadSelected = async function(req, res) {
         {_id: {$in: parseKeysOrValues(req.body, "body")}, read: {$ne: req.user._id}},
         {$push: {read: req.user._id}}
     );
-    req.user.msgCount -= result.nModified; //Subtract the number of modified messages from new message count
+
+    for (let message of req.user.inbox) {
+        if (parseKeysOrValues(req.body, "body").toString().includes(message.message.toString())) {
+            message.new = false;
+        }
+    }
     await req.user.save();
     req.flash('success', 'Marked as read');
     return res.redirect('back');
@@ -292,7 +304,6 @@ controller.markReadSelected = async function(req, res) {
 // Inbox DELETE clear inbox
 controller.clear = async function(req, res) {
     req.user.inbox = [];
-	req.user.msgCount = 0;
 	await req.user.save();
 	req.flash('success', 'Inbox cleared!');
 	return res.redirect('/inbox');
@@ -323,27 +334,19 @@ controller.reply = async function(req, res) {
         }
     }
 
-    let readRecipients = message.read; //Users who have read the original message will need to have their msgCount incremented again
-
     //Iterates through the recipients and sees if the author is part of them. If not, then no reply has been sent yet, but since the author has sent the message, they have 'read' it. Hence, they are added to the readRecipients array.
-    if (objectArrIndex(message.recipients, "_id", message.author._id) == -1) {
-        readRecipients.push(message.author);
-    }
     removeIfIncluded(message.recipients, message.author._id, "_id"); //If the original author is already part of the recipients, remove them just in case
-
     message.recipients.push(message.author); //Add original author to recipient list (code above ensures that they are not added multiple times)
     message.read = [req.user]; //Since the current user replied to this message, they've seen the completely updated message. Nobody else has
     await message.save();
 
     for (let recipient of message.recipients) { //Remove original message and add it back so that it appears 'new'
-        removeIfIncluded(recipient.inbox, message._id); //Remove message from recipient's inbox
-        recipient.inbox.push(message._id); //Add it to the front of the recipient's inbox
-
-        //If the recipient has already read this message and it is not the person sending the reply (or the recipient is the original message author), increment their message count again
-        if (readRecipients.includes(recipient._id) && !(recipient._id.equals(req.user._id))) {
-            recipient.msgCount += 1;
+        removeIfIncluded(recipient.inbox, message._id, "message"); //Remove message from recipient's inbox
+        if (!(recipient._id.equals(req.user._id))) { //Add new message to everyone except current replier's inbox
+            recipient.inbox.push({message: message._id, new: true});
+            await recipient.save();
         }
-        await recipient.save();
+
         if (!(recipient._id.equals(req.user._id)) && recipient.receiving_emails) { //Send email alerting recipients of reply
             const emailText = `<p>Hello ${recipient.firstName},</p><p><strong>${req.user.username}</strong> replied to <strong>${message.subject}</strong>.<p>${reply.text}</p><p>You can access the full message at https://saberchat.net</p> ${imageString}`;
             await sendGridEmail(recipient.email, `New Reply On ${message.subject}`, emailText, false);
@@ -358,10 +361,7 @@ controller.delete = async function(req, res) {
     if(!messages) {req.flash('error', 'Could not find messages'); return res.redirect('back');}
 
     messages.forEach( message => { //Iterate through messages and remove any selected ones from user's inbox
-        removeIfIncluded(req.user.inbox, message._id);
-        if(!message.read.includes(req.user._id)) {
-            req.user.msgCount -= 1;
-        }
+        removeIfIncluded(req.user.inbox, message._id, "message");
     });
     await req.user.save();
     return res.redirect('back');
@@ -374,7 +374,7 @@ controller.showReq = async function(req, res) { //Display access request
     const request = await AccessRequest.findById(req.params.id)
     .populate({path: 'author', select: 'username'})
     .populate({path: 'room', select: ['creator', 'name']});
-    if(!request) {req.flash('error', 'An Error Occurred.'); return res.redirect('back');}
+    if(!platform || !request) {req.flash('error', 'An Error Occurred.'); return res.redirect('back');}
     return res.render('inbox/requests/show', {platform, request});
 };
 
@@ -400,7 +400,7 @@ controller.acceptReq = async function(req, res) { //Accept access request
     if(!room) { req.flash("error", "An Error Occurred");return res.redirect('back'); }
     room.members.push(request.author);
     request.status = 'accepted'; //Update request status
-    req.user.reqCount --;
+    removeIfIncluded(req.user.requests, request._id);
     await room.save();
     await request.save();
     await req.user.save();
@@ -434,7 +434,7 @@ controller.rejectReq = async function(req, res) { //Reject access request
 
     //Update request status
     request.status = 'rejected';
-    req.user.reqCount --;
+    removeIfIncluded(req.user.requests, request._id);
     await request.save();
     await req.user.save();
 

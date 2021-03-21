@@ -26,7 +26,7 @@ if (process.env.NODE_ENV !== "production") {
 controller.index = async function(req, res) {
 	const platform = await setup(Platform);
 	const users = await User.find({authenticated: true});
-	if (!users) {
+	if (!platform || !users) {
 		req.flash("error", "An error occurred");
 		return res.redirect("back");
 	}
@@ -74,13 +74,17 @@ controller.edit = async function(req, res) {
 
 controller.changeLoginInfo = async function(req, res) {
 	const platform = await setup(Platform);
+    if (!platform) {
+        req.flash("error", "An Error Occurred");
+        return res.redirect("back");
+    }
 	return res.render('profile/edit_pwd_email', {platform});
 }
 
 controller.show = async function(req, res) {
 	const platform = await setup(Platform);
 	const user = await User.findById(req.params.id).populate('followers');
-	if (!user) {
+	if (!platform || !user) {
 		req.flash('error', 'Error. Cannot find user.');
 		return res.redirect('back');
 	}
@@ -116,7 +120,7 @@ controller.update = async function(req, res) {
 				username: filter.clean(req.body.username),
 				_id: {$ne: req.user._id}
 		});
-		if (!overlap) {
+		if (!platform || !overlap) {
 				req.flash('error', "Unable to find users");
 				return res.redirect('back');
 
@@ -264,12 +268,17 @@ controller.tagPut = async function(req, res) {
 
 controller.changeEmailPut = async function(req, res) { //Update email
 	const platform = await setup(Platform);
+    if (!platform) {
+        req.flash("error", "An Error Occurred");
+        return res.redirect("back");
+    }
+	
 	//Update receiving emails info
 		if (req.body.receiving_emails) {
 				req.user.receiving_emails = true;
 
 		} else {
-				req.user.receiving_emails = false;
+			req.user.receiving_emails = false;
 		}
 		await req.user.save();
 
@@ -450,13 +459,6 @@ controller.deleteAccount = async function(req, res)  {
 			return res.redirect('back');
 		}
 
-		for (let message of messagesSent) {
-			for (let user of message.read) {
-				user.msgCount -= 1;
-				await user.save();
-			}
-		}
-
 		const deletedMessagesSent = await InboxMessage.deleteMany({sender: req.user._id});
 
 		if (!deletedMessagesSent) {
@@ -499,9 +501,6 @@ controller.deleteAccount = async function(req, res)  {
 						req.flash('error', "Unable to update your messages");
 						return res.redirect('back');
 					}
-
-					messageSender.msgCount -= 1;
-					await messageSender.save();
 				}
 
 				messageUpdate = await InboxMessage.findByIdAndDelete(message._id);

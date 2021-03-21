@@ -6,6 +6,8 @@ const Group = mongoose.model("Group", new mongoose.Schema({
     description: {type: String, default: ""},
     private: {type: Boolean, default: false},
     date: String,
+    joinCode: String,
+    active: {type: Boolean, default: true},
     creator: {type: mongoose.Schema.Types.ObjectId, ref: "User"},
     members: [{type: mongoose.Schema.Types.ObjectId, ref: "User"}],
     blocked: [{type: mongoose.Schema.Types.ObjectId, ref: 'User'}],
@@ -43,8 +45,6 @@ module.exports = { //All subclasses
         categories: [{type: mongoose.Schema.Types.ObjectId, ref: "ItemCategory"}]
     })),
     Course: Group.discriminator("Course", new mongoose.Schema({ //Tutoring center courses
-        joinCode: String,
-        active: {type: Boolean, default: true},
         tutors: [{
             tutor: {type: mongoose.Schema.Types.ObjectId, ref: 'User'},
             slots: {type: Number, default: 0},

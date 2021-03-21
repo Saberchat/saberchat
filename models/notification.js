@@ -6,6 +6,13 @@ const Notification = mongoose.model("Notification", new mongoose.Schema({
     recipients: [{type: mongoose.Schema.Types.ObjectId, ref: 'User'}],
     author: {type: mongoose.Schema.Types.ObjectId, ref: "User"},
     status: {type: String, default: 'none'},
+    images: [{type: String}],
+    mediaFiles: [{
+        filename: String,
+        url: String,
+        originalName: String
+    }],
+    read: [{type: mongoose.Schema.Types.ObjectId, ref: 'User'}],
     date: String
 }, {
     timestamps: {createdAt: 'created_at'},
@@ -23,13 +30,6 @@ module.exports = { //All subclass Schema
     })),
     InboxMessage: Notification.discriminator("InboxMessage", new mongoose.Schema({ //Inbox notifications
         subject: String,
-        images: [{type: String}],
-        mediaFiles: [{
-            filename: String,
-            url: String,
-            originalName: String
-        }],
-        read: [{type: mongoose.Schema.Types.ObjectId, ref: 'User'}],
         toEveryone: {type: Boolean, default: false},
         anonymous: {type: Boolean, default: false},
         noReply: {type: Boolean, default: false},

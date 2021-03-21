@@ -15,13 +15,17 @@ const controller = {};
 
 controller.index = async function(req, res) {
     const platform = await setup(Platform);
+    if (!platform) {
+        req.flash("error", "An Error Occurred");
+        return res.redirect("back");
+    }
     return res.render('index', {platform});
 }
 
 controller.register = async function(req, res) {
     const platform = await setup(Platform);
     const accesslistedEmail = await Email.findOne({address: req.body.email, version: "accesslist"});
-    if (!accesslistedEmail) {
+    if (!platform || !accesslistedEmail) {
         if (platform.emailExtension != '' && req.body.email.split("@")[1] != platform.emailExtension) {
             req.flash('error', `Only members of the ${platform.name} community may sign up`);
             return res.redirect('/');
@@ -81,9 +85,7 @@ controller.register = async function(req, res) {
             firstName: firstName,
             lastName: lastName,
             username: filter.clean(username),
-            msgCount: 0,
             annCount: [],
-            reqCount: 0,
             authenticated: false,
             authenticationToken: token
         }
@@ -217,6 +219,10 @@ controller.forgotPassword = async function(req, res) {
 
 controller.resetPasswordForm = async function(req, res) {
     const platform = await setup(Platform);
+    if (!platform) {
+        req.flash("error", "An Error Occurred");
+        return res.redirect("back");
+    }
     return res.render('profile/reset-password', {platform, user: req.query.user});
 }
 
@@ -257,7 +263,7 @@ controller.contact = async function(req, res) { //Contact info of highest status
     const platform = await setup(Platform);
     //Get users with the highest status (e.g. faculty)
     const teachers = await User.find({authenticated: true, authenticated: true, status: platform.teacherStatus});
-    if (!teachers) {
+    if (!platform || !teachers) {
         req.flash('error', "An Error Occurred");
         return res.redirect('back');
     }
@@ -269,7 +275,7 @@ controller.contact = async function(req, res) { //Contact info of highest status
 controller.info = async function(req, res) {
     const platform = await setup(Platform);
     const teachers = await User.find({authenticated: true, authenticated: true, status: platform.teacherStatus});
-    if (!teachers) {
+    if (!platform || !teachers) {
         req.flash('error', "An Error Occurred");
         return res.redirect('back');
     }

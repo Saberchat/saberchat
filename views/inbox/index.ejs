@@ -42,13 +42,19 @@
               <!-- navigation between tabs -->
               <nav class="inbox-nav">
                 <div class="btn-group" role="group" aria-label="inbox navigation">
+                  <% let msgCount = 0%>
+                  <% for (let message of currentUser.inbox) { %>
+                      <% if (message.new) { %>
+                          <% msgCount ++;%>
+                      <% } %>
+                  <% } %>
                   <button
                     class="nav-tab active"
                     id="view-msg"
                     onclick="setMessages()"
                     disabled
-                    >Messages <% if (currentUser.msgCount > 0) { %>
-                        <span class="badge badge-pill badge-danger"><%=currentUser.msgCount%></span>
+                    >Messages <% if (msgCount > 0) { %>
+                        <span class="badge badge-pill badge-danger"><%=msgCount%></span>
                     <%} %></button>
 
                   <button
@@ -81,8 +87,7 @@
                   </div>
                   <!-- request actions -->
                   <div class="request-actions">
-                    <button id="current-req" class="action-btn" onclick="seeCurrentReq()" disabled>Current</button>
-                    <button id="past-req" class="action-btn" onclick="seePastReq()">History</button>
+                    <span id="current-req" class="action-btn">Current</span>
                   </div>
                 </div>
 
@@ -94,7 +99,8 @@
 
                     <ul class="list-group mode">
 
-                      <% inbox.forEach((msg) => { %>
+                      <% inbox.forEach((message) => { %>
+                        <% let msg = message.message;%>
                         <% if(msg.read.includes(currentUser._id)) { %>
                           <li class="list-group-item list-group-item-action darkmode read">
                         <% } else { %>
