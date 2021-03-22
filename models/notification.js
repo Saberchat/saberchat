@@ -37,6 +37,11 @@ module.exports = { //All subclass Schema
             author: {type: mongoose.Schema.Types.ObjectId, ref: 'User'},
             text: String,
             images: [{type: String}],
+            mediaFiles: [{
+                filename: String,
+                url: String,
+                originalName: String
+            }],
             date: String
         }]
     })),

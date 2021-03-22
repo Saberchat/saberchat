@@ -22,6 +22,7 @@ router.put('/change-password', wrapAsync(middleware.isLoggedIn), validatePasswor
 router.put('/follow/:id', wrapAsync(profile.follow)); //Follow user
 router.put('/unfollow/:id', wrapAsync(profile.unfollow)); //Unfollow user
 router.put('/remove/:id', wrapAsync(profile.remove)); //Remove/block user
+router.put('/unblock/:id', wrapAsync(profile.unblock)); //Unblock user
 
 // router.delete('/delete-account', wrapAsync(middleware.isLoggedIn), wrapAsync(profile.deleteAccount));
 

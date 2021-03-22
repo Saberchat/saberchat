@@ -11,7 +11,7 @@ router.get('/', wrapAsync(middleware.isLoggedIn), wrapAsync(inbox.index)); // Di
 router.get('/messages/new', wrapAsync(middleware.isLoggedIn), wrapAsync(inbox.newMsgForm)); // New messsage form
 router.get('/sent', wrapAsync(middleware.isLoggedIn), wrapAsync(inbox.sent)); // Display sent messages
 router.post('/messages', wrapAsync(middleware.isLoggedIn), multipleUpload, validateMsg, wrapAsync(inbox.createMsg)); // Create messsage
-router.put('/reply', wrapAsync(middleware.isLoggedIn), wrapAsync(inbox.reply)); //User can reply to notifications sent to them
+router.put('/reply/:id', wrapAsync(middleware.isLoggedIn), multipleUpload, wrapAsync(inbox.reply)); //User can reply to notifications sent to them
 router.put('/mark-all', wrapAsync(middleware.isLoggedIn), wrapAsync(inbox.markReadAll)); // Mark all messages as read
 router.put('/mark-selected', wrapAsync(middleware.isLoggedIn), wrapAsync(inbox.markReadSelected)); // Mark selected messages as read
 router.delete('/clear', wrapAsync(middleware.isLoggedIn), wrapAsync(inbox.clear)); // Clear entire inbox

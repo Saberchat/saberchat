@@ -69,7 +69,7 @@ const unfollow_show = function (button) { //Unfollow on show page (on user's own
     });
 }
 
-const remove = function (button) { //Block follower
+const remove = function(button) { //Block follower
     const userId = button.id.split("-")[1];
     const url = `/profiles/remove/${userId}?_method=put`;
     const data = {};
@@ -80,6 +80,19 @@ const remove = function (button) { //Block follower
             //Remove user's tab and block button from tab
             document.getElementById(`follower-${userId}`).parentNode.removeChild(document.getElementById(`follower-${userId}`));
             document.getElementById('followers-button').innerText = `${parseInt(document.getElementById('followers-button').innerText.split(' ')[0]) - 1} Follower(s)`;
+        }
+    });
+}
+
+const unblock = function(button) { //Unblock blocked user
+    const userId = button.id.split("-")[2];
+    const url = `/profiles/unblock/${userId}?_method=put`;
+    const data = {};
+
+    $.post(url, data, data => {
+        if (data.success) {
+            $(`#modal-${userId}-unblock`).modal('hide');
+            document.getElementById(`follow-div-${userId}`).removeChild(document.getElementById(`unblock-${userId}`));
         }
     });
 }

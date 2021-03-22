@@ -72,6 +72,13 @@ controller.showMsg = async function(req, res) {
     for (let media of message.mediaFiles) {
         fileExtensions.set(media.url, path.extname(media.url.split("SaberChat/")[1]));
     }
+
+    for (let reply of message.replies) {
+        for (let media of reply.mediaFiles) {
+            fileExtensions.set(media.url, path.extname(media.url.split("SaberChat/")[1]));
+        }
+    }
+
     const convertedText = convertToLink(message.text);
     return res.render('inbox/show', {platform, message, convertedText, fileExtensions});
 };
@@ -311,19 +318,56 @@ controller.clear = async function(req, res) {
 
 // Inbox PUT reply to message
 controller.reply = async function(req, res) {
-    const message = await InboxMessage.findById(req.body.message).populate('recipients').populate('author');
+    const message = await InboxMessage.findById(req.params.id).populate('recipients').populate('author');
     if(!message) {
-        return res.json({error: 'Error finding message'});
+        req.flash("error", "Unable to find message");
+        return res.redirect("back");
     } else if(message.anonymous || message.noReply) { //In either of these cases, you cannot reply to the message
-        return res.json({error: 'Cannot reply to this message'})
+        req.flash("error", "You cannot reply to this message");
+        return res.redirect("back");
     }
 
     const reply = { //Build reply object
         author: req.user,
         text: req.body.text,
-        images: req.body.images,
-        date: dateFormat(new Date(), "h:MM TT | mmm d")
+        images: [],
+        date: dateFormat(new Date(), "h:MM TT | mmm d"),
+        mediaFiles: []
     };
+
+    for (let image of req.body.images) { //Ensure that no undefined image URLs are added
+        if (image) {
+            reply.images.push(image);
+        }
+    }
+
+    // if files were uploaded, handle them with cloudinary
+    if (req.files) {
+        let cloudErr;
+        let cloudResult;
+        if (req.files.mediaFile) {
+            for (let file of req.files.mediaFile) {
+                if ([".mp3", ".mp4", ".m4a", ".mov"].includes(path.extname(file.originalname).toLowerCase())) {
+                    [cloudErr, cloudResult] = await cloudUpload(file, "video");
+                } else if (path.extname(file.originalname).toLowerCase() == ".pdf") {
+                    [cloudErr, cloudResult] = await cloudUpload(file, "pdf");
+                } else {
+                    [cloudErr, cloudResult] = await cloudUpload(file, "image");
+                }
+                if (cloudErr || !cloudResult) {
+                    req.flash('error', 'Upload failed');
+                    return res.redirect('back');
+                }
+
+                reply.mediaFiles.push({ //Add cloudinary-uploaded images to message files
+                    filename: cloudResult.public_id,
+                    url: cloudResult.secure_url,
+                    originalName: file.originalname
+                });
+            }
+        }
+    }
+
     message.replies.push(reply); //Add reply to message thread
 
     //Create string to track reply's images
@@ -352,7 +396,8 @@ controller.reply = async function(req, res) {
             await sendGridEmail(recipient.email, `New Reply On ${message.subject}`, emailText, false);
         }
     }
-    return res.json({success: `Replied to ${message._id}`, message, darkmode: req.user.darkmode});
+    req.flash("success", "Replied to message!");
+    return res.redirect(`/inbox/${message._id}`);
 };
 
 // Inbox DELETE messages

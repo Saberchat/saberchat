@@ -80,19 +80,21 @@
                                 <% if (!(user._id.toString() == currentUser._id.toString())) { %>
                                     <div id="follow-div-<%= user._id %>" class="follow-div">
 
-                                        <% if (user.followers.includes(currentUser._id)) { %>
-                                            <button type="button" data-toggle="modal"
-                                                    data-target="#modal-<%= user._id %>-unfollow"
-                                                    id="unfollow-<%= user._id %>"
-                                                    class="btn btn-danger unfollow-button">Unfollow
-                                            </button>
+                                        <% if (!user.blocked.includes(currentUser._id)) { %>
+                                            <% if (user.followers.includes(currentUser._id)) { %>
+                                                <button type="button" data-toggle="modal"
+                                                        data-target="#modal-<%= user._id %>-unfollow"
+                                                        id="unfollow-<%= user._id %>"
+                                                        class="btn btn-danger unfollow-button">Unfollow
+                                                </button>
 
-                                        <% } else { %>
-                                            <button type="button" data-toggle="modal"
-                                                    data-target="#modal-<%= user._id %>-follow"
-                                                    id="follow-<%= user._id %>"
-                                                    class="btn btn-primary follow-button">Follow
-                                            </button>
+                                            <% } else { %>
+                                                <button type="button" data-toggle="modal"
+                                                        data-target="#modal-<%= user._id %>-follow"
+                                                        id="follow-<%= user._id %>"
+                                                        class="btn btn-primary follow-button">Follow
+                                                </button>
+                                            <% } %>
                                         <% } %>
                                     </div>
                                 <% } %>

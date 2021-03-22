@@ -114,21 +114,31 @@
 
                 <% for (let reply of message.replies) { %>
                     <article class="msg-container replies">
-                        <h4>
-                            Reply From <a class="reply-sender darkmode-header"
-                                          href="../../profiles/<%= reply.author._id %>"><%= reply.author.username %></a>
-                        </h4>
-
-                        <p>
-                            <%= reply.date %>
-                        </p>
-                        <p>
-                            <%= reply.text %>
-                        </p>
+                        <h4>Reply From <a class="reply-sender darkmode-header" href="../../profiles/<%= reply.author._id %>"><%= reply.author.username %></a></h4>
+                        <p><%= reply.date %></p>
+                        <p><%= reply.text %></p>
 
                         <% for (let image of reply.images) { %>
                             <img src="<%= image %>" class="reply-image"/>
                             <br/>
+                        <% } %>
+                        <% for (let media of reply.mediaFiles) { %>
+                            <% if (media.filename) { %>
+                                <% if ([".png", ".jpg", ".jpeg", ".gif"].includes(fileExtensions.get(media.url).toLowerCase())) { %>
+                                    <img src="<%= media.url %>" alt="Attached Image" class="img-fluid rounded">
+                                <% } else if ([".mp3", ".m4a"].includes(fileExtensions.get(media.url).toLowerCase())) { %>
+                                    <audio controls>
+                                        <source src="<%=media.url%>" type="audio/mpeg"></source>
+                                    </audio>
+                                <% } else if (fileExtensions.get(media.url).toLowerCase() == ".mp4") {%>
+                                    <video width="600px" height="375px" src="<%=media.url%>" type="video/*" controls></video>
+                                <% } else if ([".mov", ".heic"].includes(fileExtensions.get(media.url).toLowerCase())) {%>
+                                    <a href="<%=media.url%>" download><h5><i class="fas fa-paperclip"></i> Download "<%=media.originalName%>"</h5></a>
+                                <% } else if (fileExtensions.get(media.url).toLowerCase() == ".pdf") {%>
+                                    <a href="<%=media.url%>" target="_blank"><h5>Open "<%=media.originalName%>" In New Tab  </h5></a>
+                                <% } %>
+                                <br/><br/>
+                            <% } %>
                         <% } %>
 
                     </article>
@@ -138,20 +148,26 @@
             <br/>
 
             <article class="msg-container" id="reply-box" hidden>
-                <form id="message-form-<%= message._id %>" onsubmit="sendReply(this, event)">
+                <form id="message-form-<%= message._id %>" action="/inbox/reply/<%=message._id%>?_method=put" enctype="multipart/form-data" method="post">
                     <div class="form-group">
                         <label for="message" id="reply-header">Reply</label><br/>
-                        <textarea name="message" id="message" placeholder="Message text..." rows="5"
+                        <textarea name="text" id="message" placeholder="Message text..." rows="5"
                                   class="form-control mode"></textarea>
                     </div>
 
-                    <div id="image-header">
-                        <h4>Images</h4>
-                        <button type="button" onclick="addImg()" class="btn btn-primary"><i class="fas fa-plus"></i>
-                            Image
+                    <div id="media-header">
+                        <button type="button" onclick="upload()" class="btn btn-primary"><i class="fas fa-plus"></i> File Upload</button>
+                        <br/><br/>
+                    </div><br>
+                      <div id="uploads"></div>
+                      
+                      <div id="image-header">
+                        <button type="button" onclick="addImg()" class="btn btn-primary"><i class="fas fa-plus"></i> Image URL
                         </button>
-                        <hr>
-                    </div>
+                        <br/><br/>
+                      </div>
+
+                      <div id="image-block"></div>
 
                     <div id="image-block">
                     </div>
@@ -167,6 +183,7 @@
 </body>
 <script src="/javascript/embed.js"></script>
 <script src="/javascript/image-url.js"></script>
+<script src="/javascript/upload-input.js"></script>
 <script src="/javascript/inbox/new.js"></script>
 <script src="/javascript/inbox/reply.js"></script>
 </html>
