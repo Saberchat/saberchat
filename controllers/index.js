@@ -4,6 +4,7 @@ const filter = new Filter();
 const passport = require('passport');
 const {sendGridEmail} = require("../services/sendGrid");
 const setup = require("../utils/setup");
+const {convertToLink} = require("../utils/convert-to-link");
 
 //SCHEMA
 const Platform = require("../models/platform");
@@ -269,7 +270,7 @@ controller.contact = async function(req, res) { //Contact info of highest status
     }
 
     const highestPermission = platform.permissionsProperty[platform.permissionsProperty.length-1]; //Get highest permission (e.g. principal)
-    return res.render('other/contact', {platform, teachers, highestPermission});
+    return res.render('other/contact', {platform, teachers, highestPermission, convertToLink});
 }
 
 controller.info = async function(req, res) {

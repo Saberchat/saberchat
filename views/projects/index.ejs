@@ -36,7 +36,7 @@
     <%- include('../partials/analytics') %>
 
 </head>
-<body class="mode">
+<body  class="mode">
 
 <div class="container mt-5">
     <div class="row">
@@ -267,4 +267,9 @@
     </body>
     <script src="/javascript/like.js"></script>
     <script src="/javascript/search.js"></script>
+    <script>
+        if (document.getElementById("search-input")) {
+            document.getElementById("search-input").style.backgroundColor = colorScheme[colorScheme.length-1];
+        }
+    </script>
 </html>

@@ -30,8 +30,19 @@ controller.updatePlatform = async function(req, res) {
         return res.redirect("back");
     }
     const oldAddress = platform.emailExtension;
-    for (let attr of ["name", "imageUrl", "emailExtension", "displayImages"]) { //Update elements with directly corresponding text
+    for (let attr of ["name", "imageUrl", "emailExtension", "displayImages", "font"]) { //Update elements with directly corresponding text
         platform[attr] = req.body[attr];
+    }
+
+    if (req.body.navDark) {
+        platform.navDark = true;
+    }
+
+    for (let attr of ["colorScheme", "darkColorScheme"]) {
+        platform[attr] = [];
+        for (let i = 0; i < req.body[attr].length; i+= 3) {
+            platform[attr].push(`${req.body[attr][i]}, ${req.body[attr][i+1]}, ${req.body[attr][i+2]}`);
+        }
     }
 
     for (let attr of ["community", "services"]) { //Update elements which are textareas with split text

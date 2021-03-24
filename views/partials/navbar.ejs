@@ -4,8 +4,8 @@
         <div class="container" id="nav-container">
             <!-- Brand  (change link to home page)-->
             <a class="navbar-brand" href="/">
-                <i class="far fa-comments"></i>
-                <span>Saber</span>chat
+                <i class="far fa-comments" <% if (platform.navDark) {%> style="color: black;"<%}%>></i>
+                <span>Saber</span><span<% if (platform.navDark) { %> style="color: black;"<% } %>>chat</span>
             </a>
             <!-- Toggler/collapsibe Button -->
             <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#collapsibleNavbar">
@@ -17,10 +17,10 @@
                 <ul class="navbar-nav">
                     <% if (currentUser) { %>
                         <li class="nav-item">
-                            <a class="nav-link" href="/projects"><i class="fas fa-paint-brush"></i> Projects</a>
+                            <a class="nav-link" <% if (platform.navDark) {%> style="color: black;"<%}%> href="/projects"><i class="fas fa-paint-brush"></i> Projects</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="/announcements"><i class="fas fa-bullhorn"></i>
+                            <a class="nav-link" <% if (platform.navDark) {%> style="color: black;"<%}%> href="/announcements"><i class="fas fa-bullhorn"></i>
                                 Announcements
                                 <% if (currentUser.annCount.length > 0) { %>
                                     <span class="badge badge-pill badge-danger"><%= currentUser.annCount.length %></span>
@@ -28,13 +28,13 @@
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="/profiles"><i class="fas fa-user"></i> Users</a>
+                            <a class="nav-link" <% if (platform.navDark) {%> style="color: black;"<%}%> href="/profiles"><i class="fas fa-user"></i> Users</a>
                         </li>
                         <li class="nav-item dropdown">
                         <li class="nav-item"></li>
                         <li class="nav-item dropdown">
                             <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button"
-                               data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                               data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" <% if (platform.navDark) {%> style="color: black;"<%}%>>
                                 <i class="fas fa-align-justify"></i> More
                                 <span
                                     <% if (currentUser.newRoomCount.length <= 0) { %> hidden<% } %> 
@@ -44,7 +44,9 @@
 
                             <div class="dropdown-menu" aria-labelledby="navbarDropdown">
                                 <a class="dropdown-item" href="/reports"><i class="fas fa-exclamation-triangle"></i> Error Reports</a>
-                                <a class="dropdown-item" href="https://witherlyheights.org/" target="_blank"><i class="fas fa-newspaper"></i> Witherly Heights</a>
+                                <% if (platform.name == "Alsion") { %>
+                                    <a class="dropdown-item" href="https://witherlyheights.org/" target="_blank"><i class="fas fa-newspaper"></i> Witherly Heights</a>
+                                <% } %>
                                 <a class="dropdown-item" href="/chat"><i class="fas fa-comment-dots"></i> Chat
                                     <span id="new-chat"
                                     <% if (currentUser.newRoomCount.length <= 0) { %> hidden <% } %>
@@ -63,7 +65,7 @@
                     <% } else { %>
                         <% for (let feature of platform.publicFeatures) { %>
                             <li class="nav-item">
-                                <a class="nav-link" href="/<%=feature.route%>"><i class="fas fa-<%=feature.icon%>"></i> <%=feature.name%></a>
+                                <a class="nav-link" <% if (platform.navDark) {%> style="color: black;"<%}%> href="/<%=feature.route%>"><i class="fas fa-<%=feature.icon%>"></i> <%=feature.name%></a>
                             </li>
                         <% } %>
                     <% } %>
@@ -80,10 +82,10 @@
                                 <% } %>
                             <% } %>
                             <% if (msgCount > 0) { %>
-                                <a class="nav-link" href="/inbox/"><i class="fas fa-inbox"></i> Inbox <span
+                                <a class="nav-link" <% if (platform.navDark) {%> style="color: black;"<%}%> href="/inbox/"><i class="fas fa-inbox"></i> Inbox <span
                                             class="badge badge-pill badge-danger"><%=msgCount%></span></a>
                             <% } else { %>
-                                <a class="nav-link" href="/inbox/"><i class="fas fa-inbox"></i> Inbox</a>
+                                <a class="nav-link" <% if (platform.navDark) {%> style="color: black;"<%}%> href="/inbox/"><i class="fas fa-inbox"></i> Inbox</a>
                             <% } %>
                         </li>
 
@@ -103,7 +105,7 @@
                         <% } else if (currentUser.permission == "admin") { %>
                             <li class="nav-item dropdown">
                                 <a class="nav-link dropdown-toggle" href="" id="navbarDropdownMenuLink" role="button"
-                                   data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i
+                                   data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" <% if (platform.navDark) {%> style="color: black;"<%}%>><i
                                             class="fas fa-align-justify"></i> Admin</a>
                                 <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
                                     <a href="/admin/permissions" class="dropdown-item"><i class="fas fa-user"></i>
@@ -118,7 +120,7 @@
                         <% } else if (currentUser.permission == platform.permissionsProperty[platform.permissionsProperty.length-1]) { %>
                             <li class="nav-item dropdown">
                                 <a class="nav-link dropdown-toggle" href="" id="navbarDropdownMenuLink" role="button"
-                                   data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i
+                                   data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" <% if (platform.navDark) {%> style="color: black;"<%}%>><i
                                             class="fas fa-align-justify"></i> <%=platform.permissionsDisplay[platform.permissionsDisplay.length-1]%></a>
                                 <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
                                     <a href="/admin/permissions" class="dropdown-item"><i class="fas fa-user"></i>
@@ -140,7 +142,7 @@
 
                         <li class="nav-item dropdown">
                             <a class="nav-link dropdown-toggle" href="" id="navbarDropdownMenuLink" role="button"
-                               data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                               data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" <% if (platform.navDark) {%> style="color: black;"<%}%>>
                                 <img src="<% if (currentUser.mediaFile.display) {%> <%= currentUser.mediaFile.url%><%} else {%> <%=currentUser.imageUrl.url%><%}%>" alt="profile pic" class="nav-profile-img">
                                 <%= currentUser.firstName.charAt(0) %>.<%= currentUser.lastName.charAt(0) %>.
                             </a>
@@ -160,10 +162,10 @@
                         <!-- if there is no user, show the register and login links -->
                     <% } else { %>
                         <li class="nav-item">
-                            <a class="nav-link user-form-btn signup">Register</a>
+                            <a class="nav-link user-form-btn signup" <% if (platform.navDark) {%> style="color: black;"<%}%>>Register</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link user-form-btn login">Login</a>
+                            <a class="nav-link user-form-btn login" <% if (platform.navDark) {%> style="color: black;"<%}%>>Login</a>
                         </li>
                     <% } %>
                 </ul>
@@ -250,6 +252,16 @@
 <%- include('forgot-password') %>
 <%- include('agreement') %>
 <script>
+    const body = document.getElementsByTagName("body")[0];
+    let colorScheme = [];
+    let platformColors;
+    platformColors = '<% if (currentUser) { if (currentUser.darkmode) {%> <%=platform.darkColorScheme%> <% } else { %> <%=platform.colorScheme%> <% } } else {%> <%=platform.colorScheme%> <% } %>'.split(',');
+    for (let i = 0; i < platformColors.length; i+= 3) {
+        colorScheme.push(`rgb(${platformColors[i]},${platformColors[i+1]},${platformColors[i+2]})`);
+    }
+
+    body.style.fontFamily = '<%=platform.font%>';
+    body.style["background-color"] = colorScheme[colorScheme.length-1];
 
     const checkIfAgree = e => {
         if (!document.getElementById('agree').checked) {
@@ -259,6 +271,6 @@
 
     document.getElementById('confirm-agreement').addEventListener('click', e => {
         checkIfAgree(e)
-    })
+    });
 
 </script>

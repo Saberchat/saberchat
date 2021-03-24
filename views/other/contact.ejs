@@ -171,7 +171,7 @@
                         <h1><%=platform.contact.heading%></h1>
                     </div>
                     <div class="block-content mode">
-                        <p><%=platform.contact.description%></p>
+                        <p class="convertible-text"><%=convertToLink(platform.contact.description)%></p>
                         <% sortedTeachers.forEach(user => { %>
                             <span class="developer-info"><%= user.firstName %> <%= user.lastName %></span>
                             <p><a href="mailto: <%= user.email %>"><%= user.email %></a></p>
@@ -183,6 +183,7 @@
     </div>
 </main>
 <%- include('../partials/footer') %>
+<script src="/javascript/embed.js"></script>
 <script>
     window.onload = (() => {
         window.onscroll = (() => {

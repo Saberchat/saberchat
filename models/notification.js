@@ -1,6 +1,5 @@
 const mongoose = require("mongoose");
 
-//Comments that are sent and stored in chat rooms
 const Notification = mongoose.model("Notification", new mongoose.Schema({
     text: String,
     recipients: [{type: mongoose.Schema.Types.ObjectId, ref: 'User'}],
@@ -44,5 +43,5 @@ module.exports = { //All subclass Schema
             }],
             date: String
         }]
-    })),
+    }))
 }

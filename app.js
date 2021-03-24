@@ -187,21 +187,22 @@ const getRandMessage = (list => {
 
 // Update all students' statuses on update date, if required
 const updateStatuses = async function() {
-  const platform = await setup(Platform);
-  if (!platform) {
-      return console.log("error");
-  }
-  if (platform.updateTime.split(' ')[0] != "0" && platform.updateTime.split(' ')[1] != "0") { //If there is an update time
-      await schedule.scheduleJob(`0 0 0 ${platform.updateTime.split(' ')[0]} ${platform.updateTime.split(' ')[1]} *`, async() => {
-          const statuses = platform.studentStatuses.concat(platform.formerStudentStatus);
-          const users = await User.find({authenticated: true, status: {$in: platform.studentStatuses}});
-          if (!users) { return console.log(err);}  
-          for (let user of users) {
-              user.status = statuses[statuses.indexOf(user.status)+1];
-              await user.save();
-          }
-      });
-  }
+    const platform = await setup(Platform);
+    if (!platform) {
+        return console.log("error");
+    }
+    
+    if (platform.updateTime.split(' ')[0] != "0" && platform.updateTime.split(' ')[1] != "0") { //If there is an update time
+        await schedule.scheduleJob(`0 0 0 ${platform.updateTime.split(' ')[0]} ${platform.updateTime.split(' ')[1]} *`, async() => {
+            const statuses = platform.studentStatuses.concat(platform.formerStudentStatus);
+            const users = await User.find({authenticated: true, status: {$in: platform.studentStatuses}});
+            if (!users) { return console.log(err);}  
+            for (let user of users) {
+                user.status = statuses[statuses.indexOf(user.status)+1];
+                await user.save();
+            }
+        });
+    }
 }().catch(err => {
 	console.log(err);
 });

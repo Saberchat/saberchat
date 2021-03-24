@@ -109,5 +109,8 @@
 </body>
 <script>
     document.getElementById("time-count").innerText = getTime(document.getElementById("time-count").innerText.split(' ')[0]);
+    for (let element of document.getElementsByClassName("cafe")) {
+        element.style.backgroundColor = colorScheme[1];
+    }
 </script>
 </html>

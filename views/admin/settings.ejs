@@ -42,8 +42,8 @@
                     <div class="col-12">
                         <div class="jumbotron text-center" id="course-thumbnail"
                             style="background-image: url('<%=platform.imageUrl%>');">
-                            <h1 id="courseName"><%= platform.name %> Saberchat</h1>
-                            <h5 id="courseInfo">Edit Platform Settings</h5>
+                            <h1 id="courseName" <% if (platform.navDark) {%> style="color: black"<%}%> ><%= platform.name %> Saberchat</h1>
+                            <h5 id="courseInfo" <% if (platform.navDark) {%> style="color: black"<%}%>>Edit Platform Settings</h5>
                         </div>
                     </div>
                 </div>
@@ -69,6 +69,37 @@
                             <input id="email-input" class="form-control mode" type="text"
                                     name="emailExtension" value="<%= platform.emailExtension %>" placeholder="Enter Required Email Extension">
                         </div>
+                        <div class="form-group">
+                            <label for="font">Font Family</label><br/>
+                            <input id="font" class="form-control mode" type="text"
+                                    name="font" value="<%= platform.font%>" placeholder="Enter Platform Font Family">
+                        </div>
+
+                        <div style="background-color: white; border-color: black; border-width: 2px; padding: 20px; margin-bottom: 10px; margin-top: 10px;">
+                            <% let scheme;%>
+                            <% for (let attr of [["colorScheme", "Color Scheme", "black", "updateColor"], ["darkColorScheme", "Darkmode Color Scheme", "white", "updateDarkColor"]]) { %>
+                                <% for (let i = 0; i < 3; i++) { %>
+                                    <div class="form-group">
+                                        <% scheme = platform[attr[0]][i].split(', ');%>
+                                        <label for="<%=attr[1]%>-<%=i%>-0-color" id="<%=attr[0]%>-label-<%=i%>" style="background-color: rgb(<%=scheme[0]%>, <%=scheme[1]%>, <%=scheme[2]%>); padding-left: 10px; padding-right: 10px; color: <%=attr[2]%>;">
+                                            <%=attr[1]%> Element <%=i+1%>: (<%=scheme[0]%>, <%=scheme[1]%>, <%=scheme[2]%>)
+                                        </label><br/>
+                                        <% for (let j = 0; j < 3; j++) {%>
+                                            <span id="<%=attr[0]%>-display-<%=i%>-<%=j%>" style="color: <%=attr[2]%>;"><%=scheme[j]%></span>
+                                            <input id="color-<%=i%>-<%=j%>-<%=attr[1]%>" class="form-control mode" type="range" name="<%=attr[0]%>" min="0" max="255" value="<%=parseInt(scheme[j])%>" onchange="<%=attr[3]%>(this)">
+                                        <% }%>
+                                    </div>
+                                <% } %>
+                                <br>
+                            <% } %>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="display-input">Navbar Dark Display</label>
+                            <input id="display-input" class="mode" type="checkbox"
+                                    name="navDark" <% if (platform.navDark) { %> checked <% } %>>
+                        </div>
+
                         <div class="form-group">
                             <label for="update-time-input">Student Status Update Time</label><br/>
                             <select name="month" class="mode" style="width: 30%;">
@@ -169,4 +200,29 @@
     </body>
     <script src="/javascript/image-url.js"></script>
     <script src="/javascript/cafe/image.js"></script>
+    <script>
+
+        const updateColor = function(input) {
+            const [head, i, j, end] = input.id.split('-');
+            const color0 = document.getElementById(`${head}-${i}-0-${end}`).value;
+            const color1 = document.getElementById(`${head}-${i}-1-${end}`).value;
+            const color2 = document.getElementById(`${head}-${i}-2-${end}`).value;
+
+            document.getElementById(`colorScheme-display-${i}-${j}`).innerText = input.value;
+            document.getElementById(`colorScheme-label-${i}`).innerText = `Color Scheme Element ${i}: (${color0}, ${color1}, ${color2})`;
+            document.getElementById(`colorScheme-label-${i}`).style["background-color"] = `rgb(${color0}, ${color1}, ${color2})`;
+        }
+
+        const updateDarkColor = function(input) {
+            const [head, i, j, end] = input.id.split('-');
+            const color0 = document.getElementById(`${head}-${i}-0-${end}`).value;
+            const color1 = document.getElementById(`${head}-${i}-1-${end}`).value;
+            const color2 = document.getElementById(`${head}-${i}-2-${end}`).value;
+
+            document.getElementById(`darkColorScheme-display-${i}-${j}`).innerText = input.value;
+            document.getElementById(`darkColorScheme-label-${i}`).innerText = `Darkmode Color Scheme Element ${i}: (${color0}, ${color1}, ${color2})`;
+            document.getElementById(`darkColorScheme-label-${i}`).style["background-color"] = `rgb(${color0}, ${color1}, ${color2})`;
+        }
+
+    </script>
 </html>

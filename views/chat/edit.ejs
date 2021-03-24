@@ -147,4 +147,12 @@
     <br/>
 </div>
 </body>
+<script>
+    document.getElementById("remove-search-input").style.backgroundColor = colorScheme[colorScheme.length-1];
+    document.getElementById("add-search-input").style.backgroundColor = colorScheme[colorScheme.length-1];
+
+    for (let element of document.getElementsByClassName("cafe")) {
+        element.style.backgroundColor = colorScheme[1];
+    }
+</script>
 </html>

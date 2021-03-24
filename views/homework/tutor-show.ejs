@@ -644,5 +644,9 @@
 </body>
 <script>
     document.getElementById("experience").innerText = getTime(document.getElementById("experience").innerText.split(' ')[0]);
+
+    for (let element of document.getElementsByClassName("cafe")) {
+        element.style.backgroundColor = colorScheme[1];
+    }
 </script>
 </html>

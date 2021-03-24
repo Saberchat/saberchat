@@ -6,6 +6,10 @@ var platformSchema = new mongoose.Schema({
     imageUrl: String,
     emailExtension: {type: String, default: ''},
     updateTime: {type: String, default: "0 0"},
+    navDark: {type: Boolean, default: false},
+    colorScheme: [{type: String}],
+    darkColorScheme: [{type: String}],
+    font: {type: String, default: "Helvetica"},
 
     //TODO: Starts here
     permissionsProperty: [{type: String}],

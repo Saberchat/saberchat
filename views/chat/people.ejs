@@ -172,5 +172,14 @@
         </div>
     </div>
 <% } %>
+<script>
+    if (document.getElementById("search-input")) {
+        document.getElementById("search-input").style.backgroundColor = colorScheme[colorScheme.length-1];
+    }
+
+    for (let element of document.getElementsByClassName("cafe")) {
+        element.style.backgroundColor = colorScheme[1];
+    }
+</script>
 </body>
 </html>
