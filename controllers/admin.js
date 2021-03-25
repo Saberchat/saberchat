@@ -89,9 +89,14 @@ controller.updatePlatform = async function(req, res) {
         platform.publicFeatures.splice(objectArrIndex(platform.publicFeatures, "name", "Announcements"), 1);
     }
 
-    for (let i = 0; i < platform.features.length; i++) {
-        platform.features[i].name = req.body.feature[i];
-        platform.features[i].icon = req.body.icon[i];
+    if (typeof req.body.feature == "string") {
+        platform.features[0].name = req.body.feature;
+        platform.features[0].icon = req.body.icon;
+    } else {
+        for (let i = 0; i < platform.features.length; i++) {
+            platform.features[i].name = req.body.feature[i];
+            platform.features[i].icon = req.body.icon[i];
+        }
     }
 
     if (oldAddress != req.body.emailExtension) { //Update all users who were by default allowed earlier

@@ -34,7 +34,7 @@ middleware.accessToFeature = async function(req, res, next) {
         return res.redirect("back");
     }
 
-    if (objectArrIndex(platform.features, "route", req.baseUrl.slice(1)) > -1) {
+    if (objectArrIndex(platform.features, "route", req.baseUrl.slice(1)) > -1 || objectArrIndex(platform.features, "route", `${req.baseUrl.slice(1)}${req.route.path}`) > -1) {
         return next();
     }
     req.flash('error', 'You do not have permission to view that');

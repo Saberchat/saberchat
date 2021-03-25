@@ -34,6 +34,15 @@ module.exports = { //All subclass Schema
         rating: {type: Number, default: 0}
     })),
     Article: Post.discriminator("Article", new mongoose.Schema({ //School/organization news journal articles
-        content: [{type: String, data: {}}]
+        content: [{
+            text: String,
+            data: {}
+        }]
+    })),
+    Module: Post.discriminator("Module", new mongoose.Schema({ //Curriculum with attached information
+        slides: [{type: String}]
+    })),
+    Competition: Post.discriminator("Competition", new mongoose.Schema({ //Curriculum with attached information
+        slides: [{type: String}]
     }))
 };

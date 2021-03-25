@@ -62,6 +62,20 @@ controller.index = async function(req, res) {
 	});
 }
 
+controller.team = async function(req, res) {
+	const platform = await setup(Platform);
+	const users = await User.find({
+		authenticated: true,
+		status: {$in: platform.statusesProperty.slice(platform.statusesProperty.length-2)}
+	});
+	if (!platform || !users) {
+		req.flash("error", "An error occurred");
+		return res.redirect("back");
+	}
+
+	return res.render("profile/team", {platform, users});
+}
+
 controller.edit = async function(req, res) {
 	const platform = await setup(Platform);
 	return res.render('profile/edit', { //Check if user has permissions to change their own tags and statuses

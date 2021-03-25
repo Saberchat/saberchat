@@ -81,4 +81,13 @@
 </div>
 </body>
 <script src="/javascript/admin/permission.js"></script>
+<script>
+  if (document.getElementById("search-input")) {
+      document.getElementById("search-input").style.backgroundColor = colorScheme[colorScheme.length-1];
+  }
+
+  for (let element of document.getElementsByClassName("list-group-item")) {
+        element.style.backgroundColor = colorScheme[1];
+  }
+</script>
 </html>

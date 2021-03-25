@@ -9,7 +9,7 @@ form {
 }
 
 /* Image block/area */
-#image-block {
+#image-block, #slides {
     margin: 2rem 0;
     position: relative;
 }
@@ -18,14 +18,14 @@ form {
     margin-top: 2rem;
 }
 
-#image-header h4, #media-header h4 {
+#image-header h4, #media-header h4, #slide-header h4 {
     font-weight: 500;
     font-size: 1.3rem;
     display: inline-block;
     width: 5rem;
 }
 
-#image-header button, #media-header button {
+#image-header button, #media-header button, #slide-header button {
     float: right;
 }
 
@@ -39,6 +39,6 @@ form {
     display: inline-block;
 }
 
-#image-block .image-group button {
+#image-block .image-group button, #media-block .media-group {
     float: right;
 }

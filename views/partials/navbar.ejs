@@ -53,10 +53,12 @@
                                     class="badge badge-pill badge-danger"><%= currentUser.newRoomCount.length %></span>
                                 </a>
                                 <% for (let feature of platform.features) { %>
-                                    <a class="dropdown-item" href="/<%=feature.route%>">
-                                        <i class="fas fa-<%=feature.icon%>"></i>
-                                        <%=feature.name%>
-                                    </a>
+                                    <% if (feature.name != "Witherly Heights") { %>
+                                        <a class="dropdown-item" href="/<%=feature.route%>">
+                                            <i class="fas fa-<%=feature.icon%>"></i>
+                                            <%=feature.name%>
+                                        </a>
+                                    <% } %>
                                 <% } %>
                             </div>
 

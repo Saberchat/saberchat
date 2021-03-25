@@ -10,6 +10,7 @@ router.route('/')
     .get(wrapAsync(middleware.isLoggedIn), wrapAsync(profile.index)) // renders the list of users page
     .put(wrapAsync(middleware.isLoggedIn), multipleUpload, validateUserUpdate, wrapAsync(profile.update));
 
+router.get('/team', wrapAsync(middleware.isLoggedIn), wrapAsync(middleware.accessToFeature), wrapAsync(profile.team));
 router.get('/edit', wrapAsync(middleware.isLoggedIn), wrapAsync(profile.edit)); //renders profiles edit page
 router.get('/change-login-info', wrapAsync(middleware.isLoggedIn), wrapAsync(profile.changeLoginInfo)); //renders the email/password edit page
 router.get('/confirm-email/:id', wrapAsync(profile.confirmEmail)); //Confirm new email

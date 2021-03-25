@@ -9,79 +9,85 @@ const {cloudUpload, cloudDelete} = require('../services/cloudinary');
 //SCHEMA
 const Platform = require("../models/platform");
 const User = require('../models/user');
-const {Report, PostComment} = require('../models/post');
+const {Module, PostComment} = require('../models/post');
 
 const controller = {};
 
-// Report GET index
+// Module GET index
 controller.index = async function(req, res) {
     const platform = await setup(Platform);
-    const reports = await Report.find({}).populate('sender');
-    if(!platform || !reports) {req.flash('error', 'Cannot find reports.'); return res.redirect('back');}
-    return res.render('reports/index', {platform, reports: reports.reverse()});
+    const modules = await Module.find({}).populate('sender');
+    if(!platform || !modules) {req.flash('error', 'Cannot find modules.'); return res.redirect('back');}
+    return res.render('modules/index', {platform, modules: modules.reverse()});
 };
 
-// Report GET new report
+// Module GET new module
 controller.new = async function(req, res) {
     const platform = await setup(Platform);
     if (!platform) {
         req.flash("error", "An error occurred");
         return res.redirect("back");
     }
-    return res.render('reports/new', {platform});
+    return res.render('modules/new', {platform});
 };
 
-// Report GET show
+// Module GET show
 controller.show = async function(req, res) {
     const platform = await setup(Platform);
-    const report = await Report.findById(req.params.id)
+    const module = await Module.findById(req.params.id)
         .populate('sender')
         .populate({
             path: "comments",
             populate: {path: "sender"}
         });
-    if(!platform || !report) {req.flash('error', 'Could not find report'); return res.redirect('back');}
+    if(!platform || !module) {req.flash('error', 'Could not find module'); return res.redirect('back');}
 
     let fileExtensions = new Map(); //Track which file format each attachment is in
-    for (let media of report.mediaFiles) {
+    for (let media of module.mediaFiles) {
         fileExtensions.set(media.url, path.extname(media.url.split("SaberChat/")[1]));
     }
-    const convertedText = convertToLink(report.text); //Parse and add hrefs to all links in text
-    return res.render('reports/show', {platform, report, convertedText, fileExtensions});
+    const convertedText = convertToLink(module.text); //Parse and add hrefs to all links in text
+    return res.render('modules/show', {platform, module, convertedText, fileExtensions});
 };
 
-// Report GET edit form
+// Module GET edit form
 controller.updateForm = async function(req, res) {
     const platform = await setup(Platform);
-    const report = await Report.findById(req.params.id);
-    if(!platform || !report) {req.flash('error', 'Could not find report'); return res.redirect('back');}
-    if(!report.sender._id.equals(req.user._id)) {
+    const module = await Module.findById(req.params.id);
+    if(!platform || !module) {req.flash('error', 'Could not find module'); return res.redirect('back');}
+    if(!module.sender._id.equals(req.user._id)) {
         req.flash('error', 'You do not have permission to do that.');
         return res.redirect('back');
     }
 
     let fileExtensions = new Map(); //Track which file format each attachment is in
-    for (let media of report.mediaFiles) {
+    for (let media of module.mediaFiles) {
         fileExtensions.set(media.url, path.extname(media.url.split("SaberChat/")[1]));
     }
-    return res.render('reports/edit', {platform, report, fileExtensions});
+    return res.render('modules/edit', {platform, module, fileExtensions});
 };
 
-// Report POST create
+// Module POST create
 controller.create = async function(req, res) {
-    const report = await Report.create({ //Build report with error info
+    const module = await Module.create({ //Build module with error info
         sender: req.user,
         subject: req.body.subject,
         text: req.body.message
     });
-    if (!report) {
-        req.flash('error', 'Unable to create report');
+    if (!module) {
+        req.flash('error', 'Unable to create module');
         return res.redirect('back');
     }
 
     if (req.body.images) { //If any images were added (if not, the 'images' property is null)
-        for (const image in req.body.images) {
-            report.images.push(req.body.images[image]);
+        for (let image in req.body.images) {
+            module.images.push(req.body.images[image]);
+        }
+    }
+
+    if (req.body.slides) {
+        for (let slide in req.body.slides) {
+            module.slides.push(req.body.slides[slide]);
         }
     }
 
@@ -103,7 +109,7 @@ controller.create = async function(req, res) {
                     return res.redirect('back');
                 }
 
-                report.mediaFiles.push({
+                module.mediaFiles.push({
                     filename: cloudResult.public_id,
                     url: cloudResult.secure_url,
                     originalName: file.originalname
@@ -112,61 +118,66 @@ controller.create = async function(req, res) {
         }
     }
 
-    report.date = dateFormat(report.created_at, "h:MM TT | mmm d");
-    await report.save();
+    module.date = dateFormat(module.created_at, "h:MM TT | mmm d");
+    await module.save();
 
-    req.flash('success', 'Report Posted to Bulletin!');
-    return res.redirect(`/reports/${report._id}`);
+    req.flash('success', 'Module Posted to Bulletin!');
+    return res.redirect(`/modules/${module._id}`);
 };
 
-controller.updateReport = async function(req, res) {
-    const report = await Report.findById(req.params.id).populate('sender');
-    if (!report) {
-        req.flash('error', "Unable to access report");
+controller.updateModule = async function(req, res) {
+    const module = await Module.findById(req.params.id).populate('sender');
+    if (!module) {
+        req.flash('error', "Unable to access module");
         return res.redirect('back');
     }
 
-    if (report.sender._id.toString() != req.user._id.toString()) {
-        req.flash('error', "You can only update reports which you have sent");
+    if (module.sender._id.toString() != req.user._id.toString()) {
+        req.flash('error', "You can only update modules which you have sent");
         return res.redirect('back');
     }
 
-    //When report is updated, it might have new info to be handled
-    const updatedReport = await Report.findByIdAndUpdate(req.params.id, {
+    const updatedModule = await Module.findByIdAndUpdate(req.params.id, {
         subject: req.body.subject,
         text: req.body.message,
-        handled: false
     });
-    if (!updatedReport) {
-        req.flash('error', "Unable to update report");
+    if (!updatedModule) {
+        req.flash('error', "Unable to update module");
         return res.redirect('back');
     }
 
-    updatedReport.images = []; //Empty image array so that you can fill it with whatever images are added (all images are there, not just new ones)
+    updatedModule.images = []; //Empty image array so that you can fill it with whatever images are added (all images are there, not just new ones)
     if (req.body.images) { //Only add images if any are provided
-        for (const image in req.body.images) {
-            updatedReport.images.push(req.body.images[image]);
+        for (let image in req.body.images) {
+            updatedModule.images.push(req.body.images[image]);
+        }
+    }
+
+    updatedModule.images = [];
+    if (req.body.slides) {
+        for (let slide in req.body.slides) {
+            updatedModule.slides.push(req.body.slides[slide]);
         }
     }
 
     //Iterate through all selected media to remove and delete them
     let cloudErr;
     let cloudResult;
-    for (let i = updatedReport.mediaFiles.length-1; i >= 0; i--) {
-        if (req.body[`deleteUpload-${updatedReport.mediaFiles[i].url}`] && updatedReport.mediaFiles[i] && updatedReport.mediaFiles[i].filename) {
-            if ([".mp3", ".mp4", ".m4a", ".mov"].includes(path.extname(updatedReport.mediaFiles[i].url.split("SaberChat/")[1]).toLowerCase())) {
-                [cloudErr, cloudResult] = await cloudDelete(updatedReport.mediaFiles[i].filename, "video");
-            } else if (path.extname(updatedReport.mediaFiles[i].url.split("SaberChat/")[1]).toLowerCase() == ".pdf") {
-                [cloudErr, cloudResult] = await cloudDelete(updatedReport.mediaFiles[i].filename, "pdf");
+    for (let i = updatedModule.mediaFiles.length-1; i >= 0; i--) {
+        if (req.body[`deleteUpload-${updatedModule.mediaFiles[i].url}`] && updatedModule.mediaFiles[i] && updatedModule.mediaFiles[i].filename) {
+            if ([".mp3", ".mp4", ".m4a", ".mov"].includes(path.extname(updatedModule.mediaFiles[i].url.split("SaberChat/")[1]).toLowerCase())) {
+                [cloudErr, cloudResult] = await cloudDelete(updatedModule.mediaFiles[i].filename, "video");
+            } else if (path.extname(updatedModule.mediaFiles[i].url.split("SaberChat/")[1]).toLowerCase() == ".pdf") {
+                [cloudErr, cloudResult] = await cloudDelete(updatedModule.mediaFiles[i].filename, "pdf");
             } else {
-                [cloudErr, cloudResult] = await cloudDelete(updatedReport.mediaFiles[i].filename, "image");
+                [cloudErr, cloudResult] = await cloudDelete(updatedModule.mediaFiles[i].filename, "image");
             }
             // check for failure
             if (cloudErr || !cloudResult || cloudResult.result !== 'ok') {
                 req.flash('error', 'Error deleting uploaded image');
                 return res.redirect('back');
             }
-            updatedReport.mediaFiles.splice(i, 1);
+            updatedModule.mediaFiles.splice(i, 1);
         }
     }
 
@@ -187,7 +198,7 @@ controller.updateReport = async function(req, res) {
                     return res.redirect('back');
                 }
 
-                updatedReport.mediaFiles.push({
+                updatedModule.mediaFiles.push({
                     filename: cloudResult.public_id,
                     url: cloudResult.secure_url,
                     originalName: file.originalname
@@ -196,50 +207,40 @@ controller.updateReport = async function(req, res) {
         }
     }
     
-    await updatedReport.save();
-    req.flash('success', 'Report Updated!');
-    return res.redirect(`/reports/${updatedReport._id}`);
+    await updatedModule.save();
+    req.flash('success', 'Module Updated!');
+    return res.redirect(`/modules/${updatedModule._id}`);
 }
 
-controller.handleReport = async function(req, res) {
-    const report = await Report.findByIdAndUpdate(req.params.id, {handled: true});
-    if (!report) {
-        req.flash("error", "Unable to access report");
-        return res.redirect("back");
-    }
-    req.flash("success", "Handled report!");
-    return res.redirect("/reports/");
-}
+// Module PUT like module
+controller.likeModule = async function(req, res) {
+    const module = await Module.findById(req.body.moduleId);
+    if(!module) {return res.json({error: 'Error updating module.'});}
 
-// Report PUT like report
-controller.likeReport = async function(req, res) {
-    const report = await Report.findById(req.body.reportId);
-    if(!report) {return res.json({error: 'Error updating report.'});}
-
-    if (removeIfIncluded(report.likes, req.user._id)) { //Remove like
-        await report.save();
+    if (removeIfIncluded(module.likes, req.user._id)) { //Remove like
+        await module.save();
         return res.json({
-            success: `Removed a like from ${report.subject}`,
-            likeCount: report.likes.length
+            success: `Removed a like from ${module.subject}`,
+            likeCount: module.likes.length
         });
     }
 
-    report.likes.push(req.user._id); //Add likes to report
-    await report.save();
+    module.likes.push(req.user._id); //Add likes to module
+    await module.save();
     return res.json({
-        success: `Liked ${report.subject}`,
-        likeCount: report.likes.length
+        success: `Liked ${module.subject}`,
+        likeCount: module.likes.length
     });
 };
 
-// Report PUT comment
+// Module PUT comment
 controller.comment = async function(req, res) {
-    const report = await Report.findById(req.body.reportId)
+    const module = await Module.findById(req.body.moduleId)
         .populate({
             path: "comments",
             populate: {path: "sender"}
         });
-    if (!report) {
+    if (!module) {
         return res.json({
             error: 'Error commenting'
         });
@@ -256,8 +257,8 @@ controller.comment = async function(req, res) {
     comment.date = dateFormat(comment.created_at, "h:MM TT | mmm d");
     await comment.save();
 
-    report.comments.push(comment);
-    await report.save();
+    module.comments.push(comment);
+    await module.save();
 
     let users = [];
     let user;
@@ -277,11 +278,11 @@ controller.comment = async function(req, res) {
 
     return res.json({
         success: 'Successful comment',
-        comments: report.comments
+        comments: module.comments
     });
 }
 
-// Report PUT like comment
+// Module PUT like comment
 controller.likeComment = async function(req, res) {
     const comment = await PostComment.findById(req.body.commentId);
     if(!comment) {return res.json({error: 'Error finding comment'});}
@@ -302,22 +303,22 @@ controller.likeComment = async function(req, res) {
     });
 }
 
-controller.deleteReport = async function(req, res) {
-    const report = await Report.findById(req.params.id).populate('sender');
-    if (!report) {
-        req.flash('error', "Unable to access report");
+controller.deleteModule = async function(req, res) {
+    const module = await Module.findById(req.params.id).populate('sender');
+    if (!module) {
+        req.flash('error', "Unable to access module");
         return res.redirect('back');
     }
 
-    if (report.sender._id.toString() != req.user._id.toString()) { //Doublecheck that deleter is reporter
-        req.flash('error', "You can only delete reports that you have posted");
+    if (module.sender._id.toString() != req.user._id.toString()) { //Doublecheck that deleter is moduleer
+        req.flash('error', "You can only delete modules that you have posted");
         return res.redirect('back');
     }
 
     // delete any uploads
     let cloudErr;
     let cloudResult;
-    for (let file of report.mediaFiles) {
+    for (let file of module.mediaFiles) {
         if (file && file.filename) {
             if ([".mp3", ".mp4", ".m4a", ".mov"].includes(path.extname(file.url.split("SaberChat/")[1]).toLowerCase())) {
                 [cloudErr, cloudResult] = await cloudDelete(file.filename, "video");
@@ -334,14 +335,14 @@ controller.deleteReport = async function(req, res) {
         }
     }
 
-    const deletedReport = await Report.findByIdAndDelete(report._id);
-    if (!deletedReport) {
-        req.flash('error', "Unable to delete report");
+    const deletedModule = await Module.findByIdAndDelete(module._id);
+    if (!deletedModule) {
+        req.flash('error', "Unable to delete module");
         return res.redirect('back');
     }
 
-    req.flash('success', 'Report Deleted!');
-    return res.redirect('/reports/');
+    req.flash('success', 'Module Deleted!');
+    return res.redirect('/modules/');
 }
 
 module.exports = controller;
