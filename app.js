@@ -1,3 +1,5 @@
+//TEST
+
 // set up env vars if in local developmeent
 if (process.env.NODE_ENV !== "production") {
     require('dotenv').config();
@@ -195,12 +197,12 @@ const updateStatuses = async function() {
     if (!platform) {
         return console.log("error");
     }
-    
+
     if (platform.updateTime.split(' ')[0] != "0" && platform.updateTime.split(' ')[1] != "0") { //If there is an update time
         await schedule.scheduleJob(`0 0 0 ${platform.updateTime.split(' ')[0]} ${platform.updateTime.split(' ')[1]} *`, async() => {
             const statuses = platform.studentStatuses.concat(platform.formerStudentStatus);
             const users = await User.find({authenticated: true, status: {$in: platform.studentStatuses}});
-            if (!users) { return console.log(err);}  
+            if (!users) { return console.log(err);}
             for (let user of users) {
                 user.status = statuses[statuses.indexOf(user.status)+1];
                 await user.save();
@@ -253,9 +255,9 @@ io.on('connect', (socket) => {
 				text: getRandMessage(curseResponse),
 				status: 'notif'
 			};
-			
+
 			await io.in(socket.room).emit('announcement', notif);
-			
+
 			const newComment = await ChatMessage.create({text: notif, status: notif.status});
 			if (!newComment) {
 				console.log(err);
@@ -264,7 +266,7 @@ io.on('connect', (socket) => {
 			newChatMessage.date = dateFormat(comment.created_at, "h:MM TT | mmm d");
 			await newChatMessage.save();
 		}
-	
+
 	} catch(err) {
 		console.log(err);
 	}
