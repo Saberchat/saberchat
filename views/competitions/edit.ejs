@@ -37,29 +37,29 @@
     <div class="row">
         <div class="col-12">
           <div class="jumbotron text-center header">
-            <h1><i class="fas fa-cog"></i> Edit Module</h1>
-            <a href="/modules/<%=module._id%>" class="btn btn-primary"><i class="fas fa-arrow-left"></i> Back</a>
+            <h1><i class="fas fa-cog"></i> Edit Competition Information</h1>
+            <a href="/competitions/<%=competition._id%>" class="btn btn-primary"><i class="fas fa-arrow-left"></i> Back</a>
           </div>
         </div>
     </div>
     <div class="row">
         <div class="col-md-8 offset-md-2 col-12">
-          <form action="/modules/<%= module._id %>?_method=put" method="post" enctype="multipart/form-data">
+          <form action="/competitions/<%= competition._id %>?_method=put" method="post" enctype="multipart/form-data">
             <div class="form-group mode">
               <label for="subject">Subject</label>
-              <input type="text" class="form-control mode" name="subject" placeholder="A short title..." maxlength="50" required value="<%= module.subject %>">
+              <input type="text" class="form-control mode" name="subject" placeholder="A short title..." maxlength="50" required value="<%= competition.subject %>">
             </div>
             <div class="form-group mode">
               <label for="message">Message</label>
-              <textarea class="form-control mode" name="message" rows="5" placeholder="What it is about..." required><%= module.text %></textarea>
+              <textarea class="form-control mode" name="message" rows="5" placeholder="What it is about..." required><%= competition.text %></textarea>
             </div>
 
             <div id="slide-header">
-              <button type="button" onclick="addSlide()" class="btn btn-primary"><i class="fas fa-plus"></i> Slide URL</button>
+              <button type="button" onclick="addSlide()" class="btn btn-primary"><i class="fas fa-plus"></i> Link</button>
               <br/><br/>
             </div>
             <div id="slides">
-              <% let reversedSlides = module.slides.reverse() %>
+              <% let reversedSlides = competition.slides.reverse() %>
               <% for( let i = 0; i < reversedSlides.length; i++ ) { %>
                   <div class="image-group">
                       <div class="input-container" id="slideblock-<%= reversedSlides.length - (i + 1) %>">
@@ -75,7 +75,7 @@
               <% } %>
           </div>
 
-            <% for (let media of module.mediaFiles) { %>
+            <% for (let media of competition.mediaFiles) { %>
               <% if(media.filename) { %>
                   <% if ([".png", ".jpg", ".jpeg", ".gif"].includes(fileExtensions.get(media.url).toLowerCase())) { %>
                       <img src="<%= media.url %>" alt="attached image" class="img-fluid rounded past-upload">
@@ -99,7 +99,7 @@
           <% } %>
 
           <div id="media-header">
-              <button type="button" onclick="upload(<%=module.mediaFiles.length%>)" class="btn btn-primary"><i class="fas fa-plus"></i> File Upload</button>
+              <button type="button" onclick="upload(<%=competition.mediaFiles.length%>)" class="btn btn-primary"><i class="fas fa-plus"></i> File Upload</button>
               <br/><br/>
             </div>
           <div id="uploads"></div>
@@ -110,7 +110,7 @@
           </div>
 
           <div id="image-block">
-              <% let reversedImages = module.images.reverse() %>
+              <% let reversedImages = competition.images.reverse() %>
               <% for( let i = 0; i < reversedImages.length; i++ ) { %>
                   <div class="image-group">
                       <div class="input-container" id="imageblock-<%= reversedImages.length - (i + 1) %>">

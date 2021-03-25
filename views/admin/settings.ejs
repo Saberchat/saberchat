@@ -112,7 +112,7 @@
                             </select>
                             <select name="day" class="mode" style="width: 10%;">
                                 <option value="0">None</option>
-                            <% for (let i = 1; i < 31; i++) { %>
+                            <% for (let i = 1; i <= 31; i++) { %>
                                 <option value="<%=i%>" <%if (parseInt(platform.updateTime.split(' ')[0]) == i) {%> selected <% } %>><%=i%></option>
                             <% } %>
                             </select>

@@ -44,9 +44,9 @@
     <div class="row">
         <div class="col-12">
           <div class="jumbotron text-center header">
-            <h1><i class="fas fa-sticky-note"></i> Modules</h1>
-            <p>All Modules For Our Curriculum</p>
-            <a class="btn btn-primary" href="/modules"><i class="fas fa-arrow-left"></i> Back</a>
+            <h1><i class="fas fa-trophy"></i> Competitions</h1>
+            <p>All Competitions We Are Part Of</p>
+            <a class="btn btn-primary" href="/competitions"><i class="fas fa-arrow-left"></i> Back</a>
           </div>
         </div>
     </div>
@@ -54,57 +54,57 @@
         <div class="col-12">
             <article class="ann-container">
                 <div class="ann-head">
-                    <h1><%= module.subject %></h1>
+                    <h1><%= competition.subject %></h1>
 
                     <% if (currentUser) { %>
-                        <a id="sender-info" class="darkmode-header" href="../profiles/<%= module.sender._id %>">
-                            <img src="<% if (module.sender.mediaFile.display) {%> <%= module.sender.mediaFile.url%><%} else {%> <%=module.sender.imageUrl.url%><%}%>" alt="profile pic"
+                        <a id="sender-info" class="darkmode-header" href="../profiles/<%= competition.sender._id %>">
+                            <img src="<% if (competition.sender.mediaFile.display) {%> <%= competition.sender.mediaFile.url%><%} else {%> <%=competition.sender.imageUrl.url%><%}%>" alt="profile pic"
                                  class="sender-profile-image">
-                            <%= module.sender.firstName %> <%= module.sender.lastName %>
+                            <%= competition.sender.firstName %> <%= competition.sender.lastName %>
                         </a>
                         <br/><br/>
 
                     <% } else { %>
                         <span id="sender-info" class="darkmode-header">
-                  <img src="<% if (module.sender.mediaFile.display) {%> <%= module.sender.mediaFile.url%><%} else {%> <%=module.sender.imageUrl.url%><%}%>" alt="profile pic" class="sender-profile-image">
-                  <%= module.sender.firstName %> <%= module.sender.lastName %>
+                  <img src="<% if (competition.sender.mediaFile.display) {%> <%= competition.sender.mediaFile.url%><%} else {%> <%=competition.sender.imageUrl.url%><%}%>" alt="profile pic" class="sender-profile-image">
+                  <%= competition.sender.firstName %> <%= competition.sender.lastName %>
                 </span>
                     <% } %>
 
-                    <span><%= module.date %></span>
+                    <span><%= competition.date %></span>
 
                     <% if (currentUser) { %>
-                        <% if(module.sender._id.equals(currentUser._id)) { %>
+                        <% if(competition.sender._id.equals(currentUser._id)) { %>
                             <div class="announcement-row">
-                                <a href="/modules/<%= module._id %>/edit" class="btn btn-info"><i
+                                <a href="/competitions/<%= competition._id %>/edit" class="btn btn-info"><i
                                             class="fas fa-cog"></i> Edit</a>
-                                <form action="/modules/<%= module._id %>?_method=delete" method="post"
+                                <form action="/competitions/<%= competition._id %>?_method=delete" method="post"
                                       id="delete-form">
                                     <button class="btn btn-danger announcement-button" type="button" data-toggle="modal"
-                                            data-target="#modal-<%= module._id %>"><i
+                                            data-target="#modal-<%= competition._id %>"><i
                                                 class="far fa-trash-alt"></i> Delete
                                     </button>
-                                    <div class="modal fade" id="modal-<%= module._id %>" tabindex="-1"
+                                    <div class="modal fade" id="modal-<%= competition._id %>" tabindex="-1"
                                          aria-labelledby="deleteModalLabel" aria-hidden="true">
                                         <div class="modal-dialog mode">
                                             <div class="modal-content mode">
                                                 <div class="modal-header mode">
                                                     <h5 class="modal-title" id="exampleModalLabel">Delete
-                                                        Module?</h5>
+                                                        Competition?</h5>
                                                     <button type="button" class="close mode" data-dismiss="modal"
                                                             aria-label="Close"></button>
                                                     <p aria-hidden="true">&times;</p>
                                                 </div>
                                                 <div class="modal-body mode">
                                                     This action is irreversible. You will have to manually recreate this
-                                                    module.
+                                                    competition.
                                                 </div>
                                                 <div class="modal-footer mode">
                                                     <button type="button" class="btn btn-secondary"
                                                             data-dismiss="modal">No, Go Back
                                                     </button>
                                                     <button type="submit" class="btn btn-danger">Yes, Delete
-                                                        Module
+                                                        Competition
                                                     </button>
                                                 </div>
                                             </div>
@@ -116,23 +116,23 @@
                         <% } %>
 
                         <div class="announcement-row">
-                            <% if (module.likes.includes(currentUser._id)) { %>
-                                <span id="announcement-like-row"><i id="like-<%= module._id %>-show"
-                                                                    onclick="like(this, 'module', 'modules')"
+                            <% if (competition.likes.includes(currentUser._id)) { %>
+                                <span id="announcement-like-row"><i id="like-<%= competition._id %>-show"
+                                                                    onclick="like(this, 'competition', 'competitions')"
                                                                     class="fas fa-thumbs-up liked-announcement"></i> <span
                                             id="like-count"
-                                            class="likeCount-<%= module._id %>"><%= module.likes.length %></span></span>
+                                            class="likeCount-<%= competition._id %>"><%= competition.likes.length %></span></span>
 
                             <% } else { %>
-                                <span id="announcement-like-row"><i id="like-<%= module._id %>-show"
-                                                                    onclick="like(this, 'module', 'modules')"
+                                <span id="announcement-like-row"><i id="like-<%= competition._id %>-show"
+                                                                    onclick="like(this, 'competition', 'competitions')"
                                                                     class="fas fa-thumbs-up unliked-announcement"></i> <span
                                             id="like-count"
-                                            class="likeCount-<%= module._id %>"><%= module.likes.length %></span></span>
+                                            class="likeCount-<%= competition._id %>"><%= competition.likes.length %></span></span>
 
                             <% } %>
                             <a id="comments-count-icon" class="comment-button" href="#comment-section"><i
-                                        class="fas fa-comment-dots"></i> <%= module.comments.length %></a>
+                                        class="fas fa-comment-dots"></i> <%= competition.comments.length %></a>
                         </div>
 
                     <% } %>
@@ -143,15 +143,15 @@
                     <div class="ann-images">
                         <h4 style="float: left;">Slides</h4><br>
                         <ol>
-                            <% for (let slide of module.slides) { %>
-                                <li><a href="<%=slide%>" target="_blank" style="color: darkblue"><%=slide%></a></li>
+                            <% for (let link of competition.links) { %>
+                                <li><a href="<%=link%>" target="_blank" style="color: darkblue"><%=link%></a></li>
                             <% } %>
                         </ol>
 
-                        <% for (let img of module.images) { %>
+                        <% for (let img of competition.images) { %>
                             <img src="<%= img %>" alt="Attached Image" class="img-fluid rounded">
                         <% } %>
-                        <% for (let media of module.mediaFiles) { %>
+                        <% for (let media of competition.mediaFiles) { %>
                             <% if (media.filename) { %>
                                 <% if ([".png", ".jpg", ".jpeg", ".gif"].includes(fileExtensions.get(media.url).toLowerCase())) { %>
                                     <img src="<%= media.url %>" alt="Attached Image" class="img-fluid rounded">
@@ -179,9 +179,9 @@
 
             <% if (currentUser) { %>
                 <article class="ann-container" id="comment-section">
-                    <h3 id="comments-heading">Comments (<%= module.comments.length %>)</h3>
+                    <h3 id="comments-heading">Comments (<%= competition.comments.length %>)</h3>
 
-                    <form id="form-<%= module._id %>" onsubmit="comment(this, 'module', 'modules', event)">
+                    <form id="form-<%= competition._id %>" onsubmit="comment(this, 'competition', 'competitions', event)">
                         <div class="input-group comment-input-field">
                             <input type="text" aria-describedby="send-button"
                                    class="form-control rounded-0 border-0 py-4"
@@ -198,7 +198,7 @@
 
                     <div id="all-comments">
 
-                        <% for (let comment of module.comments.reverse()) { %>
+                        <% for (let comment of competition.comments.reverse()) { %>
                             <% if (comment.sender && comment.sender._id.equals(currentUser._id)) { %>
                                 <!-- Reciever Message-->
                                 <div class="media mb-2 receiver-message">
@@ -222,14 +222,14 @@
 
                                         <% if (comment.likes.includes(currentUser._id)) { %>
                                             <span class="liked-comment" id="likeComment-<%= comment._id %>"
-                                                  onclick="likeComment(this, 'module', 'modules')"><i class="fas fa-thumbs-up"></i></span>
+                                                  onclick="likeComment(this, 'competition', 'competitions')"><i class="fas fa-thumbs-up"></i></span>
                                             <span
                                                     class="like-count-comment"
                                                     id="likeCountComment-<%= comment._id %>"><%= comment.likes.length %></span>
 
                                         <% } else { %>
                                             <span class="unliked-comment" id="likeComment-<%= comment._id %>"
-                                                  onclick="likeComment(this, 'module', 'modules')"><i class="fas fa-thumbs-up"></i></span>
+                                                  onclick="likeComment(this, 'competition', 'competitions')"><i class="fas fa-thumbs-up"></i></span>
                                             <span
                                                     class="like-comment-comment"
                                                     id="likeCountComment-<%= comment._id %>"><%= comment.likes.length %></span>
@@ -266,13 +266,13 @@
 
                                     <% if (comment.likes.includes(currentUser._id)) { %>
                                         <span class="liked-comment" id="likeComment-<%= comment._id %>"
-                                              onclick="likeComment(this, 'module', 'modules')"><i class="fas fa-thumbs-up"></i></span> <span
+                                              onclick="likeComment(this, 'competition', 'competitions')"><i class="fas fa-thumbs-up"></i></span> <span
                                                 class="like-count-comment"
                                                 id="likeCountComment-<%= comment._id %>"><%= comment.likes.length %></span>
 
                                     <% } else { %>
                                         <span class="unliked-comment" id="likeComment-<%= comment._id %>"
-                                              onclick="likeComment(this, 'module', 'modules')"><i class="fas fa-thumbs-up"></i></span> <span
+                                              onclick="likeComment(this, 'competition', 'competitions')"><i class="fas fa-thumbs-up"></i></span> <span
                                                 class="like-comment-comment"
                                                 id="likeCountComment-<%= comment._id %>"><%= comment.likes.length %></span>
                                     <% } %>

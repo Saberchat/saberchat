@@ -43,11 +43,20 @@
     <div class="row">
         <div class="col-12">
             <div class="jumbotron text-center header">
-                <h1><i class="fas fa-sticky-note"></i> Modules</h1>
-                <p>All Modules For Our Curriculum</p>
-                <a href="/modules/new" class="btn btn-primary announcement-button">
-                    <i class="fas fa-plus-circle"></i> Create New Module
+                <h1><i class="fas fa-trophy"></i> Competitions</h1>
+                <p>All <% if (activeSearch) { %>Active<% } else {%>Past<%}%> Competitions <%=platform.name%> Is Part Of</p>
+                <a href="/competitions/new" class="btn btn-primary announcement-button">
+                    <i class="fas fa-plus-circle"></i> Add New Competition
                 </a>
+                <% if (activeSearch) { %>
+                    <a href="/competitions?past=true" class="btn btn-danger announcement-button">
+                        <i class="fas fa-arrow-left"></i> View Past Competitions
+                    </a>
+                <% } else { %>
+                    <a href="/competitions" class="btn btn-success announcement-button">
+                        <i class="fas fa-arrow-right"></i> View Current Competitions
+                    </a>
+                <% } %>
             </div>
         </div>
     </div>
@@ -55,51 +64,51 @@
     <div class="search-filter mb-3 search">
         <i class="fas fa-search"></i>
         <input id="search-input" oninput="searchFunction()" class="form-control search" type="text"
-               placeholder="Search..." title="Type in module segment"/>
+               placeholder="Search..." title="Type in competition segment"/>
     </div>
     <br/>
 
-    <% modules.forEach(module => { %>
+    <% competitions.forEach(competition => { %>
 
         <div class="row">
             <div class="col-lg-12">
-                <article class="text-block color: black" id="<%= module._id %>">
+                <article class="text-block color: black" id="<%= competition._id %>">
                     <div class="block-header grey">
                         <h5 style="margin-bottom: 20px;">
 
-                            <a class="announcement-button" href="/modules/<%= module._id %>">
-                                <span class="announcement-subject-header"><%= module.subject %></span>
+                            <a class="announcement-button" href="/competitions/<%= competition._id %>">
+                                <span class="announcement-subject-header"><%= competition.subject %></span>
                             </a>
-                            <span class="float-right announcement-date"><%= module.date %></span>
+                            <span class="float-right announcement-date"><%= competition.date %></span>
                         </h5>
 
                         <div class="bottom-text">
-                            <a class="announcement-sender" href="../profiles/<%= module.sender._id %>">
-                                <img src="<% if (module.sender.mediaFile.display) {%> <%= module.sender.mediaFile.url%><%} else {%> <%=module.sender.imageUrl.url%><%}%>" alt="profile pic"
+                            <a class="announcement-sender" href="../profiles/<%= competition.sender._id %>">
+                                <img src="<% if (competition.sender.mediaFile.display) {%> <%= competition.sender.mediaFile.url%><%} else {%> <%=competition.sender.imageUrl.url%><%}%>" alt="profile pic"
                                         class="sender-profile-image">
-                                <%= module.sender.firstName %> <%= module.sender.lastName %>
+                                <%= competition.sender.firstName %> <%= competition.sender.lastName %>
                             </a>
-                            <% if (currentUser._id.toString() == module.sender._id.toString()) { %>
+                            <% if (currentUser._id.toString() == competition.sender._id.toString()) { %>
                                 <button type="button" class="edit-button btn btn-info"><a
                                             class="announcement-button"
-                                            href="/modules/<%= module._id %>/edit"><i
+                                            href="/competitions/<%= competition._id %>/edit"><i
                                                 class="fas fa-cog"></i> Edit</a></button>
 
-                                <form action="/modules/<%= module._id %>?_method=delete" method="post" style="display: inline-block;"
-                                        class="delete-module">
+                                <form action="/competitions/<%= competition._id %>?_method=delete" method="post" style="display: inline-block;"
+                                        class="delete-competition">
                                     <button class="btn btn-danger announcement-button" type="button"
                                             data-toggle="modal"
-                                            data-target="#modal-<%= module._id %>"><i
+                                            data-target="#modal-<%= competition._id %>"><i
                                                 class="far fa-trash-alt"></i>
                                         Delete
                                     </button>
-                                    <div class="modal fade" id="modal-<%= module._id %>" tabindex="-1"
+                                    <div class="modal fade" id="modal-<%= competition._id %>" tabindex="-1"
                                             aria-labelledby="deleteModalLabel" aria-hidden="true">
                                         <div class="modal-dialog">
                                             <div class="modal-content mode">
                                                 <div class="modal-header mode">
                                                     <h5 class="modal-title" id="exampleModalLabel">Delete
-                                                        Module?</h5>
+                                                        Competition?</h5>
                                                     <button type="button" class="close mode" data-dismiss="modal"
                                                             aria-label="Close">
                                                         <span aria-hidden="true">&times;</span>
@@ -108,7 +117,7 @@
                                                 <div class="modal-body mode">
                                                     This action is irreversible. You will have to manually recreate
                                                     this
-                                                    module.
+                                                    competition.
                                                 </div>
                                                 <div class="modal-footer mode">
                                                     <button type="button" class="btn btn-secondary"
@@ -116,7 +125,7 @@
                                                         Go Back
                                                     </button>
                                                     <button type="submit" class="btn btn-danger">Yes, Delete
-                                                        Module
+                                                        Competition
                                                     </button>
                                                 </div>
                                             </div>
@@ -125,37 +134,37 @@
                                 </form>
                             <% } %>
 
-                            <% if (module.likes.includes(currentUser._id)) { %>
-                                <span class="liked-button"><i id="like-<%= module._id %>-index"
-                                                                onclick="like(this, 'module', 'modules')"
+                            <% if (competition.likes.includes(currentUser._id)) { %>
+                                <span class="liked-button"><i id="like-<%= competition._id %>-index"
+                                                                onclick="like(this, 'competition', 'competitions')"
                                                                 class="fas fa-thumbs-up"></i></span> <span
-                                        class="likeCount-<%= module._id %>"><%= module.likes.length %></span>
+                                        class="likeCount-<%= competition._id %>"><%= competition.likes.length %></span>
 
                             <% } else { %>
-                                <span class="unliked-button"><i id="like-<%= module._id %>-index"
-                                                                onclick="like(this, 'module', 'modules')"
+                                <span class="unliked-button"><i id="like-<%= competition._id %>-index"
+                                                                onclick="like(this, 'competition', 'competitions')"
                                                                 class="fas fa-thumbs-up"></i></span> <span
-                                        class="likeCount-<%= module._id %>"><%= module.likes.length %></span>
+                                        class="likeCount-<%= competition._id %>"><%= competition.likes.length %></span>
 
                             <% } %>
-                            <a class="comment-button" href="/modules/<%= module._id %>#comment-section"><i
-                                        class="fas fa-comment-dots"></i> <%= module.comments.length %></a>
+                            <a class="comment-button" href="/competitions/<%= competition._id %>#comment-section"><i
+                                        class="fas fa-comment-dots"></i> <%= competition.comments.length %></a>
                         </div>
                     </div>
 
                     <div class="block-content mode">
-                        <% if (module.text.split(" ").length > 30) { %>
-                            <p class="announcement-text"><%= module.text.split(" ").slice(0, 31).join(" ") %> <a
-                                        href="/modules/<%= module._id %>">(Read More)</a></p>
+                        <% if (competition.text.split(" ").length > 30) { %>
+                            <p class="announcement-text"><%= competition.text.split(" ").slice(0, 31).join(" ") %> <a
+                                        href="/competitions/<%= competition._id %>">(Read More)</a></p>
                         <% } else { %>
-                            <p class="announcement-text"><%= module.text %></p>
+                            <p class="announcement-text"><%= competition.text %></p>
                         <% } %>
 
                     </div>
                 </article>
             </div>
         </div>
-        <br class="text-break" id="break-<%= module._id %>"/>
+        <br class="text-break" id="break-<%= competition._id %>"/>
 
     <% }) %>
 </div>

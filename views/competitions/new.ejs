@@ -37,9 +37,9 @@
     <div class="row">
         <div class="col-12">
           <div class="jumbotron text-center header">
-            <h1><i class="fas fa-sticky-note"></i> Create Module</h1>
-            <p>Post a new module for your curriculum</p>
-            <a class="btn btn-primary" href="/modules"><i class="fas fa-arrow-left"></i> Back</a>
+            <h1><i class="fas fa-trophy"></i> Add Competition</h1>
+            <p>Add a new competition that <%=platform.name%> is part of</p>
+            <a class="btn btn-primary" href="/competitions"><i class="fas fa-arrow-left"></i> Back</a>
           </div>
 
         </div>
@@ -50,10 +50,10 @@
 <div class="row">
 	<div class="col-md-8 offset-md-2 col-12">
 		<div class="form-container">
-			<form action="/modules/" method="post" enctype="multipart/form-data">
+			<form action="/competitions/" method="post" enctype="multipart/form-data">
 				<div class="form-group mode">
 					<label for="subject">Subject</label>
-					<input type="text" class="form-control mode" name="subject" placeholder="Module Subject" maxlength="50" required>
+					<input type="text" class="form-control mode" name="subject" placeholder="Competition Subject" maxlength="50" required>
 				</div><br />
 
 				<div class="form-group mode">
@@ -62,8 +62,30 @@
 				</div>
         <br>
 
+        <div class="form-group mode">
+          <label for="update-time-input">Date/Deadline</label><br/>
+          <select name="month" class="mode" style="width: 30%;">
+          <% let months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];%>
+          <% for (let month of months) { %>
+              <option value="<%=months.indexOf(month)%>"><%=month%></option>
+          <% } %>
+          </select>
+          <select name="day" class="mode" style="width: 10%;">
+          <% for (let i = 1; i <= 31; i++) { %>
+              <option value="<%=i%>" ><%=i%></option>
+          <% } %>
+          </select>
+          <select name="year" class="mode" style="width: 10%;">
+            <% let year;%>
+            <% for (let i = 0; i <= 5; i++) { %>
+                <% year = parseInt((new Date()).toString().split(' ')[3]);%>
+                <option value="<%=year+i%>" <%=year%>><%=year+i%></option>
+            <% } %>
+            </select>
+      </div><br>
+
         <div id="slide-header">
-					<button type="button" onclick="addSlide()" class="btn btn-primary"><i class="fas fa-plus"></i> Slide URL</button>
+					<button type="button" onclick="addSlide()" class="btn btn-primary"><i class="fas fa-plus"></i> Link</button>
 					<br/><br/>
 				</div>
 				<div id="slides"></div>
