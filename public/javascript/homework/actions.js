@@ -240,7 +240,6 @@ const markPayment = function(button) {
             }
             document.getElementById("cost").innerText = data.cost;
         } else {
-            console.log(data.error);
         }
     });
 }
@@ -561,13 +560,8 @@ const mark = function (button) { //MArk a student's lesson
 
             let experience = 0;
             for (let lesson of data.lessons) {
-                console.log(lesson)
-                console.log(lesson.time)
                 experience += lesson.time;
-                console.log(experience)
             }
-            console.log(experience)
-
             document.getElementById("experience").innerText = getTime(experience); //Set tutor's experience to newly formatted experience
             $(`#modal-${studentId}-mark`).modal('hide');
         }

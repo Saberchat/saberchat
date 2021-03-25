@@ -1,5 +1,5 @@
 const slideContainer = document.getElementById('slides');
-let j = document.getElementsByClassName("image-group").length-1;
+let j = document.getElementsByClassName("image-group").length;
 
 const addSlide = function () { //Add slide input field
     const slide = document.createElement('div');

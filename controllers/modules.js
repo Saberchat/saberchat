@@ -162,7 +162,7 @@ controller.updateModule = async function(req, res) {
     updatedModule.slides = [];
     if (req.body.slides) {
         for (let slide in req.body.slides) {
-            if (slide) {
+            if (req.body.slides[slide]) {
                 updatedModule.slides.push(req.body.slides[slide]);
             }
         }

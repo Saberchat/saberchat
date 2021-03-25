@@ -144,7 +144,10 @@
                         <h4 style="float: left;">Slides</h4><br>
                         <ol><br>
                             <% for (let slide of module.slides) { %>
-                                <li style="text-align: left;"><a href="<%=slide%>" target="_blank" style="color: darkblue"><%=slide%></a></li>
+                                <li style="text-align: left;">
+                                    <a href="<%=slide%>" target="_blank" style="color: darkblue"><%=slide%></a>
+                                    <br><iframe style="margin-bottom: 20px;" src="<%=slide%>/embed" frameborder="0" width="500" height="300"></iframe>
+                                </li>
                             <% } %>
                         </ol><br>
 
