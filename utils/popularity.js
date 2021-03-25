@@ -1,4 +1,5 @@
 //Popularity Functions can be used to calculate and sort popularity for projects, cafe items, tutors, etc.
+const {equateObjects} = require("../utils/object-operations");
 const package = {};
 
 // Takes an array of objects and outputs the average popularity coefficient (likes per day)

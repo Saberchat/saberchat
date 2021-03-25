@@ -142,11 +142,11 @@
                     <hr>
                     <div class="ann-images">
                         <h4 style="float: left;">Slides</h4><br>
-                        <ol>
+                        <ol><br>
                             <% for (let slide of module.slides) { %>
-                                <li><a href="<%=slide%>" target="_blank" style="color: darkblue"><%=slide%></a></li>
+                                <li style="text-align: left;"><a href="<%=slide%>" target="_blank" style="color: darkblue"><%=slide%></a></li>
                             <% } %>
-                        </ol>
+                        </ol><br>
 
                         <% for (let img of module.images) { %>
                             <img src="<%= img %>" alt="Attached Image" class="img-fluid rounded">

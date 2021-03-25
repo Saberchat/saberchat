@@ -77,7 +77,7 @@
                         <h5 style="margin-bottom: 20px;">
 
                             <a class="announcement-button" href="/competitions/<%= competition._id %>">
-                                <span class="announcement-subject-header"><%= competition.subject %></span>
+                                <span class="announcement-subject-header"><%= competition.subject %> (Deadline <%= parseInt(competition.deadline.month)+1%>/<%= competition.deadline.day%>/<%= competition.deadline.year%>)</span>
                             </a>
                             <span class="float-right announcement-date"><%= competition.date %></span>
                         </h5>

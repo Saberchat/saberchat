@@ -1,5 +1,3 @@
-//TEST
-
 // set up env vars if in local developmeent
 if (process.env.NODE_ENV !== "production") {
     require('dotenv').config();

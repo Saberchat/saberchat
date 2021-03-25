@@ -81,13 +81,17 @@ controller.create = async function(req, res) {
 
     if (req.body.images) { //If any images were added (if not, the 'images' property is null)
         for (let image in req.body.images) {
-            module.images.push(req.body.images[image]);
+            if (image) {
+                module.images.push(req.body.images[image]);
+            }
         }
     }
 
     if (req.body.slides) {
         for (let slide in req.body.slides) {
-            module.slides.push(req.body.slides[slide]);
+            if (slide) {
+                module.slides.push(req.body.slides[slide]);
+            }
         }
     }
 
@@ -149,14 +153,18 @@ controller.updateModule = async function(req, res) {
     updatedModule.images = []; //Empty image array so that you can fill it with whatever images are added (all images are there, not just new ones)
     if (req.body.images) { //Only add images if any are provided
         for (let image in req.body.images) {
-            updatedModule.images.push(req.body.images[image]);
+            if (image) {
+                updatedModule.images.push(req.body.images[image]);
+            }
         }
     }
 
-    updatedModule.images = [];
+    updatedModule.slides = [];
     if (req.body.slides) {
         for (let slide in req.body.slides) {
-            updatedModule.slides.push(req.body.slides[slide]);
+            if (slide) {
+                updatedModule.slides.push(req.body.slides[slide]);
+            }
         }
     }
 

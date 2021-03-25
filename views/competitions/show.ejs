@@ -54,7 +54,7 @@
         <div class="col-12">
             <article class="ann-container">
                 <div class="ann-head">
-                    <h1><%= competition.subject %></h1>
+                    <h1><%= competition.subject %> (<% if (version) {%> Active <% } else { %> Past <% } %>)</h1>
 
                     <% if (currentUser) { %>
                         <a id="sender-info" class="darkmode-header" href="../profiles/<%= competition.sender._id %>">
@@ -72,6 +72,7 @@
                     <% } %>
 
                     <span><%= competition.date %></span>
+                    <span>Deadline: <%= parseInt(competition.deadline.month)+1%>/<%= competition.deadline.day%>/<%= competition.deadline.year%></span>
 
                     <% if (currentUser) { %>
                         <% if(competition.sender._id.equals(currentUser._id)) { %>
@@ -141,12 +142,12 @@
                     <p class="announcement-text convertible-text"><%= convertedText %></p>
                     <hr>
                     <div class="ann-images">
-                        <h4 style="float: left;">Slides</h4><br>
-                        <ol>
+                        <h4 style="float: left;">Links</h4><br>
+                        <ol><br>
                             <% for (let link of competition.links) { %>
-                                <li><a href="<%=link%>" target="_blank" style="color: darkblue"><%=link%></a></li>
+                                <li style="text-align: left;"><a href="<%=link%>" target="_blank" style="color: darkblue"><%=link%></a></li>
                             <% } %>
-                        </ol>
+                        </ol><br>
 
                         <% for (let img of competition.images) { %>
                             <img src="<%= img %>" alt="Attached Image" class="img-fluid rounded">

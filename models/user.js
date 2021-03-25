@@ -25,7 +25,7 @@ module.exports = mongoose.model("User", new mongoose.Schema({
         display: {type: Boolean, default: false}
     },
     imageUrl: {
-        url: {type: String, default: 'https://wallpaper.dog/large/11001671.jpg'},
+        url: {type: String, default: 'https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_640.png'},
         display: {type: Boolean, default: true}
     },
     mediaFile: {

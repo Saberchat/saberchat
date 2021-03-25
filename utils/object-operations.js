@@ -4,8 +4,8 @@ const package = {};
 package.equateObjects = function(objects, property) { //Find overlapping objects, based on the equality of one array property
     let sortedObjects = new Map();
     let sortedMatrix = [];
-
     for (let object of objects) { //Iterate through objects
+
         if (sortedObjects.has(object[property].sort().toString())) { //If map already has object, add 1
             sortedObjects.set(object[property].sort().toString(), sortedObjects.get(object[property].sort().toString())+1);
         } else {

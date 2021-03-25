@@ -127,8 +127,10 @@ controller.create = async function(req, res) {
     }
 
     if (req.body.images) { //If any images were added (if not, the 'images' property is null)
-        for (const image in req.body.images) {
-            announcement.images.push(req.body.images[image]);
+        for (let image in req.body.images) {
+            if (image) {
+                announcement.images.push(req.body.images[image]);
+            }
         }
     }
 
@@ -210,8 +212,10 @@ controller.updateAnnouncement = async function(req, res) {
 
     updatedAnnouncement.images = []; //Empty image array so that you can fill it with whatever images are added (all images are there, not just new ones)
     if (req.body.images) { //Only add images if any are provided
-        for (const image in req.body.images) {
-            updatedAnnouncement.images.push(req.body.images[image]);
+        for (let image in req.body.images) {
+            if (image) {
+                updatedAnnouncement.images.push(req.body.images[image]);
+            }
         }
     }
 

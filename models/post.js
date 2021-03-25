@@ -43,7 +43,6 @@ module.exports = { //All subclass Schema
         slides: [{type: String}]
     })),
     Competition: Post.discriminator("Competition", new mongoose.Schema({ //Curriculum with attached information
-        active: {type: Boolean, default: true},
         links: [{type: String}],
         deadline: {day: String, month: String, year: String}
     }))

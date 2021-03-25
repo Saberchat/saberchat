@@ -16,17 +16,25 @@ const controller = {};
 // Competition GET index
 controller.index = async function(req, res) {
     const platform = await setup(Platform);
-    let competitions;
-    let activeSearch = true;
-    if (req.query.past) {
-        competitions = await Competition.find({active: false}).populate('sender');
-        activeSearch = false;
-    } else {
-        competitions = await Competition.find({active: true}).populate('sender');
+    const competitions = await Competition.find({}).populate('sender');
+    if(!platform || !competitions) {req.flash('error', 'Cannot find competitions.'); return res.redirect('back');}
+
+    let current = [];
+    let past = [];
+    let date;
+    for (let competition of competitions) {
+        date = new Date(parseInt(competition.deadline.year), parseInt(competition.deadline.month)-1, parseInt(competition.deadline.day));
+        if (date.getTime > new Date().getTime()) {
+            past.push(competition);
+        } else {
+            current.push(competition);
+        }
     }
 
-    if(!platform || !competitions) {req.flash('error', 'Cannot find competitions.'); return res.redirect('back');}
-    return res.render('competitions/index', {platform, competitions: competitions.reverse(), activeSearch});
+    if (req.query.past) {
+        return res.render('competitions/index', {platform, competitions: past.reverse(), activeSearch: false});   
+    }
+    return res.render('competitions/index', {platform, competitions: current.reverse(), activeSearch: true});
 };
 
 // Competition GET new competition
@@ -50,12 +58,15 @@ controller.show = async function(req, res) {
         });
     if(!platform || !competition) {req.flash('error', 'Could not find competition'); return res.redirect('back');}
 
+    let date = new Date(parseInt(competition.deadline.year), parseInt(competition.deadline.month)-1, parseInt(competition.deadline.day));
+    let version = (date.getTime < new Date().getTime());
+
     let fileExtensions = new Map(); //Track which file format each attachment is in
     for (let media of competition.mediaFiles) {
         fileExtensions.set(media.url, path.extname(media.url.split("SaberChat/")[1]));
     }
     const convertedText = convertToLink(competition.text); //Parse and add hrefs to all links in text
-    return res.render('competitions/show', {platform, competition, convertedText, fileExtensions});
+    return res.render('competitions/show', {platform, competition, convertedText, fileExtensions, version});
 };
 
 // Competition GET edit form
@@ -94,13 +105,17 @@ controller.create = async function(req, res) {
 
     if (req.body.images) { //If any images were added (if not, the 'images' property is null)
         for (let image in req.body.images) {
-            competition.images.push(req.body.images[image]);
+            if (image) {
+                competition.images.push(req.body.images[image]);
+            }
         }
     }
 
     if (req.body.slides) {
         for (let link in req.body.slides) {
-            competition.links.push(req.body.slides[link]);
+            if (link) {
+                competition.links.push(req.body.slides[link]);
+            }
         }
     }
 
@@ -153,6 +168,11 @@ controller.updateCompetition = async function(req, res) {
     const updatedCompetition = await Competition.findByIdAndUpdate(req.params.id, {
         subject: req.body.subject,
         text: req.body.message,
+        deadline: {
+            day: req.body.day,
+            month: req.body.month,
+            year: req.body.year
+        }
     });
     if (!updatedCompetition) {
         req.flash('error', "Unable to update competition");
@@ -162,14 +182,18 @@ controller.updateCompetition = async function(req, res) {
     updatedCompetition.images = []; //Empty image array so that you can fill it with whatever images are added (all images are there, not just new ones)
     if (req.body.images) { //Only add images if any are provided
         for (let image in req.body.images) {
-            updatedCompetition.images.push(req.body.images[image]);
+            if (image) {
+                updatedCompetition.images.push(req.body.images[image]);
+            }
         }
     }
 
-    updatedCompetition.images = [];
+    updatedCompetition.links = [];
     if (req.body.slides) {
-        for (let link in req.body.slides) {
-            updatedCompetition.links.push(req.body.slides[link]);
+        for (let link of req.body.slides) {
+            if (link) {
+                updatedCompetition.links.push(link);
+            }
         }
     }
 

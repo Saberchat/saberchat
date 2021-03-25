@@ -45,4 +45,5 @@ const createImg = function (val) { //Creates an image based on value of image in
 const deleteImg = function (btn) { //Remove input field and corresponding image
     const parent = btn.parentNode;
     parent.remove();
+    i--;
 }

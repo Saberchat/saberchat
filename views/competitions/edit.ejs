@@ -54,12 +54,34 @@
               <textarea class="form-control mode" name="message" rows="5" placeholder="What it is about..." required><%= competition.text %></textarea>
             </div>
 
+            <div class="form-group mode">
+              <label for="update-time-input">Date/Deadline</label><br/>
+              <select name="month" class="mode" style="width: 30%;">
+              <% let months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];%>
+              <% for (let month of months) { %>
+                  <option value="<%=months.indexOf(month)%>" <% if (competition.deadline.month == months.indexOf(month)) {%> selected <% } %>><%=month%></option>
+              <% } %>
+              </select>
+              <select name="day" class="mode" style="width: 10%;">
+              <% for (let i = 1; i <= 31; i++) { %>
+                  <option value="<%=i%>" <% if (competition.deadline.day == i) {%> selected <% } %>><%=i%></option>
+              <% } %>
+              </select>
+              <select name="year" class="mode" style="width: 10%;">
+                <% let year;%>
+                <% for (let i = 0; i <= 5; i++) { %>
+                    <% year = parseInt((new Date()).toString().split(' ')[3]);%>
+                    <option value="<%=year+i%>" <% if (parseInt(competition.deadline.year) == year+i) {%> selected <% } %>><%=year+i%></option>
+                <% } %>
+                </select>
+          </div><br>
+
             <div id="slide-header">
               <button type="button" onclick="addSlide()" class="btn btn-primary"><i class="fas fa-plus"></i> Link</button>
               <br/><br/>
             </div>
             <div id="slides">
-              <% let reversedSlides = competition.slides.reverse() %>
+              <% let reversedSlides = competition.links.reverse() %>
               <% for( let i = 0; i < reversedSlides.length; i++ ) { %>
                   <div class="image-group">
                       <div class="input-container" id="slideblock-<%= reversedSlides.length - (i + 1) %>">
