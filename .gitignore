@@ -3,9 +3,12 @@
 # for mac
 .DS_Store
 # don't know what this is for, seems like webstorm
+# yes this is for webstorm
 .idea/
 # for npm
 node_modules/
 # for vscode settings stuff
 jsconfig.json
 settings.json
+# for the server restart script present only on the production server
+restart

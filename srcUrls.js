@@ -6,10 +6,12 @@ module.exports.scriptUrls = [
     "https://unpkg.com/", // popper
     "https://cdnjs.cloudflare.com/", // popper, datetime
     "https://ajax.googleapis.com/", // jquery
-    "https://www.googletagmanager.com/" // google analytics
+    "https://www.googletagmanager.com/", // google analytics
+    "https://cdn.jsdelivr.net/" // JSDelivr
 ];
 
 module.exports.styleUrls = [
     "https://stackpath.bootstrapcdn.com/",
-    "https://maxcdn.bootstrapcdn.com/"
+    "https://maxcdn.bootstrapcdn.com/",
+    "data:"
 ];
