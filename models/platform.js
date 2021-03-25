@@ -4,6 +4,7 @@ const mongoose = require("mongoose");
 var platformSchema = new mongoose.Schema({
     name: String,
     imageUrl: String,
+    principal: String,
     emailExtension: {type: String, default: ''},
     updateTime: {type: String, default: "0 0"},
     navDark: {type: Boolean, default: false},

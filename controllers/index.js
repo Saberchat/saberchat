@@ -109,6 +109,21 @@ controller.register = async function(req, res) {
         req.flash("error", "An Error Occurred");
         return res.redirect("/");
     }
+
+    if (`${user.firstName} ${user.lastName}`.toLowerCase() == platform.principal.toLowerCase()) {
+        const principals = await User.find({permission: platform.permissionsProperty[platform.permissionsProperty.length-1]});
+        if (!principals) {
+            req.flash("error", "An Error Occurred");
+            return res.redirect("/");
+        }
+        for (let principal of principals) {
+            principal.permission = platform.permissionsProperty[platform.permissionsProperty.length-2];
+            await principal.save();
+        }
+        user.permission = platform.permissionsProperty[platform.permissionsProperty.length-1];
+        await user.save();
+    }
+
     await sendGridEmail(user.email, 'Verify Saberchat Account', `<p>Hello ${newUser.firstName},</p><p>Welcome to Saberchat! A confirmation of your account:</p><ul><li>Your username is ${newUser.username}.</li><li>Your full name is ${newUser.firstName} ${newUser.lastName}.</li><li>Your linked email is ${newUser.email}</li></ul><p>Click <a href="https://saberchat.net/authenticate/${newUser._id}?token=${token}">this link</a> to verify your account.</p>`, true);
 
     // if registration is successful, login user.
