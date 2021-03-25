@@ -210,7 +210,9 @@ controller.update = async function(req, res) {
 				}
 			}
 
-			[cloudErr, cloudResult] = await cloudUpload(req.files.mediaFile[0], "image");
+			const file = req.files.mediaFile[0];
+            const processedBuffer = await autoCompress(file.originalname, file.buffer);
+            [cloudErr, cloudResult] = await cloudUpload(file.originalname, processedBuffer);
 			if (cloudErr || !cloudResult) {
 					req.flash('error', 'Upload failed');
 					return res.redirect('back');
@@ -218,7 +220,7 @@ controller.update = async function(req, res) {
 			user.mediaFile = { //Update mediaFile info with cloudinary upload URL
 				filename: cloudResult.public_id,
 				url: cloudResult.secure_url,
-				originalName: req.files.mediaFile[0].originalname,
+				originalName: file.originalname,
 				display: req.body.showProfileImage == "upload"
 			};
 		}
@@ -232,7 +234,9 @@ controller.update = async function(req, res) {
 				}
 			}
 
-			[cloudErr, cloudResult] = await cloudUpload(req.files.mediaFile2[0], "image");
+			const file2 = req.files.mediaFile2[0];
+            const processedBuffer2 = await autoCompress(file2.originalname, file2.buffer);
+            [cloudErr, cloudResult] = await cloudUpload(file2.originalname, processedBuffer2);
 			if (cloudErr || !cloudResult) {
 				req.flash('error', 'Upload failed');
 				return res.redirect('back');
@@ -240,7 +244,7 @@ controller.update = async function(req, res) {
 			user.bannerFile = { //Update bannerFile info with cloudinary upload URL
 				filename: cloudResult.public_id,
 				url: cloudResult.secure_url,
-				originalName: req.files.mediaFile2[0].originalname,
+				originalName: file2.originalname,
 				display: req.body.showBannerImage == "upload"
 			};
 		}

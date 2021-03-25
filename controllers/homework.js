@@ -70,7 +70,9 @@ controller.createCourse = async function(req, res) {
     //If thumbnail file has been uploaded, set it up with cloudinary
     if (req.files) {
         if (req.files.mediaFile) {
-            let [cloudErr, cloudResult] = await cloudUpload(req.files.mediaFile[0], "image");
+            const file = req.files.mediaFile[0];
+            const processedBuffer = await autoCompress(file.originalname, file.buffer);
+            const [cloudErr, cloudResult] = await cloudUpload(file.originalname, processedBuffer);
             if (cloudErr || !cloudResult) {
                 req.flash("error", "Upload failed");
                 return res.redirect("back");
@@ -79,7 +81,7 @@ controller.createCourse = async function(req, res) {
             course.thumbnailFile = {
                 filename: cloudResult.public_id,
                 url: cloudResult.secure_url,
-                originalName: req.files.mediaFile[0].originalname,
+                originalName: file.originalname,
                 display: req.body.showThumbnail == "upload"
             };
             await course.save();
@@ -280,7 +282,9 @@ controller.updateSettings = async function(req, res) {
         }
 
         if (req.files.mediaFile) {
-            [cloudErr, cloudResult] = await cloudUpload(req.files.mediaFile[0], "image");
+            const file = req.files.mediaFile[0];
+            const processedBuffer = await autoCompress(file.originalname, file.buffer);
+            [cloudErr, cloudResult] = await cloudUpload(file.originalname, processedBuffer);
             if (cloudErr || !cloudResult) {
                 req.flash("error", "Upload failed");
                 return res.redirect("back");
@@ -289,7 +293,7 @@ controller.updateSettings = async function(req, res) {
             course.thumbnailFile = { //Update thumbnail display
                 filename: cloudResult.public_id,
                 url: cloudResult.secure_url,
-                originalName: req.files.mediaFile[0].originalname,
+                originalName: file.originalname,
                 display: req.body.showThumbnail == "upload"
             };
         }

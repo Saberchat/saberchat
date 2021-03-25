@@ -5,6 +5,7 @@ if (process.env.NODE_ENV !== "production") {
 const {parseBuffer} = require('./dataUri');
 const cloudinary = require('cloudinary').v2;
 const util = require('util');
+const path = require('path');
 
 cloudinary.config({
     cloud_name: process.env.CLOUDINARY_NAME,
@@ -15,11 +16,17 @@ cloudinary.config({
 const cloudUploader = util.promisify(cloudinary.uploader.upload);
 const cloudDestroyer = util.promisify(cloudinary.uploader.destroy);
 
-module.exports.cloudUpload = async function (file, type) {
-    const imgFile = parseBuffer(file.originalname, file.buffer).content; // turn file into buffer
+module.exports.cloudUpload = async function (fileName, fileBuffer) {
+    const imgFile = parseBuffer(fileName, fileBuffer).content; // turn file into buffer
     const options = {folder: 'SaberChat'}; // upload to cloudinary
-    if (type == "video") {
+    let type = 'image';
+    const extension = path.extname(fileName).toLowerCase();
+
+    if ([".mp3", ".mp4", ".m4a", ".mov"].includes(extension)) {
+        type = 'video'
         options.resource_type = type;
+    } else if (extension == ".pdf") {
+        type = 'pdf';
     }
 
     let error;
