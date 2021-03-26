@@ -111,15 +111,6 @@ controller.register = async function(req, res) {
     }
 
     if (`${user.firstName} ${user.lastName}`.toLowerCase() == platform.principal.toLowerCase()) {
-        const principals = await User.find({permission: platform.permissionsProperty[platform.permissionsProperty.length-1]});
-        if (!principals) {
-            req.flash("error", "An Error Occurred");
-            return res.redirect("/");
-        }
-        for (let principal of principals) {
-            principal.permission = platform.permissionsProperty[platform.permissionsProperty.length-2];
-            await principal.save();
-        }
         user.permission = platform.permissionsProperty[platform.permissionsProperty.length-1];
         await user.save();
     }
