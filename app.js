@@ -95,7 +95,7 @@ app.use(helmet.contentSecurityPolicy({ // customizations for helmet content secu
       workerSrc: ["'self'", "blob:"],
       objectSrc: [],
       imgSrc: ["'self'", "https:", "blob:", "data:"],
-      fontSrc: ["'self'", "https://ka-f.fontawesome.com/"]
+      fontSrc: ["'self'", "https://ka-f.fontawesome.com/", "https://fonts.gstatic.com/"]
   }
 }));
 
