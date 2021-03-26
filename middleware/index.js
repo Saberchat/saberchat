@@ -89,19 +89,34 @@ middleware.checkRoomOwnership = async function(req, res, next) {
     return res.redirect('/chat/' + room._id);
 }
 
-middleware.isPrincipal = function(req, res, next) {
+middleware.isPrincipal = async function(req, res, next) {
+    const platform = await setup(Platform);
+    if (!platform) {
+        req.flash("error", "An error occurred");
+        return res.redirect("back");
+    }
     if (req.user.permission == platform.permissionsProperty[platform.permissionsProperty.length-1]) { return next();}
     req.flash('error', 'You do not have permission to do that');
     return res.redirect('/');
 }
 
-middleware.isAdmin = function(req, res, next) {
+middleware.isAdmin = async function(req, res, next) {
+    const platform = await setup(Platform);
+    if (!platform) {
+        req.flash("error", "An error occurred");
+        return res.redirect("back");
+    }
     if (platform.permissionsProperty.slice(platform.permissionsProperty.length-2).includes(req.user.permission)) { return next();}
     req.flash('error', 'You do not have permission to do that');
     return res.redirect('/');
 }
 
-middleware.isMod = function(req, res, next) {
+middleware.isMod = async function(req, res, next) {
+    const platform = await setup(Platform);
+    if (!platform) {
+        req.flash("error", "An error occurred");
+        return res.redirect("back");
+    }
     if (platform.permissionsProperty.slice(platform.permissionsProperty.length-3).includes(req.user.permission)) { return next();}
     req.flash('error', 'You do not have permission to do that');
     return res.redirect('/');

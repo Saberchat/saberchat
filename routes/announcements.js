@@ -12,9 +12,9 @@ const router = express.Router(); //Router
 //ROUTES
 router.route('/')
     .get(wrapAsync(middleware.isLoggedIn), wrapAsync(announcements.index)) //Show all announcements
-    .post(wrapAsync(middleware.isLoggedIn), middleware.isMod, multipleUpload, validateAnn, wrapAsync(announcements.create)); //Create announcement
+    .post(wrapAsync(middleware.isLoggedIn), wrapAsync(middleware.isMod), multipleUpload, validateAnn, wrapAsync(announcements.create)); //Create announcement
 
-router.get('/new', wrapAsync(middleware.isLoggedIn), middleware.isMod, wrapAsync(announcements.new)); //Form to create new announcement
+router.get('/new', wrapAsync(middleware.isLoggedIn), wrapAsync(middleware.isMod), wrapAsync(announcements.new)); //Form to create new announcement
 router.get('/mark-all', wrapAsync(middleware.isLoggedIn), wrapAsync(announcements.markAll)); //Mark all announcements as read
 router.get('/mark/:id', wrapAsync(middleware.isLoggedIn), wrapAsync(announcements.markOne)); //Mark specific announcement as read
 
@@ -24,9 +24,9 @@ router.put('/comment', wrapAsync(middleware.isLoggedIn), wrapAsync(announcements
 
 router.route('/:id')
     .get(wrapAsync(middleware.isLoggedIn), wrapAsync(announcements.show)) //Show specific announcement
-    .put(wrapAsync(middleware.isLoggedIn), middleware.isMod, multipleUpload, wrapAsync(announcements.updateAnnouncement)) //Update specific announcement
-    .delete(wrapAsync(middleware.isLoggedIn), middleware.isMod, wrapAsync(announcements.deleteAnnouncement)); //Delete specific announcement
+    .put(wrapAsync(middleware.isLoggedIn), wrapAsync(middleware.isMod), multipleUpload, wrapAsync(announcements.updateAnnouncement)) //Update specific announcement
+    .delete(wrapAsync(middleware.isLoggedIn), wrapAsync(middleware.isMod), wrapAsync(announcements.deleteAnnouncement)); //Delete specific announcement
 
-router.get('/:id/edit', wrapAsync(middleware.isLoggedIn), middleware.isMod, wrapAsync(announcements.updateForm)); //Form to edit specific announcement
+router.get('/:id/edit', wrapAsync(middleware.isLoggedIn), wrapAsync(middleware.isMod), wrapAsync(announcements.updateForm)); //Form to edit specific announcement
 
 module.exports = router;

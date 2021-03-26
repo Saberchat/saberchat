@@ -44,6 +44,6 @@ router.route('/category')
 router.route('/category/:id')
     .get(wrapAsync(middleware.isLoggedIn), wrapAsync(middleware.accessToFeature), middleware.isCashier, wrapAsync(cafe.viewCategory)) //View category
     .put(wrapAsync(middleware.isLoggedIn), wrapAsync(middleware.accessToFeature), middleware.isCashier, wrapAsync(cafe.updateCategory)) //Update category
-    .delete(wrapAsync(middleware.isLoggedIn), wrapAsync(middleware.accessToFeature), middleware.isMod, wrapAsync(cafe.deleteCategory)); //Delete category
+    .delete(wrapAsync(middleware.isLoggedIn), wrapAsync(middleware.accessToFeature), wrapAsync(middleware.isMod), wrapAsync(cafe.deleteCategory)); //Delete category
 
 module.exports = router;

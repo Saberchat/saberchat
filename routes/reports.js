@@ -14,7 +14,7 @@ router.route('/')
     .post(wrapAsync(middleware.isLoggedIn), multipleUpload, wrapAsync(reports.create)); //Create report
 
 router.get('/new', wrapAsync(middleware.isLoggedIn), wrapAsync(reports.new)); //Form to create new report
-router.get('/handle/:id', wrapAsync(middleware.isLoggedIn), middleware.isAdmin, wrapAsync(reports.handleReport)); //Handle report
+router.get('/handle/:id', wrapAsync(middleware.isLoggedIn), wrapAsync(middleware.isAdmin), wrapAsync(reports.handleReport)); //Handle report
 
 router.put('/like', wrapAsync(middleware.isLoggedIn), wrapAsync(reports.likeReport)); //Like report
 router.put('/like-comment', wrapAsync(middleware.isLoggedIn), wrapAsync(reports.likeComment)); //Comment on report
