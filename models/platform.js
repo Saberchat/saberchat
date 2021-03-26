@@ -3,6 +3,7 @@ const mongoose = require("mongoose");
 //Platform schema holds all data for individual platform's settings
 var platformSchema = new mongoose.Schema({
     name: String,
+    url: String,
     imageUrl: String,
     principal: String,
     emailExtension: {type: String, default: ''},
