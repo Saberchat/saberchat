@@ -13,5 +13,6 @@ module.exports.scriptUrls = [
 module.exports.styleUrls = [
     "https://stackpath.bootstrapcdn.com/",
     "https://maxcdn.bootstrapcdn.com/",
-    "data:"
+    "data:",
+    "https://fonts.googleapis.com/"
 ];
