@@ -91,7 +91,7 @@
                             <% } %>
                         </li>
 
-                        <% if (currentUser.permission == 'mod') { %>
+                        <% if (currentUser.permission == platform.permissionsProperty[platform.permissionsProperty.length-3]) { %>
                             <li class="nav-item dropdown">
                                 <a class="nav-link dropdown-toggle" href="" id="navbarDropdownMenuLink" role="button"
                                    data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i
@@ -104,7 +104,7 @@
                                 </div>
                             </li>
 
-                        <% } else if (currentUser.permission == "admin") { %>
+                        <% } else if (currentUser.permission == platform.permissionsProperty[platform.permissionsProperty.length-2]) { %>
                             <li class="nav-item dropdown">
                                 <a class="nav-link dropdown-toggle" href="" id="navbarDropdownMenuLink" role="button"
                                    data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" <% if (platform.navDark) {%> style="color: black;"<%}%>><i

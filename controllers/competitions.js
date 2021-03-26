@@ -190,9 +190,9 @@ controller.updateCompetition = async function(req, res) {
 
     updatedCompetition.links = [];
     if (req.body.slides) {
-        for (let link of req.body.slides) {
+        for (let link in req.body.slides) {
             if (link) {
-                updatedCompetition.links.push(link);
+                updatedCompetition.links.push(req.body.slides[link]);
             }
         }
     }

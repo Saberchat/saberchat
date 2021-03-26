@@ -19,9 +19,9 @@ router.route("/status")
     .put(wrapAsync(middleware.isLoggedIn), middleware.isMod, wrapAsync(admin.statusPut)); //Update user's status
 
 router.route("/accesslist")
-    .get(wrapAsync(middleware.isLoggedIn), middleware.isMod, wrapAsync(admin.accesslistGet)) //Show either access list or blocked list
-    .put(wrapAsync(middleware.isLoggedIn), middleware.isMod, wrapAsync(admin.addEmail)) //Update access/blocked list
-    .delete(wrapAsync(middleware.isLoggedIn), middleware.isMod, wrapAsync(admin.deleteEmail)); //Remove email from access/blocked list
+    .get(wrapAsync(middleware.isLoggedIn), middleware.isPrincipal, wrapAsync(admin.accesslistGet)) //Show either access list or blocked list
+    .put(wrapAsync(middleware.isLoggedIn), middleware.isPrincipal, wrapAsync(admin.addEmail)) //Update access/blocked list
+    .delete(wrapAsync(middleware.isLoggedIn), middleware.isPrincipal, wrapAsync(admin.deleteEmail)); //Remove email from access/blocked list
 
 router.route("/settings")
     .get(wrapAsync(middleware.isLoggedIn), middleware.isPrincipal, wrapAsync(admin.updatePlatformForm))

@@ -90,23 +90,19 @@ middleware.checkRoomOwnership = async function(req, res, next) {
 }
 
 middleware.isPrincipal = function(req, res, next) {
-    if (req.user.permission == 'principal') { return next();}
+    if (req.user.permission == platform.permissionsProperty[platform.permissionsProperty.length-1]) { return next();}
     req.flash('error', 'You do not have permission to do that');
     return res.redirect('/');
 }
 
 middleware.isAdmin = function(req, res, next) {
-    if (req.user.permission == 'admin' || req.user.permission == 'principal') {
-        return next();
-    }
+    if (platform.permissionsProperty.slice(platform.permissionsProperty.length-2).includes(req.user.permission)) { return next();}
     req.flash('error', 'You do not have permission to do that');
     return res.redirect('/');
 }
 
 middleware.isMod = function(req, res, next) {
-    if (req.user.permission == 'mod' || req.user.permission == 'admin' || req.user.permission == 'principal') {
-        return next();
-    }
+    if (platform.permissionsProperty.slice(platform.permissionsProperty.length-3).includes(req.user.permission)) { return next();}
     req.flash('error', 'You do not have permission to do that');
     return res.redirect('/');
 }
