@@ -52,45 +52,53 @@
 <main id="main-container">
     <div class="container mt-5">
         <% let block;%>
-        <% for (let i = 0; i < users.length; i++) { %>
-            <% user = users[i]%>
-            <% if (i%2 == 0) { %>
-                <div class="row text-element">
-                    <div class="col-lg-6">
-                        <article class="text-block mode">
-                            <div class="block-header green">
-                                <h1><%=user.firstName%> <%=user.lastName%></h1>
+        <% let i = 0;%>
+        <% for (let status of platform.statusesProperty.slice(platform.statusesProperty.length-2).reverse()) { %>
+            <% for (let user of users) { %>
+                <% if (user.status == status)  { %>
+                    <% if (i%2 == 0) { %>
+                        <div class="row text-element">
+                            <div class="col-lg-6">
+                                <article class="text-block mode">
+                                    <div class="block-header green">
+                                        <h1><%=user.firstName%> <%=user.lastName%></h1>
+                                    </div>
+                                    <div class="block-content mode">
+                                        <h4>
+                                            <%=platform.statusesSingular[platform.statusesProperty.indexOf(user.status)]%>
+                                            <% if (user.title && user.title.split(' ').join('') != '') { %>(<%=user.title%>)<% } %>
+                                        </h4>
+                                        <p style="font-size: 110%;"><%=user.description%></p>
+                                    </div>
+                                </article>
                             </div>
-                            <div class="block-content mode">
-                                <h4><%=platform.statusesSingular[platform.statusesProperty.indexOf(user.status)]%></h4>
-                                <p style="font-size: 110%;"><%=user.description%></p>
+                            <div class="col-lg-6 block">
+                                <img class="image-block" src="<% if (user.imageUrl.display) { %> <%=user.imageUrl.url%> <% } else { %> <%=user.mediaFile.url%> <% } %>"
+                                    alt="Image Does Not Exist">
                             </div>
-                        </article>
-                    </div>
-                    <div class="col-lg-6 block">
-                        <img class="image-block" src="<% if (user.imageUrl.display) { %> <%=user.imageUrl.url%> <% } else { %> <%=user.mediaFile.url%> <% } %>"
-                            alt="Image Does Not Exist">
-                    </div>
-                </div>
+                        </div>
 
-            <% } else { %>
-                <div class="row text-element">
-                    <div class="col-lg-6 block">
-                        <img class="image-block" src="<% if (user.imageUrl.display) { %> <%=user.imageUrl.url%> <% } else { %> <%=user.mediaFile.url%> <% } %>"
-                            alt="Image Does Not Exist">
-                    </div>
-                    <div class="col-lg-6">
-                        <article class="text-block mode">
-                            <div class="block-header green">
-                                <h1><%=user.firstName%> <%=user.lastName%></h1>
+                    <% } else { %>
+                        <div class="row text-element">
+                            <div class="col-lg-6 block">
+                                <img class="image-block" src="<% if (user.imageUrl.display) { %> <%=user.imageUrl.url%> <% } else { %> <%=user.mediaFile.url%> <% } %>"
+                                    alt="Image Does Not Exist">
                             </div>
-                            <div class="block-content mode">
-                                <h4><%=platform.statusesSingular[platform.statusesProperty.indexOf(user.status)]%></h4>
-                                <p style="font-size: 110%;"><%=user.description%></p>
+                            <div class="col-lg-6">
+                                <article class="text-block mode">
+                                    <div class="block-header green">
+                                        <h1><%=user.firstName%> <%=user.lastName%></h1>
+                                    </div>
+                                    <div class="block-content mode">
+                                        <h4><%=platform.statusesSingular[platform.statusesProperty.indexOf(user.status)]%></h4>
+                                        <p style="font-size: 110%;"><%=user.description%></p>
+                                    </div>
+                                </article>
                             </div>
-                        </article>
-                    </div>
-                </div>
+                        </div>
+                    <% } %>
+                    <%i++;%>
+                <% } %>
             <% } %>
         <% } %>
 

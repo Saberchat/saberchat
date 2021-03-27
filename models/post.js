@@ -40,7 +40,7 @@ module.exports = { //All subclass Schema
         }]
     })),
     Module: Post.discriminator("Module", new mongoose.Schema({ //Curriculum with attached information
-        slides: [{type: String}]
+        links: [{type: String}]
     })),
     Competition: Post.discriminator("Competition", new mongoose.Schema({ //Curriculum with attached information
         links: [{type: String}],

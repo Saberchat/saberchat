@@ -99,18 +99,14 @@ controller.createProject = async function(req, res) {
         }
     }
 
-    const project = await Project.create({title: req.body.title, text: req.body.text, sender: req.user, creators}); //Create a new project with all the provided data
+    const project = await Project.create({subject: req.body.title, text: req.body.text, sender: req.user, creators}); //Create a new project with all the provided data
     if (!project) {
         req.flash('error', "Unable to create project");
         return res.redirect('back');
     }
 
     if (req.body.images) { //If any images were added (if not, the 'images' property is null)
-        for (let image in req.body.images) {
-            if (image) {
-                project.images.push(req.body.images[image]);
-            }
-        }
+        project.images = req.body.images;
     }
 
     if (req.files) {
@@ -302,7 +298,7 @@ controller.updateProject = async function(req, res) {
     }
 
     const updatedProject = await Project.findByIdAndUpdate(project._id, {
-        title: req.body.title,
+        subject: req.body.title,
         creators,
         text: req.body.text
     });
@@ -312,13 +308,8 @@ controller.updateProject = async function(req, res) {
         return res.redirect('back');
     }
 
-    updatedProject.images = []; //Empty image array so that you can fill it with whatever images are added (all images are there, not just new ones)
-    if (req.body.images) { //Only add images if any are provided
-        for (let image in req.body.images) {
-            if (image) {
-                updatedProject.images.push(req.body.images[image]);
-            }
-        }
+    if (req.body.images) { //If any images were added (if not, the 'images' property is null)
+        updatedProject.images = req.body.images;
     }
 
     let cloudErr;

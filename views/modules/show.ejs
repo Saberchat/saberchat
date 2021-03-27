@@ -143,10 +143,10 @@
                     <div class="ann-images">
                         <h4 style="float: left;">Slides</h4><br>
                         <ol><br>
-                            <% for (let slide of module.slides) { %>
+                            <% for (let slide of module.links) { %>
                                 <li style="text-align: left;">
                                     <a href="<%=slide%>" target="_blank" style="color: darkblue"><%=slide%></a>
-                                    <br><iframe style="margin-bottom: 20px;" src="<%=slide%>/embed" frameborder="0" width="500" height="300"></iframe>
+                                    <br><iframe style="margin-bottom: 20px;" src="<%=slide.split('/edit')[0]%>/embed" frameborder="0" width="500" height="300"></iframe>
                                 </li>
                             <% } %>
                         </ol><br>

@@ -127,11 +127,7 @@ controller.create = async function(req, res) {
     }
 
     if (req.body.images) { //If any images were added (if not, the 'images' property is null)
-        for (let image in req.body.images) {
-            if (image) {
-                announcement.images.push(req.body.images[image]);
-            }
-        }
+        announcement.images = req.body.images.reverse();
     }
 
     // if files were uploaded, process them
@@ -210,13 +206,8 @@ controller.updateAnnouncement = async function(req, res) {
         return res.redirect('back');
     }
 
-    updatedAnnouncement.images = []; //Empty image array so that you can fill it with whatever images are added (all images are there, not just new ones)
     if (req.body.images) { //Only add images if any are provided
-        for (let image in req.body.images) {
-            if (image) {
-                updatedAnnouncement.images.push(req.body.images[image]);
-            }
-        }
+        updatedAnnouncement.images = req.body.images;
     }
 
     //Iterate through all selected media to remove and delete them

@@ -58,7 +58,9 @@
             <select id="creator-select" class="form-control mode" onchange="addCreator('user')" required>
               <option class="creator-group" value="" selected disabled>Select Students</option>
               <% for (let status of statuses) { %>
-                <option class="creator-group" value="<%=status[0]%>"><%=status[1]%></option>
+                <% if (platform.studentStatuses.includes(status[0])) { %>
+                  <option class="creator-group" value="<%=status[0]%>"><%=status[1]%></option>
+                <% } %>
               <% } %>
               
                     <% for (let status of platform.studentStatuses) { %>

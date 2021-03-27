@@ -61,7 +61,9 @@
                 <select id="creator-select" class="form-control mode" onchange="addCreator('user')">
                     <option class="creator-group" value="" selected disabled>Select Students</option>
                     <% for (let status of statuses) { %>
-                        <option class="creator-group" value="<%=status[0]%>"><%=status[1]%></option>
+                        <% if (platform.studentStatuses.includes(status[0])) { %>
+                            <option class="creator-group" value="<%=status[0]%>"><%=status[1]%></option>
+                        <% } %>
                     <% } %>
 
                     <% for (let status of platform.statusesProperty) { %>
@@ -131,17 +133,16 @@
             </div>
 
             <div id="image-block">
-                <% let reversedImages = project.images.reverse() %>
-                <% for (let i = 0; i < reversedImages.length; i += 1) { %>
+                <% for (let i = 0; i < project.images.length; i += 1) { %>
                     <div class="image-group">
-                        <div class="input-container" id="imageblock-<%= reversedImages.length - (i + 1) %>">
-                            <input type="text" id="<%= reversedImages.length - (i + 1) %>" class="form-control"
+                        <div class="input-container" id="imageblock-<%= i %>">
+                            <input type="text" id="<%= i %>" class="form-control"
                                    oninput="createImg(this)" placeholder="Url..."
-                                   name="images[<%= reversedImages.length - (i + 1) %>]" required
-                                   value="<%= reversedImages[i] %>">
-                            <img id="image-<%= reversedImages.length - (i + 1) %>"
+                                   name="images" required
+                                   value="<%= project.images[i] %>">
+                            <img id="image-<%= i %>"
                                  style="width: 50%; height: 50%; margin-top: 10px; border-radius: 15px;"
-                                 src="<%= reversedImages[i] %>" alt="Image Does Not Exist"/>
+                                 src="<%= project.images[i] %>" alt="Image Does Not Exist"/>
                         </div>
                         <button type="button" onclick="deleteImg(this)" class="btn btn-danger">
                             <i class="fas fa-minus"></i>

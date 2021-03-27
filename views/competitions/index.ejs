@@ -44,7 +44,7 @@
         <div class="col-12">
             <div class="jumbotron text-center header">
                 <h1><i class="fas fa-trophy"></i> Competitions</h1>
-                <p>All <% if (activeSearch) { %>Active<% } else {%>Past<%}%> Competitions <%=platform.name%> Is Part Of</p>
+                <p><%=platform.name%>'s <% if (activeSearch) { %>Active<% } else {%>Past<%}%> Competitions</p>
                 <% if (currentUser.status == platform.teacherStatus) { %>
                     <a href="/competitions/new" class="btn btn-primary announcement-button">
                         <i class="fas fa-plus-circle"></i> Add New Competition

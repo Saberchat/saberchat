@@ -103,19 +103,9 @@ controller.create = async function(req, res) {
         return res.redirect('back');
     }
 
-    if (req.body.images) { //If any images were added (if not, the 'images' property is null)
-        for (let image in req.body.images) {
-            if (image) {
-                competition.images.push(req.body.images[image]);
-            }
-        }
-    }
-
-    if (req.body.slides) {
-        for (let link in req.body.slides) {
-            if (link) {
-                competition.links.push(req.body.slides[link]);
-            }
+    for (let attr of ["images", "links"]) { //Add images and links
+        if (req.body[attr]) {
+            competition[attr] = req.body[attr];
         }
     }
 
@@ -179,21 +169,9 @@ controller.updateCompetition = async function(req, res) {
         return res.redirect('back');
     }
 
-    updatedCompetition.images = []; //Empty image array so that you can fill it with whatever images are added (all images are there, not just new ones)
-    if (req.body.images) { //Only add images if any are provided
-        for (let image in req.body.images) {
-            if (image) {
-                updatedCompetition.images.push(req.body.images[image]);
-            }
-        }
-    }
-
-    updatedCompetition.links = [];
-    if (req.body.slides) {
-        for (let link in req.body.slides) {
-            if (link) {
-                updatedCompetition.links.push(req.body.slides[link]);
-            }
+    for (let attr of ["images", "links"]) { //Add images and links
+        if (req.body[attr]) {
+            updatedCompetition[attr] = req.body[attr];
         }
     }
 

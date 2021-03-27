@@ -58,15 +58,14 @@
               <button type="button" onclick="addSlide()" class="btn btn-primary"><i class="fas fa-plus"></i> Slide URL</button>
               <br/><br/>
             </div>
-            <div id="slides">
-              <% let reversedSlides = module.slides.reverse() %>
-              <% for( let i = 0; i < reversedSlides.length; i++ ) { %>
-                  <div class="image-group" id="slideblock-<%= reversedSlides.length - (i + 1) %>">
+            <div id="links">
+              <% for( let i = 0; i < module.links.length; i++ ) { %>
+                  <div class="image-group" id="slideblock-<%=i%>">
                       <div class="input-container">
-                          <input type="text" id="<%= reversedSlides.length - (i + 1) %>" class="form-control"
+                          <input type="text" id="<%=i%>" class="form-control"
                                  oninput="createSlide(this)" placeholder="Url..."
-                                 name="slides[<%= reversedSlides.length - (i + 1) %>]" required
-                                 value="<%= reversedSlides[i] %>">
+                                 name="links" required
+                                 value="<%= module.links[i] %>">
                       </div>
                       <button type="button" style="float: right;" onclick="deleteSlide(this)" class="btn btn-danger">
                           <i class="fas fa-minus"></i>
@@ -110,17 +109,16 @@
           </div>
 
           <div id="image-block">
-              <% let reversedImages = module.images.reverse() %>
-              <% for( let i = 0; i < reversedImages.length; i++ ) { %>
+              <% for( let i = 0; i < module.images.length; i++ ) { %>
                   <div class="image-group">
-                      <div class="input-container" id="imageblock-<%= reversedImages.length - (i + 1) %>">
-                          <input type="text" id="<%= reversedImages.length - (i + 1) %>" class="form-control"
+                      <div class="input-container" id="imageblock-<%=i%>">
+                          <input type="text" id="<%=i%>" class="form-control"
                                  oninput="createImg(this)" placeholder="Url..."
-                                 name="images[<%= reversedImages.length - (i + 1) %>]" required
-                                 value="<%= reversedImages[i] %>">
-                          <img id="image-<%= reversedImages.length - (i + 1) %>"
+                                 name="images" required
+                                 value="<%= module.images[i] %>">
+                          <img id="image-<%=i%>"
                                style="width: 50%; height: 50%; margin-top: 10px; border-radius: 15px;"
-                               src="<%= reversedImages[i] %>" alt="Image Does Not Exist"/>
+                               src="<%= module.images[i] %>" alt="Image Does Not Exist"/>
                       </div>
                       <button type="button" onclick="deleteImg(this)" class="btn btn-danger">
                           <i class="fas fa-minus"></i>

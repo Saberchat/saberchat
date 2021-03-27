@@ -80,14 +80,14 @@
               <button type="button" onclick="addSlide()" class="btn btn-primary"><i class="fas fa-plus"></i> Link</button>
               <br/><br/>
             </div>
-            <div id="slides">
+            <div id="links">
               <% let reversedSlides = competition.links.reverse() %>
               <% for( let i = 0; i < reversedSlides.length; i++ ) { %>
                   <div class="image-group" id="slideblock-<%= reversedSlides.length - (i + 1) %>">
                       <div class="input-container">
                           <input type="text" id="<%= reversedSlides.length - (i + 1) %>" class="form-control"
                                  oninput="createSlide(this)" placeholder="Url..."
-                                 name="slides[<%= reversedSlides.length - (i + 1) %>]" required
+                                 name="links[<%= reversedSlides.length - (i + 1) %>]" required
                                  value="<%= reversedSlides[i] %>">
                       </div>
                       <button type="button" style="float: right;" onclick="deleteSlide(this)" class="btn btn-danger">
