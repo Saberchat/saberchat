@@ -26,30 +26,14 @@ const changeFollowerTab = function (newTab) {
     document.getElementById(tabMap.get(tabMap.get(newTab.id)[0])[1]).hidden = false;
 }
 
-const searchFunctionFollowers = function() { //Search for followers in follower tab
-    const searchBarFollowers = document.getElementById('search-bar-followers');
-    const followerBlocks = document.getElementsByClassName('follower-block');
+const searchFunctionFollow = function(searchbar, delimeter) { //Search for followers/following in respective tabs
+    const blocks = document.getElementsByClassName(`${searchbar.id.split('-')[2]}-block`); //Find all blocks with this information
 
-    for (let b = 0; b < followerBlocks.length; b++) { //Iterate through followers and see if there is overlap with search keyword
-        if (!followerBlocks[b].textContent.split('Remove')[0].toLowerCase().includes(searchBarFollowers.value.toLowerCase())) {
-            followerBlocks[b].hidden = true;
-
+    for (let b = 0; b < blocks.length; b++) { //Iterate through followers and see if there is overlap with search keyword
+        if (!blocks[b].textContent.split(delimeter)[0].toLowerCase().includes(searchbar.value.toLowerCase())) {
+            blocks[b].hidden = true;
         } else {
-            followerBlocks[b].hidden = false;
-        }
-    }
-}
-
-const searchFunctionFollowing = function() { //Search for users in following tab
-    const searchBarFollowing = document.getElementById('search-bar-following');
-    const followingBlocks = document.getElementsByClassName('following-block');
-
-    for (let b = 0; b < followingBlocks.length; b++) { //Iterate through following and see if there is overlap with search keyword
-        if (!followingBlocks[b].textContent.split('Unfollow')[0].toLowerCase().includes(searchBarFollowing.value.toLowerCase())) {
-            followingBlocks[b].hidden = true;
-
-        } else {
-            followingBlocks[b].hidden = false;
+            blocks[b].hidden = false;
         }
     }
 }

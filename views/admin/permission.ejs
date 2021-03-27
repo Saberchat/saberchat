@@ -39,7 +39,7 @@
 
               <div class="search-filter mb-3 search">
                 <i class="fas fa-search"></i>
-                <input id="search-input" oninput="searchFunction()" class="form-control search" type="text" placeholder="Search..." title="Type in name"/>
+                <input id="search-input" oninput="searchFunction('user')" class="form-control search" type="text" placeholder="Search..." title="Type in name"/>
               </div><br />
 
             <ul class="list-group">
@@ -81,6 +81,7 @@
 </div>
 </body>
 <script src="/javascript/admin/permission.js"></script>
+<script src="/javascript/admin/search.js"></script>
 <script>
   if (document.getElementById("search-input")) {
       document.getElementById("search-input").style.backgroundColor = colorScheme[colorScheme.length-1];

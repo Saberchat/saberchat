@@ -227,7 +227,7 @@ Username
     text-align: center;
 }
 
-#search-bar-followers, #search-bar-following {
+#search-bar-follower, #search-bar-following {
     width: 95%;
     margin: 15px;
     border-radius: 5px;

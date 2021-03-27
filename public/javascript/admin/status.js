@@ -73,18 +73,3 @@ const updateTag = function (select) { //Update a user's status tags
         }
     });
 }
-
-const searchFunction = function () { //Function to search for user info within body
-    const users = document.getElementsByClassName('user');
-    const searchInput = document.getElementById('search-input');
-    let filter = searchInput.value.toLowerCase();
-
-    for (let i = 0; i < users.length; i += 1) { //Iterate through user list and see if any text/class names match the search input
-        if ((users[i].textContent.split('\n')[1].toLowerCase().includes(filter) || users[i].classList.toString().toLowerCase().includes(filter.toLowerCase()))) {
-            users[i].hidden = false;
-
-        } else {
-            users[i].hidden = true;
-        }
-    }
-}

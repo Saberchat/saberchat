@@ -1,18 +1,3 @@
-const searchFunction = function () { //Search for an email that matches a keyword
-    const emails = document.getElementsByClassName('email');
-    const searchInput = document.getElementById('search-input');
-    let filter = searchInput.value.toLowerCase();
-
-    for (let i = 0; i < emails.length; i += 1) { //Iterate through emails and display any that contain search keyword
-        if (emails[i].innerText.replace('User Exists', '').toLowerCase().includes(filter)) {
-            emails[i].hidden = false;
-
-        } else {
-            emails[i].hidden = true;
-        }
-    }
-}
-
 const addEmail = function(event, version) { //Add an email to access list/blocked list
     event.preventDefault();
     const url = '/admin/accesslist?_method=put';

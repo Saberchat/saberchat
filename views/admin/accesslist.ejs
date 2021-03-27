@@ -43,7 +43,7 @@
 
             <div class="search-filter mb-3">
                 <i class="fas fa-search"></i>
-                <input id="search-input" oninput="searchFunction()" class="form-control mode mode" oninput="searchFunction()"
+                <input id="search-input" oninput="searchFunction('email')" class="form-control mode mode" oninput="searchFunction()"
                        type="text" placeholder="Search..." title="Type in email"/>
             </div>
             <br/>
@@ -141,6 +141,7 @@
     </div>
 </div>
 <script src="/javascript/admin/accesslist.js"></script>
+<script src="/javascript/admin/search.js"></script>
 <script>
     if (document.getElementById("search-input")) {
         document.getElementById("search-input").style.backgroundColor = colorScheme[colorScheme.length-1];
