@@ -127,7 +127,7 @@ controller.create = async function(req, res) {
     }
 
     if (req.body.images) { //If any images were added (if not, the 'images' property is null)
-        announcement.images = req.body.images.reverse();
+        announcement.images = req.body.images;
     }
 
     // if files were uploaded, process them

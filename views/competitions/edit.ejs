@@ -132,17 +132,16 @@
           </div>
 
           <div id="image-block">
-              <% let reversedImages = competition.images.reverse() %>
-              <% for( let i = 0; i < reversedImages.length; i++ ) { %>
+              <% for( let i = 0; i < competition.images.length; i++ ) { %>
                   <div class="image-group">
-                      <div class="input-container" id="imageblock-<%= reversedImages.length - (i + 1) %>">
-                          <input type="text" id="<%= reversedImages.length - (i + 1) %>" class="form-control"
+                      <div class="input-container" id="imageblock-<%=i%>">
+                          <input type="text" id="<%=i%>" class="form-control"
                                  oninput="createImg(this)" placeholder="Url..."
-                                 name="images[<%= reversedImages.length - (i + 1) %>]" required
-                                 value="<%= reversedImages[i] %>">
-                          <img id="image-<%= reversedImages.length - (i + 1) %>"
+                                 name="images" required
+                                 value="<%=competition.images[i]">
+                          <img id="image-<%=i%>"
                                style="width: 50%; height: 50%; margin-top: 10px; border-radius: 15px;"
-                               src="<%= reversedImages[i] %>" alt="Image Does Not Exist"/>
+                               src="<%= competition.images[i] %>" alt="Image Does Not Exist"/>
                       </div>
                       <button type="button" onclick="deleteImg(this)" class="btn btn-danger">
                           <i class="fas fa-minus"></i>

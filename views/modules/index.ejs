@@ -146,6 +146,10 @@
                     </div>
 
                     <div class="block-content mode">
+                        <% if (module.links.length > 0) { %>
+                            <iframe class="project-first-image" src="<%=module.links[0].split('/edit')[0]%>/embed" frameborder="0" width="400" height="240"></iframe>
+                        <% } %>
+
                         <% if (module.text.split(" ").length > 30) { %>
                             <p class="announcement-text"><%= module.text.split(" ").slice(0, 31).join(" ") %> <a
                                         href="/modules/<%= module._id %>">(Read More)</a></p>
