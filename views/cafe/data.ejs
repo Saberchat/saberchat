@@ -50,8 +50,7 @@
     <ol>
         <% for (let customer of lucrativeCustomers) { %>
             <li>
-                <%= customer.customer.firstName %> <%= customer.customer.lastName %>: $<%= customer.spent %> spent (Avg.
-                $<%= Math.round(customer.avgCharge * 100) / 100 %> per order)
+                <%= customer.customer.firstName %> <%= customer.customer.lastName %>: $<%= customer.spent %> spent (Avg. $<%=(customer.avgCharge).toFixed(2)%> per order)
             </li>
         <% } %>
     </ol>

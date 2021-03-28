@@ -688,10 +688,8 @@ controller.viewBalances = async function(req, res) {
 
 controller.updateBalances = async function(req, res) {
     const user = await User.findByIdAndUpdate(req.body.userId, {balance: parseFloat(req.body.bal)});
-    if (!user) {
-        return res.json({error: "Error. Could not change"});
-    }
-    return res.json({success: 'Succesfully changed', balance: parseFloat(req.body.bal)});
+    if (!user) { return res.json({error: "Error. Could not change"});}
+    return res.json({success: 'Succesfully changed', balance: (parseFloat(req.body.bal)).toFixed(2)});
 }
 
 module.exports = controller;

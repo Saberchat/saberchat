@@ -109,7 +109,7 @@
                       <p id="lessons-length"><%=lessons%></p>
 
                       <h4 id="darkmode-header">Hourly Cost</h4>
-                      <p>$<%= tutor.cost %>.00</p>
+                      <p>$<%=(tutor.cost).toFixed(2)%></p>
 
                       <h4 id="darkmode-header">Status</h4>
                       <p><%= tutor.tutor.status.charAt(0).toUpperCase() + tutor.tutor.status.slice(1) %></p>

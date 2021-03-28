@@ -106,7 +106,7 @@
                                     <label class="form-check-label" for="<%= item._id %>">
                                         <span class="item-name"><%= item.name %></span>
                                         (<%= item.availableItems %> orders available) -
-                                        $<%= `${(item.price * 100).toString().slice(0, (item.price * 100).toString().length - 2)}.${(item.price * 100).toString().slice((item.price * 100).toString().length - 2)}` %>
+                                        $<%= (item.price).toFixed(2) %>
 
                                         <% if (frequentItems.toString().includes(item._id.toString())) { %>
                                             <span class="popular">Frequently Ordered</span>
@@ -162,11 +162,7 @@
                             <span id="extra-instructions"
                                   class="list-group-item list-group-item-action form-check darkmode-outline"><span
                                         class="instructions">Extra Instructions:</span> None</span>
-                            <span id="balance-box" class="list-group-item list-group-item-action form-check darkmode-outline">Current Balance:
-                                <% if (currentUser.balance == 0) {%>$0.00 <%} else { %>
-                                    $<%= `${(currentUser.balance * 100).toString().slice(0, (currentUser.balance * 100).toString().length - 2)}.${(currentUser.balance * 100).toString().slice((currentUser.balance * 100).toString().length - 2)}` %>
-                                <% } %>
-                            </span>
+                            <span id="balance-box" class="list-group-item list-group-item-action form-check darkmode-outline">Current Balance: $<%= (currentUser.balance).toFixed(2)%></span>
                             <span id="total-cost"
                                   class="list-group-item list-group-item-action form-check darkmode-outline">Total: $0.00</span>
                             <span id="paying-style" class="list-group-item list-group-item-action form-check darkmode-outline">Paying Online</span>

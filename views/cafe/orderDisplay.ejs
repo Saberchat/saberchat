@@ -73,13 +73,13 @@
                             <li class="list-group-item cafe"><%= item.item.name %>
                                 <% let itemCharge = (item.quantity * item.item.price).toString(); %>
                                 <%= item.item.name %> (<%= item.quantity %> order(s)) -
-                                $<%= `${(itemCharge * 100).toString().slice(0, (itemCharge * 100).toString().length - 2)}.${(itemCharge * 100).toString().slice((itemCharge * 100).toString().length - 2)}` %>
+                                $<%= itemCharge.toFixed(2)%>
                             </li>
                         <% } %>
                     </ul>
 
                     <p class="card-text mt-3"><span class="cost">Cost:</span>
-                        $<%= `${(order.charge * 100).toString().slice(0, (order.charge * 100).toString().length - 2)}.${(order.charge * 100).toString().slice((order.charge * 100).toString().length - 2)}` %>
+                        $<%= (order.charge).toFixed(2)%>
                     </p>
 
                     <p class="paying-in-person">

@@ -30,6 +30,20 @@ const updateRole = function (select) { //Update user's permission
     });
 }
 
+const incBalance = function(userId) { //Add 1 to balance
+    const input = document.getElementById(`balance-${userId}`);
+    input.value = (parseFloat(input.value) + 1).toFixed(2);
+    updateBalance(document.getElementById(userId), event);
+}
+
+const decBalance = function(userId) { //Remove 1 from balance
+    const input = document.getElementById(`balance-${userId}`);
+    if (parseFloat(input.value) -1 >= 0) { //Check that balance still > 0
+        input.value = (parseFloat(input.value) - 1).toFixed(2);
+        updateBalance(document.getElementById(userId), event);
+    }
+}
+
 const updateBalance = function(form, event) {
     const loading = document.getElementById('loading'); //Button which shows request status
     loading.style.display = 'block';
@@ -45,6 +59,8 @@ const updateBalance = function(form, event) {
             loading.innerHTML = data.success;
             if (data.balance == 0) {
                 balanceInput.value = "0.00";
+            } else if (Math.abs(data.balance < 1)) {
+                balanceInput.value = `0${(data.balance * 100).toString().slice(0, (data.balance * 100).toString().length - 2)}.${(data.balance * 100).toString().slice((data.balance * 100).toString().length - 2)}`;
             } else {
                 balanceInput.value = `${(data.balance * 100).toString().slice(0, (data.balance * 100).toString().length - 2)}.${(data.balance * 100).toString().slice((data.balance * 100).toString().length - 2)}`;
             }

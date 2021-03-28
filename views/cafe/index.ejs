@@ -71,13 +71,13 @@
                         <% if (order.present == true) { %>
                             <li class="list-group-item darkmode-outline" id="<%= order._id %>">
                                 <h4 class="order-heading">Order -
-                                    $<%= `${(order.charge * 100).toString().slice(0, (order.charge * 100).toString().length - 2)}.${(order.charge * 100).toString().slice((order.charge * 100).toString().length - 2)}` %></h4>
+                                    $<%= (order.charge).toFixed(2)%></h4>
                                 <ul>
                                     <% for (let item of order.items) { %>
                                         <li>
                                             <% let itemCharge = (item.quantity * item.item.price).toString(); %>
                                             <%= item.item.name %> (<%= item.quantity %> order(s)) -
-                                            $<%= `${(itemCharge * 100).toString().slice(0, (itemCharge * 100).toString().length - 2)}.${(itemCharge * 100).toString().slice((itemCharge * 100).toString().length - 2)}` %>
+                                            $<%= itemCharge.toFixed(2)%>
                                         </li>
                                     <% } %>
                                 </ul>
@@ -149,13 +149,13 @@
               <% orders.forEach(order => { %>
                 <% if (order.present == false) { %>
                   <li class="list-group-item">
-                    <h4 class="order-heading">Order - $<%= `${(order.charge * 100).toString().slice(0, (order.charge * 100).toString().length - 2)}.${(order.charge * 100).toString().slice((order.charge * 100).toString().length - 2)}` %></h4>
+                    <h4 class="order-heading">Order - $<%= (order.charge).toFixed(2)%></h4>
 
                     <ul>
                       <% for (let item of order.items) { %>
                         <li>
                             <% let itemCharge = (item.quantity * item.item.price).toString(); %>
-                            <%= item.item.name %> (<%= item.quantity %> order(s)) - $<%= `${(itemCharge * 100).toString().slice(0, (itemCharge * 100).toString().length - 2)}.${(itemCharge * 100).toString().slice((itemCharge * 100).toString().length - 2)}` %>
+                            <%= item.item.name %> (<%= item.quantity %> order(s)) - $<%= itemCharge.toFixed(2)%>
                         </li>
                       <% } %>
                     </ul>

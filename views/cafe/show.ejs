@@ -61,7 +61,7 @@
                                     <div class="input-group-text mode">$</div>
                                 </div>
                                 <input id="priceInput" class="form-control mode" type="text" name="price"
-                                       placeholder="price" value="<%= `${(item.price * 100).toString().slice(0, (item.price * 100).toString().length - 2)}.${(item.price * 100).toString().slice((item.price * 100).toString().length - 2)}` %>"
+                                       placeholder="price" value="<%= (item.price).toFixed(2)%>"
                                        maxlength="10" required>
 
                             </div>

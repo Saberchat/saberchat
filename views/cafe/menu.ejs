@@ -76,8 +76,7 @@
                             <% } %>
 
 
-                                  <span class="item-name"><%= item.name %> (<%= item.availableItems %> orders available)</span>
-                                  - $<%= `${(item.price * 100).toString().slice(0, (item.price * 100).toString().length - 2)}.${(item.price * 100).toString().slice((item.price * 100).toString().length - 2)}` %>
+                                  <span class="item-name"><%= item.name %> (<%= item.availableItems %> orders available)</span>- $<%= (item.price).toFixed(2)%>
 
                                 <div title="Upvotes" class="upvotes">
 

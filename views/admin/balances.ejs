@@ -48,22 +48,26 @@
                   <span id="modify-header">Modify Balances</span>
                 </li>
 
-                <% for (let user of users) { %>
-                    <% if(!user._id.equals(currentUser._id)){ %>
-                      <form onsubmit="updateBalance(this, event)" id="<%=user._id%>">
-                        <li class="list-group-item user cafe">
-                          <div class="col">
-                            <span class="user-balance-info"><%= user.firstName %> <%= user.lastName %> (<%= user.username %>)</span>
-                            <div class="input-group balance-input">
-                                <div class="input-group-prepend">
-                                    <div class="input-group-text mode">$</div>
-                                </div><input class="form-control mode" type="text" id="balance-<%=user._id%>" placeholder="price" maxlength="10" required value="<% if (user.balance == 0) { %>0.00<% } else {%><%= `${(user.balance * 100).toString().slice(0, (user.balance * 100).toString().length - 2)}.${(user.balance * 100).toString().slice((user.balance * 100).toString().length - 2)}`%><% } %>">
-                              </div>
-                          </div>
-                        </li>
-                      </form>
-                    <% } %>
-
+                <% for (let status of platform.statusesProperty.reverse()) { %>
+                  <% for (let user of users) { %>
+                      <% if(!user._id.equals(currentUser._id) && user.status == status){ %>
+                        <form onsubmit="updateBalance(this, event)" id="<%=user._id%>">
+                          <li class="list-group-item user cafe">
+                            <div class="col">
+                              <span class="user-balance-info"><%= user.firstName %> <%= user.lastName %> (<%= user.username %>)</span>
+                              <div class="input-group balance-input">
+                                  <div class="input-group-prepend">
+                                      <div class="input-group-text mode">$</div>
+                                  </div>
+                                  <input class="form-control mode" type="text" id="balance-<%=user._id%>" placeholder="price" maxlength="10" required value="<%=(user.balance).toFixed(2)%>">
+                                  <button class="btn btn-primary balance-button" type="button" id="add-<%=user._id%>" onclick="incBalance('<%=user._id%>')"><i class="fas fa-plus-circle"></i></button>
+                                  <button class="btn btn-danger balance-button" type="button" id="subtract-<%=user._id%>" onclick="decBalance('<%=user._id%>')"><i class="fas fa-minus-circle"></i></button>
+                                </div>
+                            </div>
+                          </li>
+                        </form>
+                      <% } %>
+                  <% } %>
                 <% } %>
 
             </ul>

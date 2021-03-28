@@ -209,8 +209,7 @@ controller.processOrder = async function(req, res) {
     }
 
     //Formats the charge in money format
-    const formattedCharge = `$${(order.charge * 100).toString().slice(0, (order.charge * 100).toString().length - 2)}.${(order.charge * 100).toString().slice((order.charge * 100).toString().length - 2)}`;
-    notif.text = `Your order is ready to pick up:\n ${itemText.join("\n")} \n\nExtra Instructions: ${order.instructions} \nTotal Cost: ${formattedCharge}`;
+    notif.text = `Your order is ready to pick up:\n ${itemText.join("\n")} \n\nExtra Instructions: ${order.instructions} \nTotal Cost: ${(order.charge).toFixed(2)}`;
     await notif.save();
     if (order.customer.receiving_emails) {
         await sendGridEmail(order.customer.email, "Cafe Order Ready", `<p>Hello ${order.customer.firstName},</p><p>${notif.text}</p>`, false);
@@ -268,12 +267,10 @@ controller.deleteOrder = async function(req, res) {
             itemText.push(` - ${order.items[i].item.name}: ${order.items[i].quantity} order(s)`);
         }
 
-        //Formats the charge in money format
-        const formattedCharge = `$${(order.charge * 100).toString().slice(0, (order.charge * 100).toString().length - 2)}.${(order.charge * 100).toString().slice((order.charge * 100).toString().length - 2)}`;
         if (req.body.rejectionReason == '') {
-            notif.text = `Your order was rejected. This is most likely because we suspect your order is not genuine. Contact us if you think there has been a mistake. No reason was provided for rejection.\n ${itemText.join("\n")} \n\nExtra Instructions: ${order.instructions} \nTotal Cost: ${formattedCharge}`;
+            notif.text = `Your order was rejected. This is most likely because we suspect your order is not genuine. Contact us if you think there has been a mistake. No reason was provided for rejection.\n ${itemText.join("\n")} \n\nExtra Instructions: ${order.instructions} \nTotal Cost: ${(order.charge).toFixed(2)}`;
         } else {
-            notif.text = `Your order was rejected. This is most likely because we suspect your order is not genuine. Contact us if you think there has been a mistake. The reason was provided for rejection was the following: \"${req.body.rejectionReason}\"\n ${itemText.join("\n")} \n\nExtra Instructions: ${order.instructions} \nTotal Cost: ${formattedCharge}`;
+            notif.text = `Your order was rejected. This is most likely because we suspect your order is not genuine. Contact us if you think there has been a mistake. The reason was provided for rejection was the following: \"${req.body.rejectionReason}\"\n ${itemText.join("\n")} \n\nExtra Instructions: ${order.instructions} \nTotal Cost: ${(order.charge).toFixed(2)}`;
         }
 
         await notif.save();
@@ -508,19 +505,18 @@ controller.manage = async function(req, res) {
     if (req.query.orders) { //If route calls to display orders
         await controller.manageOrders(req, res);
 
-    // } else if (req.query.data) { //If route calls to display data
-    //     const customers = await User.find({authenticated: true}); if (!customers) {return false;}
-    //     const items = await Item.find({}); if (!items) {return false;}
-    //     const allOrders = await Order.find({}); if (!allOrders) {return false;}
+    } else if (req.query.data) { //If route calls to display data
+        const customers = await User.find({authenticated: true}); if (!customers) {return false;}
+        const items = await Item.find({}); if (!items) {return false;}
+        const allOrders = await Order.find({}); if (!allOrders) {return false;}
 
-    //     const data = await getData(customers, items, allOrders);
-    //     if (!data) {
-    //         req.flash("error", "An Error Occurred");
-    //         return res.redirect("back")
-    //     }
-    //     data.platform = platform;
-
-    //     return res.render("cafe/data", data);
+        const data = await getData(customers, items, allOrders);
+        if (!data) {
+            req.flash("error", "An Error Occurred");
+            return res.redirect("back")
+        }
+        data.platform = platform;
+        return res.render("cafe/data", data);
 
     } else { //If route calls to display regular management
         await controller.manageCafe(req, res);

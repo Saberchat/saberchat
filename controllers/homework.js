@@ -1023,7 +1023,7 @@ controller.showTutor = async function(req, res) {
                 if (cost == 0) {
                     costMap.set(student.student._id.toString(), `0.00`);
                 } else {
-                    costMap.set(student.student._id.toString(), `${(Math.round(cost*100)).toString().slice(0, -2)}.${(Math.round(cost*100)).toString().slice(-2)}`);
+                    costMap.set(student.student._id.toString(), cost.toFixed(2));
                 }
             }
 
@@ -1035,7 +1035,7 @@ controller.showTutor = async function(req, res) {
                         return res.render('homework/lessons', {
                             platform, course, tutor, student: allStudents[objectArrIndex(allStudents, "student", req.query.studentId, "_id")], objectArrIndex,
                             time: lessonMap.get(allStudents[objectArrIndex(allStudents, "student", req.query.studentId, "_id")].student._id.toString()), 
-                            cost: costMap.get(allStudents[objectArrIndex(allStudents, "student", req.query.studentId, "_id")].student._id.toString()), 
+                            cost: costMap.get(allStudents[objectArrIndex(allStudents, "student", req.query.studentId, "_id")].student._id.toString())
                         });
                     }
                     req.flash('error', "You do not have permission to view that student");
