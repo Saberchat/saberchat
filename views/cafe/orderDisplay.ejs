@@ -34,7 +34,6 @@
     <!-- Cdn for formatting the dates -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-dateFormat/1.0/jquery.dateFormat.min.js"></script>
     <script src="/javascript/cafe/cafe-socket.js" charset="utf-8"></script>
-    <script src="/javascript/cafe/search.js"></script>
     <%- include('../partials/analytics') %>
   </head>
   <body class="mode">
@@ -57,7 +56,7 @@
 
       <div class="search-filter mb-3 search">
         <i class="fas fa-search"></i>
-        <input id="search-input" oninput="searchOrders()" class="form-control search" type="text" placeholder="Search..." title="Type in an order segment"/>
+        <input id="search-input" oninput="searchFunction(this, 'card')" class="form-control search" type="text" placeholder="Search..." title="Type in an order segment"/>
       </div><br />
 
     <% if (orders.length == 0) { %>
@@ -167,6 +166,8 @@
         <% }); %>
     <% } %>
 </div>
+<script src="/javascript/cafe/search.js"></script>
+<script src="/javascript/admin/search.js"></script>
 <script>
     getOrders("#output-stream");
 </script>

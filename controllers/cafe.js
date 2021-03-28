@@ -672,10 +672,13 @@ controller.updateCategory = async function(req, res) {
         await otherCategory.save();
     }
 
-    const other = await ItemCategory.findOne({_id: {$in: cafe.categories}, _name: "Other"}); //Find category "other"
+    let other = await ItemCategory.findOne({_id: {$in: cafe.categories}, name: "Other"}); //Find category "other"
     if (!other) {
-        req.flash("error", "Unable to find item category 'Other', please add it");
-        return res.redirect("back"); //There"s nowhere for the category-less items to go unless "Other" exists
+        other = await ItemCategory.create({name: "Other"}); //If it does not exist, create it category "other"
+        if (!other) {
+            req.flash("error", "Item Category could not be created");
+            return res.redirect("back");
+        }
     }
 
     for (let item of category.items) {
@@ -700,10 +703,13 @@ controller.updateCategory = async function(req, res) {
 //DELETE ITEM CATEGORY
 controller.deleteCategory = async function(req, res) {
     const cafe = await setup(Market);
-    const other = await ItemCategory.findOne({_id: {$in: cafe.categories}, name: "Other"}); //Find the category with name "Other" - we"ve created this category so that any unselected items go here
+    let other = await ItemCategory.findOne({_id: {$in: cafe.categories}, name: "Other"}); //Find the category with name "Other" - all unselected items go there
     if (!other) {
-        req.flash("error", "Unable to find item category 'Other', please add it");
-        return res.redirect("back");
+        other = await ItemCategory.create({name: "Other"}); //If it does not exist, create it category "other"
+        if (!other) {
+            req.flash("error", "Item category could not be created");
+            return res.redirect("back");
+        }
     }
 
     const category = await ItemCategory.findByIdAndDelete(req.params.id); //Delete category based on specified ID

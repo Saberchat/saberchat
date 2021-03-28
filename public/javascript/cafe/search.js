@@ -34,19 +34,3 @@ const search = function () { //Item search function
         }
     }
 }
-
-//Searching for orders works differently from the other cafe search function
-const searchOrders = function () {
-    const orders = document.getElementsByClassName('card');
-    const searchInput = document.getElementById('search-input');
-    let filter = searchInput.value.toLowerCase();
-
-    for (let i = 0; i < orders.length; i ++) {
-        if (!orders[i].innerText.toLowerCase().includes(filter)) {
-            orders[i].hidden = true;
-
-        } else {
-            orders[i].hidden = false;
-        }
-    }
-}
