@@ -5,6 +5,7 @@ const path = require('path');
 const {removeIfIncluded} = require("../utils/object-operations");
 const setup = require("../utils/setup");
 const {cloudUpload, cloudDelete} = require('../services/cloudinary');
+const {autoCompress} = require("../utils/image-compress");
 
 //SCHEMA
 const Platform = require("../models/platform");

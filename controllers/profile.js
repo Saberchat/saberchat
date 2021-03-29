@@ -7,6 +7,7 @@ const axios = require('axios');
 const {cloudUpload, cloudDelete} = require('../services/cloudinary');
 const {objectArrIndex, removeIfIncluded, concatMatrix, multiplyArrays, parsePropertyArray} = require('../utils/object-operations');
 const setup = require("../utils/setup");
+const {autoCompress} = require("../utils/image-compress");
 
 //SCHEMA
 const Platform = require("../models/platform");

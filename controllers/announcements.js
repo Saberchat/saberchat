@@ -6,6 +6,7 @@ const setup = require("../utils/setup");
 const path = require('path');
 const dateFormat = require('dateformat');
 const {cloudUpload, cloudDelete} = require('../services/cloudinary');
+const {autoCompress} = require("../utils/image-compress");
 
 //SCHEMA
 const Platform = require("../models/platform");

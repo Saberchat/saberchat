@@ -4,6 +4,7 @@ const {sendGridEmail} = require("../services/sendGrid");
 const {sortByPopularity} = require("../utils/popularity");
 const {objectArrIndex, parsePropertyArray, removeIfIncluded} = require("../utils/object-operations");
 const {cloudUpload, cloudDelete} = require('../services/cloudinary');
+const {autoCompress} = require("../utils/image-compress");
 const setup = require("../utils/setup");
 
 //SCHEMA

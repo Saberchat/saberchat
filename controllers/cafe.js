@@ -8,6 +8,7 @@ const getData = require("../utils/cafe-data");
 const {removeIfIncluded} = require("../utils/object-operations");
 const {cloudUpload, cloudDelete} = require("../services/cloudinary");
 const setup = require("../utils/setup");
+const {autoCompress} = require("../utils/image-compress");
 
 //SCHEMA
 const Platform = require("../models/platform");

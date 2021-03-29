@@ -6,7 +6,7 @@ const path = require('path');
 const {sendGridEmail} = require("../services/sendGrid");
 const {convertToLink} = require("../utils/convert-to-link");
 const { cloudUpload } = require('../services/cloudinary');
-const { autoCompress } = require('../services/tinify');
+const {autoCompress} = require("../utils/image-compress");
 const {objectArrIndex, removeIfIncluded, parseKeysOrValues, parsePropertyArray, concatMatrix} = require("../utils/object-operations");
 const setup = require("../utils/setup");
 
