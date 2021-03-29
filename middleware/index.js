@@ -49,7 +49,7 @@ middleware.checkIfMember = async function(req, res, next) {
         return res.redirect('/chat')
     }
 
-    if (room.type == 'public' || room.members.includes(req.user._id)) {
+    if (!room.private || room.members.includes(req.user._id)) {
         return next();
     }
     req.flash('error', 'You are not a member of this room');
