@@ -1,30 +1,32 @@
 # Saberchat
 
-demo on heroku Link: https://saberchat.net/
+PLATFORM LINKS
+https://saberchat.net/
+https://idot.saberchat.net/
 
-ToC
+Table of Directory Contents
 -----------------------------------------
-app.js: main file of the app\
+App: Website's main file, implements all routes and libraries
 .\
-controllers: Server logic files that are used in the callbacks of routes\
+Controllers: Server logic files that are used in the callbacks of routes\
 .\
-joiValidation: schema for form validation\
+JoiValidation: schema for form validation\
 .\
-middleware: express middleware for permissions, uploads and form validation\
+Middleware: express middleware for permissions, uploads and form validation\
 .\
-models: Mongoose DB models for collection schema\
+Models: Mongoose DB models for collection schema\
 .\
-Procfile: Tells Heroku what command to call on app start\
+Procfile: Tells Heroku what command to call on app start (No longer in usage)\
 .\
-public: Contains All Front-End CSS, JS and Static Display Images\
+Public: Contains All Front-End CSS, JS and Static Display Images\
 .\
-routes: Server routes, accessed in app.js\
+Routes: Server routes, accessed in app.js\
 .\
-services: Configurations for libraries and APIs such as image uploads and email sending\
+Services: Configurations for libraries and APIs such as image uploads and email sending\
 .\
-utils: Functions used platform-wide in both controllers and EJS logic\
+Utils: Functions used platform-wide in both controllers and EJS logic\
 .\
-Views: ejs files of front end code for all pages\
+Views: EJS files of front end code for all pages\
 
 
 Npm Libraries
