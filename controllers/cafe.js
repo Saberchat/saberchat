@@ -8,6 +8,7 @@ const getData = require("../utils/cafe-data");
 const {removeIfIncluded} = require("../utils/object-operations");
 const {cloudUpload, cloudDelete} = require("../services/cloudinary");
 const setup = require("../utils/setup");
+const {autoCompress} = require("../utils/image-compress");
 
 //SCHEMA
 const Platform = require("../models/platform");
@@ -375,7 +376,9 @@ controller.createItem = async function(req, res) {
 
     if (req.files) {
         if (req.files.mediaFile) {
-            const [cloudErr, cloudResult] = await cloudUpload(req.files.mediaFile[0]);
+            const file = req.files.mediaFile[0];
+            const processedBuffer = await autoCompress(file.originalname, file.buffer);
+            const [cloudErr, cloudResult] = await cloudUpload(file.originalname, processedBuffer);
             if (cloudErr || !cloudResult) {
                 req.flash("error", "Upload failed");
                 return res.redirect("back");
@@ -385,7 +388,7 @@ controller.createItem = async function(req, res) {
             item.mediaFile = {
                 filename: cloudResult.public_id,
                 url: cloudResult.secure_url,
-                originalName: req.files.mediaFile[0].originalname,
+                originalName: file.originalname,
                 display: req.body.showImage == "upload"
             };
         }
@@ -785,8 +788,11 @@ controller.updateItemInfo = async function(req, res) {
                     return res.redirect("back");
                 }
             }
+            
+            const file = req.files.mediaFile[0];
+            const processedBuffer = await autoCompress(file.originalname, file.buffer);
+            [cloudErr, cloudResult] = await cloudUpload(file.originalname, processedBuffer);
 
-            [cloudErr, cloudResult] = await cloudUpload(req.files.mediaFile[0]);
             if (cloudErr || !cloudResult) {
                 req.flash("error", "Upload failed");
                 return res.redirect("back");
@@ -795,7 +801,7 @@ controller.updateItemInfo = async function(req, res) {
             item.mediaFile = {
                 filename: cloudResult.public_id,
                 url: cloudResult.secure_url,
-                originalName: req.files.mediaFile[0].originalname,
+                originalName: file.originalname,
                 display: false
             };
         }

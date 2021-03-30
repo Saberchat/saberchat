@@ -7,6 +7,7 @@ const {sortByPopularity} = require("../utils/popularity");
 const {removeIfIncluded, parsePropertyArray, concatMatrix} = require('../utils/object-operations');
 const {cloudUpload, cloudDelete} = require('../services/cloudinary');
 const setup = require("../utils/setup");
+const {autoCompress} = require("../utils/image-compress");
 
 //SCHEMA
 const Platform = require("../models/platform");
@@ -114,13 +115,8 @@ controller.createProject = async function(req, res) {
             let cloudErr;
             let cloudResult;
             for (let file of req.files.mediaFile) {
-                if ([".mp3", ".mp4", ".m4a", ".mov"].includes(path.extname(file.originalname).toLowerCase())) {
-                    [cloudErr, cloudResult] = await cloudUpload(file, "video");
-                } else if (path.extname(file.originalname).toLowerCase() == ".pdf") {
-                    [cloudErr, cloudResult] = await cloudUpload(file, "pdf");
-                } else {
-                    [cloudErr, cloudResult] = await cloudUpload(file, "image");
-                }
+                const processedBuffer = await autoCompress(file.originalname, file.buffer);
+                [cloudErr, cloudResult] = await cloudUpload(file.originalname, processedBuffer);
 
                 if (cloudErr || !cloudResult) {
                     req.flash('error', 'Upload failed');
@@ -337,13 +333,8 @@ controller.updateProject = async function(req, res) {
     if (req.files) {
         if (req.files.mediaFile) {
             for (let file of req.files.mediaFile) { //Upload each file to cloudinary basd on format
-                if ([".mp3", ".mp4", ".m4a", ".mov"].includes(path.extname(file.originalname).toLowerCase())) {
-                    [cloudErr, cloudResult] = await cloudUpload(file, "video");
-                } else if (path.extname(file.originalname).toLowerCase() == ".pdf") {
-                    [cloudErr, cloudResult] = await cloudUpload(file, "pdf");
-                } else {
-                    [cloudErr, cloudResult] = await cloudUpload(file, "image");
-                }
+                const processedBuffer = await autoCompress(file.originalname, file.buffer);
+                [cloudErr, cloudResult] = await cloudUpload(file.originalname, processedBuffer);
                 if (cloudErr || !cloudResult) {
                     req.flash('error', 'Upload failed');
                     return res.redirect('back');
