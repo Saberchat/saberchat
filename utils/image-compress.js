@@ -16,16 +16,21 @@ module.exports.autoCompress = async function(fileName, fileBuffer) {
     const ext = path.extname(fileName).toLowerCase();
     if([".png", ".jpg", ".jpeg"].includes(ext)) {
         try {
-            console.log("DMITRY-DEBUG: attempting to compress image...");
+            if (process.env.DEBUG === "true") {
+                console.log("DMITRY-DEBUG: attempting to compress image...");
+            }
             let originalSize = fileBuffer.byteLength;
             let compressedBuffer = await compressImage(fileBuffer);
             let compressedSize = compressedBuffer.byteLength;
-            console.log("Original:", originalSize);
-            console.log("Compressed:", compressedSize);
-            console.log("Ratio:", compressedSize/originalSize);
+            if (process.env.DEBUG === "true") {
+                console.log("Image compression results:")
+                console.log("Original:", originalSize);
+                console.log("Compressed:", compressedSize);
+                console.log("Ratio:", compressedSize/originalSize);
+            }
             return compressedBuffer;
         } catch(e) {
-            console.log("An error occurred while compressing image: ");
+            console.warn("An error occurred while compressing image: ");
             console.error(e);
             return fileBuffer;
         }

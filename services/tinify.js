@@ -8,7 +8,7 @@ const path = require('path');
 tinify.key = process.env.TINIFY_KEY;
 
 async function compressImage(buffer) {
-    console.log("DMITRY-DEBUG: If you are seeing this, it means that the deprecated tinify.js compressor script is being used.")
+    console.warn("DEBUG: If you are seeing this, it means that the deprecated tinify.js compressor script is being used to compress images.")
     let results = {};
     await new Promise((resolve, reject) => {
         tinify.fromBuffer(buffer).toBuffer((err, resultData)=> {
