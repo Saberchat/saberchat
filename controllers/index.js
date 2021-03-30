@@ -295,12 +295,7 @@ controller.info = async function(req, res) {
 }
 
 controller.darkmode = async function(req, res) {
-    if (req.user.darkmode) {
-        req.user.darkmode = false;
-    } else {
-        req.user.darkmode = true;
-    }
-
+    req.user.darkmode = !req.user.darkmode;
     await req.user.save();
     return res.redirect('back');
 }

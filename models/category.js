@@ -8,10 +8,10 @@ const Category = mongoose.model("Category", new mongoose.Schema({
 }));
 
 module.exports = {
-    ItemCategory: Category.discriminator("ItemCategory", new mongoose.Schema({
+    ItemCategory: Category.discriminator("ItemCategory", new mongoose.Schema({ //Cafe order item category
         items: [{type: mongoose.Schema.Types.ObjectId, ref: "OrderItem"}]
     })),
-    PostCategory: Category.discriminator("PostCategory", new mongoose.Schema({
+    PostCategory: Category.discriminator("PostCategory", new mongoose.Schema({ //Post category (for journal articles, projects, etc.)
         posts: [{type: mongoose.Schema.Types.ObjectId, ref: "Post"}]
     }))
 };
