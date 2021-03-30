@@ -1,10 +1,11 @@
 # Saberchat
 
 PLATFORM LINKS
-https://saberchat.net/
+-----------------------------------------
+https://saberchat.net/\
 https://idot.saberchat.net/
 
-Table of Directory Contents
+TABLE OF DIRECTORY CONTENTS
 -----------------------------------------
 App: Website's main file, implements all routes and libraries
 .\
@@ -29,7 +30,7 @@ Utils: Functions used platform-wide in both controllers and EJS logic\
 Views: EJS files of front end code for all pages\
 
 
-Npm Libraries
+NPM LIBRARIES
 ===================================
 
 - Axios: Facilitates JSON requests and responses. Saberchat currently uses it for email sending with SendGrid
