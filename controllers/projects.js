@@ -431,7 +431,7 @@ controller.comment = async function(req, res) {
 
     const comment = await PostComment.create({
         text: req.body.text.split('<').join('&lt'),
-        sender: req.user,
+        sender: req.user
     });
     if (!comment) {
         return res.json({error: 'Error commenting'});

@@ -50,4 +50,5 @@ const comment = function (form, object, route, event) {
 
 const reply = function (comment) {
     document.getElementById('comment-input').value = `@${comment.id.split("comment-")[1]}_ `;
+    // document.getElementById('comment-input').value = `Replying to @${comment.id.split("comment-")[1]}: `;
 }

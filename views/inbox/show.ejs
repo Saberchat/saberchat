@@ -135,6 +135,7 @@
                                 <% } else if ([".mov", ".heic"].includes(fileExtensions.get(media.url).toLowerCase())) {%>
                                     <a href="<%=media.url%>" download><h5><i class="fas fa-paperclip"></i> Download "<%=media.originalName%>"</h5></a>
                                 <% } else if (fileExtensions.get(media.url).toLowerCase() == ".pdf") {%>
+                                    <iframe src="<%=media.url%>" height="300" width="250"></iframe>
                                     <a href="<%=media.url%>" target="_blank"><h5>Open "<%=media.originalName%>" In New Tab  </h5></a>
                                 <% } %>
                                 <br/><br/>

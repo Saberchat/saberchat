@@ -185,6 +185,7 @@
                             <% } else if ([".mov", ".heic"].includes(fileExtensions.get(media.url).toLowerCase())) {%>
                                 <a href="<%=media.url%>" download><h5><i class="fas fa-paperclip"></i> Download "<%=media.originalName%>"</h5></a>
                             <% } else if (fileExtensions.get(media.url).toLowerCase() == ".pdf") {%>
+                                <iframe src="<%=media.url%>" height="300" width="250"></iframe>
                                 <a href="<%=media.url%>" target="_blank"><h5>Open "<%=media.originalName%>" In New Tab  </h5></a>
                             <% } %>
                             <br/><br/>
@@ -214,18 +215,59 @@
 
                 <div id="all-comments">
                     <% for (let comment of project.comments.reverse()) { %>
-                        <% if (comment.sender && comment.sender._id.equals(currentUser._id)) { %>
-                            <!-- Reciever Message-->
-                            <div class="media mb-2 comment-body">
-                                <img src="<% if (comment.sender.mediaFile.display) {%> <%= comment.sender.mediaFile.url%><%} else {%> <%=comment.sender.imageUrl.url%><%}%>" alt="user" class="user-image">
-                                <div class="media-body ml-3">
-                                    <div class="bg-primary rounded py-2 px-3 mb-2 w-75">
-                                        <p class="text-small mb-0 text-white">
+                        <% if (comment.sender) { %>
+                            <% if (comment.sender._id.equals(currentUser._id)) { %>
+                                <!-- Reciever Message-->
+                                <div class="media mb-2 comment-body">
+                                    <img src="<% if (comment.sender.mediaFile.display) {%> <%= comment.sender.mediaFile.url%><%} else {%> <%=comment.sender.imageUrl.url%><%}%>" alt="user" class="user-image">
+                                    <div class="media-body ml-3">
+                                        <div class="bg-primary rounded py-2 px-3 mb-2 w-75">
+                                            <p class="text-small mb-0 text-white">
 
+                                                <% for (let line of comment.text.split(" ")) { %>
+                                                    <% if (line[0] == '@') { %>
+                                                        <a class="edit-button-text"
+                                                            href="../profiles/<%= line.split('#')[1].split('_')[0] %>"><%= line.split("#")[0] %></a>
+                                                    <% } else { %>
+                                                        <%= line %>
+                                                    <% } %>
+                                                <% } %>
+                                            </p>
+                                        </div>
+                                        <p class="small text-muted msg-info"><span
+                                                    class="username">Me</span>, <%= comment.date %></p>
+
+                                        <% if (comment.likes.includes(currentUser._id)) { %>
+                                            <span class="liked-comment" id="likeComment-<%= comment._id %>"
+                                                    onclick="likeComment(this, 'project', 'projects')"><i class="fas fa-thumbs-up"></i></span>
+                                            <span
+                                                    class="like-count-comment"
+                                                    id="likeCountComment-<%= comment._id %>"><%= comment.likes.length %></span>
+
+                                        <% } else { %>
+                                            <span class="unliked-comment" id="likeComment-<%= comment._id %>"
+                                                    onclick="likeComment(this, 'project', 'projects')"><i class="fas fa-thumbs-up"></i></span>
+                                            <span
+                                                    class="like-comment-comment"
+                                                    id="likeCountComment-<%= comment._id %>"><%= comment.likes.length %></span>
+                                        <% } %>
+
+                                    </div>
+                                </div>
+                        <% } else { %>
+                        <div class="media mb-2 comment-body">
+                            <img src="<% if (comment.sender.mediaFile.display) {%> <%= comment.sender.mediaFile.url%><%} else {%> <%=comment.sender.imageUrl.url%><%}%>" alt="user" class="user-image">
+                            <div class="media-body ml-3">
+                                <% if (comment.text.includes(`@${currentUser.username.split(' ').join('')}#${currentUser._id.toString()}`)) { %>
+                                <div class="rounded py-2 px-3 mb-2 w-75 mentioned-comment">
+                                    <% } else { %>
+                                    <div class="bg-grey rounded py-2 px-3 mb-2 w-75">
+                                        <% } %>
+
+                                        <p class="text-small mb-0 text-dark">
                                             <% for (let line of comment.text.split(" ")) { %>
                                                 <% if (line[0] == '@') { %>
-                                                    <a class="edit-button-text"
-                                                        href="../profiles/<%= line.split('#')[1].split('_')[0] %>"><%= line.split("#")[0] %></a>
+                                                    <a href="../profiles/<%= line.split('#')[1].split('_')[0] %>"><%= line.split("#")[0] %></a>
                                                 <% } else { %>
                                                     <%= line %>
                                                 <% } %>
@@ -233,66 +275,110 @@
                                         </p>
                                     </div>
                                     <p class="small text-muted msg-info"><span
-                                                class="username">Me</span>, <%= comment.date %></p>
+                                                class="username"><%= comment.sender.username %></span>, <%= comment.date %>
+                                        <a class="comment-date"
+                                            id="comment-<%= comment.sender.username.split(' ').join('') %>#<%= comment.sender._id %>"
+                                            href="#comment-section" onclick="reply(this)">Reply</a></p>
 
                                     <% if (comment.likes.includes(currentUser._id)) { %>
                                         <span class="liked-comment" id="likeComment-<%= comment._id %>"
-                                                onclick="likeComment(this, 'project', 'projects')"><i class="fas fa-thumbs-up"></i></span>
-                                        <span
+                                                onclick="likeComment(this, 'project', 'projects')"><i class="fas fa-thumbs-up"></i></span> <span
                                                 class="like-count-comment"
                                                 id="likeCountComment-<%= comment._id %>"><%= comment.likes.length %></span>
 
                                     <% } else { %>
                                         <span class="unliked-comment" id="likeComment-<%= comment._id %>"
-                                                onclick="likeComment(this, 'project', 'projects')"><i class="fas fa-thumbs-up"></i></span>
-                                        <span
+                                                onclick="likeComment(this, 'project', 'projects')"><i class="fas fa-thumbs-up"></i></span> <span
                                                 class="like-comment-comment"
                                                 id="likeCountComment-<%= comment._id %>"><%= comment.likes.length %></span>
                                     <% } %>
-
                                 </div>
                             </div>
-                        <% } else if(comment.sender) { %>
-                            <!-- Sender message -->
-                    <div class="media mb-2 comment-body">
-                        <img src="<% if (comment.sender.mediaFile.display) {%> <%= comment.sender.mediaFile.url%><%} else {%> <%=comment.sender.imageUrl.url%><%}%>" alt="user" class="user-image">
-                        <div class="media-body ml-3">
-                            <% if (comment.text.includes(`@${currentUser.username.split(' ').join('')}#${currentUser._id.toString()}`)) { %>
-                            <div class="rounded py-2 px-3 mb-2 w-75 mentioned-comment">
-                                <% } else { %>
-                                <div class="bg-grey rounded py-2 px-3 mb-2 w-75">
-                                    <% } %>
+                            <% } %>
 
-                                    <p class="text-small mb-0 text-dark">
-                                        <% for (let line of comment.text.split(" ")) { %>
-                                            <% if (line[0] == '@') { %>
-                                                <a href="../profiles/<%= line.split('#')[1].split('_')[0] %>"><%= line.split("#")[0] %></a>
+                            <% for (let reply of comment.comments) { %>
+                                <% if (reply.sender) { %>
+                                    <% if (reply.sender._id.equals(currentUser._id)) { %>
+                                        <!-- Reciever Message-->
+                                        <div class="media mb-2 reply-body" style="margin-left: 50px;">
+                                            <img src="<% if (reply.sender.mediaFile.display) {%> <%= reply.sender.mediaFile.url%><%} else {%> <%=reply.sender.imageUrl.url%><%}%>" alt="user" class="user-image">
+                                            <div class="media-body ml-3">
+                                                <div class="bg-primary rounded py-2 px-3 mb-2 w-75">
+                                                    <p class="text-small mb-0 text-white">
+                                
+                                                        <% for (let line of reply.text.split(" ")) { %>
+                                                            <% if (line[0] == '@') { %>
+                                                                <a class="edit-button-text"
+                                                                    href="../profiles/<%= line.split('#')[1].split('_')[0] %>"><%= line.split("#")[0] %></a>
+                                                            <% } else { %>
+                                                                <%= line %>
+                                                            <% } %>
+                                                        <% } %>
+                                                    </p>
+                                                </div>
+                                                <p class="small text-muted msg-info"><span
+                                                            class="username">Me</span>, <%= reply.date %></p>
+                                
+                                                <% if (reply.likes.includes(currentUser._id)) { %>
+                                                    <span class="liked-reply" id="likeComment-<%= reply._id %>"
+                                                            onclick="likeComment(this, 'project', 'projects')"><i class="fas fa-thumbs-up"></i></span>
+                                                    <span
+                                                            class="like-count-reply"
+                                                            id="likeCountComment-<%= reply._id %>"><%= reply.likes.length %></span>
+                                
+                                                <% } else { %>
+                                                    <span class="unliked-reply" id="likeComment-<%= reply._id %>"
+                                                            onclick="likeComment(this, 'project', 'projects')"><i class="fas fa-thumbs-up"></i></span>
+                                                    <span
+                                                            class="like-reply-reply"
+                                                            id="likeCountComment-<%= reply._id %>"><%= reply.likes.length %></span>
+                                                <% } %>
+                                
+                                            </div>
+                                        </div>
+                                <% } else { %>
+                                <div class="media mb-2 reply-body" style="margin-left: 50px;">
+                                    <img src="<% if (reply.sender.mediaFile.display) {%> <%= reply.sender.mediaFile.url%><%} else {%> <%=reply.sender.imageUrl.url%><%}%>" alt="user" class="user-image">
+                                    <div class="media-body ml-3">
+                                        <% if (reply.text.includes(`@${currentUser.username.split(' ').join('')}#${currentUser._id.toString()}`)) { %>
+                                        <div class="rounded py-2 px-3 mb-2 w-75 mentioned-reply">
                                             <% } else { %>
-                                                <%= line %>
+                                            <div class="bg-grey rounded py-2 px-3 mb-2 w-75">
+                                                <% } %>
+                                
+                                                <p class="text-small mb-0 text-dark">
+                                                    <% for (let line of reply.text.split(" ")) { %>
+                                                        <% if (line[0] == '@') { %>
+                                                            <a href="../profiles/<%= line.split('#')[1].split('_')[0] %>"><%= line.split("#")[0] %></a>
+                                                        <% } else { %>
+                                                            <%= line %>
+                                                        <% } %>
+                                                    <% } %>
+                                                </p>
+                                            </div>
+                                            <p class="small text-muted msg-info"><span
+                                                        class="username"><%= reply.sender.username %></span>, <%= reply.date %>
+                                                <a class="reply-date"
+                                                    id="reply-<%= reply.sender.username.split(' ').join('') %>#<%= reply.sender._id %>"
+                                                    href="#reply-section" onclick="reply(this)">Reply</a></p>
+                                
+                                            <% if (reply.likes.includes(currentUser._id)) { %>
+                                                <span class="liked-reply" id="likeComment-<%= reply._id %>"
+                                                        onclick="likeComment(this, 'project', 'projects')"><i class="fas fa-thumbs-up"></i></span> <span
+                                                        class="like-count-reply"
+                                                        id="likeCountComment-<%= reply._id %>"><%= reply.likes.length %></span>
+                                
+                                            <% } else { %>
+                                                <span class="unliked-reply" id="likeComment-<%= reply._id %>"
+                                                        onclick="likeComment(this, 'project', 'projects')"><i class="fas fa-thumbs-up"></i></span> <span
+                                                        class="like-reply-reply"
+                                                        id="likeCountComment-<%= reply._id %>"><%= reply.likes.length %></span>
                                             <% } %>
-                                        <% } %>
-                                    </p>
-                                </div>
-                                <p class="small text-muted msg-info"><span
-                                            class="username"><%= comment.sender.username %></span>, <%= comment.date %>
-                                    <a class="comment-date"
-                                        id="comment-<%= comment.sender.username.split(' ').join('') %>#<%= comment.sender._id %>"
-                                        href="#comment-section" onclick="reply(this)">Reply</a></p>
-
-                                <% if (comment.likes.includes(currentUser._id)) { %>
-                                    <span class="liked-comment" id="likeComment-<%= comment._id %>"
-                                            onclick="likeComment(this, 'project', 'projects')"><i class="fas fa-thumbs-up"></i></span> <span
-                                            class="like-count-comment"
-                                            id="likeCountComment-<%= comment._id %>"><%= comment.likes.length %></span>
-
-                                <% } else { %>
-                                    <span class="unliked-comment" id="likeComment-<%= comment._id %>"
-                                            onclick="likeComment(this, 'project', 'projects')"><i class="fas fa-thumbs-up"></i></span> <span
-                                            class="like-comment-comment"
-                                            id="likeCountComment-<%= comment._id %>"><%= comment.likes.length %></span>
+                                        </div>
+                                    </div>
+                                    <% } %>
                                 <% } %>
-                            </div>
-                        </div>
+                            <% } %>
                         <% } %>
                     <% } %>
                 </div>
