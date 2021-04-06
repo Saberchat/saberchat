@@ -4,6 +4,7 @@ PLATFORM LINKS
 -----------------------------------------
 - https://saberchat.net/
 - https://idot.saberchat.net/
+- https://aapa.saberchat.net/
 
 TABLE OF DIRECTORY CONTENTS
 -----------------------------------------
