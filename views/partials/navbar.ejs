@@ -131,6 +131,9 @@
                                         Statuses</a>
                                     <a href="/admin/moderate" class="dropdown-item"><i class="fas fa-flag"></i> Moderate
                                         Comments</a>
+                                    <% if (platform.principalAuthenticate) { %>
+                                        <a href="/admin/authenticate" class="dropdown-item"><i class="fas fa-user-plus"></i> Authenticate Users</a>                                        
+                                    <% } %>
                                     <a href="/admin/accesslist" class="dropdown-item"><i class="fas fa-inbox"></i> Email
                                         Access List</a>
                                     <a href="/admin/accesslist?version=blockedlist" class="dropdown-item"><i class="fas fa-inbox"></i> Email

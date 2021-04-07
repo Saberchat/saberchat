@@ -115,10 +115,16 @@ controller.register = async function(req, res) {
         await user.save();
     }
 
-    await sendGridEmail(user.email, 'Verify Saberchat Account', `<p>Hello ${newUser.firstName},</p><p>Welcome to Saberchat! A confirmation of your account:</p><ul><li>Your username is ${newUser.username}.</li><li>Your full name is ${newUser.firstName} ${newUser.lastName}.</li><li>Your linked email is ${newUser.email}</li></ul><p>Click <a href="https://${platform.url}/authenticate/${newUser._id}?token=${token}">this link</a> to verify your account.</p>`, true);
+    if (!platform.principalAuthenticate) { //If principal does not have to authenticate user, user authenticates themself with email
+        await sendGridEmail(user.email, 'Verify Saberchat Account', `<p>Hello ${newUser.firstName},</p><p>Welcome to Saberchat! A confirmation of your account:</p><ul><li>Your username is ${newUser.username}.</li><li>Your full name is ${newUser.firstName} ${newUser.lastName}.</li><li>Your linked email is ${newUser.email}</li></ul><p>Click <a href="https://${platform.url}/authenticate/${newUser._id}?token=${token}">this link</a> to verify your account.</p>`, true);
+    }
 
     // if registration is successful, login user.
-    req.flash("success", "Welcome to Saberchat " + user.firstName + "! Go to your email to verify your account");
+    if (!platform.principalAuthenticate) {
+        req.flash("success", "Welcome to Saberchat " + user.firstName + "! Go to your email to verify your account");
+    } else {
+        req.flash("success", "Welcome to Saberchat " + user.firstName + "! Your account will be evaluated and authenticated soon");
+    }
     return res.redirect("/");
 }
 

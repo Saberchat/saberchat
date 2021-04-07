@@ -16,8 +16,7 @@ middleware.isLoggedIn = async function(req, res, next) {
     }
 
     if (req.isAuthenticated()) {return next();}
-    //If user is not logged in, but this feature is available to people without accounts
-    if (objectArrIndex(platform.publicFeatures, "route", req.baseUrl.slice(1)) > -1) {
+    if (objectArrIndex(platform.publicFeatures, "route", req.baseUrl.slice(1)) > -1) { //If user is not logged in, but this feature is available to people without accounts
         if (platform.publicFeatures[objectArrIndex(platform.publicFeatures, "route", req.baseUrl.slice(1))].subroutes.includes(req.route.path)) {
             return next();
         }
