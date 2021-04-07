@@ -49,49 +49,55 @@
                   <input id="search-input" oninput="searchFunction(this, 'user')" class="form-control search" type="text" placeholder="Search..." title="Type in name"/>
                 </div><br />
 
-            <ul class="list-group">
+            <% if (users.length <= 1) {%>
+              <h1>No Users</h1>
 
-                  <li class="list-group-item mode darkmode-outline">
-                    <span id="modify-header">Modify Statuses</span>
-                </li>
+            <%} else { %>
 
-                <% for (let status of statusMatrix) { %>
-                    <% for (let user of users) { %>
-                        <% if(!user._id.equals(currentUser._id) && user.status.toLowerCase() == status[0].toLowerCase()){ %>
-                            <% for (let perm of permMatrix) { %>
-                              <% if (perm[0].toLowerCase() == user.permission.toLowerCase())  { %>
-                                <li class="list-group-item user <%=status[0].toLowerCase()%> <%=status[1].toLowerCase()%> <%=perm[0]%> <%=user.tags.join(' ')%> cafe" id="user-<%=user._id%>">
-                                  <%= user.username %> (<%= user.firstName %> <%= user.lastName %>)
+              <ul class="list-group">
+
+                    <li class="list-group-item mode darkmode-outline">
+                      <span id="modify-header">Modify Statuses</span>
+                  </li>
+
+                  <% for (let status of statusMatrix) { %>
+                      <% for (let user of users) { %>
+                          <% if(!user._id.equals(currentUser._id) && user.status.toLowerCase() == status[0].toLowerCase()){ %>
+                              <% for (let perm of permMatrix) { %>
+                                <% if (perm[0].toLowerCase() == user.permission.toLowerCase())  { %>
+                                  <li class="list-group-item user <%=status[0].toLowerCase()%> <%=status[1].toLowerCase()%> <%=perm[0]%> <%=user.tags.join(' ')%> cafe" id="user-<%=user._id%>">
+                                    <%= user.username %> (<%= user.firstName %> <%= user.lastName %>)
+                                <% } %>
                               <% } %>
+                            <select name="status" class="role-select mode" onchange="updateStatus(this)" id="<%= user._id %>">
+
+                              <% for (let status of statusMatrix) { %>
+                                <% if (user.status.toLowerCase() == status[0].toLowerCase()) { %>
+                                  <option value="<%=status[0]%>" selected><%=status[1]%></option>
+
+                                <% } else { %>
+                                  <option value="<%=status[0]%>"><%=status[1]%></option>
+                                <% }%>
+                              <% } %>
+                            </select>
+                            <select name="tag" class="role-select mode" onchange="updateTag(this)" id="<%= user._id %>">
+                              <option value=""></option>
+
+                              <% for (let tag of tags) { %>
+                                <option value="<%=tag%>"><%=tag%></option>
+                              <% } %>
+                            </select>
+
+                            <% for (let tag of user.tags) { %>
+                              <span class="badge badge-pill badge-warning tag-<%=user._id%> user-tag"><%=tag%></span>
                             <% } %>
-                          <select name="status" class="role-select mode" onchange="updateStatus(this)" id="<%= user._id %>">
-
-                            <% for (let status of statusMatrix) { %>
-                              <% if (user.status.toLowerCase() == status[0].toLowerCase()) { %>
-                                <option value="<%=status[0]%>" selected><%=status[1]%></option>
-
-                              <% } else { %>
-                                <option value="<%=status[0]%>"><%=status[1]%></option>
-                              <% }%>
-                            <% } %>
-                          </select>
-                          <select name="tag" class="role-select mode" onchange="updateTag(this)" id="<%= user._id %>">
-                            <option value=""></option>
-
-                            <% for (let tag of tags) { %>
-                              <option value="<%=tag%>"><%=tag%></option>
-                            <% } %>
-                          </select>
-
-                          <% for (let tag of user.tags) { %>
-                            <span class="badge badge-pill badge-warning tag-<%=user._id%> user-tag"><%=tag%></span>
-                          <% } %>
-                        </li>
-                      <% } %>
+                          </li>
+                        <% } %>
+                    <% } %>
                   <% } %>
-                <% } %>
 
-            </ul>
+              </ul>
+            <% } %>
             <br/>
         </div>
     </div>

@@ -66,6 +66,13 @@ const authenticateUser = function(button, action) { //Authenticate or remove use
                 document.getElementById("loading").style.display = "none";
             }, 1000);
 
+            if (document.getElementsByClassName("user").length == 0) {
+                const noUsers = document.createElement("h1");
+                noUsers.innerHTML = "No Users";
+                document.getElementById("email-list").parentNode.appendChild(noUsers);
+                document.getElementById("email-list").parentNode.removeChild(document.getElementById("email-list"));
+            }
+
         } else if (data.error) {
             document.getElementById("loading").style.color = "red";
             document.getElementById("loading").innerText = data.error;

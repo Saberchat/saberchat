@@ -42,39 +42,43 @@
                 <input id="search-input" oninput="searchFunction(this, 'user')" class="form-control search" type="text" placeholder="Search..." title="Type in name"/>
               </div><br />
 
-            <ul class="list-group">
+              <% if (users.length <= 1) {%>
+                <h1>No Users</h1>
 
-                <li class="list-group-item mode darkmode-outline">
-                  <span id="modify-header">Modify Permissions</span>
-                </li>
+              <%} else { %>
+                <ul class="list-group">
+                  <li class="list-group-item mode darkmode-outline">
+                    <span id="modify-header">Modify Permissions</span>
+                  </li>
 
-                <% for (let perm of permMatrix) { %>
-                    <% for (let user of users) { %>
-                        <% if(!user._id.equals(currentUser._id) && user.permission == perm[0]) { %>
-                            <% for (let status of statusMatrix) { %>
-                              <% if (status[0].toLowerCase() == user.status.toLowerCase())  { %>
-                                <li class="list-group-item user <%=perm[1].toLowerCase()%> <%=status[0].toLowerCase()%> <%=status[1].toLowerCase()%> <%=perm[0]%> <%=user.tags.join(' ')%> cafe" id="<%=user._id%>">
-                                  <%= user.username %> (<%= user.firstName %> <%= user.lastName %>)
+                  <% for (let perm of permMatrix) { %>
+                      <% for (let user of users) { %>
+                          <% if(!user._id.equals(currentUser._id) && user.permission == perm[0]) { %>
+                              <% for (let status of statusMatrix) { %>
+                                <% if (status[0].toLowerCase() == user.status.toLowerCase())  { %>
+                                  <li class="list-group-item user <%=perm[1].toLowerCase()%> <%=status[0].toLowerCase()%> <%=status[1].toLowerCase()%> <%=perm[0]%> <%=user.tags.join(' ')%> cafe" id="<%=user._id%>">
+                                    <%= user.username %> (<%= user.firstName %> <%= user.lastName %>)
+                                <% } %>
                               <% } %>
-                            <% } %>
 
-                            <select name="permission" class="role-select mode" onchange="updateRole(this)" id="<%= user._id %>">
-                              <% for (let perm of permMatrix) { %>
-                                <% if (user.permission == perm[0]) { %>
-                                  <option value="<%=perm[0]%>" selected><%=perm[1]%></option>
+                              <select name="permission" class="role-select mode" onchange="updateRole(this)" id="<%= user._id %>">
+                                <% for (let perm of permMatrix) { %>
+                                  <% if (user.permission == perm[0]) { %>
+                                    <option value="<%=perm[0]%>" selected><%=perm[1]%></option>
 
-                                <% } else { %>
-                                  <option value="<%=perm[0]%>"><%=perm[1]%></option>
-                                <% }%>
-                              <% } %>
-                            </select>
-                          </li>
-                      <% } %>
+                                  <% } else { %>
+                                    <option value="<%=perm[0]%>"><%=perm[1]%></option>
+                                  <% }%>
+                                <% } %>
+                              </select>
+                            </li>
+                        <% } %>
+                    <% } %>
+
                   <% } %>
 
-                <% } %>
-
-            </ul>
+              </ul>
+            <% } %>
             <br/>
         </div>
     </div>
