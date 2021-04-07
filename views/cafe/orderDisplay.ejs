@@ -71,7 +71,7 @@
                     <ul class="list-group">
                         <% for (let item of order.items) { %>
                             <li class="list-group-item cafe"><%= item.item.name %>
-                                <% let itemCharge = (item.quantity * item.item.price).toString(); %>
+                                <% let itemCharge = (item.quantity * item.item.price); %>
                                 <%= item.item.name %> (<%= item.quantity %> order(s)) -
                                 $<%= itemCharge.toFixed(2)%>
                             </li>

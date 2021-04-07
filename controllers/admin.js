@@ -74,11 +74,11 @@ controller.updatePlatform = async function(req, res) {
     platform.contact = {heading: req.body.contactHeading, description: req.body.contactInfo};
 
     if (req.body.displayProjects) {
-        if (objectArrIndex(platform.publicFeatures, "name", "Student Projects") == -1) {
-            platform.publicFeatures.push({route: "projects", name: "Student Projects", icon: "paint-brush", subroutes: ["/"]});
+        if (objectArrIndex(platform.publicFeatures, "name", "Projects") == -1) {
+            platform.publicFeatures.push({route: "projects", name: "Projects", icon: "paint-brush", subroutes: ["/"]});
         }
     } else {
-        platform.publicFeatures.splice(objectArrIndex(platform.publicFeatures, "name", "Student Projects"), 1);
+        platform.publicFeatures.splice(objectArrIndex(platform.publicFeatures, "name", "Projects"), 1);
     }
     
     if (req.body.displayAnns) {

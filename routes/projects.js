@@ -1,4 +1,4 @@
-//Project routes dictate the posting, viewing, and editing of the Saberchat Student Projects Board
+//Project routes dictate the posting, viewing, and editing of the Saberchat Projects Board
 const express = require('express');
 const middleware = require('../middleware');
 const {multipleUpload} = require('../middleware/multer');
@@ -9,7 +9,7 @@ const router = express.Router(); //Router
 
 router.route('/')
     .get(wrapAsync(middleware.isLoggedIn), wrapAsync(projects.index)) //Show all projects
-    .post(wrapAsync(middleware.isLoggedIn), wrapAsync(middleware.isFaculty), multipleUpload, validateProject, wrapAsync(projects.createProject)); //Create ne wproject
+    .post(wrapAsync(middleware.isLoggedIn), wrapAsync(middleware.isFaculty), multipleUpload, validateProject, wrapAsync(projects.createProject)); //Create new project
 
 router.get('/new', wrapAsync(middleware.isLoggedIn), wrapAsync(middleware.isFaculty), wrapAsync(projects.newProject)); //Form to create new project
 // router.get('/data', wrapAsync(middleware.isLoggedIn), wrapAsync(middleware.isFaculty), wrapAsync(projects.data));

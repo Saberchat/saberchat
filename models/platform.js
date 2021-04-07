@@ -1,3 +1,4 @@
+const { boolean } = require("joi");
 const mongoose = require("mongoose");
 
 //Platform schema holds all data for individual platform's settings
@@ -6,6 +7,7 @@ var platformSchema = new mongoose.Schema({
     url: String,
     imageUrl: String,
     principal: String,
+    principalAuthenticate: {type: Boolean, default: false}, //Check if users have to be validated by principal first
     emailExtension: {type: String, default: ''},
     updateTime: {type: String, default: "0 0"},
     navDark: {type: Boolean, default: false},
