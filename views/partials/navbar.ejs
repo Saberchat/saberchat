@@ -37,7 +37,7 @@
                                data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" <% if (platform.navDark) {%> style="color: black;"<%}%>>
                                 <i class="fas fa-align-justify"></i> More
                                 <span
-                                    <% if (currentUser.newRoomCount.length <= 0) { %> hidden<% } %> 
+                                    <% if (currentUser.newRoomCount.length <= 0) { %> hidden<% } %>
                                     class="badge badge-pill badge-danger" id="new-count"><%= currentUser.newRoomCount.length %>
                                 </span>
                             </a>
@@ -53,7 +53,7 @@
                                     class="badge badge-pill badge-danger"><%= currentUser.newRoomCount.length %></span>
                                 </a>
                                 <% for (let feature of platform.features) { %>
-                                    <% if (feature.name != "Witherly Heights") { %>
+                                    <% if (feature.name != "Unused") { %>
                                         <a class="dropdown-item" href="/<%=feature.route%>">
                                             <i class="fas fa-<%=feature.icon%>"></i>
                                             <%=feature.name%>

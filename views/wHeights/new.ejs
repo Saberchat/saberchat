@@ -61,9 +61,9 @@
                     <label for="type">Category</label><br/>
                     <select required id="type" name="type" class="form-control">
                         <option value="">Select A Category</option>
-                        <% for (let type of types) { %>
+                        <% for (let category of categories) { %>
                             <option value="<%= type._id %>">
-                                <%= type.name %>
+                                <%= category.name %>
                             </option>
                         <% } %>
                     </select>

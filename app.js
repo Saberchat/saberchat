@@ -149,7 +149,7 @@ app.use('/announcements', announcementRoutes);
 app.use('/admin', adminRoutes);
 app.use('/cafe', cafeRoutes);
 app.use('/projects', projectRoutes);
-// app.use('/articles', wHeightsRoutes);
+app.use('/articles', wHeightsRoutes);
 app.use('/homework', hwRoutes);
 app.use('/reports', reportRoutes);
 app.use('/modules', moduleRoutes);
