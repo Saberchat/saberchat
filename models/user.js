@@ -15,7 +15,7 @@ module.exports = mongoose.model("User", new mongoose.Schema({
     authenticationToken: String,
     receiving_emails: {type: Boolean, default: true},
     bannerUrl: {
-        url: {type: String, default: 'https://i.imgur.com/Wnbn7Ei.gif'},
+        url: {type: String, default: 'https://wallpaper.dog/large/11001671.jpg'},
         display: {type: Boolean, default: true}
     },
     bannerFile: {

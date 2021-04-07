@@ -30,8 +30,13 @@ router.route("/settings")
 router.put('/tag', wrapAsync(middleware.isLoggedIn), wrapAsync(middleware.isMod), wrapAsync(admin.tag));
 
 router.route('/balances')
-    .get(middleware.isLoggedIn, middleware.isCashier, wrapAsync(admin.viewBalances))
-    .put(middleware.isLoggedIn, middleware.isCashier, wrapAsync(admin.updateBalances));
+    .get(wrapAsync(middleware.isLoggedIn), middleware.isCashier, wrapAsync(admin.viewBalances))
+    .put(wrapAsync(middleware.isLoggedIn), middleware.isCashier, wrapAsync(admin.updateBalances));
+
+router.route('/authenticate')
+    .get(wrapAsync(middleware.isLoggedIn), wrapAsync(middleware.isPrincipal), wrapAsync(admin.authenticateGet))
+    .put(wrapAsync(middleware.isLoggedIn), wrapAsync(middleware.isPrincipal), wrapAsync(admin.authenticatePut))
+    .delete(wrapAsync(middleware.isLoggedIn), wrapAsync(middleware.isPrincipal), wrapAsync(admin.authenticateDelete));
 
 // router.delete('/accesslist/:id', wrapAsync(middleware.isLoggedIn), wrapAsync(middleware.isPrincipal), wrapAsync(admin.permanentDelete));
 

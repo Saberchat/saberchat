@@ -30,7 +30,7 @@ const addEmail = function(event, version) { //Add an email to access list/blocke
 const removeEmail = function (button) { //Remove email from access list/blocked list
     const emailId = button.id.split('-')[1];
     const url = `/admin/accesslist?_method=delete`;
-    const data = {email: emailId};
+    const data = {emailId};
 
     $.post(url, data, data => {
         $(`#modal-${emailId}`).modal('hide');
@@ -46,6 +46,19 @@ const removeEmail = function (button) { //Remove email from access list/blocked 
             setTimeout(() => { //After a second, remove the loading message
                 document.getElementById("loading").style.display = "none";
             }, 1000)
+        }
+    });
+}
+
+const authenticateUser = function(button, action) { //Authenticate or remove user
+    const userId = button.id.split('-')[1];
+    const url = `/admin/authenticate?_method=${action}`;
+    const data = {userId};
+
+    $.post(url, data, data => {
+        if (data.success) {
+            $(`#modal-${action}-${userId}`).modal('hide');
+            document.getElementById("email-list").removeChild(document.getElementById(`${userId}`));
         }
     });
 }
