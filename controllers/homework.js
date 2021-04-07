@@ -913,9 +913,7 @@ controller.likeReview = async function(req, res) {
 
 controller.approveLesson = async function(req, res) {
     const course = await Course.findById(req.params.id);
-    if (!course) {
-        return res.json({error: "Unable to find course"});
-    }
+    if (!course) { return res.json({error: "Unable to find course"});}
     for (let tutor of course.tutors) {
         if (tutor.tutor.equals(req.body.tutorId)) {
             for (let student of tutor.members) {
@@ -1010,8 +1008,8 @@ controller.showTutor = async function(req, res) {
             }
 
             let lessonMap = new Map(); //Track all lessons of this tutor's members
-            let costMap = new Map();
             let time = 0;
+            let costMap = new Map();
             let cost = 0;
             for (let student of tutor.members.concat(tutor.formerStudents)) {
                 time = 0;

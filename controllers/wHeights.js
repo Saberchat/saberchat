@@ -18,7 +18,7 @@ controller.index = async function(req, res) {
     const articles = await Article.find({}).populate('sender');
     if (!platform || !articles) {
         req.flash('error', 'An Error Occurred');
-        return res.redirect('/articles');
+        return res.redirect('/wHeights');
     }
     return res.render('wHeights/index', {platform, articles});
 }
@@ -58,7 +58,7 @@ controller.show = async function(req, res) {
 
     if (!platform || !article) {
         req.flash('error', 'Cannot find article');
-        return res.redirect('/articles');
+        return res.redirect('/wHeights');
     }
     return res.render('wHeights/show', {platform, article});
 }
@@ -75,7 +75,7 @@ controller.create = async function(req, res) {
     const article = await Article.create(articleObj);
     if (!article) {
         req.flash('error', "Error creating article");
-        return res.redirect('/articles');
+        return res.redirect('/wHeights');
     }
     article.date = dateFormat(article.created_at, "mmm d, yyyy - h:MM TT");
 
@@ -97,7 +97,7 @@ controller.create = async function(req, res) {
     //Add articles to the article category
     category.articles.push(article);
     await category.save();
-    return res.redirect('/articles');
+    return res.redirect('/wHeights');
 }
 
 //Comment on article

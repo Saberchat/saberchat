@@ -143,13 +143,13 @@ controller.authenticatePut = async function(req, res) {
     const user = await User.updateOne({_id: req.body.userId, authenticated: false}, {authenticated: true});
     if (!user) { return res.json({error: "Unable to find user"});}
     await sendGridEmail(user.email, 'Welcome To Saberchat!', `<p>Hello ${user.firstName},</p><p>Welcome to Saberchat! A confirmation of your account:</p><ul><li>Your username is ${user.username}.</li><li>Your full name is ${user.firstName} ${user.lastName}.</li><li>Your linked email is ${user.email}</li></ul><p>You will be assigned a role and status soon.</p>`, false);
-    return res.json({success: "Succesfully Updated"});
+    return res.json({success: "Authenticated User!"});
 }
 
 controller.authenticateDelete = async function(req, res) {
     const user = await User.deleteOne({_id: req.body.userId, authenticated: false});
     if (!user) { return res.json({error: "Unable to find user"});}
-    return res.json({success: "Succesfully Deleted"});
+    return res.json({success: "Removed User!"});
 }
 
 controller.moderateGet = async function(req, res) { //Show all reported comments
