@@ -1,74 +1,61 @@
+// set up env vars if in local developmeent
+if (process.env.NODE_ENV !== "production") {
+    require('dotenv').config();
+}
+
+//NODE.JS MODULES
+//set up and start the express server
+const express = require('express');
+// mongoose allows us to communicate with mongodb seamlessly through js
+const mongoose = require('mongoose');
+// passport.js is an authentication middleware module
+const passport = require('passport');
+const LocalStrategy = require('passport-local');
+// flash messages on screen i.e "logged in successfully!"
+const flash = require('connect-flash');
+// middleware; parses incoming data from client under req.body
+const bodyParser = require('body-parser');
+// allow us to use other methods besides post and get
+const methodOverride = require('method-override');
+// Sets HTTP headers for security
+const helmet = require('helmet');
+// prevents MongoDB Operator Injection
+const mongoSanitize = require('express-mongo-sanitize');
+// Sets up express session for authorization
+const session = require('express-session');
+// add favicon
+const favicon = require('serve-favicon');
+//Source URLs for data security
+const {scriptUrls, styleUrls} = require('./srcUrls');
+//Platform data
+const setup = require("./utils/setup");
+//Async wrapper
+const wrapAsync = require("./utils/wrapAsync");
+//Callbacks for chat room socket functions
+const chat = require("./socket/chat");
+//Callbacks for cafe socket functions
+const cafe = require("./socket/cafe");
+//Scheduler for schedule jobs
+const schedule = require('node-schedule');
+
+// SCHEMA
+const Platform = require('./models/platform');
+const User = require("./models/user");
+
+// connect to db.
+mongoose.connect(process.env.DATABASE_URL,
+{
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+    useFindAndModify: false
+});
+
 const appSetup = async function() {
-    // set up env vars if in local developmeent
-    if (process.env.NODE_ENV !== "production") {
-        require('dotenv').config();
-    }
-
-    //NODE.JS MODULES
-    //set up and start the express server
-    const express = require('express');
     const app = express();
-    // mongoose allows us to communicate with mongodb seamlessly through js
-    const mongoose = require('mongoose');
-    // passport.js is an authentication middleware module
-    const passport = require('passport');
-    const LocalStrategy = require('passport-local');
-    // flash messages on screen i.e "logged in successfully!"
-    const flash = require('connect-flash');
-    // middleware; parses incoming data from client under req.body
-    const bodyParser = require('body-parser');
-    // allow us to use other methods besides post and get
-    const methodOverride = require('method-override');
-    // package for formating dates on the serverside
-    const dateFormat = require('dateformat');
-    // Sets HTTP headers for security
-    const helmet = require('helmet');
-    // prevents MongoDB Operator Injection
-    const mongoSanitize = require('express-mongo-sanitize');
-    // add favicon
-    const favicon = require('serve-favicon');
-    //Source URLs for data security
-    const {scriptUrls, styleUrls} = require('./srcUrls');
-    //Platform data
-    const setup = require("./utils/setup");
-
-    // profanity filter
-    const Filter = require('bad-words');
-    const filter = new Filter();
-
-    // require scheduler
-    const schedule = require('node-schedule');
-
-    // require the models for database actions
-    const Platform = require('./models/platform');
-    const User = require("./models/user");
-    const {ChatMessage} = require('./models/notification');
-    const Order = require('./models/cafe/order');
-    const Item = require('./models/cafe/orderItem');
-    const {Market, ChatRoom} = require('./models/group');
-
-    // require the routes
-    const indexRoutes = require('./routes/index');
-    const chatRoutes = require('./routes/chat');
-    const profileRoutes = require('./routes/profiles');
-    const inboxRoutes = require('./routes/inbox');
-    const adminRoutes = require('./routes/admin');
-    const announcementRoutes = require('./routes/announcements');
-    const projectRoutes = require('./routes/projects');
-    const reportRoutes = require('./routes/reports');
-
     // set up ports and socket.io
     const http = require('http').createServer(app);
     const io = require('socket.io')(http);
     const port = process.env.PORT || 3000;
-
-    // connect to db.
-    mongoose.connect(process.env.DATABASE_URL,
-    {
-        useNewUrlParser: true,
-        useUnifiedTopology: true,
-        useFindAndModify: false
-    });
 
     // APP CONFIGURATION
     app.use(favicon(__dirname + '/public/images/favicon.ico')); // use favicon
@@ -82,24 +69,21 @@ const appSetup = async function() {
     app.use(helmet()); // Helmet security headers
 
     app.use(helmet.contentSecurityPolicy({ // customizations for helmet content security policy
-    directives: {
-        defaultSrc: ["https://docs.google.com", "https://res.cloudinary.com"],
-        connectSrc: ["'self'", "https://ka-f.fontawesome.com/", "https://res.cloudinary.com", "https://www.googletagmanager.com", "https://www.google-analytics.com"],
-        scriptSrc: ["'unsafe-inline'", "'self'", ...scriptUrls],
-        styleSrc: ["'self'", "'unsafe-inline'", ...styleUrls],
-        mediaSrc: ["'self'", "https://res.cloudinary.com"],
-        workerSrc: ["'self'", "blob:"],
-        objectSrc: [],
-        imgSrc: ["'self'", "https:", "blob:", "data:"],
-        fontSrc: ["'self'", "https://ka-f.fontawesome.com/", "https://fonts.gstatic.com/"]
-    }
+        directives: {
+            defaultSrc: ["https://docs.google.com", "https://res.cloudinary.com"],
+            connectSrc: ["'self'", "https://ka-f.fontawesome.com/", "https://res.cloudinary.com", "https://www.googletagmanager.com", "https://www.google-analytics.com"],
+            scriptSrc: ["'unsafe-inline'", "'self'", ...scriptUrls],
+            styleSrc: ["'self'", "'unsafe-inline'", ...styleUrls],
+            mediaSrc: ["'self'", "https://res.cloudinary.com"],
+            workerSrc: ["'self'", "blob:"],
+            objectSrc: [],
+            imgSrc: ["'self'", "https:", "blob:", "data:"],
+            fontSrc: ["'self'", "https://ka-f.fontawesome.com/", "https://fonts.gstatic.com/"]
+        }
     }));
 
-    app.use(helmet.referrerPolicy({ // customizations for helmet referrer policy
-        policy: "same-origin"
-    }));
+    app.use(helmet.referrerPolicy({policy: "same-origin"})); // customizations for helmet referrer policy
 
-    const session = require('express-session'); // Sets up express session for authorization
     const MemoryStore = require('memorystore')(session); // Memorystore package (express-session has memory leaks, bad for production)
     const sessionConfig = {
         name: 'app-ses',
@@ -130,7 +114,6 @@ const appSetup = async function() {
 
     app.use((req, res, next) => { // setting app locals, which can be accessed in all ejs views
         res.locals.currentUser = req.user; // puts user info into 'currentUser' variable
-        // flash message stuff
         res.locals.error = req.flash('error');
         res.locals.success = req.flash('success');
         next();
@@ -138,8 +121,10 @@ const appSetup = async function() {
 
     // Import Routes
     const platform = await setup(Platform); //Set up Platform
-    
-    app.use(indexRoutes); //Index Routes, with no prefix
+     
+    //Index Routes, with no prefix
+    const indexRoutes = require("./routes/index");
+    app.use(indexRoutes);
 
     for (let route of ["chat", "profiles", "inbox", "announcements", "admin", "projects", "reports"]) { //General Routes
         app.use(`/${route}`, require(`./routes/${route}`));
@@ -151,8 +136,7 @@ const appSetup = async function() {
         }
     }
 
-    // Catch-all route.
-    app.get('*', (req, res) => { res.redirect('/');});
+    app.get('*', (req, res) => { res.redirect('/');}); // Catch-all route.
 
     // list of responses to bad words
     const curseResponse = [
@@ -185,167 +169,17 @@ const appSetup = async function() {
         });
     }
 
-    // Socket.io server-side code
+    // Socket.io server-side code (in route structure, connecting to socket controllers)
+    //TODO: Try to turn functions into callbacks
     io.on('connect', socket => {
-        socket.on('switch room', (newroom) => {
-            socket.leave(socket.room);
-            socket.join(newroom);
-            socket.room = newroom;
+        socket.on('switch room', newroom => {
+            chat.switchRoom(io, socket, newroom);
         });
-
-        // When 'chat message' event is detected, emit msg to all clients in room
         socket.on('chat message', async(msg) => {
-            try {
-                let profanity;
-                // clean the message
-                if (msg.text != filter.clean(msg.text)) {
-                    msg.text = filter.clean(msg.text);
-                    profanity = true;
-                }
-                // create/save comment to db
-                const room = await ChatRoom.findById(socket.room);
-                if (!room) {
-                    return console.log(err);
-                }
-
-                const comment = await ChatMessage.create({text: msg.text, author: msg.authorId});
-                if (!comment) {
-                    return console.log(err); // sends error msg if comment could not be created
-                }
-
-                msg.id = comment._id;
-                socket.to(socket.room).emit('chat message', msg); // broadcast message to all connected users in the room
-                comment.date = dateFormat(comment.created_at, "h:MM TT | mmm d");
-                await comment.save();
-                room.comments.push(comment._id);
-                await room.save();
-
-                if (profanity) { // checks if bad language was used
-                    let notif = {
-                        text: getRandMessage(curseResponse),
-                        status: 'notif'
-                    };
-
-                    await io.in(socket.room).emit('announcement', notif);
-
-                    const newComment = await ChatMessage.create({text: notif, status: notif.status});
-                    if (!newComment) {
-                        console.log(err);
-                    }
-
-                    newChatMessage.date = dateFormat(comment.created_at, "h:MM TT | mmm d");
-                    await newChatMessage.save();
-                }
-
-            } catch(err) {
-                console.log(err);
-            }
+            await chat.chatMessage(io, socket, msg).catch(err => { return console.log(err);});
         });
-
-        socket.on('order', async(itemList, itemCount, instructions, payingInPerson, customerId) => { //If an order is sent, handle it here (determined from cafe-socket frontend)
-            try {
-                const cafe = await Market.findOne({}); //Collect data on cafe to figure out whether it's open or not
-                if (!cafe) {
-                    return console.log('error accessing cafe');
-                }
-
-                if (cafe.open) { //If the cafe is open, run everything else. Otherwise, nothing matters since orders aren't being accepted
-                    const user = await User.findById(customerId);
-                    if (!user) {
-                        return console.log('error accessing user');
-                    }
-
-                    const activeOrders = await Order.find({name: `${user.firstName} ${user.lastName}`, present: true}); //Access user's current orders (so we can see if they've passed the order limit)
-                    if (!activeOrders) {
-                        return console.log('error accessing orders');
-                    }
-
-                    if (activeOrders.length >= 3) { //If you have made three or more orders that are still active (have not been delivered), then you cannot make anymore
-                        return console.log("Max orders made");
-                    }
-
-                    const orderItems = await Item.find({_id: {$in: itemList}}); //Find all items that are part of the user's order (itemList was generated in cafe-socket FE)
-                    if (!orderItems) {
-                        return console.log('error accessing order items');
-                    }
-
-                    let unavailable = false; //This variable will track if any items are unavailable in the requested quantities
-
-                    for (let i = 0; i < orderItems.length; i++) { //Iterate over each item and check if any are unavailable
-                        if (orderItems[i].availableItems < parseInt(itemCount[i])) { //If order asks for more of this item than is available, unavailable is now true, and the checking stops immediately
-                            unavailable = true;
-                            break;
-                        }
-                    }
-
-                    if (unavailable) { //An unlikely scenario. Another user places an order that results in there being less available items than the number that our user has ordered.
-                        return console.log('some items unavailable');
-                    }
-
-                    let orderItemsObjects = [];
-                    for (let i = 0; i < itemList.length; i += 1) {
-                        orderItemsObjects.push(
-                            {
-                                item: itemList[i],
-                                quantity: parseInt(itemCount[i]),
-                                price: 0
-                            }
-                        );
-                    }
-
-                    let orderInstructions = "";
-                    if (instructions == "") {
-                        orderInstructions = "None";
-
-                    } else {
-                        orderInstructions = instructions;
-                    }
-
-                    let order = await Order.create({
-                        customer: customerId,
-                        name: `${user.firstName} ${user.lastName}`,
-                        present: true,
-                        charge: 0,
-                        instructions: orderInstructions,
-                        payingInPerson: payingInPerson
-                    });
-
-                    if (!order) {return console.log('error creating order');}
-
-                    order.date = dateFormat(order.created_at, "mmm d, h:MM TT");
-                    let charge = 0;
-                    let itemProfile;
-
-                    for (let i = 0; i < orderItemsObjects.length; i++) { //items[] contains info about individual items (and their prices); itemCount[] says how much of each item is ordered. Multiplication will calculate how much to charge for an item
-                        itemProfile = await Item.findById(orderItemsObjects[i].item);
-                        if (!itemProfile) {
-                            return console.log('error accessing item');
-                        }
-
-                        charge += (itemProfile.price * orderItemsObjects[i].quantity);
-                        orderItemsObjects[i].price = itemProfile.price;
-                    }
-
-                    order.charge = charge; //Set order cost based on the items ordered
-                    order.items = orderItemsObjects;
-                    await order.save();
-
-                    if (order.charge > user.balance && !payingInPerson) { //If charge is over online balance, and user is paying online
-                        const deletedOrder = await Order.findByIdAndDelete(order._id);
-
-                        if (!deletedOrder) {
-                            return console.log('Error deleting order');
-                        }
-                    }
-
-                    const displayItems = await Item.find({_id: {$in: itemList}}); //Full versions of the _id signatures sent in order.items
-                    if (!displayItems) {
-                        return console.log('Error accessing display items');
-                    }
-                    return io.emit('order', order, displayItems); //Send order to cafe admins via socket
-                }
-
-            } catch(err) { console.log(err);} //Execute and catch any error
+        socket.on('order', async(itemList, itemCount, instructions, payingInPerson, customerId) => {
+            await cafe.order(io, socket, itemList, itemCount, instructions, payingInPerson, customerId).catch(err => { return console.log(err);});
         });
     });
 

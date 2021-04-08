@@ -1,4 +1,4 @@
-const updateRole = function (select) { //Update user's permission
+const updateRole = function(select) { //Update user's permission
     const loading = document.getElementById('loading'); //Button which shows request status
     loading.style.display = 'block';
     loading.style.color = 'gray';
