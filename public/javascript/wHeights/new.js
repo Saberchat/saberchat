@@ -146,5 +146,5 @@ $('#create-btn').on('click', (() => {
         content: JSON.stringify(articleContent)
     }
 
-    postIt('/articles/new', article);
+    postIt('/wHeights/new', article);
 }));

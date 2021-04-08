@@ -331,4 +331,9 @@ controller.deleteArticle = async function(req, res) {
     return res.redirect('/articles/');
 }
 
+controller.specificInfo = async function(req, res) {
+    const platform = await setup(Platform);
+    return res.render('other/specific-info', {platform});
+}
+
 module.exports = controller;

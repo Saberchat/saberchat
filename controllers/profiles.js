@@ -49,7 +49,7 @@ controller.index = async function(req, res) {
 		}
 	}
 
-	return res.render("profile/index", {
+	return res.render("profiles/index", {
 		platform, users, statuses,
 		permMap: new Map(concatMatrix([
 			platform.permissionsProperty.slice(1),
@@ -74,12 +74,12 @@ controller.team = async function(req, res) {
 		return res.redirect("back");
 	}
 
-	return res.render("profile/team", {platform, users});
+	return res.render("profiles/team", {platform, users});
 }
 
 controller.edit = async function(req, res) {
 	const platform = await setup(Platform);
-	return res.render('profile/edit', { //Check if user has permissions to change their own tags and statuses
+	return res.render('profiles/edit', { //Check if user has permissions to change their own tags and statuses
 		platform,
 		statuses: platform.statusesProperty,
 		tags: platform.tags,
@@ -93,7 +93,7 @@ controller.changeLoginInfo = async function(req, res) {
         req.flash("error", "An Error Occurred");
         return res.redirect("back");
     }
-	return res.render('profile/edit_pwd_email', {platform});
+	return res.render('profiles/edit_pwd_email', {platform});
 }
 
 controller.show = async function(req, res) {
@@ -120,7 +120,7 @@ controller.show = async function(req, res) {
 		if (u.followers.includes(req.user._id)) {currentUserFollowing.push(u);}
 	}
 
-	return res.render('profile/show', {
+	return res.render('profiles/show', {
 		platform, user, following, followerIds,
 		convertedDescription: convertToLink(user.description),
 		perms: new Map(concatMatrix([platform.permissionsProperty, platform.permissionsDisplay])),
@@ -198,7 +198,7 @@ controller.update = async function(req, res) {
 		};
 	}
 
-	//Upload new images for banner and profile
+	//Upload new images for banner and profiles
 	if (req.files) {
 		let cloudErr;
 		let cloudResult;
@@ -253,11 +253,11 @@ controller.update = async function(req, res) {
 
 	const updatedUser = await User.findByIdAndUpdate(req.user._id, user); //find and update the user with new info
 	if (!updatedUser) {
-		req.flash('error', 'There was an error updating your profile');
+		req.flash('error', 'There was an error updating your profiles');
 		return res.redirect('back');
 	}
 
-	req.flash('success', 'Updated your profile');
+	req.flash('success', 'Updated your profiles');
 	return res.redirect(`/profiles/${req.user._id}`);
 }
 
@@ -387,7 +387,7 @@ controller.confirmEmail = async function(req, res) {
 		user.authenticationToken = token;
 		await user.save();
 
-		await sendGridEmail(user, 'Email Update Confirmation', `<p>Hello ${user.firstName},</p><p>You are receiving this email because you recently made changes to your Saberchat email. This is a confirmation of your profile.</p><p>Your username is ${user.username}.</p><p>Your full name is ${user.firstName} ${user.lastName}.</p><p>Your email is ${user.email}.</p>`, false);
+		await sendGridEmail(user, 'Email Update Confirmation', `<p>Hello ${user.firstName},</p><p>You are receiving this email because you recently made changes to your Saberchat email. This is a confirmation of your profiles.</p><p>Your username is ${user.username}.</p><p>Your full name is ${user.firstName} ${user.lastName}.</p><p>Your email is ${user.email}.</p>`, false);
 		req.flash('success', "Email updated!")
 		return res.redirect('/');
 	}
@@ -404,7 +404,7 @@ controller.changePasswordPut = async function(req, res) {
 		}
 
 		await user.changePassword(req.body.oldPassword, req.body.newPassword); //Update user's password
-		await sendGridEmail(req.user.email, 'Password Update Confirmation', `<p>Hello ${req.user.firstName},</p><p>You are receiving this email because you recently made changes to your Saberchat password. This is a confirmation of your profile.\n\nYour username is ${req.user.username}.\nYour full name is ${req.user.firstName} ${req.user.lastName}.\nYour email is ${req.user.email}\n\nIf you did not recently change your password, reset it immediately and contact a faculty member.</p>`, false);
+		await sendGridEmail(req.user.email, 'Password Update Confirmation', `<p>Hello ${req.user.firstName},</p><p>You are receiving this email because you recently made changes to your Saberchat password. This is a confirmation of your profiles.\n\nYour username is ${req.user.username}.\nYour full name is ${req.user.firstName} ${req.user.lastName}.\nYour email is ${req.user.email}\n\nIf you did not recently change your password, reset it immediately and contact a faculty member.</p>`, false);
 		req.flash('success', 'Successfully changed your password');
 		return res.redirect('/profiles/' + req.user._id);
 	}

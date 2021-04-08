@@ -61,7 +61,7 @@ saveButton.addEventListener('click', () => { //Save article draft
             content: JSON.stringify(savedData.blocks)
         }
 
-        postIt('/articles/new', article);
+        postIt('/wHeights/new', article);
         console.log('Saved Article');
     }).catch((error) => {
         console.log('Saving failed: ', error);

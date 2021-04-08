@@ -11,11 +11,11 @@
     <link rel="stylesheet" href="/stylesheets/components/navbar.css">
     <link rel="stylesheet" href="/stylesheets/components/header.css">
     <link rel="stylesheet" href="/stylesheets/chat/edit.css">
-    <link rel="stylesheet" href="/stylesheets/profile/index.css">
+    <link rel="stylesheet" href="/stylesheets/profiles/index.css">
     <%if (currentUser) {%>
       <%if (currentUser.darkmode) { %>
         <link rel="stylesheet" href="/stylesheets/darkmode.css">
-        <link rel="stylesheet" href="/stylesheets/profile/dark-profile.css">
+        <link rel="stylesheet" href="/stylesheets/profiles/dark-profile.css">
       <%}%>
     <%}%>
 
@@ -25,8 +25,8 @@
 
     <!-- I'm using my fontawesome kit -->
     <script src="https://kit.fontawesome.com/dccc745c41.js" crossorigin="anonymous"></script>
-    <script src="/javascript/profile/search.js"></script>
-    <script src="/javascript/profile/follow.js"></script>
+    <script src="/javascript/profiles/search.js"></script>
+    <script src="/javascript/profiles/follow.js"></script>
     <%- include('../partials/analytics') %>
   </head>
   <body class="mode">

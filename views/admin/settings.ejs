@@ -57,7 +57,12 @@
                         <div class="form-group">
                             <label for="newName">Name</label>
                             <input id="newName" class="form-control mode" type="text" name="name" value="<%= platform.name %>"
-                                    placeholder="Enter Course Name" oninput="changeName(this)" required>
+                                    placeholder="Enter Platform Name" oninput="changeName(this)" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="newDescription">Description</label>
+                            <input id="newDescription" class="form-control mode" type="text" name="description" value="<%= platform.description %>"
+                                    placeholder="Enter Platform Description">
                         </div>
                         <div class="form-group">
                             <label for="thumbnail-input">Image Url</label><br/>

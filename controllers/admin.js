@@ -30,7 +30,7 @@ controller.updatePlatform = async function(req, res) {
         return res.redirect("back");
     }
     const oldAddress = platform.emailExtension;
-    for (let attr of ["name", "imageUrl", "emailExtension", "displayImages", "font"]) { //Update elements with directly corresponding text
+    for (let attr of ["name", "description", "imageUrl", "emailExtension", "displayImages", "font"]) { //Update elements with directly corresponding text
         platform[attr] = req.body[attr];
     }
 
