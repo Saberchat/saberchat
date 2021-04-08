@@ -166,19 +166,10 @@ const appSetup = async function() {
     const getRandMessage = (list => {return list[Math.floor(Math.random() * list.length)];})
 
     // deletes all comments at midnight
-
-    // const manageComments = schedule.scheduleJob('0 0 0 * * *', () => {
-    // 	ChatMessage.find({}, (err, comments) => {
-    // 		if(err || !comments) {
-    // 			console.log(err);
-    // 		} else {
-    // 			comments.map((comment) => {
-    // 				if(true) {
-    // 					comment.remove();
-    // 				}
-    // 			});
-    // 		}
-    // 	});
+    // await schedule.scheduleJob('0 0 0 * * *', async() => {
+    //     const comments = await ChatMessage.find({});
+    //     if(!comments) { return console.log(err);}
+    //     comments.map((comment) => { if(true) {comment.remove();}});
     // });
 
     // Update all students' statuses on update date, if required
@@ -358,7 +349,6 @@ const appSetup = async function() {
         });
     });
 
-    // -----------------------
     // Start server
     http.listen(port, process.env.IP, () => {
         console.log(":: App listening on port " + port + " ::");
