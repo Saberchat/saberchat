@@ -16,11 +16,17 @@ const controller = {};
 
 controller.index = async function(req, res) {
     const platform = await setup(Platform);
-    if (!platform) {
-        req.flash("error", "An Error Occurred");
-        return res.redirect("back");
+    const teachers = await User.find({authenticated: true, authenticated: true, status: platform.teacherStatus});
+    if (!platform || !teachers) {
+        req.flash('error', "An Error Occurred");
+        return res.redirect('back');
     }
-    return res.render('index', {platform});
+
+    let names = [];
+    for (let user of teachers) { //Iterate through faculty and add their name to array
+        names.push(`${user.firstName} ${user.lastName}`);
+    }
+    return res.render('other/platform-info', {platform, names: names.join(', ')});
 }
 
 controller.register = async function(req, res) {
@@ -287,17 +293,11 @@ controller.contact = async function(req, res) { //Contact info of highest status
 
 controller.info = async function(req, res) {
     const platform = await setup(Platform);
-    const teachers = await User.find({authenticated: true, authenticated: true, status: platform.teacherStatus});
-    if (!platform || !teachers) {
-        req.flash('error', "An Error Occurred");
-        return res.redirect('back');
+    if (!platform) {
+        req.flash("error", "An Error Occurred");
+        return res.redirect("back");
     }
-
-    let names = [];
-    for (let user of teachers) { //Iterate through faculty and add their name to array
-        names.push(`${user.firstName} ${user.lastName}`);
-    }
-    return res.render('other/platform-info', {platform, names: names.join(', ')});
+    return res.render('index', {platform});
 }
 
 controller.darkmode = async function(req, res) {
