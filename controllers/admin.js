@@ -36,6 +36,8 @@ controller.updatePlatform = async function(req, res) {
 
     if (req.body.navDark) {
         platform.navDark = true;
+    } else {
+        platform.navDark = false;
     }
 
     for (let attr of ["colorScheme", "darkColorScheme"]) {
