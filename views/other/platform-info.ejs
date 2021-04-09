@@ -41,8 +41,13 @@
     <div class="container-fluid text-center">
         <div class="row">
             <div class="col-12 background-title">
-                <h1><%=platform.name%></h1>
-                <p><%=platform.description%></p>
+                <% if (platform.descriptionDisplay) { %>
+                    <h1><%=platform.description%></h1>
+                    <p style="font-size: 200%;"><%=platform.name%><% if (platform.postText){%>, <%=platform.postText%><%}%></p>
+                <% } else { %>
+                    <h1><%=platform.name%></h1>
+                    <p><%=platform.description%><% if (platform.postText){%>, <%=platform.postText%><%}%></p>
+                <% } %>
             </div>
         </div>
     </div>
@@ -51,10 +56,27 @@
 <!-- Home Page content -->
 <main id="main-container">
     <div class="container mt-5">
+        <div class="row text-element">
+            <div class="col-lg-6 block">
+                <article class="text-block">
+                    <div class="block-header red">
+                        <h1 style="user-select: none; -moz-user-select: none;">Community</h1>
+                    </div>
+                    <div class="block-content mode">
+                    <% for (let para of platform.community) { %>
+                        <p class="convertible-text"><%=para%></p>
+                    <% } %>
+                    </div>
+                </article>
+            </div>
+            <div class="col-lg-6 block">
+                <img class="image-block" src="<%=platform.displayImages[2]%>" alt="<%=platform.name%> image">
+            </div>
+        </div>
         <% let block;%>
         <% for (let i = 0; i < platform.info.length; i++) { %>
             <% block = platform.info[i]%>
-            <% if (i%2 == 0) { %>
+            <% if (i%2 == 1) { %>
                 <div class="row text-element">
                     <div class="col-lg-6">
                         <article class="text-block mode">
@@ -95,7 +117,6 @@
                 </div>
             <% } %>
         <% } %>
-
     </div>
     </div>
 </main>
@@ -109,5 +130,6 @@
         });
     });
 </script>
+<script src="/javascript/embed.js"></script>
 </body>
 </html>

@@ -5,9 +5,12 @@ const mongoose = require("mongoose");
 var platformSchema = new mongoose.Schema({
     name: String,
     description: {type: String, default: ''},
+    postText: String,
     url: String,
+    icon: String,
     imageUrl: String,
     principal: String,
+    descriptionDisplay: {type: Boolean, default: false}, //Display description or platform name first on homepage
     principalAuthenticate: {type: Boolean, default: false}, //Check if users have to be validated by principal first
     emailExtension: {type: String, default: ''},
     updateTime: {type: String, default: "0 0"},

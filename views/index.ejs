@@ -95,24 +95,6 @@
                 <img class="image-block" src="<%=platform.displayImages[1]%>" alt="<%=platform.name%> image">
             </div>
         </div>
-        <!-- Block 3 -->
-        <div class="row element" id="block-3">
-            <div class="col-lg-6">
-                <article class="text-block">
-                    <div class="block-header red">
-                        <h1 style="user-select: none; -moz-user-select: none;">Community</h1>
-                    </div>
-                    <div class="block-content mode">
-                    <% for (let para of platform.community) { %>
-                        <p class="convertible-text"><%=para%></p>
-                    <% } %>
-                    </div>
-                </article>
-            </div>
-            <div class="col-lg-6 block">
-                <img class="image-block" src="<%=platform.displayImages[2]%>" alt="<%=platform.name%> image">
-            </div>
-        </div>
     </div>
 </main>
 <%- include('./partials/footer') %>

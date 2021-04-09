@@ -65,6 +65,11 @@
                                     placeholder="Enter Platform Description">
                         </div>
                         <div class="form-group">
+                            <label for="postText">Extra Description Information</label>
+                            <input id="postText" class="form-control mode" type="text" name="postText" value="<%= platform.postText %>"
+                                    placeholder="Enter Any Extra Description Information">
+                        </div>
+                        <div class="form-group">
                             <label for="thumbnail-input">Image Url</label><br/>
                             <input id="thumbnail-input" class="form-control mode" type="text" oninput="changeThumbnail(this)"
                                     name="imageUrl" value="<%= platform.imageUrl %>" placeholder="Enter Image Url">
