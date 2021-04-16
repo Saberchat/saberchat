@@ -36,8 +36,6 @@
                             <a class="nav-link" <% if (platform.navDark) {%> style="color: black;"<%}%> href="/profiles"><i class="fas fa-user"></i> Users</a>
                         </li>
                         <li class="nav-item dropdown">
-                        <li class="nav-item"></li>
-                        <li class="nav-item dropdown">
                             <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button"
                                data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" <% if (platform.navDark) {%> style="color: black;"<%}%>>
                                 <i class="fas fa-align-justify"></i> More
@@ -66,7 +64,6 @@
                                     <% } %>
                                 <% } %>
                             </div>
-
                         </li>
 
                     <% } else { %>
@@ -76,6 +73,21 @@
                             </li>
                         <% } %>
                     <% } %>
+
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button"
+                           data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" <% if (platform.navDark) {%> style="color: black;"<%}%>>
+                            <i class="fas fa-align-justify"></i> About
+                        </a>
+
+                        <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                            <a class="dropdown-item" href="/"><i class="fas fa-info-circle"></i> About <%=platform.name%></a>
+                            <% if (currentUser) { %>
+                                <a class="dropdown-item" href="/contact"><i class="fas fa-phone"></i> Contact</a>
+                            <% } %>
+                            <a class="dropdown-item" href="/info"><i class="fas fa-question-circle"></i> About Saberchat</a>
+                        </div>
+                    </li>
 
                 </ul>
                 <ul class="navbar-nav ml-auto">
