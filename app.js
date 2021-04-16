@@ -51,24 +51,24 @@ mongoose.connect(process.env.DATABASE_URL,
 });
 
 const appSetup = async function() {
-    const app = express();
+    const app = await express();
     // set up ports and socket.io
-    const http = require('http').createServer(app);
-    const io = require('socket.io')(http);
+    const http = await require('http').createServer(app);
+    const io = await require('socket.io')(http);
     const port = process.env.PORT || 3000;
 
     // APP CONFIGURATION
-    app.use(favicon(__dirname + '/public/images/favicon.ico')); // use favicon
-    app.use(express.static(__dirname + "/public")); // make public dir accessible in all views
-    app.use('/editor', express.static(__dirname + "/node_modules/@editorjs")); // try serving editorjs package to frontend
-    app.use(bodyParser.urlencoded({extended: true})); // use body parser
-    app.set("view engine", "ejs"); // set view engine to ejs
-    app.use(methodOverride('_method')); // Allows for forms to use PUT and DELETE requests
-    app.use(flash()); // use connect-flash for flash messages
-    app.use(mongoSanitize({replaceWith: '_'})); // replaces $ and .  with _ in req.body, req.query, or req.params
-    app.use(helmet()); // Helmet security headers
+    await app.use(favicon(__dirname + '/public/images/favicon.ico')); // use favicon
+    await app.use(express.static(__dirname + "/public")); // make public dir accessible in all views
+    await app.use('/editor', express.static(__dirname + "/node_modules/@editorjs")); // try serving editorjs package to frontend
+    await app.use(bodyParser.urlencoded({extended: true})); // use body parser
+    await app.set("view engine", "ejs"); // set view engine to ejs
+    await app.use(methodOverride('_method')); // Allows for forms to use PUT and DELETE requests
+    await app.use(flash()); // use connect-flash for flash messages
+    await app.use(mongoSanitize({replaceWith: '_'})); // replaces $ and .  with _ in req.body, req.query, or req.params
+    await app.use(helmet()); // Helmet security headers
 
-    app.use(helmet.contentSecurityPolicy({ // customizations for helmet content security policy
+    await app.use(helmet.contentSecurityPolicy({ // customizations for helmet content security policy
         directives: {
             defaultSrc: ["https://docs.google.com", "https://res.cloudinary.com"],
             connectSrc: ["'self'", "https://ka-f.fontawesome.com/", "https://res.cloudinary.com", "https://www.googletagmanager.com", "https://www.google-analytics.com"],
@@ -82,9 +82,9 @@ const appSetup = async function() {
         }
     }));
 
-    app.use(helmet.referrerPolicy({policy: "same-origin"})); // customizations for helmet referrer policy
+    await app.use(helmet.referrerPolicy({policy: "same-origin"})); // customizations for helmet referrer policy
 
-    const MemoryStore = require('memorystore')(session); // Memorystore package (express-session has memory leaks, bad for production)
+    const MemoryStore = await require('memorystore')(session); // Memorystore package (express-session has memory leaks, bad for production)
     const sessionConfig = {
         name: 'app-ses',
         cookie: {
@@ -105,51 +105,40 @@ const appSetup = async function() {
         sessionConfig.cookie.secure = false;
     }
 
-    app.use(session(sessionConfig));
-    app.use(passport.initialize()); // passport required authorization setup that I also know nothing about.
-    app.use(passport.session());
-    passport.use(User.createStrategy()); // Sets strategy used. FOR NOW: email and pwd. LATER: Google, FB, Twitter logins
-    passport.serializeUser(User.serializeUser()); // prepares the user schema for authorization
-    passport.deserializeUser(User.deserializeUser());
+    await app.use(session(sessionConfig));
+    await app.use(passport.initialize()); // passport required authorization setup that I also know nothing about.
+    await app.use(passport.session());
+    await passport.use(User.createStrategy()); // Sets strategy used. FOR NOW: email and pwd. LATER: Google, FB, Twitter logins
+    await passport.serializeUser(User.serializeUser()); // prepares the user schema for authorization
+    await passport.deserializeUser(User.deserializeUser());
 
-    app.use((req, res, next) => { // setting app locals, which can be accessed in all ejs views
+    await app.use((req, res, next) => { // setting app locals, which can be accessed in all ejs views
         res.locals.currentUser = req.user; // puts user info into 'currentUser' variable
         res.locals.error = req.flash('error');
         res.locals.success = req.flash('success');
-        next();
+        return next();
     });
 
     // Import Routes
     const platform = await setup(Platform); //Set up Platform
      
     //Index Routes, with no prefix
-    const indexRoutes = require("./routes/index");
-    app.use(indexRoutes);
+    const indexRoutes = await require("./routes/index");
+    await app.use(indexRoutes);
 
     for (let route of ["chat", "profiles", "inbox", "announcements", "admin", "projects", "reports"]) { //General Routes
-        app.use(`/${route}`, require(`./routes/${route}`));
+        await app.use(`/${route}`, require(`./routes/${route}`));
     }
 
     for (let feature of platform.features) { //Platform-Specific Routes
         if (!feature.route.includes('/')) { //If feature is its own route directory
-            app.use(`/${feature.route}`, require(`./routes/${feature.route}`));
+            await app.use(`/${feature.route}`, require(`./routes/${feature.route}`));
         }
     }
 
-    app.get('*', (req, res) => { res.redirect('/');}); // Catch-all route.
+    app.get('*', (req, res) => { return res.redirect('/');}); // Catch-all route.
 
-    // list of responses to bad words
-    const curseResponse = [
-        "Please Don't curse. Let's keep things family-friendly.",
-        "Give the word filter a break! Don't curse.",
-        "Not cool. Very not cool.",
-        "Come on. Be friendly."
-    ];
-
-    // gets random item in array
-    const getRandMessage = (list => {return list[Math.floor(Math.random() * list.length)];})
-
-    // deletes all comments at midnight
+    // deletes all comments at midnight (not doing for now)
     // await schedule.scheduleJob('0 0 0 * * *', async() => {
     //     const comments = await ChatMessage.find({});
     //     if(!comments) { return console.log(err);}
@@ -170,11 +159,8 @@ const appSetup = async function() {
     }
 
     // Socket.io server-side code (in route structure, connecting to socket controllers)
-    //TODO: Try to turn functions into callbacks
-    io.on('connect', socket => {
-        socket.on('switch room', newroom => {
-            chat.switchRoom(io, socket, newroom);
-        });
+    await io.on('connect', socket => {
+        socket.on('switch room', newroom => {chat.switchRoom(io, socket, newroom);});
         socket.on('chat message', async(msg) => {
             await chat.chatMessage(io, socket, msg).catch(err => { return console.log(err);});
         });
@@ -184,10 +170,7 @@ const appSetup = async function() {
     });
 
     // Start server
-    http.listen(port, process.env.IP, () => {
-        console.log(":: App listening on port " + port + " ::");
-    });
-    
-}().catch(err => {
-    console.log(err);
-})
+    const running = await http.listen(port, process.env.IP);
+    if (running) { await console.log(":: App listening on port " + port + " ::");}
+ 
+}().catch(err => { console.log(err);}) 
