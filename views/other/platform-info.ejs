@@ -56,27 +56,12 @@
 <!-- Home Page content -->
 <main id="main-container">
     <div class="container mt-5">
-        <div class="row text-element">
-            <div class="col-lg-6 block">
-                <article class="text-block">
-                    <div class="block-header red">
-                        <h1 style="user-select: none; -moz-user-select: none;">Community</h1>
-                    </div>
-                    <div class="block-content mode">
-                    <% for (let para of platform.community) { %>
-                        <p class="convertible-text"><%=para%></p>
-                    <% } %>
-                    </div>
-                </article>
-            </div>
-            <div class="col-lg-6 block">
-                <img class="image-block" src="<%=platform.displayImages[2]%>" alt="<%=platform.name%> image">
-            </div>
-        </div>
         <% let block;%>
+        <% let counter = 0;%>
         <% for (let i = 0; i < platform.info.length; i++) { %>
+            <% counter ++;%>
             <% block = platform.info[i]%>
-            <% if (i%2 == 1) { %>
+            <% if (i%2 == 0) { %>
                 <div class="row text-element">
                     <div class="col-lg-6">
                         <article class="text-block mode">
@@ -116,6 +101,43 @@
                     </div>
                 </div>
             <% } %>
+        <% } %>
+        <% if (counter%2 == 0) {%>
+            <div class="row text-element">
+                <div class="col-lg-6 block">
+                    <article class="text-block">
+                        <div class="block-header red">
+                            <h1 style="user-select: none; -moz-user-select: none;">Community</h1>
+                        </div>
+                        <div class="block-content mode">
+                        <% for (let para of platform.community) { %>
+                            <p class="convertible-text"><%=para%></p>
+                        <% } %>
+                        </div>
+                    </article>
+                </div>
+                <div class="col-lg-6 block">
+                    <img class="image-block" src="<%=platform.displayImages[2]%>" alt="<%=platform.name%> image">
+                </div>
+            </div>
+        <% } else {%>
+            <div class="row text-element">
+                <div class="col-lg-6 block">
+                    <img class="image-block" src="<%=platform.displayImages[2]%>" alt="<%=platform.name%> image">
+                </div>
+                <div class="col-lg-6 block">
+                    <article class="text-block">
+                        <div class="block-header red">
+                            <h1 style="user-select: none; -moz-user-select: none;">Community</h1>
+                        </div>
+                        <div class="block-content mode">
+                        <% for (let para of platform.community) { %>
+                            <p class="convertible-text"><%=para%></p>
+                        <% } %>
+                        </div>
+                    </article>
+                </div>
+            </div>
         <% } %>
     </div>
     </div>

@@ -42,7 +42,7 @@ module.exports = { //All subclass Schema
     Module: Post.discriminator("Module", new mongoose.Schema({ //Curriculum with attached information
         links: [{type: String}]
     })),
-    Competition: Post.discriminator("Competition", new mongoose.Schema({ //Curriculum with attached information
+    Deadline: Post.discriminator("Deadline", new mongoose.Schema({ //Curriculum with attached information
         links: [{type: String}],
         deadline: {day: String, month: String, year: String}
     }))

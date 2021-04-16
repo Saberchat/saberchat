@@ -59,7 +59,7 @@
             <div class="form-group" id="creator-input-div">
                 <label for="creator-select" id="creator-input-label">Creators</label>
                 <select id="creator-select" class="form-control mode" onchange="addCreator('user')">
-                    <option class="creator-group" value="" selected disabled>Select Students</option>
+                    <option class="creator-group" value="" selected disabled>Select Creators</option>
                     <% for (let status of statuses) { %>
                         <% if (platform.studentStatuses.includes(status[0])) { %>
                             <option class="creator-group" value="<%=status[0]%>"><%=status[1]%></option>

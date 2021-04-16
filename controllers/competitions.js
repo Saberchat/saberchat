@@ -9,7 +9,8 @@ const {cloudUpload, cloudDelete} = require('../services/cloudinary');
 //SCHEMA
 const Platform = require("../models/platform");
 const User = require('../models/user');
-const {Competition, PostComment} = require('../models/post');
+const {Deadline, PostComment} = require('../models/post');
+const Competition = Deadline;
 
 const controller = {};
 

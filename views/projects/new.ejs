@@ -38,7 +38,7 @@
         <div class="col-12">
           <div class="jumbotron text-center header">
             <h1><i class="fas fa-paint-brush"></i> Add Project </h1>
-            <p>Post a project for the <%=platform.name%> community to see</p>
+            <p>Post a project that you are conducting for the <%=platform.name%> community to see</p>
             <a class="btn btn-primary" href="/projects"><i class="fas fa-arrow-left"></i> Back</a>
           </div>
         </div>
@@ -56,7 +56,7 @@
           <div class="form-group mode" id="creator-input-div">
             <label for="creator-select" id="creator-input-label">Creators</label>
             <select id="creator-select" class="form-control mode" onchange="addCreator('user')" required>
-              <option class="creator-group" value="" selected disabled>Select Students</option>
+              <option class="creator-group" value="" selected disabled>Select Creators</option>
               <% for (let status of statuses) { %>
                 <% if (platform.studentStatuses.includes(status[0])) { %>
                   <option class="creator-group" value="<%=status[0]%>"><%=status[1]%></option>
