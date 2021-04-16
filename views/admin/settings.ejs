@@ -106,8 +106,12 @@
                         
                         <div class="form-group">
                             <label for="display-input">Navbar Dark Display</label>
-                            <input id="display-input" class="mode" type="checkbox"
-                                    name="navDark" <% if (platform.navDark) { %> checked <% } %>>
+                            <input id="display-input" class="mode" type="checkbox" name="navDark" <% if (platform.navDark) { %> checked <% } %>>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="contact-input">Display Contact Photos</label>
+                            <input id="contact-input" class="mode" type="checkbox" name="contactPhotoDisplay" <% if (platform.contactPhotoDisplay) { %> checked <% } %>>
                         </div>
 
                         <div class="form-group">
@@ -150,7 +154,7 @@
                             <label for="contact-heading">Contact Information Heading</label>
                             <input id="contact-heading" class="form-control mode" type="text" name="contactHeading" value="<%= platform.contact.heading %>" placeholder="Enter Contact Info Heading" required><br>
                             <label for="contact-info">Contact Information Blurb</label>
-                            <textarea id="contact-info" rows="5" class="form-control mode" name="contactInfo" placeholder="Enter contact information blurb"><%=platform.contact.description%></textarea>
+                            <textarea id="contact-info" rows="5" class="form-control mode" name="contactInfo" placeholder="Enter contact information blurb"><% for (let para of platform.contact.description) { %><%=para%>&#013;&#010;<% } %></textarea>
                         </div>
                         <div class="form-group">
                             <label for="community-info">Platform Community Information</label>

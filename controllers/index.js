@@ -231,7 +231,7 @@ controller.forgotPassword = async function(req, res) {
     user.tempPwd = pwd;
     await user.save();
     //Email with password reset instructions
-    await sendGridEmail(user.email, 'Saberchat Password Reset', `<p>Hello ${user.firstName},</p><p>You are receiving this email because you recently requested a password reset.</p><p>Click <a href="https://saberchat.net/reset-password?user=${user._id}">here</a> to reset your password. Use the following character sequence as your temporary password:</p><p>${pwd}</p>`, true);
+    await sendGridEmail(user.email, 'Saberchat Password Reset', `<p>Hello ${user.firstName},</p><p>You are receiving this email because you recently requested a password reset.</p><p>Click <a href="https://${platform.url}/reset-password?user=${user._id}">here</a> to reset your password. Use the following character sequence as your temporary password:</p><p>${pwd}</p>`, true);
     req.flash('success', "Check your email for instructions on  how to reset your password");
     return res.redirect('/');
 }
@@ -242,7 +242,7 @@ controller.resetPasswordForm = async function(req, res) {
         req.flash("error", "An Error Occurred");
         return res.redirect("back");
     }
-    return res.render('profile/reset-password', {platform, user: req.query.user});
+    return res.render('profiles/reset-password', {platform, user: req.query.user});
 }
 
 controller.resetPassword = async function(req, res) {

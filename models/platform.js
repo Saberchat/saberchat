@@ -11,6 +11,7 @@ var platformSchema = new mongoose.Schema({
     imageUrl: String,
     principal: String,
     descriptionDisplay: {type: Boolean, default: false}, //Display description or platform name first on homepage
+    contactPhotoDisplay: {type: Boolean, default: true}, //Display photos of platform administrators on contact page
     principalAuthenticate: {type: Boolean, default: false}, //Check if users have to be validated by principal first
     emailExtension: {type: String, default: ''},
     updateTime: {type: String, default: "0 0"},
@@ -37,7 +38,10 @@ var platformSchema = new mongoose.Schema({
     info: [{heading: String, text: [{type: String}], image: String}],
     services: [{type: String}],
     community: [{type: String}],
-    contact: {heading: String, description: String}
+    contact: {
+        heading: String,
+        description: [{type: String}]
+    }
 }, {timestamps: {createdAt: 'created_at'}});
 
 module.exports = mongoose.model("Platform", platformSchema);

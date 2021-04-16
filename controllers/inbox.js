@@ -257,11 +257,11 @@ controller.createMsg = async function(req, res) {
         //Send email alerting recipients about notification
         let emailText;
         if(message.toEveryone) {
-            emailText = `<p>Hello ${r.firstName},</p><p>You have a new Saberchat inbox notification from <strong>${req.user.username}</strong>!</p><p><strong>To</strong>: Everyone</p><p>${newMessage.text}</p><p>You can access the full message at https://saberchat.net</p> ${imageString}`;
+            emailText = `<p>Hello ${r.firstName},</p><p>You have a new Saberchat inbox notification from <strong>${req.user.username}</strong>!</p><p><strong>To</strong>: Everyone</p><p>${newMessage.text}</p><p>You can access the full message at https://${platform.url}</p> ${imageString}`;
         } else if(message.anonymous) {
-            emailText = `<p>Hello ${r.firstName},</p><p>You have a new Saberchat anonymous notification!</p><p><strong>To</strong>: ${recipientArr.join(', ')}</p><p>${newMessage.text}</p><p>You can access the full message at https://saberchat.net</p> ${imageString}`;
+            emailText = `<p>Hello ${r.firstName},</p><p>You have a new Saberchat anonymous notification!</p><p><strong>To</strong>: ${recipientArr.join(', ')}</p><p>${newMessage.text}</p><p>You can access the full message at https://${platform.url}</p> ${imageString}`;
         } else {
-            emailText = `<p>Hello ${r.firstName},</p><p>You have a new Saberchat inbox notification from <strong>${req.user.username}</strong>!</p><p><strong>To</strong>: ${recipientArr.join(', ')}</p><p>${newMessage.text}</p><p>You can access the full message at https://saberchat.net</p> ${imageString}`;
+            emailText = `<p>Hello ${r.firstName},</p><p>You have a new Saberchat inbox notification from <strong>${req.user.username}</strong>!</p><p><strong>To</strong>: ${recipientArr.join(', ')}</p><p>${newMessage.text}</p><p>You can access the full message at https://${platform.url}</p> ${imageString}`;
         }
 
         if(r.receiving_emails) {
@@ -383,7 +383,7 @@ controller.reply = async function(req, res) {
         }
 
         if (!(recipient._id.equals(req.user._id)) && recipient.receiving_emails) { //Send email alerting recipients of reply
-            const emailText = `<p>Hello ${recipient.firstName},</p><p><strong>${req.user.username}</strong> replied to <strong>${message.subject}</strong>.<p>${reply.text}</p><p>You can access the full message at https://saberchat.net</p> ${imageString}`;
+            const emailText = `<p>Hello ${recipient.firstName},</p><p><strong>${req.user.username}</strong> replied to <strong>${message.subject}</strong>.<p>${reply.text}</p><p>You can access the full message at https://${platform.url}</p> ${imageString}`;
             await sendGridEmail(recipient.email, `New Reply On ${message.subject}`, emailText, false);
         }
     }
@@ -443,7 +443,7 @@ controller.acceptReq = async function(req, res) { //Accept access request
 
     //Send notification alerting user that they have been accepted
     if(request.author.receiving_emails) {
-        const emailText = `<p>Hello ${request.author.firstName},</p><p>Your request to join chat room <strong>${room.name}</strong> has been accepted!<p><p>You can access the room at https://saberchat.net</p>`;
+        const emailText = `<p>Hello ${request.author.firstName},</p><p>Your request to join chat room <strong>${room.name}</strong> has been accepted!<p><p>You can access the room at https://${platform.url}</p>`;
         await sendGridEmail(request.author.email, `Room Request Accepted - ${room.name}`, emailText, false);
     }
 

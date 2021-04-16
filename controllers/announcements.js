@@ -169,7 +169,7 @@ controller.create = async function(req, res) {
 
     for (let user of users) { //Send email to all users
         if (user.receiving_emails) {
-            const emailText = `<p>Hello ${user.firstName},</p><p>${req.user.username} has recently posted a new announcement - '${announcement.subject}'.</p><p>${announcement.text}</p><p>You can access the full announcement at https://saberchat.net</p> ${imageString}`;
+            const emailText = `<p>Hello ${user.firstName},</p><p>${req.user.username} has recently posted a new announcement - '${announcement.subject}'.</p><p>${announcement.text}</p><p>You can access the full announcement at https://${platform.url}</p> ${imageString}`;
             await sendGridEmail(user.email, `New Saberchat Announcement - ${announcement.subject}`, emailText, false);
             user.annCount.push({announcement, version: "new"});
             await user.save();
@@ -262,7 +262,7 @@ controller.updateAnnouncement = async function(req, res) {
 
     for (let user of users) {
         if (user.receiving_emails) {
-            await sendGridEmail(user.email, `Updated Saberchat Announcement - ${announcement.subject}`, `<p>Hello ${user.firstName},</p><p>${req.user.username} has recently updated an announcement - '${announcement.subject}'.</p><p>${announcement.text}</p><p>You can access the full announcement at https://saberchat.net</p> ${imageString}`, false);
+            await sendGridEmail(user.email, `Updated Saberchat Announcement - ${announcement.subject}`, `<p>Hello ${user.firstName},</p><p>${req.user.username} has recently updated an announcement - '${announcement.subject}'.</p><p>${announcement.text}</p><p>You can access the full announcement at https://${platform.url}</p> ${imageString}`, false);
         }
 
         //If announcement not already in user's anncount, add it

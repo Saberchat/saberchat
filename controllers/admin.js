@@ -34,10 +34,8 @@ controller.updatePlatform = async function(req, res) {
         platform[attr] = req.body[attr];
     }
 
-    if (req.body.navDark) {
-        platform.navDark = true;
-    } else {
-        platform.navDark = false;
+    for (let attr of ["navDark", "contactPhotoDisplay"]) {
+        platform[attr] = (req.body[attr] != undefined);
     }
 
     for (let attr of ["colorScheme", "darkColorScheme"]) {
@@ -56,6 +54,8 @@ controller.updatePlatform = async function(req, res) {
         }
     }
 
+    platform.updateTime = `${req.body.day} ${req.body.month}`;
+
     platform.info = [];
     let parsedText = [];
     for (let i = 0; i < req.body.infoHeading.length; i++) { //Update about information
@@ -72,8 +72,12 @@ controller.updatePlatform = async function(req, res) {
         });
     }
 
-    platform.updateTime = `${req.body.day} ${req.body.month}`;
-    platform.contact = {heading: req.body.contactHeading, description: req.body.contactInfo};
+    platform.contact =  {heading: req.body.contactHeading, description:[]};
+    for (let element of req.body.contactInfo.split('\n')) { //Iterate through contact info
+        if (element.split('\r').join('').split(' ').join('') != "") {
+            platform.contact.description.push(element);
+        }
+    }
 
     if (req.body.displayProjects) {
         if (objectArrIndex(platform.publicFeatures, "name", "Projects") == -1) {
