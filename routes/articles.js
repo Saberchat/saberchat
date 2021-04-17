@@ -15,6 +15,7 @@ router.route('/')
 
 router.get('/new', wrapAsync(middleware.isLoggedIn), wrapAsync(middleware.accessToFeature), wrapAsync(articles.new)); //Form to create new article
 router.get('/specific-info', wrapAsync(middleware.isLoggedIn), wrapAsync(middleware.accessToFeature), wrapAsync(articles.specificInfo)); //Specific information by site
+router.get('/donate', wrapAsync(middleware.isLoggedIn), wrapAsync(articles.donate)); //Help and Donation Options
 router.put('/like', wrapAsync(middleware.isLoggedIn), wrapAsync(middleware.accessToFeature), wrapAsync(articles.likeArticle)); //Like article
 router.put('/like-comment', wrapAsync(middleware.isLoggedIn), wrapAsync(middleware.accessToFeature), wrapAsync(articles.likeComment)); //Comment on article
 router.put('/comment', wrapAsync(middleware.isLoggedIn), wrapAsync(middleware.accessToFeature), wrapAsync(articles.comment)); //Like comment on article

@@ -11,6 +11,7 @@ const Platform = require("../models/platform");
 const User = require('../models/user');
 const Email = require('../models/admin/email');
 const {Announcement} = require('../models/post');
+const {Market} = require("../models/group");
 
 const controller = {};
 

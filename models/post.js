@@ -39,10 +39,13 @@ module.exports = { //All subclass Schema
             data: {}
         }]
     })),
+    ArticleLink: Post.discriminator("ArticleLink", new mongoose.Schema({ //Contains references to other articles and serves as a simple post system
+        links: [{type: String}]
+    })),
     Module: Post.discriminator("Module", new mongoose.Schema({ //Curriculum with attached information
         links: [{type: String}]
     })),
-    Deadline: Post.discriminator("Deadline", new mongoose.Schema({ //Curriculum with attached information
+    Event: Post.discriminator("Event", new mongoose.Schema({ //Scheduled Future event
         links: [{type: String}],
         deadline: {day: String, month: String, year: String}
     }))

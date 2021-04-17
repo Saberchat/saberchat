@@ -41,21 +41,21 @@
     <div class="row">
         <div class="col-12">
           <div class="jumbotron text-center header">
-            <h1><i class="fas fa-coffee"></i> Manage No Left Turn Cafe</h1><br />
+            <h1><i class="fas fa-shopping-cart"></i> Manage <%=market.name%></h1><br />
             <button id="cafe-status-button" onclick="changeCafeStatus()"
             <% if (open) { %>
-              class="btn btn-danger" ><i class="fas fa-lock-open"></i> Close Cafe
+              class="btn btn-danger" ><i class="fas fa-lock-open"></i> Close
 
                     <% } else { %>
-                        class="btn btn-success"><i class="fas fa-lock"></i> Open Cafe
+                        class="btn btn-success"><i class="fas fa-lock"></i> Open
                     <% } %>
                 </button>
 
-                <a href="/cafe/manage?orders=true" class="btn btn-primary"><i class="fas fa-coffee"></i> Orders</a>
+                <a href="/cafe/manage?orders=true" class="btn btn-primary"><i class="fas fa-shopping-cart"></i> Orders</a>
                 <a href="/cafe/item" class="btn btn-warning"><i class="fas fa-plus-circle"></i> Add New Item</a>
                 <a href="/cafe/category" class="btn btn-info"><i class="fas fa-plus-circle"></i> Add New Category</a>
                 <a href="/admin/balances" class="btn btn-success"><i class="fas fa-money-check"></i> User Balances</a>
-                <!-- <a href="/cafe/manage?data=true" class="btn btn-secondary"><i class="fas fa-chart-bar"></i> Cafe Data Analytics</a> -->
+                <!-- <a href="/cafe/manage?data=true" class="btn btn-secondary"><i class="fas fa-chart-bar"></i> Data Analytics</a> -->
             </div>
         </div>
     </div>
@@ -63,8 +63,8 @@
     <div class="row">
         <div class="col-md-8 offset-md-2 col-12">
           <div class="search-filter mb-3 search">
-            <i class="fas fa-search"></i>
-            <input id="search-input" oninput="search()" class="form-control search" type="text" placeholder="Search..." title="Type in itemname" />
+            <i class="fas fa-search search"></i>
+            <input id="search-input" style="background-color: rgb(<%=platform.colorScheme[2]%>)" oninput="search()" class="form-control search" type="text" placeholder="Search..." title="Type in itemname" />
           </div>
 
           <% let temp;%>
@@ -83,14 +83,14 @@
                                class="list-group-item list-group-item-action menu-item cafe <%= category.name.replace(' ', '') %>"><span
                                         class="item-name"><%= item.name %></span> (<%= item.availableItems %> orders
                                 available) <span class="upvote"
-                                                 title="Upvotes (Cafe admins cannot upvote items from here)"></span><span
+                                                 title="Upvotes (Admins cannot upvote items from here)"></span><span
                                         id="upvoteCount-<%= item._id %>"
                                         class="upvote-count cafetext"> Upvotes: <%= item.upvotes.length %></span></a>
                         <% } else { %>
                             <a href="/cafe/item/<%= item._id %>" id="item-<%= item.id %>"
                                class="list-group-item list-group-item-action menu-item cafe <%= category.name.replace(' ', '') %>"><span
                                         class="item-name"><%= item.name %></span> (Unavailable) <span class="upvote"
-                                                                                                      title="Upvotes (Cafe admins cannot upvote items from here)"></span><span
+                                                                                                      title="Upvotes (Admins cannot upvote items from here)"></span><span
                                         id="upvoteCount-<%= item._id %>"
                                         class="upvote-count cafetext"> Upvotes: <%= item.upvotes.length %></span></a>
                         <% } %>
@@ -99,48 +99,48 @@
                 <% } %>
             <% }) %>
 
-            <br class="category-break" id="categories-break"/>
-            <li class="list-group-item list-group-item-primary darkmode-outline category-header" id="categories-header">
-                <div class="d-flex w-100 justify-content-between">
-                    <h2 class="mb-1 darkmode-header">Item Categories</h2>
-                    <span class="darkmode-header"><%= categories.length %> category(s)</span>
-                </div>
-            </li>
-
             <% let upvoteCount = 0; %>
-            <% categories.forEach(category => { %>
-                <% upvoteCount = 0; %>
-                <% if (category.name != "Other") { %>
-                    <% for (let item of category.items) { %>
-                        <% upvoteCount += item.upvotes.length %>
-                    <% } %>
-                    <a href="/cafe/category/<%= category._id %>" id="category-<%= category.id %>"
-                       class="list-group-item list-group-item-action menu-item ItemCategories cafe"><span
-                                class="item-name"><%= category.name %></span> (<%= category.items.length %> items) <span
-                                class="upvote"
-                                title="Sum of all upvotes for this category (Cafe admins cannot upvote items from here)"></span><span
-                                id="upvoteCount-<%= category._id %>"
-                                class="upvote-count cafetext"> Upvotes: <%= upvoteCount %></span> </a>
-                <% } %>
-            <% }) %>
-
-            <!-- Ensures that 'other' will be last -->
-            <% categories.forEach(category => { %>
-                <% upvoteCount = 0; %>
-                <% if (category.name == "Other") { %>
-                    <% for (let item of category.items) { %>
-                        <% upvoteCount += item.upvotes.length %>
-                    <% } %>
-                    <div class="list-group-item list-group-item-action menu-item ItemCategories cafe"
-                         id="category-<%= category.id %>"><span class="item-name"><%= category.name %></span>
-                        (<%= category.items.length %> items) <span
-                                id="modify-banned">Cannot Modify </span> <span
-                                title="Sum of all upvotes for this category (Cafe admins cannot upvote items from here)"
-                                class="upvote"></span><span id="upvoteCount-<%= category._id %>" class="upvote-count cafetext"> Upvotes: <%= upvoteCount %></span>
+            <% if (categories.length > 0) { %>
+                <br class="category-break" id="categories-break"/>
+                <li class="list-group-item list-group-item-primary darkmode-outline category-header" id="categories-header">
+                    <div class="d-flex w-100 justify-content-between">
+                        <h2 class="mb-1 darkmode-header">Item Categories</h2>
+                        <span class="darkmode-header"><%= categories.length %> category(s)</span>
                     </div>
-                <% } %>
-            <% }) %>
+                </li>
+                <% categories.forEach(category => { %>
+                    <% upvoteCount = 0; %>
+                    <% if (category.name != "Other") { %>
+                        <% for (let item of category.items) { %>
+                            <% upvoteCount += item.upvotes.length %>
+                        <% } %>
+                        <a href="/cafe/category/<%= category._id %>" id="category-<%= category.id %>"
+                        class="list-group-item list-group-item-action menu-item ItemCategories cafe"><span
+                                    class="item-name"><%= category.name %></span> (<%= category.items.length %> items) <span
+                                    class="upvote"
+                                    title="Sum of all upvotes for this category (Admins cannot upvote items from here)"></span><span
+                                    id="upvoteCount-<%= category._id %>"
+                                    class="upvote-count cafetext"> Upvotes: <%= upvoteCount %></span> </a>
+                    <% } %>
+                <% }) %>
 
+                <!-- Ensures that 'other' will be last -->
+                <% categories.forEach(category => { %>
+                    <% upvoteCount = 0; %>
+                    <% if (category.name == "Other") { %>
+                        <% for (let item of category.items) { %>
+                            <% upvoteCount += item.upvotes.length %>
+                        <% } %>
+                        <div class="list-group-item list-group-item-action menu-item ItemCategories cafe"
+                            id="category-<%= category.id %>"><span class="item-name"><%= category.name %></span>
+                            (<%= category.items.length %> items) <span
+                                    id="modify-banned">Cannot Modify </span> <span
+                                    title="Sum of all upvotes for this category (Admins cannot upvote items from here)"
+                                    class="upvote"></span><span id="upvoteCount-<%= category._id %>" class="upvote-count cafetext"> Upvotes: <%= upvoteCount %></span>
+                        </div>
+                    <% } %>
+                <% }) %>
+            <% } %>
             <br/>
         </div>
     </div>

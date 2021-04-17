@@ -9,14 +9,14 @@ const {cloudUpload, cloudDelete} = require('../services/cloudinary');
 //SCHEMA
 const Platform = require("../models/platform");
 const User = require('../models/user');
-const {Module, PostComment} = require('../models/post');
+const {ArticleLink, PostComment} = require('../models/post');
 
 const controller = {};
 
 // Article GET index
 controller.index = async function(req, res) {
     const platform = await setup(Platform);
-    const articles = await Module.find({}).populate('sender');
+    const articles = await ArticleLink.find({}).populate('sender');
     if(!platform || !articles) {req.flash('error', 'Cannot find articles.'); return res.redirect('back');}
     return res.render('articles/index', {platform, articles: articles.reverse()});
 };
@@ -34,7 +34,7 @@ controller.new = async function(req, res) {
 // Article GET show
 controller.show = async function(req, res) {
     const platform = await setup(Platform);
-    const article = await Module.findById(req.params.id)
+    const article = await ArticleLink.findById(req.params.id)
         .populate('sender')
         .populate({
             path: "comments",
@@ -53,7 +53,7 @@ controller.show = async function(req, res) {
 // Article GET edit form
 controller.updateForm = async function(req, res) {
     const platform = await setup(Platform);
-    const article = await Module.findById(req.params.id);
+    const article = await ArticleLink.findById(req.params.id);
     if(!platform || !article) {req.flash('error', 'Could not find article'); return res.redirect('back');}
     if(!article.sender._id.equals(req.user._id)) {
         req.flash('error', 'You do not have permission to do that.');
@@ -69,7 +69,7 @@ controller.updateForm = async function(req, res) {
 
 // Article POST create
 controller.create = async function(req, res) {
-    const article = await Module.create({ //Build article with error info
+    const article = await ArticleLink.create({ //Build article with error info
         sender: req.user,
         subject: req.body.subject,
         text: req.body.message
@@ -120,7 +120,7 @@ controller.create = async function(req, res) {
 };
 
 controller.updateArticle = async function(req, res) {
-    const article = await Module.findById(req.params.id).populate('sender');
+    const article = await ArticleLink.findById(req.params.id).populate('sender');
     if (!article) {
         req.flash('error', "Unable to access article");
         return res.redirect('back');
@@ -131,7 +131,7 @@ controller.updateArticle = async function(req, res) {
         return res.redirect('back');
     }
 
-    const updatedArticle = await Module.findByIdAndUpdate(req.params.id, {
+    const updatedArticle = await ArticleLink.findByIdAndUpdate(req.params.id, {
         subject: req.body.subject,
         text: req.body.message,
     });
@@ -200,7 +200,7 @@ controller.updateArticle = async function(req, res) {
 
 // Article PUT like article
 controller.likeArticle = async function(req, res) {
-    const article = await Module.findById(req.body.articleId);
+    const article = await ArticleLink.findById(req.body.articleId);
     if(!article) {return res.json({error: 'Error updating article.'});}
 
     if (removeIfIncluded(article.likes, req.user._id)) { //Remove like
@@ -221,7 +221,7 @@ controller.likeArticle = async function(req, res) {
 
 // Article PUT comment
 controller.comment = async function(req, res) {
-    const article = await Module.findById(req.body.articleId)
+    const article = await ArticleLink.findById(req.body.articleId)
         .populate({
             path: "comments",
             populate: {path: "sender"}
@@ -290,7 +290,7 @@ controller.likeComment = async function(req, res) {
 }
 
 controller.deleteArticle = async function(req, res) {
-    const article = await Module.findById(req.params.id).populate('sender');
+    const article = await ArticleLink.findById(req.params.id).populate('sender');
     if (!article) {
         req.flash('error', "Unable to access article");
         return res.redirect('back');
@@ -321,7 +321,7 @@ controller.deleteArticle = async function(req, res) {
         }
     }
 
-    const deletedArticle = await Module.findByIdAndDelete(article._id);
+    const deletedArticle = await ArticleLink.findByIdAndDelete(article._id);
     if (!deletedArticle) {
         req.flash('error', "Unable to delete article");
         return res.redirect('back');
@@ -334,6 +334,11 @@ controller.deleteArticle = async function(req, res) {
 controller.specificInfo = async function(req, res) {
     const platform = await setup(Platform);
     return res.render('other/specific-info', {platform});
+}
+
+controller.donate = async function(req, res) {
+    const platform = await setup(Platform);
+    return res.render('other/donate', {platform});
 }
 
 module.exports = controller;

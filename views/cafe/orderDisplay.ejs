@@ -44,7 +44,7 @@
     <div class="row">
         <div class="col-12">
           <div class="jumbotron text-center header">
-            <h1><i class="fas fa-coffee"></i> Orders</h1>
+            <h1><i class="fas fa-shopping-cart"></i> Orders</h1>
             <p>All New Orders</p>
             <a class="btn btn-primary" href="manage"><i class="fas fa-arrow-left"></i> Back</a>
           </div>
@@ -56,7 +56,7 @@
 
       <div class="search-filter mb-3 search">
         <i class="fas fa-search"></i>
-        <input id="search-input" oninput="searchFunction(this, 'card')" class="form-control search" type="text" placeholder="Search..." title="Type in an order segment"/>
+        <input id="search-input" style="background-color: rgb(<%=platform.colorScheme[2]%>)" oninput="searchFunction(this, 'card')" class="form-control search" type="text" placeholder="Search..." title="Type in an order segment"/>
       </div><br />
 
     <% if (orders.length == 0) { %>

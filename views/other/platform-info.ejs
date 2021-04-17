@@ -48,6 +48,9 @@
                     <h1><%=platform.name%></h1>
                     <p><%=platform.description%><% if (platform.postText){%>, <%=platform.postText%><%}%></p>
                 <% } %>
+                <% if (currentUser) { %>
+                    <a href="/articles/donate" class="btn btn-primary">Help And Donate</a>
+                <% } %>
             </div>
         </div>
     </div>

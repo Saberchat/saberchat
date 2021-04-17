@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- home page -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Saberchat</title>
+
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css"
+          integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk" crossorigin="anonymous">
+    <link rel="stylesheet" href="/stylesheets/main.css">
+    <link rel="stylesheet" href="/stylesheets/home/index.css">
+    <link rel="stylesheet" href="/stylesheets/components/background.css">
+    <link rel="stylesheet" href="/stylesheets/components/navbar.css">
+    <link rel="stylesheet" href="/stylesheets/other/index.css">
+    <link rel="stylesheet" href="/stylesheets/homework/index.css">
+    <%if (currentUser) {%>
+      <%if (currentUser.darkmode) { %>
+        <link rel="stylesheet" href="/stylesheets/darkmode.css">
+      <%}%>
+    <%}%>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"
+            integrity="sha256-9/aliU8dGd2tb6OSsuzixeV4y/faTqgFtohetphbbj0=" crossorigin="anonymous"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://unpkg.com/@popperjs/core@2" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js"
+            integrity="sha384-OgVRvuATP1z7JjHLkuOU7Xw704+h835Lr+6QL9UvYjZE3Ipu6Tp75j7Bh/kR0JKI"
+            crossorigin="anonymous"></script>
+
+    <script src="https://kit.fontawesome.com/dccc745c41.js" crossorigin="anonymous"></script>
+    <script src="/javascript/nav/userForm.js"></script>
+    <script src="/javascript/nav/navbar.js"></script>
+    <script src="/javascript/home/index.js"></script>
+</head>
+<body class="mode">
+<!-- insert navbar via ejs-->
+<%- include('../partials/navbar') %>
+
+<!-- Background image and text -->
+<section id="background" style="background-image: url('<%=platform.imageUrl%>'); background-size: cover;">
+    <div class="container-fluid text-center">
+        <div class="row">
+            <div class="col-12 background-title">
+                <h1>Help and Donate</h1>
+                <p style="font-size: 130%;">Here are ways you can help our community</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Home Page content -->
+<main id="main-container">
+    <div class="container mt-5">
+        
+            <div class="row text-element">
+                <div class="col-lg-12">
+                    <article class="text-block mode">
+                        <div class="block-header green">
+                            <h1>As A Victim</h1>
+                        </div>
+                        <div class="block-content mode">
+                            <p>The following includes steps you are recommended to take after being subject to a hate crime. Note that these circumstances vary, so always remember to put your safety first.</p>
+                            <ol>
+                                <li><strong>Get medical assistance​</strong> if necessary and contact authorities then and there if you are in immediate danger. </li>
+                                <li><strong>Note identifiable details</strong> of your attacker. (height, race, gender, weight, among other markers of physical appearance)​</li>
+                                <li><strong>Prioritize your Mental Health.</strong> Coping with the trauma of a Hate Crime can be extremely difficult. Make sure you have a suiting support group to get you through these times. Take your time to come out with your story and don't allow anyone to downplay your emotions or experience.</li>
+                                <li><strong>File Reports.</strong> If you've faced something other than physical aggression, like verbal harassment, know that your experience was still unacceptable and needs to be addressed. File a police report and follow-through in all of its stages of documentation to ensure your experience isn't overlooked. <a target="_blank" href="https://www.standagainsthatred.org/report">Asian Americans Advancing Justice</a> and <a target="_blank" href="https://stopaapihate.org/">Stop AAPI Hate</a>, are among two organizations where you can safely share your story and help document hate crimes against Asian Americans over the US.</li>
+                            </ol>
+                        </div>
+                    </article>
+                </div>
+            </div>
+
+            <div style="text-align: center;">
+                <div class="card course-title darkmode-outline">
+                    <img class="card-img-top course-thumbnail" src="https://upload.wikimedia.org/wikipedia/en/2/27/Stop_AAPI_Hate_logo.jpg" alt="Image Does Not Exist" style="height: 350px;">
+                    <div class="card-body">
+                        <p><a target="_blank" href="https://stopaapihate.org/">Stop AAPI Hate</a> is an organization where you can safely share your story and help document hate crimes against Asian Americans throughout the US.</p>
+                    </div>
+                </div>
+
+                <div class="card course-title darkmode-outline">
+                    <img class="card-img-top course-thumbnail" src="https://upload.wikimedia.org/wikipedia/en/2/27/Stop_AAPI_Hate_logo.jpg" alt="Image Does Not Exist" style="height: 350px;">
+                    <div class="card-body">
+                        <p><a target="_blank" href="https://stopaapihate.org/">Stop AAPI Hate</a> is an organization where you can safely share your story and help document hate crimes against Asian Americans throughout the US.</p>
+                    </div>
+                </div>
+            </div><br>
+
+            <div class="row text-element">
+                <div class="col-lg-12">
+                    <article class="text-block mode">
+                        <div class="block-header green">
+                            <h1>As A Bystander</h1>
+                        </div>
+                        <div class="block-content mode">
+                            <p>Recently, as the Asian American community has faced a spike in hate crimes, it is essential for the entire community to be educated on how to successfully intervene in these circumstances. Again and again, we have seen instances of authorities and citizens ignoring these acts of violence as they occur, turning a blind eye towards the Asian community. Here are some tips on how to safely approach this circumstance:</p>
+                            <ol>
+                                <li><strong>Distract:</strong> If the situation has not escalated, create a conversation with the victim or even spill a drink. Anything to take the attacker's attention of the victim and for them to realize the victim would be advocated for if attacked in any way.</li>
+                                <li><strong>Delegate:</strong> Ask the victim if you can call police authority or seek out help from someone nearby. Try to build support around the victim. </li>
+                                <li><strong>Document:</strong> Recording an incident can be very helpful for creating evidence for the victim, and provides firsthand details of the attacker's appearance. However, be sure you are in a safe position to record and be careful not to jeopardize your own safety.</li>
+                                <li><strong>Delay:</strong> Try to prevent the attack for as long as possible, even if that means simply standing with the victim, creating distractions, or helping the victim escape. </li>
+                                <li><strong>Direct:</strong> Your last option should be directly intervening with your words. Some examples are, "Please Stop", or "That's highly inappropriate" For your safety as well as the victim's, try not to engage in physical aggression. </li>
+                            </ol>
+                            <p>Follow the five D's and make sure you are safe!</p>
+                        </div>
+                    </article>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</main>
+<script>
+    window.onload = (() => {
+        window.onscroll = (() => {
+            updateNav();
+            animateDisplay();
+        });
+    });
+</script>
+</body>
+</html>

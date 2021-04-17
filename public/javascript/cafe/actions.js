@@ -61,7 +61,7 @@ const changeCafeStatus = function () { //Send request to close/open cafe
 
         if (data.success) {
             //List of corresponding element changes based on cafe status
-            const change = new Map([[true, ["btn btn-danger", "lock-open", "Close Cafe"]], [false, ["btn btn-success", "lock", "Open Cafe"]]]);
+            const change = new Map([[true, ["btn btn-danger", "lock-open", "Close"]], [false, ["btn btn-success", "lock", "Open"]]]);
             document.getElementById("cafe-status-button").className = change.get(data.open)[0];
             document.getElementById("cafe-status-button").innerHTML = `<i class="fas fa-${change.get(data.open)[1]}"></i> ${change.get(data.open)[2]}`;
         }

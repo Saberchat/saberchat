@@ -125,7 +125,7 @@
                         <% for (let para of platform.contact.description) { %>
                             <p class="convertible-text"><%=convertToLink(para)%></p>
                         <% } %>
-                        <h4 style="padding-top: 10px;">Platform Heads</h4>
+                        <h5 style="padding-top: 10px;">Platform Heads</h5><hr>
                         <% sortedTeachers.forEach(user => { %>
                             <span class="developer-info"><%= user.firstName %> <%= user.lastName %></span>
                             <p><a href="mailto: <%= user.email %>"><%= user.email %></a></p>

@@ -25,12 +25,13 @@ const controller = {};
 //SHOW CAFE HOMEPAGE
 controller.index = async function(req, res) {
     const platform = await setup(Platform);
+    const market = await setup(Market);
     const orders = await Order.find({customer: req.user._id}).populate("items.item"); //Find all of the orders that you have ordered, and populate info on their items
     if (!platform || !orders) {
         req.flash("error", "Unable to find orders");
         return res.redirect("back");
     }
-    return res.render("cafe/index", {platform, orders});
+    return res.render("cafe/index", {market, platform, orders});
 }
 
 controller.orderForm = async function(req, res) {
@@ -190,7 +191,7 @@ controller.processOrder = async function(req, res) {
     }
 
     const notif = await InboxMessage.create({
-        subject: "Cafe Order Ready",
+        subject: "Order Ready",
         author: req.user,
         noReply: true,
         recipients: [order.customer],
@@ -213,7 +214,7 @@ controller.processOrder = async function(req, res) {
     notif.text = `Your order is ready to pick up:\n ${itemText.join("\n")} \n\nExtra Instructions: ${order.instructions} \nTotal Cost: ${(order.charge).toFixed(2)}`;
     await notif.save();
     if (order.customer.receiving_emails) {
-        await sendGridEmail(order.customer.email, "Cafe Order Ready", `<p>Hello ${order.customer.firstName},</p><p>${notif.text}</p>`, false);
+        await sendGridEmail(order.customer.email, "Order Ready", `<p>Hello ${order.customer.firstName},</p><p>${notif.text}</p>`, false);
     }
 
     order.customer.inbox.push({message: notif, new: true}); //Add notif to user"s inbox
@@ -250,7 +251,7 @@ controller.deleteOrder = async function(req, res) {
         }
 
         const notif = await InboxMessage.create({
-            subject: "Cafe Order Rejected",
+            subject: "Order Rejected",
             author: req.user,
             noReply: true,
             recipients: [order.customer],
@@ -276,7 +277,7 @@ controller.deleteOrder = async function(req, res) {
 
         await notif.save();
         if (order.customer.receiving_emails) {
-            await sendGridEmail(order.customer.email, "Cafe Order Rejected", `<p>Hello ${order.customer.firstName},</p><p>${notif.text}</p>`, false);
+            await sendGridEmail(order.customer.email, "Order Rejected", `<p>Hello ${order.customer.firstName},</p><p>${notif.text}</p>`, false);
         }
 
         //Refund if the transaction is via online balance
@@ -298,27 +299,15 @@ controller.deleteOrder = async function(req, res) {
     //Cancellation starts here
 
     const cafe = await Market.findOne({});
-    if (!cafe) {
-        return res.json({error: "Could not access cafe"});
-    }
-
-    if (!cafe.open) {
-        return res.json({error: "The cafe is currently not taking orders"});
-    }
+    if (!cafe) {return res.json({error: "Could not access cafe"});}
+    if (!cafe.open) { return res.json({error: "We are currently not taking orders"});}
 
     const order = await Order.findById(req.params.id);
-    if (!order) {
-        return res.json({error: "Could not find order"});
-    }
-
-    if (!order.customer.equals(req.user._id)) {
-        return res.json({error: "You can only delete your own orders"});
-    }
+    if (!order) {return res.json({error: "Could not find order"});}
+    if (!order.customer.equals(req.user._id)) {return res.json({error: "You can only delete your own orders"});}
 
     const deletedOrder = await Order.findByIdAndDelete(req.params.id).populate("items.item");
-    if (!deletedOrder) {
-        return res.json({error: "Could not find order"});
-    }
+    if (!deletedOrder) {return res.json({error: "Could not find order"});}
 
     if (!deletedOrder.payingInPerson) { //Refund balance
         req.user.balance += deletedOrder.charge;
@@ -509,6 +498,8 @@ controller.manage = async function(req, res) {
         await controller.manageOrders(req, res);
 
     } else if (req.query.data) { //If route calls to display data
+        const platform = await setup(Platform);
+        const market = await setup(Market);
         const customers = await User.find({authenticated: true}); if (!customers) {return false;}
         const items = await Item.find({}); if (!items) {return false;}
         const allOrders = await Order.find({}); if (!allOrders) {return false;}
@@ -519,6 +510,7 @@ controller.manage = async function(req, res) {
             return res.redirect("back")
         }
         data.platform = platform;
+        data.market = market;
         return res.render("cafe/data", data);
 
     } else { //If route calls to display regular management
@@ -866,7 +858,7 @@ controller.manageCafe = async function(req, res) {
         sortedCategories.push(sortedCategory);
     }
 
-    return res.render("cafe/manage", {platform, categories: sortedCategories, open: cafe.open});
+    return res.render("cafe/manage", {platform, categories: sortedCategories, market: cafe, open: cafe.open});
 }
 
 controller.manageOrders = async function(req, res) {
