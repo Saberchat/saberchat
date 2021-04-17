@@ -52,120 +52,123 @@
             <ul class="col-12">
                 <li class="list-group-item list-group-item-info cafe" id="menu">
                     <div class="d-flex w-100 justify-content-between">
-                        <h2 class="mb-1"><i class="fas fa-bars"></i> <a href='cafe/order?menu=true' class="section-heading">Menu</a>
+                        <h2 class="mb-1"><i class="fas fa-bars"></i> <a href='cafe/order?menu=true' class="section-heading">
+                            <% if (platform.purchasable){%>Menu<% } else {%> Shop<%}%></a>
                         </h2>
                     </div>
                     <p class="mb-1">All Our Available Items</p>
                 </li>
             </ul>
         </div>
-        <div class="row mb-5">
-            <ul class="col-12">
-                <li class="list-group-item list-group-item-info cafe">
-                    <div class="d-flex w-100 justify-content-between">
-                        <h2 class="mb-1"><i class="fas fa-shopping-cart"></i> Current Orders</h2>
-                        <a href="cafe/order?order=true" class="btn btn-info"><i class="fas fa-plus-circle"></i> Order</a>
-                    </div>
-                    <p class="mb-1">View your currently active orders, or place a new one.</p>
-                </li>
-                <ul class="list-group" id="active-orders">
-                    <% orders.reverse().forEach(order => { %>
-                        <% if (order.present == true) { %>
-                            <li class="list-group-item darkmode-outline" id="<%= order._id %>">
-                                <h4 class="order-heading">Order -
-                                    $<%= (order.charge).toFixed(2)%></h4>
-                                <ul>
-                                    <% for (let item of order.items) { %>
-                                        <li>
-                                            <% let itemCharge = (item.quantity * item.item.price); %>
-                                            <%= item.item.name %> (<%= item.quantity %> order(s)) -
-                                            $<%= itemCharge.toFixed(2)%>
-                                        </li>
-                                    <% } %>
-                                </ul>
-                                <br/>
-                                <span class="instructions">Extra Instructions: </span>
-                                <span>
-                                    <% if (order.instructions != "") { %>
-                                        <%= order.instructions %>
-                                    <% } else { %>
-                                        None
-                                    <% } %>
-                                    <p class="paying-style">
-                                        <% if (order.payingInPerson) { %>
-                                            Paying In-Person
-                                        <% } else { %>
-                                            Paying Online
+        <% if (platform.purchasable) { %>
+            <div class="row mb-5">
+                <ul class="col-12">
+                    <li class="list-group-item list-group-item-info cafe">
+                        <div class="d-flex w-100 justify-content-between">
+                            <h2 class="mb-1"><i class="fas fa-shopping-cart"></i> Current Orders</h2>
+                            <a href="cafe/order?order=true" class="btn btn-info"><i class="fas fa-plus-circle"></i> Order</a>
+                        </div>
+                        <p class="mb-1">View your currently active orders, or place a new one.</p>
+                    </li>
+                    <ul class="list-group" id="active-orders">
+                        <% orders.reverse().forEach(order => { %>
+                            <% if (order.present == true) { %>
+                                <li class="list-group-item darkmode-outline" id="<%= order._id %>">
+                                    <h4 class="order-heading">Order -
+                                        $<%= (order.charge).toFixed(2)%></h4>
+                                    <ul>
+                                        <% for (let item of order.items) { %>
+                                            <li>
+                                                <% let itemCharge = (item.quantity * item.item.price); %>
+                                                <%= item.item.name %> (<%= item.quantity %> order(s)) -
+                                                $<%= itemCharge.toFixed(2)%>
+                                            </li>
                                         <% } %>
-                                    </p>
-                                </span>
-                                <p class="date"><%= order.date %></p>
-                                <form action="cafe/order/<%= order._id %>?_method=delete" method="post">
-                                    <button type="button" data-toggle="modal" data-target="#modal-<%= order._id %>-cancel"
-                                            class="btn btn-danger"><a class="cancel">Cancel Order</a></button>
+                                    </ul>
+                                    <br/>
+                                    <span class="instructions">Extra Instructions: </span>
+                                    <span>
+                                        <% if (order.instructions != "") { %>
+                                            <%= order.instructions %>
+                                        <% } else { %>
+                                            None
+                                        <% } %>
+                                        <p class="paying-style">
+                                            <% if (order.payingInPerson) { %>
+                                                Paying In-Person
+                                            <% } else { %>
+                                                Paying Online
+                                            <% } %>
+                                        </p>
+                                    </span>
+                                    <p class="date"><%= order.date %></p>
+                                    <form action="cafe/order/<%= order._id %>?_method=delete" method="post">
+                                        <button type="button" data-toggle="modal" data-target="#modal-<%= order._id %>-cancel"
+                                                class="btn btn-danger"><a class="cancel">Cancel Order</a></button>
 
-                                    <div class="modal fade" id="modal-<%= order._id %>-cancel" tabindex="-1"
-                                         aria-labelledby="deleteModalLabel" aria-hidden="true">
-                                        <div class="modal-dialog mode">
-                                            <div class="modal-content mode">
-                                                <div class="modal-header mode">
-                                                    <h5 class="modal-title" id="exampleModalLabel">Cancel Order?</h5>
-                                                    <button type="button" class="close mode" data-dismiss="modal"
-                                                            aria-label="Close">
-                                                        <span aria-hidden="true">&times;</span>
-                                                    </button>
-                                                </div>
-                                                <div class="modal-body mode">
-                                                    Some items may be unavailable in the quantities you ask for if you want
-                                                    to
-                                                    order again.
-                                                </div>
-                                                <div class="modal-footer mode">
-                                                    <button type="button" class="btn btn-secondary" data-dismiss="modal">No,
-                                                        Go Back
-                                                    </button>
-                                                    <button type="button" id="<%= order._id %>-cancel"
-                                                            onclick="cancel(this)"
-                                                            class="btn btn-danger">Yes, Cancel My Order
-                                                    </button>
+                                        <div class="modal fade" id="modal-<%= order._id %>-cancel" tabindex="-1"
+                                            aria-labelledby="deleteModalLabel" aria-hidden="true">
+                                            <div class="modal-dialog mode">
+                                                <div class="modal-content mode">
+                                                    <div class="modal-header mode">
+                                                        <h5 class="modal-title" id="exampleModalLabel">Cancel Order?</h5>
+                                                        <button type="button" class="close mode" data-dismiss="modal"
+                                                                aria-label="Close">
+                                                            <span aria-hidden="true">&times;</span>
+                                                        </button>
+                                                    </div>
+                                                    <div class="modal-body mode">
+                                                        Some items may be unavailable in the quantities you ask for if you want
+                                                        to
+                                                        order again.
+                                                    </div>
+                                                    <div class="modal-footer mode">
+                                                        <button type="button" class="btn btn-secondary" data-dismiss="modal">No,
+                                                            Go Back
+                                                        </button>
+                                                        <button type="button" id="<%= order._id %>-cancel"
+                                                                onclick="cancel(this)"
+                                                                class="btn btn-danger">Yes, Cancel My Order
+                                                        </button>
+                                                    </div>
                                                 </div>
                                             </div>
                                         </div>
-                                    </div>
 
-                                </form>
+                                    </form>
+                                </li>
+                            <% } %>
+                        <% }); %>
+                    </ul>
+                </ul>
+            </div>
+            <!-- <div class="row mb-5">
+                <div class="col-12">
+                <li class="list-group-item list-group-item-info" style="margin-top: -1px;">
+                    <div class="d-flex w-100 justify-content-between">
+                    <h2 class="mb-1"><i class="fas fa-utensils"></i> Past Orders</h2>
+                    </div>
+                    <p class="mb-1">View your past orders.</p>
+                </li>
+                <% orders.forEach(order => { %>
+                    <% if (order.present == false) { %>
+                    <li class="list-group-item">
+                        <h4 class="order-heading">Order - $<%= (order.charge).toFixed(2)%></h4>
+
+                        <ul>
+                        <% for (let item of order.items) { %>
+                            <li>
+                                <% let itemCharge = (item.quantity * item.item.price); %>
+                                <%= item.item.name %> (<%= item.quantity %> order(s)) - $<%= itemCharge.toFixed(2)%>
                             </li>
                         <% } %>
-                    <% }); %>
-                </ul>
-            </ul>
-        </div>
-        <!-- <div class="row mb-5">
-            <div class="col-12">
-              <li class="list-group-item list-group-item-info" style="margin-top: -1px;">
-                <div class="d-flex w-100 justify-content-between">
-                  <h2 class="mb-1"><i class="fas fa-utensils"></i> Past Orders</h2>
+                        </ul>
+                    </li>
+                    <% } %>
+                <% }); %>
                 </div>
-                <p class="mb-1">View your past orders.</p>
-              </li>
-              <% orders.forEach(order => { %>
-                <% if (order.present == false) { %>
-                  <li class="list-group-item">
-                    <h4 class="order-heading">Order - $<%= (order.charge).toFixed(2)%></h4>
-
-                    <ul>
-                      <% for (let item of order.items) { %>
-                        <li>
-                            <% let itemCharge = (item.quantity * item.item.price); %>
-                            <%= item.item.name %> (<%= item.quantity %> order(s)) - $<%= itemCharge.toFixed(2)%>
-                        </li>
-                      <% } %>
-                    </ul>
-                  </li>
-                <% } %>
-              <% }); %>
-            </div>
-          </div> -->
+            </div> -->
+        <% } %>
     </div>
 </body>
 </html>

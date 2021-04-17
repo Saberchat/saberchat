@@ -79,7 +79,7 @@
                             <div class="input-group mb-3 field">
                                 <label id="category-input-label" for="categoryInput">Type</label>
                                 <select id="categoryInput" name="category" class="field mode">
-                                    <option disabled selected required>Meal Type</option>
+                                    <option disabled selected required>Item Category</option>
                                     <% categories.forEach(category => { %>
                                         <% if (category.items.includes(item._id)) { %>
                                             <option selected><%= category.name %></option>
@@ -117,6 +117,15 @@
                             </div>
                         </div>
                     </div>
+
+                    <% if (!platform.purchasable) {%>
+                        <div class="row">
+                            <div class="col">
+                                <label for="usernameInput">URL To Access Item</label>
+                                <input required id="url-input" class="form-control mode" type="text" name="url" value="<%=item.link%>" placeholder="Enter URL for Item Purchase Site">
+                            </div>
+                        </div><br>
+                  <% } %>
 
                     <div class="form-group">
                         <input type="radio" name="showImage" value="upload" id="showUploadedImage" <% if (item.mediaFile.display) {%> checked <%}%>/>

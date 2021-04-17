@@ -9,20 +9,20 @@ const router = express.Router(); //Router
 //GENERAL ROUTES
 router.route('/')
     .get(wrapAsync(middleware.isLoggedIn), wrapAsync(middleware.accessToFeature), wrapAsync(cafe.index)) //View homepage
-    .post(wrapAsync(middleware.isLoggedIn), wrapAsync(middleware.accessToFeature), wrapAsync(middleware.cafeOpen), wrapAsync(cafe.order)); //Create new order
+    .post(wrapAsync(middleware.isLoggedIn), wrapAsync(middleware.accessToFeature), wrapAsync(middleware.platformPurchasable), wrapAsync(middleware.cafeOpen), wrapAsync(cafe.order)); //Create new order
 
 //View menu or view new order form
 router.get('/order', wrapAsync(middleware.isLoggedIn), wrapAsync(middleware.accessToFeature), wrapAsync(middleware.cafeOpen), wrapAsync(cafe.orderForm));
 
 //SPECIFIC ORDER ROUTES
 router.route('/order/:id')
-    .put(wrapAsync(middleware.isLoggedIn), wrapAsync(middleware.accessToFeature), middleware.isCashier, wrapAsync(cafe.processOrder)) //Confirm order
-    .delete(wrapAsync(middleware.isLoggedIn), wrapAsync(middleware.accessToFeature), wrapAsync(cafe.deleteOrder)); //Reject/cancel order
+    .put(wrapAsync(middleware.isLoggedIn), wrapAsync(middleware.accessToFeature), wrapAsync(middleware.platformPurchasable), middleware.isCashier, wrapAsync(cafe.processOrder)) //Confirm order
+    .delete(wrapAsync(middleware.isLoggedIn), wrapAsync(middleware.accessToFeature), wrapAsync(middleware.platformPurchasable), wrapAsync(cafe.deleteOrder)); //Reject/cancel order
 
 //EC MANAGEMENT ROUTES
 router.route('/manage')
     .get(wrapAsync(middleware.isLoggedIn), wrapAsync(middleware.accessToFeature), middleware.isCashier, wrapAsync(cafe.manage)) //Manage cafe, view orders or view data
-    .put(wrapAsync(middleware.isLoggedIn), wrapAsync(middleware.accessToFeature), middleware.isCashier, wrapAsync(cafe.changeStatus)); //Open/close cafe
+    .put(wrapAsync(middleware.isLoggedIn), wrapAsync(middleware.accessToFeature), wrapAsync(middleware.platformPurchasable), middleware.isCashier, wrapAsync(cafe.changeStatus)); //Open/close cafe
 
 //GENERAL ITEM ROUTES
 router.route('/item')

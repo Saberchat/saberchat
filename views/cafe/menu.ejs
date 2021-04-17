@@ -38,10 +38,10 @@
     <div class="row">
         <div class="col-12">
             <div class="jumbotron text-center header">
-                <h1><i class="fas fa-bars"></i> Menu </h1>
+                <h1><i class="fas fa-bars"></i><% if (platform.purchasable){%>Menu<% } else{%> Shop<%}%></a></h1>
                 <p>All of our products, with photos and descriptions</p>
                 <a class="btn btn-primary" href='/cafe'><i class="fas fa-arrow-left"></i> Back to Market</a>
-                <a class="btn btn-info" href='/cafe/order?order=true'><i class="fas fa-plus-circle"></i> Order</a>
+                <% if (platform.purchasable) { %><a class="btn btn-info" href='/cafe/order?order=true'><i class="fas fa-plus-circle"></i> Order</a><% } %>
             </div>
             <div class="search-filter">
                 <i class="fas fa-search search"></i>
@@ -96,12 +96,23 @@
                                     <span class="popular">Frequently Ordered</span>
                                 <% } %>
 
-                  <br/><em class="item-description convertible-text"><%= itemDescriptions[item._id.toString()] %></em><br/>
-                  <% if (item.mediaFile.display && [".png", ".jpg", ".jpeg", ".gif"].includes(fileExtensions.get(item.mediaFile.url).toLowerCase())) { %>
-                      <img class="item-image" src="<%= item.mediaFile.url %>"/>
-                  <% } else { %>
-                      <img class="item-image" src="<%= item.imgUrl.url %>"/>
-                  <% } %>
+                                <% if (!platform.purchasable) {%><br><strong>Link:</strong> <a target="_blank" href="<%=item.link%>"> <%=item.link%></a><% } %>
+                                <br><br/><em class="item-description convertible-text"><%= itemDescriptions[item._id.toString()] %></em><br/>
+                    <% if (!platform.purchasable) { %>
+                        <a href="<%=item.link%>" target="_blank">
+                            <% if (item.mediaFile.display && [".png", ".jpg", ".jpeg", ".gif"].includes(fileExtensions.get(item.mediaFile.url).toLowerCase())) { %>
+                                <img class="item-image" src="<%= item.mediaFile.url %>"/>
+                            <% } else { %>
+                                <img class="item-image" src="<%= item.imgUrl.url %>"/>
+                            <% } %>
+                        </a>
+                    <% } else {%>
+                        <% if (item.mediaFile.display && [".png", ".jpg", ".jpeg", ".gif"].includes(fileExtensions.get(item.mediaFile.url).toLowerCase())) { %>
+                            <img class="item-image" src="<%= item.mediaFile.url %>"/>
+                        <% } else { %>
+                            <img class="item-image" src="<%= item.imgUrl.url %>"/>
+                        <% } %>
+                    <% } %>
 
                 </span>
                 <% } %>
@@ -119,7 +130,7 @@
     }
 
     for (let element of document.getElementsByClassName("menu-item")) {
-        element.style.backgroundColor = colorScheme[1];
+        element.style.backgroundColor = colorScheme[0];
     }
 </script>
 </body>

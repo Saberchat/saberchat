@@ -16,6 +16,7 @@ var platformSchema = new mongoose.Schema({
     emailExtension: {type: String, default: ''},
     updateTime: {type: String, default: "0 0"},
     navDark: {type: Boolean, default: false},
+    purchasable: {type: Boolean, default: true},
     colorScheme: [{type: String}],
     darkColorScheme: [{type: String}],
     font: {type: String, default: "Helvetica"},

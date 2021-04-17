@@ -5,6 +5,7 @@ module.exports = mongoose.model("OrderItem", new mongoose.Schema({
     name: String,
     description: String,
     price: Number,
+    link: String,
     imgUrl: {
         url: String,
         display: Boolean

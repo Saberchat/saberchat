@@ -88,6 +88,11 @@ controller.orderForm = async function(req, res) {
     const frequentItems = sortByPopularity(orderedItems, "totalOrdered", "created_at", ["item"]).popular;
 
     if (req.query.order) { //SHOW NEW ORDER FORM
+        if (!platform.purchasable) {
+            req.flash('error', `This feature is not enabled on ${platform.name} Saberchat`);
+            return res.redirect('back');        
+        }
+        
         const sentOrders = await Order.find({name: `${req.user.firstName} ${req.user.lastName}`, present: true}); //Find all of this user"s orders that are currently active
         if (!sentOrders) {
             req.flash("error", "Unable to find orders");
@@ -338,6 +343,7 @@ controller.newItem = async function(req, res) {
 
 //CREATE NEW ITEM
 controller.createItem = async function(req, res) {
+    const platform = await setup(Platform);
     const overlap = await Item.find({name: req.body.name});
     if (!overlap) {
         req.flash("error", "Unable to find items");
@@ -362,6 +368,7 @@ controller.createItem = async function(req, res) {
     }
 
     item.mediaFile.display = req.body.showImage == "upload";
+    if (!platform.purchasable) {item.link = req.body.url;}
 
     if (req.files) {
         if (req.files.mediaFile) {
@@ -384,12 +391,8 @@ controller.createItem = async function(req, res) {
     }
 
     //Create charge; once created, add to item"s info
-    if (parseFloat(req.body.price)) {
-        item.price = parseFloat(req.body.price);
-
-    } else {
-        item.price = 0.00;
-    }
+    if (parseFloat(req.body.price)) {item.price = parseFloat(req.body.price);
+    } else {item.price = 0.00;}
 
     const category = await ItemCategory.findOne({name: req.body.category}); //Find the category specified in the form
     if (!category) {
@@ -499,6 +502,11 @@ controller.manage = async function(req, res) {
 
     } else if (req.query.data) { //If route calls to display data
         const platform = await setup(Platform);
+        if (!platform.purchasable) {
+            req.flash('error', `This feature is not enabled on ${platform.name} Saberchat`);
+            return res.redirect('back');        
+        }
+
         const market = await setup(Market);
         const customers = await User.find({authenticated: true}); if (!customers) {return false;}
         const items = await Item.find({}); if (!items) {return false;}
@@ -521,9 +529,7 @@ controller.manage = async function(req, res) {
 //OPEN/CLOSE CAFE
 controller.changeStatus = async function(req, res) {
     const cafe = await Market.findOne({});
-    if (!cafe) {
-        return res.json({error: "An error occurred"});
-    }
+    if (!cafe) {return res.json({error: "An error occurred"});}
     cafe.open = !cafe.open;
     await cafe.save();
     return res.json({success: "Succesfully updated cafe", open: cafe.open});
@@ -738,6 +744,7 @@ controller.upvoteItem = async function(req, res) {
 }
 
 controller.updateItemInfo = async function(req, res) {
+    const platform = await setup(Platform);
     const cafe = await setup(Market);
     if (!req.user.tags.includes("Cashier")) {
         req.flash("error", "You do not have permission to do that");
@@ -767,6 +774,7 @@ controller.updateItemInfo = async function(req, res) {
         return res.redirect("back");
     }
 
+    if (!platform.purchasable) {item.link = req.body.url;}
     item.mediaFile.display = req.body.showImage == "upload";
     if (req.files) {
         if (req.files.mediaFile) {
@@ -863,6 +871,11 @@ controller.manageCafe = async function(req, res) {
 
 controller.manageOrders = async function(req, res) {
     const platform = await setup(Platform);
+    if (!platform.purchasable) {
+        req.flash('error', `This feature is not enabled on ${platform.name} Saberchat`);
+        return res.redirect('back');        
+    }
+
     const orders = await Order.find({present: true}).populate("items.item");
     if (!platform || !orders) {
         req.flash("error", "Could not find orders");

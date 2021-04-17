@@ -162,7 +162,7 @@ middleware.isEditor = function(req, res, next) {
 
 //Whether cafe is open to orders
 middleware.cafeOpen = async function(req, res, next) {
-    const cafe = await Market.findOne({});
+    const cafe = await setup(Market);
     if (!cafe) {
         req.flash('error', "An Error Occurred")
         return res.redirect('back')
@@ -170,6 +170,13 @@ middleware.cafeOpen = async function(req, res, next) {
 
     if (cafe.open) { return next();}
     req.flash('error', "The cafe is currently not taking orders");
+    return res.redirect('back');
+}
+
+middleware.platformPurchasable = async function(req, req, next) {
+    const platform = await setup(Platform);
+    if (platform.purchasable) { return next();}
+    req.flash('error', `This feature is not enabled on ${platform.name} Saberchat`);
     return res.redirect('back');
 }
 

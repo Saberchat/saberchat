@@ -56,7 +56,7 @@
 
       <div class="search-filter mb-3 search">
         <i class="fas fa-search"></i>
-        <input id="search-input" style="background-color: rgb(<%=platform.colorScheme[2]%>)" oninput="searchFunction(this, 'card')" class="form-control search" type="text" placeholder="Search..." title="Type in an order segment"/>
+        <input id="search-input" oninput="searchFunction(this, 'card')" class="form-control search" type="text" placeholder="Search..." title="Type in an order segment"/>
       </div><br />
 
     <% if (orders.length == 0) { %>
@@ -169,6 +169,10 @@
 <script src="/javascript/cafe/search.js"></script>
 <script src="/javascript/admin/search.js"></script>
 <script>
+    if (document.getElementById("search-input")) {
+        document.getElementById("search-input").style.backgroundColor = colorScheme[colorScheme.length-1];
+    }
+    
     getOrders("#output-stream");
 </script>
 </body>

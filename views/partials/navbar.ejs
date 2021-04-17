@@ -3,9 +3,7 @@
     <nav class="navbar navbar-expand-md navbar-dark navbar-custom bg-custom" id="main-nav">
         <div class="container" id="nav-container">
             <% if (platform.icon) { %>
-                <!-- <a href="/"> -->
-                    <img src="<%=platform.icon%>" style="width: 5%; height: 5%;">
-                <!-- </a> -->
+                <a href="/"><img src="<%=platform.icon%>" style="width: 60px; height: 60px; margin-right: 20px;"></a>
             <% } %>
             <!-- Brand  (change link to home page)-->
             <a class="navbar-brand" href="/info">
@@ -48,7 +46,7 @@
                             </a>
 
                             <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-                                <a class="dropdown-item" href="/reports"><i class="fas fa-exclamation-triangle"></i> Error Reports</a>
+                                <a class="dropdown-item" href="/reports"><i class="fas fa-exclamation-circle"></i> Error Reports</a>
                                 <% if (platform.name == "Alsion") { %>
                                     <a class="dropdown-item" href="https://witherlyheights.org/" target="_blank"><i class="fas fa-newspaper"></i> Witherly Heights</a>
                                 <% } %>

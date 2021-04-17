@@ -69,7 +69,7 @@
                       <div class="input-group mb-3 field">
                           <label id="category-input-label" for="categoryInput">Category</label>
                           <select id="categoryInput" name="category" class="field mode">
-                              <option disabled selected required>Meal Category</option>
+                              <option disabled selected required>Item Category</option>
                               <% categories.forEach(category => { %>
                                   <option><%= category.name %></option>
                               <% }) %>
@@ -89,6 +89,15 @@
                     </div>
                 </div>
             </div>
+
+            <% if (!platform.purchasable) { %>
+              <div class="row">
+                <div class="col">
+                    <label for="usernameInput">URL To Access Item</label>
+                    <input required id="url-input" class="form-control mode" type="text" name="url" placeholder="Enter URL for Item Purchase Site">
+                </div>
+            </div><br>
+          <% } %>
 
                     <div class="form-group">
                         <label for="mediaFile">Image (Upload)</label>
