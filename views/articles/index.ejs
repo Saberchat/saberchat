@@ -71,6 +71,11 @@
 
                             <a class="announcement-button" href="/articles/<%= article._id %>">
                                 <span class="announcement-subject-header"><%= article.subject %></span>
+                                <% if (!article.verified && platform.permissionsProperty.slice(platform.permissionsProperty.length-3).includes(currentUser.permission)) { %>
+                                    <a href="/articles/verify/<%= article._id %>">
+                                        <span class="badge badge-pill badge-primary" id="mark">Verify</span>
+                                    </a>
+                                <% } %>
                             </a>
                             <span class="float-right announcement-date"><%= article.date %></span>
                         </h5>

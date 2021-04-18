@@ -16,7 +16,13 @@ const controller = {};
 // Article GET index
 controller.index = async function(req, res) {
     const platform = await setup(Platform);
-    const articles = await ArticleLink.find({}).populate('sender');
+    let articles;
+    if (req.user && platform.permissionsProperty.slice(platform.permissionsProperty.length-3).includes(req.user.permission)) {
+        articles = await ArticleLink.find({}).populate('sender');
+    } else {
+        articles = await ArticleLink.find({verified: true}).populate('sender');
+    }
+
     if(!platform || !articles) {req.flash('error', 'Cannot find articles.'); return res.redirect('back');}
     return res.render('articles/index', {platform, articles: articles.reverse()});
 };
@@ -40,7 +46,12 @@ controller.show = async function(req, res) {
             path: "comments",
             populate: {path: "sender"}
         });
-    if(!platform || !article) {req.flash('error', 'Could not find article'); return res.redirect('back');}
+    if(!platform || !article) {
+        req.flash('error', 'Could not find article'); return res.redirect('back');
+    } else if (!article.verified && !platform.permissionsProperty.slice(platform.permissionsProperty.length-3).includes(req.user.permission)) {
+        req.flash('error', 'You cannot view that article');
+        return res.redirect('back');
+    }
 
     let fileExtensions = new Map(); //Track which file format each attachment is in
     for (let media of article.mediaFiles) {
@@ -119,7 +130,23 @@ controller.create = async function(req, res) {
     return res.redirect(`/articles/${article._id}`);
 };
 
+controller.verify = async function(req, res) {
+    const article = await ArticleLink.findByIdAndUpdate(req.params.id, {verified: true});
+    if (!article) {
+        req.flash('error', "Unable to access article");
+        return res.redirect('back');
+    }
+
+    req.flash("success", "Verified Article!");
+    return res.redirect("/articles");
+}
+
 controller.updateArticle = async function(req, res) {
+    const platform = await setup(Platform);
+    if (!platform) {
+        req.flash("error", "Unable to setup platform");
+        return res.redirect("back");
+    } 
     const article = await ArticleLink.findById(req.params.id).populate('sender');
     if (!article) {
         req.flash('error', "Unable to access article");
@@ -145,6 +172,7 @@ controller.updateArticle = async function(req, res) {
             updatedArticle[attr] = req.body[attr];
         }
     }
+    if (!platform.postVerifiable) {updatedArticle.verified = true;} //Article does not need to be verified if platform does not support verifying articles
 
     //Iterate through all selected media to remove and delete them
     let cloudErr;

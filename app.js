@@ -121,6 +121,7 @@ const appSetup = async function() {
 
     // Import Routes
     const platform = await setup(Platform); //Set up Platform
+    if (!platform) {return console.log("Platform cannot be found");}
      
     //Index Routes, with no prefix
     const indexRoutes = await require("./routes/index");

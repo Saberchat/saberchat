@@ -1,4 +1,3 @@
-const { boolean } = require("joi");
 const mongoose = require("mongoose");
 
 //Platform schema holds all data for individual platform's settings
@@ -13,10 +12,12 @@ var platformSchema = new mongoose.Schema({
     descriptionDisplay: {type: Boolean, default: false}, //Display description or platform name first on homepage
     contactPhotoDisplay: {type: Boolean, default: true}, //Display photos of platform administrators on contact page
     principalAuthenticate: {type: Boolean, default: false}, //Check if users have to be validated by principal first
+    enableDarkmode: {type: Boolean, default: true}, //Check if users can enable darkmode
     emailExtension: {type: String, default: ''},
     updateTime: {type: String, default: "0 0"},
     navDark: {type: Boolean, default: false},
-    purchasable: {type: Boolean, default: true},
+    purchasable: {type: Boolean, default: true}, //Item purchases can be made
+    postVerifiable: {type: Boolean, default: true}, //Posts need to be verified before being displayed
     colorScheme: [{type: String}],
     darkColorScheme: [{type: String}],
     font: {type: String, default: "Helvetica"},

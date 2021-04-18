@@ -11,12 +11,12 @@ const Platform = require("../models/platform");
 const User = require('../models/user');
 const Email = require('../models/admin/email');
 const {Announcement} = require('../models/post');
-const {Market} = require("../models/group");
 
 const controller = {};
 
 controller.index = async function(req, res) {
     const platform = await setup(Platform);
+
     const teachers = await User.find({authenticated: true, authenticated: true, status: platform.teacherStatus});
     if (!platform || !teachers) {
         req.flash('error', "An Error Occurred");
@@ -302,7 +302,13 @@ controller.info = async function(req, res) {
 }
 
 controller.darkmode = async function(req, res) {
-    req.user.darkmode = !req.user.darkmode;
+    const platform = await setup(Platform);
+    if (!platform) {
+        req.flash("error", "An Error Occurred");
+        return res.redirect("back");
+    }
+
+    if (platform.enableDarkmode) { req.user.darkmode = !req.user.darkmode;}
     await req.user.save();
     return res.redirect('back');
 }

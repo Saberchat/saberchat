@@ -75,6 +75,12 @@
                                 <% if (currentUser) { %>
                                     <a class="project-info" href="projects/<%= project._id %>"><%= project.subject %></a>
                                     <span class="float-right project-info date"><%= project.date %></span>
+                                    <% if (!project.verified && currentUser.status == platform.teacherStatus) { %>
+                                        <a href="/projects/verify/<%= project._id %>">
+                                            <span class="badge badge-pill badge-primary" id="mark">Verify</span>
+                                        </a>
+                                    <% } %>
+
                                 <% } else { %>
                                     <span class="project-info"><%= project.subject %></span>
                                     <span class="float-right project-info date"><%= project.date %></span>

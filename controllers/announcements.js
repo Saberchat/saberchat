@@ -25,7 +25,12 @@ controller.index = async function(req, res) {
         return res.redirect('back');
     }
 
-    const announcements = await Announcement.find({}).populate('sender');
+    let announcements;
+    if (req.user && platform.permissionsProperty.slice(platform.permissionsProperty.length-3).includes(req.user.permission)) {
+        announcements = await Announcement.find({}).populate('sender');
+    } else {
+        announcements = await Announcement.find({verified: true}).populate('sender');
+    }
     if(!announcements) {
         req.flash('error', 'Cannot find announcements.');
         return res.redirect('back');
@@ -77,6 +82,10 @@ controller.show = async function(req, res) {
     if(!platform || !announcement) {
         req.flash('error', 'Could not find announcement');
         return res.redirect('back');
+
+    } else if (!announcement.verified && !platform.permissionsProperty.slice(platform.permissionsProperty.length-3).includes(req.user.permission)) {
+        req.flash('error', 'You cannot view that announcement');
+        return res.redirect('back');
     }
 
     if(req.user) {
@@ -117,6 +126,11 @@ controller.updateForm = async function(req, res) {
 
 // Announcement POST create
 controller.create = async function(req, res) {
+    const platform = await setup(Platform);
+    if (!platform) {
+        req.flash("error", "Unable to setup platform");
+        return res.redirect("back");
+    }
     const announcement = await Announcement.create({
         sender: req.user,
         subject: req.body.subject,
@@ -127,9 +141,8 @@ controller.create = async function(req, res) {
         return res.redirect('back');
     }
 
-    if (req.body.images) { //If any images were added (if not, the 'images' property is null)
-        announcement.images = req.body.images;
-    }
+    if (req.body.images) {announcement.images = req.body.images;} //If any images were added (if not, the 'images' property is empty)
+    if (!platform.postVerifiable) {announcement.verified = true;} //Announcement does not need to be verified if platform does not support verifying announcements
 
     // if files were uploaded, process them
     if (req.files) {
@@ -180,8 +193,24 @@ controller.create = async function(req, res) {
     return res.redirect(`/announcements/${announcement._id}`);
 };
 
+controller.verify = async function(req, res) {
+    const announcement = await Announcement.findByIdAndUpdate(req.params.id, {verified: true});
+    if (!announcement) {
+        req.flash('error', "Unable to access announcement");
+        return res.redirect('back');
+    }
+
+    req.flash("success", "Verified Announcement!");
+    return res.redirect("/announcements");
+}
+
 //Announcement PUT Update
 controller.updateAnnouncement = async function(req, res) {
+    const platform = await setup(Platform);
+    if (!platform) {
+        req.flash("error", "Unable to setup platform");
+        return res.redirect("back");
+    } 
     const announcement = await Announcement.findById(req.params.id).populate('sender');
     if (!announcement) {
         req.flash('error', "Unable to access announcement");
@@ -195,16 +224,16 @@ controller.updateAnnouncement = async function(req, res) {
 
     const updatedAnnouncement = await Announcement.findByIdAndUpdate(req.params.id, {
         subject: req.body.subject,
-        text: req.body.message
+        text: req.body.message,
+        verified: false
     });
     if (!updatedAnnouncement) {
         req.flash('error', "Unable to update announcement");
         return res.redirect('back');
     }
 
-    if (req.body.images) { //Only add images if any are provided
-        updatedAnnouncement.images = req.body.images;
-    }
+    if (req.body.images) {updatedAnnouncement.images = req.body.images;} //Only add images if any are provided
+    if (!platform.postVerifiable) {updatedAnnouncement.verified = true;} //Announcement does not need to be verified if platform does not support verifying announcements
 
     //Iterate through all selected media to remove and delete them
     let cloudErr;

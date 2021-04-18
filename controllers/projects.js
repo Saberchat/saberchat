@@ -25,9 +25,12 @@ controller.index = async function(req, res) {
         return res.redirect('back');
     }
 
-    const projects = await Project.find({})
-        .populate('creators')
-        .populate('sender')
+    let projects;
+    if (req.user && req.user.status == platform.teacherStatus) {
+        projects = await Project.find({}).populate('creators').populate('sender');
+    } else {
+        projects = await Project.find({verified: true}).populate('creators').populate('sender');
+    }
     if (!projects) {
         req.flash('error', 'An Error Occurred');
         return res.redirect('back');
@@ -63,7 +66,6 @@ controller.newProject = async function(req, res) {
         ]),
     });
 }
-
 
 controller.createProject = async function(req, res) {
     const platform = await setup(Platform);
@@ -178,6 +180,16 @@ controller.createProject = async function(req, res) {
     return res.redirect(`/projects/${project._id}`);
 }
 
+controller.verify = async function(req, res) {
+    const project = await Project.findByIdAndUpdate(req.params.id, {verified: true});
+    if (!project) {
+        req.flash('error', "Unable to access project");
+        return res.redirect('back');
+    }
+
+    req.flash("success", "Verified Project!");
+    return res.redirect("/projects");
+}
 
 controller.editProject = async function(req, res) {
     const platform = await setup(Platform);
@@ -234,6 +246,10 @@ controller.showProject = async function(req, res) {
     if (!platform || !project) {
         req.flash('error', "An Error Occurred");
         res.redirect('back');
+
+    } else if (!project.verified && !(req.user.status != platform.teacherStatus)) {
+        req.flash('error', 'You cannot view that project');
+        return res.redirect('back');
     }
 
     let fileExtensions = new Map();
@@ -307,6 +323,7 @@ controller.updateProject = async function(req, res) {
     if (req.body.images) { //If any images were added (if not, the 'images' property is null)
         updatedProject.images = req.body.images;
     }
+    if (!platform.postVerifiable) {updatedProject.verified = true;} //PRoject does not need to be verified if platform does not support verifying projects
 
     let cloudErr;
     let cloudResult;

@@ -80,6 +80,11 @@
 
                             <a class="announcement-button" href="/events/<%= event._id %>">
                                 <span class="announcement-subject-header"><%= event.subject %></span>
+                                <% if (!event.verified && platform.permissionsProperty.slice(platform.permissionsProperty.length-3).includes(currentUser.permission)) { %>
+                                    <a href="/events/verify/<%= event._id %>">
+                                        <span class="badge badge-pill badge-primary" id="mark">Verify</span>
+                                    </a>
+                                <% } %>
                             </a>
                             <span class="float-right"><%= parseInt(event.deadline.month)+1%>/<%= event.deadline.day%>/<%= event.deadline.year%></span>
                         </h5>

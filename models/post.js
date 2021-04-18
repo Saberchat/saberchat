@@ -5,6 +5,7 @@ const Post = mongoose.model("Post", new mongoose.Schema({
     subject: String,
     sender: {type: mongoose.Schema.Types.ObjectId, ref: "User"},
     text: String,
+    verified: {type: Boolean, default: false},
     images: [{type: String}],
     mediaFiles: [{
         filename: String,

@@ -17,12 +17,17 @@ const controller = {};
 // Module GET index
 controller.index = async function(req, res) {
     const platform = await setup(Platform);
-    const modules = await Module.find({}).populate('sender');
+    let modules;
+    if (req.user && platform.permissionsProperty.slice(platform.permissionsProperty.length-3).includes(req.user.permission)) {
+        modules = await Module.find({}).populate('sender');
+    } else {
+        modules = await Module.find({verified: true}).populate('sender');
+    }
+
     if(!platform || !modules) {req.flash('error', 'Cannot find modules.'); return res.redirect('back');}
     return res.render('modules/index', {platform, modules: modules.reverse()});
 };
 
-// Module GET new module
 controller.new = async function(req, res) {
     const platform = await setup(Platform);
     if (!platform) {
@@ -41,7 +46,13 @@ controller.show = async function(req, res) {
             path: "comments",
             populate: {path: "sender"}
         });
-    if(!platform || !module) {req.flash('error', 'Could not find module'); return res.redirect('back');}
+    if(!platform || !module) {
+        req.flash('error', 'Could not find module'); return res.redirect('back');
+
+    } else if (!module.verified && !platform.permissionsProperty.slice(platform.permissionsProperty.length-3).includes(req.user.permission)) {
+        req.flash('error', 'You cannot view that module');
+        return res.redirect('back');
+    }
 
     let fileExtensions = new Map(); //Track which file format each attachment is in
     for (let media of module.mediaFiles) {
@@ -115,7 +126,23 @@ controller.create = async function(req, res) {
     return res.redirect(`/modules/${module._id}`);
 };
 
+controller.verify = async function(req, res) {
+    const module = await Module.findByIdAndUpdate(req.params.id, {verified: true});
+    if (!module) {
+        req.flash('error', "Unable to access module");
+        return res.redirect('back');
+    }
+
+    req.flash("success", "Verified Module!");
+    return res.redirect("/modules");
+}
+
 controller.updateModule = async function(req, res) {
+    const platform = await setup(Platform);
+    if (!platform) {
+        req.flash("error", "Unable to setup platform");
+        return res.redirect("back");
+    }
     const module = await Module.findById(req.params.id).populate('sender');
     if (!module) {
         req.flash('error', "Unable to access module");
@@ -141,6 +168,7 @@ controller.updateModule = async function(req, res) {
             updatedModule[attr] = req.body[attr];
         }
     }
+    if (!platform.postVerifiable) {updatedModule.verified = true;} //Module does not need to be verified if platform does not support verifying modules
 
     //Iterate through all selected media to remove and delete them
     let cloudErr;

@@ -19,6 +19,7 @@ router.get('/donate', wrapAsync(middleware.isLoggedIn), wrapAsync(articles.donat
 router.put('/like', wrapAsync(middleware.isLoggedIn), wrapAsync(middleware.accessToFeature), wrapAsync(articles.likeArticle)); //Like article
 router.put('/like-comment', wrapAsync(middleware.isLoggedIn), wrapAsync(middleware.accessToFeature), wrapAsync(articles.likeComment)); //Comment on article
 router.put('/comment', wrapAsync(middleware.isLoggedIn), wrapAsync(middleware.accessToFeature), wrapAsync(articles.comment)); //Like comment on article
+router.get('/verify/:id', wrapAsync(middleware.isLoggedIn), wrapAsync(middleware.isMod), wrapAsync(articles.verify)); //Verify Article
 
 router.route('/:id')
     .get(wrapAsync(middleware.isLoggedIn), wrapAsync(middleware.accessToFeature), wrapAsync(articles.show)) //Show specific article

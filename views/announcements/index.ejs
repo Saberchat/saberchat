@@ -90,10 +90,14 @@
                                         <% } %>
 
                                         <% if (index != -1) { %>
-                                            <a href="/announcements/mark/<%= announcement._id %>"><span
-                                                        class="badge badge-pill badge-success announcement-button">Mark As Read</span></a>
+                                            <a href="/announcements/mark/<%= announcement._id %>"><span class="badge badge-pill badge-success announcement-button">Mark As Read</span></a>
                                         <% } %>
                                     </a>
+                                    <% if (!announcement.verified && platform.permissionsProperty.slice(platform.permissionsProperty.length-3).includes(currentUser.permission)) { %>
+                                        <a href="/announcements/verify/<%= announcement._id %>">
+                                            <span class="badge badge-pill badge-primary" id="mark">Verify</span>
+                                        </a>
+                                    <% } %>
                                 <% } else { %>
                                     <span class="announcement-button">
                                         <span class="announcement-subject-header"><%= announcement.subject %></span>

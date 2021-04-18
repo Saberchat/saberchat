@@ -18,6 +18,7 @@ router.get('/new', wrapAsync(middleware.isLoggedIn), wrapAsync(middleware.access
 router.put('/like', wrapAsync(middleware.isLoggedIn), wrapAsync(middleware.accessToFeature), wrapAsync(events.likeEvent)); //Like event
 router.put('/like-comment', wrapAsync(middleware.isLoggedIn), wrapAsync(middleware.accessToFeature), wrapAsync(events.likeComment)); //Comment on event
 router.put('/comment', wrapAsync(middleware.isLoggedIn), wrapAsync(middleware.accessToFeature), wrapAsync(events.comment)); //Like comment on event
+router.get('/verify/:id', wrapAsync(middleware.isLoggedIn), wrapAsync(middleware.isMod), wrapAsync(events.verify)); //Verify Event
 
 router.route('/:id')
     .get(wrapAsync(middleware.isLoggedIn), wrapAsync(middleware.accessToFeature), wrapAsync(events.show)) //Show specific event

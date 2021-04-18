@@ -40,6 +40,19 @@ middleware.accessToFeature = async function(req, res, next) {
     return res.redirect('back');
 }
 
+middleware.postPermission = async function(req, res, next) {
+    const platform = await setup(Platform);
+    if (!platform) {
+        req.flash("error", "Unable to setup platform");
+        return res.redirect("back");
+    }
+    if (platform.postPermission || platform.permissionsProperty.slice(platform.permissionsProperty.length-3).includes(req.user.permission)) {
+        return next();
+    }
+    req.flash('error', 'You do not have permission to do that');
+    return res.redirect('back');
+}
+
 //checks if user is allowed into room
 middleware.checkIfMember = async function(req, res, next) {
     const room = await ChatRoom.findById(req.params.id);
@@ -48,9 +61,7 @@ middleware.checkIfMember = async function(req, res, next) {
         return res.redirect('/chat')
     }
 
-    if (!room.private || room.members.includes(req.user._id)) {
-        return next();
-    }
+    if (!room.private || room.members.includes(req.user._id)) { return next();}
     req.flash('error', 'You are not a member of this room');
     return res.redirect('/chat');
 }
@@ -67,9 +78,7 @@ middleware.checkForLeave = async function(req, res, next) {
         req.flash('error', 'You cannot leave a public room.');
         return res.redirect('back')
     }
-    if (room.members.includes(req.user._id)) {
-        return next();
-    }
+    if (room.members.includes(req.user._id)) { return next();}
 
     req.flash('error', 'You are not a member of this room');
     return res.redirect('/chat');
@@ -135,9 +144,7 @@ middleware.isStudent = async function(req, res, next) {
         return res.redirect("back");
     }
     
-    if (platform.studentStatuses.includes(req.user.status)) {
-        return next();
-    }
+    if (platform.studentStatuses.includes(req.user.status)) { return next();}
     req.flash('error', 'You do not have permission to do that');
     return res.redirect('back');
 }

@@ -16,7 +16,12 @@ const controller = {};
 // Event GET index
 controller.index = async function(req, res) {
     const platform = await setup(Platform);
-    const events = await Event.find({}).populate('sender');
+    let events;
+    if (req.user && platform.permissionsProperty.slice(platform.permissionsProperty.length-3).includes(req.user.permission)) {
+        events = await Event.find({}).populate('sender');
+    } else {
+        events = await Event.find({verified: true}).populate('sender');
+    }
     if(!platform || !events) {req.flash('error', 'Cannot find events.'); return res.redirect('back');}
 
     let current = [];
@@ -56,7 +61,12 @@ controller.show = async function(req, res) {
             path: "comments",
             populate: {path: "sender"}
         });
-    if(!platform || !event) {req.flash('error', 'Could not find event'); return res.redirect('back');}
+    if(!platform || !event) {
+        req.flash('error', 'Could not find event'); return res.redirect('back');
+    } else if (!event.verified && !platform.permissionsProperty.slice(platform.permissionsProperty.length-3).includes(req.user.permission)) {
+        req.flash('error', 'You cannot view that event');
+        return res.redirect('back');
+    }
 
     let date = new Date(parseInt(event.deadline.year), parseInt(event.deadline.month)-1, parseInt(event.deadline.day));
     let version = (date.getTime < new Date().getTime());
@@ -143,7 +153,23 @@ controller.create = async function(req, res) {
     return res.redirect(`/events/${event._id}`);
 };
 
+controller.verify = async function(req, res) {
+    const event = await Event.findByIdAndUpdate(req.params.id, {verified: true});
+    if (!event) {
+        req.flash('error', "Unable to access event");
+        return res.redirect('back');
+    }
+
+    req.flash("success", "Verified Event!");
+    return res.redirect("/events");
+}
+
 controller.updateEvent = async function(req, res) {
+    const platform = await setup(Platform);
+    if (!platform) {
+        req.flash("error", "Unable to setup platform");
+        return res.redirect("back");
+    } 
     const event = await Event.findById(req.params.id).populate('sender');
     if (!event) {
         req.flash('error', "Unable to access event");
@@ -174,6 +200,7 @@ controller.updateEvent = async function(req, res) {
             updatedEvent[attr] = req.body[attr];
         }
     }
+    if (!platform.postVerifiable) {updatedEvent.verified = true;} //Event does not need to be verified if platform does not support verifying events
 
     //Iterate through all selected media to remove and delete them
     let cloudErr;
