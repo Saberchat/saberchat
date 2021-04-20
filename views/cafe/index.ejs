@@ -38,9 +38,9 @@
     <div class="row">
         <div class="col-12">
             <div class="jumbotron text-center header">
-                <h1><i class="fas fa-shopping-cart"></i> <%=market.name%></h1>
+                <h1><i class="fas fa-<%=icon%>"></i> <%=market.name%></h1>
                 <% if (currentUser.tags.includes("Cashier")) {%>
-                    <a href="/cafe/manage" class="btn btn-warning"><i class="fas fa-shopping-cart"></i> Manage</a>
+                    <a href="/cafe/manage" class="btn btn-warning"><i class="fas fa-<%=icon%>"></i> Manage</a>
                 <% } %>
             </div>
         </div>

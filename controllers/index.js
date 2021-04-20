@@ -5,6 +5,7 @@ const passport = require('passport');
 const {sendGridEmail} = require("../services/sendGrid");
 const setup = require("../utils/setup");
 const {convertToLink} = require("../utils/convert-to-link");
+const {objectArrIndex} = require("../utils/object-operations");
 
 //SCHEMA
 const Platform = require("../models/platform");
@@ -27,7 +28,7 @@ controller.index = async function(req, res) {
     for (let user of teachers) { //Iterate through faculty and add their name to array
         names.push(`${user.firstName} ${user.lastName}`);
     }
-    return res.render('other/platform-info', {platform, names: names.join(', ')});
+    return res.render('other/platform-info', {platform, names: names.join(', '), objectArrIndex});
 }
 
 controller.register = async function(req, res) {

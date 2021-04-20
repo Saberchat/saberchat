@@ -56,7 +56,7 @@
                                     class="badge badge-pill badge-danger"><%= currentUser.newRoomCount.length %></span>
                                 </a>
                                 <% for (let feature of platform.features) { %>
-                                    <% if (feature.name != "Unused") { %>
+                                    <% if (feature.name != "Help And Donate") { //Done temporarily until page is finished%>
                                         <a class="dropdown-item" href="/<%=feature.route%>">
                                             <i class="fas fa-<%=feature.icon%>"></i>
                                             <%=feature.name%>

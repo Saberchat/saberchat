@@ -81,7 +81,11 @@
                             <span class="room-name"><%= room.name %></span>
                             <p class="latest-message">
                                 <% if (commentObject[room._id.toString()]) { %>
-                                    <%= commentObject[room._id.toString()].text %>
+                                    <% if (commentObject[room._id.toString()].text.length <= 100) { %>
+                                        <%= commentObject[room._id.toString()].text%>
+                                    <% } else { %>
+                                        <%= commentObject[room._id.toString()].text.slice(0, 100)%>...
+                                    <% } %>
                                 <% } else { %>
                                     <span class="room-created">Room Was Created</span>
                                 <% } %>

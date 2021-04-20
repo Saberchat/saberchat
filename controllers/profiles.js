@@ -253,11 +253,11 @@ controller.update = async function(req, res) {
 
 	const updatedUser = await User.findByIdAndUpdate(req.user._id, user); //find and update the user with new info
 	if (!updatedUser) {
-		req.flash('error', 'There was an error updating your profiles');
+		req.flash('error', 'There was an error updating your profile');
 		return res.redirect('back');
 	}
 
-	req.flash('success', 'Updated your profiles');
+	req.flash('success', 'Updated your profile');
 	return res.redirect(`/profiles/${req.user._id}`);
 }
 
@@ -387,7 +387,7 @@ controller.confirmEmail = async function(req, res) {
 		user.authenticationToken = token;
 		await user.save();
 
-		await sendGridEmail(user, 'Email Update Confirmation', `<p>Hello ${user.firstName},</p><p>You are receiving this email because you recently made changes to your Saberchat email. This is a confirmation of your profiles.</p><p>Your username is ${user.username}.</p><p>Your full name is ${user.firstName} ${user.lastName}.</p><p>Your email is ${user.email}.</p>`, false);
+		await sendGridEmail(user, 'Email Update Confirmation', `<p>Hello ${user.firstName},</p><p>You are receiving this email because you recently made changes to your Saberchat email. This is a confirmation of your profile.</p><p>Your username is ${user.username}.</p><p>Your full name is ${user.firstName} ${user.lastName}.</p><p>Your email is ${user.email}.</p>`, false);
 		req.flash('success', "Email updated!")
 		return res.redirect('/');
 	}
@@ -404,7 +404,7 @@ controller.changePasswordPut = async function(req, res) {
 		}
 
 		await user.changePassword(req.body.oldPassword, req.body.newPassword); //Update user's password
-		await sendGridEmail(req.user.email, 'Password Update Confirmation', `<p>Hello ${req.user.firstName},</p><p>You are receiving this email because you recently made changes to your Saberchat password. This is a confirmation of your profiles.\n\nYour username is ${req.user.username}.\nYour full name is ${req.user.firstName} ${req.user.lastName}.\nYour email is ${req.user.email}\n\nIf you did not recently change your password, reset it immediately and contact a faculty member.</p>`, false);
+		await sendGridEmail(req.user.email, 'Password Update Confirmation', `<p>Hello ${req.user.firstName},</p><p>You are receiving this email because you recently made changes to your Saberchat password. This is a confirmation of your profile.\n\nYour username is ${req.user.username}.\nYour full name is ${req.user.firstName} ${req.user.lastName}.\nYour email is ${req.user.email}\n\nIf you did not recently change your password, reset it immediately and contact a faculty member.</p>`, false);
 		req.flash('success', 'Successfully changed your password');
 		return res.redirect('/profiles/' + req.user._id);
 	}

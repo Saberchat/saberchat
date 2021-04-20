@@ -115,6 +115,11 @@
                         </div>
 
                         <div class="form-group">
+                            <label for="post-input">Allow Non-Admins To Make Posts (Admins Can Verify)</label>
+                            <input id="post-input" class="mode" type="checkbox" name="postVerifiable" <% if (platform.postVerifiable) { %> checked <% } %>>
+                        </div>
+
+                        <div class="form-group">
                             <label for="update-time-input">Student Status Update Time</label><br/>
                             <select name="month" class="mode" style="width: 30%;">
                             <% let months = ["None", "January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];%>
@@ -131,6 +136,21 @@
                             <% } %>
                             </select>
                         </div><br>
+                        <h4>Permissions</h4>
+                        <% for (let i = platform.permissionsProperty.length-1; i >= 0; i--) { %>
+                            <div class="form-group">
+                                <input class="mode" type="text" name="permissionProperty" placeholder="Property Form" value="<%=platform.permissionsProperty[i]%>"><br>
+                                <input class="mode" type="text" name="permissionDisplay" placeholder="Display Form" value="<%=platform.permissionsDisplay[i]%>"><br>
+                            </div><br>
+                        <% } %>
+                        <h4>Statuses</h4>
+                        <% for (let i = platform.statusesSingular.length-1; i >= 0; i--) { %>
+                            <div class="form-group">
+                                <input class="mode" type="text" name="statusProperty" placeholder="Property Form" value="<%=platform.statusesProperty[i]%>"><br>
+                                <input class="mode" type="text" name="statusSingular" placeholder="Singular Form" value="<%=platform.statusesSingular[i]%>"><br>
+                                <input class="mode" type="text" name="statusPlural" placeholder="Plural Form" value="<%=platform.statusesPlural[i]%>"><br>
+                            </div><br>
+                        <% } %>
                         <h4>Feature Settings</h4>
                         <div class="form-group">
                             <input type="checkbox" name="displayProjects" id="display-projects" 
@@ -162,7 +182,11 @@
                         </div>
                         <div class="form-group">
                             <label for="service-info">Platform Services</label>
-                            <textarea id="service-info" rows="5" class="form-control mode" name="services" placeholder="Enter services, separated by page breaks"><% for (let service of platform.services) { %><%=service%>&#013;&#010;<% } %></textarea>
+                            <textarea id="service-info" rows="5" class="form-control mode" name="services" placeholder="Enter services, separated by line breaks"><% for (let service of platform.services) { %><%=service%>&#013;&#010;<% } %></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label for="terms-conditions">Platform-Specific Terms and Conditions</label>
+                            <textarea id="terms-conditions" rows="5" class="form-control mode" name="terms" placeholder="Enter platform-specific terms and conditions, separated by line breaks"><% for (let term of platform.terms) { %><%=term%>&#013;&#010;<% } %></textarea>
                         </div>
                         <div class="form-group">
                             <label >Platform Display Images</label>

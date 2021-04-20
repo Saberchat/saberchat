@@ -2,7 +2,7 @@
 const {convertToLink} = require("../utils/convert-to-link");
 const dateFormat = require('dateformat');
 const path = require('path');
-const {removeIfIncluded} = require("../utils/object-operations");
+const {objectArrIndex, removeIfIncluded} = require("../utils/object-operations");
 const setup = require("../utils/setup");
 const {cloudUpload, cloudDelete} = require('../services/cloudinary');
 
@@ -37,9 +37,9 @@ controller.index = async function(req, res) {
     }
 
     if (req.query.past) {
-        return res.render('events/index', {platform, events: past.reverse(), activeSearch: false});   
+        return res.render('events/index', {platform, events: past.reverse(), activeSearch: false, icon: platform.features[objectArrIndex(platform.features, "route", "events")].icon});   
     }
-    return res.render('events/index', {platform, events: current.reverse(), activeSearch: true});
+    return res.render('events/index', {platform, events: current.reverse(), activeSearch: true, icon: platform.features[objectArrIndex(platform.features, "route", "events")].icon});
 };
 
 // Event GET new event
@@ -49,7 +49,7 @@ controller.new = async function(req, res) {
         req.flash("error", "An error occurred");
         return res.redirect("back");
     }
-    return res.render('events/new', {platform});
+    return res.render('events/new', {platform, icon: platform.features[objectArrIndex(platform.features, "route", "events")].icon});
 };
 
 // Event GET show
@@ -76,7 +76,7 @@ controller.show = async function(req, res) {
         fileExtensions.set(media.url, path.extname(media.url.split("SaberChat/")[1]));
     }
     const convertedText = convertToLink(event.text); //Parse and add hrefs to all links in text
-    return res.render('events/show', {platform, event, convertedText, fileExtensions, version});
+    return res.render('events/show', {platform, event, convertedText, fileExtensions, version, icon: platform.features[objectArrIndex(platform.features, "route", "events")].icon});
 };
 
 // Event GET edit form
@@ -93,7 +93,7 @@ controller.updateForm = async function(req, res) {
     for (let media of event.mediaFiles) {
         fileExtensions.set(media.url, path.extname(media.url.split("SaberChat/")[1]));
     }
-    return res.render('events/edit', {platform, event, fileExtensions});
+    return res.render('events/edit', {platform, event, fileExtensions, icon: platform.features[objectArrIndex(platform.features, "route", "events")].icon});
 };
 
 // Event POST create

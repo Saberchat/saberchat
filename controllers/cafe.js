@@ -5,7 +5,7 @@ const {sendGridEmail} = require("../services/sendGrid");
 const { sortByPopularity } = require("../utils/popularity");
 const {convertToLink} = require("../utils/convert-to-link");
 const getData = require("../utils/cafe-data");
-const {removeIfIncluded} = require("../utils/object-operations");
+const {objectArrIndex, removeIfIncluded} = require("../utils/object-operations");
 const {cloudUpload, cloudDelete} = require("../services/cloudinary");
 const setup = require("../utils/setup");
 const {autoCompress} = require("../utils/image-compress");
@@ -31,7 +31,7 @@ controller.index = async function(req, res) {
         req.flash("error", "Unable to find orders");
         return res.redirect("back");
     }
-    return res.render("cafe/index", {market, platform, orders});
+    return res.render("cafe/index", {market, platform, orders, icon: platform.features[objectArrIndex(platform.features, "route", "cafe")].icon});
 }
 
 controller.orderForm = async function(req, res) {
@@ -103,7 +103,7 @@ controller.orderForm = async function(req, res) {
             return res.redirect("back");
         }
 
-        return res.render("cafe/newOrder", {platform, categories: sortedCategories, frequentItems});
+        return res.render("cafe/newOrder", {platform, categories: sortedCategories, frequentItems, icon: platform.features[objectArrIndex(platform.features, "route", "cafe")].icon});
     }
 
     if (req.query.menu) { //SHOW MENU
@@ -338,7 +338,7 @@ controller.newItem = async function(req, res) {
         return res.redirect("back");
     }
 
-    return res.render("cafe/newOrderItem", {platform, categories});
+    return res.render("cafe/newOrderItem", {platform, categories, icon: platform.features[objectArrIndex(platform.features, "route", "cafe")].icon});
 }
 
 //CREATE NEW ITEM
@@ -428,7 +428,7 @@ controller.viewItem = async function(req, res) {
         fileExtensions.set(item.mediaFile.url, path.extname(item.mediaFile.url.split("SaberChat/")[1]));
     }
 
-    return res.render("cafe/show", {platform, categories, item, fileExtensions});
+    return res.render("cafe/show", {platform, categories, item, fileExtensions, icon: platform.features[objectArrIndex(platform.features, "route", "cafe")].icon});
 }
 
 //UPDATE/UPVOTE ITEM
@@ -519,6 +519,7 @@ controller.manage = async function(req, res) {
         }
         data.platform = platform;
         data.market = market;
+        data.icon = platform.features[objectArrIndex(platform.features, "route", "cafe")].icon;
         return res.render("cafe/data", data);
 
     } else { //If route calls to display regular management
@@ -546,7 +547,7 @@ controller.newCategory = async function(req, res) {
         req.flash("error", "Unable to find categories");
         return res.redirect("back");
     }
-    return res.render("cafe/newItemCategory", {platform, categories});
+    return res.render("cafe/newItemCategory", {platform, categories, icon: platform.features[objectArrIndex(platform.features, "route", "cafe")].icon});
 }
 
 //CREATE NEW ITEM CATEGORY
@@ -625,7 +626,7 @@ controller.viewCategory = async function(req, res) {
         req.flash("error", "An Error Occurred");
         return res.redirect("back");
     }
-    return res.render("cafe/editItemCategory", {platform, category, categories});
+    return res.render("cafe/editItemCategory", {platform, category, categories, icon: platform.features[objectArrIndex(platform.features, "route", "cafe")].icon});
 }
 
 //UPDATE ITEM CATEGORY
@@ -866,7 +867,7 @@ controller.manageCafe = async function(req, res) {
         sortedCategories.push(sortedCategory);
     }
 
-    return res.render("cafe/manage", {platform, categories: sortedCategories, market: cafe, open: cafe.open});
+    return res.render("cafe/manage", {platform, categories: sortedCategories, market: cafe, open: cafe.open, icon: platform.features[objectArrIndex(platform.features, "route", "cafe")].icon});
 }
 
 controller.manageOrders = async function(req, res) {
@@ -881,7 +882,7 @@ controller.manageOrders = async function(req, res) {
         req.flash("error", "Could not find orders");
         return res.redirect("back");
     }
-    return res.render("cafe/orderDisplay", {platform, orders});
+    return res.render("cafe/orderDisplay", {platform, orders, icon: platform.features[objectArrIndex(platform.features, "route", "cafe")].icon});
 }
 
 module.exports = controller;

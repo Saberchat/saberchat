@@ -43,9 +43,9 @@
     <div class="row">
         <div class="col-12">
             <div class="jumbotron text-center header">
-                <h1><i class="fas fa-calendar"></i> Events</h1>
+                <h1><i class="fas fa-<%=icon%>"></i> Events</h1>
                 <p><%=platform.name%>'s <% if (activeSearch) { %>Active<% } else {%>Past<%}%> Events</p>
-                <% if (currentUser.status == platform.teacherStatus) { %>
+                <% if (platform.postVerifiable || currentUser.status == platform.teacherStatus) { %>
                     <a href="/events/new" class="btn btn-primary announcement-button">
                         <i class="fas fa-plus-circle"></i> Add New Event
                     </a>
@@ -80,7 +80,7 @@
 
                             <a class="announcement-button" href="/events/<%= event._id %>">
                                 <span class="announcement-subject-header"><%= event.subject %></span>
-                                <% if (!event.verified && platform.permissionsProperty.slice(platform.permissionsProperty.length-3).includes(currentUser.permission)) { %>
+                                <% if (platform.postVerifiable && !event.verified && platform.permissionsProperty.slice(platform.permissionsProperty.length-3).includes(currentUser.permission)) { %>
                                     <a href="/events/verify/<%= event._id %>">
                                         <span class="badge badge-pill badge-primary" id="mark">Verify</span>
                                     </a>

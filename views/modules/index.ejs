@@ -43,9 +43,9 @@
     <div class="row">
         <div class="col-12">
             <div class="jumbotron text-center header">
-                <h1><i class="fas fa-sticky-note"></i> Modules</h1>
+                <h1><i class="fas fa-<%=icon%>"></i> Modules</h1>
                 <p>All Modules For Our Curriculum</p>
-                <% if (currentUser.status == platform.teacherStatus) { %>
+                <% if (platform.postVerifiable || currentUser.status == platform.teacherStatus) { %>
                     <a href="/modules/new" class="btn btn-primary announcement-button">
                         <i class="fas fa-plus-circle"></i> Create New Module
                     </a>
@@ -71,7 +71,7 @@
 
                             <a class="announcement-button" href="/modules/<%= module._id %>">
                                 <span class="announcement-subject-header"><%= module.subject %></span>
-                                <% if (!modules.verified && platform.permissionsProperty.slice(platform.permissionsProperty.length-3).includes(currentUser.permission)) { %>
+                                <% if (platform.postVerifiable && !module.verified && platform.permissionsProperty.slice(platform.permissionsProperty.length-3).includes(currentUser.permission)) { %>
                                     <a href="/modules/verify/<%= module._id %>">
                                         <span class="badge badge-pill badge-primary" id="mark">Verify</span>
                                     </a>

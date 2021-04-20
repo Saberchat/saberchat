@@ -21,8 +21,6 @@ var platformSchema = new mongoose.Schema({
     colorScheme: [{type: String}],
     darkColorScheme: [{type: String}],
     font: {type: String, default: "Helvetica"},
-
-    //TODO: Starts here
     permissionsProperty: [{type: String}],
     permissionsDisplay: [{type: String}],
     statusesProperty: [{type: String}],
@@ -31,9 +29,8 @@ var platformSchema = new mongoose.Schema({
     studentStatuses: [{type: String}],
     formerStudentStatus: String,
     teacherStatus: String,
-    //ENDS HERE
-
     tags: [{type: String}],
+    terms: [{type: String}],
     publicFeatures: [{route: String, name: String, icon: String, subroutes: [{type: String}]}],
     features: [{route: String, name: String, icon: String}],
     displayImages: [{type: String}],

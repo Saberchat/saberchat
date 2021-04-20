@@ -12,12 +12,7 @@
                     conditions.</p>
                 <h5>Basic Terms</h5>
                 <ul>
-                    <li>You must be a member of the <%=platform.name%> Community - a student, parent, teacher or a guest approved by
-                        the current school administrator
-                    </li>
-                    <li>You may not share the Saberchat link outside of the <%=platform.name%> Community, unless otherwise
-                        approved.
-                    </li>
+                    <li>You must be approved by the <%=platform.name%> Platform Administrator to have access to all features</li>
                     <li>You are responsible for any activity that occurs under your profile and username.</li>
                     <li>You are responsible for keeping your password secure.</li>
                     <li>You must not abuse, harass, threaten, cyberbully or in any way cause discomfort to other
@@ -123,6 +118,17 @@
                         Content that violates this Agreement, Saberchat reserves the right to delete any Content for any
                         reason, without prior notice.
                     </li>
+                    </ul>
+
+                    <% if (platform.terms.length > 0) {%>
+                        <h5><%=platform.name%>-Specific Terms and Conditions</h5>
+                        <ul>
+                        <% for (let term of platform.terms) { %>
+                            <li><%=term%></li>
+                        <% } %>
+                        </ul>
+                    <% } %>
+
                 </ul>
 
                 <input type="checkbox" name="agree" id="agree"/>

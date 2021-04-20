@@ -2,7 +2,7 @@
 const {convertToLink} = require("../utils/convert-to-link");
 const dateFormat = require('dateformat');
 const path = require('path');
-const {removeIfIncluded} = require("../utils/object-operations");
+const {objectArrIndex, removeIfIncluded} = require("../utils/object-operations");
 const setup = require("../utils/setup");
 const {cloudUpload, cloudDelete} = require('../services/cloudinary');
 const {autoCompress} = require("../utils/image-compress");
@@ -25,7 +25,7 @@ controller.index = async function(req, res) {
     }
 
     if(!platform || !modules) {req.flash('error', 'Cannot find modules.'); return res.redirect('back');}
-    return res.render('modules/index', {platform, modules: modules.reverse()});
+    return res.render('modules/index', {platform, modules: modules.reverse(), icon: platform.features[objectArrIndex(platform.features, "route", "modules")].icon});
 };
 
 controller.new = async function(req, res) {
@@ -34,7 +34,7 @@ controller.new = async function(req, res) {
         req.flash("error", "An error occurred");
         return res.redirect("back");
     }
-    return res.render('modules/new', {platform});
+    return res.render('modules/new', {platform, icon: platform.features[objectArrIndex(platform.features, "route", "modules")].icon});
 };
 
 // Module GET show
@@ -59,7 +59,7 @@ controller.show = async function(req, res) {
         fileExtensions.set(media.url, path.extname(media.url.split("SaberChat/")[1]));
     }
     const convertedText = convertToLink(module.text); //Parse and add hrefs to all links in text
-    return res.render('modules/show', {platform, module, convertedText, fileExtensions});
+    return res.render('modules/show', {platform, module, convertedText, fileExtensions, icon: platform.features[objectArrIndex(platform.features, "route", "modules")].icon});
 };
 
 // Module GET edit form
@@ -76,7 +76,7 @@ controller.updateForm = async function(req, res) {
     for (let media of module.mediaFiles) {
         fileExtensions.set(media.url, path.extname(media.url.split("SaberChat/")[1]));
     }
-    return res.render('modules/edit', {platform, module, fileExtensions});
+    return res.render('modules/edit', {platform, module, fileExtensions, icon: platform.features[objectArrIndex(platform.features, "route", "modules")].icon});
 };
 
 // Module POST create

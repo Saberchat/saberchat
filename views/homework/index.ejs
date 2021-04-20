@@ -46,12 +46,11 @@
     <div class="row">
         <div class="col-12">
             <div class="jumbotron text-center header">
-                <h1><i class="fas fa-chalkboard-teacher"></i> Tutoring Center </h1>
+                <h1><i class="fas fa-<%=icon%>"></i> Tutoring Center </h1>
                 <p>A platform for students to communicate and help each other learn</p>
                 <% if (currentUser.status == platform.teacherStatus) { %>
                     <form action="/homework" method="post" id="add-course-form" enctype="multipart/form-data">
-                        <button type="button" data-toggle="modal" data-target="#modal-teacher" class="btn btn-info"><i
-                                    class="fas fa-chalkboard-teacher"></i> Create Course
+                        <button type="button" data-toggle="modal" data-target="#modal-teacher" class="btn btn-info"><i class="fas fa-<%=icon%>"></i> Create Course
                         </button>
                         <div class="modal fade" id="modal-teacher" tabindex="-1" aria-labelledby="deleteModalLabel"
                              aria-hidden="true">
@@ -93,8 +92,7 @@
 
                 <% } else if (studentStatuses.includes(currentUser.status)) { %>
                     <form action="/homework/join" method="post" id="join-course-student">
-                        <button type="button" data-toggle="modal" data-target="#modal-join" class="btn btn-primary"><i
-                                    class="fas fa-chalkboard-teacher"></i> Join Course
+                        <button type="button" data-toggle="modal" data-target="#modal-join" class="btn btn-primary"><i class="fas fa-<%=icon%>"></i> Join Course
                         </button>
                         <div class="modal fade" id="modal-join" tabindex="-1" aria-labelledby="deleteModalLabel"
                              aria-hidden="true">
@@ -123,7 +121,7 @@
                     <% if (currentUser.tags.includes("Tutor")) { %>
                         <form action="/homework/join" method="post" id="join-course-tutor">
                             <button type="button" data-toggle="modal" data-target="#modal-tutor"
-                                    class="btn btn-success"><i class="fas fa-chalkboard-teacher"></i> Join Course As
+                                    class="btn btn-success"><i class="fas fa-<%=icon%>"></i> Join Course As
                                 Tutor
                             </button>
                             <div class="modal fade" id="modal-tutor" tabindex="-1" aria-labelledby="deleteModalLabel"

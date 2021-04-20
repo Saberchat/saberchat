@@ -2,7 +2,7 @@
 const {convertToLink} = require("../utils/convert-to-link");
 const dateFormat = require('dateformat');
 const path = require('path');
-const {removeIfIncluded} = require("../utils/object-operations");
+const {objectArrIndex, removeIfIncluded} = require("../utils/object-operations");
 const setup = require("../utils/setup");
 const {cloudUpload, cloudDelete} = require('../services/cloudinary');
 
@@ -24,7 +24,7 @@ controller.index = async function(req, res) {
     }
 
     if(!platform || !articles) {req.flash('error', 'Cannot find articles.'); return res.redirect('back');}
-    return res.render('articles/index', {platform, articles: articles.reverse()});
+    return res.render('articles/index', {platform, articles: articles.reverse(), icon: platform.features[objectArrIndex(platform.features, "route", "articles")].icon});
 };
 
 // Article GET new article
@@ -34,7 +34,7 @@ controller.new = async function(req, res) {
         req.flash("error", "An error occurred");
         return res.redirect("back");
     }
-    return res.render('articles/new', {platform});
+    return res.render('articles/new', {platform, icon: platform.features[objectArrIndex(platform.features, "route", "articles")].icon});
 };
 
 // Article GET show
@@ -58,7 +58,7 @@ controller.show = async function(req, res) {
         fileExtensions.set(media.url, path.extname(media.url.split("SaberChat/")[1]));
     }
     const convertedText = convertToLink(article.text); //Parse and add hrefs to all links in text
-    return res.render('articles/show', {platform, article, convertedText, fileExtensions});
+    return res.render('articles/show', {platform, article, convertedText, fileExtensions, icon: platform.features[objectArrIndex(platform.features, "route", "articles")].icon});
 };
 
 // Article GET edit form

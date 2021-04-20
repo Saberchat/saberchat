@@ -36,7 +36,7 @@ controller.index = async function(req, res) {
             }
         }
     }
-    return res.render('homework/index', {platform, courses: courseList, studentStatuses: platform.studentStatuses});
+    return res.render('homework/index', {platform, courses: courseList, studentStatuses: platform.studentStatuses, icon: platform.features[objectArrIndex(platform.features, "route", "homework")].icon});
 }
 
 controller.createCourse = async function(req, res) {
@@ -183,7 +183,7 @@ controller.showCourse = async function(req, res) {
         req.flash('error', "Unable to find teachers");
         return res.redirect('back');
     }
-    return res.render('homework/show', {platform, course, studentIds, tutorIds, tutors, teachers, objectArrIndex}); //Export function for ejs evaluation
+    return res.render('homework/show', {platform, course, studentIds, tutorIds, tutors, teachers, objectArrIndex, icon: platform.features[objectArrIndex(platform.features, "route", "homework")].icon}); //Export function for ejs evaluation
 }
 
 controller.unenrollStudent = async function(req, res) {
@@ -1038,7 +1038,8 @@ controller.showTutor = async function(req, res) {
                         return res.render('homework/lessons', {
                             platform, course, tutor, student: allStudents[objectArrIndex(allStudents, "student", req.query.studentId, "_id")], objectArrIndex,
                             time: lessonMap.get(allStudents[objectArrIndex(allStudents, "student", req.query.studentId, "_id")].student._id.toString()), 
-                            cost: costMap.get(allStudents[objectArrIndex(allStudents, "student", req.query.studentId, "_id")].student._id.toString())
+                            cost: costMap.get(allStudents[objectArrIndex(allStudents, "student", req.query.studentId, "_id")].student._id.toString()),
+                            icon: platform.features[objectArrIndex(platform.features, "route", "homework")].icon
                         });
                     }
                     req.flash('error', "You do not have permission to view that student");
@@ -1051,7 +1052,8 @@ controller.showTutor = async function(req, res) {
 
             return res.render('homework/tutor-show', {
                 platform, course, tutor, students: members, studentIds, averageRating,
-                lessons: lessonMap, courses: enrolledCourses, objectArrIndex
+                lessons: lessonMap, courses: enrolledCourses, objectArrIndex,
+                icon: platform.features[objectArrIndex(platform.features, "route", "homework")].icon
             });
         }
     }

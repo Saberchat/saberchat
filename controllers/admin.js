@@ -25,16 +25,18 @@ controller.updatePlatformForm = async function(req, res) {
 
 controller.updatePlatform = async function(req, res) {
     const platform = await setup(Platform);
-    if (!platform) {
+    const users = await User.find({});
+    if (!platform || !users) {
         req.flash("error", "An Error Occurred");
         return res.redirect("back");
     }
+
     const oldAddress = platform.emailExtension;
     for (let attr of ["name", "description", "postText", "imageUrl", "emailExtension", "displayImages", "font"]) { //Update elements with directly corresponding text
         platform[attr] = req.body[attr];
     }
 
-    for (let attr of ["navDark", "contactPhotoDisplay"]) {
+    for (let attr of ["navDark", "contactPhotoDisplay", "postVerifiable"]) {
         platform[attr] = (req.body[attr] != undefined);
     }
 
@@ -45,7 +47,7 @@ controller.updatePlatform = async function(req, res) {
         }
     }
 
-    for (let attr of ["community", "services"]) { //Update elements which are textareas with split text
+    for (let attr of ["community", "services", "terms"]) { //Update elements which are textareas with split text
         platform[attr] = [];
         for (let element of req.body[attr].split('\n')) {
             if (element.split('\r').join('').split(' ').join('') != "") {
@@ -105,9 +107,35 @@ controller.updatePlatform = async function(req, res) {
         }
     }
 
+    const oldPerms = platform.permissionsProperty;
+    const oldStatuses = platform.statusesProperty;
+
+    platform.permissionsProperty = [];
+    platform.permissionsDisplay = [];
+
+    for (let i = req.body.permissionProperty.length-1; i >= 0; i--) {
+        platform.permissionsProperty.push(req.body.permissionProperty[i]);
+        platform.permissionsDisplay.push(req.body.permissionDisplay[i]);
+    }
+
+    platform.statusesProperty = [];
+    platform.statusesSingular = [];
+    platform.statusesPlural = [];
+
+    for (let i = req.body.statusSingular.length-1; i >= 0; i--) {
+        platform.statusesProperty.push(req.body.statusProperty[i]);
+        platform.statusesSingular.push(req.body.statusSingular[i]);
+        platform.statusesPlural.push(req.body.statusPlural[i]);
+    }
+
+    for (let user of users) {
+        user.permission = platform.permissionsProperty[oldPerms.indexOf(user.permission)];
+        user.status = platform.statusesProperty[oldStatuses.indexOf(user.status)];
+        await user.save();
+    }
+    
     if (oldAddress != req.body.emailExtension) { //Update all users who were by default allowed earlier
         let email;
-        const users = await User.find({});
         for (let user of users) {
             if (user.email.split('@')[1] == oldAddress) {
                 email = await Email.create({address: user.email, version: "accesslist"});

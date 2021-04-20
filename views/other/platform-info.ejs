@@ -48,9 +48,9 @@
                     <h1><%=platform.name%></h1>
                     <p><%=platform.description%><% if (platform.postText){%>, <%=platform.postText%><%}%></p>
                 <% } %>
-                <% if (currentUser && platform.name == "None") { %>
-                    <a href="/articles/donate" class="btn btn-primary">Help And Donate</a>
-                <% } %>
+                <!-- <% if (currentUser && objectArrIndex(platform.features, "route", "articles/donate") > -1) {%> -->
+                    <!-- <a href="/articles/donate" style="padding-left: 30px; padding-right: 30px; padding-top: 20px;" class="btn btn-primary"><p style="color:white; font-size: 140%;"><i class="fas fa-hand-holding-usd"></i> Help And Donate</p></a> -->
+                <!-- <% } %> -->
             </div>
         </div>
     </div>

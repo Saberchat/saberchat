@@ -20,7 +20,7 @@ controller.index = async function(req, res) {
         req.flash('error', 'An Error Occurred');
         return res.redirect('/wHeights');
     }
-    return res.render('wHeights/index', {platform, articles});
+    return res.render('wHeights/index', {platform, articles, icon: platform.features[objectArrIndex(platform.features, "route", "wHeights")].icon});
 }
 
 // display form for creating articles
@@ -43,7 +43,7 @@ controller.new = async function(req, res) {
         return res.redirect('back');
     }
 
-    return res.render('wHeights/new', {platform, students, categories});
+    return res.render('wHeights/new', {platform, students, categories, icon: platform.features[objectArrIndex(platform.features, "route", "wHeights")].icon});
 }
 
 // display specific article
@@ -60,7 +60,7 @@ controller.show = async function(req, res) {
         req.flash('error', 'Cannot find article');
         return res.redirect('/wHeights');
     }
-    return res.render('wHeights/show', {platform, article});
+    return res.render('wHeights/show', {platform, article, icon: platform.features[objectArrIndex(platform.features, "route", "wHeights")].icon});
 }
 
 //Create article
