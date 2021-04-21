@@ -56,12 +56,10 @@
                                     class="badge badge-pill badge-danger"><%= currentUser.newRoomCount.length %></span>
                                 </a>
                                 <% for (let feature of platform.features) { %>
-                                    <% if (feature.name != "Help And Donate") { %>
-                                        <a class="dropdown-item" href="/<%=feature.route%>">
-                                            <i class="fas fa-<%=feature.icon%>"></i>
-                                            <%=feature.name%>
-                                        </a>
-                                    <% } %>
+                                    <a class="dropdown-item" href="/<%=feature.route%>">
+                                        <i class="fas fa-<%=feature.icon%>"></i>
+                                        <%=feature.name%>
+                                    </a>
                                 <% } %>
                             </div>
                         </li>
@@ -274,26 +272,25 @@
 </div>
 <%- include('forgot-password') %>
 <%- include('agreement') %>
-<script>
-    const body = document.getElementsByTagName("body")[0];
-    let colorScheme = [];
-    let platformColors;
-    platformColors = '<% if (currentUser) { if (currentUser.darkmode) {%> <%=platform.darkColorScheme%> <% } else { %> <%=platform.colorScheme%> <% } } else {%> <%=platform.colorScheme%> <% } %>'.split(',');
-    for (let i = 0; i < platformColors.length; i+= 3) {
-        colorScheme.push(`rgb(${platformColors[i]},${platformColors[i+1]},${platformColors[i+2]})`);
-    }
+<% if (!currentUser || !currentUser.darkmode) { %>
+    <script>
+        const body = document.getElementsByTagName("body")[0];
+        let colorScheme = [];
+        let platformColors;
+        body.style.fontFamily = '<%=platform.font%>';
 
-    body.style.fontFamily = '<%=platform.font%>';
-    body.style["background-color"] = colorScheme[colorScheme.length-1];
-
-    const checkIfAgree = e => {
-        if (!document.getElementById('agree').checked) {
-            e.preventDefault();
+        platformColors = '<%=platform.colorScheme%>'.split(',');
+        for (let i = 0; i < platformColors.length; i+= 3) {
+            colorScheme.push(`rgb(${platformColors[i]},${platformColors[i+1]},${platformColors[i+2]})`);
         }
-    }
 
-    document.getElementById('confirm-agreement').addEventListener('click', e => {
-        checkIfAgree(e)
-    });
+        body.style["background-color"] = colorScheme[colorScheme.length-1];
+    </script>
+<% } %>
+
+<script>
+    const checkIfAgree = e => { if (!document.getElementById('agree').checked) {e.preventDefault();}}
+
+    document.getElementById('confirm-agreement').addEventListener('click', e => {checkIfAgree(e)});
 
 </script>

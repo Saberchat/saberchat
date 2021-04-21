@@ -32,19 +32,12 @@ controller.updatePlatform = async function(req, res) {
     }
 
     const oldAddress = platform.emailExtension;
-    for (let attr of ["name", "description", "postText", "imageUrl", "emailExtension", "displayImages", "font"]) { //Update elements with directly corresponding text
+    for (let attr of ["name", "description", "postText", "imageUrl", "emailExtension", "officialEmail", "displayImages", "font"]) { //Update elements with directly corresponding text
         platform[attr] = req.body[attr];
     }
 
-    for (let attr of ["navDark", "contactPhotoDisplay", "postVerifiable"]) {
+    for (let attr of ["navDark", "contactPhotoDisplay", "postVerifiable", "enableDarkmode"]) {
         platform[attr] = (req.body[attr] != undefined);
-    }
-
-    for (let attr of ["colorScheme", "darkColorScheme"]) {
-        platform[attr] = [];
-        for (let i = 0; i < req.body[attr].length; i+= 3) {
-            platform[attr].push(`${req.body[attr][i]}, ${req.body[attr][i+1]}, ${req.body[attr][i+2]}`);
-        }
     }
 
     for (let attr of ["community", "services", "terms"]) { //Update elements which are textareas with split text
@@ -57,6 +50,10 @@ controller.updatePlatform = async function(req, res) {
     }
 
     platform.updateTime = `${req.body.day} ${req.body.month}`;
+    platform.colorScheme = [];
+    for (let i = 0; i < req.body.colorScheme.length; i+= 3) {
+        platform.colorScheme.push(`${req.body.colorScheme[i]}, ${req.body.colorScheme[i+1]}, ${req.body.colorScheme[i+2]}`);
+    }
 
     platform.info = [];
     let parsedText = [];
@@ -202,20 +199,18 @@ controller.getContext = async function(req, res) { //Get context for reported co
         return res.json({error: "Unable to find comment"});
     }
 
-    const allComments = await ChatMessage.find({room: reportedChatMessage.room}).populate("author"); //All comments from the reported comment's room
+    const allComments = await ChatMessage.find({room: reportedComment.room}).populate("author"); //All comments from the reported comment's room
     if (!allComments) {
         return res.json({error: "Unable to find other comments"});
     }
 
-    const commentIndex = objectArrIndex(allComments, "_id", reportedChatMessage._id); //Get index of reported comment
+    const commentIndex = objectArrIndex(allComments, "_id", reportedComment._id); //Get index of reported comment
     let context = []; //Comments 5 before and 5 after
 
     //Find the comments 5 before and 5 after the reported one, and add to array
-    for (let i = -5; i >= 5; i++) {
-        if (commentIndex + i > 0) {
-            if (allComments[commentIndex + i].author) {
-                context.push(allComments[commentIndex + i]);
-            }
+    for (let i = -5; i <= 5; i++) {
+        if (commentIndex + i > 0 && allComments[commentIndex + i].author) {
+            context.push(allComments[commentIndex + i]);
         }
     }
     return res.json({success: "Succesfully collected data", context});

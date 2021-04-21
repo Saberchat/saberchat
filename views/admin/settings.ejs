@@ -80,6 +80,11 @@
                                     name="emailExtension" value="<%= platform.emailExtension %>" placeholder="Enter Required Email Extension">
                         </div>
                         <div class="form-group">
+                            <label for="official-email-input">Platform Official Email</label><br/>
+                            <input id="official-email-input" class="form-control mode" type="text"
+                                    name="officialEmail" value="<%= platform.officialEmail %>" placeholder="Enter Platform Official Email">
+                        </div>
+                        <div class="form-group">
                             <label for="font">Font Family</label><br/>
                             <input id="font" class="form-control mode" type="text"
                                     name="font" value="<%= platform.font%>" placeholder="Enter Platform Font Family">
@@ -87,7 +92,7 @@
 
                         <div style="background-color: white; border-color: black; border-width: 2px; padding: 20px; margin-bottom: 10px; margin-top: 10px;">
                             <% let scheme;%>
-                            <% for (let attr of [["colorScheme", "Color Scheme", "black", "updateColor"], ["darkColorScheme", "Darkmode Color Scheme", "white", "updateDarkColor"]]) { %>
+                            <% for (let attr of [["colorScheme", "Color Scheme", "black", "updateColor"]]) { %>
                                 <% for (let i = 0; i < 3; i++) { %>
                                     <div class="form-group">
                                         <% scheme = platform[attr[0]][i].split(', ');%>
@@ -107,6 +112,11 @@
                         <div class="form-group">
                             <label for="display-input">Navbar Dark Display</label>
                             <input id="display-input" class="mode" type="checkbox" name="navDark" <% if (platform.navDark) { %> checked <% } %>>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="darkmode-input">Enable Darkmode</label>
+                            <input id="darkmode-input" class="mode" type="checkbox" name="enableDarkmode" <% if (platform.enableDarkmode) { %> checked <% } %>>
                         </div>
 
                         <div class="form-group">
@@ -139,16 +149,16 @@
                         <h4>Permissions</h4>
                         <% for (let i = platform.permissionsProperty.length-1; i >= 0; i--) { %>
                             <div class="form-group">
-                                <input class="mode" type="text" name="permissionProperty" placeholder="Property Form" value="<%=platform.permissionsProperty[i]%>"><br>
-                                <input class="mode" type="text" name="permissionDisplay" placeholder="Display Form" value="<%=platform.permissionsDisplay[i]%>"><br>
+                                <input class="form-control mode" type="text" name="permissionProperty" placeholder="Property Form" value="<%=platform.permissionsProperty[i]%>"><br>
+                                <input class="form-control mode" type="text" name="permissionDisplay" placeholder="Display Form" value="<%=platform.permissionsDisplay[i]%>"><br>
                             </div><br>
                         <% } %>
                         <h4>Statuses</h4>
                         <% for (let i = platform.statusesSingular.length-1; i >= 0; i--) { %>
                             <div class="form-group">
-                                <input class="mode" type="text" name="statusProperty" placeholder="Property Form" value="<%=platform.statusesProperty[i]%>"><br>
-                                <input class="mode" type="text" name="statusSingular" placeholder="Singular Form" value="<%=platform.statusesSingular[i]%>"><br>
-                                <input class="mode" type="text" name="statusPlural" placeholder="Plural Form" value="<%=platform.statusesPlural[i]%>"><br>
+                                <input class="form-control mode" type="text" name="statusProperty" placeholder="Property Form" value="<%=platform.statusesProperty[i]%>"><br>
+                                <input class="form-control mode" type="text" name="statusSingular" placeholder="Singular Form" value="<%=platform.statusesSingular[i]%>"><br>
+                                <input class="form-control mode" type="text" name="statusPlural" placeholder="Plural Form" value="<%=platform.statusesPlural[i]%>"><br>
                             </div><br>
                         <% } %>
                         <h4>Feature Settings</h4>
@@ -250,17 +260,5 @@
             document.getElementById(`colorScheme-label-${i}`).innerText = `Color Scheme Element ${i}: (${color0}, ${color1}, ${color2})`;
             document.getElementById(`colorScheme-label-${i}`).style["background-color"] = `rgb(${color0}, ${color1}, ${color2})`;
         }
-
-        const updateDarkColor = function(input) {
-            const [head, i, j, end] = input.id.split('-');
-            const color0 = document.getElementById(`${head}-${i}-0-${end}`).value;
-            const color1 = document.getElementById(`${head}-${i}-1-${end}`).value;
-            const color2 = document.getElementById(`${head}-${i}-2-${end}`).value;
-
-            document.getElementById(`darkColorScheme-display-${i}-${j}`).innerText = input.value;
-            document.getElementById(`darkColorScheme-label-${i}`).innerText = `Darkmode Color Scheme Element ${i}: (${color0}, ${color1}, ${color2})`;
-            document.getElementById(`darkColorScheme-label-${i}`).style["background-color"] = `rgb(${color0}, ${color1}, ${color2})`;
-        }
-
     </script>
 </html>

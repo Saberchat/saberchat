@@ -90,7 +90,7 @@
                             <div class="row photo-row">
                                 <div class="col col-photo"><img
                                             src="/images/<%= sortedTeachers[i].firstName %> <%= sortedTeachers[i].lastName %>.jpg"
-                                            class="image <% if (i + 1 >= sortedTeachers.length) { %>end<% } %> <% if (i + 3 >= developers.length) { %> row-end <% } %>"
+                                            class="image <% if (i + 1 >= sortedTeachers.length) { %>end<% } %> <% if (i + 3 >= sortedTeachers.length) { %> row-end <% } %>"
                                             alt="Photo of <%= sortedTeachers[i].firstName %> <%= sortedTeachers[i].lastName %>">
                                 </div>
 
@@ -116,23 +116,29 @@
                 </div>
             </div>
 
-            <div class="col-lg-6 faculty-info">
-                <article class="text-block">
-                    <div class="block-header green">
-                        <h1><%=platform.contact.heading%></h1>
-                    </div>
-                    <div class="block-content mode">
-                        <% for (let para of platform.contact.description) { %>
-                            <p class="convertible-text"><%=convertToLink(para)%></p>
-                        <% } %>
-                        <h5 style="padding-top: 10px;">Platform Heads</h5><hr>
-                        <% sortedTeachers.forEach(user => { %>
-                            <span class="developer-info"><%= user.firstName %> <%= user.lastName %></span>
-                            <p><a href="mailto: <%= user.email %>"><%= user.email %></a></p>
-                        <% }); %>
-                    </div>
-                </article>
-            </div>
+            <% if (platform.contactPhotoDisplay && sortedTeachers.length > 0) { %>
+                <div class="col-lg-6 faculty-info">
+            <% } else { %>
+                <div class="col-lg-12 faculty-info">
+            <% } %>
+                    <article class="text-block">
+                        <div class="block-header green">
+                            <h1><%=platform.contact.heading%></h1>
+                        </div>
+                        <div class="block-content mode">
+                            <% for (let para of platform.contact.description) { %>
+                                <p class="convertible-text"><%=para%></p>
+                            <% } %>
+                            <% if (sortedTeachers.length > 0) { %>
+                                <h5 style="padding-top: 10px;">Platform Heads</h5><hr>
+                                <% sortedTeachers.forEach(user => { %>
+                                    <a href="/profiles/<%=user._id%>" target="_blank" class="developer-info" style="color: black;"><%= user.firstName %> <%= user.lastName %> (<%=user.username%>)</a>
+                                    <p><a href="mailto: <%= user.email %>"><%= user.email %></a></p>
+                                <% }); %>
+                            <% } %>
+                        </div>
+                    </article>
+                </div>
         </div>
     </div>
 </main>

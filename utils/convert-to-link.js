@@ -1,3 +1,5 @@
+const { link } = require("joi");
+
 const package = {};
 
 package.convertToLink = function(text) { //Convert text to contain embedded links
@@ -9,6 +11,7 @@ package.convertToLink = function(text) { //Convert text to contain embedded link
     //Final list of emails and links, and the converted text
     let emails = [];
     let links = [];
+    let phones = [];
     let convertedText = "";
 
     //Iterate through text and parse out words and links
@@ -20,7 +23,7 @@ package.convertToLink = function(text) { //Convert text to contain embedded link
 
     //Parse emails and links from deformatted text
     for (let line of deformatted) {
-        if ((line.includes('@'))) { //All emails must include @, use that as the catch
+        if ((line.includes('@')) && (!line.includes('/'))) { //All emails must include @, but do not include /, although some site URLs have @ and /)
             emails.push(text.slice(text.indexOf(line), text.indexOf(line) + line.length));
 
         //Money can be confused as a link, so $ expressions are discounted
@@ -28,6 +31,10 @@ package.convertToLink = function(text) { //Convert text to contain embedded link
             if (line.slice(0, line.length - 1).split('.')[1][0].match(alpha)) {
                 links.push(text.slice(text.indexOf(line), text.indexOf(line) + line.length));
             }
+        
+        //Pick up phone numbers (Only US works) by identifying 10-digit numerical series
+        } else if (parseInt(line.split('-').join('').split('(').join('').split(')').join('')).toString().length == 10) {
+            phones.push(text.slice(text.indexOf(line), text.indexOf(line) + line.length));
         }
     }
 
@@ -40,6 +47,21 @@ package.convertToLink = function(text) { //Convert text to contain embedded link
                 for (let segment of line.split('\n')) {
                     if (segment.includes(email)) {
                         convertedText += `<a class="embedded-link" href="mailto:${email}">${segment}</a>`;
+                    } else {
+                        convertedText += `${segment}`;
+                    }
+                }
+                convertedText += ` `;
+                break;
+            }
+        }
+
+        for (let phone of phones) {
+            if (line.includes(phone)) {
+                embedded = true;
+                for (let segment of line.split('\n')) {
+                    if (segment.includes(phone)) {
+                        convertedText += `<a class="embedded-link" href="tel:${phone}">${segment}</a>`;
                     } else {
                         convertedText += `${segment}`;
                     }

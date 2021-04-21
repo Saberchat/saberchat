@@ -1,7 +1,5 @@
-// set up env vars if in local developmeent
-if (process.env.NODE_ENV !== "production") {
-    require('dotenv').config();
-}
+// Set up ENV vars if in local developmeent
+if (process.env.NODE_ENV !== "production") {require('dotenv').config();}
 
 //NODE.JS MODULES
 //set up and start the express server
@@ -10,7 +8,6 @@ const express = require('express');
 const mongoose = require('mongoose');
 // passport.js is an authentication middleware module
 const passport = require('passport');
-const LocalStrategy = require('passport-local');
 // flash messages on screen i.e "logged in successfully!"
 const flash = require('connect-flash');
 // middleware; parses incoming data from client under req.body
@@ -32,9 +29,11 @@ const setup = require("./utils/setup");
 //Async wrapper
 const wrapAsync = require("./utils/wrapAsync");
 //Callbacks for chat room socket functions
-const chat = require("./socket/chat");
+const chatSocket = require("./socket/chat");
 //Callbacks for cafe socket functions
-const cafe = require("./socket/cafe");
+const cafeSocket = require("./socket/cafe");
+//Callbacks for nodeSchedule functions
+const profileSchedule = require("./schedule/profiles");
 //Scheduler for schedule jobs
 const schedule = require('node-schedule');
 
@@ -100,9 +99,7 @@ const appSetup = async function() {
     };
 
     if (process.env.NODE_ENV === 'production') {
-        // allows cookies to only be accessed over https
-        // this wouldn't allow authentication for local dev since local host is http
-        sessionConfig.cookie.secure = false;
+        sessionConfig.cookie.secure = false; // allows cookies to only be accessed over https; this wouldn't allow authentication for local dev since local host is http
     }
 
     await app.use(session(sessionConfig));
@@ -119,55 +116,27 @@ const appSetup = async function() {
         return next();
     });
 
-    // Import Routes
     const platform = await setup(Platform); //Set up Platform
     if (!platform) {return console.log("Platform cannot be found");}
-     
-    //Index Routes, with no prefix
-    const indexRoutes = await require("./routes/index");
+    const generalRoutes = ["chat", "profiles", "inbox", "announcements", "admin", "projects", "reports"];
+    
+    // Import And Use Routes From Routes Directory
+    const indexRoutes = await require("./routes/index"); //Index Routes, with no prefix
     await app.use(indexRoutes);
-
-    for (let route of ["chat", "profiles", "inbox", "announcements", "admin", "projects", "reports"]) { //General Routes
-        await app.use(`/${route}`, require(`./routes/${route}`));
+    for (let route of generalRoutes) { await app.use(`/${route}`, require(`./routes/${route}`));} //General Routes for all platforms
+    for (let feature of platform.features) { //Platform-Specific Routes (For features in their own route directories)
+        if (!feature.route.includes('/')) { await app.use(`/${feature.route}`, require(`./routes/${feature.route}`));}
     }
+    app.get('*', (req, res) => { return res.redirect('/');}); // Catch-all route
 
-    for (let feature of platform.features) { //Platform-Specific Routes
-        if (!feature.route.includes('/')) { //If feature is its own route directory
-            await app.use(`/${feature.route}`, require(`./routes/${feature.route}`));
-        }
-    }
-
-    app.get('*', (req, res) => { return res.redirect('/');}); // Catch-all route.
-
-    // deletes all comments at midnight (not doing for now)
-    // await schedule.scheduleJob('0 0 0 * * *', async() => {
-    //     const comments = await ChatMessage.find({});
-    //     if(!comments) { return console.log(err);}
-    //     comments.map((comment) => { if(true) {comment.remove();}});
-    // });
-
-    // Update all students' statuses on update date, if required
-    if (platform.updateTime.split(' ')[0] != "0" && platform.updateTime.split(' ')[1] != "0") { //If there is an update time
-        await schedule.scheduleJob(`0 0 0 ${platform.updateTime.split(' ')[0]} ${platform.updateTime.split(' ')[1]} *`, async() => {
-            const statuses = platform.studentStatuses.concat(platform.formerStudentStatus);
-            const users = await User.find({authenticated: true, status: {$in: platform.studentStatuses}});
-            if (!users) { return console.log(err);}
-            for (let user of users) {
-                user.status = statuses[statuses.indexOf(user.status)+1];
-                await user.save();
-            }
-        });
-    }
+    //NodeSchedule code for any scheduled jobs, with attached callbacks
+    await schedule.scheduleJob(`0 0 0 ${platform.updateTime.split(' ')[0]} ${platform.updateTime.split(' ')[1]} *`, wrapAsync(profileSchedule.updateStatuses));
 
     // Socket.io server-side code (in route structure, connecting to socket controllers)
     await io.on('connect', socket => {
-        socket.on('switch room', newroom => {chat.switchRoom(io, socket, newroom);});
-        socket.on('chat message', async(msg) => {
-            await chat.chatMessage(io, socket, msg).catch(err => { return console.log(err);});
-        });
-        socket.on('order', async(itemList, itemCount, instructions, payingInPerson, customerId) => {
-            await cafe.order(io, socket, itemList, itemCount, instructions, payingInPerson, customerId).catch(err => { return console.log(err);});
-        });
+        socket.on('switch room', newroom => {chatSocket.switchRoom(io, socket, newroom);});
+        socket.on('chat message', async(msg) => {wrapAsync(chatSocket.chatMessage(io, socket, msg));});
+        socket.on('order', async(itemList, itemCount, instructions, payingInPerson, customerId) => {wrapAsync(cafeSocket.order(io, socket, itemList, itemCount, instructions, payingInPerson, customerId));});
     });
 
     // Start server

@@ -374,32 +374,36 @@ controller.donate = async function(req, res) {
 
 controller.advice = async function(req, res) {
     const platform = await setup(Platform);
-    let images = [];
-    let pdfs = [];
-    let text = req.body.message;
+    if (platform.originalEmail != '') {
+        let images = [];
+        let pdfs = [];
+        let text = req.body.message;
 
-    if (req.files) {
-        if (req.files.mediaFile) {
-            let cloudErr;
-            let cloudResult;
-            for (let file of req.files.mediaFile) { //Upload each file to cloudinary
-                const processedBuffer = await autoCompress(file.originalname, file.buffer);
-                [cloudErr, cloudResult] = await cloudUpload(file.originalname, processedBuffer);
-                if (cloudErr || !cloudResult) {
-                    req.flash('error', 'Upload failed');
-                    return res.redirect('back');
+        if (req.files) {
+            if (req.files.mediaFile) {
+                let cloudErr;
+                let cloudResult;
+                for (let file of req.files.mediaFile) { //Upload each file to cloudinary
+                    const processedBuffer = await autoCompress(file.originalname, file.buffer);
+                    [cloudErr, cloudResult] = await cloudUpload(file.originalname, processedBuffer);
+                    if (cloudErr || !cloudResult) {
+                        req.flash('error', 'Upload failed');
+                        return res.redirect('back');
+                    }
+                    if ([".png", ".jpg"].includes(path.extname(cloudResult.url.split("SaberChat/")[1]))) {images.push(cloudResult.url);}
+                    else { pdfs.push({url: cloudResult.secure_url, name: file.originalname});}
                 }
-                if ([".png", ".jpg"].includes(path.extname(cloudResult.url.split("SaberChat/")[1]))) {images.push(cloudResult.url);}
-                else { pdfs.push(cloudResult.url);}
             }
         }
-    }
 
-    for (let file of images) {text += `<br><img src="${file}" style="width: 50%; height: 50%;>`;}
-    for (let file of pdfs) {text += `<iframe src="${file}" height="300" width="250"></iframe><a href="${file}" target="_blank"><h5>Open File In New Tab  </h5></a>`;}
-    await sendGridEmail(platform.officialEmail, `New Advice Donation From ${req.user.firstName} ${req.user.lastName}`, text, false);
-    req.flash("success", "Thank you for sending us your advice!")
-    return res.redirect("/articles/donate");
+        for (let file of images) {text += `<br><img src="${file}" style="width: 50%; height: 50%;>`;}
+        for (let file of pdfs) {text += `<iframe src="${file.url}" height="300" width="250"></iframe><a href="${file.url}" target="_blank"><h5>Open ${file.originalname} New Tab?</h5></a>`;}
+        await sendGridEmail(platform.officialEmail, `New Advice Donation From ${req.user.firstName} ${req.user.lastName} - ${req.body.subject}`, text, false);
+        req.flash("success", "Thank you for sending us your advice!");
+        return res.redirect("/articles/donate");
+    }
+    req.flash("error", `${platform.name} Saberchat does not have an official email set up yet`);
+    return res.redirect("back");
 }
 
 module.exports = controller;
