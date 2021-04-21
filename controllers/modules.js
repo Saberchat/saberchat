@@ -84,7 +84,8 @@ controller.create = async function(req, res) {
     const module = await Module.create({ //Build module with error info
         sender: req.user,
         subject: req.body.subject,
-        text: req.body.message
+        text: req.body.message,
+        verified: true
     });
     if (!module) {
         req.flash('error', 'Unable to create module');
@@ -126,17 +127,6 @@ controller.create = async function(req, res) {
     return res.redirect(`/modules/${module._id}`);
 };
 
-controller.verify = async function(req, res) {
-    const module = await Module.findByIdAndUpdate(req.params.id, {verified: true});
-    if (!module) {
-        req.flash('error', "Unable to access module");
-        return res.redirect('back');
-    }
-
-    req.flash("success", "Verified Module!");
-    return res.redirect("/modules");
-}
-
 controller.updateModule = async function(req, res) {
     const platform = await setup(Platform);
     if (!platform) {
@@ -157,6 +147,7 @@ controller.updateModule = async function(req, res) {
     const updatedModule = await Module.findByIdAndUpdate(req.params.id, {
         subject: req.body.subject,
         text: req.body.message,
+        verified: true
     });
     if (!updatedModule) {
         req.flash('error', "Unable to update module");
@@ -168,7 +159,6 @@ controller.updateModule = async function(req, res) {
             updatedModule[attr] = req.body[attr];
         }
     }
-    if (!platform.postVerifiable) {updatedModule.verified = true;} //Module does not need to be verified if platform does not support verifying modules
 
     //Iterate through all selected media to remove and delete them
     let cloudErr;

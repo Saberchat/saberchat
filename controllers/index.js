@@ -17,7 +17,6 @@ const controller = {};
 
 controller.index = async function(req, res) {
     const platform = await setup(Platform);
-
     const teachers = await User.find({authenticated: true, authenticated: true, status: platform.teacherStatus});
     if (!platform || !teachers) {
         req.flash('error', "An Error Occurred");
@@ -208,8 +207,9 @@ controller.login = function(req, res, next) { //No need for async as login recor
 }
 
 controller.forgotPassword = async function(req, res) {
+    const platform = await setup(Platform);
     const user = await User.findOne({authenticated: true, email: req.body.newPwdEmail});
-    if (!user) {
+    if (!platform || !user) {
         req.flash('error', "We couldn't find any users with that email address");
         return res.redirect('/');
     }

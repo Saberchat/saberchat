@@ -134,9 +134,7 @@ controller.createMsg = async function(req, res) {
         mediaFiles: []
     };
 
-    if(req.body.images) {
-        message.images = req.body.images;
-    }
+    if(req.body.images) { message.images = req.body.images;}
 
     // if files were uploaded, handle them with cloudinary
     if (req.files) {
@@ -314,8 +312,9 @@ controller.clear = async function(req, res) {
 
 // Inbox PUT reply to message
 controller.reply = async function(req, res) {
+    const platform = await setup(Platform);
     const message = await InboxMessage.findById(req.params.id).populate('recipients').populate('author');
-    if(!message) {
+    if(!platform || !message) {
         req.flash("error", "Unable to find message");
         return res.redirect("back");
     } else if(message.anonymous || message.noReply) { //In either of these cases, you cannot reply to the message
@@ -415,10 +414,11 @@ controller.showReq = async function(req, res) { //Display access request
 };
 
 controller.acceptReq = async function(req, res) { //Accept access request
+    const platform = await setup(Platform);
     const request = await AccessRequest.findById(req.params.id)
     .populate({path: 'room', select: ['creator']}).populate('author');
 
-    if(!request) {
+    if(!platform || !request) {
         req.flash("error", "An Error Occurred");
         return res.redirect('back');
 

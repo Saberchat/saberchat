@@ -14,6 +14,7 @@
     <link rel="stylesheet" href="/stylesheets/components/navbar.css">
     <link rel="stylesheet" href="/stylesheets/other/index.css">
     <link rel="stylesheet" href="/stylesheets/homework/index.css">
+    <link rel="stylesheet" href="/stylesheets/announcements/form.css">
     <%if (currentUser) {%>
       <%if (currentUser.darkmode) { %>
         <link rel="stylesheet" href="/stylesheets/darkmode.css">
@@ -44,7 +45,7 @@
             <div class="col-12 background-title">
                 <h1>Help and Donate</h1>
                 <p style="font-size: 130%;">Here are ways you can help our community</p>
-                <a style="padding-left: 30px; padding-right: 30px; padding-top: 20px;" class="btn btn-primary"><p style="color:white; font-size: 140%;"><i class="fab fa-paypal" style="font-size: 120%;"></i> Donate Now!</p></a>
+                <a style="padding-left: 30px; padding-right: 30px; padding-top: 20px;" class="btn btn-primary"><p style="color:white; font-size: 140%;"><i class="fab fa-paypal" style="font-size: 120%;"></i> Donate Now!</p></a><br>
             </div>
         </div>
     </div>
@@ -108,10 +109,22 @@
                     </article>
                 </div>
             </div>
+            <form action="/articles/advice" method="post" enctype="multipart/form-data">
+                <div class="form-group">
+                    <textarea minlength="20" class="form-control mode" name="message" rows="5" placeholder="We are looking for donations in time as well! Any resources, advice, ideas, etc, would be greatly appreciate and valued." required></textarea><br>
+                    <div id="media-header">
+                        <button type="button" onclick="upload(0, 'image/png, image/jpg, application/pdf')" class="btn btn-primary"><i class="fas fa-plus"></i> File Upload</button>
+                        <br/><br/>
+                    </div>
+                    <div id="uploads"></div>
+                    <br><button type="submit" class="btn btn-primary btn-block">Submit</button><br>
+                </div>
+            </form>
 
         </div>
     </div>
 </main>
+<script src="/javascript/upload-input.js"></script>
 <script>
     window.onload = (() => {
         window.onscroll = (() => {

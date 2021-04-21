@@ -11,14 +11,13 @@ const router = express.Router(); //Router
 //ROUTES
 router.route('/')
     .get(wrapAsync(middleware.isLoggedIn), wrapAsync(middleware.accessToFeature), wrapAsync(modules.index)) //Show all modules
-    .post(wrapAsync(middleware.isLoggedIn), wrapAsync(middleware.accessToFeature), multipleUpload, wrapAsync(modules.create)); //Create module
+    .post(wrapAsync(middleware.isLoggedIn), wrapAsync(middleware.isFaculty), multipleUpload, wrapAsync(modules.create)); //Create module
 
 router.get('/new', wrapAsync(middleware.isLoggedIn), wrapAsync(middleware.accessToFeature), wrapAsync(modules.new)); //Form to create new module
 
 router.put('/like', wrapAsync(middleware.isLoggedIn), wrapAsync(middleware.accessToFeature), wrapAsync(modules.likeModule)); //Like module
 router.put('/like-comment', wrapAsync(middleware.isLoggedIn), wrapAsync(middleware.accessToFeature), wrapAsync(modules.likeComment)); //Comment on module
 router.put('/comment', wrapAsync(middleware.isLoggedIn), wrapAsync(middleware.accessToFeature), wrapAsync(modules.comment)); //Like comment on module
-router.get('/verify/:id', wrapAsync(middleware.isLoggedIn), wrapAsync(middleware.isMod), wrapAsync(modules.verify)); //Verify Module
 
 router.route('/:id')
     .get(wrapAsync(middleware.isLoggedIn), wrapAsync(middleware.accessToFeature), wrapAsync(modules.show)) //Show specific module

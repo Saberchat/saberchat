@@ -233,8 +233,9 @@ controller.leaveRoom = async function(req, res) {
 }
 
 controller.requestJoin = async function(req, res) {
+    const platform = await setup(Platform);
     const room = await ChatRoom.findById(req.params.id); // find the room
-    if (!room) {
+    if (!platform || !room) {
         return res.json({error: 'Room does not Exist'});
     }
 

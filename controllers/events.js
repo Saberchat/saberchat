@@ -184,6 +184,7 @@ controller.updateEvent = async function(req, res) {
     const updatedEvent = await Event.findByIdAndUpdate(req.params.id, {
         subject: req.body.subject,
         text: req.body.message,
+        verified: false,
         deadline: {
             day: req.body.day,
             month: req.body.month,

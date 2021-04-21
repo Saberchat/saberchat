@@ -1,10 +1,12 @@
 //LIBRARIES
 const {convertToLink} = require("../utils/convert-to-link");
+const {sendGridEmail} = require("../services/sendGrid");
 const dateFormat = require('dateformat');
 const path = require('path');
 const {objectArrIndex, removeIfIncluded} = require("../utils/object-operations");
 const setup = require("../utils/setup");
 const {cloudUpload, cloudDelete} = require('../services/cloudinary');
+const {autoCompress} = require("../utils/image-compress");
 
 //SCHEMA
 const Platform = require("../models/platform");
@@ -161,6 +163,7 @@ controller.updateArticle = async function(req, res) {
     const updatedArticle = await ArticleLink.findByIdAndUpdate(req.params.id, {
         subject: req.body.subject,
         text: req.body.message,
+        verified: false
     });
     if (!updatedArticle) {
         req.flash('error', "Unable to update article");
@@ -367,6 +370,36 @@ controller.specificInfo = async function(req, res) {
 controller.donate = async function(req, res) {
     const platform = await setup(Platform);
     return res.render('other/donate', {platform});
+}
+
+controller.advice = async function(req, res) {
+    const platform = await setup(Platform);
+    let images = [];
+    let pdfs = [];
+    let text = req.body.message;
+
+    if (req.files) {
+        if (req.files.mediaFile) {
+            let cloudErr;
+            let cloudResult;
+            for (let file of req.files.mediaFile) { //Upload each file to cloudinary
+                const processedBuffer = await autoCompress(file.originalname, file.buffer);
+                [cloudErr, cloudResult] = await cloudUpload(file.originalname, processedBuffer);
+                if (cloudErr || !cloudResult) {
+                    req.flash('error', 'Upload failed');
+                    return res.redirect('back');
+                }
+                if ([".png", ".jpg"].includes(path.extname(cloudResult.url.split("SaberChat/")[1]))) {images.push(cloudResult.url);}
+                else { pdfs.push(cloudResult.url);}
+            }
+        }
+    }
+
+    for (let file of images) {text += `<br><img src="${file}" style="width: 50%; height: 50%;>`;}
+    for (let file of pdfs) {text += `<iframe src="${file}" height="300" width="250"></iframe><a href="${file}" target="_blank"><h5>Open File In New Tab  </h5></a>`;}
+    await sendGridEmail(platform.officialEmail, `New Advice Donation From ${req.user.firstName} ${req.user.lastName}`, text, false);
+    req.flash("success", "Thank you for sending us your advice!")
+    return res.redirect("/articles/donate");
 }
 
 module.exports = controller;

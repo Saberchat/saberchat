@@ -312,7 +312,8 @@ controller.updateProject = async function(req, res) {
     const updatedProject = await Project.findByIdAndUpdate(project._id, {
         subject: req.body.title,
         creators,
-        text: req.body.text
+        text: req.body.text,
+        verified: false
     });
 
     if (!updatedProject) {

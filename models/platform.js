@@ -9,6 +9,7 @@ var platformSchema = new mongoose.Schema({
     icon: String,
     imageUrl: String,
     principal: String,
+    officialEmail: String,
     descriptionDisplay: {type: Boolean, default: false}, //Display description or platform name first on homepage
     contactPhotoDisplay: {type: Boolean, default: true}, //Display photos of platform administrators on contact page
     principalAuthenticate: {type: Boolean, default: false}, //Check if users have to be validated by principal first
