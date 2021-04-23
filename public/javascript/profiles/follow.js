@@ -3,7 +3,7 @@ const follow = function (button, location) { //Follow user
     const url = `/profiles/follow/${userId}?_method=put`;
     const data = {};
 
-    $.post(url, data, data => {
+    sendPostReq(url, data, data => {
         if (data.success) {
             $(`#modal-${userId}-follow`).modal('hide');
 
@@ -33,7 +33,7 @@ const unfollow = function (button, location) { //Unfollow user
     const url = `/profiles/unfollow/${userId}?_method=put`;
     const data = {};
 
-    $.post(url, data, data => {
+    sendPostReq(url, data, data => {
         if (data.success) {
             $(`#modal-${userId}-unfollow`).modal('hide');
 
@@ -59,7 +59,7 @@ const unfollow_show = function (button) { //Unfollow on show page (on user's own
     const url = `/profiles/unfollow/${userId}?_method=put`;
     const data = {};
 
-    $.post(url, data, data => {
+    sendPostReq(url, data, data => {
         if (data.success) {
             $(`#modal-${userId}-unfollow`).modal('hide');
             //Remove tabs which show user's info and unfollow button
@@ -74,7 +74,7 @@ const remove = function(button) { //Block follower
     const url = `/profiles/remove/${userId}?_method=put`;
     const data = {};
 
-    $.post(url, data, data => {
+    sendPostReq(url, data, data => {
         if (data.success) {
             $(`#modal-${userId}-remove`).modal('hide');
             //Remove user's tab and block button from tab
@@ -89,7 +89,7 @@ const unblock = function(button) { //Unblock blocked user
     const url = `/profiles/unblock/${userId}?_method=put`;
     const data = {};
 
-    $.post(url, data, data => {
+    sendPostReq(url, data, data => {
         if (data.success) {
             $(`#modal-${userId}-unblock`).modal('hide');
             document.getElementById(`follow-div-${userId}`).removeChild(document.getElementById(`unblock-${userId}`));

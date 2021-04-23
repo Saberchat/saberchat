@@ -3,7 +3,7 @@ const ready = function (button) { //Send request that order is ready
     const url = `/cafe/order/${orderId}?_method=put`;
     const data = {};
 
-    $.post(url, data, data => {
+    sendPostReq(url, data, data => {
         if (data.success) {
             $(`#modal-${orderId}-ready`).modal('hide');
             document.getElementById("output-stream").removeChild(document.getElementById(`${orderId}`));
@@ -24,7 +24,7 @@ const reject = function (button) { //Send request that order is rejected
     const url = `/cafe/order/${orderId}?_method=delete`;
     const data = {rejectionReason};
 
-    $.post(url, data, data => {
+    sendPostReq(url, data, data => {
         if (data.success) {
             $(`#modal-${orderId}-reject`).modal('hide');
             document.getElementById("output-stream").removeChild(document.getElementById(`${orderId}`));
@@ -44,7 +44,7 @@ const cancel = function (button) { //Send request to cancel order
     const url = `/cafe/order/${orderId}?_method=delete`;
     const data = {};
 
-    $.post(url, data, data => {
+    sendPostReq(url, data, data => {
 
         if (data.success) { //If successful request, remove order from list of active orders
             $(`#modal-${orderId}-cancel`).modal('hide');
@@ -57,7 +57,7 @@ const changeCafeStatus = function () { //Send request to close/open cafe
     const url = `/cafe/manage?_method=put`;
     const data = {};
 
-    $.post(url, data, data => {
+    sendPostReq(url, data, data => {
 
         if (data.success) {
             //List of corresponding element changes based on cafe status

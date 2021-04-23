@@ -3,7 +3,7 @@ const like = function (button, object, route) { //Like an object
     const url = `/${route}/like?_method=put`;
     const data = {};
     data[`${object}Id`] = id;
-    $.post(url, data, data => {
+    sendPostReq(url, data, data => {
         if (data.success) {
             if (data.success.includes("Removed a like")) { //If response involved removing a like, change button color based on page
                 if (button.id.split("-")[2] == "index")  {
@@ -23,7 +23,7 @@ const likeComment = function (button, object, route) { //Like a comment on an ob
     const commentId = button.id.split("-")[1];
     const url = `/${route}/like-comment?_method=put`;
     const data = {commentId};
-    $.post(url, data, data => {
+    sendPostReq(url, data, data => {
         if (data.success) {
             if (data.success.includes("Removed a like")) { //If response involved removing a like, change button color
                 button.style.color = "grey";

@@ -60,7 +60,7 @@ const changeJoinCode = function (courseID, event) { //Change course join code (i
     const url = `/homework/joinCode/${courseID}?_method=put`;
     const data = {};
 
-    $.post(url, data, data => {
+    sendPostReq(url, data, data => {
         document.getElementById('loading').style.color = "grey";
         document.getElementById('loading').innerText = "Waiting";
 

@@ -6,7 +6,7 @@ const ignoreComment = function (button) { //Ignore a reported comment
     const listItem = document.getElementById(`comment-${commentId}`);
     const data = {commentId};
 
-    $.post(url, data, data => {
+    sendPostReq(url, data, data => {
         $(`#modal-ignore-${commentId}`).modal('hide');
         if (data.success) { //If successful response, remove comment from list
             listItem.remove();
@@ -32,7 +32,7 @@ const deleteComment = function (button) { //Delete a reported comment
     const listItem = document.getElementById(`comment-${commentId}`);
     const data = {commentId};
 
-    $.post(url, data, data => {
+    sendPostReq(url, data, data => {
         $(`#modal-delete-${commentId}`).modal('hide');
         if (data.success) {
             listItem.remove();
@@ -60,7 +60,7 @@ const getContext = function (button) {
     if (!loaded.includes(commentId)) {
         loaded.push(commentId);
 
-        $.post(url, data, data => {
+        sendPostReq(url, data, data => {
             if (data.success) {
                 const contextBody = document.getElementById(`context-body-${commentId}`);
                 let newComment;
