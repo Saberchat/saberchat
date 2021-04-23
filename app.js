@@ -41,14 +41,6 @@ const schedule = require('node-schedule');
 const Platform = require('./models/platform');
 const User = require("./models/user");
 
-// connect to db.
-mongoose.connect(process.env.DATABASE_URL,
-{
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-    useFindAndModify: false
-});
-
 const appSetup = async function() {
     const app = await express();
     // set up ports and socket.io
@@ -143,4 +135,15 @@ const appSetup = async function() {
     const running = await http.listen(port, process.env.IP);
     if (running) { await console.log(":: App listening on port " + port + " ::");}
  
-}().catch(err => { console.log(err);}) 
+}
+
+// connect to db.
+mongoose.connect(process.env.DATABASE_URL,
+    {
+        useNewUrlParser: true,
+        useUnifiedTopology: true,
+        useFindAndModify: false
+    }).then(()=> {
+        appSetup().catch(err => { console.log(err);}); 
+    });
+
