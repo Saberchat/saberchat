@@ -330,11 +330,7 @@ controller.reply = async function(req, res) {
         mediaFiles: []
     };
 
-    for (let image of req.body.images) { //Ensure that no undefined image URLs are added
-        if (image) {
-            reply.images.push(image);
-        }
-    }
+    if(req.body.images) {reply.images = req.body.images;}
 
     // if files were uploaded, handle them with cloudinary
     if (req.files) {
