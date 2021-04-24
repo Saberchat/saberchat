@@ -288,14 +288,16 @@ controller.requestCancel = async function(req, res) {
         return res.json({error: "Unable to find room"});
     }
 
-    const deletedReq = await AccessRequest.deleteOne({room: room._id, author: req.user._id, status: "pending"});
-    if (!deletedReq) {
-        return res.json({error: "Unable to find request"});
-    }
+    let deletedReq = await AccessRequest.findOne({room: room._id, author: req.user._id, status: "pending"});
+    if (!deletedReq) {return res.json({error: "Unable to find request"});}
 
     //Remove Access Request From from creator's inbox
     removeIfIncluded(room.creator.requests, deletedReq._id);
     await room.creator.save();
+
+    //Delete after removing from inbox (Will not return _id, so cannot be used earlier)
+    deletedReq = await AccessRequest.findByIdAndDelete(deletedReq._id);
+    if (!deletedReq) {return res.json({error: "Unable to find request"});}
     return res.json({success: "Successfully deleted request"});
 }
 

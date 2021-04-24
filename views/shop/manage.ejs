@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Saberchat</title>
+
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css"
+          integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk" crossorigin="anonymous">
+    <link rel="stylesheet" href="/stylesheets/main.css">
+    <link rel="stylesheet" href="/stylesheets/components/header.css">
+    <link rel="stylesheet" href="/stylesheets/components/navbar.css">
+    <link rel="stylesheet" href="/stylesheets/admin/permission.css">
+    <link rel="stylesheet" href="/stylesheets/chat/new.css">
+    <link rel="stylesheet" href="/stylesheets/shop/manage.css">
+    <%if (currentUser) {%>
+      <%if (currentUser.darkmode) { %>
+        <link rel="stylesheet" href="/stylesheets/darkmode.css">
+      <%}%>
+    <%}%>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"
+            integrity="sha256-9/aliU8dGd2tb6OSsuzixeV4y/faTqgFtohetphbbj0=" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js"></script>
+    <script src="https://unpkg.com/@popperjs/core@2" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js"
+            integrity="sha384-OgVRvuATP1z7JjHLkuOU7Xw704+h835Lr+6QL9UvYjZE3Ipu6Tp75j7Bh/kR0JKI"
+            crossorigin="anonymous"></script>
+
+    <script src="https://kit.fontawesome.com/dccc745c41.js" crossorigin="anonymous"></script>
+    <script src="/javascript/postUtil.js"></script>
+    <script src="/javascript/shop/search.js"></script>
+    <script src="/javascript/shop/actions.js"></script>
+    <%- include('../partials/analytics') %>
+  </head>
+  <body class="mode">
+    <%- include('../partials/navbar') %>
+    <%- include('../partials/header') %>
+
+<div class="container mt-5">
+    <div class="row">
+        <div class="col-12">
+          <div class="jumbotron text-center header">
+            <h1><i class="fas fa-<%=data.icon%>"></i> Manage <%=data.name%></h1><br />
+            <form action="/shop?_method=put" method="post">
+                <input name="name" type="text" class="form-control" value="<%=data.name%>" placeholder="Name"><br>
+                <textarea name="description" class="form-control" placeholder="Description"><%=data.description%></textarea><br>
+                <button type="submit" class="btn btn-primary btn-block">Submit Changes</button><br>
+            </form>
+            <% if (platform.purchasable) { %>
+                <button id="shop-status-button" onclick="changeShopStatus()"
+                <% if (open) { %>
+                class="btn btn-danger" ><i class="fas fa-lock-open"></i> Close
+
+                        <% } else { %>
+                            class="btn btn-success"><i class="fas fa-lock"></i> Open
+                        <% } %>
+                    </button>
+
+                    <a href="/shop/manage?orders=true" class="btn btn-primary"><i class="fas fa-<%=data.icon%>"></i> Orders</a>
+                <% } %>
+                <a href="/shop/item" class="btn btn-warning"><i class="fas fa-plus-circle"></i> Add New Item</a>
+                <a href="/shop/category" class="btn btn-info"><i class="fas fa-plus-circle"></i> Add New Category</a>
+                <a href="/admin/balances" class="btn btn-success"><i class="fas fa-money-check"></i> User Balances</a>
+                <!-- <a href="/shop/manage?data=true" class="btn btn-secondary"><i class="fas fa-chart-bar"></i> Purchase Analytics</a> -->
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-8 offset-md-2 col-12">
+          <div class="search-filter mb-3 search">
+            <i class="fas fa-search search"></i>
+            <input id="search-input" oninput="search()" class="form-control search" type="text" placeholder="Search..." title="Type in itemname" />
+          </div>
+
+          <% let temp;%>
+
+            <% categories.forEach(category => { %>
+                <% if (category.items.length > 0) { %>
+                    <li class="list-group-item list-group-item-success category-header darkmode-outline" id="<%= category._id %>-header">
+                        <div class="d-flex w-100 justify-content-between">
+                            <h2 class="mb-1 darkmode-header"><%= category.name %></h2>
+                            <span class="darkmode-header"><%= category.items.length %> item(s)</span>
+                        </div>
+                    </li>
+                    <% category.items.forEach(item => { %>
+                        <% if (item.availableItems > 0) { %>
+                            <a href="/shop/item/<%= item._id %>" id="item-<%= item.id %>"
+                               class="list-group-item list-group-item-action menu-item shop <%= category.name.replace(' ', '') %>"><span
+                                        class="item-name"><%= item.name %></span> (<%= item.availableItems %> orders
+                                available) <span class="upvote"
+                                                 title="Upvotes (Admins cannot upvote items from here)"></span><span
+                                        id="upvoteCount-<%= item._id %>"
+                                        class="upvote-count shoptext"> Upvotes: <%= item.upvotes.length %></span></a>
+                        <% } else { %>
+                            <a href="/shop/item/<%= item._id %>" id="item-<%= item.id %>"
+                               class="list-group-item list-group-item-action menu-item shop <%= category.name.replace(' ', '') %>"><span
+                                        class="item-name"><%= item.name %></span> (Unavailable) <span class="upvote"
+                                                                                                      title="Upvotes (Admins cannot upvote items from here)"></span><span
+                                        id="upvoteCount-<%= item._id %>"
+                                        class="upvote-count shoptext"> Upvotes: <%= item.upvotes.length %></span></a>
+                        <% } %>
+                    <% }) %>
+                    <br class="category-break" id="<%= category._id %>-break"/>
+                <% } %>
+            <% }) %>
+
+            <% let upvoteCount = 0; %>
+            <% if (categories.length > 0) { %>
+                <br class="category-break" id="categories-break"/>
+                <li class="list-group-item list-group-item-primary darkmode-outline category-header" id="categories-header">
+                    <div class="d-flex w-100 justify-content-between">
+                        <h2 class="mb-1 darkmode-header">Item Categories</h2>
+                        <span class="darkmode-header"><%= categories.length %> category(s)</span>
+                    </div>
+                </li>
+                <% categories.forEach(category => { %>
+                    <% upvoteCount = 0; %>
+                    <% if (category.name != "Other") { %>
+                        <% for (let item of category.items) { %>
+                            <% upvoteCount += item.upvotes.length %>
+                        <% } %>
+                        <a href="/shop/category/<%= category._id %>" id="category-<%= category.id %>"
+                        class="list-group-item list-group-item-action menu-item ItemCategories shop"><span
+                                    class="item-name"><%= category.name %></span> (<%= category.items.length %> items) <span
+                                    class="upvote"
+                                    title="Sum of all upvotes for this category (Admins cannot upvote items from here)"></span><span
+                                    id="upvoteCount-<%= category._id %>"
+                                    class="upvote-count shoptext"> Upvotes: <%= upvoteCount %></span> </a>
+                    <% } %>
+                <% }) %>
+
+                <!-- Ensures that 'other' will be last -->
+                <% categories.forEach(category => { %>
+                    <% upvoteCount = 0; %>
+                    <% if (category.name == "Other") { %>
+                        <% for (let item of category.items) { %>
+                            <% upvoteCount += item.upvotes.length %>
+                        <% } %>
+                        <div class="list-group-item list-group-item-action menu-item ItemCategories shop"
+                            id="category-<%= category.id %>"><span class="item-name"><%= category.name %></span>
+                            (<%= category.items.length %> items) <span
+                                    id="modify-banned">Cannot Modify </span> <span
+                                    title="Sum of all upvotes for this category (Admins cannot upvote items from here)"
+                                    class="upvote"></span><span id="upvoteCount-<%= category._id %>" class="upvote-count shoptext"> Upvotes: <%= upvoteCount %></span>
+                        </div>
+                    <% } %>
+                <% }) %>
+            <% } %>
+            <br/>
+        </div>
+    </div>
+</div>
+</body>
+<script>
+    if (document.getElementById("search-input")) {
+        document.getElementById("search-input").style.backgroundColor = colorScheme[colorScheme.length-1];
+    }
+</script>
+</html>

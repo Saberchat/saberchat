@@ -26,7 +26,10 @@ controller.index = async function(req, res) {
     }
 
     if(!platform || !articles) {req.flash('error', 'Cannot find articles.'); return res.redirect('back');}
-    return res.render('articles/index', {platform, articles: articles.reverse(), icon: platform.features[objectArrIndex(platform.features, "route", "articles")].icon});
+    return res.render('articles/index', {
+        platform, articles: articles.reverse(), 
+        data: platform.features[objectArrIndex(platform.features, "route", "articles")]
+    });
 };
 
 // Article GET new article
@@ -36,7 +39,7 @@ controller.new = async function(req, res) {
         req.flash("error", "An error occurred");
         return res.redirect("back");
     }
-    return res.render('articles/new', {platform, icon: platform.features[objectArrIndex(platform.features, "route", "articles")].icon});
+    return res.render('articles/new', {platform, data: platform.features[objectArrIndex(platform.features, "route", "articles")]});
 };
 
 // Article GET show
@@ -60,7 +63,7 @@ controller.show = async function(req, res) {
         fileExtensions.set(media.url, path.extname(media.url.split("SaberChat/")[1]));
     }
     const convertedText = convertToLink(article.text); //Parse and add hrefs to all links in text
-    return res.render('articles/show', {platform, article, convertedText, fileExtensions, icon: platform.features[objectArrIndex(platform.features, "route", "articles")].icon});
+    return res.render('articles/show', {platform, article, convertedText, fileExtensions, data: platform.features[objectArrIndex(platform.features, "route", "articles")]});
 };
 
 // Article GET edit form
@@ -145,12 +148,8 @@ controller.verify = async function(req, res) {
 
 controller.updateArticle = async function(req, res) {
     const platform = await setup(Platform);
-    if (!platform) {
-        req.flash("error", "Unable to setup platform");
-        return res.redirect("back");
-    } 
     const article = await ArticleLink.findById(req.params.id).populate('sender');
-    if (!article) {
+    if (!platform || !article) {
         req.flash('error', "Unable to access article");
         return res.redirect('back');
     }

@@ -37,7 +37,7 @@
 
     <div class="container">
         <div class="row">
-            <div class="col-md-10 offset-md-1 col-12 cafetext">
+            <div class="col-md-10 offset-md-1 col-12 shoptext">
                 <h1 class="title" id="darkmode-header">Users (<%=users.length%>)</h1>
                 <div class="search-filter search">
                     <i class="fas fa-search"></i>
@@ -55,7 +55,7 @@
                       </li>
 
                         <% for (let user of status[2]) { %>
-                            <li class="list-group-item list-group-item-action user-element cafe">
+                            <li class="list-group-item list-group-item-action user-element shop">
 
                                 <a href="../profiles/<%= user._id %>" class="user-element-text">
                                     <img class="profile-image" src="<% if (user.mediaFile.display) { %> <%= user.mediaFile.url%> <%} else {%> <%=user.imageUrl.url%><%}%>" alt="profile picture">
@@ -158,7 +158,7 @@
         document.getElementById("search-input").style.backgroundColor = colorScheme[colorScheme.length-1];
     }
 
-    for (let element of document.getElementsByClassName("cafe")) {
+    for (let element of document.getElementsByClassName("shop")) {
         element.style.backgroundColor = colorScheme[1];
     }
 </script>

@@ -15,7 +15,7 @@ const User = require('../models/user');
 const Email = require('../models/admin/email');
 const {ChatMessage, AccessRequest, InboxMessage} = require('../models/notification');
 const {Announcement, Project, Article} = require('../models/post');
-const Order = require('../models/cafe/order');
+const Order = require('../models/shop/order');
 const {Course, ChatRoom} = require('../models/group');
 
 const controller = {};
@@ -155,7 +155,7 @@ controller.update = async function(req, res) {
 			}
 	
 			for (let course of courses) {
-				if (course.creator.equals(user._id)) {
+				if (course.creator.equals(req.user._id)) {
 					req.flash('error', "You are currently teaching a course, and cannot lose your status");
 					return res.redirect('back');
 				}

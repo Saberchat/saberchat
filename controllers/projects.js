@@ -273,7 +273,6 @@ controller.updateProject = async function(req, res) {
 
     if (req.body.creatorInput == '') {
         creators = [];
-
     } else {
         for (let creator of req.body.creatorInput.split(',')) { //Iterate throguh listed creators
             if (platform.studentStatuses.includes(creator)) { //If 'creator' is one of the statuses (grades), find all users with that status

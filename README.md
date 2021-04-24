@@ -51,4 +51,4 @@ NPM LIBRARIES
 - Passport.Socketio: Validating user information for real-time actions with socket.io
 - Sanitize-HTML: Used in conjunction with Joi schema to validate form data
 - Serve-Favicon: Used to send favicons from backend storage to EJS pages
-- Socket.io: Module for real-time activity including cafe orders and chat messages
+- Socket.io: Module for real-time activity including shop orders and chat messages

@@ -25,7 +25,7 @@ controller.index = async function(req, res) {
     }
 
     if(!platform || !modules) {req.flash('error', 'Cannot find modules.'); return res.redirect('back');}
-    return res.render('modules/index', {platform, modules: modules.reverse(), icon: platform.features[objectArrIndex(platform.features, "route", "modules")].icon});
+    return res.render('modules/index', {platform, modules: modules.reverse(), data: platform.features[objectArrIndex(platform.features, "route", "modules")]});
 };
 
 controller.new = async function(req, res) {
@@ -34,7 +34,7 @@ controller.new = async function(req, res) {
         req.flash("error", "An error occurred");
         return res.redirect("back");
     }
-    return res.render('modules/new', {platform, icon: platform.features[objectArrIndex(platform.features, "route", "modules")].icon});
+    return res.render('modules/new', {platform, data: platform.features[objectArrIndex(platform.features, "route", "modules")]});
 };
 
 // Module GET show
@@ -59,7 +59,7 @@ controller.show = async function(req, res) {
         fileExtensions.set(media.url, path.extname(media.url.split("SaberChat/")[1]));
     }
     const convertedText = convertToLink(module.text); //Parse and add hrefs to all links in text
-    return res.render('modules/show', {platform, module, convertedText, fileExtensions, icon: platform.features[objectArrIndex(platform.features, "route", "modules")].icon});
+    return res.render('modules/show', {platform, module, convertedText, fileExtensions, data: platform.features[objectArrIndex(platform.features, "route", "modules")]});
 };
 
 // Module GET edit form
@@ -76,7 +76,7 @@ controller.updateForm = async function(req, res) {
     for (let media of module.mediaFiles) {
         fileExtensions.set(media.url, path.extname(media.url.split("SaberChat/")[1]));
     }
-    return res.render('modules/edit', {platform, module, fileExtensions, icon: platform.features[objectArrIndex(platform.features, "route", "modules")].icon});
+    return res.render('modules/edit', {platform, module, fileExtensions, data: platform.features[objectArrIndex(platform.features, "route", "modules")]});
 };
 
 // Module POST create
@@ -129,12 +129,8 @@ controller.create = async function(req, res) {
 
 controller.updateModule = async function(req, res) {
     const platform = await setup(Platform);
-    if (!platform) {
-        req.flash("error", "Unable to setup platform");
-        return res.redirect("back");
-    }
     const module = await Module.findById(req.params.id).populate('sender');
-    if (!module) {
+    if (!platform || !module) {
         req.flash('error', "Unable to access module");
         return res.redirect('back');
     }

@@ -44,8 +44,8 @@
     <div class="row">
         <div class="col-12">
             <div class="jumbotron text-center header">
-                <h1><i class="fas fa-<%=icon%>"></i> Updates And Articles</h1>
-                <p>Important Updates And Articles About Acts of Violence Against Asian Americans</p>
+                <h1><i class="fas fa-<%=data.icon%>"></i> <%=data.name%></h1>
+                <p><%=data.description%></p>
                 <% if (platform.postVerifiable || currentUser.status == platform.teacherStatus || currentUser.permission == platform.permissionsProperty[platform.permissionsProperty.length-1]) { %>
                     <a href="/articles/new" class="btn btn-primary announcement-button">
                         <i class="fas fa-plus-circle"></i> Add New Article

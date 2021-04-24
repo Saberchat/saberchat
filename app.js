@@ -30,8 +30,8 @@ const setup = require("./utils/setup");
 const wrapAsync = require("./utils/wrapAsync");
 //Callbacks for chat room socket functions
 const chatSocket = require("./socket/chat");
-//Callbacks for cafe socket functions
-const cafeSocket = require("./socket/cafe");
+//Callbacks for shop socket functions
+const shopSocket = require("./socket/shop");
 //Callbacks for nodeSchedule functions
 const profileSchedule = require("./schedule/profiles");
 //Scheduler for schedule jobs
@@ -40,14 +40,6 @@ const schedule = require('node-schedule');
 // SCHEMA
 const Platform = require('./models/platform');
 const User = require("./models/user");
-
-// connect to db.
-mongoose.connect(process.env.DATABASE_URL,
-{
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-    useFindAndModify: false
-});
 
 const appSetup = async function() {
     const app = await express();
@@ -140,11 +132,21 @@ const appSetup = async function() {
     await io.on('connect', socket => {
         socket.on('switch room', newroom => {chatSocket.switchRoom(io, socket, newroom);});
         socket.on('chat message', async(msg) => {wrapAsync(chatSocket.chatMessage(io, socket, msg));});
-        socket.on('order', async(itemList, itemCount, instructions, payingInPerson, customerId) => {wrapAsync(cafeSocket.order(io, socket, itemList, itemCount, instructions, payingInPerson, customerId));});
+        socket.on('order', async(itemList, itemCount, instructions, payingInPerson, customerId) => {wrapAsync(shopSocket.order(io, socket, itemList, itemCount, instructions, payingInPerson, customerId));});
     });
 
     // Start server
     const running = await http.listen(port, process.env.IP);
     if (running) { await console.log(":: App listening on port " + port + " ::");}
  
-}().catch(err => { console.log(err);}) 
+}
+
+// connect to db.
+mongoose.connect(process.env.DATABASE_URL,
+    {
+        useNewUrlParser: true,
+        useUnifiedTopology: true,
+        useFindAndModify: false
+    }).then(()=> {
+        appSetup().catch(err => { console.log(err);}); 
+    });

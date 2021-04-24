@@ -11,13 +11,13 @@
         <link rel="stylesheet" href="/stylesheets/components/header.css">
         <link rel="stylesheet" href="/stylesheets/components/navbar.css">
         <link rel="stylesheet" href="/stylesheets/home/index.css">
-        <link rel="stylesheet" href="/stylesheets/homework/show.css">
-        <link rel="stylesheet" href="/stylesheets/cafe/menu.css">
+        <link rel="stylesheet" href="/stylesheets/tutoringCenter/show.css">
+        <link rel="stylesheet" href="/stylesheets/shop/menu.css">
         <link rel="stylesheet" href="/stylesheets/announcements/form.css">
         <%if (currentUser) {%>
         <%if (currentUser.darkmode) { %>
             <link rel="stylesheet" href="/stylesheets/darkmode.css">
-            <link rel="stylesheet" href="/stylesheets/homework/homework-dark.css">
+            <link rel="stylesheet" href="/stylesheets/tutoringCenter/tutoringCenter-dark.css">
         <%}%>
         <%}%>
 
@@ -115,6 +115,11 @@
                         </div>
 
                         <div class="form-group">
+                            <label for="homepage-description-input">Display Content On Homepage</label>
+                            <input id="homepage-description-input" class="mode" type="checkbox" name="homepageInfo" <% if (platform.homepageInfo) { %> checked <% } %>>
+                        </div>
+
+                        <div class="form-group">
                             <label for="darkmode-input">Enable Darkmode</label>
                             <input id="darkmode-input" class="mode" type="checkbox" name="enableDarkmode" <% if (platform.enableDarkmode) { %> checked <% } %>>
                         </div>
@@ -175,7 +180,8 @@
                             <% for (let feature of platform.features) { %>
                                 <label for="<%=feature.name%>"><i id="display-icon-<%=feature.name%>" class="fas fa-<%=feature.icon%>"></i> <span id="feature-name-<%=feature.name%>"><%=feature.name%></span></label>
                                 <input oninput="changeFeatureName(this)"  type="text" id="<%=feature.name%>" class="form-control mode" placeholder="Enter feature name" value="<%=feature.name%>" name="feature"><br>
-                                <input oninput="changeIcon(this)" type="text" id="icon-<%=feature.name%>" class="form-control mode" placeholder="Enter feature icon" value="<%=feature.icon%>" name="icon"><br>
+                                <input oninput="changeIcon(this)" type="text" id="icon-<%=feature.name%>" class="form-control mode" placeholder="Enter feature icon" value="<%=feature.icon%>" name="featureIcon"><br>
+                                <input type="text" id="description-<%=feature.name%>" class="form-control mode" placeholder="Enter feature description" value="<%=feature.description%>" name="featureDescription"><br>
                             <% } %>
                         </div><br>
 
@@ -247,7 +253,7 @@
         </div>
     </body>
     <script src="/javascript/image-url.js"></script>
-    <script src="/javascript/cafe/image.js"></script>
+    <script src="/javascript/shop/image.js"></script>
     <script>
 
         const updateColor = function(input) {

@@ -287,7 +287,7 @@ controller.markReadAll = async function(req, res) {
 
 // Inbox PUT mark selected messages as read
 controller.markReadSelected = async function(req, res) {
-    const result = await InboxMessage.updateMany(
+    await InboxMessage.updateMany(
         {_id: {$in: parseKeysOrValues(req.body, "body")}, read: {$ne: req.user._id}},
         {$push: {read: req.user._id}}
     );
@@ -330,11 +330,7 @@ controller.reply = async function(req, res) {
         mediaFiles: []
     };
 
-    for (let image of req.body.images) { //Ensure that no undefined image URLs are added
-        if (image) {
-            reply.images.push(image);
-        }
-    }
+    if(req.body.images) {reply.images = req.body.images;}
 
     // if files were uploaded, handle them with cloudinary
     if (req.files) {

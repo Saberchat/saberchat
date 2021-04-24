@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Saberchat</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css"
+          integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk" crossorigin="anonymous">
+    <!-- link chat stylesheet -->
+    <link rel="stylesheet" href="/stylesheets/main.css">
+    <link rel="stylesheet" href="/stylesheets/components/header.css">
+    <link rel="stylesheet" href="/stylesheets/components/navbar.css">
+    <link rel="stylesheet" href="/stylesheets/home/index.css">
+    <link rel="stylesheet" href="/stylesheets/chat/new.css">
+    <link rel="stylesheet" href="/stylesheets/shop/show.css">
+    <%if (currentUser) {%>
+      <%if (currentUser.darkmode) { %>
+        <link rel="stylesheet" href="/stylesheets/darkmode.css">
+      <%}%>
+    <%}%>
+    <script src="/javascript/postUtil.js"></script>
+    <script src="/javascript/shop/actions.js"></script>
+
+    <!-- using my fontawesome kit -->
+    <script src="https://kit.fontawesome.com/dccc745c41.js" crossorigin="anonymous"></script>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"
+            integrity="sha256-9/aliU8dGd2tb6OSsuzixeV4y/faTqgFtohetphbbj0=" crossorigin="anonymous"></script>
+    <script src="https://unpkg.com/@popperjs/core@2" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js"
+            integrity="sha384-OgVRvuATP1z7JjHLkuOU7Xw704+h835Lr+6QL9UvYjZE3Ipu6Tp75j7Bh/kR0JKI"
+            crossorigin="anonymous"></script>
+
+    <!-- Cdn for formatting the dates -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-dateFormat/1.0/jquery.dateFormat.min.js"></script>
+    <script src="/javascript/shop/shop-socket.js" charset="utf-8"></script>
+    <%- include('../partials/analytics') %>
+  </head>
+  <body class="mode">
+    <%- include("../partials/navbar") %>
+    <%- include('../partials/header') %>
+
+<div class="container mt-5">
+    <div class="row">
+        <div class="col-12">
+          <div class="jumbotron text-center header">
+            <h1><i class="fas fa-<%=data.icon%>"></i> Orders</h1>
+            <p>All New Orders</p>
+            <a class="btn btn-primary" href="manage"><i class="fas fa-arrow-left"></i> Back</a>
+          </div>
+        </div>
+    </div>
+</div>
+
+<div id="output-stream" class="container mt-3">
+
+      <div class="search-filter mb-3 search">
+        <i class="fas fa-search"></i>
+        <input id="search-input" oninput="searchFunction(this, 'card')" class="form-control search" type="text" placeholder="Search..." title="Type in an order segment"/>
+      </div><br />
+
+    <% if (orders.length == 0) { %>
+        <h2>No New Orders</h2>
+    <% } else { %>
+        <% orders.reverse().forEach((order) => { %>
+            <div class="card mt-3 order-card darkmode-outline" id="<%= order._id %>">
+                <div class="card-body">
+                    <h5 class="card-title">Order for <%= order.name %></h5>
+                    <p class="card-text"><span class="instructions">Extra Instructions:</span> <%= order.instructions %>
+                    </p>
+                    <ul class="list-group">
+                        <% for (let item of order.items) { %>
+                            <li class="list-group-item shop"><%= item.item.name %>
+                                <% let itemCharge = (item.quantity * item.item.price); %>
+                                <%= item.item.name %> (<%= item.quantity %> order(s)) -
+                                $<%= itemCharge.toFixed(2)%>
+                            </li>
+                        <% } %>
+                    </ul>
+
+                    <p class="card-text mt-3"><span class="cost">Cost:</span>
+                        $<%= (order.charge).toFixed(2)%>
+                    </p>
+
+                    <p class="paying-in-person">
+                        <% if (order.payingInPerson) { %>
+                            Paying In-Person
+                        <% } else { %>
+                            Paying Online
+                        <% } %>
+                    </p>
+
+                    <p class="card-text"><%= order.date %></p>
+
+                    <% if (currentUser.tags.includes("Cashier")) { %>
+                        <form class="ready-form" action="<%= order._id %>/ready" method="post">
+                            <button type="button" data-toggle="modal" data-target="#modal-<%= order._id %>-ready"
+                                    class="btn btn-primary" name="button">Order Ready
+                            </button>
+                            <button type="button" data-toggle="modal" data-target="#modal-<%= order._id %>-reject"
+                                    class="btn btn-danger" name="button">Reject Order
+                            </button>
+
+                            <div class="modal fade" id="modal-<%= order._id %>-ready" tabindex="-1"
+                                 aria-labelledby="deleteModalLabel" aria-hidden="true">
+                                <div class="modal-dialog mode">
+                                    <div class="modal-content mode">
+                                        <div class="modal-header mode">
+                                            <h5 class="modal-title" id="exampleModalLabel">Order Ready?</h5>
+                                            <button type="button" class="close mode" data-dismiss="modal" aria-label="Close">
+                                                <span aria-hidden="true">&times;</span>
+                                            </button>
+                                        </div>
+                                        <div class="modal-body mode">
+                                            This will notify the customer that their order is ready.
+                                        </div>
+                                        <div class="modal-footer mode">
+                                            <button type="button" class="btn btn-secondary" data-dismiss="modal">No, Go
+                                                Back
+                                            </button>
+                                            <button type="button" class="btn btn-primary" id="<%= order._id %>-ready"
+                                                    onclick="ready(this)">Yes, Order Is Ready
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="modal fade" id="modal-<%= order._id %>-reject" tabindex="-1"
+                                 aria-labelledby="deleteModalLabel" aria-hidden="true">
+                                <div class="modal-dialog mode">
+                                    <div class="modal-content mode">
+                                        <div class="modal-header mode">
+                                            <h5 class="modal-title" id="exampleModalLabel">Reject Order?</h5>
+                                            <button type="button" class="close mode" data-dismiss="modal" aria-label="Close">
+                                                <span aria-hidden="true">&times;</span>
+                                            </button>
+                                        </div>
+                                        <div class="modal-body mode">
+                                            This action is irreversible. Only reject this order if there is something
+                                            wrong
+                                            about it, or you suspect it to not be genuine. You might want to check with
+                                            a
+                                            faculty member and the customer first.
+                                            <textarea class="form-control mode rejection-input"
+                                                      id="rejection-reason-<%= order._id %>" rows="5" type="text"
+                                                      name="rejectionReason"
+                                                      placeholder="Enter reason for rejecting order"></textarea>
+                                        </div>
+                                        <div class="modal-footer mode">
+                                            <button type="button" class="btn btn-secondary" data-dismiss="modal">No, Go
+                                                Back
+                                            </button>
+                                            <button type="button" class="btn btn-danger" id="<%= order._id %>-reject"
+                                                    onclick="reject(this)">Yes, Reject Order
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </form>
+                    <% } %>
+                </div>
+            </div>
+        <% }); %>
+    <% } %>
+</div>
+<script src="/javascript/shop/search.js"></script>
+<script src="/javascript/admin/search.js"></script>
+<script>
+    if (document.getElementById("search-input")) {
+        document.getElementById("search-input").style.backgroundColor = colorScheme[colorScheme.length-1];
+    }
+    
+    getOrders("#output-stream");
+</script>
+</body>
+</html>

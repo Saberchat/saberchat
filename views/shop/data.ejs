@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Saberchat</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/stylesheets/main.css">
+    <!-- link css for navbar. Don't need to include public/javascript/userForm.js since user is already logged in and does not need to access login and register forms.  -->
+    <link rel="stylesheet" href="/stylesheets/components/header.css">
+    <link rel="stylesheet" href="/stylesheets/components/navbar.css">
+    <link rel="stylesheet" href="/stylesheets/chat/new.css">
+    <link rel="stylesheet" href="/stylesheets/shop/data.css">
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js"></script>
+
+    <!-- I'm using my fontawesome kit -->
+    <script src="https://kit.fontawesome.com/dccc745c41.js" crossorigin="anonymous"></script>
+    <%- include('../partials/analytics') %>
+</head>
+<body class="mode">
+<!-- include the navbar via ejs -->
+<%- include('../partials/navbar') %>
+<%- include('../partials/header') %>
+
+<div class="container mt-5">
+    <div class="row">
+        <div class="col-12" id="data">
+            <h1><i class="fas fa-<%=data.icon%>"></i> Sales Analytics</h1>
+            <a class="btn btn-primary" href="/shop/manage"><i class="fas fa-arrow-left"></i> Back</a><br/><br/>
+        </div>
+    </div>
+
+    <h3>Most Frequent Customers (Bar Graph)</h3>
+
+    <ol>
+
+        <% for (let customer of popularCustomers) { %>
+            <li>
+                <%= customer.customer.firstName %> <%= customer.customer.lastName %>: <%= customer.orderCount %> order(s)
+            </li>
+        <% } %>
+
+    </ol>
+
+    <h3>Most Lucrative Customers (Bar Graph)</h3>
+    <ol>
+        <% for (let customer of lucrativeCustomers) { %>
+            <li>
+                <%= customer.customer.firstName %> <%= customer.customer.lastName %>: $<%= customer.spent %> spent (Avg. $<%=(customer.avgCharge).toFixed(2)%> per order)
+            </li>
+        <% } %>
+    </ol>
+
+    <h3>Customers With Largest Orders (Bar Graph)</h3>
+    <ol>
+        <% for (let customer of longestOrderCustomers) { %>
+            <li>
+                <%= customer.customer.firstName %> <%= customer.customer.lastName %>
+                (Avg. <%= Math.round(customer.orderLength * 100) / 100 %> item(s) per order)
+            </li>
+        <% } %>
+    </ol>
+
+    <h3>Most Popular Items BY ORDERS (Pie Chart/Bar Graph)</h3>
+    <ol>
+        <% for (let item of popularOrderedItems) { %>
+            <li>
+                <%= item.item.name %>: <%= item.orderCount%> order(s)
+            </li>
+        <% } %>
+    </ol>
+
+    <h3>Most Popular Items BY UPVOTES (Pie Chart/Bar Graph)</h3>
+    <ol>
+        <% for (let item of upvotedItems) { %>
+            <li>
+                <%= item.name %>: <%= item.upvotes.length %> upvote(s)
+            </li>
+        <% } %>
+
+    </ol>
+
+    <h3>Average Amount Ordered Per Item (Bar Graph)</h3>
+
+    <ol>
+        <% let numOrders; %>
+        <% let sumOrders; %>
+
+        <% for (let obj of orderedQuantities) { %>
+            <li>
+                <%= obj.item.name %>: <%= Math.round(obj.avgQuantity * 100) / 100 %>
+            </li>
+        <% } %>
+
+    </ol>
+
+    <h3>Common Order Combinations (Bar Graph)</h3>
+
+    <ol>
+        <% let nameArr; %>
+        <% for (let combo of combinations) { %>
+
+            <% nameArr = [] %>
+            <% for (let item of combo.combination) { %>
+                <% nameArr.push(item.name) %>
+            <% } %>
+
+            <li>The combination of the following has been ordered <%= combo.instances %> time(s):</li>
+            <ul>
+                <% for (let name of nameArr) { %>
+                    <li>
+                        <span class="time"><%= name %></span>
+                    </li>
+                <% } %>
+            </ul>
+            <br/>
+        <% } %>
+    </ol>
+
+    <h3>Popularity of Items At Different Price Points (Line Graph)</h3>
+    <% for (let item of pricepoints.keys()) { %>
+
+        <% if (pricepoints.get(item).size > 0) { %>
+
+            <% for (let i of items) { %>
+                <% if (i._id.toString() == item) { %>
+                    <span class="item-name"><%= i.name %>:</span>
+                <% } %>
+            <% } %>
+
+            <ul>
+                <% for (let point of pricepoints.get(item).keys()) { %>
+                    <li>At price $<%= point %>, this item was ordered <%= pricepoints.get(item).get(point) %> time(s) <em>(Total
+                            Revenue At This Price: $<%= point * pricepoints.get(item).get(point) %>)</em></li>
+                <% } %>
+            </ul>
+        <% } %>
+
+    <% } %>
+
+    <h3>Common Ordering Timeframes (Boxplot)</h3>
+
+    <ul>
+        <% for (let time of times) { %>
+            <li>
+                <span class="time"><%=time%></span>
+            </li>
+        <% } %>
+    </ul>
+
+    <p>
+        The average ordering time is
+        <span class="time">
+            <%=timeStats.avgTime%>
+        </span>
+    </p>
+
+    <p>
+        The median ordering time is
+        <span class="time">
+            <%=timeStats.medianTime%>
+        </span>
+    </p>
+
+    <p>
+        Most orders will be placed between
+        <span class="time">
+            <%=timeStats.minTime%>
+        </span>
+        and
+        <span class="time">
+            <%=timeStats.maxTime%>
+        </span>
+    </p>
+</div>
+<br/>
+</body>
+
+</html>

@@ -143,7 +143,6 @@ middleware.isStudent = async function(req, res, next) {
         req.flash("error", "An error occurred");
         return res.redirect("back");
     }
-    
     if (platform.studentStatuses.includes(req.user.status)) { return next();}
     req.flash('error', 'You do not have permission to do that');
     return res.redirect('back');
@@ -167,16 +166,16 @@ middleware.isEditor = function(req, res, next) {
     return res.redirect('back');
 }
 
-//Whether cafe is open to orders
-middleware.cafeOpen = async function(req, res, next) {
-    const cafe = await setup(Market);
-    if (!cafe) {
+//Whether shop is open to orders
+middleware.shopOpen = async function(req, res, next) {
+    const shop = await setup(Market);
+    if (!shop) {
         req.flash('error', "An Error Occurred")
         return res.redirect('back')
     }
 
-    if (cafe.open) { return next();}
-    req.flash('error', "The cafe is currently not taking orders");
+    if (shop.open) { return next();}
+    req.flash('error', "The shop is currently not taking orders");
     return res.redirect('back');
 }
 
@@ -192,7 +191,7 @@ middleware.memberOfCourse = async function(req, res, next) {
     const course = await Course.findById(req.params.id);
     if (!course) {
         req.flash('error', 'Course not found');
-        return res.redirect('/homework');
+        return res.redirect('/tutoringCenter');
     }
 
     if (course.creator.equals(req.user._id) || course.members.includes(req.user._id) || objectArrIndex(course.tutors, "tutor", req.user._id) > -1) {
@@ -200,7 +199,7 @@ middleware.memberOfCourse = async function(req, res, next) {
     }
 
     req.flash('error', 'You are not a member of this course');
-    return res.redirect('/homework');
+    return res.redirect('/tutoringCenter');
 }
 
 //checks if user is not part of a course
@@ -208,17 +207,17 @@ middleware.notMemberOfCourse = async function(req, res, next) {
     const course = await Course.findOne({joinCode: req.body.joincode});
     if (!course) {
         req.flash('error', 'Course not found');
-        return res.redirect('/homework')
+        return res.redirect('/tutoringCenter')
     }
 
     if (course.creator.equals(req.user._id) || course.members.includes(req.user._id) || objectArrIndex(course.tutors, "tutor", req.user._id) > -1) {
         req.flash('error', 'You are already a member of this course');
-        return res.redirect('/homework');
+        return res.redirect('/tutoringCenter');
     }
 
     if (course.blocked.includes(req.user._id)) {
         req.flash('error', 'You are blocked from joining this course');
-        return res.redirect('/homework');
+        return res.redirect('/tutoringCenter');
     }
     return next();
 }

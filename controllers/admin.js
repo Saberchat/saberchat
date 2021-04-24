@@ -10,7 +10,7 @@ const User = require("../models/user");
 const Email = require("../models/admin/email");
 const {Announcement, Project, Article} = require("../models/post");
 const {Course, ChatRoom} = require('../models/group');
-const Order = require('../models/cafe/order');
+const Order = require('../models/shop/order');
 
 const controller = {};
 
@@ -36,7 +36,7 @@ controller.updatePlatform = async function(req, res) {
         platform[attr] = req.body[attr];
     }
 
-    for (let attr of ["navDark", "contactPhotoDisplay", "postVerifiable", "enableDarkmode"]) {
+    for (let attr of ["navDark", "contactPhotoDisplay", "postVerifiable", "enableDarkmode", "homepageInfo"]) {
         platform[attr] = (req.body[attr] != undefined);
     }
 
@@ -96,11 +96,13 @@ controller.updatePlatform = async function(req, res) {
 
     if (typeof req.body.feature == "string") {
         platform.features[0].name = req.body.feature;
-        platform.features[0].icon = req.body.icon;
+        platform.features[0].icon = req.body.featureIcon;
+        platform.features[0].description = req.body.featureDescription;
     } else {
         for (let i = 0; i < platform.features.length; i++) {
             platform.features[i].name = req.body.feature[i];
-            platform.features[i].icon = req.body.icon[i];
+            platform.features[i].icon = req.body.featureIcon[i];
+            platform.features[i].description = req.body.featureDescription[i];
         }
     }
 
@@ -171,7 +173,7 @@ controller.authenticateGet = async function(req, res) {
 }
 
 controller.authenticatePut = async function(req, res) {
-    const user = await User.updateOne({_id: req.body.userId, authenticated: false}, {authenticated: true});
+    const user = await User.findByIdAndUpdate(req.body.userId, {authenticated: true});
     if (!user) { return res.json({error: "Unable to find user"});}
     await sendGridEmail(user.email, 'Welcome To Saberchat!', `<p>Hello ${user.firstName},</p><p>Welcome to Saberchat! A confirmation of your account:</p><ul><li>Your username is ${user.username}.</li><li>Your full name is ${user.firstName} ${user.lastName}.</li><li>Your linked email is ${user.email}</li></ul><p>You will be assigned a role and status soon.</p>`, false);
     return res.json({success: "Authenticated User!"});
@@ -387,9 +389,7 @@ controller.accesslistGet = async function(req, res) { //Show page with all permi
 
 controller.addEmail = async function (req, res) { //Add email to access list/blocked list
     const platform = await setup(Platform);
-    if (!platform) {
-        return res.json({error: "Unable to find platform"});
-    }
+    if (!platform) {return res.json({error: "Unable to find platform"});}
 
     if (req.body.version === "accesslist") {
         if (platform.emailExtension != '' && req.body.address.split('@')[1] === platform.emailExtension) { //These emails are already verified

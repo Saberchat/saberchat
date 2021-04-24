@@ -38,7 +38,7 @@ module.exports = { //All subclasses
     PostOrg: Group.discriminator("PostOrg", new mongoose.Schema({ //For organizations like wHeights that post content without profit
         categories: [{type: mongoose.Schema.Types.ObjectId, ref: "PostCategory"}]
     })),
-    Market: Group.discriminator("Market", new mongoose.Schema({ //Cafe, Fundraising Platforms, etc.
+    Market: Group.discriminator("Market", new mongoose.Schema({ //Shop, Fundraising Platforms, etc.
         open: {type: Boolean, default: false},
         revenue: {type: Number, default: 0},
         expenditures: {type: Number, default: 0},

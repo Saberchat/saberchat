@@ -27,7 +27,7 @@ controller.index = async function(req, res) {
     for (let user of teachers) { //Iterate through faculty and add their name to array
         names.push(`${user.firstName} ${user.lastName}`);
     }
-    return res.render('other/platform-info', {platform, names: names.join(', '), objectArrIndex});
+    return res.render('other/platform-info', {platform, names: names.join(', '), objectArrIndex, description: (req.query.description != undefined)});
 }
 
 controller.register = async function(req, res) {
@@ -95,7 +95,8 @@ controller.register = async function(req, res) {
             username: filter.clean(username),
             annCount: [],
             authenticated: false,
-            authenticationToken: token
+            authenticationToken: token,
+            bannerUrl: {url: platform.imageUrl, display: true}
         }
     );
 

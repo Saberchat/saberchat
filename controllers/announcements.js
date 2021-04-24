@@ -127,16 +127,12 @@ controller.updateForm = async function(req, res) {
 // Announcement POST create
 controller.create = async function(req, res) {
     const platform = await setup(Platform);
-    if (!platform) {
-        req.flash("error", "Unable to setup platform");
-        return res.redirect("back");
-    }
     const announcement = await Announcement.create({
         sender: req.user,
         subject: req.body.subject,
         text: req.body.message
     });
-    if (!announcement) {
+    if (!platform || !announcement) {
         req.flash('error', 'Unable to create announcement');
         return res.redirect('back');
     }
@@ -207,12 +203,8 @@ controller.verify = async function(req, res) {
 //Announcement PUT Update
 controller.updateAnnouncement = async function(req, res) {
     const platform = await setup(Platform);
-    if (!platform) {
-        req.flash("error", "Unable to setup platform");
-        return res.redirect("back");
-    } 
     const announcement = await Announcement.findById(req.params.id).populate('sender');
-    if (!announcement) {
+    if (!platform || !announcement) {
         req.flash('error', "Unable to access announcement");
         return res.redirect('back');
     }
