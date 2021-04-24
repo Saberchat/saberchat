@@ -2,6 +2,7 @@
 const dateFormat = require('dateformat');
 const {sendGridEmail} = require("../services/sendGrid");
 const setup = require("../utils/setup");
+const {objectArrIndex} = require("../utils/object-operations");
 
 //SCHEMA
 const Platform = require("../models/platform");

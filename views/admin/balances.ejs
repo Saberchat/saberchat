@@ -56,7 +56,7 @@
                     <% for (let user of users) { %>
                         <% if(!user._id.equals(currentUser._id) && user.status == status){ %>
                           <form onsubmit="updateBalance(this, event)" id="<%=user._id%>">
-                            <li class="list-group-item user cafe">
+                            <li class="list-group-item user shop">
                               <div class="col">
                                 <span class="user-balance-info"><%= user.firstName %> <%= user.lastName %> (<%= user.username %>)</span>
                                 <div class="input-group balance-input">

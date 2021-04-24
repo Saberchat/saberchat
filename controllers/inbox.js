@@ -287,7 +287,7 @@ controller.markReadAll = async function(req, res) {
 
 // Inbox PUT mark selected messages as read
 controller.markReadSelected = async function(req, res) {
-    const result = await InboxMessage.updateMany(
+    await InboxMessage.updateMany(
         {_id: {$in: parseKeysOrValues(req.body, "body")}, read: {$ne: req.user._id}},
         {$push: {read: req.user._id}}
     );

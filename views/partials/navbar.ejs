@@ -79,7 +79,12 @@
                         </a>
 
                         <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-                            <a class="dropdown-item" href="/"><i class="fas fa-info-circle"></i> About <%=platform.name%></a>
+                            <% if (platform.homepageInfo) { %>
+                                <a class="dropdown-item" href="/"><i class="fas fa-info-circle"></i> About <%=platform.name%></a>
+                            <% } else { %>
+                                <a class="dropdown-item" href="/?"><i class="fas fa-home"></i> Home</a>
+                                <a class="dropdown-item" href="/?description=true"><i class="fas fa-info-circle"></i> About <%=platform.name%></a>
+                            <% } %>
                             <% if (currentUser) { %>
                                 <a class="dropdown-item" href="/contact"><i class="fas fa-phone"></i> Contact</a>
                             <% } %>

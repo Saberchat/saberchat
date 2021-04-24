@@ -57,7 +57,7 @@
             </li>
             <% rooms.forEach(room => { %>
                 <% if (!room.private || room.members.includes(currentUser._id)) { %>
-                    <a href="chat/<%= room._id %>" class="list-group-item list-group-item-action cafe">
+                    <a href="chat/<%= room._id %>" class="list-group-item list-group-item-action shop">
                         <% if (commentObject[room._id.toString()]) { %>
                             <img src="<% if (commentObject[room._id.toString()].author.mediaFile.display) {%> <%= commentObject[room._id.toString()].author.mediaFile.url%><%} else {%> <%=commentObject[room._id.toString()].author.imageUrl.url%><%}%>" alt="user"
                                  class="user-image">
@@ -109,7 +109,7 @@
                 </li>
                 <% rooms.forEach(room => { %>
                     <% if (room.private && !(room.members.includes(currentUser._id)) && room.mutable) { %>
-                        <li class="list-group-item list-group-item-action cafe">
+                        <li class="list-group-item list-group-item-action shop">
                             <%= room.name %>
                             <% let roomRequested = false; %>
                             <% for (let request of requests) { %>

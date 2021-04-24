@@ -13,7 +13,7 @@
     <link rel="stylesheet" href="/stylesheets/components/background.css">
     <link rel="stylesheet" href="/stylesheets/components/navbar.css">
     <link rel="stylesheet" href="/stylesheets/other/index.css">
-    <link rel="stylesheet" href="/stylesheets/homework/index.css">
+    <link rel="stylesheet" href="/stylesheets/tutoringCenter/index.css">
     <link rel="stylesheet" href="/stylesheets/announcements/form.css">
     <%if (currentUser) {%>
       <%if (currentUser.darkmode) { %>
@@ -45,9 +45,13 @@
             <div class="col-12 background-title">
                 <h1>Help and Donate</h1>
                 <p style="font-size: 130%;">Here are ways you can help our community</p>
-                <a href="https://www.paypal.com/paypalme/donateaapa?locale.x=en_US" target="_blank" style="padding-left: 30px; padding-right: 30px; padding-top: 20px;" class="btn btn-primary">
-                    <p style="color:white; font-size: 140%;"><i class="fab fa-paypal" style="font-size: 120%;"></i> Donate Now!</p>
-                </a><br>
+                <form action="https://www.paypal.com/donate" method="post" target="_blank">
+                    <input type="hidden" name="business" value="HXF4ZVE3XCTSQ" />
+                    <input type="hidden" name="item_name" value="Please help us in our education endeavor, stopping Asian hate through the power of knowledge!" />
+                    <input type="hidden" name="currency_code" value="USD" />
+                    <input type="image" src="https://www.paypalobjects.com/en_US/i/btn/btn_donate_LG.gif" border="0" name="submit" title="PayPal - The safer, easier way to pay online!" alt="Donate with PayPal button" style="width: 7.5%;"/>
+                    <img alt="" border="0" src="https://www.paypal.com/en_US/i/scr/pixel.gif"/>
+                </form>
             </div>
         </div>
     </div>
@@ -77,27 +81,16 @@
             </div>
 
             <div style="text-align: center;">
-
-                <div class="card course-title darkmode-outline">
-                    <img class="card-img-top course-thumbnail" src="https://www.advancingjustice-la.org/sites/default/files/AAAJ%20torch%20transparent.png" alt="Image Does Not Exist" style="height: 350px;">
-                    <div class="card-body">
-                        <p><a target="_blank" href="https://www.standagainsthatred.org/report">Asian Americans Advancing Justice</a> is an organization where you can safely share your story and help document hate crimes against Asian Americans throughout the US.</p>
+                <% for (let card of [["https://res.cloudinary.com/dhifj0kpt/image/upload/v1619219731/SaberChat/ojkuocw1u8t0mesvohzc.pdf", "https://i.imgur.com/bgrEITM.png",  "Printable Awareness Flier"], ["https://res.cloudinary.com/dhifj0kpt/image/upload/v1619227778/SaberChat/xw9grbflqrwb49oey68k.pdf", "https://i.imgur.com/afCIUuI.png", "Printable Education Flier"]]) {%>
+                    <div class="card course-title darkmode-outline" style="width: 350px;">
+                        <a href="<%=card[0]%>" class="card-img-top course-thumbnail" target="_blank">
+                            <img src="<%=card[1]%>" alt="Image Does Not Exist" style="height: 525px; width: 350px;">
+                            <div class="card-body" style="color: white;">
+                                <h5><%=card[2]%></h5>
+                            </div>
+                        </a>
                     </div>
-                </div>
-
-                <div class="card course-title darkmode-outline">
-                    <img class="card-img-top course-thumbnail" src="https://upload.wikimedia.org/wikipedia/en/2/27/Stop_AAPI_Hate_logo.jpg" alt="Image Does Not Exist" style="height: 350px;">
-                    <div class="card-body">
-                        <p><a target="_blank" href="https://stopaapihate.org/">Stop AAPI Hate</a> is an organization where you can safely share your story and help document hate crimes against Asian Americans throughout the US.</p>
-                    </div>
-                </div>
-
-                <div class="card course-title darkmode-outline">
-                    <img class="card-img-top course-thumbnail" src="https://caaav.org/wp-content/themes/CAAAV/timthumb.php?src=https://caaav.org/wp-content/uploads/2021/03/caaav_logos_2018_stacked_color-1.jpg&h=320&w=525&zc=1" alt="Image Does Not Exist" style="height: 350px;">
-                    <div class="card-body">
-                        <p><a target="_blank" href="https://caaav.ourpowerbase.net/civicrm/contribute/transact?reset=1&id=2">CAAAV</a> builds grassroots power across low-income Asian immigrant and refugee communities in New York City, helping identify and resolve their problems.</p>
-                    </div>
-                </div>
+                <% } %>
             </div><br>
 
             <div class="row text-element">
@@ -109,7 +102,7 @@
                         <div class="block-content mode">
                             <p>As stated before, we are looking towards creating educational packets with original and credible information to help <a target="_blank" href="https://www.instagram.com/explore/tags/stopasianhate/">#STOPASIANHATE</a>. This is unlike any others, with slideshows, videos, etc, being made available and tailored to specific communities. We are even looking towards creating a curriculum upon request, regarding what it considered to be ‘most important’ to others in relation to this context. Thus, we will greatly rely on donations and support from others in order to prosper in this endeavor! All of your donations will be used to help make this dream possible, whether it is allocated to marketing the production of physical copies and presentations, hiring those that can provide us with original/credible information, etc… We will also be using donations to help aid some of our special events that are to come in the future, such as conferences, seminars, and rallies. If you would like to specify where you want your donation to go towards within the organization’s efforts, do include that! Unfortunately, donations towards us are not tax deductible, but we are working toward getting to that point with your help!</p>
                             <ol>
-                                <li>Please donate to us through our PayPal, a personal account run through one of our group leaders. Do note that this account is used PURELY for AAPA, and running through funds regarding the organization. We are keeping all our money separate to avoid complications and confusions!</li>
+                                <li><a target="_blank" href="https://www.paypal.com/donate?business=HXF4ZVE3XCTSQ&item_name=Please+help+us+in+our+education+endeavor%2C+stopping+Asian+hate+through+the+power+of+knowledge%21&currency_code=USD">Please donate to us through our PayPal</a>, a personal account run through one of our group leaders. Do note that this account is used PURELY for AAPA, and running through funds regarding the organization. We are keeping all our money separate to avoid complications and confusions!</li>
                                 <li>There are multiple well established organizations that support the AAPI community in several ways, especially in light of recent events. We are not only looking for donations directed towards our organization, but also hope that you will donate to others as well! In fact, AAPA is trying our best to support other similar institutions as well, allocating our profits between our educational journey and other Anti-Asian hate organizations.</li>
                                 <li>We are also running a <a target="_blank" href="https://www.gofundme.com/f/support-our-local-asian-communities">GoFundMe</a>, with 100% of the profits directed to AIWA (Asian Immigrant Women Advocates). More information on what they do and the impact made is on the fundraiser page!</li>
                                 <li>Lastly, we would like to remind you to support small Asian owned businesses and organizations near you, making a direct impact in your community!</li>
@@ -127,10 +120,10 @@
                         </div>
                         <div class="block-content mode">
                             <ol>
-                                <li><a target="_blank" href="https://secure.donationpay.org/aajc/">Asian Americans Advancing Justice</a>: “Fighting for civil rights and empowering Asian Americans to create a more just America for all”</li>
-                                <li><a target="_blank" href="https://donate.givedirect.org/?cid=14711&n=944938">Stop AAPI Hate</a>: Help track and respond to the surge of attacks towards the AAPI community</li>
-                                <li><a target="_blank" href="https://www.gofundme.com/f/support-our-local-asian-communities">Asian Immigrant Women Advocates</a> (For those located in the SF Bay Area): Promoting leadership development and collective action among Women within the Asian American community</li>
-                                <li><a target="_blank" href="https://caaav.ourpowerbase.net/civicrm/contribute/transact?reset=1&id=2">CAAAV</a>: “building grassroots power across low-income Asian immigrant and refugee communities in New York City to address the problems in our communities, target their root causes, and enact institutional change for racial, gender, and economic justice.”</li>
+                                <li><a target="_blank" href="https://secure.donationpay.org/aajc/">Asian Americans Advancing Justice</a>: Fighting for civil rights and empowering Asian Americans to create a more just America for all.</li>
+                                <li><a target="_blank" href="https://donate.givedirect.org/?cid=14711&n=944938">Stop AAPI Hate</a>: Help track and respond to the surge of attacks towards the AAPI community.</li>
+                                <li><a target="_blank" href="https://www.gofundme.com/f/support-our-local-asian-communities">Asian Immigrant Women Advocates (SF Bay Area)</a>: Leadership development and collective action among Asian American women.</li>
+                                <li><a target="_blank" href="https://caaav.ourpowerbase.net/civicrm/contribute/transact?reset=1&id=2">CAAAV</a>: Building grassroots power across low-income Asian immigrant and refugee communities in New York City to address the problems in our communities, target their root causes, and enact institutional change for racial, gender, and economic justice.</li>
                             </ol>
                         </div>
                     </article>
@@ -139,7 +132,7 @@
             <% if (platform.officialEmail != '') { %>
                 <form action="/articles/advice" method="post" enctype="multipart/form-data">
                     <div class="form-group">
-                        <input type="text" class="form-control mode" name="subject" placeholder="Enter A Subject For Your Idea or Question!" required><br>
+                        <input type="text" class="form-control mode" name="subject" placeholder="Subject Heading For Your Idea or Question" required><br>
                         <textarea minlength="20" class="form-control mode" name="message" rows="5" placeholder="We are looking for donations in time as well! Any resources, advice, ideas, etc, would be greatly appreciate and valued." required></textarea><br>
                         <div id="media-header">
                             <button type="button" onclick="upload(0, 'image/png, image/jpg, application/pdf')" class="btn btn-primary"><i class="fas fa-plus"></i> File Upload</button>

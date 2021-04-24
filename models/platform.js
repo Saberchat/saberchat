@@ -7,8 +7,9 @@ var platformSchema = new mongoose.Schema({
     postText: String,
     url: String,
     icon: String,
-    imageUrl: String,
+    imageUrl: {type: String, default: "https://wallpaper.dog/large/11001671.jpg"},
     principal: String,
+    homepageInfo: {type: Boolean, default: true}, //Display information on homepage
     descriptionDisplay: {type: Boolean, default: false}, //Display description or platform name first on homepage
     contactPhotoDisplay: {type: Boolean, default: true}, //Display photos of platform administrators on contact page
     principalAuthenticate: {type: Boolean, default: false}, //Check if users have to be validated by principal first
@@ -32,7 +33,7 @@ var platformSchema = new mongoose.Schema({
     tags: [{type: String}],
     terms: [{type: String}],
     publicFeatures: [{route: String, name: String, icon: String, subroutes: [{type: String}]}],
-    features: [{route: String, name: String, icon: String}],
+    features: [{route: String, name: String, description: {type: String, default: ''}, icon: String}],
     displayImages: [{type: String}],
     info: [{heading: String, text: [{type: String}], image: String}],
     services: [{type: String}],

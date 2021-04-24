@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Saberchat</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/stylesheets/main.css">
+    <!-- link css for navbar. Don't need to include public/javascript/userForm.js since user is already logged in and does not need to access login and register forms.  -->
+    <link rel="stylesheet" href="/stylesheets/components/header.css">
+    <link rel="stylesheet" href="/stylesheets/components/navbar.css">
+    <link rel="stylesheet" href="/stylesheets/chat/new.css">
+    <link rel="stylesheet" href="/stylesheets/shop/edit.css">
+    <%if (currentUser) {%>
+      <%if (currentUser.darkmode) { %>
+        <link rel="stylesheet" href="/stylesheets/darkmode.css">
+      <%}%>
+    <%}%>
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js"></script>
+
+    <!-- I'm using my fontawesome kit -->
+    <script src="https://kit.fontawesome.com/dccc745c41.js" crossorigin="anonymous"></script>
+    <%- include('../partials/analytics') %>
+</head>
+<body class="mode">
+<!-- include the navbar via ejs -->
+<%- include('../partials/navbar') %>
+<%- include('../partials/header') %>
+
+<div class="container mt-5">
+    <div class="row">
+        <div class="col-12">
+            <div class="col-12 main">
+                <h1 id="heading"><i class="fas fa-<%=data.icon%>"></i> Edit Item Category - "<%= category.name %>"</h1>
+                <a class="btn btn-primary" href="/shop/manage"><i class="fas fa-arrow-left"></i> Back</a><br/><br/>
+            </div>
+        </div>
+    </div>
+
+    <form action="/shop/category/<%= category._id %>?_method=put" method="post">
+
+        <h2 class="element">Name</h2>
+        <div class="row">
+            <div class="col-md-8 offset-md-2 col-12">
+                <div class="form-group">
+                    <div class="row">
+                        <div class="input-group mb-3">
+                            <input id="itemInput" class="form-control mode" type="text" name="name" value="<%= category.name %>"
+                                   placeholder="Enter Item Name" maxlength="45" required/>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <h2 class="element">Items</h2>
+        <div class="row">
+            <div class="col-md-8 offset-md-2 col-12">
+                <div class="form-group">
+
+                    <h5><%= category.name %></h5>
+                    <% if (category.items.length > 0) { %>
+                        <% category.items.forEach(item => { %>
+                            <input id="item<%= item._id %>" type="checkbox" name="<%= item._id %>" checked/>
+                            <label for="item<%= item._id %>"><%= item.name %></label>
+                            <br/>
+                        <% }) %>
+
+                    <% } else { %>
+                        <p>
+                            No Items Currently
+                        </p>
+                    <% } %>
+
+                    <br/>
+
+                    <% categories.forEach(t => { %>
+
+                        <% if (t.name != "Other") { %>
+                            <% if (t.items.length > 0) { %>
+                                <h5><%= t.name %></h5>
+                                <% t.items.forEach(item => { %>
+                                    <input id="item<%= item._id %>" type="checkbox" name="<%= item._id %>"/>
+                                    <label for="item<%= item._id %>"><%= item.name %></label>
+                                    <br/>
+                                <% }) %>
+                                <br/>
+                            <% } %>
+                        <% } %>
+                    <% }) %>
+
+                    <% categories.forEach(t => { %>
+
+                        <% if (t.name == "Other") { %>
+                            <% if (t.items.length > 0) { %>
+                                <h5><%= t.name %></h5>
+                                <% t.items.forEach(item => { %>
+                                    <input id="item<%= item._id %>" type="checkbox" name="<%= item._id %>"/>
+                                    <label for="item<%= item._id %>"><%= item.name %></label>
+                                    <br/>
+                                <% }) %>
+                                <br/>
+                            <% } %>
+                        <% } %>
+                    <% }) %>
+
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-8 offset-md-2 col-12">
+                <button type="submit" class="btn btn-lg btn-primary btn-block">Submit Changes</button>
+            </div>
+        </div>
+
+        <div class="row mt-2">
+            <div class="col-md-8 offset-md-2 col-12">
+                <button type="button" class="btn btn-danger btn-lg btn-block" data-toggle="modal" data-target="#modal"
+                        id="delete-button">Delete Category
+                </button>
+                <div class="modal fade" id="modal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+                    <div class="modal-dialog mode">
+                        <div class="modal-content mode">
+                            <div class="modal-header mode">
+                                <h5 class="modal-title" id="exampleModalLabel">Delete this category?</h5>
+                                <button type="button" class="close mode" data-dismiss="modal" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                            </div>
+                            <div class="modal-body mode">
+                                You will have to manually add this category back
+                            </div>
+                            <div class="modal-footer mode">
+                                <button type="button" class="btn btn-secondary" data-dismiss="modal">Back</button>
+                                <button type="submit" formaction="<%= category._id %>?_method=delete"
+                                        class="btn btn-danger">Delete
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+</body>
+</html>

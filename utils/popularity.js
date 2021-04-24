@@ -1,4 +1,4 @@
-//Popularity Functions can be used to calculate and sort popularity for projects, cafe items, tutors, etc.
+//Popularity Functions can be used to calculate and sort popularity for projects, shop items, tutors, etc.
 const {equateObjects} = require("../utils/object-operations");
 const package = {};
 

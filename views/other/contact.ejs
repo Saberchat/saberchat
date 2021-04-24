@@ -132,7 +132,7 @@
                             <% if (sortedTeachers.length > 0) { %>
                                 <h5 style="padding-top: 10px;">Platform Heads</h5><hr>
                                 <% sortedTeachers.forEach(user => { %>
-                                    <a href="/profiles/<%=user._id%>" target="_blank" class="developer-info" style="color: black;"><%= user.firstName %> <%= user.lastName %> (<%=user.username%>)</a>
+                                    <a href="/profiles/<%=user._id%>" target="_blank" class="developer-info" style="color: <% if (currentUser.darkmode) {%> white; <% } else {%> black; <% } %>"><%= user.firstName %> <%= user.lastName %> (<%=user.username%>)</a>
                                     <p><a href="mailto: <%= user.email %>"><%= user.email %></a></p>
                                 <% }); %>
                             <% } %>

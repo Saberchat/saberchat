@@ -17,12 +17,12 @@
   color: white;
 }
 
-.cafe,.cafe:focus,.cafe:hover {
+.shop,.shop:focus,.shop:hover {
   background-color: #000057;
   color: #7FFFD4;
 }
 
-.cafetext {
+.shoptext {
   color: #7FFFD4;
 }
 
