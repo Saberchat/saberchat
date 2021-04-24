@@ -30,8 +30,8 @@ const setup = require("./utils/setup");
 const wrapAsync = require("./utils/wrapAsync");
 //Callbacks for chat room socket functions
 const chatSocket = require("./socket/chat");
-//Callbacks for cafe socket functions
-const cafeSocket = require("./socket/cafe");
+//Callbacks for shop socket functions
+const shopSocket = require("./socket/shop");
 //Callbacks for nodeSchedule functions
 const profileSchedule = require("./schedule/profiles");
 //Scheduler for schedule jobs
@@ -128,7 +128,7 @@ const appSetup = async function() {
     await io.on('connect', socket => {
         socket.on('switch room', newroom => {chatSocket.switchRoom(io, socket, newroom);});
         socket.on('chat message', async(msg) => {wrapAsync(chatSocket.chatMessage(io, socket, msg));});
-        socket.on('order', async(itemList, itemCount, instructions, payingInPerson, customerId) => {wrapAsync(cafeSocket.order(io, socket, itemList, itemCount, instructions, payingInPerson, customerId));});
+        socket.on('order', async(itemList, itemCount, instructions, payingInPerson, customerId) => {wrapAsync(shopSocket.order(io, socket, itemList, itemCount, instructions, payingInPerson, customerId));});
     });
 
     // Start server
