@@ -4,7 +4,7 @@ const book = function (button, location, darkmode) { //Book a tutor
     const url = `/tutoringCenter/book/${courseId}?_method=put`;
     const data = {tutorId};
 
-    $.post(url, data, data => {
+    sendPostReq(url, data, data => {
         if (data.success) {
             $(`#modal-book-${tutorId}`).modal('hide');
 
@@ -140,7 +140,7 @@ const leave = function (button, location, darkmode) { //Leave a tutor
     const url = `/tutoringCenter/leave/${courseId}?_method=put`;
     const data = {tutorId};
 
-    $.post(url, data, data => {
+    sendPostReq(url, data, data => {
         if (data.success) {
             $(`#modal-stop-${tutorId}`).modal('hide');
 
@@ -206,7 +206,7 @@ const approve = function(button) {
     const url = `/tutoringCenter/approve-lesson/${courseId}?_method=put`;
     const data = {tutorId, index};
 
-    $.post(url, data, data => {
+    sendPostReq(url, data, data => {
         if (data.success) {
             if (button.innerText == "Reject Lesson") {
                 button.className = "btn btn-success";
@@ -229,7 +229,7 @@ const markPayment = function(button) {
     const url = `/tutoringCenter/mark-payment/${courseId}?_method=put`;
     const data = {studentId, index};
 
-    $.post(url, data, data => {
+    sendPostReq(url, data, data => {
         if (data.success) {
             if (button.innerText == "Cancel Payment") {
                 button.className = "btn btn-success";
@@ -250,7 +250,7 @@ const closeLessons = function (button, location) {
     const url = `/tutoringCenter/close-lessons/${courseId}?_method=put`;
     const data = {tutorId};
 
-    $.post(url, data, data => {
+    sendPostReq(url, data, data => {
         if (data.success) {
             $(`#modal-close-${tutorId}`).modal('hide');
             let reopenButton = document.createElement('button');
@@ -278,7 +278,7 @@ const reopenLessons = function (button, location) { //For tutors to reopen lesso
     const url = `/tutoringCenter/reopen-lessons/${courseId}?_method=put`;
     const data = {tutorId};
 
-    $.post(url, data, data => {
+    sendPostReq(url, data, data => {
         if (data.success) {
             $(`#modal-reopen-${tutorId}`).modal('hide');
 
@@ -324,7 +324,7 @@ const setCostShow = function (courseId) { //For tutors to set their price (not w
     const cost = document.getElementById('cost').value;
     const data = {courseId, cost};
 
-    $.post(url, data, data => {
+    sendPostReq(url, data, data => {
         if (data.success) {
             document.getElementById("cost-count").innerText = `$${data.tutor.cost}.00`;
             document.getElementById(`cost-info-${data.tutor.tutor}`).innerText = `$${data.tutor.cost}.00`;
@@ -337,7 +337,7 @@ const setStudentsShow = function (courseId) { //For tutors to set how many stude
     const slots = document.getElementById('slots').value;
     const data = {courseId, slots};
 
-    $.post(url, data, data => {
+    sendPostReq(url, data, data => {
         if (data.success) {
             document.getElementById("slots-count").innerText = `${slots}`;
             document.getElementById("change-message").style.color = "green";
@@ -370,7 +370,7 @@ const removeStudent = function (button) {
     const url = `/tutoringCenter/remove-student/${courseId}?_method=put`;
     const data = {studentId, reason};
 
-    $.post(url, data, data => {
+    sendPostReq(url, data, data => {
         if (data.success) {
             //Remove student from list of students
             $(`#modal-index-remove-${studentId}`).modal('hide');
@@ -421,7 +421,7 @@ const removeTutor = function (button) { //Remove tutor from course
     const url = `/tutoringCenter/remove-tutor/${courseId}?_method=put`;
     const data = {tutorId, reason, show: true};
 
-    $.post(url, data, data => {
+    sendPostReq(url, data, data => {
         if (data.success) {
             //Remove tutor from list of tutors
             $(`#modal-index-remove-${tutorId}`).modal('hide');
@@ -480,7 +480,7 @@ const unblock = function (button) { //Unblock user from course
     const url = `/tutoringCenter/unblock/${courseId}?_method=put`;
     const data = {blockedId};
 
-    $.post(url, data, data => {
+    sendPostReq(url, data, data => {
         if (data.success) { 
             //Remove blocked user from list of blocked users
             $(`#modal-index-unblock-${blockedId}`).modal('hide');
@@ -504,7 +504,7 @@ const changeBio = function (button) { //Change tutor's bio
     const url = `/tutoringCenter/bio/${courseId}?_method=put`;
     const data = {bio};
 
-    $.post(url, data, data => {
+    sendPostReq(url, data, data => {
         if (data.success) {
             $(`#modal-edit-bio`).modal('hide');
             document.getElementById("tutor-bio").innerText = bio; //Update displayed bio text
@@ -552,7 +552,7 @@ const mark = function (button) { //MArk a student's lesson
     const url = `/tutoringCenter/mark/${courseId}?_method=put`;
     const data = {studentId, time, summary};
 
-    $.post(url, data, data => {
+    sendPostReq(url, data, data => {
         if (data.success) {
             document.getElementById(`time-${studentId}`).value = "0"; //Reset student lessons
             document.getElementById("lessons-length").innerText = data.lessons.length; //Increment tutor lessons

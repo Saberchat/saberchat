@@ -18,7 +18,7 @@ const report = function (element) {
     let parent = element.parentNode;
     element.remove();
     $(parent).append(`<p class="flag">Waiting...</p>`);
-    $.post(url, data, data => {
+    sendPostReq(url, data, data => {
         parent.getElementsByClassName('flag')[0].remove();
         $(parent).append(`<p class="flag">[${data}]</p>`);
     });

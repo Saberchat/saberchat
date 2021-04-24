@@ -7,7 +7,7 @@ const updateRole = function(select) { //Update user's permission
     const url = '/admin/permissions?_method=put';
     const userId = select.id;
     const data = {userId, role};
-    $.post(url, data, (data) => {
+    sendPostReq(url, data, (data) => {
         if (data.success) { //If successful, display success info
             loading.style.color = 'green';
             loading.innerHTML = data.success;
@@ -53,7 +53,7 @@ const updateBalance = function(form, event) {
     const balanceInput = document.getElementById(`balance-${userId}`);
     const url = '/admin/balances?_method=put';
     const data = {userId, bal: balanceInput.value};
-    $.post(url, data, (data) => {
+    sendPostReq(url, data, (data) => {
         if (data.success) { //If successful, display success info
             loading.style.color = 'green';
             loading.innerHTML = data.success;

@@ -4,7 +4,7 @@ const upvote = function (button, location) { //Upvote a tutor
     const url = `/tutoringCenter/upvote/${courseId}?_method=put`;
     const data = {tutorId};
 
-    $.post(url, data, data => {
+    sendPostReq(url, data, data => {
         if (data.success) {
             if (data.success.includes("Downvoted")) { //If downvoting tutor, make color grey
                 button.innerHTML = `<span class="not-upvoted"><i class="fas fa-arrow-circle-up"></i><span class="upvote-count" id="upvoteCount-<%=course._id%>-${tutorId}"> ${data.upvoteCount}</span></span>`;
@@ -29,7 +29,7 @@ const likeReview = function (button) { //Like a tutor's review (restricted to st
     const url = `/tutoringCenter/like-review/${reviewId}?_method=put`;
     const data = {};
 
-    $.post(url, data, data => {
+    sendPostReq(url, data, data => {
         if (data.success) {
             if (data.success.includes("Liked")) {
                 button.style.color = "#03a5fc";

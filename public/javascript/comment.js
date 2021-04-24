@@ -6,7 +6,7 @@ const comment = function (form, object, route, event) {
         data[`${object}Id`] = id;
         document.getElementById('comment-input').value = ""; //Empty input field
 
-        $.post(url, data, data => {
+        sendPostReq(url, data, data => {
             if (data.success) {
                 // DOM Elements that change with new comment
                 const allComments = document.getElementById('all-comments');

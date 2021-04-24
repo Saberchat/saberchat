@@ -17,7 +17,7 @@ const updateTag = (select => { //Update status tags
     const url = '/profiles/tag/?_method=put';
 
     const data = {tag};
-    $.post(url, data, data => {
+    sendPostReq(url, data, data => {
         if (data.success) { //If data is successfully posted
             for (let option of select) { //Make the option with no value (the top option) the default selected option
                 if (option.value == "") {

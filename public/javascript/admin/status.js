@@ -7,7 +7,7 @@ const updateStatus = function (select) { //Update a user's official stautus
     const url = '/admin/status?_method=put';
     const userId = select.id;
     const data = {userId, status};
-    $.post(url, data, data => { //If data is successful, display success message
+    sendPostReq(url, data, data => { //If data is successful, display success message
         if (data.success) {
             loading.style.color = 'green';
             loading.innerHTML = data.success;
@@ -41,7 +41,7 @@ const updateTag = function (select) { //Update a user's status tags
     const tags = document.getElementsByClassName(`tag-${userId}`); //Each tag in this user's tag list
 
     const data = {userId, tag};
-    $.post(url, data, data => {
+    sendPostReq(url, data, data => {
         if (data.success) { //If data is successfully posted
             loading.style.color = 'green';
             loading.innerHTML = data.success;

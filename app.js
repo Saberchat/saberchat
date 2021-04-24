@@ -52,7 +52,11 @@ const appSetup = async function() {
     await app.use(favicon(__dirname + '/public/images/favicon.ico')); // use favicon
     await app.use(express.static(__dirname + "/public")); // make public dir accessible in all views
     await app.use('/editor', express.static(__dirname + "/node_modules/@editorjs")); // try serving editorjs package to frontend
-    await app.use(bodyParser.urlencoded({extended: true})); // use body parser
+    // await app.use(bodyParser.urlencoded({extended: true})); // use body parser
+    // await app.use(bodyParser.json());
+    await app.use(express.urlencoded({extended: true})); // express has bodyparser integrated as of 4.16>=
+    await app.use(express.json()); // parse content-type application/json. 
+
     await app.set("view engine", "ejs"); // set view engine to ejs
     await app.use(methodOverride('_method')); // Allows for forms to use PUT and DELETE requests
     await app.use(flash()); // use connect-flash for flash messages

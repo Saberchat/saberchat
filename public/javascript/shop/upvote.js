@@ -3,7 +3,7 @@ const upvote = function (button) {
     const itemId = button.id.split("-")[1];
     const url = `/shop/item/${itemId}?_method=put`;
     const data = {};
-    $.post(url, data, data => {
+    sendPostReq(url, data, data => {
         if (data.success) {
             if (data.success.includes("Downvoted")) { //If upvote is removed, make button grey
                 button.style.color = "grey";

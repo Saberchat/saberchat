@@ -4,7 +4,7 @@ const addEmail = function(event, version) { //Add an email to access list/blocke
     const address = document.getElementById("address").value;
     const data = {address, version};
 
-    $.post(url, data, data => {
+    sendPostReq(url, data, data => {
         $("#modal-add-email").modal('hide');
 
         if (data.success) { //If successful response, create new HTML element for email
@@ -32,7 +32,7 @@ const removeEmail = function (button) { //Remove email from access list/blocked 
     const url = `/admin/accesslist?_method=delete`;
     const data = {emailId};
 
-    $.post(url, data, data => {
+    sendPostReq(url, data, data => {
         $(`#modal-${emailId}`).modal('hide');
 
         if (data.success) { //If successful response, remove email's body from page
@@ -55,7 +55,7 @@ const authenticateUser = function(button, action) { //Authenticate or remove use
     const url = `/admin/authenticate?_method=${action}`;
     const data = {userId};
 
-    $.post(url, data, data => {
+    sendPostReq(url, data, data => {
         if (data.success) {
             $(`#modal-${action}-${userId}`).modal('hide');
             document.getElementById("email-list").removeChild(document.getElementById(`${userId}`));
