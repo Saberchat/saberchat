@@ -45,21 +45,21 @@
             <div class="form-group">
               <div class="row">
                 <div class="col mode">
-                  <label for="usernameInput">Name</label>
-                  <input id="usernameInput" class="form-control mode" type="text" name="name" placeholder="Enter Item Name" maxlength="45" required>
+                  <label for="nameInput">Name</label>
+                  <input id="nameInput" class="form-control mode" type="text" name="name" placeholder="Enter Item Name" maxlength="45" required>
                 </div>
                 <div class="col mode">
-                  <label for="priceInput">Price</label>
+                  <label for="priceInput"><% if (platform.purchasable) {%>Price<% } else {%>Donation Requirement<% } %></label>
                   <div class="input-group">
                     <div class="input-group-prepend">
                       <div class="input-group-text mode">$</div>
                     </div>
-                    <input id="priceInput" class="form-control mode" type="text" name="price" placeholder="Enter Price" maxlength="10" required>
+                    <input id="priceInput" class="form-control mode" type="text" name="price" placeholder="Enter <% if (platform.purchasable) {%>Price<% } else {%>Donation Requirement<% } %>" maxlength="10" required>
                   </div>
                 </div>
                 <div class="col">
-                  <label for="usernameInput">Available</label>
-                  <input id="usernameInput" class="form-control mode" type="text" name="available" placeholder="Enter Number Available" maxlength="45" required>
+                  <label for="available">Available</label>
+                  <input id="available" class="form-control mode" type="text" name="available" placeholder="Enter Number Available" maxlength="45" required>
                 </div>
               </div>
 
@@ -80,7 +80,7 @@
 
               <div class="row">
                 <div class="col">
-                    <label for="usernameInput">Image (URL)</label>
+                    <label for="image-input">Image (URL)</label>
                     <div id="image-block">
                         <input id="image-input" oninput="createImage(this, 'item-image')" class="form-control mode" type="text"
                                name="image" placeholder="Enter URL for Item Image">
@@ -93,7 +93,7 @@
             <% if (!platform.purchasable) { %>
               <div class="row">
                 <div class="col">
-                    <label for="usernameInput">URL To Access Item</label>
+                    <label for="url-input">URL To Access Item</label>
                     <input id="url-input" class="form-control mode" type="text" name="url" placeholder="Enter URL for Item Purchase Site">
                 </div>
             </div><br>

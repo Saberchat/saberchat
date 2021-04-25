@@ -52,8 +52,6 @@ const appSetup = async function() {
     await app.use(favicon(__dirname + '/public/images/favicon.ico')); // use favicon
     await app.use(express.static(__dirname + "/public")); // make public dir accessible in all views
     await app.use('/editor', express.static(__dirname + "/node_modules/@editorjs")); // try serving editorjs package to frontend
-    // await app.use(bodyParser.urlencoded({extended: true})); // use body parser
-    // await app.use(bodyParser.json());
     await app.use(express.urlencoded({extended: true})); // express has bodyparser integrated as of 4.16>=
     await app.use(express.json()); // parse content-type application/json. 
 
@@ -82,21 +80,15 @@ const appSetup = async function() {
     const MemoryStore = await require('memorystore')(session); // Memorystore package (express-session has memory leaks, bad for production)
     const sessionConfig = {
         name: 'app-ses',
-        cookie: {
-            httpOnly: true,
-            maxAge: 86400000
-        },
-        store: new MemoryStore({
-            checkPeriod: 86400000 //prune expired entries every 24hrs
-        }),
+        cookie: {httpOnly: true, maxAge: 86400000},
+        store: new MemoryStore({checkPeriod: 86400000}), //prune expired entries every 24hrs
         secret: "Programming For Alsion is Cool",
         resave: false,
         saveUninitialized: false
     };
 
-    if (process.env.NODE_ENV === 'production') {
-        sessionConfig.cookie.secure = false; // allows cookies to only be accessed over https; this wouldn't allow authentication for local dev since local host is http
-    }
+    // allows cookies to only be accessed over https; this wouldn't allow authentication for local dev since local host is http
+    if (process.env.NODE_ENV === 'production') {sessionConfig.cookie.secure = false;}
 
     await app.use(session(sessionConfig));
     await app.use(passport.initialize()); // passport required authorization setup that I also know nothing about.
@@ -117,8 +109,7 @@ const appSetup = async function() {
     const generalRoutes = ["chat", "profiles", "inbox", "announcements", "admin", "projects", "reports"];
     
     // Import And Use Routes From Routes Directory
-    const indexRoutes = await require("./routes/index"); //Index Routes, with no prefix
-    await app.use(indexRoutes);
+    await app.use(require("./routes/index")); //Index routes (no prefix)
     for (let route of generalRoutes) { await app.use(`/${route}`, require(`./routes/${route}`));} //General Routes for all platforms
     for (let feature of platform.features) { //Platform-Specific Routes (For features in their own route directories)
         if (!feature.route.includes('/')) { await app.use(`/${feature.route}`, require(`./routes/${feature.route}`));}

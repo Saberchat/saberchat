@@ -87,7 +87,7 @@
 
                                     <input name="check[<%= item._id %>]" id="<%= item._id %>" class="form-check-input"
                                            type="checkbox" value="">
-                                    <select class="num-orders" id="dd_<%= item._id %>" name="<%= item.name %>"
+                                    <select class="num-orders mode" id="dd_<%= item._id %>" name="<%= item.name %>"
                                             onchange="changeOrderConfirmation()">
                                         <% let val = 1 %>
                                         <% if (item.availableItems > 3) { %>
