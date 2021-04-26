@@ -33,7 +33,7 @@
         <div class="container mt-5">
           <div class="row">
             <div class="col-12">
-              <h1>Change <% if (platform.purchasable) { %> Balances <% } else {%> Donation Credits <% } %></h1>
+              <h1>Change <% if (platform.dollarPayment) { %> Balances <% } else {%> Donation Credits <% } %></h1>
               <span id="loading"></span>
               <hr>
 
@@ -61,7 +61,7 @@
                                 <span class="user-balance-info"><%= user.firstName %> <%= user.lastName %> (<%= user.username %>)</span>
                                 <div class="input-group balance-input">
                                     <div class="input-group-prepend">
-                                        <%if (platform.purchasable) { %><div class="input-group-text mode">$</div><% } %>
+                                        <%if (platform.dollarPayment) { %><div class="input-group-text mode">$</div><% } %>
                                     </div>
                                     <input class="form-control mode" type="text" id="balance-<%=user._id%>" placeholder="price" maxlength="10" required value="<%=(user.balance).toFixed(2)%>">
                                     <button class="btn btn-primary balance-button" type="button" id="add-<%=user._id%>" onclick="incBalance('<%=user._id%>')"><i class="fas fa-plus-circle"></i></button>
