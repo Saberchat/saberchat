@@ -165,20 +165,21 @@ controller.order = async function(req, res) {
     }
 
     let charge = 0; //Track order charge to compare with balance
-    for (let item of orderedItems) {
-        item.availableItems -= parseInt(req.body[item.name]);
-        charge += (item.price * parseInt(req.body[item.name])); //Increment charge
-        await item.save();
-    }
+    for (let item of orderedItems) {charge += (item.price * parseInt(req.body[item.name]));} //Increment charge
 
     if (!req.body.payingInPerson) {
         if (charge > req.user.balance) { //Check to see if you are ordering more than you can
-            req.flash("error", `You do not have enough money in your account to pay for this order. Contact the ${platform.permissionsDisplay[platform.permissionsDisplay.length-1]} to update your balance.`);
+            req.flash("error", `You do not have enough money in your account for this order. Contact a platform ${platform.permissionsDisplay[platform.permissionsDisplay.length-1].toLowerCase()} if there has been a mistake.`);
             return res.redirect("/shop");
         }
         req.user.balance -= charge;
         req.user.debt += charge;
         await req.user.save();
+    }
+
+    for (let item of orderedItems) { //Update items
+        item.availableItems -= parseInt(req.body[item.name]);
+        await item.save();
     }
 
     req.flash("success", "Order Sent!");
