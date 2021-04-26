@@ -20,7 +20,7 @@ let balanceBox;
 let formattedCost;
 
 //Changes the order confirmation on the form
-const changeOrderConfirmation = function () {
+const changeOrderConfirmation = function (dollarPayment) {
     sum = 0;
     while (orderConfirm.firstChild) { //Remove all the items in the 'confirm order' section
         orderConfirm.removeChild(orderConfirm.firstChild);
@@ -33,13 +33,22 @@ const changeOrderConfirmation = function () {
 
                     for (let no of numOrders) {
                         if (no.id.split('_')[1] == i.id) { //Id's are constructed in format 'dd_<id>'. This extracts that ID
-                            sum += parseInt(no.value) * parseFloat(l.innerText.split('$')[1]);
+                            if (dollarPayment) {
+                                sum += parseInt(no.value) * parseFloat(l.innerText.split('$')[1]);
+                            } else {
+                                sum += parseInt(no.value) * parseFloat(l.innerText.split('Credits: ')[1]);
+                            }
 
                             orderedItem = document.createElement('strong'); //Create the item confirmation
-                            orderedItem.className = "list-group-item list-group-item-action form-check darkmode-outline"; //Give it the boostrap class that will style it
+                            orderedItem.className = "list-group-item list-group-item-action form-check darkmode-outline";
 
-                            formattedCost = (parseInt(no.value) * parseFloat(l.innerText.split('$')[1]));
-                            orderedItem.innerText = `${no.name} (${no.value} orders) - $${(formattedCost * 100).toString().slice(0, (formattedCost * 100).toString().length - 2)}.${(formattedCost * 100).toString().slice((formattedCost * 100).toString().length - 2)}`;
+                            if (dollarPayment) {
+                                formattedCost = (parseInt(no.value) * parseFloat(l.innerText.split('$')[1]));
+                                orderedItem.innerText = `${no.name} (${no.value} orders) - $${(formattedCost * 100).toString().slice(0, (formattedCost * 100).toString().length - 2)}.${(formattedCost * 100).toString().slice((formattedCost * 100).toString().length - 2)}`;
+                            } else {
+                                formattedCost = (parseInt(no.value) * parseFloat(l.innerText.split("Credits: ")[1]));
+                                orderedItem.innerText = `${no.name} (${no.value} orders) - ${(formattedCost * 100).toString().slice(0, (formattedCost * 100).toString().length - 2)}.${(formattedCost * 100).toString().slice((formattedCost * 100).toString().length - 2)} Credits`;
+                            }
                             orderConfirm.appendChild(orderedItem); //Add the order to the list of orders
                         }
                     }
@@ -69,14 +78,28 @@ const changeOrderConfirmation = function () {
     totalNew.className = "list-group-item list-group-item-action form-check darkmode-outline";
     totalNew.id = "total-cost";
 
-    if (sum == 0) {
-        totalNew.innerHTML = `<strong>Total: $0.00`;
+    if (dollarPayment) {
+        if (sum == 0) {
+            totalNew.innerHTML = `<strong>Total: $0.00`;
+        } else {
+            totalNew.innerHTML = `<strong>Total: $${sum.toFixed(2)}</strong>`;
+        }
     } else {
-        totalNew.innerHTML = `<strong>Total: $${(sum * 100).toString().slice(0, (sum * 100).toString().length - 2)}.${(sum * 100).toString().slice((sum * 100).toString().length - 2)}</strong>`;
+        if (sum == 0) {
+            totalNew.innerHTML = `<strong>Total: 0.00 Credits`;
+        } else {
+            totalNew.innerHTML = `<strong>Total: ${sum.toFixed(2)} Credits</strong>`;
+        }
     }
 
-    if (sum > parseFloat(balanceString.split("$")[1]) && !payingInPerson.checked) {
-        totalNew.innerHTML += `<em style="color: red; margin-left: 20px;">Charge is over your account balance</em>`
+    if (dollarPayment) {
+        if (sum > parseFloat(balanceString.split("$")[1]) && !payingInPerson.checked) {
+            totalNew.innerHTML += `<em style="color: red; margin-left: 20px;">Charge is over your account balance</em>`
+        }
+    } else {
+        if (sum > parseFloat(balanceString.split(": ")[1].split(' ')[0])) {
+            totalNew.innerHTML += `<em style="color: red; margin-left: 20px;">Charge is over your account balance</em>`
+        }
     }
 
     payingStyleNew = document.createElement('strong');
@@ -84,16 +107,16 @@ const changeOrderConfirmation = function () {
     payingStyleNew.className = "list-group-item list-group-item-action form-check darkmode-outline";
     payingStyleNew.id = "paying-style";
 
-    if (payingInPerson.checked) {
-        payingStyleNew.innerText = "Paying In-Person";
-    } else {
-        payingStyleNew.innerText = "Paying Online";
+    if (dollarPayment) {
+        if (payingInPerson.checked) {
+            payingStyleNew.innerText = "Paying In-Person";
+        } else {
+            payingStyleNew.innerText = "Paying Online";
+        }
     }
 
     orderConfirm.appendChild(instructionsNew); //Add the total to the div
-    if (!payingInPerson.checked) {
-        orderConfirm.appendChild(balanceBox);
-    }
+    if (!dollarPayment || (dollarPayment && !payingInPerson.checked)) {orderConfirm.appendChild(balanceBox);}
 
     orderConfirm.appendChild(totalNew);
     orderConfirm.appendChild(payingStyleNew);

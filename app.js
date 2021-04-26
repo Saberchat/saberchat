@@ -123,7 +123,7 @@ const appSetup = async function() {
     await io.on('connect', socket => {
         socket.on('switch room', newroom => {chatSocket.switchRoom(io, socket, newroom);});
         socket.on('chat message', async(msg) => {wrapAsync(chatSocket.chatMessage(io, socket, msg));});
-        socket.on('order', async(itemList, itemCount, instructions, payingInPerson, customerId) => {wrapAsync(shopSocket.order(io, socket, itemList, itemCount, instructions, payingInPerson, customerId));});
+        socket.on('order', async(itemList, itemCount, instructions, address, payingInPerson, customerId) => {wrapAsync(shopSocket.order(io, socket, itemList, itemCount, instructions, address, payingInPerson, customerId));});
     });
 
     // Start server

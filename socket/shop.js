@@ -11,7 +11,7 @@ const {Market} = require("../models/group");
 
 const shop = {};
 
-shop.order = async function(io, socket, itemList, itemCount, instructions, payingInPerson, customerId) { //Create New Shop Order
+shop.order = async function(io, socket, itemList, itemCount, instructions, address, payingInPerson, customerId) { //Create New Shop Order
     const platform = await setup(Platform);
     if (!platform.purchasable) {return console.log("Platform is not open to purchases");}
     const shop = await setup(Market); //Collect data on shop to figure out whether it's open or not
@@ -54,12 +54,17 @@ shop.order = async function(io, socket, itemList, itemCount, instructions, payin
         if (instructions == "") {orderInstructions = "None";
         } else {orderInstructions = instructions;}
 
+        let orderAddress = "";
+        if (address == "") {orderAddress = "None";
+        } else {orderAddress = address;}
+
         let order = await Order.create({
             customer: customerId,
             name: `${user.firstName} ${user.lastName}`,
             present: true,
             charge: 0,
             instructions: orderInstructions,
+            address: orderAddress,
             payingInPerson: payingInPerson
         });
 

@@ -11,6 +11,7 @@ module.exports = mongoose.model("Order", new mongoose.Schema({
     }],
     shop: {type: mongoose.Schema.Types.ObjectId, ref: "Shop"},
     instructions: String,
+    address: String,
     charge: Number,
     date: String,
     present: Boolean,

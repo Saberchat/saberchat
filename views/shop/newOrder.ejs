@@ -32,7 +32,7 @@
     <%- include('../partials/analytics') %>
 </head>
 
-<body class="mode" onclick="changeOrderConfirmation()">
+<body class="mode" onclick="changeOrderConfirmation(<%=platform.dollarPayment%>)">
 <!-- include the navbar via ejs -->
 <%- include('../partials/navbar') %>
 <%- include('../partials/header') %>
@@ -44,7 +44,7 @@
                 <h1><i class="fas fa-<%=data.icon%>"></i> New Order</h1>
                 <p>Place an order that will be delivered to you</p>
                 <a class="btn btn-primary" href='/shop'><i class="fas fa-arrow-left"></i> Back</a>
-                <a class="btn btn-info" href='/shop/order?menu=true'><i class="fas fa-bars"></i> Menu </a>
+                <a class="btn btn-info" href='/shop/order?menu=true'><i class="fas fa-bars"></i> Shop</a>
             </div>
         </div>
     </div>
@@ -88,7 +88,7 @@
                                     <input name="check[<%= item._id %>]" id="<%= item._id %>" class="form-check-input"
                                            type="checkbox" value="">
                                     <select class="num-orders mode" id="dd_<%= item._id %>" name="<%= item.name %>"
-                                            onchange="changeOrderConfirmation()">
+                                            onchange="changeOrderConfirmation(<%=platform.dollarPayment%>)">
                                         <% let val = 1 %>
                                         <% if (item.availableItems > 3) { %>
                                             <% while (val <= 3) { %>
@@ -106,7 +106,7 @@
                                     <label class="form-check-label" for="<%= item._id %>">
                                         <span class="item-name"><%= item.name %></span>
                                         (<%= item.availableItems %> orders available) -
-                                        $<%= (item.price).toFixed(2) %>
+                                        <%if (platform.dollarPayment) {%>$<%} else {%> Credits: <% } %><%= (item.price).toFixed(2)%>
 
                                         <% if (frequentItems.toString().includes(item._id.toString())) { %>
                                             <span class="popular">Frequently Ordered</span>
@@ -138,16 +138,22 @@
                     </div>
 
                     <div class="form-group mt-3">
-                        <input type="checkbox" name="payingInPerson" id="payingInPerson"
-                               onchange="changeOrderConfirmation()"/>
-                        <label class="shoptext" for="payingInPerson"
-                               title="Paying in person will not subtract money from your online balance">In-Person
-                            Payment</label>
-                        <br/><br/>
+                        <% if (platform.dollarPayment) { %>
+                            <input type="checkbox" name="payingInPerson" id="payingInPerson"
+                                onchange="changeOrderConfirmation(<%=platform.dollarPayment%>)"/>
+                            <label class="shoptext" for="payingInPerson"
+                                title="Paying in person will not subtract money from your online balance">In-Person
+                                Payment</label>
+                            <br><br>
+                        <% } %>
                         <textarea id="descInput" class="form-control shop" name="instructions"
                                   placeholder="Add special instructions for your order" maxlength="100" rows="5"
-                                  oninput="changeOrderConfirmation()"></textarea>
+                                  oninput="changeOrderConfirmation(<%=platform.dollarPayment%>)"></textarea>
                         <br/>
+                        <% if (!platform.dollarPayment) { %>
+                            <textarea id="addressInput" class="form-control shop" name="address"
+                            placeholder="Enter Your Mailing Address" required rows="3"></textarea>
+                        <% } %>
                     </div>
 
                     <br/>
@@ -162,15 +168,14 @@
                             <span id="extra-instructions"
                                   class="list-group-item list-group-item-action form-check darkmode-outline"><span
                                         class="instructions">Extra Instructions:</span> None</span>
-                            <span id="balance-box" class="list-group-item list-group-item-action form-check darkmode-outline">Current Balance: $<%= (currentUser.balance).toFixed(2)%></span>
-                            <span id="total-cost"
-                                  class="list-group-item list-group-item-action form-check darkmode-outline">Total: $0.00</span>
-                            <span id="paying-style" class="list-group-item list-group-item-action form-check darkmode-outline">Paying Online</span>
+                            <span id="balance-box" class="list-group-item list-group-item-action form-check darkmode-outline">Current Balance: <%if (platform.dollarPayment){%>$<%}%><%= (currentUser.balance).toFixed(2)%><% if (!platform.dollarPayment){%> Credits<%}%></span>
+                            <span id="total-cost" class="list-group-item list-group-item-action form-check darkmode-outline">Total: <%if (platform.dollarPayment){%>$<%}%>0.00<% if (!platform.dollarPayment){%> Credits<%}%></span>
+                            <%if (platform.dollarPayment) {%> <span id="paying-style" class="list-group-item list-group-item-action form-check darkmode-outline">Paying Online</span><% } %>
                         </div>
                     </div>
 
                     <br/>
-                    <button type="submit" class="btn btn-lg btn-primary btn-block">Complete your Order</button>
+                    <button type="submit" class="btn btn-lg btn-primary btn-block">Complete your Order</button><br>
                 </div>
             </form>
             <br/>
@@ -193,6 +198,6 @@
     }
 </script>
 <script>
-    order(orderForm, '<%= currentUser._id %>');
+    order(orderForm, '<%= currentUser._id %>', "<%=platform.dollarPayment%>");
 </script>
 </html>

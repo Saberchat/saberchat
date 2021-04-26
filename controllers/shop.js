@@ -189,8 +189,9 @@ controller.order = async function(req, res) {
 
 //PROCESS AND CONFIRM ORDER
 controller.processOrder = async function(req, res) {
+    const platform = await setup(Platform);
     const order = await Order.findById(req.params.id).populate("items.item").populate("customer"); //Find the order that is currently being handled based on id, and populate info about its items
-    if (!order) {
+    if (!platform || !order) {
         return res.json({error: "Could not find order"});
     }
 
@@ -203,10 +204,7 @@ controller.processOrder = async function(req, res) {
         images: []
     });
 
-    if (!notif) {
-        return res.json({error: "Unable to send notification"});
-    }
-
+    if (!notif) {return res.json({error: "Unable to send notification"});}
     notif.date = dateFormat(notif.created_at, "h:MM TT | mmm d");
 
     let itemText = []; //This will have all the decoded info about the order
@@ -215,10 +213,17 @@ controller.processOrder = async function(req, res) {
     }
 
     //Formats the charge in money format
-    notif.text = `Your order is ready to pick up:\n ${itemText.join("\n")} \n\nExtra Instructions: ${order.instructions} \nTotal Cost: ${(order.charge).toFixed(2)}`;
+    let emailText = "";
+    if (platform.dollarPayment) {
+        notif.text = `Your order is ready:\n ${itemText.join("\n")} \n\nExtra Instructions: ${order.instructions} \nTotal Cost: $${(order.charge).toFixed(2)}`;
+        emailText =  `<p>Your order is ready:<p><p>${itemText.join(", ")}</p><p>Extra Instructions: ${order.instructions}</p><p>Total Cost: $${(order.charge).toFixed(2)}</p>`;
+    } else {
+        notif.text = `Your order is ready:\n ${itemText.join("\n")} \n\nExtra Instructions: ${order.instructions} \nTotal Cost: ${(order.charge).toFixed(2)} Credits`;
+        emailText =  `<p>Your order is ready:<p><p>${itemText.join(", ")}</p><p>Extra Instructions: ${order.instructions}</p><p>Total Cost: ${(order.charge).toFixed(2)} Credits</p>`;
+    }
     await notif.save();
     if (order.customer.receiving_emails) {
-        await sendGridEmail(order.customer.email, "Order Ready", `<p>Hello ${order.customer.firstName},</p><p>${notif.text}</p>`, false);
+        await sendGridEmail(order.customer.email, "Order Ready", `<p>Hello ${order.customer.firstName},</p>${emailText}`, false);
     }
 
     order.customer.inbox.push({message: notif, new: true}); //Add notif to user"s inbox
@@ -241,11 +246,9 @@ controller.deleteOrder = async function(req, res) {
             req.flash("error", "You do not have permission to do that");
             return res.redirect("back");
         }
-
+        const platform = await setup(Platform);
         const order = await Order.findById(req.params.id).populate("items.item").populate("customer");
-        if (!order) {
-            return res.json({error: "Could not find order"});
-        }
+        if (!platform || !order) {return res.json({error: "Could not find order"});}
 
         for (let i of order.items) { //Iterate over each item/quantity object
             i.item.availableItems += i.quantity;
@@ -260,10 +263,7 @@ controller.deleteOrder = async function(req, res) {
             read: [],
             images: []
         });
-        if (!notif) {
-            return res.json({error: "Could not send notification"});
-        }
-
+        if (!notif) {return res.json({error: "Could not send notification"});}
         notif.date = dateFormat(notif.created_at, "h:MM TT | mmm d");
 
         let itemText = []; //This will have all the decoded info about the order
@@ -271,10 +271,23 @@ controller.deleteOrder = async function(req, res) {
             itemText.push(` - ${order.items[i].item.name}: ${order.items[i].quantity} order(s)`);
         }
 
-        if (req.body.rejectionReason == '') {
-            notif.text = `Your order was rejected. This is most likely because we suspect your order is not genuine. Contact us if you think there has been a mistake. No reason was provided for rejection.\n ${itemText.join("\n")} \n\nExtra Instructions: ${order.instructions} \nTotal Cost: ${(order.charge).toFixed(2)}`;
+        let emailText = "";
+        if (platform.dollarPayment) {
+            if (req.body.rejectionReason == '') {
+                notif.text = `Your order was rejected. This is most likely because we suspect your order is not genuine. Contact us if you think there has been a mistake. No reason was provided for rejection.\n ${itemText.join("\n")} \n\nExtra Instructions: ${order.instructions} \nTotal Cost: $${(order.charge).toFixed(2)}`;
+                emailText = `<p>Your order was rejected. This is most likely because we suspect your order is not genuine. Contact us if you think there has been a mistake. No reason was provided for rejection.</p><p>${itemText.join(", ")}</p><p>Extra Instructions: ${order.instructions}</p><p>Total Cost: $${(order.charge).toFixed(2)}</p>`;
+            } else {
+                notif.text = `Your order was rejected. This is most likely because we suspect your order is not genuine. Contact us if you think there has been a mistake. The reason was provided for rejection was the following: \"${req.body.rejectionReason}\"\n ${itemText.join("\n")} \n\nExtra Instructions: $${order.instructions} \nTotal Cost: ${(order.charge).toFixed(2)}`;
+                emailText = `<p>Your order was rejected. This is most likely because we suspect your order is not genuine. Contact us if you think there has been a mistake. The reason was provided for rejection was the following: "${req.body.rejectionReason}"</p><p>${itemText.join(", ")}</p><p>Extra Instructions: ${order.instructions}</p><p>Total Cost: $${(order.charge).toFixed(2)}</p>`;
+            }
         } else {
-            notif.text = `Your order was rejected. This is most likely because we suspect your order is not genuine. Contact us if you think there has been a mistake. The reason was provided for rejection was the following: \"${req.body.rejectionReason}\"\n ${itemText.join("\n")} \n\nExtra Instructions: ${order.instructions} \nTotal Cost: ${(order.charge).toFixed(2)}`;
+            if (req.body.rejectionReason == '') {
+                notif.text = `Your order was rejected. This is most likely because we suspect your order is not genuine. Contact us if you think there has been a mistake. No reason was provided for rejection.\n ${itemText.join("\n")} \n\nExtra Instructions: ${order.instructions} \nTotal Cost: ${(order.charge).toFixed(2)} Credits`;
+                emailText = `<p>Your order was rejected. This is most likely because we suspect your order is not genuine. Contact us if you think there has been a mistake. No reason was provided for rejection.</p><p>${itemText.join(", ")}</p><p>Extra Instructions: ${order.instructions}</p><p>Total Cost: ${(order.charge).toFixed(2)} Credits</p>`;
+            } else {
+                notif.text = `Your order was rejected. This is most likely because we suspect your order is not genuine. Contact us if you think there has been a mistake. The reason was provided for rejection was the following: \"${req.body.rejectionReason}\"\n ${itemText.join("\n")} \n\nExtra Instructions: ${order.instructions} \nTotal Cost: ${(order.charge).toFixed(2)} Credits`;
+                emailText = `<p>Your order was rejected. This is most likely because we suspect your order is not genuine. Contact us if you think there has been a mistake. The reason was provided for rejection was the following: "${req.body.rejectionReason}"</p><p>${itemText.join(", ")}</p><p>Extra Instructions: ${order.instructions}</p><p>Total Cost: ${(order.charge).toFixed(2)} Credits</p>`;
+            }
         }
 
         await notif.save();
@@ -292,9 +305,7 @@ controller.deleteOrder = async function(req, res) {
         await order.customer.save();
 
         const deletedOrder = await Order.findByIdAndDelete(order._id).populate("items.item").populate("customer");
-        if (!deletedOrder) {
-            return res.json({error: "Could not delete order"});
-        }
+        if (!deletedOrder) {return res.json({error: "Could not delete order"});}
         return res.json({success: "Successfully rejected order"});
     }
 

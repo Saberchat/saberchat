@@ -363,12 +363,12 @@ controller.deleteArticle = async function(req, res) {
 
 controller.specificInfo = async function(req, res) {
     const platform = await setup(Platform);
-    return res.render('other/specific-info', {platform});
+    return res.render('other/specific-info', {platform, description: platform.features[objectArrIndex(platform.features, "route", "articles/specific-info")].description});
 }
 
 controller.donate = async function(req, res) {
     const platform = await setup(Platform);
-    return res.render('other/donate', {platform});
+    return res.render('other/donate', {platform, description: platform.features[objectArrIndex(platform.features, "route", "articles/donate")].description});
 }
 
 controller.advice = async function(req, res) {

@@ -68,19 +68,20 @@
                 <div class="card-body">
                     <h5 class="card-title">Order for <%= order.name %></h5>
                     <p class="card-text"><span class="instructions">Extra Instructions:</span> <%= order.instructions %>
+                    <% if (!platform.dollarPayment) {%><p class="card-text"><span class="instructions">Deliver To:</span> <%= order.address %><%}%>
                     </p>
                     <ul class="list-group">
                         <% for (let item of order.items) { %>
-                            <li class="list-group-item shop"><%= item.item.name %>
+                            <li class="list-group-item shop">
                                 <% let itemCharge = (item.quantity * item.item.price); %>
                                 <%= item.item.name %> (<%= item.quantity %> order(s)) -
-                                $<%= itemCharge.toFixed(2)%>
+                                <% if (platform.dollarPayment) {%>$<%}%><%= itemCharge.toFixed(2)%><% if (!platform.dollarPayment) {%> Credits<%}%>
                             </li>
                         <% } %>
                     </ul>
 
                     <p class="card-text mt-3"><span class="cost">Cost:</span>
-                        $<%= (order.charge).toFixed(2)%>
+                        <% if (platform.dollarPayment) {%>$<%}%><%= (order.charge).toFixed(2)%><% if (!platform.dollarPayment) {%> Credits<%}%>
                     </p>
 
                     <p class="paying-in-person">
@@ -174,7 +175,7 @@
         document.getElementById("search-input").style.backgroundColor = colorScheme[colorScheme.length-1];
     }
     
-    getOrders("#output-stream");
+    getOrders("#output-stream", "<%=platform.dollarPayment%>");
 </script>
 </body>
 </html>

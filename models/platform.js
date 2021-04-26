@@ -19,6 +19,7 @@ var platformSchema = new mongoose.Schema({
     updateTime: {type: String, default: "0 0"},
     navDark: {type: Boolean, default: false},
     purchasable: {type: Boolean, default: true}, //Item purchases can be made
+    dollarPayment: {type: Boolean, default: true}, //Item purchases are made through dollars
     postVerifiable: {type: Boolean, default: true}, //Posts need to be verified before being displayed
     colorScheme: [{type: String}],
     font: {type: String, default: "Helvetica"},
