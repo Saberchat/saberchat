@@ -110,7 +110,11 @@
                       <p id="lessons-length"><%=lessons%></p>
 
                       <h4 id="darkmode-header">Hourly Cost</h4>
-                      <p>$<%=(tutor.cost).toFixed(2)%></p>
+                      <% if (platform.dollarPayment) {%>
+                        <p>$<%=(tutor.cost).toFixed(2)%></p>
+                      <% } else {%>
+                        <p><%=(tutor.cost)%> Credits</p>
+                      <% } %>
 
                       <h4 id="darkmode-header">Status</h4>
                       <p><%= tutor.tutor.status.charAt(0).toUpperCase() + tutor.tutor.status.slice(1) %></p>
@@ -606,9 +610,13 @@
                                             <input type="range" min="0" max="5" value="0" class="slider"
                                                   id="slots-<%= c._id %>" name="slots"
                                                   onchange="setStudentsTutorShow(this)">
-                                            <br><label for="cost" id="cost-label-<%=c._id%>">Hourly Cost: $10.00</label><br/>
+                                            <% if (platform.dollarPayment) {%>
+                                              <br><label for="cost" id="cost-label-<%=c._id%>">Hourly Cost: $10.00</label><br/>
+                                            <% } else { %>
+                                              <br><label for="cost" id="cost-label-<%=c._id%>">Hourly Cost: 10 Credits</label><br/>
+                                            <% } %>
                                             <input type="range" min="10" max="30" value="10" class="slider mode" id="cost-<%=c._id%>"
-                                                    name="cost" onchange="setCostTutorShow(this)">
+                                                    name="cost" onchange="setCostTutorShow(this, <%=platform.dollarPayment%>)">
                                             <textarea rows="5" minlength="20" maxlength="500" class="form-control mode"
                                                       name="bio" placeholder="A Short Bio About Yourself"></textarea>
                                           </div>

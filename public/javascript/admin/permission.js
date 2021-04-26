@@ -30,21 +30,24 @@ const updateRole = function(select) { //Update user's permission
     });
 }
 
-const incBalance = function(userId) { //Add 1 to balance
+const incBalance = function(userId, dollarPayment) { //Add 1 to balance
     const input = document.getElementById(`balance-${userId}`);
-    input.value = (parseFloat(input.value) + 1).toFixed(2);
+    if (dollarPayment) {input.value = (parseFloat(input.value) + 1).toFixed(2);
+    } else {input.value = (parseFloat(input.value) + 1);}
+
     updateBalance(document.getElementById(userId), event);
 }
 
-const decBalance = function(userId) { //Remove 1 from balance
+const decBalance = function(userId, dollarPayment) { //Remove 1 from balance
     const input = document.getElementById(`balance-${userId}`);
     if (parseFloat(input.value) -1 >= 0) { //Check that balance still > 0
-        input.value = (parseFloat(input.value) - 1).toFixed(2);
+        if (dollarPayment) {input.value = (parseFloat(input.value) - 1).toFixed(2);
+        } else {input.value = (parseFloat(input.value) - 1);}
         updateBalance(document.getElementById(userId), event);
     }
 }
 
-const updateBalance = function(form, event) {
+const updateBalance = function(form, event, dollarPayment) {
     const loading = document.getElementById('loading'); //Button which shows request status
     loading.style.display = 'block';
     loading.style.color = 'gray';
@@ -57,22 +60,13 @@ const updateBalance = function(form, event) {
         if (data.success) { //If successful, display success info
             loading.style.color = 'green';
             loading.innerHTML = data.success;
-            if (data.balance == 0) {
-                balanceInput.value = "0.00";
-            } else if (Math.abs(data.balance < 1)) {
-                balanceInput.value = `0${(data.balance * 100).toString().slice(0, (data.balance * 100).toString().length - 2)}.${(data.balance * 100).toString().slice((data.balance * 100).toString().length - 2)}`;
-            } else {
-                balanceInput.value = `${(data.balance * 100).toString().slice(0, (data.balance * 100).toString().length - 2)}.${(data.balance * 100).toString().slice((data.balance * 100).toString().length - 2)}`;
-            }
-
+            if (dollarPayment) {balanceInput.value = data.balance.toFixed(2);
+            } else {balanceInput.value = data.balance}
         } else if (data.error) { //If unsuccessful, display error message
             loading.style.color = 'red';
             loading.innerHTML = data.error;
         }
-
-        setTimeout(() => { //After a second, hide the message
-            loading.style.display = "none";
-        }, 1000);
+        setTimeout(() => {loading.style.display = "none";}, 1000); //After a second, hide the message
     });
     event.preventDefault();
 }

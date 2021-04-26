@@ -291,7 +291,11 @@
                                 <% } %>
                             </div> 
 
-                            <span title="cost" class="cost-info" id="cost-info-<%=tutor.tutor._id%>">$<%=(tutor.cost).toFixed(2)%></span>
+                            <% if (platform.dollarPayment) { %>
+                                <span title="cost" class="cost-info" id="cost-info-<%=tutor.tutor._id%>">$<%=(tutor.cost).toFixed(2)%></span>
+                            <% } else { %>
+                                <span title="cost" class="cost-info" id="cost-info-<%=tutor.tutor._id%>"><%=(tutor.cost)%> Credits</span>
+                            <% } %>
                             <a href="/tutoringCenter/tutors/<%= course._id %>?tutorId=<%= tutor.tutor._id %>"
                                class="reviews-length"><i class="fas fa-comment-dots reviews-icon"></i> <span
                                         id="reviews-length-<%= tutor.tutor._id %>"><%= tutor.reviews.length %></span>
@@ -328,7 +332,11 @@
                                 <br>
                                 <label for="cost" id="cost-label" class="darkmode-header"><span
                                 id="cost-heading">Hourly Cost: </span>
-                                <span id="cost-count">$<%=(tutor.cost).toFixed(2)%></span></label><br>
+                                <% if (platform.dollarPayment) {%>
+                                    <span id="cost-count">$<%=(tutor.cost).toFixed(2)%></span></label><br>
+                                <% } else {%>
+                                    <span id="cost-count"><%=(tutor.cost)%> Credits</span></label><br>
+                                <% } %>
                                 <input type="range" min="10" max="30" value="<%=tutor.cost%>" class="slider" id="cost" name="cost" onchange="setCostShow('<%= course._id %>')">
 
                             <% } %>

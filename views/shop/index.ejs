@@ -78,14 +78,14 @@
                             <% if (order.present == true) { %>
                                 <li class="list-group-item darkmode-outline" id="<%= order._id %>">
                                     <h4 class="order-heading">Order -
-                                        <% if (platform.dollarPayment) {%>$<%}%><%= (order.charge).toFixed(2)%><% if (!platform.dollarPayment) {%> Credits<%}%>
+                                        <% if (platform.dollarPayment) {%>$<%=(order.charge).toFixed(2)%><% } else {%><%=(order.charge)%> Credits<%}%>
                                     </h4>
                                     <ul>
                                         <% for (let item of order.items) { %>
                                             <li>
                                                 <% let itemCharge = (item.quantity * item.item.price); %>
                                                 <%= item.item.name %> (<%= item.quantity %> order(s)) -
-                                                <% if (platform.dollarPayment) {%>$<%}%><%= itemCharge.toFixed(2)%><% if (!platform.dollarPayment) {%> Credits<%}%>
+                                                <% if (platform.dollarPayment) {%>$<%=itemCharge.toFixed(2)%><% } else {%><%=itemCharge%> Credits<%}%>
                                             </li>
                                         <% } %>
                                     </ul>
@@ -168,14 +168,14 @@
                     <% if (order.present == false) { %>
                     <li class="list-group-item">
                         <h4 class="order-heading">
-                            <% if (platform.dollarPayment) {%>$<%}%><%= (order.charge).toFixed(2)%><% if (!platform.dollarPayment) {%> Credits<%}%>
+                            <% if (platform.dollarPayment) {%>$<%=(order.charge).toFixed(2)%><% } else {%><%=(order.charge)%> Credits<%}%>
                         </h4>
 
                         <ul>
                         <% for (let item of order.items) { %>
                             <li>
                                 <% let itemCharge = (item.quantity * item.item.price); %>
-                                <%= item.item.name %> (<%= item.quantity %> order(s)) - <% if (platform.dollarPayment) {%>$<%}%><%= itemCharge.toFixed(2)%><% if (!platform.dollarPayment) {%> Credits<%}%>
+                                <% if (platform.dollarPayment) {%>$<%=(itemCharge).toFixed(2)%><% } else {%><%=(itemCharge)%> Credits<%}%>
                             </li>
                         <% } %>
                         </ul>

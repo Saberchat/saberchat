@@ -104,7 +104,11 @@
             <% } %>
         </ul>
     <% } else { %>
-        <h1 id="no-lessons">No Lessons ($0.00)</h1>
+        <% if (platform.dollarPayment) { %>
+            <h1 id="no-lessons">No Lessons ($0.00)</h1>
+        <% } else { %>
+            <h1 id="no-lessons">No Lessons (0 Credits)</h1>
+        <% } %>
     <% } %>
 </div>
 </body>

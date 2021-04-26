@@ -50,7 +50,11 @@
     <ol>
         <% for (let customer of lucrativeCustomers) { %>
             <li>
-                <%= customer.customer.firstName %> <%= customer.customer.lastName %>: $<%= customer.spent %> spent (Avg. $<%=(customer.avgCharge).toFixed(2)%> per order)
+                <% if (platform.dollarPayment) {%>
+                    <%= customer.customer.firstName %> <%= customer.customer.lastName %>: $<%= customer.spent %> spent (Avg. $<%=(customer.avgCharge).toFixed(2)%> per order)
+                <% } else {%>
+                    <%= customer.customer.firstName %> <%= customer.customer.lastName %>: $<%= customer.spent %> spent (Avg. <%=(customer.avgCharge)%> Credits per order)
+                <% } %>
             </li>
         <% } %>
     </ol>

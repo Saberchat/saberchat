@@ -106,7 +106,7 @@
                                     <label class="form-check-label" for="<%= item._id %>">
                                         <span class="item-name"><%= item.name %></span>
                                         (<%= item.availableItems %> orders available) -
-                                        <%if (platform.dollarPayment) {%>$<%} else {%> Credits: <% } %><%= (item.price).toFixed(2)%>
+                                        <%if (platform.dollarPayment) {%>$<%= (item.price).toFixed(2)%><%} else {%> Credits: <%=item.price%><% } %>
 
                                         <% if (frequentItems.toString().includes(item._id.toString())) { %>
                                             <span class="popular">Frequently Ordered</span>
@@ -168,8 +168,9 @@
                             <span id="extra-instructions"
                                   class="list-group-item list-group-item-action form-check darkmode-outline"><span
                                         class="instructions">Extra Instructions:</span> None</span>
-                            <span id="balance-box" class="list-group-item list-group-item-action form-check darkmode-outline">Current Balance: <%if (platform.dollarPayment){%>$<%}%><%= (currentUser.balance).toFixed(2)%><% if (!platform.dollarPayment){%> Credits<%}%></span>
-                            <span id="total-cost" class="list-group-item list-group-item-action form-check darkmode-outline">Total: <%if (platform.dollarPayment){%>$<%}%>0.00<% if (!platform.dollarPayment){%> Credits<%}%></span>
+                                        
+                            <span id="balance-box" class="list-group-item list-group-item-action form-check darkmode-outline">Current Balance: <%if (platform.dollarPayment){%>$<%= (currentUser.balance).toFixed(2)%><%} else {%><%=currentUser.balance%> Credits<%}%></span>
+                            <span id="total-cost" class="list-group-item list-group-item-action form-check darkmode-outline">Total: <%if (platform.dollarPayment){%>$0.00<%} else {%>0 Credits<%}%></span>
                             <%if (platform.dollarPayment) {%> <span id="paying-style" class="list-group-item list-group-item-action form-check darkmode-outline">Paying Online</span><% } %>
                         </div>
                     </div>

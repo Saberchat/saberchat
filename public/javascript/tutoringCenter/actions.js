@@ -305,8 +305,12 @@ const setStudents = function () { //For tutors to set how many students they can
     document.getElementById("slots-label").innerText = `Number of Student Slots: ${document.getElementById('slots').value}`;
 }
 
-const setCost = function () { //For tutors to set their price while joining course
-    document.getElementById("cost-label").innerText = `Hourly Cost: $${document.getElementById('cost').value}.00`;
+const setCost = function (dollarPayment) { //For tutors to set their price while joining course
+    if (dollarPayment) {
+        document.getElementById("cost-label").innerText = `Hourly Cost: $${document.getElementById('cost').value}.00`;
+    } else {
+        document.getElementById("cost-label").innerText = `Hourly Cost: ${document.getElementById('cost').value} Credits`;
+    }
 }
 
 const setStudentsTutorShow = function (slider) { //For tutors to set how many students they can take in a specific course on their own profile page
@@ -314,9 +318,13 @@ const setStudentsTutorShow = function (slider) { //For tutors to set how many st
     document.getElementById(`slots-label-${courseId}`).innerText = `Number of Student Slots: ${slider.value}`;
 }
 
-const setCostTutorShow = function (slider) { //For tutors to set their price on their own profile page
+const setCostTutorShow = function (slider, dollarPayment) { //For tutors to set their price on their own profile page
     const courseId = slider.id.split('-')[1];
-    document.getElementById(`cost-label-${courseId}`).innerText = `Hourly Cost: $${slider.value}.00`;
+    if (dollarPayment) {
+        document.getElementById(`cost-label-${courseId}`).innerText = `Hourly Cost: $${slider.value}.00`;
+    } else {
+        document.getElementById(`cost-label-${courseId}`).innerText = `Hourly Cost: ${slider.value} Credits`;
+    }
 }
 
 const setCostShow = function (courseId) { //For tutors to set their price (not while joining course)

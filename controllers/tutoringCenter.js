@@ -557,17 +557,12 @@ controller.markPayment = async function(req, res) {
                         let time = 0;
                         let costString;
                         for (let lesson of student.lessons) {
-                            if (lesson.approved) {
-                                time += lesson.time;
-                                if (!lesson.paid) {
-                                    cost += (lesson.time/60)*tutor.cost;
-                                }
+                            if (lesson.approved) {time += lesson.time;
+                                if (!lesson.paid) {cost += (lesson.time/60)*tutor.cost;}
                             }
                         }
-                        if (cost == 0) {costString = `0.00`;
-                        } else {
-                            costString = `${(Math.round(cost*100)).toString().slice(0, -2)}.${(Math.round(cost*100)).toString().slice(-2)}`;
-                        }
+                        if (platform.purchasable) {costString = cost.toFixed(2);
+                        } else {costString = cost;}
                         return res.json({success: "Successfully changed", time, cost: costString});
                     }
                 }
@@ -854,10 +849,8 @@ controller.approveLesson = async function(req, res) {
                                 }
                             }
                         }
-                        if (cost == 0) {costString = `0.00`;
-                        } else {
-                            costString = `${(Math.round(cost*100)).toString().slice(0, -2)}.${(Math.round(cost*100)).toString().slice(-2)}`;
-                        }
+                        if (platform.dollarPayment) {costString = cost.toFixed(2);
+                        } else {costString = cost;}
                         return res.json({success: "Successfully changed", time, cost: costString});
                     }
                 }
@@ -929,8 +922,8 @@ controller.showTutor = async function(req, res) {
                     }
                 }
                 lessonMap.set(student.student._id.toString(), time);
-                if (cost == 0) {costMap.set(student.student._id.toString(), `0.00`);
-                } else {costMap.set(student.student._id.toString(), cost.toFixed(2));}
+                if (platform.dollarPayment) {costMap.set(student.student._id.toString(), cost.toFixed(2));
+                } else {costMap.set(student.student._id.toString(), cost);}
             }
 
             if (req.query.studentId) { //If query is to show a tutor's lessons with a specific student

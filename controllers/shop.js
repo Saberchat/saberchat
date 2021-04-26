@@ -219,8 +219,8 @@ controller.processOrder = async function(req, res) {
         notif.text = `Your order is ready:\n ${itemText.join("\n")} \n\nExtra Instructions: ${order.instructions} \nTotal Cost: $${(order.charge).toFixed(2)}`;
         emailText =  `<p>Your order is ready:<p><p>${itemText.join(", ")}</p><p>Extra Instructions: ${order.instructions}</p><p>Total Cost: $${(order.charge).toFixed(2)}</p>`;
     } else {
-        notif.text = `Your order is ready:\n ${itemText.join("\n")} \n\nExtra Instructions: ${order.instructions} \nTotal Cost: ${(order.charge).toFixed(2)} Credits`;
-        emailText =  `<p>Your order is ready:<p><p>${itemText.join(", ")}</p><p>Extra Instructions: ${order.instructions}</p><p>Total Cost: ${(order.charge).toFixed(2)} Credits</p>`;
+        notif.text = `Your order is ready:\n ${itemText.join("\n")} \n\nExtra Instructions: ${order.instructions} \nTotal Cost: ${(order.charge)} Credits`;
+        emailText =  `<p>Your order is ready:<p><p>${itemText.join(", ")}</p><p>Extra Instructions: ${order.instructions}</p><p>Total Cost: ${(order.charge)} Credits</p>`;
     }
     await notif.save();
     if (order.customer.receiving_emails) {
@@ -283,11 +283,11 @@ controller.deleteOrder = async function(req, res) {
             }
         } else {
             if (req.body.rejectionReason == '') {
-                notif.text = `Your order was rejected. This is most likely because we suspect your order is not genuine. Contact us if you think there has been a mistake. No reason was provided for rejection.\n ${itemText.join("\n")} \n\nExtra Instructions: ${order.instructions} \nTotal Cost: ${(order.charge).toFixed(2)} Credits`;
-                emailText = `<p>Your order was rejected. This is most likely because we suspect your order is not genuine. Contact us if you think there has been a mistake. No reason was provided for rejection.</p><p>${itemText.join(", ")}</p><p>Extra Instructions: ${order.instructions}</p><p>Total Cost: ${(order.charge).toFixed(2)} Credits</p>`;
+                notif.text = `Your order was rejected. This is most likely because we suspect your order is not genuine. Contact us if you think there has been a mistake. No reason was provided for rejection.\n ${itemText.join("\n")} \n\nExtra Instructions: ${order.instructions} \nTotal Cost: ${order.charge} Credits`;
+                emailText = `<p>Your order was rejected. This is most likely because we suspect your order is not genuine. Contact us if you think there has been a mistake. No reason was provided for rejection.</p><p>${itemText.join(", ")}</p><p>Extra Instructions: ${order.instructions}</p><p>Total Cost: ${order.charge} Credits</p>`;
             } else {
-                notif.text = `Your order was rejected. This is most likely because we suspect your order is not genuine. Contact us if you think there has been a mistake. The reason was provided for rejection was the following: \"${req.body.rejectionReason}\"\n ${itemText.join("\n")} \n\nExtra Instructions: ${order.instructions} \nTotal Cost: ${(order.charge).toFixed(2)} Credits`;
-                emailText = `<p>Your order was rejected. This is most likely because we suspect your order is not genuine. Contact us if you think there has been a mistake. The reason was provided for rejection was the following: "${req.body.rejectionReason}"</p><p>${itemText.join(", ")}</p><p>Extra Instructions: ${order.instructions}</p><p>Total Cost: ${(order.charge).toFixed(2)} Credits</p>`;
+                notif.text = `Your order was rejected. This is most likely because we suspect your order is not genuine. Contact us if you think there has been a mistake. The reason was provided for rejection was the following: \"${req.body.rejectionReason}\"\n ${itemText.join("\n")} \n\nExtra Instructions: ${order.instructions} \nTotal Cost: ${order.charge} Credits`;
+                emailText = `<p>Your order was rejected. This is most likely because we suspect your order is not genuine. Contact us if you think there has been a mistake. The reason was provided for rejection was the following: "${req.body.rejectionReason}"</p><p>${itemText.join(", ")}</p><p>Extra Instructions: ${order.instructions}</p><p>Total Cost: ${order.charge} Credits</p>`;
             }
         }
 
@@ -401,7 +401,7 @@ controller.createItem = async function(req, res) {
 
     //Create charge; once created, add to item"s info
     if (parseFloat(req.body.price)) {item.price = parseFloat(req.body.price);
-    } else {item.price = 0.00;}
+    } else {item.price = 0;}
 
     const category = await ItemCategory.findOne({name: req.body.category}); //Find the category specified in the form
     if (!category) {

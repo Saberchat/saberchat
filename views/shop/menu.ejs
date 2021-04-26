@@ -77,8 +77,8 @@
                                     id="item-<%= item.id %>">
                             <% } %>
 
-
-                                <span class="item-name"><%= item.name %> (<%= item.availableItems %> orders available)</span> - <%if(platform.dollarPayment) { %> $ <% } %><%= (item.price).toFixed(2)%> <%if(!platform.dollarPayment) { %> Credits <% } %>
+                            
+                                <span class="item-name"><%= item.name %> (<%= item.availableItems %> orders available)</span> - <% if (platform.dollarPayment) {%>$<%=(item.price).toFixed(2)%><% } else {%><%=(item.price)%> Credits<%}%>
 
                                 <% if (currentUser) { %>
                                     <div title="Upvotes" class="upvotes">

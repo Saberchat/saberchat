@@ -75,13 +75,13 @@
                             <li class="list-group-item shop">
                                 <% let itemCharge = (item.quantity * item.item.price); %>
                                 <%= item.item.name %> (<%= item.quantity %> order(s)) -
-                                <% if (platform.dollarPayment) {%>$<%}%><%= itemCharge.toFixed(2)%><% if (!platform.dollarPayment) {%> Credits<%}%>
+                                <% if (platform.dollarPayment) {%>$<%= itemCharge.toFixed(2)%><%} else {%><%= itemCharge%> Credits<%}%>
                             </li>
                         <% } %>
                     </ul>
 
                     <p class="card-text mt-3"><span class="cost">Cost:</span>
-                        <% if (platform.dollarPayment) {%>$<%}%><%= (order.charge).toFixed(2)%><% if (!platform.dollarPayment) {%> Credits<%}%>
+                        <% if (platform.dollarPayment) {%>$<%= order.charge.toFixed(2)%><%} else {%><%= order.charge%> Credits<%}%>
                     </p>
 
                     <p class="paying-in-person">

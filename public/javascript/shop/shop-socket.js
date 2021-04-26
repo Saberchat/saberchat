@@ -100,7 +100,7 @@ const getOrders = function (outputStream, dollarPayment) { //Build order card on
                     <ul class="list-group">
                         ${getItems()}
                     </ul>
-                    <p class="card-text mt-3"><strong>Cost:</strong>${order.charge.toFixed(2)} Credits</p>
+                    <p class="card-text mt-3"><strong>Cost:</strong>${order.charge} Credits</p>
                     <p class="card-text">${order.date}</p>
                     <form class="ready-form" action="${order._id}/ready" method="post">
                         <button type="submit" class="btn btn-primary" name="button">Order Ready</button>

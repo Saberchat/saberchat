@@ -44,10 +44,10 @@ const changeOrderConfirmation = function (dollarPayment) {
 
                             if (dollarPayment) {
                                 formattedCost = (parseInt(no.value) * parseFloat(l.innerText.split('$')[1]));
-                                orderedItem.innerText = `${no.name} (${no.value} orders) - $${(formattedCost * 100).toString().slice(0, (formattedCost * 100).toString().length - 2)}.${(formattedCost * 100).toString().slice((formattedCost * 100).toString().length - 2)}`;
+                                orderedItem.innerText = `${no.name} (${no.value} orders) - $${formattedCost.toFixed(2)}`;
                             } else {
                                 formattedCost = (parseInt(no.value) * parseFloat(l.innerText.split("Credits: ")[1]));
-                                orderedItem.innerText = `${no.name} (${no.value} orders) - ${(formattedCost * 100).toString().slice(0, (formattedCost * 100).toString().length - 2)}.${(formattedCost * 100).toString().slice((formattedCost * 100).toString().length - 2)} Credits`;
+                                orderedItem.innerText = `${no.name} (${no.value} orders) - ${formattedCost} Credits`;
                             }
                             orderConfirm.appendChild(orderedItem); //Add the order to the list of orders
                         }
@@ -78,19 +78,8 @@ const changeOrderConfirmation = function (dollarPayment) {
     totalNew.className = "list-group-item list-group-item-action form-check darkmode-outline";
     totalNew.id = "total-cost";
 
-    if (dollarPayment) {
-        if (sum == 0) {
-            totalNew.innerHTML = `<strong>Total: $0.00`;
-        } else {
-            totalNew.innerHTML = `<strong>Total: $${sum.toFixed(2)}</strong>`;
-        }
-    } else {
-        if (sum == 0) {
-            totalNew.innerHTML = `<strong>Total: 0.00 Credits`;
-        } else {
-            totalNew.innerHTML = `<strong>Total: ${sum.toFixed(2)} Credits</strong>`;
-        }
-    }
+    if (dollarPayment) {totalNew.innerHTML = `<strong>Total: $${sum.toFixed(2)}</strong>`;
+    } else {totalNew.innerHTML = `<strong>Total: ${sum} Credits</strong>`;}
 
     if (dollarPayment) {
         if (sum > parseFloat(balanceString.split("$")[1]) && !payingInPerson.checked) {

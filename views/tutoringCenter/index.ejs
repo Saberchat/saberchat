@@ -140,9 +140,13 @@
                                             <label for="slots" id="slots-label">Number of Student Slots: 0</label><br/>
                                             <input type="range" min="0" max="10" value="0" class="slider mode" id="slots"
                                                    name="slots" onchange="setStudents()">
-                                            <label for="cost" id="cost-label">Hourly Cost: $10.00</label><br/>
+                                            <% if (platform.dollarPayment) {%>
+                                                <label for="cost" id="cost-label">Hourly Cost: $10.00</label><br/>
+                                            <% } else { %>
+                                                <label for="cost" id="cost-label">Hourly Cost: 10 Credits</label><br/>
+                                            <% } %>
                                             <input type="range" min="10" max="30" value="10" class="slider mode" id="cost"
-                                                    name="cost" onchange="setCost()">
+                                                    name="cost" onchange="setCost(<%=platform.dollarPayment%>)">
                                             <textarea rows="5" minlength="50" maxlength="500" class="form-control mode"
                                                       name="bio" placeholder="A Short Bio About Yourself"></textarea>
                                         </div>

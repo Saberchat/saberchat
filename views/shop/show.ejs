@@ -61,8 +61,7 @@
                                     <% if (platform.dollarPayment) {%><div class="input-group-text mode">$</div><%}%>
                                 </div>
                                 <input id="priceInput" class="form-control mode" type="text" name="price"
-                                placeholder="Enter <% if (platform.dollarPayment) {%>Price<% } else {%>Credits<% } %>" value="<%= (item.price).toFixed(2)%>"
-                                       maxlength="10" required>
+                                placeholder="Enter <% if (platform.dollarPayment) {%>Price<% } else {%>Credits<% } %>" value="<% if (platform.dollarPayment) {%><%= (item.price).toFixed(2)%><% } else {%><%=item.price%><%}%>" maxlength="10" required>
 
                             </div>
                         </div>
