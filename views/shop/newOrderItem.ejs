@@ -49,12 +49,12 @@
                   <input id="nameInput" class="form-control mode" type="text" name="name" placeholder="Enter Item Name" maxlength="45" required>
                 </div>
                 <div class="col mode">
-                  <label for="priceInput"><% if (platform.purchasable) {%>Price<% } else {%>Credits<% } %></label>
+                  <label for="priceInput"><% if (platform.dollarPayment) {%>Price<% } else {%>Credits<% } %></label>
                   <div class="input-group">
                     <div class="input-group-prepend">
-                      <% if (platform.purchasable) {%><div class="input-group-text mode">$</div><%}%>
+                      <% if (platform.dollarPayment) {%><div class="input-group-text mode">$</div><%}%>
                     </div>
-                    <input id="priceInput" class="form-control mode" type="text" name="price" placeholder="Enter <% if (platform.purchasable) {%>Price<% } else {%>Credits<% } %>" maxlength="10" required>
+                    <input id="priceInput" class="form-control mode" type="text" name="price" placeholder="Enter <% if (platform.dollarPayment) {%>Price<% } else {%>Credits<% } %>" maxlength="10" required>
                   </div>
                 </div>
                 <div class="col">
