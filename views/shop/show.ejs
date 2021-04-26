@@ -55,13 +55,13 @@
                                    value="<%= item.name %>" maxlength="45" required>
                         </div>
                         <div class="col">
-                            <label for="priceInput"<label for="priceInput"><% if (platform.purchasable) {%>Price<% } else {%>Donation Requirement<% } %></label>
+                            <label for="priceInput"<label for="priceInput"><% if (platform.purchasable) {%>Price<% } else {%>Credits<% } %></label>
                             <div class="input-group">
                                 <div class="input-group-prepend">
-                                    <div class="input-group-text mode">$</div>
+                                    <% if (platform.purchasable) {%><div class="input-group-text mode">$</div><%}%>
                                 </div>
                                 <input id="priceInput" class="form-control mode" type="text" name="price"
-                                placeholder="Enter <% if (platform.purchasable) {%>Price<% } else {%>Donation Requirement<% } %>" value="<%= (item.price).toFixed(2)%>"
+                                placeholder="Enter <% if (platform.purchasable) {%>Price<% } else {%>Credits<% } %>" value="<%= (item.price).toFixed(2)%>"
                                        maxlength="10" required>
 
                             </div>

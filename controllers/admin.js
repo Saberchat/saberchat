@@ -741,6 +741,7 @@ controller.viewBalances = async function(req, res) {
 controller.updateBalances = async function(req, res) {
     const user = await User.findByIdAndUpdate(req.body.userId, {balance: parseFloat(req.body.bal)});
     if (!user) { return res.json({error: "Error. Could not change"});}
+    if (!platform.purchasable) { await sendGridEmail(user.email, "Balance Update", `<p>Hello ${user.firstName},</p><p>Your balance has been updated! Visit ${platform.url} to view all new items you have access to.}</p>`, false); }
     return res.json({success: 'Succesfully changed', balance: (parseFloat(req.body.bal)).toFixed(2)});
 }
 

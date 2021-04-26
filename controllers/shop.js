@@ -49,7 +49,7 @@ controller.orderForm = async function(req, res) {
         return res.redirect("back");
     }
 
-    let sortedCategories = [];
+    sortedCategories = [];
     let sortedCategory;
     for (let category of categories) {
         if (category.items.length > 0) {
@@ -64,7 +64,7 @@ controller.orderForm = async function(req, res) {
         }
     }
 
-    let orderedItems = []; //Array of ordered item objects to sort by popularity
+    orderedItems = []; //Array of ordered item objects to sort by popularity
     let overlap = false;
     for (let order of allOrders) {
         for (let item of order.items) {
@@ -85,10 +85,10 @@ controller.orderForm = async function(req, res) {
             }
         }
     }
-    const frequentItems = sortByPopularity(orderedItems, "totalOrdered", "created_at", ["item"]).popular;
+    frequentItems = sortByPopularity(orderedItems, "totalOrdered", "created_at", ["item"]).popular;
 
     if (req.query.order) { //SHOW NEW ORDER FORM
-        if (!platform.purchasable) {
+        if (!platform.purchasable || !req.user) {
             req.flash('error', `This feature is not enabled on ${platform.name} Saberchat`);
             return res.redirect('back');        
         }
@@ -102,7 +102,6 @@ controller.orderForm = async function(req, res) {
             req.flash("error", "You have made the maximum number of orders for the day");
             return res.redirect("back");
         }
-
         return res.render("shop/newOrder", {platform, categories: sortedCategories, frequentItems, data: platform.features[objectArrIndex(platform.features, "route", "shop")]});
     }
 

@@ -81,12 +81,12 @@
             </div>
 
             <div style="text-align: center;">
-                <% for (let card of [["https://drive.google.com/file/d/1iPyFLrGZg7gbVvodGc6sAs7tcZnNeKNL/view", "https://i.imgur.com/bgrEITM.png",  "Printable Awareness Flier"], ["https://drive.google.com/file/d/1-qIWxGGtQ8wJPJSHsO3Cp_RKyz2SAVB6/view", "https://i.imgur.com/dHKLpLy.png", "Printable Education Flier"]]) {%>
-                    <div class="card course-title darkmode-outline" style="width: 350px;">
+                <% for (let card of [["https://drive.google.com/file/d/1iPyFLrGZg7gbVvodGc6sAs7tcZnNeKNL/view", "https://i.imgur.com/bgrEITM.png",  "Awareness"], ["https://drive.google.com/file/d/1-qIWxGGtQ8wJPJSHsO3Cp_RKyz2SAVB6/view", "https://i.imgur.com/dHKLpLy.png", "Education"]]) {%>
+                    <div class="card course-title darkmode-outline" style="width: 375px;">
                         <a href="<%=card[0]%>" class="card-img-top course-thumbnail" target="_blank">
-                            <img src="<%=card[1]%>" alt="Image Does Not Exist" style="height: 525px; width: 350px;">
+                            <img src="<%=card[1]%>" alt="Image Does Not Exist" style="height: 525px; width: 375px;">
                             <div class="card-body" style="color: white;">
-                                <h5><%=card[2]%></h5>
+                                <strong>Click to view Printable <%=card[2]%> Flier</strong>
                             </div>
                         </a>
                     </div>
