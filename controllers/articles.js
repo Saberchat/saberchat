@@ -131,8 +131,8 @@ controller.create = async function(req, res) {
     article.date = dateFormat(article.created_at, "h:MM TT | mmm d");
     await article.save();
 
-    req.flash('success', 'Article Posted to Bulletin!');
-    return res.redirect(`/articles/${article._id}`);
+    req.flash('success', `Article Posted! A ${platform.permissionsDisplay[platform.permissionsDisplay.length-1].toLowerCase()} will verify your post soon.`);
+    return res.redirect(`/articles`);
 };
 
 controller.verify = async function(req, res) {
@@ -170,9 +170,7 @@ controller.updateArticle = async function(req, res) {
     }
 
     for (let attr of ["images", "links"]) { //Add images and links
-        if (req.body[attr]) {
-            updatedArticle[attr] = req.body[attr];
-        }
+        if (req.body[attr]) {updatedArticle[attr] = req.body[attr];}
     }
     if (!platform.postVerifiable) {updatedArticle.verified = true;} //Article does not need to be verified if platform does not support verifying articles
 
@@ -225,7 +223,7 @@ controller.updateArticle = async function(req, res) {
     
     await updatedArticle.save();
     req.flash('success', 'Article Updated!');
-    return res.redirect(`/articles/${updatedArticle._id}`);
+    return res.redirect(`/articles`);
 }
 
 // Article PUT like article

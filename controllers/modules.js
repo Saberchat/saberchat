@@ -123,8 +123,8 @@ controller.create = async function(req, res) {
     module.date = dateFormat(module.created_at, "h:MM TT | mmm d");
     await module.save();
 
-    req.flash('success', 'Module Posted to Bulletin!');
-    return res.redirect(`/modules/${module._id}`);
+    req.flash('success', `Module Posted! A ${platform.permissionsDisplay[platform.permissionsDisplay.length-1].toLowerCase()} will verify your post soon.`);
+    return res.redirect(`/modules`);
 };
 
 controller.updateModule = async function(req, res) {
@@ -200,7 +200,7 @@ controller.updateModule = async function(req, res) {
     
     await updatedModule.save();
     req.flash('success', 'Module Updated!');
-    return res.redirect(`/modules/${updatedModule._id}`);
+    return res.redirect(`/modules`);
 }
 
 // Module PUT like module

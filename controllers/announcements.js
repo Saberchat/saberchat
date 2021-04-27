@@ -172,9 +172,7 @@ controller.create = async function(req, res) {
     }
 
     let imageString = ""; //Build string of all attached images
-    for (const image of announcement.images) {
-        imageString += `<img src="${image}">`;
-    }
+    for (const image of announcement.images) {imageString += `<img src="${image}">`;}
 
     for (let user of users) { //Send email to all users
         if (user.receiving_emails) {
@@ -185,8 +183,8 @@ controller.create = async function(req, res) {
         }
     }
 
-    req.flash('success', 'Announcement posted to bulletin!');
-    return res.redirect(`/announcements/${announcement._id}`);
+    req.flash('success', `Announcement Posted! A ${platform.permissionsDisplay[platform.permissionsDisplay.length-1].toLowerCase()} will verify your post soon.`);
+    return res.redirect(`/announcements`);
 };
 
 controller.verify = async function(req, res) {
@@ -277,16 +275,9 @@ controller.updateAnnouncement = async function(req, res) {
     }
 
     let imageString = "";
-    for (let image of announcement.images) {
-        imageString += `<img src="${image}">`;
-    }
-
+    for (let image of announcement.images) {imageString += `<img src="${image}">`;}
     for (let user of users) {
-        if (user.receiving_emails) {
-            await sendGridEmail(user.email, `Updated Saberchat Announcement - ${announcement.subject}`, `<p>Hello ${user.firstName},</p><p>${req.user.username} has recently updated an announcement - '${announcement.subject}'.</p><p>${announcement.text}</p><p>You can access the full announcement at https://${platform.url}</p> ${imageString}`, false);
-        }
-
-        //If announcement not already in user's anncount, add it
+        //If announcement not already in user's annCount, add it
         if (objectArrIndex(user.annCount, "announcement", updatedAnnouncement._id) == -1) {
             user.annCount.push({announcement: updatedAnnouncement, version: "updated"});
             await user.save();
@@ -294,7 +285,7 @@ controller.updateAnnouncement = async function(req, res) {
     }
 
     req.flash('success', 'Announcement Updated!');
-    return res.redirect(`/announcements/${updatedAnnouncement._id}`);
+    return res.redirect(`/announcements`);
 }
 
 // Announcement PUT like ann
@@ -325,17 +316,13 @@ controller.comment = async function(req, res) {
             path: "comments",
             populate: {path: "sender"}
         });
-    if (!announcement) {
-        return res.json({error: 'Error commenting'});
-    }
+    if (!announcement) {return res.json({error: 'Error commenting'});}
 
     const comment = await PostComment.create({
         text: req.body.text.split('<').join('&lt'),
         sender: req.user
     });
-    if (!comment) {
-        return res.json({error: 'Error commenting'});
-    }
+    if (!comment) {return res.json({error: 'Error commenting'});}
 
     comment.date = dateFormat(comment.created_at, "h:MM TT | mmm d");
     await comment.save();
@@ -348,12 +335,7 @@ controller.comment = async function(req, res) {
     for (let line of comment.text.split(" ")) {
         if (line[0] == '@') {
             user = await User.findById(line.split("#")[1].split("_")[0]);
-
-            if (!user) {
-                return res.json({
-                    error: "Error accessing user"
-                });
-            }
+            if (!user) {return res.json({error: "Error accessing user"});}
             users.push(user);
         }
     }
@@ -369,9 +351,7 @@ controller.comment = async function(req, res) {
             toEveryone: false,
             images: []
         });
-        if (!notif) {
-            return res.json({error: "Error creating notification"});
-        }
+        if (!notif) {return res.json({error: "Error creating notification"});}
 
         notif.date = dateFormat(notif.created_at, "h:MM TT | mmm d");
         notif.text = `Hello ${user.firstName},\n\n${req.user.firstName} ${req.user.lastName} mentioned you in a comment on "${announcement.subject}":\n${comment.text}`;
@@ -464,7 +444,7 @@ controller.deleteAnnouncement = async function(req, res) {
     }
 
     req.flash('success', 'Announcement Deleted!');
-    return res.redirect('/announcements/');
+    return res.redirect('/announcements');
 }
 
 module.exports = controller;

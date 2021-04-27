@@ -78,28 +78,21 @@ controller.updatePlatform = async function(req, res) {
         }
     }
 
-    if (req.body.displayProjects) {
-        if (objectArrIndex(platform.publicFeatures, "name", "Projects") == -1) {
-            platform.publicFeatures.push({route: "projects", name: "Projects", icon: "paint-brush", subroutes: ["/"]});
-        }
-    } else {
-        platform.publicFeatures.splice(objectArrIndex(platform.publicFeatures, "name", "Projects"), 1);
-    }
-    
-    if (req.body.displayAnns) {
-        if (objectArrIndex(platform.publicFeatures, "name", "Announcements") == -1) {
-            platform.publicFeatures.push({route: "announcements", name: "Announcements", icon: "bullhorn", subroutes: ["/"]});
-        }
-    } else {
-        platform.publicFeatures.splice(objectArrIndex(platform.publicFeatures, "name", "Announcements"), 1);
-    }
-
     if (typeof req.body.feature == "string") {
+        if (objectArrIndex(platform.publicFeatures, "name", platform.features[0].name) > -1) {
+            platform.publicFeatures[0].icon = req.body.featureIcon;
+            platform.publicFeatures[0].name = req.body.feature;
+        }
+
         platform.features[0].name = req.body.feature;
         platform.features[0].icon = req.body.featureIcon;
         platform.features[0].description = req.body.featureDescription;
     } else {
         for (let i = 0; i < platform.features.length; i++) {
+            if (objectArrIndex(platform.publicFeatures, "name", platform.features[i].name) > -1) {
+                platform.publicFeatures[objectArrIndex(platform.publicFeatures, "name", platform.features[i].name)].icon = req.body.featureIcon[i];
+                platform.publicFeatures[objectArrIndex(platform.publicFeatures, "name", platform.features[i].name)].name = req.body.feature[i];
+            }
             platform.features[i].name = req.body.feature[i];
             platform.features[i].icon = req.body.featureIcon[i];
             platform.features[i].description = req.body.featureDescription[i];
@@ -473,6 +466,25 @@ controller.tag = async function(req, res) { //Add/remove status tag to user
     return res.json({success: "Successfully added status", tag: req.body.tag})
 }
 
+controller.viewBalances = async function(req, res) {
+    const platform = await setup(Platform);
+    const users = await User.find({authenticated: true});
+    if (!platform || !users) {
+        req.flash('error', 'Could not find users');
+        return res.redirect('back');
+    }
+    return res.render('admin/balances.ejs', {platform, users});
+}
+
+controller.updateBalances = async function(req, res) {
+    const platform = await setup(Platform);
+    const user = await User.findByIdAndUpdate(req.body.userId, {balance: parseFloat(req.body.bal)});
+    if (!platform || !user) { return res.json({error: "Error. Could not change"});}
+    if (!platform.dollarPayment) { await sendGridEmail(user.email, "Balance Update", `<p>Hello ${user.firstName},</p><p>Your balance has been updated to $${user.balance}! Visit ${platform.url} to check out our merchandise.</p>`, false); }
+    if (platform.dollarPayment) {return res.json({success: 'Succesfully changed', balance: (parseFloat(req.body.bal)).toFixed(2)});}
+    return res.json({success: 'Succesfully changed', balance: (parseInt(req.body.bal))});
+}
+
 controller.permanentDelete = async function(req, res) {
     const email = await Email.findByIdAndDelete(req.params.id);
 
@@ -726,25 +738,6 @@ controller.permanentDelete = async function(req, res) {
 
 	req.flash('success', "Email Removed From Access List! Any users with this email have been removed.");
 	return res.redirect('/admin/accesslist');
-}
-
-controller.viewBalances = async function(req, res) {
-    const platform = await setup(Platform);
-    const users = await User.find({authenticated: true});
-    if (!platform || !users) {
-        req.flash('error', 'Could not find users');
-        return res.redirect('back');
-    }
-    return res.render('admin/balances.ejs', {platform, users});
-}
-
-controller.updateBalances = async function(req, res) {
-    const platform = await setup(Platform);
-    const user = await User.findByIdAndUpdate(req.body.userId, {balance: parseFloat(req.body.bal)});
-    if (!platform || !user) { return res.json({error: "Error. Could not change"});}
-    if (!platform.dollarPayment) { await sendGridEmail(user.email, "Balance Update", `<p>Hello ${user.firstName},</p><p>Your balance has been updated! Visit ${platform.url} to view all new items you have access to.}</p>`, false); }
-    if (platform.dollarPayment) {return res.json({success: 'Succesfully changed', balance: (parseFloat(req.body.bal)).toFixed(2)});}
-    return res.json({success: 'Succesfully changed', balance: (parseInt(req.body.bal))});
 }
 
 module.exports = controller;

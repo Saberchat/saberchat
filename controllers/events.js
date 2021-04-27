@@ -149,8 +149,8 @@ controller.create = async function(req, res) {
     event.date = dateFormat(event.created_at, "h:MM TT | mmm d");
     await event.save();
 
-    req.flash('success', 'Event Posted to Bulletin!');
-    return res.redirect(`/events/${event._id}`);
+    req.flash('success', `Event Posted! A ${platform.permissionsDisplay[platform.permissionsDisplay.length-1].toLowerCase()} will verify your post soon.`);
+    return res.redirect(`/events`);
 };
 
 controller.verify = async function(req, res) {
@@ -193,9 +193,7 @@ controller.updateEvent = async function(req, res) {
     }
 
     for (let attr of ["images", "links"]) { //Add images and links
-        if (req.body[attr]) {
-            updatedEvent[attr] = req.body[attr];
-        }
+        if (req.body[attr]) {updatedEvent[attr] = req.body[attr];}
     }
     if (!platform.postVerifiable) {updatedEvent.verified = true;} //Event does not need to be verified if platform does not support verifying events
 
@@ -248,7 +246,7 @@ controller.updateEvent = async function(req, res) {
     
     await updatedEvent.save();
     req.flash('success', 'Event Updated!');
-    return res.redirect(`/events/${updatedEvent._id}`);
+    return res.redirect(`/events`);
 }
 
 // Event PUT like event

@@ -86,10 +86,7 @@ controller.createProject = async function(req, res) {
                     req.flash('error', "Unable to find the users you listed");
                     return res.redirect('back');
                 }
-
-                for (let user of statusGroup) {
-                    creators.push(user);
-                }
+                for (let user of statusGroup) {creators.push(user);}
 
             } else {
                 individual = await User.findById(creator);
@@ -108,9 +105,7 @@ controller.createProject = async function(req, res) {
         return res.redirect('back');
     }
 
-    if (req.body.images) { //If any images were added (if not, the 'images' property is null)
-        project.images = req.body.images;
-    }
+    if (req.body.images) {project.images = req.body.images;} //If any images were added (if not, the 'images' property is null)
 
     if (req.files) {
         if (req.files.mediaFile) { //Look for all attached files and upload them
@@ -145,10 +140,7 @@ controller.createProject = async function(req, res) {
 
     let notif;
     let imageString = ``;
-
-    for (let image of project.images) {
-        imageString += `<img style="width: 50%; height: 50%;" src="${image}"/>`;
-    }
+    for (let image of project.images) {imageString += `<img style="width: 50%; height: 50%;" src="${image}"/>`;}
 
     for (let user of users) {
         notif = await  InboxMessage.create({
@@ -176,8 +168,8 @@ controller.createProject = async function(req, res) {
         await user.save();
     }
 
-    req.flash('success', "Project Posted!");
-    return res.redirect(`/projects/${project._id}`);
+    req.flash('success', `Project Posted! A ${platform.permissionsDisplay[platform.permissionsDisplay.length-1].toLowerCase()} will verify your post soon.`);
+    return res.redirect(`/projects`);
 }
 
 controller.verify = async function(req, res) {
@@ -368,7 +360,7 @@ controller.updateProject = async function(req, res) {
     }
     await updatedProject.save();
     req.flash("success", "Project Updated!");
-    return res.redirect(`/projects/${project._id}`);
+    return res.redirect(`/projects`);
 }
 
 
