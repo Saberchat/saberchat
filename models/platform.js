@@ -9,6 +9,7 @@ var platformSchema = new mongoose.Schema({
     icon: String,
     imageUrl: {type: String, default: "https://wallpaper.dog/large/11001671.jpg"},
     principal: String,
+    indexPlatformInfo: {type: Boolean, default: false}, //Display Saberchat page vs platform info page
     homepageInfo: {type: Boolean, default: true}, //Display information on homepage
     descriptionDisplay: {type: Boolean, default: false}, //Display description or platform name first on homepage
     contactPhotoDisplay: {type: Boolean, default: true}, //Display photos of platform administrators on contact page

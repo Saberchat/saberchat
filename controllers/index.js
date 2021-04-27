@@ -24,9 +24,26 @@ controller.index = async function(req, res) {
     }
 
     let names = [];
-    for (let user of teachers) { //Iterate through faculty and add their name to array
-        names.push(`${user.firstName} ${user.lastName}`);
+    for (let user of teachers) {names.push(`${user.firstName} ${user.lastName}`);} //Iterate through faculty and add their name to array
+
+    if (platform.indexPlatformInfo) {
+        return res.render('other/platform-info', {platform, names: names.join(', '), objectArrIndex, description: (req.user != undefined && req.query.description != undefined)});
     }
+    return res.render('index', {platform});
+}
+
+controller.info = async function(req, res) {
+    const platform = await setup(Platform);
+    const teachers = await User.find({authenticated: true, authenticated: true, status: platform.teacherStatus});
+    if (!platform || !teachers) {
+        req.flash('error', "An Error Occurred");
+        return res.redirect('back');
+    }
+
+    let names = [];
+    for (let user of teachers) {names.push(`${user.firstName} ${user.lastName}`);} //Iterate through faculty and add their name to array
+
+    if (platform.indexPlatformInfo) {return res.render('index', {platform});}
     return res.render('other/platform-info', {platform, names: names.join(', '), objectArrIndex, description: (req.user != undefined && req.query.description != undefined)});
 }
 
@@ -292,15 +309,6 @@ controller.contact = async function(req, res) { //Contact info of highest status
 
     const highestPermission = platform.permissionsProperty[platform.permissionsProperty.length-1]; //Get highest permission (e.g. principal)
     return res.render('other/contact', {platform, teachers, highestPermission, convertToLink});
-}
-
-controller.info = async function(req, res) {
-    const platform = await setup(Platform);
-    if (!platform) {
-        req.flash("error", "An Error Occurred");
-        return res.redirect("back");
-    }
-    return res.render('index', {platform});
 }
 
 controller.darkmode = async function(req, res) {

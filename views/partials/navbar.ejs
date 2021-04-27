@@ -84,15 +84,15 @@
 
                         <div class="dropdown-menu" aria-labelledby="navbarDropdown">
                             <% if (platform.homepageInfo) { %>
-                                <a class="dropdown-item" href="/"><i class="fas fa-info-circle"></i> About <%=platform.name%></a>
+                                <a class="dropdown-item" href="<%if(platform.indexPlatformInfo){%>/<%}else{%>/info<%}%>"><i class="fas fa-info-circle"></i> About <%=platform.name%></a>
                             <% } else { %>
-                                <a class="dropdown-item" href="/?"><i class="fas fa-home"></i> Home</a>
-                                <a class="dropdown-item" href="/?description=true"><i class="fas fa-info-circle"></i> About <%=platform.name%></a>
+                                <a class="dropdown-item" href="<%if(platform.indexPlatformInfo){%>/<%}else{%>/info<%}%>"><i class="fas fa-home"></i> Home</a>
+                                <a class="dropdown-item" href="<%if(platform.indexPlatformInfo){%>/<%}else{%>/info<%}%>?description=true"><i class="fas fa-info-circle"></i> About <%=platform.name%></a>
                             <% } %>
                             <% if (currentUser) { %>
                                 <a class="dropdown-item" href="/contact"><i class="fas fa-phone"></i> Contact</a>
                             <% } %>
-                            <a class="dropdown-item" href="/info"><i class="fas fa-question-circle"></i> About Saberchat</a>
+                            <a class="dropdown-item" href="<%if(platform.indexPlatformInfo){%>/info<%}else{%>/<%}%>"><i class="fas fa-question-circle"></i> About Saberchat</a>
                         </div>
                     </li>
 
@@ -299,7 +299,5 @@
 
 <script>
     const checkIfAgree = e => { if (!document.getElementById('agree').checked) {e.preventDefault();}}
-
     document.getElementById('confirm-agreement').addEventListener('click', e => {checkIfAgree(e)});
-
 </script>
