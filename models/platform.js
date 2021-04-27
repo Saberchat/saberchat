@@ -16,6 +16,7 @@ var platformSchema = new mongoose.Schema({
     enableDarkmode: {type: Boolean, default: true}, //Check if users can enable darkmode
     emailExtension: {type: String, default: ''},
     officialEmail: {type: String, default: ''},
+    balanceMessage: {type: String, default: ''},
     updateTime: {type: String, default: "0 0"},
     navDark: {type: Boolean, default: false},
     purchasable: {type: Boolean, default: true}, //Item purchases can be made

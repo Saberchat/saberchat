@@ -89,6 +89,10 @@
                             <input id="font" class="form-control mode" type="text"
                                     name="font" value="<%= platform.font%>" placeholder="Enter Platform Font Family">
                         </div>
+                        <div class="form-group">
+                            <label for="balance-message">Balance Update Message</label><br/>
+                            <textarea id="balance-message" class="form-control mode" type="text" name="balanceMessage" placeholder="Enter Message To Send With Balance Updates"><%= platform.balanceMessage%></textarea>
+                        </div>
 
                         <div style="background-color: white; border-color: black; border-width: 2px; padding: 20px; margin-bottom: 10px; margin-top: 10px;">
                             <% let scheme;%>

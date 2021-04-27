@@ -32,7 +32,7 @@ controller.updatePlatform = async function(req, res) {
     }
 
     const oldAddress = platform.emailExtension;
-    for (let attr of ["name", "description", "postText", "imageUrl", "emailExtension", "officialEmail", "displayImages", "font"]) { //Update elements with directly corresponding text
+    for (let attr of ["name", "description", "postText", "imageUrl", "emailExtension", "officialEmail", "displayImages", "font", "balanceMessage"]) { //Update elements with directly corresponding text
         platform[attr] = req.body[attr];
     }
 
@@ -480,7 +480,11 @@ controller.updateBalances = async function(req, res) {
     const platform = await setup(Platform);
     const user = await User.findByIdAndUpdate(req.body.userId, {balance: parseFloat(req.body.bal)});
     if (!platform || !user) { return res.json({error: "Error. Could not change"});}
-    if (!platform.dollarPayment) { await sendGridEmail(user.email, "Balance Update", `<p>Hello ${user.firstName},</p><p>Your balance has been updated to $${user.balance}! Visit ${platform.url} to check out our merchandise.</p>`, false); }
+    if (platform.dollarPayment) {
+        await sendGridEmail(user.email, "Balance Update", `<p>Hello ${user.firstName},</p><p>Your balance has been updated to $${user.balance.toFixed(2)}!</p><p>${platform.balanceMessage}</p><p>Visit ${url} to check out our merchandise.</p>`, false);
+    } else {
+        await sendGridEmail(user.email, "Balance Update", `<p>Hello ${user.firstName},</p><p>Your balance has been updated to ${user.balance} Credits!</p><p>${platform.balanceMessage}</p><p>Visit ${platform.url}/shop to check out our merchandise.</p>`, false);
+    }
     if (platform.dollarPayment) {return res.json({success: 'Succesfully changed', balance: (parseFloat(req.body.bal)).toFixed(2)});}
     return res.json({success: 'Succesfully changed', balance: (parseInt(req.body.bal))});
 }
