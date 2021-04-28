@@ -353,8 +353,9 @@ controller.newItem = async function(req, res) {
 //CREATE NEW ITEM
 controller.createItem = async function(req, res) {
     const platform = await setup(Platform);
+    const shop = await setup(Market);
     const overlap = await Item.find({name: req.body.name});
-    if (!overlap) {
+    if (!platform || !shop || !overlap) {
         req.flash("error", "Unable to find items");
         return res.redirect("back");
     }
@@ -403,10 +404,16 @@ controller.createItem = async function(req, res) {
     if (parseFloat(req.body.price)) {item.price = parseFloat(req.body.price);
     } else {item.price = 0;}
 
-    const category = await ItemCategory.findOne({name: req.body.category}); //Find the category specified in the form
+    let category = await ItemCategory.findOne({_id: {$in: shop.categories}, name: req.body.category}); //Find the category specified in the form
     if (!category) {
-        req.flash("error", "Unable to find correct item category");
-        return res.redirect("back");
+        category = await ItemCategory.findOne({name: "Other"});
+        if (!category) {
+            category = await ItemCategory.create({name: "Other"});
+            if (!category) {
+                req.flash("error", "Unable to find item category");
+                return res.redirect("back");
+            }
+        }
     }
 
     await item.save();
@@ -442,11 +449,8 @@ controller.viewItem = async function(req, res) {
 
 //UPDATE/UPVOTE ITEM
 controller.updateItem = async function(req, res) {
-    if (req.body.name) {
-        await controller.updateItemInfo(req, res);
-    } else {
-        await controller.upvoteItem(req, res);
-    }
+    if (req.body.name) {await controller.updateItemInfo(req, res);
+    } else {await controller.upvoteItem(req, res);}
 }
 
 //DELETE ITEM
@@ -769,15 +773,15 @@ controller.upvoteItem = async function(req, res) {
 }
 
 controller.updateItemInfo = async function(req, res) {
-    const platform = await setup(Platform);
-    const shop = await setup(Market);
     if (!req.user.tags.includes("Cashier")) {
         req.flash("error", "You do not have permission to do that");
         return res.redirect("back");
     }
 
+    const platform = await setup(Platform);
+    const shop = await setup(Market);
     const overlap = await Item.find({_id: {$ne: req.params.id}, name: req.body.name});
-    if (!overlap) {
+    if (!platform || !shop || !overlap) {
         req.flash("error", "Item Not Found");
         return res.redirect("back");
     }
@@ -860,10 +864,16 @@ controller.updateItemInfo = async function(req, res) {
         await t.save();
     }
 
-    const category = await ItemCategory.findOne({_id: {$in: shop.categories}, name: req.body.category});  //Add the item to the category which is now specified
+    let category = await ItemCategory.findOne({_id: {$in: shop.categories}, name: req.body.category}); //Find the category specified in the form
     if (!category) {
-        req.flash("error", "Unable to find item category");
-        return res.redirect("back");
+        category = await ItemCategory.findOne({name: "Other"});
+        if (!category) {
+            category = await ItemCategory.create({name: "Other"});
+            if (!category) {
+                req.flash("error", "Unable to find item category");
+                return res.redirect("back");
+            }
+        }
     }
 
     removeIfIncluded(category.items, item._id); //If item is already in category, remove it so you can put the updated category back (we don"t know whether the category will be there or not, so it"s better to just cover all bases)
