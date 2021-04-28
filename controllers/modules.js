@@ -151,11 +151,7 @@ controller.updateModule = async function(req, res) {
         return res.redirect('back');
     }
 
-    for (let attr of ["images", "links"]) { //Add images and links
-        if (req.body[attr]) {
-            updatedModule[attr] = req.body[attr];
-        }
-    }
+    for (let attr of ["images", "links"]) {if (req.body[attr]) {updatedModule[attr] = req.body[attr];}} //Add images and links
 
     //Iterate through all selected media to remove and delete them
     let cloudErr;

@@ -80,7 +80,7 @@ controller.updateForm = async function(req, res) {
     for (let media of article.mediaFiles) {
         fileExtensions.set(media.url, path.extname(media.url.split("SaberChat/")[1]));
     }
-    return res.render('articles/edit', {platform, article, fileExtensions});
+    return res.render('articles/edit', {platform, article, fileExtensions, data: platform.features[objectArrIndex(platform.features, "route", "articles")]});
 };
 
 // Article POST create
@@ -96,11 +96,8 @@ controller.create = async function(req, res) {
         return res.redirect('back');
     }
 
-    for (let attr of ["images", "links"]) { //Add images and links
-        if (req.body[attr]) {
-            article[attr] = req.body[attr];
-        }
-    }
+    for (let attr of ["images", "links"]) {if (req.body[attr]) {article[attr] = req.body[attr];}}//Add images and links
+    if (!platform.postVerifiable) {article.verified = true;} //Event does not need to be verified if platform does not support verifying announcements
 
     // if files were uploaded, process them
     if (req.files) {
@@ -108,13 +105,8 @@ controller.create = async function(req, res) {
             let cloudErr;
             let cloudResult;
             for (let file of req.files.mediaFile) { //Upload each file to cloudinary
-                if ([".mp3", ".mp4", ".m4a", ".mov"].includes(path.extname(file.originalname).toLowerCase())) {
-                    [cloudErr, cloudResult] = await cloudUpload(file, "video");
-                } else if (path.extname(file.originalname).toLowerCase() == ".pdf") {
-                    [cloudErr, cloudResult] = await cloudUpload(file, "pdf");
-                } else {
-                    [cloudErr, cloudResult] = await cloudUpload(file, "image");
-                }
+                const processedBuffer = await autoCompress(file.originalname, file.buffer);
+                [cloudErr, cloudResult] = await cloudUpload(file.originalname, processedBuffer);
                 if (cloudErr || !cloudResult) {
                     req.flash('error', 'Upload failed');
                     return res.redirect('back');
@@ -170,9 +162,7 @@ controller.updateArticle = async function(req, res) {
         return res.redirect('back');
     }
 
-    for (let attr of ["images", "links"]) { //Add images and links
-        if (req.body[attr]) {updatedArticle[attr] = req.body[attr];}
-    }
+    for (let attr of ["images", "links"]) {if (req.body[attr]) {updatedArticle[attr] = req.body[attr];}}
     if (!platform.postVerifiable) {updatedArticle.verified = true;} //Article does not need to be verified if platform does not support verifying articles
 
     //Iterate through all selected media to remove and delete them
@@ -201,13 +191,8 @@ controller.updateArticle = async function(req, res) {
         if (req.files.mediaFile) {
             //Iterate through all new attached media
             for (let file of req.files.mediaFile) {
-                if ([".mp3", ".mp4", ".m4a", ".mov"].includes(path.extname(file.originalname).toLowerCase())) {
-                    [cloudErr, cloudResult] = await cloudUpload(file, "video");
-                } else if (path.extname(file.originalname).toLowerCase() == ".pdf") {
-                    [cloudErr, cloudResult] = await cloudUpload(file, "pdf");
-                } else {
-                    [cloudErr, cloudResult] = await cloudUpload(file, "image");
-                }
+                const processedBuffer = await autoCompress(file.originalname, file.buffer);
+                [cloudErr, cloudResult] = await cloudUpload(file.originalname, processedBuffer);
                 if (cloudErr || !cloudResult) {
                     req.flash('error', 'Upload failed');
                     return res.redirect('back');
@@ -340,8 +325,8 @@ controller.deleteArticle = async function(req, res) {
             } else if (path.extname(file.url.split("SaberChat/")[1]).toLowerCase() == ".pdf") {
                 [cloudErr, cloudResult] = await cloudDelete(file.filename, "pdf");
             } else {
-            }
                 [cloudErr, cloudResult] = await cloudDelete(file.filename, "image");
+            }
             // check for failure
             if (cloudErr || !cloudResult || cloudResult.result !== 'ok') {
                 req.flash('error', 'Error deleting uploaded image');

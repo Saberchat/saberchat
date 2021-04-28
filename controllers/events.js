@@ -5,6 +5,7 @@ const path = require('path');
 const {objectArrIndex, removeIfIncluded} = require("../utils/object-operations");
 const setup = require("../utils/setup");
 const {cloudUpload, cloudDelete} = require('../services/cloudinary');
+const {autoCompress} = require("../utils/image-compress");
 
 //SCHEMA
 const Platform = require("../models/platform");
@@ -114,11 +115,8 @@ controller.create = async function(req, res) {
         return res.redirect('back');
     }
 
-    for (let attr of ["images", "links"]) { //Add images and links
-        if (req.body[attr]) {
-            event[attr] = req.body[attr];
-        }
-    }
+    for (let attr of ["images", "links"]) {if (req.body[attr]) {event[attr] = req.body[attr];}} //Add images and links
+    if (!platform.postVerifiable) {event.verified = true;} //Announcement does not need to be verified if platform does not support verifying announcements
 
     // if files were uploaded, process them
     if (req.files) {
@@ -126,13 +124,8 @@ controller.create = async function(req, res) {
             let cloudErr;
             let cloudResult;
             for (let file of req.files.mediaFile) { //Upload each file to cloudinary
-                if ([".mp3", ".mp4", ".m4a", ".mov"].includes(path.extname(file.originalname).toLowerCase())) {
-                    [cloudErr, cloudResult] = await cloudUpload(file, "video");
-                } else if (path.extname(file.originalname).toLowerCase() == ".pdf") {
-                    [cloudErr, cloudResult] = await cloudUpload(file, "pdf");
-                } else {
-                    [cloudErr, cloudResult] = await cloudUpload(file, "image");
-                }
+                const processedBuffer = await autoCompress(file.originalname, file.buffer);
+                [cloudErr, cloudResult] = await cloudUpload(file.originalname, processedBuffer);
                 if (cloudErr || !cloudResult) {
                     req.flash('error', 'Upload failed');
                     return res.redirect('back');
@@ -193,9 +186,7 @@ controller.updateEvent = async function(req, res) {
         return res.redirect('back');
     }
 
-    for (let attr of ["images", "links"]) { //Add images and links
-        if (req.body[attr]) {updatedEvent[attr] = req.body[attr];}
-    }
+    for (let attr of ["images", "links"]) {if (req.body[attr]) {updatedEvent[attr] = req.body[attr];}} //Add images and links
     if (!platform.postVerifiable) {updatedEvent.verified = true;} //Event does not need to be verified if platform does not support verifying events
 
     //Iterate through all selected media to remove and delete them
@@ -224,13 +215,8 @@ controller.updateEvent = async function(req, res) {
         if (req.files.mediaFile) {
             //Iterate through all new attached media
             for (let file of req.files.mediaFile) {
-                if ([".mp3", ".mp4", ".m4a", ".mov"].includes(path.extname(file.originalname).toLowerCase())) {
-                    [cloudErr, cloudResult] = await cloudUpload(file, "video");
-                } else if (path.extname(file.originalname).toLowerCase() == ".pdf") {
-                    [cloudErr, cloudResult] = await cloudUpload(file, "pdf");
-                } else {
-                    [cloudErr, cloudResult] = await cloudUpload(file, "image");
-                }
+                const processedBuffer = await autoCompress(file.originalname, file.buffer);
+                [cloudErr, cloudResult] = await cloudUpload(file.originalname, processedBuffer);
                 if (cloudErr || !cloudResult) {
                     req.flash('error', 'Upload failed');
                     return res.redirect('back');
@@ -363,8 +349,8 @@ controller.deleteEvent = async function(req, res) {
             } else if (path.extname(file.url.split("SaberChat/")[1]).toLowerCase() == ".pdf") {
                 [cloudErr, cloudResult] = await cloudDelete(file.filename, "pdf");
             } else {
-            }
                 [cloudErr, cloudResult] = await cloudDelete(file.filename, "image");
+            }
             // check for failure
             if (cloudErr || !cloudResult || cloudResult.result !== 'ok') {
                 req.flash('error', 'Error deleting uploaded image');

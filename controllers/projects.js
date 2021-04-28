@@ -106,6 +106,7 @@ controller.createProject = async function(req, res) {
     }
 
     if (req.body.images) {project.images = req.body.images;} //If any images were added (if not, the 'images' property is null)
+    if (!platform.postVerifiable) {project.verified = true;}
 
     if (req.files) {
         if (req.files.mediaFile) { //Look for all attached files and upload them
@@ -312,10 +313,8 @@ controller.updateProject = async function(req, res) {
         return res.redirect('back');
     }
 
-    if (req.body.images) { //If any images were added (if not, the 'images' property is null)
-        updatedProject.images = req.body.images;
-    }
-    if (!platform.postVerifiable) {updatedProject.verified = true;} //PRoject does not need to be verified if platform does not support verifying projects
+    if (req.body.images) {updatedProject.images = req.body.images;} //If any images were added (if not, the 'images' property is null)
+    if (!platform.postVerifiable) {updatedProject.verified = true;} //Project does not need to be verified if platform does not support verifying projects
 
     let cloudErr;
     let cloudResult;

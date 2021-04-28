@@ -402,8 +402,8 @@ controller.deleteAnnouncement = async function(req, res) {
     if (announcement.sender._id.toString() != req.user._id.toString()) {
         req.flash('error', "You can only delete announcements that you have posted");
         return res.redirect('back');
-
     }
+    
     // delete any uploads
     let cloudErr;
     let cloudResult;
