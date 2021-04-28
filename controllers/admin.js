@@ -2,6 +2,8 @@
 const {sendGridEmail} = require("../services/sendGrid");
 const {objectArrIndex, concatMatrix, removeIfIncluded} = require("../utils/object-operations");
 const setup = require("../utils/setup");
+const {cloudUpload, cloudDelete} = require('../services/cloudinary');
+const {autoCompress} = require("../utils/image-compress");
 
 //SCHEMA
 const Platform = require("../models/platform");
@@ -29,6 +31,37 @@ controller.updatePlatform = async function(req, res) {
     if (!platform || !users) {
         req.flash("error", "An Error Occurred");
         return res.redirect("back");
+    }
+
+    if (req.files) {
+        if (req.files.mediaFile) {
+            let cloudErr;
+            let cloudResult;
+            if (platform.displayVideo && platform.displayVideo.filename) {
+                [cloudErr, cloudResult] = await cloudDelete(platform.displayVideo.filename, "video");
+                // check for failure
+                if (cloudErr || !cloudResult || cloudResult.result !== "ok") {
+                    req.flash("error", "Error deleting video");
+                    return res.redirect("back");
+                }
+            }
+            
+            const file = req.files.mediaFile[0];
+            const processedBuffer = await autoCompress(file.originalname, file.buffer);
+            [cloudErr, cloudResult] = await cloudUpload(file.originalname, processedBuffer);
+
+            if (cloudErr || !cloudResult) {
+                req.flash("error", "Upload failed");
+                return res.redirect("back");
+            }
+
+            platform.displayVideo = {
+                filename: cloudResult.public_id,
+                url: cloudResult.secure_url,
+                originalName: file.originalname,
+                display: false
+            };
+        }
     }
 
     const oldAddress = platform.emailExtension;

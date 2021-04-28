@@ -52,7 +52,7 @@
 
             <div class="row settings">
                 <div class="col-12">
-                    <form id="update-settings" action="/admin/settings?_method=put" method="post">
+                    <form id="update-settings" action="/admin/settings?_method=put" method="post" enctype="multipart/form-data">
                         <h4>General Settings</h4>
                         <div class="form-group">
                             <label for="newName">Name</label>
@@ -74,6 +74,15 @@
                             <input id="thumbnail-input" class="form-control mode" type="text" oninput="changeThumbnail(this)"
                                     name="imageUrl" value="<%= platform.imageUrl %>" placeholder="Enter Image Url">
                         </div>
+                        <div class="form-group">
+                            <label for="mediaFile">Display Video (Upload)</label>
+                            <input type="file" name="mediaFile" class="image-upload form-control-file mode" accept="video/*">
+                        </div>
+
+                        <% if (platform.displayVideo.url) {%>
+                            <video width="520px" height="305px" src="<%=platform.displayVideo.url%>" type="video/*" controls></video>
+                        <% } %>
+
                         <div class="form-group">
                             <label for="email-input">Required Email Extension (if left blank, none will be applied)</label><br/>
                             <input id="email-input" class="form-control mode" type="text"

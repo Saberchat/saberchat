@@ -63,13 +63,17 @@
                         <h1 style="user-select: none; -moz-user-select: none;">About</h1>
                     </div>
                     <div class="block-content mode">
-                        <p>Saberchat is an intranet platform that connects and centralizes your communication and notification platforms. It streamlines communication between members across your community, allowing users to quickly share and access important information. It is used across schools, clubs, organizations and more.</p>
+                        <p>Saberchat is an intranet platform that connects and centralizes your communication and notification platforms. It streamlines communication across your community, allowing users to quickly share and access important information. It is used across schools, clubs, organizations and more.</p>
                         <span id="developers"><span id="developers-heading">Developers: </span>Alexander Zhou, Kabir Samsi, Siddharth Chavan, Vibhav Darsha, Dmitry Pleshkov</span>
                     </div>
                 </article>
             </div>
             <div class="col-lg-6 block">
-                <img class="image-block" src="<%=platform.displayImages[0]%>" alt="<%=platform.name%> image">
+                <% if (platform.displayVideo.url && platform.displayVideo.url != '') {%>
+                    <video width="520px" height="305px" src="<%=platform.displayVideo.url%>" type="video/*" controls class="image-block"></video>
+                <% } else {%>
+                    <img class="image-block" src="<%=platform.displayImages[0]%>" alt="<%=platform.name%> image">
+                <% } %>
             </div>
         </div>
         <!-- Block 2 -->

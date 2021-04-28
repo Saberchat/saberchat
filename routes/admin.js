@@ -1,6 +1,7 @@
 const express = require('express');
 const middleware = require('../middleware');
 const wrapAsync = require('../utils/wrapAsync');
+const {singleUpload} = require('../middleware/multer')
 const admin = require("../controllers/admin"); //Controller
 const router = express.Router(); //Router
 
@@ -25,7 +26,7 @@ router.route("/accesslist")
 
 router.route("/settings")
     .get(wrapAsync(middleware.isLoggedIn), wrapAsync(middleware.isPrincipal), wrapAsync(admin.updatePlatformForm))
-    .put(wrapAsync(middleware.isLoggedIn), wrapAsync(middleware.isPrincipal), wrapAsync(admin.updatePlatform));
+    .put(wrapAsync(middleware.isLoggedIn), wrapAsync(middleware.isPrincipal), singleUpload, wrapAsync(admin.updatePlatform));
 
 router.put('/tag', wrapAsync(middleware.isLoggedIn), wrapAsync(middleware.isMod), wrapAsync(admin.tag));
 
