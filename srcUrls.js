@@ -7,7 +7,8 @@ module.exports.scriptUrls = [
     "https://cdnjs.cloudflare.com/", // popper, datetime
     "https://ajax.googleapis.com/", // jquery
     "https://www.googletagmanager.com/", // google analytics
-    "https://cdn.jsdelivr.net/" // JSDelivr
+    "https://cdn.jsdelivr.net/", // JSDelivr
+    "https://www.gofundme.com/"
 ];
 
 module.exports.styleUrls = [

@@ -81,13 +81,14 @@ controller.updateForm = async function(req, res) {
 
 // Module POST create
 controller.create = async function(req, res) {
+    const platform = await setup(Platform);
     const module = await Module.create({ //Build module with error info
         sender: req.user,
         subject: req.body.subject,
         text: req.body.message,
         verified: true
     });
-    if (!module) {
+    if (!platform || !module) {
         req.flash('error', 'Unable to create module');
         return res.redirect('back');
     }

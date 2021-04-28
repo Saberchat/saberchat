@@ -85,12 +85,13 @@ controller.updateForm = async function(req, res) {
 
 // Article POST create
 controller.create = async function(req, res) {
+    const platform = await setup(Platform);
     const article = await ArticleLink.create({ //Build article with error info
         sender: req.user,
         subject: req.body.subject,
         text: req.body.message
     });
-    if (!article) {
+    if (!platform || !article) {
         req.flash('error', 'Unable to create article');
         return res.redirect('back');
     }

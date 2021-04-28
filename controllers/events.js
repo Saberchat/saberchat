@@ -98,6 +98,7 @@ controller.updateForm = async function(req, res) {
 
 // Event POST create
 controller.create = async function(req, res) {
+    const platform = await setup(Platform);
     const event = await Event.create({ //Build event with error info
         sender: req.user,
         subject: req.body.subject,
@@ -108,7 +109,7 @@ controller.create = async function(req, res) {
             year: req.body.year
         }
     });
-    if (!event) {
+    if (!platform || !event) {
         req.flash('error', 'Unable to create event');
         return res.redirect('back');
     }
