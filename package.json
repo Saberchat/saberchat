@@ -33,6 +33,7 @@
     "express": "^4.17.1",
     "express-mongo-sanitize": "^2.0.2",
     "express-session": "^1.17.1",
+    "ffmpeg": "^0.0.4",
     "fillers": "^1.1.4",
     "heic2any": "0.0.3",
     "helmet": "^4.3.1",

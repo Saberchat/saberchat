@@ -34,6 +34,27 @@ module.exports.autoCompress = async function(fileName, fileBuffer) {
             console.error(e);
             return fileBuffer;
         }
+    } else if ([".mp4"].includes(ext)) {
+        return fileBuffer; //placeholder
+        try {
+            if (process.env.DEBUG === "true") {
+                console.log("DMITRY-DEBUG: attempting to compress video...");
+            }
+            let originalSize = fileBuffer.byteLength;
+            let compressedBuffer = await compressImage(fileBuffer);
+            let compressedSize = compressedBuffer.byteLength;
+            if (process.env.DEBUG === "true") {
+                console.log("Image compression results:")
+                console.log("Original:", originalSize);
+                console.log("Compressed:", compressedSize);
+                console.log("Ratio:", compressedSize/originalSize);
+            }
+            return compressedBuffer;
+        } catch(e) {
+            console.warn("An error occurred while compressing video: ");
+            console.error(e);
+            return fileBuffer;
+        }
     }
     return fileBuffer;
 }
