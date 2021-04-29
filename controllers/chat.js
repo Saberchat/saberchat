@@ -3,7 +3,7 @@ const Filter = require('bad-words');
 const filter = new Filter();
 const dateFormat = require('dateformat');
 const {sendGridEmail} = require("../services/sendGrid");
-const {removeIfIncluded, concatMatrix, multiplyArrays} = require("../utils/object-operations");
+const {removeIfIncluded, concatMatrix, multiplyArrays, sortAlph} = require("../utils/object-operations");
 const setup = require("../utils/setup");
 
 //SCHEMA
@@ -72,7 +72,6 @@ controller.showRoom = async function(req, res) {
     }
     removeIfIncluded(req.user.newRoomCount, room._id); //If user has not seen room before, remove it
     await req.user.save();
-
     return res.render('chat/show', {platform, room});
 }
 
@@ -90,13 +89,14 @@ controller.showMembers = async function(req, res) {
 		multiplyArrays([], platform.statusesProperty.length)
 	]).reverse();
 
-	for (let status of statuses) {
+    let reversedPerms = [];
+	for (let permission of platform.permissionsProperty) {reversedPerms.unshift(permission);}
+
+    for (let status of statuses) {
 		status[2] = [];
-		for (let permission of platform.permissionsProperty) {
-			for (let user of room.members) {
-				if (status[0] == user.status && permission == user.permission) {
-					status[2].push(user);
-				}
+		for (let permission of reversedPerms) {
+			for (let user of sortAlph(room.members, "email")) {
+				if (status[0] == user.status && permission == user.permission) {status[2].push(user);}
 			}
 		}
 	}

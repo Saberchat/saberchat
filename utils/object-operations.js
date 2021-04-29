@@ -23,24 +23,27 @@ package.equateObjects = function(objects, property) { //Find overlapping objects
     return sortByPopularity(sortedMatrix, "instances", "date").popular; //Sort matrix by popularity of objects
 }
 
-package.objectArrIndex = function(arr, property, key, subproperty) { //Check if an object which includes a certain property contains a key in that property
+package.objectArrIndex = function(arr, property, key, subproperty, caseInsensitive) { //Check if an object which includes a certain property contains a key in that property
     for (let i = 0; i < arr.length; i ++) {
         if (subproperty) { //If a subproperty needs to be evaluated
-            if (arr[i][property][subproperty].toString() == key.toString()) { //Check equality with property and subproperty
-                return i;
+            if (caseInsensitive) { //If case insensitive
+                if (arr[i][property][subproperty].toString().toLowerCase() == key.toString().toLowerCase()) {return i;} //Check equality with property and subproperty    
             }
+            if (arr[i][property][subproperty].toString() == key.toString()) {return i;} //Check equality with property and subproperty
         }
-        if (arr[i][property].toString() == key.toString()) { //Otherwise, check equality with just property
-            return i;
+        if (caseInsensitive) {
+            if (arr[i][property].toString().toLowerCase() == key.toString().toLowerCase()) {return i;}
         }
+        if (arr[i][property].toString() == key.toString()) {return i;} //Otherwise, check equality with just property
     }
     return -1; //If no result is found, return -1 (like a regular array)
 }
 
-package.parsePropertyArray = function(arr, property) { //Build an array with a single property for each item in an array of objects
+package.parsePropertyArray = function(arr, property, lower) { //Build an array with a single property for each item in an array of objects
     let final = [];
     for (let object of arr) { //Iterate through array, and parse out specific property from each object
-        final.push(object[property]);
+        if (lower) {final.push(object[property].toLowerCase());}
+        else {final.push(object[property]);}
     }
     return final;
 }
@@ -68,10 +71,7 @@ package.parseKeysOrValues = function(obj, version) { //Take an object and extrac
         keys.push(key);
         values.push(obj[key]);
     }
-    //Depending on return value, return either keys or values
-    if (version == "keys") {
-        return keys;
-    }
+    if (version == "keys") {return keys;} //Depending on return value, return either keys or values
     return values;
 }
 
@@ -80,11 +80,7 @@ package.concatMatrix = function(arrs) { //Take a list of arrays and concatenate 
     let temp = [];
     for (let i = 0; i < arrs[0].length; i++) { //Iterate through each position in first array
         temp = [];
-        for (let arr of arrs) { //Build temporary array with each item at given index at all arrays
-            if (arr[i]) {
-                temp.push(arr[i]);
-            }
-        }
+        for (let arr of arrs) {if (arr[i]) {temp.push(arr[i]);}} //Build temporary array with each item at given index at all arrays
         mat.push(temp); //Add built array to matrix
     }
     return mat;
@@ -92,10 +88,17 @@ package.concatMatrix = function(arrs) { //Take a list of arrays and concatenate 
 
 package.multiplyArrays = function(arr, number) { //Take an array and return multiple copies of it as a matrix
     let mat = []; //Matrix stores duplicated arrays
-    for (let i = 0; i < number; i++) { //Add arrays for the number of occurrences
-        mat.push(arr);
-    }
+    for (let i = 0; i < number; i++) {mat.push(arr);}  //Add arrays for the number of occurrences
     return mat;
+}
+
+package.sortAlph = function(arr, property) {
+    const sortedProperties = package.parsePropertyArray(arr, property, true).sort();
+    let sortedArr = [];
+    for (let element of sortedProperties) {
+        sortedArr.push(arr[package.objectArrIndex(arr, property, element, null, true)]);
+    }
+    return sortedArr;
 }
 
 module.exports = package;

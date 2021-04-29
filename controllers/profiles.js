@@ -5,7 +5,7 @@ const Filter = require('bad-words');
 const filter = new Filter();
 const axios = require('axios');
 const {cloudUpload, cloudDelete} = require('../services/cloudinary');
-const {objectArrIndex, removeIfIncluded, concatMatrix, multiplyArrays, parsePropertyArray} = require('../utils/object-operations');
+const {objectArrIndex, removeIfIncluded, concatMatrix, multiplyArrays, parsePropertyArray, sortAlph} = require('../utils/object-operations');
 const setup = require("../utils/setup");
 const {autoCompress} = require("../utils/image-compress");
 
@@ -38,13 +38,14 @@ controller.index = async function(req, res) {
 		multiplyArrays([], platform.statusesProperty.length)
 	]).reverse();
 
+	let reversedPerms = [];
+	for (let permission of platform.permissionsProperty) {reversedPerms.unshift(permission);}
+
 	for (let status of statuses) {
 		status[2] = [];
-		for (let permission of platform.permissionsProperty) {
-			for (let user of users) {
-				if (status[0] == user.status && permission == user.permission) {
-					status[2].push(user);
-				}
+		for (let permission of reversedPerms) {
+			for (let user of sortAlph(users, "email")) {
+				if (status[0] == user.status && permission == user.permission) {status[2].push(user);}
 			}
 		}
 	}
@@ -73,7 +74,6 @@ controller.team = async function(req, res) {
 		req.flash("error", "An error occurred");
 		return res.redirect("back");
 	}
-
 	return res.render("profiles/team", {platform, users});
 }
 
@@ -275,7 +275,6 @@ controller.tagPut = async function(req, res) {
 				}
 			}
 		}
-		
 		removeIfIncluded(req.user.tags, req.body.tag); //If no issue, remove tag
 		await req.user.save();
 		return res.json({success: "Succesfully removed status", tag: req.body.tag, user: req.user._id});
@@ -292,13 +291,7 @@ controller.changeEmailPut = async function(req, res) { //Update email
         return res.redirect("back");
     }
 	
-	//Update receiving emails info
-	if (req.body.receiving_emails) {
-		req.user.receiving_emails = true;
-
-	} else {
-		req.user.receiving_emails = false;
-	}
+	req.user.receiving_emails = (req.body.receiving_emails != undefined); //Update receiving emails info
 	await req.user.save();
 
 	if (req.user.email == req.body.email) { //If email is not changed, no need to update
