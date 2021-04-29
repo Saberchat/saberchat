@@ -63,7 +63,7 @@ const appSetup = async function() {
 
     await app.use(helmet.contentSecurityPolicy({ // customizations for helmet content security policy
         directives: {
-            defaultSrc: ["https://docs.google.com", "https://res.cloudinary.com", "https://www.gofundme.com/"],
+            defaultSrc: ["https://docs.google.com", "https://drive.google.com", "https://res.cloudinary.com", "https://www.gofundme.com/"],
             connectSrc: ["'self'", "https://ka-f.fontawesome.com/", "https://res.cloudinary.com", "https://www.googletagmanager.com", "https://www.google-analytics.com"],
             scriptSrc: ["'unsafe-inline'", "'self'", ...scriptUrls],
             styleSrc: ["'self'", "'unsafe-inline'", ...styleUrls],

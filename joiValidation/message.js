@@ -16,9 +16,9 @@ const msgSchema = Joi.object({
     all: Joi.boolean().valid(true),
     anonymous: Joi.boolean().valid(true),
     noreply: Joi.boolean().valid(true),
-    images: Joi.array().items(Joi.string().pattern(new RegExp(/https:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,4}\b([-a-zA-Z0-9@:%_\+.~#?&//=]*)/))).messages({
-        "string.pattern.base": "Image Urls should be https links"
-    })
+    images: Joi.alternatives().try(Joi.string(), Joi.array().items(Joi.string().pattern(new RegExp(/https:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,4}\b([-a-zA-Z0-9@:%_\+.~#?&//=]*)/)))).messages({
+        "string.pattern.base": "Image URLs should be https links"
+    }),
 }).xor('recipients', 'all').messages({
     "object.missing": 'Please select recipients or "everyone".'
 });

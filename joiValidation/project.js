@@ -13,9 +13,9 @@ const projectSchema = Joi.object({
         "string.min": "Descrip. minimum 50 characters."
     }),
     creatorInput: Joi.string().allow('').required().escapeHtml(),
-    images: Joi.array().items(Joi.string().pattern(new RegExp(/https:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,4}\b([-a-zA-Z0-9@:%_\+.~#?&//=]*)/))).messages({
-        "string.pattern.base": "Image Urls should be https links"
-    })
+    images: Joi.alternatives().try(Joi.string(), Joi.array().items(Joi.string().pattern(new RegExp(/https:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,4}\b([-a-zA-Z0-9@:%_\+.~#?&//=]*)/)))).messages({
+        "string.pattern.base": "Image URLs should be https links"
+    }),
 });
 
 module.exports = {projectSchema};
