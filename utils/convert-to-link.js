@@ -45,11 +45,9 @@ package.convertToLink = function(text) { //Convert text to contain embedded link
             if (line.includes(email)) {
                 embedded = true;
                 for (let segment of line.split('\n')) {
-                    if (segment.includes(email)) {
+                    if (segment.includes(email) && segment.indexOf('@') > 0) { //Check that a) email is included and b) it has an address before the @ (not a social media handle)
                         convertedText += `<a class="embedded-link" href="mailto:${email}">${segment}</a>`;
-                    } else {
-                        convertedText += `${segment}`;
-                    }
+                    } else {convertedText += `${segment}`;}
                 }
                 convertedText += ` `;
                 break;

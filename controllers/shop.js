@@ -369,7 +369,8 @@ controller.createItem = async function(req, res) {
         name: req.body.name,
         availableItems: parseInt(req.body.available),
         description: req.body.description,
-        imgUrl: {url: req.body.image, display: req.body.showImage == "url"}
+        imgUrl: {url: req.body.image, display: req.body.showImage == "url"},
+        imageLink: (req.body.imageLink != undefined)
     });
 
     if (!item) {
@@ -797,6 +798,7 @@ controller.updateItemInfo = async function(req, res) {
         availableItems: parseInt(req.body.available),
         description: req.body.description,
         imgUrl: {url: req.body.image, display: req.body.showImage == "url"},
+        imageLink: (req.body.imageLink != undefined)
     });
     if (!item) {
         req.flash("error", "item not found");

@@ -126,10 +126,11 @@
 
                     <div class="form-group">
                         <input type="radio" name="showImage" value="upload" id="showUploadedImage" <% if (item.mediaFile.display) {%> checked <%}%>/>
-                        <label for="showUploadedImage">Display Uploaded Image</label>
-                        <br />
+                        <label for="showUploadedImage">Display Uploaded Image</label><br />
                         <input type="radio" name="showImage" value="url" id="showLinkImage" <% if (item.imgUrl.display) {%> checked <%}%>/>
-                        <label for="showLinkImage">Display Image URL</label>
+                        <label for="showLinkImage">Display Image URL</label><br />
+                        <input type="checkbox" name="imageLink" id="imageLink" <%if(item.imageLink){%>checked<%}%>/>
+                        <label for="imageLink">Allow Display Image To Link To Larger Image</label>
                     </div>
                 </div>
                 <div class="form-group">

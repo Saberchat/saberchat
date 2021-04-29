@@ -76,10 +76,7 @@
                                 <span class="list-group-item list-group-item-action menu-item <%= category.name.split(' ').join('') %>  shop"
                                     id="item-<%= item.id %>">
                             <% } %>
-
-                            
                                 <span class="item-name"><%= item.name %> (<%= item.availableItems %> orders available)</span> - <% if (platform.dollarPayment) {%>$<%=(item.price).toFixed(2)%><% } else {%><%=(item.price)%> Credits<%}%>
-
                                 <% if (currentUser) { %>
                                     <div title="Upvotes" class="upvotes">
                                         <% if (item.upvotes.includes(currentUser._id)) { %>
@@ -106,13 +103,27 @@
                                 <% if (!platform.purchasable && item.link != '') {%><br><strong>Order Here:</strong> <a target="_blank" href="<%=item.link%>"> <%=item.link%></a><% } %>
                                 <br><br/><em class="item-description convertible-text"><%= itemDescriptions[item._id.toString()] %></em><br/>
                         <% if (item.mediaFile.display && [".png", ".jpg", ".jpeg", ".gif"].includes(fileExtensions.get(item.mediaFile.url).toLowerCase())) { %>
-                            <a href="<%=item.mediaFile.url%>" target="_blank">
-                                <img class="item-image" src="<%= item.mediaFile.url %>"/>
+                            <% if (item.imageLink) {%>
+                                <a href="<%=item.mediaFile.url%>" target="_blank">
+                                    <img class="item-image" src="<%= item.mediaFile.url %>"/>
+                                </a>
+                            <% } else {%>
+                                <div class="no-link-container">
+                                    <img class="item-image" src="<%= item.mediaFile.url %>"/>
+                                </div>
+                            <% } %>
+                        
                         <% } else { %>
-                            <a href="<%=item.imgUrl.url%>" target="_blank">
-                                <img class="item-image" src="<%= item.imgUrl.url %>"/>
+                            <% if (item.imageLink) {%>
+                                <a href="<%=item.imgUrl.url%>" target="_blank">
+                                    <img class="item-image" src="<%= item.imgUrl.url %>"/>
+                                </a>
+                            <% } else {%>
+                                <div class="no-link-container">
+                                    <img class="item-image" src="<%= item.mediaFile.url %>"/>
+                                </div>
+                            <% } %>
                         <% } %>
-                            </a>
                     </span>
                     <% } %>
                     <div class="modal fade" id="modal-<%=item._id%>-request" tabindex="-1"
@@ -164,13 +175,8 @@
 </div>
 <script src="/javascript/embed.js"></script>
 <script>
-    if (document.getElementById("search-input")) {
-        document.getElementById("search-input").style.backgroundColor = colorScheme[colorScheme.length-1];
-    }
-
-    for (let element of document.getElementsByClassName("menu-item")) {
-        element.style.backgroundColor = colorScheme[0];
-    }
+    if (document.getElementById("search-input")) {document.getElementById("search-input").style.backgroundColor = colorScheme[colorScheme.length-1];}
+    for (let element of document.getElementsByClassName("menu-item")) {element.style.backgroundColor = colorScheme[0];}
 </script>
 </body>
 </html>

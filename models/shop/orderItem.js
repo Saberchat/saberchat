@@ -16,6 +16,7 @@ module.exports = mongoose.model("OrderItem", new mongoose.Schema({
         originalName: String,
         display: Boolean
     },
+    imageLink: {type: Boolean, default: false}, //Allow images to link to larger image on menu
     availableItems: Number,
     upvotes: [{type: mongoose.Schema.Types.ObjectId, ref: 'User'}],
     shop: {type: mongoose.Schema.Types.ObjectId, ref: "Shop"}
