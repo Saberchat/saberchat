@@ -191,14 +191,23 @@ controller.updatePlatform = async function(req, res) {
 controller.authenticateGet = async function(req, res) {
     const platform = await setup(Platform);
     const users = await User.find({authenticated: false});
-    if (!users) {
+    if (!platform || !users) {
         req.flash('error', "Unable to find users");
+        return res.redirect('back');
+    }
+    if (!platform.principalAuthenticate) {
+        req.flash('error', `Principal Authentication is not enabled on ${platform.name} Saberchat`);
         return res.redirect('back');
     }
     return res.render('admin/authenticate', {platform, users});
 }
 
 controller.authenticatePut = async function(req, res) {
+    const platform = await setup(Platform);
+    if (!platform) { return res.json({error: "Unable to set up platform"});}
+    if (!platform.principalAuthenticate) {
+        return res.json({error: `Principal Authentication is not enabled on ${platform.name} Saberchat`});
+    }
     const user = await User.findByIdAndUpdate(req.body.userId, {authenticated: true});
     if (!user) { return res.json({error: "Unable to find user"});}
     await sendGridEmail(user.email, 'Welcome To Saberchat!', `<p>Hello ${user.firstName},</p><p>Welcome to Saberchat! A confirmation of your account:</p><ul><li>Your username is ${user.username}.</li><li>Your full name is ${user.firstName} ${user.lastName}.</li><li>Your linked email is ${user.email}</li></ul><p>You will be assigned a role and status soon.</p>`, false);
@@ -206,6 +215,11 @@ controller.authenticatePut = async function(req, res) {
 }
 
 controller.authenticateDelete = async function(req, res) {
+    const platform = await setup(Platform);
+    if (!platform) { return res.json({error: "Unable to set up platform"});}
+    if (!platform.principalAuthenticate) {
+        return res.json({error: `Principal Authentication is not enabled on ${platform.name} Saberchat`});
+    }
     const user = await User.deleteOne({_id: req.body.userId, authenticated: false});
     if (!user) { return res.json({error: "Unable to find user"});}
     return res.json({success: "Removed User!"});

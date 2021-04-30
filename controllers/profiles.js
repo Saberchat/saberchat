@@ -340,11 +340,8 @@ controller.changeEmailPut = async function(req, res) { //Update email
 	axios({
 		method: 'post', url, data,
 		headers: {"Authorization": "Bearer " + process.env.SENDGRID_KEY}
-	}).then(response => {
-		console.log(`Email Sent with status code: ${response.status}`);
-	}).catch(error => {
-		console.log(error);
-	});
+	}).then(response => {console.log(`Email Sent with status code: ${response.status}`);
+	}).catch(error => {console.log(error);});
 
 	req.flash('success', 'Go to your new email to confirm new address');
 	return res.redirect('/profiles/change-login-info');
@@ -407,21 +404,10 @@ controller.changePasswordPut = async function(req, res) {
 
 controller.follow = async function(req, res) {
 	const user = await User.findById(req.params.id);
-	if (!user) {
-		return res.json({error: "Error finding user"});
-	}
-
-	if (user.followers.includes(req.user._id)) {
-		return res.json({error: "You are already following this user"});
-	}
-
-	if (user.blocked.includes(req.user._id)) {
-		return res.json({error: "User has blocked you"});
-	}
-
-	if (user._id.equals(req.user._id)) {
-		return res.json({error: "You may not follow yourself"});
-	}
+	if (!user) {return res.json({error: "Error finding user"});}
+	if (user.followers.includes(req.user._id)) {return res.json({error: "You are already following this user"});}
+	if (user.blocked.includes(req.user._id)) {return res.json({error: "User has blocked you"});}
+	if (user._id.equals(req.user._id)) {return res.json({error: "You may not follow yourself"});}
 
 	user.followers.push(req.user);
 	await user.save();
@@ -430,9 +416,7 @@ controller.follow = async function(req, res) {
 
 controller.unfollow = async function(req, res) {
 	const user = await User.findById(req.params.id);
-	if (!user) {
-		return res.json({error: "Error finding user"});
-	}
+	if (!user) {return res.json({error: "Error finding user"});}
 
 	//Try to unfollow; if user is not following person, then do not process
 	if (removeIfIncluded(user.followers, req.user._id)) {
@@ -444,9 +428,7 @@ controller.unfollow = async function(req, res) {
 
 controller.remove = async function(req, res) {
 	const user = await User.findById(req.params.id);
-	if (!user) {
-		return res.json({error: "Error finding user"});
-	}
+	if (!user) {return res.json({error: "Error finding user"});}
 
 	//Try to remove follower from user; if person is not following user, then do not process
 	if (removeIfIncluded(req.user.followers, user._id)) {
@@ -459,9 +441,7 @@ controller.remove = async function(req, res) {
 
 controller.unblock = async function(req, res) {
 	const user = await User.findById(req.params.id);
-	if (!user) {
-		return res.json({error: "Error finding user"});
-	}
+	if (!user) {return res.json({error: "Error finding user"});}
 
 	//Try to remove follower from user's blocked list; if person is not following user, then do not process
 	if (removeIfIncluded(req.user.blocked, user._id)) {
@@ -473,239 +453,10 @@ controller.unblock = async function(req, res) {
 
 //DELETE ACCOUNT. CURRENTLY DISABLED ROUTE
 controller.deleteAccount = async function(req, res)  {
-	const deletedComments = await ChatMessage.deleteMany({author: req.user._id});
-
-	if (!deletedComments) {
-		req.flash('error', "Unable to delete your comments");
-		return res.redirect('back');
-	}
-
-	const messagesSent = await InboxMessage.find({sender: req.user._id}).populate('read');
-
-	if (!messagesSent) {
-		req.flash('error', "Unable to delete your messages");
-		return res.redirect('back');
-	}
-
-	const deletedMessagesSent = await InboxMessage.deleteMany({sender: req.user._id});
-
-	if (!deletedMessagesSent) {
-		req.flash('error', "Unable to delete your messages");
-		return res.redirect('back');
-	}
-
-	const messagesReceived = await InboxMessage.find({});
-
-	if (!messagesReceived) {
-		req.flash('error', "Unable to delete your messages");
-		return res.redirect('back');
-	}
-
-	let messageUpdate;
-	let messageSender;
-
-	for (let message of messagesReceived) {
-		if (message.recipients.includes(req.user._id)) {
-			messageUpdate = await InboxMessage.findByIdAndUpdate(message._id, {$pull: {recipients: req.user._id, read: req.user._id}});
-
-			if (!messageUpdate) {
-				req.flash('error', "Unable to update your messages");
-				return res.redirect('back');
-			}
-
-			for (let i = message.replies.length-1; i > 0; i--) {
-				if (message.replies[i].sender.equals(user._id)) {
-					message.replies.splice(i, 1);
-				}
-			}
-		}
-
-	//Remove all messages which are now 'empty', but still have the original sender in the 'recipients' (meaning the person who is being deleted replied to this message)
-		if (message.recipients.length == 1 && message.recipients[0].equals(message.sender)) {
-			if (!message.read.includes(message.sender)) {
-				messageSender = await User.findById(message.sender);
-
-				if (!messageSender) {
-					req.flash('error', "Unable to update your messages");
-					return res.redirect('back');
-				}
-			}
-
-			messageUpdate = await InboxMessage.findByIdAndDelete(message._id);
-			if (!messageUpdate) {
-				req.flash('error', "Unable to update your messages");
-				return res.redirect('back');
-			}
-		}
-	}
-
-	const emptyMessages = await InboxMessage.deleteMany({recipients: []});
-
-	if (!emptyMessages) {
-		req.flash('error', "Unable to delete your messages");
-		return res.redirect('back');
-	}
-
-	const anns = await Announcement.find({sender: req.user._id});
-
-	if (!anns) {
-		req.flash('error', "Unable to delete your announcements");
-		return res.redirect('back');
-	}
-
-	const users = await User.find({authenticated: true});
-
-	for (let ann of anns) {
-		for (let user of users) {
-			for (let i = 0; i < user.annCount.length; i +=1) {
-				if (user.annCount[i].announcement.toString() == ann._id.toString()) {
-					user.annCount.splice(i, 1);
-				}
-			}
-			await user.save();
-		}
-	}
-
-	const deletedAnns = await Announcement.deleteMany({sender: req.user._id});
-
-	if (!deletedAnns) {
-		req.flash('error', "Unable to delete your announcements");
-		return res.redirect('back');
-	}
-
-	const deletedArticles = await Article.deleteMany({author: req.user._id});
-
-	if (!deletedArticles) {
-		req.flash('error', "Unable to delete your articles");
-		return res.redirect('back');
-	}
-
-	const deletedRequests = await AccessRequest.deleteMany({author: req.user._id});
-
-	if (!deletedRequests) {
-		req.flash('error', "Unable to delete your requests");
-		return res.redirect('back');
-	}
-
-	const orders = await Order.find({customer: req.user._id});
-
-	if (!orders) {
-		req.flash('error', "Unable to find your orders");
-		return res.redirect('back');
-	}
-
-	let deletedOrder;
-
-	for (let order of orders) {
-		deletedOrder = await Order.findByIdAndDelete(order._id).populate('items.item');
-		if (!deletedOrder) {
-			req.flash("error", "Unable to delete orders");
-			return res.redirect('back');
-		}
-
-		for (let i = 0; i < deletedOrder.items.length; i += 1) { //For each of the order's items, add the number ordered back to that item. (If there are 12 available quesadillas and our user ordered 3, there are now 15)
-
-			if (deletedOrder.present) {
-				deletedOrder.items[i].item.availableItems += deletedOrder.items[i].quantity;
-				await deletedOrder.items[i].item.save();
-			}
-		}
-	}
-
-	const roomsCreated = await ChatRoom.find({});
-
-	if (!roomsCreated) {
-		req.flash('error', "Unable to delete your rooms");
-		return res.redirect('back');
-	}
-
-	let deletedRoomCreated = null;
-
-	for (let room of roomsCreated) {
-		if (room.creator.toString() == req.user._id.toString()) {
-			deletedRoomCreated = await ChatRoom.findByIdAndDelete(room._id);
-
-			if (!deletedRoomCreated) {
-				req.flash('error', "Unable to delete your rooms");
-				return res.redirect('back');
-			}
-		}
-	}
-
-	const roomsPartOf = await ChatRoom.find({});
-
-	if (!roomsPartOf) {
-		req.flash('error', "Unable to find your rooms");
-		return res.redirect('back');
-	}
-
-	let roomUpdates = [];
-
-	for (let room of roomsPartOf) {
-		if (room.members.includes(req.user._id)) {
-			roomUpdates.push(room._id);
-		}
-	}
-
-	for (let room of roomUpdates) {
-		updatedRoom = await ChatRoom.findByIdAndUpdate(room, {$pull: {members: req.user._id}});
-
-		if (!updatedRoom) {
-			req.flash('error', "Unable to access your rooms");
-			return res.redirect('back');
-		}
-	}
-
-	const deletedProjectsPosted = await Project.deleteMany({poster: req.user._id});
-
-	if (!deletedProjectsPosted) {
-		req.flash('error', "Unable to delete your projects");
-		return res.redirect('back');
-	}
-
-	const projectsCreated = await Project.find({});
-
-	if (!projectsCreated) {
-		req.flash('error', "Unable to find your projects");
-		return res.redirect('back');
-	}
-
-	let projectUpdates = [];
-
-	for (let project of projectsCreated) {
-		if (project.creators.includes(req.user._id)) {
-			projectUpdates.push(project._id);
-		}
-	}
-
-	let updatedProjectCreated;
-
-	for (let project of projectUpdates) {
-		updatedProjectCreated = await Project.findByIdAndUpdate(project, {$pull: {creators: user._id}});
-
-		if (!updatedProjectCreated) {
-			req.flash('error', "Unable to remove you from your projects");
-			return res.redirect('back');
-		}
-	}
-
-	const emptyProjects = await Project.deleteMany({creators: []});
-
-	if (!emptyProjects) {
-		req.flash('error', "Unable to delete your projects");
-		return res.redirect('back');
-	}
-
-	const deletedUser = await User.findByIdAndDelete(req.user._id);
-
-	if (!deletedUser) {
-		req.flash('error', "There was an error deleting your account");
-		return res.redirect('back');
-	}
-
-	await sendGridEmail(deletedUser.email, 'Profile Deletion Confirmation', `<p>Hello ${deletedUser.firstName},</p><p>You are receiving this email because you recently deleted your Saberchat account. If you did not delete your account, contact a staff member immediately.</p>`, false);
-
-	req.flash('success', "Account deleted!");
+	req.user.archived = true;
+	await req.user.save();
+	req.flash("Archived your account!")
+	await req.logout();
 	return res.redirect('/');
 }
 

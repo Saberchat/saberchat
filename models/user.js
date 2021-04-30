@@ -1,3 +1,4 @@
+const {boolean} = require("joi");
 const mongoose = require("mongoose");
 const passportLocalMongoose = require("passport-local-mongoose");
 
@@ -11,8 +12,9 @@ module.exports = mongoose.model("User", new mongoose.Schema({
     lastName: String,
     description: {type: String, default: ""},
     title: {type: String, default: ""},
-    authenticated: Boolean,
+    authenticated: {type: Boolean, default: false},
     authenticationToken: String,
+    archived: {type: Boolean, default: false},
     receiving_emails: {type: Boolean, default: true},
     bannerUrl: {
         url: {type: String, default: 'https://wallpaper.dog/large/11001671.jpg'},
