@@ -345,6 +345,7 @@ controller.deleteOrder = async function(req, res) {
     const order = await Order.findById(req.params.id);
     if (!order) {return res.json({error: "Could not find order"});}
     if (!order.customer.equals(req.user._id)) {return res.json({error: "You can only delete your own orders"});}
+    if (order.confirmed) {return res.json({error: "Order has been confirmed"});}
 
     const deletedOrder = await Order.findByIdAndDelete(req.params.id).populate("items.item");
     if (!deletedOrder) {return res.json({error: "Could not find order"});}

@@ -5,8 +5,8 @@ const confirm = function (button) { //Send request that order is ready
 
     sendPostReq(url, data, data => {
         if (data.success) {
-            $(`#modal-${orderId}-ready`).modal('hide');
-            button.parentNode.removeChild(button);
+            $(`#modal-${orderId}-confirm`).modal('hide');
+            document.getElementById(`ready-form-${orderId}`).removeChild(document.getElementById(`confirm-${orderId}`));
         }
     });
 }

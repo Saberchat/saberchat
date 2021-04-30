@@ -95,9 +95,9 @@
                     <p class="card-text"><%= order.date %></p>
 
                     <% if (currentUser.tags.includes("Cashier")) { %>
-                        <form class="ready-form" action="<%= order._id %>/ready" method="post">
+                        <form class="ready-form" action="<%= order._id %>/ready" method="post" id="ready-form-<%=order._id%>">
                             <% if (!order.confirmed) {%>
-                                <button type="button" data-toggle="modal" data-target="#modal-<%= order._id %>-confirm" class="btn btn-success" name="button">Confirm Order</button>
+                                <button type="button" data-toggle="modal" data-target="#modal-<%= order._id %>-confirm" id="confirm-<%=order._id%>" class="btn btn-success" name="button">Confirm Order</button>
                             <% } %>
                             <button type="button" data-toggle="modal" data-target="#modal-<%= order._id %>-ready" class="btn btn-primary" name="button">Order Ready</button>
                             <button type="button" data-toggle="modal" data-target="#modal-<%= order._id %>-reject" class="btn btn-danger" name="button">Reject Order</button>
