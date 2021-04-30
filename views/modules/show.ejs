@@ -141,7 +141,9 @@
                     <p class="announcement-text convertible-text"><%= convertedText %></p>
                     <hr>
                     <div class="ann-images">
-                        <h4 style="float: left;">Slides</h4><br>
+                        <% if (module.links.length > 0) {%>
+                            <h4 style="float: left;">Slides</h4><br>
+                        <% } %>
                         <ol><br>
                             <% for (let slide of module.links) { %>
                                 <li style="text-align: left;">
