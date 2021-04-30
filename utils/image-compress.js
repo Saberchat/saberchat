@@ -12,6 +12,20 @@ const compressImage = async function(buffer) {
     });
 }
 
+const compressVideo = async function(buffer) {
+    const cp = require("child_process");
+    let process = cp.spawn("ffmpeg", [
+        "-i", "-",
+        "-vcodec", "libx264",
+        "-crf", "24",
+        "-f", "mp4",
+        "-"
+    ]);
+    process.stdin.write(buffer);
+    process.stdin.end();
+    
+}
+
 module.exports.autoCompress = async function(fileName, fileBuffer) {
     const ext = path.extname(fileName).toLowerCase();
     if([".png", ".jpg", ".jpeg"].includes(ext)) {
@@ -44,7 +58,7 @@ module.exports.autoCompress = async function(fileName, fileBuffer) {
             let compressedBuffer = await compressImage(fileBuffer);
             let compressedSize = compressedBuffer.byteLength;
             if (process.env.DEBUG === "true") {
-                console.log("Image compression results:")
+                console.log("Video compression results:")
                 console.log("Original:", originalSize);
                 console.log("Compressed:", compressedSize);
                 console.log("Ratio:", compressedSize/originalSize);
