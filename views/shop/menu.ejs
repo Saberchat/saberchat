@@ -76,7 +76,7 @@
                                 <span class="list-group-item list-group-item-action menu-item <%= category.name.split(' ').join('') %>  shop"
                                     id="item-<%= item.id %>">
                             <% } %>
-                                <span class="item-name"><%= item.name %> (<%= item.availableItems %> orders available)</span> - <% if (platform.dollarPayment) {%>$<%=(item.price).toFixed(2)%><% } else {%><%=(item.price)%> Credits<%}%>
+                                <span class="item-name"><%= item.name %> <% if (item.displayAvailability){%>(<%= item.availableItems %> in stock)<%}%></span> - <% if (platform.dollarPayment) {%>$<%=(item.price).toFixed(2)%><% } else {%><%=(item.price)%> Credits<%}%>
                                 <% if (currentUser) { %>
                                     <div title="Upvotes" class="upvotes">
                                         <% if (item.upvotes.includes(currentUser._id)) { %>
@@ -101,7 +101,14 @@
                                 <% } %>
 
                                 <% if (!platform.purchasable && item.link != '') {%><br><strong>Order Here:</strong> <a target="_blank" href="<%=item.link%>"> <%=item.link%></a><% } %>
-                                <br><br/><em class="item-description convertible-text"><%= itemDescriptions[item._id.toString()] %></em><br/>
+                                <br><br/>
+                                <% for (let i = 0; i < itemDescriptions[item._id.toString()].length; i++) {%>
+                                    <% let para = itemDescriptions[item._id.toString()][i];%>
+                                    <% if (para.split('\r').join('').split(' ').join('') != '') {%>
+                                        <em class="item-description convertible-text"><%=para%></em>
+                                        <% if ((i+1) < itemDescriptions[item._id.toString()].length) {%><br/><br/><%}%>
+                                    <% } %>
+                                <% } %><br/>
                         <% if (item.mediaFile.display && [".png", ".jpg", ".jpeg", ".gif"].includes(fileExtensions.get(item.mediaFile.url).toLowerCase())) { %>
                             <% if (item.imageLink) {%>
                                 <a href="<%=item.mediaFile.url%>" target="_blank">

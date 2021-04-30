@@ -352,7 +352,7 @@ controller.specificInfo = async function(req, res) {
 
 controller.donate = async function(req, res) {
     const platform = await setup(Platform);
-    return res.render('other/donate', {platform, description: platform.features[objectArrIndex(platform.features, "route", "articles/donate")].description});
+    return res.render('other/donate', {platform, description: platform.features[objectArrIndex(platform.features, "route", "articles/donate")].description, objectArrIndex});
 }
 
 controller.advice = async function(req, res) {

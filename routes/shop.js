@@ -17,7 +17,7 @@ router.get('/order', wrapAsync(middleware.isLoggedIn), wrapAsync(middleware.acce
 
 //SPECIFIC ORDER ROUTES
 router.route('/order/:id')
-    .put(wrapAsync(middleware.isLoggedIn), wrapAsync(middleware.accessToFeature), wrapAsync(middleware.platformPurchasable), middleware.isCashier, wrapAsync(shop.processOrder)) //Confirm order
+    .put(wrapAsync(middleware.isLoggedIn), wrapAsync(middleware.accessToFeature), wrapAsync(middleware.platformPurchasable), middleware.isCashier, wrapAsync(shop.processOrder)) //Process order
     .delete(wrapAsync(middleware.isLoggedIn), wrapAsync(middleware.accessToFeature), wrapAsync(middleware.platformPurchasable), wrapAsync(shop.deleteOrder)); //Reject/cancel order
 
 //EC MANAGEMENT ROUTES
@@ -46,5 +46,8 @@ router.route('/category/:id')
     .get(wrapAsync(middleware.isLoggedIn), wrapAsync(middleware.accessToFeature), middleware.isCashier, wrapAsync(shop.viewCategory)) //View category
     .put(wrapAsync(middleware.isLoggedIn), wrapAsync(middleware.accessToFeature), middleware.isCashier, wrapAsync(shop.updateCategory)) //Update category
     .delete(wrapAsync(middleware.isLoggedIn), wrapAsync(middleware.accessToFeature), wrapAsync(middleware.isMod), wrapAsync(shop.deleteCategory)); //Delete category
+
+//EMAIL CONFIRMATION FOR ORDERS
+router.put("/order/confirm/:id", wrapAsync(middleware.isLoggedIn), wrapAsync(middleware.accessToFeature), wrapAsync(middleware.platformPurchasable), middleware.isCashier, wrapAsync(shop.confirmOrder)) //Confirm order
 
 module.exports = router;

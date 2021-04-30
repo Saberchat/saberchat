@@ -18,6 +18,7 @@ module.exports = mongoose.model("OrderItem", new mongoose.Schema({
     },
     imageLink: {type: Boolean, default: false}, //Allow images to link to larger image on menu
     availableItems: Number,
+    displayAvailability: {type: Boolean, default: false}, //Display number available
     upvotes: [{type: mongoose.Schema.Types.ObjectId, ref: 'User'}],
     shop: {type: mongoose.Schema.Types.ObjectId, ref: "Shop"}
 }, {timestamps: {createdAt: 'created_at'}

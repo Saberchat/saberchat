@@ -14,7 +14,8 @@ module.exports = mongoose.model("Order", new mongoose.Schema({
     address: String,
     charge: Number,
     date: String,
-    present: Boolean,
+    present: {type: Boolean, default: true},
+    confirmed: {type: Boolean, default: false},
     payingInPerson: Boolean,
 }, {timestamps: {createdAt: 'created_at'}
 }));

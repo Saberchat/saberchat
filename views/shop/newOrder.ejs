@@ -105,7 +105,7 @@
 
                                     <label class="form-check-label" for="<%= item._id %>">
                                         <span class="item-name"><%= item.name %></span>
-                                        (<%= item.availableItems %> orders available) -
+                                        <%if(item.displayAvailability){%>(<%= item.availableItems %> orders available)<%}%> -
                                         <%if (platform.dollarPayment) {%>$<%= (item.price).toFixed(2)%><%} else {%> Credits: <%=item.price%><% } %>
 
                                         <% if (frequentItems.toString().includes(item._id.toString())) { %>

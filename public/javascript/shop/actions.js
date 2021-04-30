@@ -1,3 +1,16 @@
+const confirm = function (button) { //Send request that order is ready
+    const orderId = button.id.split('-')[0];
+    const url = `/shop/order/confirm/${orderId}?_method=put`;
+    const data = {};
+
+    sendPostReq(url, data, data => {
+        if (data.success) {
+            $(`#modal-${orderId}-ready`).modal('hide');
+            button.parentNode.removeChild(button);
+        }
+    });
+}
+
 const ready = function (button) { //Send request that order is ready
     const orderId = button.id.split('-')[0];
     const url = `/shop/order/${orderId}?_method=put`;

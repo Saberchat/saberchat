@@ -116,7 +116,7 @@ controller.orderForm = async function(req, res) {
         let itemDescriptions = {}; //Object of items and their link-embedded descriptions
         for (let category of categories) {
             for (let item of category.items) {
-                itemDescriptions[item._id] = convertToLink(item.description);
+                itemDescriptions[item._id] = convertToLink(item.description).split('\n');
                 if (item.mediaFile.filename) {
                     fileExtensions.set(item.mediaFile.url, path.extname(item.mediaFile.url.split("SaberChat/")[1]));
                 }
@@ -178,8 +178,10 @@ controller.order = async function(req, res) {
     }
 
     for (let item of orderedItems) { //Update items
-        item.availableItems -= parseInt(req.body[item.name]);
-        await item.save();
+        if (item.displayAvailability) {
+            item.availableItems -= parseInt(req.body[item.name]);
+            await item.save();
+        }
     }
 
     req.flash("success", "Order Sent!");
@@ -189,12 +191,34 @@ controller.order = async function(req, res) {
 //-----------ROUTES FOR SPECIFIC ORDERS-------------//
 
 //PROCESS AND CONFIRM ORDER
+controller.confirmOrder = async function(req, res) {
+    const platform = await setup(Platform);
+    const order = await Order.findByIdAndUpdate(req.params.id, {confirmed: true}).populate("items.item").populate("customer"); //Find the order that is currently being handled based on id, and populate info about its items
+    if (!platform || !order) {return res.json({error: "Could not find order"});}
+
+    if (order.customer.receiving_emails) {
+        let itemText = []; //This will have all the decoded info about the order
+        for (let i = 0; i < order.items.length; i++) {
+            itemText.push(` - ${order.items[i].item.name}: ${order.items[i].quantity} order(s)`);
+        }
+
+        let emailText = '';
+        if (platform.dollarPayment) {
+            emailText =  `<p>Your order has been confirmed! Please alert us if there are any problems, etc.<p><p>${itemText.join(", ")}</p><p>Extra Instructions: ${order.instructions}</p><p>Total Cost: $${(order.charge).toFixed(2)}</p>`;
+        } else {
+            emailText =  `<p>Your order has been confirmed! Please alert us if there are any problems, etc.<p><p>${itemText.join(", ")}</p><p>Extra Instructions: ${order.instructions}</p><p>Total Cost: ${(order.charge)} Credits</p>`;
+        }
+        if (order.customer.receiving_emails) {
+            await sendGridEmail(order.customer.email, "Order Confirmed", `<p>Hello ${order.customer.firstName},</p>${emailText}`, false);
+        }
+    }
+    return res.json({success: "Successfully confirmed email"});
+}
+
 controller.processOrder = async function(req, res) {
     const platform = await setup(Platform);
     const order = await Order.findById(req.params.id).populate("items.item").populate("customer"); //Find the order that is currently being handled based on id, and populate info about its items
-    if (!platform || !order) {
-        return res.json({error: "Could not find order"});
-    }
+    if (!platform || !order) {return res.json({error: "Could not find order"});}
 
     const notif = await InboxMessage.create({
         subject: "Order Ready",
@@ -216,11 +240,11 @@ controller.processOrder = async function(req, res) {
     //Formats the charge in money format
     let emailText = "";
     if (platform.dollarPayment) {
-        notif.text = `Your order is ready:\n ${itemText.join("\n")} \n\nExtra Instructions: ${order.instructions} \nTotal Cost: $${(order.charge).toFixed(2)}`;
-        emailText =  `<p>Your order is ready:<p><p>${itemText.join(", ")}</p><p>Extra Instructions: ${order.instructions}</p><p>Total Cost: $${(order.charge).toFixed(2)}</p>`;
+        notif.text = `Your order is on its way!\n ${itemText.join("\n")} \n\nExtra Instructions: ${order.instructions} \nTotal Cost: $${(order.charge).toFixed(2)}`;
+        emailText =  `<p>Your order is on its way!<p><p>${itemText.join(", ")}</p><p>Extra Instructions: ${order.instructions}</p><p>Total Cost: $${(order.charge).toFixed(2)}</p>`;
     } else {
-        notif.text = `Your order is ready:\n ${itemText.join("\n")} \n\nExtra Instructions: ${order.instructions} \nTotal Cost: ${(order.charge)} Credits`;
-        emailText =  `<p>Your order is ready:<p><p>${itemText.join(", ")}</p><p>Extra Instructions: ${order.instructions}</p><p>Total Cost: ${(order.charge)} Credits</p>`;
+        notif.text = `Your order is on its way!\n ${itemText.join("\n")} \n\nExtra Instructions: ${order.instructions} \nTotal Cost: ${(order.charge)} Credits`;
+        emailText =  `<p>Your order is on its way!<p><p>${itemText.join(", ")}</p><p>Extra Instructions: ${order.instructions}</p><p>Total Cost: ${(order.charge)} Credits</p>`;
     }
     await notif.save();
     if (order.customer.receiving_emails) {
@@ -252,8 +276,10 @@ controller.deleteOrder = async function(req, res) {
         if (!platform || !order) {return res.json({error: "Could not find order"});}
 
         for (let i of order.items) { //Iterate over each item/quantity object
-            i.item.availableItems += i.quantity;
-            await i.item.save();
+            if (item.displayAvailability) {
+                i.item.availableItems += i.quantity;
+                await i.item.save();
+            }
         }
 
         const notif = await InboxMessage.create({
@@ -330,8 +356,10 @@ controller.deleteOrder = async function(req, res) {
     }
 
     for (let item of deletedOrder.items) { //For each of the order"s items, add the number ordered back to that item. (If there are 12 available quesadillas and the  user ordered 3, there are now 15)
-        item.item.availableItems += item.quantity;
-        await item.item.save();
+        if (item.item.displayAvailability) {
+            item.item.availableItems += item.quantity;
+            await item.item.save();
+        }
     }
     return res.json({success: "Successfully canceled"});
 }
@@ -370,13 +398,15 @@ controller.createItem = async function(req, res) {
         availableItems: parseInt(req.body.available),
         description: req.body.description,
         imgUrl: {url: req.body.image, display: req.body.showImage == "url"},
-        imageLink: (req.body.imageLink != undefined)
+        imageLink: (req.body.imageLink != undefined),
+        displayAvailability: (req.body.displayAvailability != undefined)
     });
 
     if (!item) {
         req.flash("error", "Unable to create item");
         return res.redirect("back");
     }
+    if (!item.displayAvailability) {item.availableItems = 10;}
 
     item.mediaFile.display = req.body.showImage == "upload";
     if (!platform.purchasable) {item.link = req.body.url;}
@@ -791,20 +821,21 @@ controller.updateItemInfo = async function(req, res) {
         req.flash("error", "Item With This Name Exists");
         return res.redirect("back");
     }
-
     const item = await Item.findByIdAndUpdate(req.params.id, {
         name: req.body.name,
         price: parseFloat(req.body.price),
         availableItems: parseInt(req.body.available),
         description: req.body.description,
         imgUrl: {url: req.body.image, display: req.body.showImage == "url"},
-        imageLink: (req.body.imageLink != undefined)
+        imageLink: (req.body.imageLink != undefined),
+        displayAvailability: (req.body.displayAvailability != undefined)
     });
     if (!item) {
         req.flash("error", "item not found");
         return res.redirect("back");
     }
 
+    if (!item.displayAvailability) {item.availableItems = 10;}
     if (!platform.purchasable) {item.link = req.body.url;}
     item.mediaFile.display = req.body.showImage == "upload";
     if (req.files) {

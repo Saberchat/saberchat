@@ -206,7 +206,7 @@ controller.authenticatePut = async function(req, res) {
     const platform = await setup(Platform);
     if (!platform) { return res.json({error: "Unable to set up platform"});}
     if (!platform.principalAuthenticate) {
-        return res.json({error: `Principal Authentication is not enabled on ${platform.name} Saberchat`});
+        return res.json({error: `${platform.permissionsDisplay[platform.permissionsDisplay.length-1]} Authentication is not enabled on ${platform.name} Saberchat`});
     }
     const user = await User.findByIdAndUpdate(req.body.userId, {authenticated: true});
     if (!user) { return res.json({error: "Unable to find user"});}
@@ -218,7 +218,7 @@ controller.authenticateDelete = async function(req, res) {
     const platform = await setup(Platform);
     if (!platform) { return res.json({error: "Unable to set up platform"});}
     if (!platform.principalAuthenticate) {
-        return res.json({error: `Principal Authentication is not enabled on ${platform.name} Saberchat`});
+        return res.json({error: `${platform.permissionsDisplay[platform.permissionsDisplay.length-1]} Authentication is not enabled on ${platform.name} Saberchat`});
     }
     const user = await User.deleteOne({_id: req.body.userId, authenticated: false});
     if (!user) { return res.json({error: "Unable to find user"});}
