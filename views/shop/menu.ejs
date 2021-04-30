@@ -42,7 +42,9 @@
         <div class="col-12">
             <div class="jumbotron text-center header">
                 <h1><i class="fas fa-bars"></i> <%=data.name%></h1>
-                <p><%=data.description%></p>
+                <% for (let para of data.description.split('\n')) {%>
+                    <p class="convertible-text"><%=para%></p>
+                <% } %>
                 <a class="btn btn-primary" href='/shop'><i class="fas fa-arrow-left"></i> Back to Main</a>
                 <% if (platform.purchasable) { %><a class="btn btn-info" href='/shop/order?order=true'><i class="fas fa-plus-circle"></i> Order</a><% } %>
             </div>
@@ -104,10 +106,8 @@
                                 <br><br/>
                                 <% for (let i = 0; i < itemDescriptions[item._id.toString()].length; i++) {%>
                                     <% let para = itemDescriptions[item._id.toString()][i];%>
-                                    <% if (para.split('\r').join('').split(' ').join('') != '') {%>
-                                        <em class="item-description convertible-text"><%=para%></em>
-                                        <% if ((i+1) < itemDescriptions[item._id.toString()].length) {%><br/><br/><%}%>
-                                    <% } %>
+                                    <em class="item-description convertible-text"><%=para%></em>
+                                    <% if ((i+1) < itemDescriptions[item._id.toString()].length) {%><br/><br/><%}%>
                                 <% } %><br/>
                         <% if (item.mediaFile.display && [".png", ".jpg", ".jpeg", ".gif"].includes(fileExtensions.get(item.mediaFile.url).toLowerCase())) { %>
                             <% if (item.imageLink) {%>

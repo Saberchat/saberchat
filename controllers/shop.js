@@ -114,9 +114,14 @@ controller.orderForm = async function(req, res) {
 
         let fileExtensions = new Map();
         let itemDescriptions = {}; //Object of items and their link-embedded descriptions
+        let itemDescription = [];
         for (let category of categories) {
             for (let item of category.items) {
-                itemDescriptions[item._id] = convertToLink(item.description).split('\n');
+                itemDescription = [];
+                for (let element of convertToLink(item.description).split('\n')) {
+                    if (element.split('\r').join('').split(' ').join('') != '') {itemDescription.push(element);}
+                }
+                itemDescriptions[item._id] = itemDescription;
                 if (item.mediaFile.filename) {
                     fileExtensions.set(item.mediaFile.url, path.extname(item.mediaFile.url.split("SaberChat/")[1]));
                 }
@@ -267,16 +272,13 @@ controller.processOrder = async function(req, res) {
 //REJECT OR CANCEL ORDER
 controller.deleteOrder = async function(req, res) {
     if (req.body.rejectionReason) {
-        if (!req.user.tags.includes("Cashier")) {
-            req.flash("error", "You do not have permission to do that");
-            return res.redirect("back");
-        }
+        if (!req.user.tags.includes("Cashier")) {return res.json({error: "You do not have permission to do that"});}
         const platform = await setup(Platform);
         const order = await Order.findById(req.params.id).populate("items.item").populate("customer");
         if (!platform || !order) {return res.json({error: "Could not find order"});}
 
         for (let i of order.items) { //Iterate over each item/quantity object
-            if (item.displayAvailability) {
+            if (i.item.displayAvailability) {
                 i.item.availableItems += i.quantity;
                 await i.item.save();
             }
