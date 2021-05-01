@@ -21,7 +21,7 @@ controller.index = async function(req, res) {
     const platform = await setup(Platform);
     const users = await User.find({});
     if (!platform || !users) {
-        req.flash('error', 'An Error Occurred');
+        await req.flash('error', 'An Error Occurred');
         return res.redirect('back');
     }
 
@@ -32,12 +32,12 @@ controller.index = async function(req, res) {
         announcements = await Announcement.find({verified: true}).populate('sender');
     }
     if(!announcements) {
-        req.flash('error', 'Cannot find announcements.');
+        await req.flash('error', 'Cannot find announcements.');
         return res.redirect('back');
     }
 
     const userNames = await parsePropertyArray(users, "firstName").join(',').toLowerCase().split(',');
-    const announcementTexts = embedLink(req.user, announcements, userNames);
+    const announcementTexts = await embedLink(req.user, announcements, userNames);
 
     return res.render('announcements/index', {platform, announcements: announcements.reverse(), announcementTexts});
 };
@@ -46,7 +46,7 @@ controller.index = async function(req, res) {
 controller.new = async function(req, res) {
     const platform = await setup(Platform);
     if (!platform) {
-        req.flash("error", "An Error Occurred");
+        await req.flash("error", "An Error Occurred");
         return res.redirect("back");
     }
     return res.render('announcements/new', {platform});
@@ -56,17 +56,17 @@ controller.new = async function(req, res) {
 controller.markAll = async function(req, res) {
     req.user.annCount = []; //No new announcements in user's annCount
     await req.user.save();
-    req.flash('success', 'All Announcements Marked As Read!');
+    await req.flash('success', 'All Announcements Marked As Read!');
     return res.redirect(`/announcements`);
 };
 
 // Announcement GET mark one ann as read
 controller.markOne = async function(req, res) {
     if (objectArrIndex(req.user.annCount, "announcement", req.params.id) > -1) { //If user's annCount includes announcement, remove it
-        req.user.annCount.splice(objectArrIndex(req.user.annCount, "announcement", req.params.id), 1);
+        await req.user.annCount.splice(objectArrIndex(req.user.annCount, "announcement", req.params.id), 1);
         await req.user.save();
     }
-    req.flash('success', 'Announcement Marked As Read!');
+    await req.flash('success', 'Announcement Marked As Read!');
     return res.redirect(`/announcements`);
 };
 
@@ -80,18 +80,18 @@ controller.show = async function(req, res) {
             populate: {path: "sender"}
         });
     if(!platform || !announcement) {
-        req.flash('error', 'Could not find announcement');
+        await req.flash('error', 'Could not find announcement');
         return res.redirect('back');
 
     } else if (!announcement.verified && !platform.permissionsProperty.slice(platform.permissionsProperty.length-3).includes(req.user.permission)) {
-        req.flash('error', 'You cannot view that announcement');
+        await req.flash('error', 'You cannot view that announcement');
         return res.redirect('back');
     }
 
     if(req.user) {
         //If this announcement is new to the user, it is no longer new, so remove it
         if (objectArrIndex(req.user.annCount, "announcement", announcement._id, "_id") > -1) {
-            req.user.annCount.splice(objectArrIndex(req.user.annCount, "announcement", announcement._id, "_id"), 1);
+            await req.user.annCount.splice(objectArrIndex(req.user.annCount, "announcement", announcement._id, "_id"), 1);
             await req.user.save();
         }
     }
@@ -100,7 +100,7 @@ controller.show = async function(req, res) {
     for (let media of announcement.mediaFiles) {
         fileExtensions.set(media.url, path.extname(media.url.split("SaberChat/")[1]));
     }
-    const convertedText = convertToLink(announcement.text); //Parse and add hrefs to all links in text
+    const convertedText = await convertToLink(announcement.text); //Parse and add hrefs to all links in text
     return res.render('announcements/show', {platform, announcement, convertedText, fileExtensions});
 };
 
@@ -109,11 +109,11 @@ controller.updateForm = async function(req, res) {
     const platform = await setup(Platform);
     const announcement = await Announcement.findById(req.params.id);
     if(!platform || !announcement) {
-        req.flash('error', 'Could not find announcement');
+        await req.flash('error', 'Could not find announcement');
         return res.redirect('back');
     }
     if(!announcement.sender.equals(req.user._id)) { //Only the sender may edit the announcement
-        req.flash('error', 'You do not have permission to do that.');
+        await req.flash('error', 'You do not have permission to do that.');
         return res.redirect('back');
     }
 
@@ -133,7 +133,7 @@ controller.create = async function(req, res) {
         text: req.body.message
     });
     if (!platform || !announcement) {
-        req.flash('error', 'Unable to create announcement');
+        await req.flash('error', 'Unable to create announcement');
         return res.redirect('back');
     }
 
@@ -149,11 +149,11 @@ controller.create = async function(req, res) {
                 const processedBuffer = await autoCompress(file.originalname, file.buffer);
                 [cloudErr, cloudResult] = await cloudUpload(file.originalname, processedBuffer);
                 if (cloudErr || !cloudResult) {
-                    req.flash('error', 'Upload failed');
+                    await req.flash('error', 'Upload failed');
                     return res.redirect('back');
                 }
 
-                announcement.mediaFiles.push({
+                await announcement.mediaFiles.push({
                     filename: cloudResult.public_id,
                     url: cloudResult.secure_url,
                     originalName: file.originalname
@@ -167,7 +167,7 @@ controller.create = async function(req, res) {
 
     const users = await User.find({authenticated: true, _id: {$ne: req.user._id}});
     if (!users) {
-        req.flash('error', "An Error Occurred");
+        await req.flash('error', "An Error Occurred");
         return res.redirect('back');
     }
 
@@ -178,23 +178,23 @@ controller.create = async function(req, res) {
         if (user.receiving_emails) {
             const emailText = `<p>Hello ${user.firstName},</p><p>${req.user.username} has recently posted a new announcement - '${announcement.subject}'.</p><p>${announcement.text}</p><p>You can access the full announcement at https://${platform.url}</p> ${imageString}`;
             await sendGridEmail(user.email, `New Saberchat Announcement - ${announcement.subject}`, emailText, false);
-            user.annCount.push({announcement, version: "new"});
+            await user.annCount.push({announcement, version: "new"});
             await user.save();
         }
     }
 
-    req.flash('success', `Announcement Posted! A ${platform.permissionsDisplay[platform.permissionsDisplay.length-1].toLowerCase()} will verify your post soon.`);
+    await req.flash('success', `Announcement Posted! A ${platform.permissionsDisplay[platform.permissionsDisplay.length-1].toLowerCase()} will verify your post soon.`);
     return res.redirect(`/announcements`);
 };
 
 controller.verify = async function(req, res) {
     const announcement = await Announcement.findByIdAndUpdate(req.params.id, {verified: true});
     if (!announcement) {
-        req.flash('error', "Unable to access announcement");
+        await req.flash('error', "Unable to access announcement");
         return res.redirect('back');
     }
 
-    req.flash("success", "Verified Announcement!");
+    await req.flash("success", "Verified Announcement!");
     return res.redirect("/announcements");
 }
 
@@ -203,12 +203,12 @@ controller.updateAnnouncement = async function(req, res) {
     const platform = await setup(Platform);
     const announcement = await Announcement.findById(req.params.id).populate('sender');
     if (!platform || !announcement) {
-        req.flash('error', "Unable to access announcement");
+        await req.flash('error', "Unable to access announcement");
         return res.redirect('back');
     }
 
     if (announcement.sender._id.toString() != req.user._id.toString()) {
-        req.flash('error', "You can only update announcements which you have sent");
+        await req.flash('error', "You can only update announcements which you have sent");
         return res.redirect('back');
     }
 
@@ -218,7 +218,7 @@ controller.updateAnnouncement = async function(req, res) {
         verified: false
     });
     if (!updatedAnnouncement) {
-        req.flash('error', "Unable to update announcement");
+        await req.flash('error', "Unable to update announcement");
         return res.redirect('back');
     }
 
@@ -239,7 +239,7 @@ controller.updateAnnouncement = async function(req, res) {
             }
             // check for failure
             if (cloudErr || !cloudResult || cloudResult.result !== 'ok') {
-                req.flash('error', 'Error deleting uploaded image');
+                await req.flash('error', 'Error deleting uploaded image');
                 return res.redirect('back');
             }
             updatedAnnouncement.mediaFiles.splice(i, 1);
@@ -254,11 +254,11 @@ controller.updateAnnouncement = async function(req, res) {
                 const processedBuffer = await autoCompress(file.originalname, file.buffer);
                 [cloudErr, cloudResult] = await cloudUpload(file.originalname, processedBuffer);
                 if (cloudErr || !cloudResult) {
-                    req.flash('error', 'Upload failed');
+                    await req.flash('error', 'Upload failed');
                     return res.redirect('back');
                 }
 
-                updatedAnnouncement.mediaFiles.push({
+                await updatedAnnouncement.mediaFiles.push({
                     filename: cloudResult.public_id,
                     url: cloudResult.secure_url,
                     originalName: file.originalname
@@ -270,7 +270,7 @@ controller.updateAnnouncement = async function(req, res) {
     await updatedAnnouncement.save();
     const users = await User.find({authenticated: true, _id: {$ne: req.user._id}});
     if (!users) {
-        req.flash('error', "An Error Occurred");
+        await req.flash('error', "An Error Occurred");
         return res.redirect('back');
     }
 
@@ -279,12 +279,12 @@ controller.updateAnnouncement = async function(req, res) {
     for (let user of users) {
         //If announcement not already in user's annCount, add it
         if (objectArrIndex(user.annCount, "announcement", updatedAnnouncement._id) == -1) {
-            user.annCount.push({announcement: updatedAnnouncement, version: "updated"});
+            await user.annCount.push({announcement: updatedAnnouncement, version: "updated"});
             await user.save();
         }
     }
 
-    req.flash('success', 'Announcement Updated!');
+    await req.flash('success', 'Announcement Updated!');
     return res.redirect(`/announcements`);
 }
 
@@ -301,7 +301,7 @@ controller.likeAnnouncement = async function(req, res) {
         });
     }
     
-    announcement.likes.push(req.user._id);
+    await announcement.likes.push(req.user._id);
     await announcement.save();
     return res.json({
         success: `Liked ${announcement.subject}`,
@@ -327,7 +327,7 @@ controller.comment = async function(req, res) {
     comment.date = dateFormat(comment.created_at, "h:MM TT | mmm d");
     await comment.save();
 
-    announcement.comments.push(comment);
+    await announcement.comments.push(comment);
     await announcement.save();
 
     let users = [];
@@ -336,7 +336,7 @@ controller.comment = async function(req, res) {
         if (line[0] == '@') {
             user = await User.findById(line.split("#")[1].split("_")[0]);
             if (!user) {return res.json({error: "Error accessing user"});}
-            users.push(user);
+            await users.push(user);
         }
     }
 
@@ -361,7 +361,7 @@ controller.comment = async function(req, res) {
             await sendGridEmail(user.email, `New Mention in ${announcement.subject}`, `<p>Hello ${user.firstName},</p><p>${req.user.firstName} ${req.user.lastName} mentioned you in a comment on <strong>${announcement.subject}</strong>.<p>${comment.text}</p>`, false);
         }
 
-        user.inbox.push({message: notif, new: true}); //Add notif to user's inbox
+        await user.inbox.push({message: notif, new: true}); //Add notif to user's inbox
         await user.save();
     }
 
@@ -384,7 +384,7 @@ controller.likeComment = async function(req, res) {
         });
     }
 
-    comment.likes.push(req.user._id); //Add Like
+    await comment.likes.push(req.user._id); //Add Like
     await comment.save();
     return res.json({
         success: `Liked comment`,
@@ -395,12 +395,12 @@ controller.likeComment = async function(req, res) {
 controller.deleteAnnouncement = async function(req, res) {
     const announcement = await Announcement.findById(req.params.id).populate('sender');
     if (!announcement) {
-        req.flash('error', "Unable to access announcement");
+        await req.flash('error', "Unable to access announcement");
         return res.redirect('back');
     }
 
     if (announcement.sender._id.toString() != req.user._id.toString()) {
-        req.flash('error', "You can only delete announcements that you have posted");
+        await req.flash('error', "You can only delete announcements that you have posted");
         return res.redirect('back');
     }
     
@@ -418,7 +418,7 @@ controller.deleteAnnouncement = async function(req, res) {
             }
             // check for failure
             if (cloudErr || !cloudResult || cloudResult.result !== 'ok') {
-                req.flash('error', 'Error deleting uploaded image');
+                await req.flash('error', 'Error deleting uploaded image');
                 return res.redirect('back');
             }
         }
@@ -426,24 +426,24 @@ controller.deleteAnnouncement = async function(req, res) {
 
     const deletedAnnouncement = await Announcement.findByIdAndDelete(announcement._id);
     if (!deletedAnnouncement) {
-        req.flash('error', "Unable to delete announcement");
+        await req.flash('error', "Unable to delete announcement");
         return res.redirect('back');
     }
 
     const users = await User.find({authenticated: true});
     if (!users) {
-        req.flash('error', "Unable to find users");
+        await req.flash('error', "Unable to find users");
         return res.redirect('back');
     }
 
     for (let user of users) {
         if (objectArrIndex(user.annCount, "announcement", deletedAnnouncement._id) > -1) {
-            user.annCount.splice(objectArrIndex(user.annCount, "announcement", deletedAnnouncement._id), 1);
+            await user.annCount.splice(objectArrIndex(user.annCount, "announcement", deletedAnnouncement._id), 1);
             await user.save();
         }
     }
 
-    req.flash('success', 'Announcement Deleted!');
+    await req.flash('success', 'Announcement Deleted!');
     return res.redirect('/announcements');
 }
 

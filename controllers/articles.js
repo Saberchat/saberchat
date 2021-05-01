@@ -36,7 +36,7 @@ controller.index = async function(req, res) {
 controller.new = async function(req, res) {
     const platform = await setup(Platform);
     if (!platform) {
-        req.flash("error", "An error occurred");
+        await req.flash("error", "An error occurred");
         return res.redirect("back");
     }
     return res.render('articles/new', {platform, data: platform.features[objectArrIndex(platform.features, "route", "articles")]});
@@ -52,9 +52,9 @@ controller.show = async function(req, res) {
             populate: {path: "sender"}
         });
     if(!platform || !article) {
-        req.flash('error', 'Could not find article'); return res.redirect('back');
+        await req.flash('error', 'Could not find article'); return res.redirect('back');
     } else if (!article.verified && !platform.permissionsProperty.slice(platform.permissionsProperty.length-3).includes(req.user.permission)) {
-        req.flash('error', 'You cannot view that article');
+        await req.flash('error', 'You cannot view that article');
         return res.redirect('back');
     }
 
@@ -72,7 +72,7 @@ controller.updateForm = async function(req, res) {
     const article = await ArticleLink.findById(req.params.id);
     if(!platform || !article) {req.flash('error', 'Could not find article'); return res.redirect('back');}
     if(!article.sender._id.equals(req.user._id)) {
-        req.flash('error', 'You do not have permission to do that.');
+        await req.flash('error', 'You do not have permission to do that.');
         return res.redirect('back');
     }
 
@@ -92,7 +92,7 @@ controller.create = async function(req, res) {
         text: req.body.message
     });
     if (!platform || !article) {
-        req.flash('error', 'Unable to create article');
+        await req.flash('error', 'Unable to create article');
         return res.redirect('back');
     }
 
@@ -108,11 +108,11 @@ controller.create = async function(req, res) {
                 const processedBuffer = await autoCompress(file.originalname, file.buffer);
                 [cloudErr, cloudResult] = await cloudUpload(file.originalname, processedBuffer);
                 if (cloudErr || !cloudResult) {
-                    req.flash('error', 'Upload failed');
+                    await req.flash('error', 'Upload failed');
                     return res.redirect('back');
                 }
 
-                article.mediaFiles.push({
+                await article.mediaFiles.push({
                     filename: cloudResult.public_id,
                     url: cloudResult.secure_url,
                     originalName: file.originalname
@@ -124,18 +124,18 @@ controller.create = async function(req, res) {
     article.date = dateFormat(article.created_at, "h:MM TT | mmm d");
     await article.save();
 
-    req.flash('success', `Article Posted! A ${platform.permissionsDisplay[platform.permissionsDisplay.length-1].toLowerCase()} will verify your post soon.`);
+    await req.flash('success', `Article Posted! A ${platform.permissionsDisplay[platform.permissionsDisplay.length-1].toLowerCase()} will verify your post soon.`);
     return res.redirect(`/articles`);
 };
 
 controller.verify = async function(req, res) {
     const article = await ArticleLink.findByIdAndUpdate(req.params.id, {verified: true});
     if (!article) {
-        req.flash('error', "Unable to access article");
+        await req.flash('error', "Unable to access article");
         return res.redirect('back');
     }
 
-    req.flash("success", "Verified Article!");
+    await req.flash("success", "Verified Article!");
     return res.redirect("/articles");
 }
 
@@ -143,12 +143,12 @@ controller.updateArticle = async function(req, res) {
     const platform = await setup(Platform);
     const article = await ArticleLink.findById(req.params.id).populate('sender');
     if (!platform || !article) {
-        req.flash('error', "Unable to access article");
+        await req.flash('error', "Unable to access article");
         return res.redirect('back');
     }
 
     if (article.sender._id.toString() != req.user._id.toString()) {
-        req.flash('error', "You can only update articles which you have sent");
+        await req.flash('error', "You can only update articles which you have sent");
         return res.redirect('back');
     }
 
@@ -158,7 +158,7 @@ controller.updateArticle = async function(req, res) {
         verified: false
     });
     if (!updatedArticle) {
-        req.flash('error', "Unable to update article");
+        await req.flash('error', "Unable to update article");
         return res.redirect('back');
     }
 
@@ -179,10 +179,10 @@ controller.updateArticle = async function(req, res) {
             }
             // check for failure
             if (cloudErr || !cloudResult || cloudResult.result !== 'ok') {
-                req.flash('error', 'Error deleting uploaded image');
+                await req.flash('error', 'Error deleting uploaded image');
                 return res.redirect('back');
             }
-            updatedArticle.mediaFiles.splice(i, 1);
+            await updatedArticle.mediaFiles.splice(i, 1);
         }
     }
 
@@ -194,11 +194,11 @@ controller.updateArticle = async function(req, res) {
                 const processedBuffer = await autoCompress(file.originalname, file.buffer);
                 [cloudErr, cloudResult] = await cloudUpload(file.originalname, processedBuffer);
                 if (cloudErr || !cloudResult) {
-                    req.flash('error', 'Upload failed');
+                    await req.flash('error', 'Upload failed');
                     return res.redirect('back');
                 }
 
-                updatedArticle.mediaFiles.push({
+                await updatedArticle.mediaFiles.push({
                     filename: cloudResult.public_id,
                     url: cloudResult.secure_url,
                     originalName: file.originalname
@@ -208,7 +208,7 @@ controller.updateArticle = async function(req, res) {
     }
     
     await updatedArticle.save();
-    req.flash('success', 'Article Updated!');
+    await req.flash('success', 'Article Updated!');
     return res.redirect(`/articles`);
 }
 
@@ -225,7 +225,7 @@ controller.likeArticle = async function(req, res) {
         });
     }
 
-    article.likes.push(req.user._id); //Add likes to article
+    await article.likes.push(req.user._id); //Add likes to article
     await article.save();
     return res.json({
         success: `Liked ${article.subject}`,
@@ -257,7 +257,7 @@ controller.comment = async function(req, res) {
     comment.date = dateFormat(comment.created_at, "h:MM TT | mmm d");
     await comment.save();
 
-    article.comments.push(comment);
+    await article.comments.push(comment);
     await article.save();
 
     let users = [];
@@ -295,7 +295,7 @@ controller.likeComment = async function(req, res) {
         });
     }
 
-    comment.likes.push(req.user._id); //Add Like
+    await comment.likes.push(req.user._id); //Add Like
     await comment.save();
     return res.json({
         success: `Liked comment`,
@@ -306,12 +306,12 @@ controller.likeComment = async function(req, res) {
 controller.deleteArticle = async function(req, res) {
     const article = await ArticleLink.findById(req.params.id).populate('sender');
     if (!article) {
-        req.flash('error', "Unable to access article");
+        await req.flash('error', "Unable to access article");
         return res.redirect('back');
     }
 
     if (article.sender._id.toString() != req.user._id.toString()) { //Doublecheck that deleter is articleer
-        req.flash('error', "You can only delete articles that you have posted");
+        await req.flash('error', "You can only delete articles that you have posted");
         return res.redirect('back');
     }
 
@@ -329,7 +329,7 @@ controller.deleteArticle = async function(req, res) {
             }
             // check for failure
             if (cloudErr || !cloudResult || cloudResult.result !== 'ok') {
-                req.flash('error', 'Error deleting uploaded image');
+                await req.flash('error', 'Error deleting uploaded image');
                 return res.redirect('back');
             }
         }
@@ -337,11 +337,11 @@ controller.deleteArticle = async function(req, res) {
 
     const deletedArticle = await ArticleLink.findByIdAndDelete(article._id);
     if (!deletedArticle) {
-        req.flash('error', "Unable to delete article");
+        await req.flash('error', "Unable to delete article");
         return res.redirect('back');
     }
 
-    req.flash('success', 'Article Deleted!');
+    await req.flash('success', 'Article Deleted!');
     return res.redirect('/articles/');
 }
 
@@ -370,7 +370,7 @@ controller.advice = async function(req, res) {
                     const processedBuffer = await autoCompress(file.originalname, file.buffer);
                     [cloudErr, cloudResult] = await cloudUpload(file.originalname, processedBuffer);
                     if (cloudErr || !cloudResult) {
-                        req.flash('error', 'Upload failed');
+                        await req.flash('error', 'Upload failed');
                         return res.redirect('back');
                     }
                     if ([".png", ".jpg"].includes(path.extname(cloudResult.url.split("SaberChat/")[1]))) {images.push(cloudResult.url);}
@@ -382,10 +382,10 @@ controller.advice = async function(req, res) {
         for (let file of images) {text += `<br><img src="${file}" style="width: 50%; height: 50%;>`;}
         for (let file of pdfs) {text += `<iframe src="${file.url}" height="300" width="250"></iframe><a href="${file.url}" target="_blank"><h5>Open ${file.originalname} New Tab?</h5></a>`;}
         await sendGridEmail(platform.officialEmail, `New Advice Donation From ${req.user.firstName} ${req.user.lastName} - ${req.body.subject}`, text, false);
-        req.flash("success", "Thank you for sending us your advice!");
+        await req.flash("success", "Thank you for sending us your advice!");
         return res.redirect("/articles/donate");
     }
-    req.flash("error", `${platform.name} Saberchat does not have an official email set up yet`);
+    await req.flash("error", `${platform.name} Saberchat does not have an official email set up yet`);
     return res.redirect("back");
 }
 

@@ -26,7 +26,7 @@ controller.index = async function(req, res) {
 controller.new = async function(req, res) {
     const platform = await setup(Platform);
     if (!platform) {
-        req.flash("error", "An error occurred");
+        await req.flash("error", "An error occurred");
         return res.redirect("back");
     }
     return res.render('reports/new', {platform});
@@ -57,7 +57,7 @@ controller.updateForm = async function(req, res) {
     const report = await Report.findById(req.params.id);
     if(!platform || !report) {req.flash('error', 'Could not find report'); return res.redirect('back');}
     if(!report.sender._id.equals(req.user._id)) {
-        req.flash('error', 'You do not have permission to do that.');
+        await req.flash('error', 'You do not have permission to do that.');
         return res.redirect('back');
     }
 
@@ -76,14 +76,14 @@ controller.create = async function(req, res) {
         text: req.body.message
     });
     if (!report) {
-        req.flash('error', 'Unable to create report');
+        await req.flash('error', 'Unable to create report');
         return res.redirect('back');
     }
 
     if (req.body.images) { //If any images were added (if not, the 'images' property is null)
         for (let image in req.body.images) {
             if (image) {
-                report.images.push(req.body.images[image]);
+                await report.images.push(req.body.images[image]);
             }
         }
     }
@@ -97,11 +97,11 @@ controller.create = async function(req, res) {
                 const processedBuffer = await autoCompress(file.originalname, file.buffer);
                 [cloudErr, cloudResult] = await cloudUpload(file.originalname, processedBuffer);
                 if (cloudErr || !cloudResult) {
-                    req.flash('error', 'Upload failed');
+                    await req.flash('error', 'Upload failed');
                     return res.redirect('back');
                 }
 
-                report.mediaFiles.push({
+                await report.mediaFiles.push({
                     filename: cloudResult.public_id,
                     url: cloudResult.secure_url,
                     originalName: file.originalname
@@ -113,19 +113,19 @@ controller.create = async function(req, res) {
     report.date = dateFormat(report.created_at, "h:MM TT | mmm d");
     await report.save();
 
-    req.flash('success', 'Report Posted to Bulletin!');
+    await req.flash('success', 'Report Posted to Bulletin!');
     return res.redirect(`/reports/${report._id}`);
 };
 
 controller.updateReport = async function(req, res) {
     const report = await Report.findById(req.params.id).populate('sender');
     if (!report) {
-        req.flash('error', "Unable to access report");
+        await req.flash('error', "Unable to access report");
         return res.redirect('back');
     }
 
     if (report.sender._id.toString() != req.user._id.toString()) {
-        req.flash('error', "You can only update reports which you have sent");
+        await req.flash('error', "You can only update reports which you have sent");
         return res.redirect('back');
     }
 
@@ -136,7 +136,7 @@ controller.updateReport = async function(req, res) {
         handled: false
     });
     if (!updatedReport) {
-        req.flash('error', "Unable to update report");
+        await req.flash('error', "Unable to update report");
         return res.redirect('back');
     }
 
@@ -144,7 +144,7 @@ controller.updateReport = async function(req, res) {
     if (req.body.images) { //Only add images if any are provided
         for (let image in req.body.images) {
             if (image) {
-                updatedReport.images.push(req.body.images[image]);
+                await updatedReport.images.push(req.body.images[image]);
             }
         }
     }
@@ -163,7 +163,7 @@ controller.updateReport = async function(req, res) {
             }
             // check for failure
             if (cloudErr || !cloudResult || cloudResult.result !== 'ok') {
-                req.flash('error', 'Error deleting uploaded image');
+                await req.flash('error', 'Error deleting uploaded image');
                 return res.redirect('back');
             }
             updatedReport.mediaFiles.splice(i, 1);
@@ -178,11 +178,11 @@ controller.updateReport = async function(req, res) {
                 const processedBuffer = await autoCompress(file.originalname, file.buffer);
                 [cloudErr, cloudResult] = await cloudUpload(file.originalname, processedBuffer);
                 if (cloudErr || !cloudResult) {
-                    req.flash('error', 'Upload failed');
+                    await req.flash('error', 'Upload failed');
                     return res.redirect('back');
                 }
 
-                updatedReport.mediaFiles.push({
+                await updatedReport.mediaFiles.push({
                     filename: cloudResult.public_id,
                     url: cloudResult.secure_url,
                     originalName: file.originalname
@@ -192,17 +192,17 @@ controller.updateReport = async function(req, res) {
     }
     
     await updatedReport.save();
-    req.flash('success', 'Report Updated!');
+    await req.flash('success', 'Report Updated!');
     return res.redirect(`/reports/${updatedReport._id}`);
 }
 
 controller.handleReport = async function(req, res) {
     const report = await Report.findByIdAndUpdate(req.params.id, {handled: true});
     if (!report) {
-        req.flash("error", "Unable to access report");
+        await req.flash("error", "Unable to access report");
         return res.redirect("back");
     }
-    req.flash("success", "Handled report!");
+    await req.flash("success", "Handled report!");
     return res.redirect("/reports/");
 }
 
@@ -219,7 +219,7 @@ controller.likeReport = async function(req, res) {
         });
     }
 
-    report.likes.push(req.user._id); //Add likes to report
+    await report.likes.push(req.user._id); //Add likes to report
     await report.save();
     return res.json({
         success: `Liked ${report.subject}`,
@@ -251,7 +251,7 @@ controller.comment = async function(req, res) {
     comment.date = dateFormat(comment.created_at, "h:MM TT | mmm d");
     await comment.save();
 
-    report.comments.push(comment);
+    await report.comments.push(comment);
     await report.save();
 
     let users = [];
@@ -289,7 +289,7 @@ controller.likeComment = async function(req, res) {
         });
     }
 
-    comment.likes.push(req.user._id); //Add Like
+    await comment.likes.push(req.user._id); //Add Like
     await comment.save();
     return res.json({
         success: `Liked comment`,
@@ -300,12 +300,12 @@ controller.likeComment = async function(req, res) {
 controller.deleteReport = async function(req, res) {
     const report = await Report.findById(req.params.id).populate('sender');
     if (!report) {
-        req.flash('error', "Unable to access report");
+        await req.flash('error', "Unable to access report");
         return res.redirect('back');
     }
 
     if (report.sender._id.toString() != req.user._id.toString()) { //Doublecheck that deleter is reporter
-        req.flash('error', "You can only delete reports that you have posted");
+        await req.flash('error', "You can only delete reports that you have posted");
         return res.redirect('back');
     }
 
@@ -323,7 +323,7 @@ controller.deleteReport = async function(req, res) {
             }
             // check for failure
             if (cloudErr || !cloudResult || cloudResult.result !== 'ok') {
-                req.flash('error', 'Error deleting uploaded image');
+                await req.flash('error', 'Error deleting uploaded image');
                 return res.redirect('back');
             }
         }
@@ -331,11 +331,11 @@ controller.deleteReport = async function(req, res) {
 
     const deletedReport = await Report.findByIdAndDelete(report._id);
     if (!deletedReport) {
-        req.flash('error', "Unable to delete report");
+        await req.flash('error', "Unable to delete report");
         return res.redirect('back');
     }
 
-    req.flash('success', 'Report Deleted!');
+    await req.flash('success', 'Report Deleted!');
     return res.redirect('/reports/');
 }
 

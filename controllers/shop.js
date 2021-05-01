@@ -28,7 +28,7 @@ controller.index = async function(req, res) {
     const market = await setup(Market);
     const orders = await Order.find({customer: req.user._id}).populate("items.item"); //Find all of the orders that you have ordered, and populate info on their items
     if (!platform || !orders) {
-        req.flash("error", "Unable to find orders");
+        await req.flash("error", "Unable to find orders");
         return res.redirect("back");
     }
     return res.render("shop/index", {market, platform, orders, data: platform.features[objectArrIndex(platform.features, "route", "shop")]});
@@ -39,13 +39,13 @@ controller.orderForm = async function(req, res) {
     const shop = await setup(Market);
     const categories = await ItemCategory.find({_id: {$in: shop.categories}}).populate("items");
     if (!platform || !shop || !categories) {
-        req.flash("error", "Unable to find categories");
+        await req.flash("error", "Unable to find categories");
         return res.redirect("back");
     }
 
     const allOrders = await Order.find({customer: req.user._id}).populate("items.item"); //Find all of the orders that you have ordered, and populate info on their items
     if (!allOrders) {
-        req.flash("error", "Unable to find orders");
+        await req.flash("error", "Unable to find orders");
         return res.redirect("back");
     }
 
@@ -57,10 +57,10 @@ controller.orderForm = async function(req, res) {
             sortedCategory.items = sortByPopularity(category.items, "upvotes", "created_at", null).popular.concat(sortByPopularity(category.items, "upvotes", "created_at", null).unpopular);
             for (let i = sortedCategory.items.length-1; i > 0; i--) {
                 if (!sortedCategory.items[i].availableItems > 0) {
-                    sortedCategory.items.splice(i, 1);
+                    await sortedCategory.items.splice(i, 1);
                 }
             }
-            sortedCategories.push(sortedCategory);
+            await sortedCategories.push(sortedCategory);
         }
     }
 
@@ -77,7 +77,7 @@ controller.orderForm = async function(req, res) {
                 }
             }
             if (!overlap) {
-                orderedItems.push({
+                await orderedItems.push({
                     item: item.item._id,
                     totalOrdered: item.quantity,
                     created_at: item.item.created_at
@@ -89,17 +89,17 @@ controller.orderForm = async function(req, res) {
 
     if (req.query.order) { //SHOW NEW ORDER FORM
         if (!platform.purchasable || !req.user) {
-            req.flash('error', `This feature is not enabled on ${platform.name} Saberchat`);
+            await req.flash('error', `This feature is not enabled on ${platform.name} Saberchat`);
             return res.redirect('back');        
         }
         
         const sentOrders = await Order.find({name: `${req.user.firstName} ${req.user.lastName}`, present: true}); //Find all of this user"s orders that are currently active
         if (!sentOrders) {
-            req.flash("error", "Unable to find orders");
+            await req.flash("error", "Unable to find orders");
             return res.redirect("back");
 
         } else if (sentOrders.length > 2) {
-            req.flash("error", "You have made the maximum number of orders for the day");
+            await req.flash("error", "You have made the maximum number of orders for the day");
             return res.redirect("back");
         }
         return res.render("shop/newOrder", {platform, categories: sortedCategories, frequentItems, data: platform.features[objectArrIndex(platform.features, "route", "shop")]});
@@ -108,7 +108,7 @@ controller.orderForm = async function(req, res) {
     if (req.query.menu) { //SHOW MENU
         const categories = await ItemCategory.find({_id: {$in: shop.categories}}).populate("items"); //Collects info on every item category, to render (in frontend, the ejs checks each item inside category, and only shows it if it"s available)
         if (!categories) {
-            req.flash("error", "An Error Occurred");
+            await req.flash("error", "An Error Occurred");
             return res.redirect("back");
         }
 
@@ -123,7 +123,7 @@ controller.orderForm = async function(req, res) {
                 }
                 itemDescriptions[item._id] = itemDescription;
                 if (item.mediaFile.filename) {
-                    fileExtensions.set(item.mediaFile.url, path.extname(item.mediaFile.url.split("SaberChat/")[1]));
+                    await fileExtensions.set(item.mediaFile.url, path.extname(item.mediaFile.url.split("SaberChat/")[1]));
                 }
             }
         }
@@ -137,34 +137,34 @@ controller.orderForm = async function(req, res) {
 controller.order = async function(req, res) {
     const platform = await setup(Platform);
     if (!platform) {
-        req.flash("error", "An Error Occurred");
+        await req.flash("error", "An Error Occurred");
         return res.redirect("back");
     }
     if (!req.body.check) { //If any items are selected
-        req.flash("error", "Cannot send empty order"); //If no items were checked
+        await req.flash("error", "Cannot send empty order"); //If no items were checked
         return res.redirect("back");
     }
 
     const sentOrders = await Order.find({name: `${req.user.firstName} ${req.user.lastName}`, present: true});
     if (!sentOrders) {
-        req.flash("error", "Unable to find orders");
+        await req.flash("error", "Unable to find orders");
         return res.redirect("back");
     }
 
     if (sentOrders.length > 2) { //If more than two orders are already made, you cannot order again
-        req.flash("error", "You have made the maximum number of orders for the day");
+        await req.flash("error", "You have made the maximum number of orders for the day");
         return res.redirect("back");
     }
 
     const orderedItems = await Item.find({_id: {$in: Object.keys(req.body.check)}}); //Find all ordered items
     if (!orderedItems) {
-        req.flash("error", "No items found");
+        await req.flash("error", "No items found");
         return res.redirect("back");
     }
 
     for (let item of orderedItems) { //Search for unavailable items
         if (item.availableItems < parseInt(req.body[item.name])) {
-            req.flash("error", "Some items are unavailable in the quantities you requested. Please order again.");
+            await req.flash("error", "Some items are unavailable in the quantities you requested. Please order again.");
             return res.redirect("back");
         }
     }
@@ -174,7 +174,7 @@ controller.order = async function(req, res) {
 
     if (!req.body.payingInPerson) {
         if (charge > req.user.balance) { //Check to see if you are ordering more than you can
-            req.flash("error", `You do not have enough money in your account for this order. Contact a platform ${platform.permissionsDisplay[platform.permissionsDisplay.length-1].toLowerCase()} if there has been a mistake.`);
+            await req.flash("error", `You do not have enough money in your account for this order. Contact a platform ${platform.permissionsDisplay[platform.permissionsDisplay.length-1].toLowerCase()} if there has been a mistake.`);
             return res.redirect("/shop");
         }
         req.user.balance -= charge;
@@ -189,7 +189,7 @@ controller.order = async function(req, res) {
         }
     }
 
-    req.flash("success", "Order Sent!");
+    await req.flash("success", "Order Sent!");
     return res.redirect("/shop");
 }
 
@@ -256,7 +256,7 @@ controller.processOrder = async function(req, res) {
         await sendGridEmail(order.customer.email, "Order Ready", `<p>Hello ${order.customer.firstName},</p>${emailText}`, false);
     }
 
-    order.customer.inbox.push({message: notif, new: true}); //Add notif to user"s inbox
+    await order.customer.inbox.push({message: notif, new: true}); //Add notif to user"s inbox
     await order.customer.save();
     order.present = false; //Order is not active anymore
     await order.save();
@@ -330,7 +330,7 @@ controller.deleteOrder = async function(req, res) {
             order.customer.debt -= order.charge;
         }
 
-        order.customer.inbox.push({message: notif, new: true}); //Add notif to user"s inbox
+        await order.customer.inbox.push({message: notif, new: true}); //Add notif to user"s inbox
         await order.customer.save();
 
         const deletedOrder = await Order.findByIdAndDelete(order._id).populate("items.item").populate("customer");
@@ -374,7 +374,7 @@ controller.newItem = async function(req, res) {
     const platform = await setup(Platform);
     const categories = await ItemCategory.find({});
     if (!platform || !categories) {
-        req.flash("error", "An Error Occurred");
+        await req.flash("error", "An Error Occurred");
         return res.redirect("back");
     }
 
@@ -387,12 +387,12 @@ controller.createItem = async function(req, res) {
     const shop = await setup(Market);
     const overlap = await Item.find({name: req.body.name});
     if (!platform || !shop || !overlap) {
-        req.flash("error", "Unable to find items");
+        await req.flash("error", "Unable to find items");
         return res.redirect("back");
     }
 
     if (overlap.length > 0) {
-        req.flash("error", "Item already exists");
+        await req.flash("error", "Item already exists");
         return res.redirect("back");
     }
 
@@ -406,7 +406,7 @@ controller.createItem = async function(req, res) {
     });
 
     if (!item) {
-        req.flash("error", "Unable to create item");
+        await req.flash("error", "Unable to create item");
         return res.redirect("back");
     }
     if (!item.displayAvailability) {item.availableItems = 10;}
@@ -420,7 +420,7 @@ controller.createItem = async function(req, res) {
             const processedBuffer = await autoCompress(file.originalname, file.buffer);
             const [cloudErr, cloudResult] = await cloudUpload(file.originalname, processedBuffer);
             if (cloudErr || !cloudResult) {
-                req.flash("error", "Upload failed");
+                await req.flash("error", "Upload failed");
                 return res.redirect("back");
             }
 
@@ -444,14 +444,14 @@ controller.createItem = async function(req, res) {
         if (!category) {
             category = await ItemCategory.create({name: "Other"});
             if (!category) {
-                req.flash("error", "Unable to find item category");
+                await req.flash("error", "Unable to find item category");
                 return res.redirect("back");
             }
         }
     }
 
     await item.save();
-    category.items.push(item); //Push this item to that category"s item list
+    await category.items.push(item); //Push this item to that category"s item list
     await category.save();
     return res.redirect("/shop/manage");
 }
@@ -463,13 +463,13 @@ controller.viewItem = async function(req, res) {
     const platform = await setup(Platform);
     const item = await Item.findById(req.params.id);
     if (!platform || !item) {
-        req.flash("error", "Unable to find item");
+        await req.flash("error", "Unable to find item");
         return res.redirect("back")
     }
 
     const categories = await ItemCategory.find({});
     if (!categories) {
-        req.flash("error", "Unable to find item categories");
+        await req.flash("error", "Unable to find item categories");
         return res.redirect("back");
     }
 
@@ -492,7 +492,7 @@ controller.deleteItem = async function(req, res) {
     const shop = await setup(Market);
     const item = await Item.findByIdAndDelete(req.params.id); //Delete item based on specified ID
     if (!item) {
-        req.flash("error", "Could not delete item");
+        await req.flash("error", "Could not delete item");
         return res.redirect("back");
     }
 
@@ -500,14 +500,14 @@ controller.deleteItem = async function(req, res) {
     if (item.mediaFile && item.mediaFile.filename) {
         [cloudErr, cloudResult] = await cloudDelete(item.mediaFile.filename, "image");
         if (cloudErr || !cloudResult || cloudResult.result !== "ok") {
-            req.flash("error", "Error deleting uploaded image");
+            await req.flash("error", "Error deleting uploaded image");
             return res.redirect("back");
         }
     }
 
     const categories = await ItemCategory.find({_id: {$in: shop.categories}});
     if (!categories) {
-        req.flash("error", "Could not remove item from list of item categories");
+        await req.flash("error", "Could not remove item from list of item categories");
         return res.redirect("back");
     }
 
@@ -518,14 +518,14 @@ controller.deleteItem = async function(req, res) {
 
     const orders = await Order.find({}).populate("items.item");
     if (!orders) {
-        req.flash("error", "Could not find orders");
+        await req.flash("error", "Could not find orders");
         return res.redirect("back");
     }
 
     for (let order of orders) { //If the order includes this item, remove the item from that order"s item list
         for (let i of order.items) {
             if (!i.item) {
-                order.items.splice(i, 1);
+                await order.items.splice(i, 1);
             }
         }
 
@@ -536,7 +536,7 @@ controller.deleteItem = async function(req, res) {
         await order.save();
     }
 
-    req.flash("success", "Deleted Item!");
+    await req.flash("success", "Deleted Item!");
     return res.redirect("/shop/manage");
 }
 
@@ -550,7 +550,7 @@ controller.manage = async function(req, res) {
     } else if (req.query.data) { //If route calls to display data
         const platform = await setup(Platform);
         if (!platform.purchasable) {
-            req.flash('error', `This feature is not enabled on ${platform.name} Saberchat`);
+            await req.flash('error', `This feature is not enabled on ${platform.name} Saberchat`);
             return res.redirect('back');        
         }
 
@@ -561,7 +561,7 @@ controller.manage = async function(req, res) {
 
         const data = await getData(customers, items, allOrders);
         if (!data) {
-            req.flash("error", "An Error Occurred");
+            await req.flash("error", "An Error Occurred");
             return res.redirect("back")
         }
         data.platform = platform;
@@ -586,7 +586,7 @@ controller.changeStatus = async function(req, res) {
 controller.updateSettings = async function(req, res) {
     const platform = await setup(Platform);
     if (!platform) {
-        req.flash("error", "Could not access platform");
+        await req.flash("error", "Could not access platform");
         return res.redirect("back");
     }
 
@@ -594,7 +594,7 @@ controller.updateSettings = async function(req, res) {
         platform.features[objectArrIndex(platform.features, "route", "shop")][attr] = req.body[attr];
     }
     await platform.save();
-    req.flash("success", "Updated Settings!");
+    await req.flash("success", "Updated Settings!");
     return res.redirect("/shop/manage");
 }
 
@@ -606,7 +606,7 @@ controller.newCategory = async function(req, res) {
     const shop = await setup(Market);
     const categories = await ItemCategory.find({_id: {$in: shop.categories}}).populate("items"); //Collect info on all the items, so that we can give the user the option to add them to that category
     if (!platform || !shop || !categories) {
-        req.flash("error", "Unable to find categories");
+        await req.flash("error", "Unable to find categories");
         return res.redirect("back");
     }
     return res.render("shop/newItemCategory", {platform, categories, data: platform.features[objectArrIndex(platform.features, "route", "shop")]});
@@ -617,18 +617,18 @@ controller.createCategory = async function(req, res) {
     const shop = await setup(Market);
     const overlap = await ItemCategory.find({_id: {$in: shop.categories}, name: req.body.name}); //Find all item categories with this name that already exist
     if (!overlap) {
-        req.flash("error", "Unable to find item categories");
+        await req.flash("error", "Unable to find item categories");
         return res.redirect("back");
     }
 
     if (overlap.length > 0) { //If there are overlapping items
-        req.flash("error", "Item Category Already Exists.");
+        await req.flash("error", "Item Category Already Exists.");
         return res.redirect("back");
     }
 
     const category = await ItemCategory.create({name: req.body.name, items: []});
     if (!category) {
-        req.flash("error", "Item Category could not be created");
+        await req.flash("error", "Item Category could not be created");
         return res.redirect("back");
     }
 
@@ -637,7 +637,7 @@ controller.createCategory = async function(req, res) {
 
     const categories = await ItemCategory.find({_id: {$in: shop.categories}}); //Found categories, but represents all item categories
     if (!categories) {
-        req.flash("error", "Could not find item categories");
+        await req.flash("error", "Could not find item categories");
         return res.redirect("back");
     }
 
@@ -652,18 +652,18 @@ controller.createCategory = async function(req, res) {
 
     const items = await Item.find({}); //Find all items
     if (!items) {
-        req.flash("error", "Could not find items");
+        await req.flash("error", "Could not find items");
         return res.redirect("back");
     }
 
     for (let item of items) { //If the item is selected, add it to this category (now that we"ve removed it from all other categories)
         if (req.body[item._id.toString()]) {
-            category.items.push(item);
+            await category.items.push(item);
         }
     }
 
     await category.save();
-    req.flash("success", "Item Category Created!");
+    await req.flash("success", "Item Category Created!");
     return res.redirect("/shop/manage");
 }
 
@@ -674,18 +674,18 @@ controller.viewCategory = async function(req, res) {
     const platform = await setup(Platform);
     const category = await ItemCategory.findById(req.params.id).populate("items"); //Find the specified category
     if (!platform || !category) {
-        req.flash("error", "An Error Occurred");
+        await req.flash("error", "An Error Occurred");
         return res.redirect("back");
     }
 
     if (category.name == "Other") {
-        req.flash("error", "You cannot modify that category");
+        await req.flash("error", "You cannot modify that category");
         return res.redirect("/shop/manage");
     }
 
     const categories = await ItemCategory.find({_id: {$ne: category._id}}).populate("items"); //Find all items
     if (!categories) {
-        req.flash("error", "An Error Occurred");
+        await req.flash("error", "An Error Occurred");
         return res.redirect("back");
     }
     return res.render("shop/editItemCategory", {platform, category, categories, data: platform.features[objectArrIndex(platform.features, "route", "shop")]});
@@ -696,37 +696,37 @@ controller.updateCategory = async function(req, res) {
     const shop = await setup(Market);
     const overlap = await ItemCategory.find({_id: {$in: shop.categories, $ne: req.params.id}, name: req.body.name}); //Find all categories besides the one we are editing with the same name
     if (!overlap) {
-        req.flash("error", "An Error Occurred");
+        await req.flash("error", "An Error Occurred");
         return res.redirect("back");
     }
 
     if (overlap.length > 0) { //If there is overlap
-        req.flash("error", "Item category already in database");
+        await req.flash("error", "Item category already in database");
         return res.redirect("back");
     }
 
     const category = await ItemCategory.findByIdAndUpdate(req.params.id, {name: req.body.name}); //Update this item category based on the id
     if (!category) {
-        req.flash("error", "Unable to update item category");
+        await req.flash("error", "Unable to update item category");
         return res.redirect("back");
     }
 
     const otherCategories = await ItemCategory.find({_id: {$in: shop.categories, $ne: category._id}}); //Find all other categories
     if (!otherCategories) {
-        req.flash("error", "Unable to find item categories");
+        await req.flash("error", "Unable to find item categories");
         return res.redirect("back");
     }
 
     const items = await Item.find({}); //Find all items
     if (!items) {
-        req.flash("error", "Unable to find items");
+        await req.flash("error", "Unable to find items");
         return res.redirect("back");
     }
 
     for (let otherCategory of otherCategories) { //Iterate over other categories
         for (let item of items) {
             if (otherCategory.items.includes(item._id) && req.body[item._id.toString()] == "on") {
-                otherCategory.items.splice(otherCategory.items.indexOf(item._id), 1);
+                await otherCategory.items.splice(otherCategory.items.indexOf(item._id), 1);
             }
         }
         await otherCategory.save();
@@ -736,14 +736,14 @@ controller.updateCategory = async function(req, res) {
     if (!other) {
         other = await ItemCategory.create({name: "Other"}); //If it does not exist, create it category "other"
         if (!other) {
-            req.flash("error", "Item Category could not be created");
+            await req.flash("error", "Item Category could not be created");
             return res.redirect("back");
         }
     }
 
     for (let item of category.items) {
         if (!req.body[item._id.toString()]) { //Item is no longer checked
-            other.items.push(item); //Move that item to "Other"
+            await other.items.push(item); //Move that item to "Other"
         }
     }
     await other.save();
@@ -751,12 +751,12 @@ controller.updateCategory = async function(req, res) {
     category.items = []; //Empty category and push new items to its items[] array, based on the latest changes
     for (let item of items) {
         if (req.body[item._id.toString()]) {
-            category.items.push(item);
+            await category.items.push(item);
         }
     }
 
     await category.save();
-    req.flash("success", "Item category updated!");
+    await req.flash("success", "Item category updated!");
     return res.redirect("/shop/manage");
 }
 
@@ -767,14 +767,14 @@ controller.deleteCategory = async function(req, res) {
     if (!other) {
         other = await ItemCategory.create({name: "Other"}); //If it does not exist, create it category "other"
         if (!other) {
-            req.flash("error", "Item category could not be created");
+            await req.flash("error", "Item category could not be created");
             return res.redirect("back");
         }
     }
 
     const category = await ItemCategory.findByIdAndDelete(req.params.id); //Delete category based on specified ID
     if (!category) {
-        req.flash("error", "Unable to find item category");
+        await req.flash("error", "Unable to find item category");
         return res.redirect("back");
     }
 
@@ -782,11 +782,11 @@ controller.deleteCategory = async function(req, res) {
     await shop.save();
 
     for (let item of category.items) {
-        other.items.push(item);
+        await other.items.push(item);
     }
 
     await other.save();
-    req.flash("success", "Item category deleted!");
+    await req.flash("success", "Item category deleted!");
     return res.redirect("/shop/manage");
 }
 
@@ -801,14 +801,14 @@ controller.upvoteItem = async function(req, res) {
         return res.json({success: `Downvoted ${item.name}`, upvoteCount: item.upvotes.length});
     }
 
-    item.upvotes.push(req.user._id);
+    await item.upvotes.push(req.user._id);
     await item.save();
     return res.json({success: `Upvoted ${item.name}`, upvoteCount: item.upvotes.length});
 }
 
 controller.updateItemInfo = async function(req, res) {
     if (!req.user.tags.includes("Cashier")) {
-        req.flash("error", "You do not have permission to do that");
+        await req.flash("error", "You do not have permission to do that");
         return res.redirect("back");
     }
 
@@ -816,12 +816,12 @@ controller.updateItemInfo = async function(req, res) {
     const shop = await setup(Market);
     const overlap = await Item.find({_id: {$ne: req.params.id}, name: req.body.name});
     if (!platform || !shop || !overlap) {
-        req.flash("error", "Item Not Found");
+        await req.flash("error", "Item Not Found");
         return res.redirect("back");
     }
 
     if (overlap.length > 0) {
-        req.flash("error", "Item With This Name Exists");
+        await req.flash("error", "Item With This Name Exists");
         return res.redirect("back");
     }
     const item = await Item.findByIdAndUpdate(req.params.id, {
@@ -834,7 +834,7 @@ controller.updateItemInfo = async function(req, res) {
         displayAvailability: (req.body.displayAvailability != undefined)
     });
     if (!item) {
-        req.flash("error", "item not found");
+        await req.flash("error", "item not found");
         return res.redirect("back");
     }
 
@@ -849,7 +849,7 @@ controller.updateItemInfo = async function(req, res) {
                 [cloudErr, cloudResult] = await cloudDelete(item.mediaFile.filename, "image");
                 // check for failure
                 if (cloudErr || !cloudResult || cloudResult.result !== "ok") {
-                    req.flash("error", "Error deleting uploaded image");
+                    await req.flash("error", "Error deleting uploaded image");
                     return res.redirect("back");
                 }
             }
@@ -859,7 +859,7 @@ controller.updateItemInfo = async function(req, res) {
             [cloudErr, cloudResult] = await cloudUpload(file.originalname, processedBuffer);
 
             if (cloudErr || !cloudResult) {
-                req.flash("error", "Upload failed");
+                await req.flash("error", "Upload failed");
                 return res.redirect("back");
             }
 
@@ -875,7 +875,7 @@ controller.updateItemInfo = async function(req, res) {
 
     const activeOrders = await Order.find({present: true}).populate("items.item"); //Any orders that are active will need to change, to accomodate the item changes.
     if (!activeOrders) {
-        req.flash("error", "Unable to find active orders");
+        await req.flash("error", "Unable to find active orders");
         return res.redirect("back");
     }
 
@@ -891,7 +891,7 @@ controller.updateItemInfo = async function(req, res) {
 
     const categories = await ItemCategory.find({_id: {$in: shop.categories}, name: {$ne: req.body.category}}); //Collect all item categories
     if (!categories) {
-        req.flash("error", "Unable to find item categories");
+        await req.flash("error", "Unable to find item categories");
         return res.redirect("back");
     }
 
@@ -906,17 +906,17 @@ controller.updateItemInfo = async function(req, res) {
         if (!category) {
             category = await ItemCategory.create({name: "Other"});
             if (!category) {
-                req.flash("error", "Unable to find item category");
+                await req.flash("error", "Unable to find item category");
                 return res.redirect("back");
             }
         }
     }
 
     removeIfIncluded(category.items, item._id); //If item is already in category, remove it so you can put the updated category back (we don"t know whether the category will be there or not, so it"s better to just cover all bases)
-    category.items.push(item);
+    await category.items.push(item);
     await category.save();
 
-    req.flash("success", "Item updated!");
+    await req.flash("success", "Item updated!");
     return res.redirect("/shop/manage");
 }
 
@@ -925,7 +925,7 @@ controller.manageShop = async function(req, res) {
     const shop = await setup(Market);
     const categories = await ItemCategory.find({_id: {$in: shop.categories}}).populate("items"); //Collect info on all the item categories
     if (!platform || !shop || !categories) {
-        req.flash("error", "An Error Occurred");
+        await req.flash("error", "An Error Occurred");
         return res.redirect("back");
     }
 
@@ -943,13 +943,13 @@ controller.manageShop = async function(req, res) {
 controller.manageOrders = async function(req, res) {
     const platform = await setup(Platform);
     if (!platform.purchasable) {
-        req.flash('error', `This feature is not enabled on ${platform.name} Saberchat`);
+        await req.flash('error', `This feature is not enabled on ${platform.name} Saberchat`);
         return res.redirect('back');        
     }
 
     const orders = await Order.find({present: true}).populate("items.item");
     if (!platform || !orders) {
-        req.flash("error", "Could not find orders");
+        await req.flash("error", "Could not find orders");
         return res.redirect("back");
     }
     return res.render("shop/orderDisplay", {platform, orders, data: platform.features[objectArrIndex(platform.features, "route", "shop")]});

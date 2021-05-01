@@ -28,7 +28,7 @@ controller.index = async function(req, res) {
 	const platform = await setup(Platform);
 	const users = await User.find({authenticated: true});
 	if (!platform || !users) {
-		req.flash("error", "An error occurred");
+		await req.flash("error", "An error occurred");
 		return res.redirect("back");
 	}
 
@@ -71,7 +71,7 @@ controller.team = async function(req, res) {
 		status: {$in: platform.statusesProperty.slice(platform.statusesProperty.length-2)}
 	});
 	if (!platform || !users) {
-		req.flash("error", "An error occurred");
+		await req.flash("error", "An error occurred");
 		return res.redirect("back");
 	}
 	return res.render("profiles/team", {platform, users});
@@ -90,7 +90,7 @@ controller.edit = async function(req, res) {
 controller.changeLoginInfo = async function(req, res) {
 	const platform = await setup(Platform);
     if (!platform) {
-        req.flash("error", "An Error Occurred");
+        await req.flash("error", "An Error Occurred");
         return res.redirect("back");
     }
 	return res.render('profiles/edit_pwd_email', {platform});
@@ -100,7 +100,7 @@ controller.show = async function(req, res) {
 	const platform = await setup(Platform);
 	const user = await User.findById(req.params.id).populate('followers');
 	if (!platform || !user) {
-		req.flash('error', 'Error. Cannot find user.');
+		await req.flash('error', 'Error. Cannot find user.');
 		return res.redirect('back');
 	}
 
@@ -111,7 +111,7 @@ controller.show = async function(req, res) {
 
 	const users = await User.find({authenticated: true});
 	if (!users) {
-		req.flash('error', 'Error. Cannot find users.');
+		await req.flash('error', 'Error. Cannot find users.');
 		return res.redirect('back');
 	}
 
@@ -136,10 +136,10 @@ controller.update = async function(req, res) {
 		_id: {$ne: req.user._id}
 	});
 	if (!platform || !overlap) {
-		req.flash('error', "Unable to find users");
+		await req.flash('error', "Unable to find users");
 		return res.redirect('back');
 	} else if (overlap.length > 0) {
-		req.flash('error', "Another user already has that username.");
+		await req.flash('error', "Another user already has that username.");
 		return res.redirect('back');
 	}
 
@@ -150,13 +150,13 @@ controller.update = async function(req, res) {
 		if (req.user.status == platform.teacherStatus) { //If user is currently teaching a course, they cannot lose their teacher status
 			const courses = await Course.find({});
 			if (!courses) {
-				req.flash('error', "Could not find courses");
+				await req.flash('error', "Could not find courses");
 				return res.redirect('back');
 			}
 	
 			for (let course of courses) {
 				if (course.creator.equals(req.user._id)) {
-					req.flash('error', "You are currently teaching a course, and cannot lose your status");
+					await req.flash('error', "You are currently teaching a course, and cannot lose your status");
 					return res.redirect('back');
 				}
 			}
@@ -206,7 +206,7 @@ controller.update = async function(req, res) {
 			if (req.user.mediaFile.filename) {
 				[cloudErr, cloudResult] = await cloudDelete(req.user.mediaFile.filename, "image");
 				if (cloudErr || !cloudResult || cloudResult.result !== 'ok') {
-					req.flash('error', 'Error deleting uploaded image');
+					await req.flash('error', 'Error deleting uploaded image');
 					return res.redirect('back');
 				}
 			}
@@ -215,7 +215,7 @@ controller.update = async function(req, res) {
             const processedBuffer = await autoCompress(file.originalname, file.buffer);
             [cloudErr, cloudResult] = await cloudUpload(file.originalname, processedBuffer);
 			if (cloudErr || !cloudResult) {
-					req.flash('error', 'Upload failed');
+					await req.flash('error', 'Upload failed');
 					return res.redirect('back');
 			}
 			user.mediaFile = { //Update mediaFile info with cloudinary upload URL
@@ -230,7 +230,7 @@ controller.update = async function(req, res) {
 			if (req.user.bannerFile.filename) {
 				[cloudErr, cloudResult] = await cloudDelete(req.user.bannerFile.filename, "image");
 				if (cloudErr || !cloudResult || cloudResult.result !== 'ok') {
-					req.flash('error', 'Error deleting uploaded image 1');
+					await req.flash('error', 'Error deleting uploaded image 1');
 					return res.redirect('back');
 				}
 			}
@@ -239,7 +239,7 @@ controller.update = async function(req, res) {
             const processedBuffer2 = await autoCompress(file2.originalname, file2.buffer);
             [cloudErr, cloudResult] = await cloudUpload(file2.originalname, processedBuffer2);
 			if (cloudErr || !cloudResult) {
-				req.flash('error', 'Upload failed');
+				await req.flash('error', 'Upload failed');
 				return res.redirect('back');
 			}
 			user.bannerFile = { //Update bannerFile info with cloudinary upload URL
@@ -253,11 +253,11 @@ controller.update = async function(req, res) {
 
 	const updatedUser = await User.findByIdAndUpdate(req.user._id, user); //find and update the user with new info
 	if (!updatedUser) {
-		req.flash('error', 'There was an error updating your profile');
+		await req.flash('error', 'There was an error updating your profile');
 		return res.redirect('back');
 	}
 
-	req.flash('success', 'Updated your profile');
+	await req.flash('success', 'Updated your profile');
 	return res.redirect(`/profiles/${req.user._id}`);
 }
 
@@ -279,7 +279,7 @@ controller.tagPut = async function(req, res) {
 		await req.user.save();
 		return res.json({success: "Succesfully removed status", tag: req.body.tag, user: req.user._id});
 	}
-	req.user.tags.push(req.body.tag);
+	await req.user.tags.push(req.body.tag);
 	await req.user.save();
 	return res.json({success: "Succesfully added status", tag: req.body.tag, user: req.user._id});
 }
@@ -287,7 +287,7 @@ controller.tagPut = async function(req, res) {
 controller.changeEmailPut = async function(req, res) { //Update email
 	const platform = await setup(Platform);
     if (!platform) {
-        req.flash("error", "An Error Occurred");
+        await req.flash("error", "An Error Occurred");
         return res.redirect("back");
     }
 	
@@ -295,7 +295,7 @@ controller.changeEmailPut = async function(req, res) { //Update email
 	await req.user.save();
 
 	if (req.user.email == req.body.email) { //If email is not changed, no need to update
-		req.flash('success', "Email sending settings updated");
+		await req.flash('success', "Email sending settings updated");
 		return res.redirect(`/profiles/${req.user._id}`);
 	}
 
@@ -303,20 +303,20 @@ controller.changeEmailPut = async function(req, res) { //Update email
 	const allowedEmail = await Email.findOne({address: req.body.email, version: "accesslist"});
 	if (!allowedEmail) {
 		if (platform.emailExtension != '' && req.body.email.split("@")[1] != platform.emailExtension) {
-			req.flash('error', "New email must be a platform-verified email");
+			await req.flash('error', "New email must be a platform-verified email");
 			return res.redirect('back');
 		}
 	}
 
 	const blocked = await Email.findOne({address: req.body.email, version: "blockedlist"});
 	if (blocked) {
-		req.flash('error', "New email must be a platform-verified email");
+		await req.flash('error', "New email must be a platform-verified email");
 		return res.redirect('back');
 	}
 
 	const overlap = await User.findOne({email: req.body.email, _id: {$ne: req.user._id}});
 	if (overlap) {
-		req.flash('error', "Another current or pending user already has that email.");
+		await req.flash('error', "Another current or pending user already has that email.");
 		return res.redirect('back');
 	}
 
@@ -343,14 +343,14 @@ controller.changeEmailPut = async function(req, res) { //Update email
 	}).then(response => {console.log(`Email Sent with status code: ${response.status}`);
 	}).catch(error => {console.log(error);});
 
-	req.flash('success', 'Go to your new email to confirm new address');
+	await req.flash('success', 'Go to your new email to confirm new address');
 	return res.redirect('/profiles/change-login-info');
 }
 
 controller.confirmEmail = async function(req, res) {
 	const user = await User.findById(req.params.id);
 	if (!user) {
-		req.flash('error', "Unable to find user");
+		await req.flash('error', "Unable to find user");
 		return res.redirect('back');
 	}
 
@@ -381,7 +381,7 @@ controller.confirmEmail = async function(req, res) {
 		req.flash('success', "Email updated!")
 		return res.redirect('/');
 	}
-	req.flash('error', "Invalid authentication token");
+	await req.flash('error', "Invalid authentication token");
 	return res.redirect('/');
 }
 
@@ -395,10 +395,10 @@ controller.changePasswordPut = async function(req, res) {
 
 		await user.changePassword(req.body.oldPassword, req.body.newPassword); //Update user's password
 		await sendGridEmail(req.user.email, 'Password Update Confirmation', `<p>Hello ${req.user.firstName},</p><p>You are receiving this email because you recently made changes to your Saberchat password. This is a confirmation of your profile.\n\nYour username is ${req.user.username}.\nYour full name is ${req.user.firstName} ${req.user.lastName}.\nYour email is ${req.user.email}\n\nIf you did not recently change your password, reset it immediately and contact a faculty member.</p>`, false);
-		req.flash('success', 'Successfully changed your password');
+		await req.flash('success', 'Successfully changed your password');
 		return res.redirect('/profiles/' + req.user._id);
 	}
-	req.flash('error', "Passwords do not match");
+	await req.flash('error', "Passwords do not match");
 	return res.redirect('back');
 }
 
@@ -409,7 +409,7 @@ controller.follow = async function(req, res) {
 	if (user.blocked.includes(req.user._id)) {return res.json({error: "User has blocked you"});}
 	if (user._id.equals(req.user._id)) {return res.json({error: "You may not follow yourself"});}
 
-	user.followers.push(req.user);
+	await user.followers.push(req.user);
 	await user.save();
 	return res.json({success: "Succesfully followed user", user: req.user});
 }
@@ -432,7 +432,7 @@ controller.remove = async function(req, res) {
 
 	//Try to remove follower from user; if person is not following user, then do not process
 	if (removeIfIncluded(req.user.followers, user._id)) {
-		req.user.blocked.push(user._id);
+		await req.user.blocked.push(user._id);
 		await req.user.save();
 		return res.json({success: "Succesfully removed user"});
 	}
@@ -455,7 +455,7 @@ controller.unblock = async function(req, res) {
 controller.deleteAccount = async function(req, res)  {
 	req.user.archived = true;
 	await req.user.save();
-	req.flash("Archived your account!")
+	await req.flash("Archived your account!")
 	await req.logout();
 	return res.redirect('/');
 }

@@ -18,7 +18,7 @@ controller.index = async function(req, res) {
     const platform = await setup(Platform);
     const articles = await Article.find({}).populate('sender');
     if (!platform || !articles) {
-        req.flash('error', 'An Error Occurred');
+        await req.flash('error', 'An Error Occurred');
         return res.redirect('/wHeights');
     }
     return res.render('wHeights/index', {platform, articles, icon: platform.features[objectArrIndex(platform.features, "route", "wHeights")].icon});
@@ -34,13 +34,13 @@ controller.new = async function(req, res) {
         status: {$in: platform.studentStatuses} //All students
     });
     if (!platform || !wHeightsOrg || !students) {
-        req.flash('error', "Unable to find students");
+        await req.flash('error', "Unable to find students");
         return res.redirect('back');
     }
 
     const categories = await PostCategory.find({_id: {$in: wHeightsOrg.categories}}); //Find list of article categories (for sorting)
     if (!categories) {
-        req.flash('error', "Unable to find article categories");
+        await req.flash('error', "Unable to find article categories");
         return res.redirect('back');
     }
 
@@ -58,7 +58,7 @@ controller.show = async function(req, res) {
         });
 
     if (!platform || !article) {
-        req.flash('error', 'Cannot find article');
+        await req.flash('error', 'Cannot find article');
         return res.redirect('/wHeights');
     }
     return res.render('wHeights/show', {platform, article, icon: platform.features[objectArrIndex(platform.features, "route", "wHeights")].icon});
@@ -75,14 +75,14 @@ controller.create = async function(req, res) {
 
     const article = await Article.create(articleObj);
     if (!article) {
-        req.flash('error', "Error creating article");
+        await req.flash('error', "Error creating article");
         return res.redirect('/wHeights');
     }
     article.date = dateFormat(article.created_at, "mmm d, yyyy - h:MM TT");
 
     const sender = await User.findById(req.body.sender);
     if (!sender) {
-        req.flash('error', "Unable to find sender");
+        await req.flash('error', "Unable to find sender");
         return res.redirect('back');
     }
 
@@ -91,12 +91,12 @@ controller.create = async function(req, res) {
 
     const category = await PostCategory.findById(req.body.category);
     if (!category) {
-        req.flash('error', "Unable to find specified category");
+        await req.flash('error', "Unable to find specified category");
         return res.redirect('back');
     }
 
     //Add articles to the article category
-    category.articles.push(article);
+    await category.articles.push(article);
     await category.save();
     return res.redirect('/wHeights');
 }
@@ -125,7 +125,7 @@ controller.comment = async function(req, res) {
     comment.date = dateFormat(comment.created_at, "h:MM TT | mmm d");
     await comment.save();
 
-    article.comments.push(comment);
+    await article.comments.push(comment);
     await article.save();
 
     let users = [];
@@ -140,7 +140,7 @@ controller.comment = async function(req, res) {
                 return res.json({error: "Error accessing user"});
             }
 
-            users.push(user);
+            await users.push(user);
         }
     }
 
@@ -166,7 +166,7 @@ controller.comment = async function(req, res) {
             await sendGridEmail(user.email, `New Mention in ${article.title}`, `<p>Hello ${user.firstName},</p><p>${req.user.firstName} ${req.user.lastName} mentioned you in a comment on <strong>${article.title}</strong>.<p>${comment.text}</p>`, false);
         }
 
-        user.inbox.push({message: notif, new: true}); //Add notif to user's inbox
+        await user.inbox.push({message: notif, new: true}); //Add notif to user's inbox
         await user.save();
     }
     return res.json({success: 'Successful comment', comments: article.comments});
@@ -185,7 +185,7 @@ controller.likeComment = async function(req, res) {
             likeCount: comment.likes.length
         });
     }
-    comment.likes.push(req.user._id); //Add Like
+    await comment.likes.push(req.user._id); //Add Like
     await comment.save();
     return res.json({
         success: `Liked comment`,

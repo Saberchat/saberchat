@@ -19,7 +19,7 @@ const controller = {};
 controller.updatePlatformForm = async function(req, res) {
     const platform = await setup(Platform);
     if (!platform) {
-        req.flash("error", "An Error Occurred");
+        await req.flash("error", "An Error Occurred");
         return res.redirect("back");
     }
     return res.render("admin/settings", {platform, objectArrIndex});
@@ -29,7 +29,7 @@ controller.updatePlatform = async function(req, res) {
     const platform = await setup(Platform);
     const users = await User.find({});
     if (!platform || !users) {
-        req.flash("error", "An Error Occurred");
+        await req.flash("error", "An Error Occurred");
         return res.redirect("back");
     }
 
@@ -41,7 +41,7 @@ controller.updatePlatform = async function(req, res) {
                 [cloudErr, cloudResult] = await cloudDelete(platform.displayVideo.filename, "video");
                 // check for failure
                 if (cloudErr || !cloudResult || cloudResult.result !== "ok") {
-                    req.flash("error", "Error deleting video");
+                    await req.flash("error", "Error deleting video");
                     return res.redirect("back");
                 }
             }
@@ -51,7 +51,7 @@ controller.updatePlatform = async function(req, res) {
             [cloudErr, cloudResult] = await cloudUpload(file.originalname, processedBuffer);
 
             if (cloudErr || !cloudResult) {
-                req.flash("error", "Upload failed");
+                await req.flash("error", "Upload failed");
                 return res.redirect("back");
             }
 
@@ -77,7 +77,7 @@ controller.updatePlatform = async function(req, res) {
         platform[attr] = [];
         for (let element of req.body[attr].split('\n')) {
             if (element.split('\r').join('').split(' ').join('') != "") {
-                platform[attr].push(element);
+                await platform[attr].push(element);
             }
         }
     }
@@ -85,7 +85,7 @@ controller.updatePlatform = async function(req, res) {
     platform.updateTime = `${req.body.day} ${req.body.month}`;
     platform.colorScheme = [];
     for (let i = 0; i < req.body.colorScheme.length; i+= 3) {
-        platform.colorScheme.push(`${req.body.colorScheme[i]}, ${req.body.colorScheme[i+1]}, ${req.body.colorScheme[i+2]}`);
+        await platform.colorScheme.push(`${req.body.colorScheme[i]}, ${req.body.colorScheme[i+1]}, ${req.body.colorScheme[i+2]}`);
     }
 
     platform.info = [];
@@ -94,10 +94,10 @@ controller.updatePlatform = async function(req, res) {
         parsedText = [];
         for (let element of req.body.infoText[i].split('\n')) {
             if (element.split('\r').join('').split(' ').join('') != "") {
-                parsedText.push(element);
+                await parsedText.push(element);
             }
         }
-        platform.info.push({
+        await platform.info.push({
             heading: req.body.infoHeading[i],
             text: parsedText,
             image: req.body.infoImages[i]
@@ -107,7 +107,7 @@ controller.updatePlatform = async function(req, res) {
     platform.contact =  {heading: req.body.contactHeading, description:[]};
     for (let element of req.body.contactInfo.split('\n')) { //Iterate through contact info
         if (element.split('\r').join('').split(' ').join('') != "") {
-            platform.contact.description.push(element);
+            await platform.contact.description.push(element);
         }
     }
 
@@ -139,8 +139,8 @@ controller.updatePlatform = async function(req, res) {
     platform.permissionsDisplay = [];
 
     for (let i = req.body.permissionProperty.length-1; i >= 0; i--) {
-        platform.permissionsProperty.push(req.body.permissionProperty[i]);
-        platform.permissionsDisplay.push(req.body.permissionDisplay[i]);
+        await platform.permissionsProperty.push(req.body.permissionProperty[i]);
+        await platform.permissionsDisplay.push(req.body.permissionDisplay[i]);
     }
 
     platform.statusesProperty = [];
@@ -148,9 +148,9 @@ controller.updatePlatform = async function(req, res) {
     platform.statusesPlural = [];
 
     for (let i = req.body.statusSingular.length-1; i >= 0; i--) {
-        platform.statusesProperty.push(req.body.statusProperty[i]);
-        platform.statusesSingular.push(req.body.statusSingular[i]);
-        platform.statusesPlural.push(req.body.statusPlural[i]);
+        await platform.statusesProperty.push(req.body.statusProperty[i]);
+        await platform.statusesSingular.push(req.body.statusSingular[i]);
+        await platform.statusesPlural.push(req.body.statusPlural[i]);
     }
 
     for (let user of users) {
@@ -165,7 +165,7 @@ controller.updatePlatform = async function(req, res) {
             if (user.email.split('@')[1] == oldAddress) {
                 email = await Email.create({address: user.email, version: "accesslist"});
                 if (!email) {
-                    req.flash("error", "Unable to create new email");
+                    await req.flash("error", "Unable to create new email");
                     return res.redirect("back");
                 }
             }
@@ -176,7 +176,7 @@ controller.updatePlatform = async function(req, res) {
             if (email.address.split('@')[1] == req.body.emailExtension) { //Remove now-unnecessary emails from access list
                 email = await Email.findByIdAndDelete(email._id);
                 if (!email) {
-                    req.flash("error", "Unable to delete email");
+                    await req.flash("error", "Unable to delete email");
                     return res.redirect("back");
                 }
             }
@@ -184,7 +184,7 @@ controller.updatePlatform = async function(req, res) {
     }
 
     await platform.save();
-    req.flash("success", "Updated platform settings!");
+    await req.flash("success", "Updated platform settings!");
     return res.redirect("/admin/settings");
 }
 
@@ -192,11 +192,11 @@ controller.authenticateGet = async function(req, res) {
     const platform = await setup(Platform);
     const users = await User.find({authenticated: false});
     if (!platform || !users) {
-        req.flash('error', "Unable to find users");
+        await req.flash('error', "Unable to find users");
         return res.redirect('back');
     }
     if (!platform.principalAuthenticate) {
-        req.flash('error', `Principal Authentication is not enabled on ${platform.name} Saberchat`);
+        await req.flash('error', `Principal Authentication is not enabled on ${platform.name} Saberchat`);
         return res.redirect('back');
     }
     return res.render('admin/authenticate', {platform, users});
@@ -229,7 +229,7 @@ controller.moderateGet = async function(req, res) { //Show all reported comments
     const platform = await setup(Platform);
     const comments = await ChatMessage.find({status: 'flagged'}).populate("author statusBy room");
     if (!platform || !comments) {
-        req.flash('error', 'An Error Occurred');
+        await req.flash('error', 'An Error Occurred');
         return res.redirect('/admin');
     }
     return res.render('admin/mod', {platform, comments});
@@ -252,7 +252,7 @@ controller.getContext = async function(req, res) { //Get context for reported co
     //Find the comments 5 before and 5 after the reported one, and add to array
     for (let i = -5; i <= 5; i++) {
         if (commentIndex + i > 0 && allComments[commentIndex + i].author) {
-            context.push(allComments[commentIndex + i]);
+            await context.push(allComments[commentIndex + i]);
         }
     }
     return res.json({success: "Succesfully collected data", context});
@@ -296,7 +296,7 @@ controller.permissionsGet = async function(req, res) { //Show page with all user
     const platform = await setup(Platform);
     const users = await User.find({authenticated: true});
     if (!platform || !users) {
-        req.flash('error', 'An Error Occurred');
+        await req.flash('error', 'An Error Occurred');
         return res.redirect('/admin');
     }
     
@@ -393,7 +393,7 @@ controller.statusPut = async function(req, res) { //Update user's status
 controller.accesslistGet = async function(req, res) { //Show page with all permitted emails
     const platform = await setup(Platform);
     if (!platform) {
-        req.flash("error", "An Error Occurred");
+        await req.flash("error", "An Error Occurred");
         return res.redirect("back");
     }
 
@@ -409,13 +409,13 @@ controller.accesslistGet = async function(req, res) { //Show page with all permi
     }
 
     if (!emails) {
-        req.flash('error', "Unable to find emails");
+        await req.flash('error', "Unable to find emails");
         return res.redirect('back');
     }
 
     const users = await User.find({authenticated: true});
     if (!users) {
-        req.flash('error', "Unable to find users");
+        await req.flash('error', "Unable to find users");
         return res.redirect('back');
     }
 
@@ -496,19 +496,19 @@ controller.tag = async function(req, res) { //Add/remove status tag to user
             }
 
             //If there is no error, remove the tag
-            removeIfIncluded(user.tags, req.body.tag);
+            await removeIfIncluded(user.tags, req.body.tag);
             await user.save();
             return res.json({success: "Successfully removed status", tag: req.body.tag})
         }
 
         //Remove the tag
-        removeIfIncluded(user.tags, req.body.tag);
+        await removeIfIncluded(user.tags, req.body.tag);
         await user.save();
         return res.json({success: "Successfully removed status", tag: req.body.tag})
     }
 
     //If user does not already have this tag, add it
-    user.tags.push(req.body.tag);
+    await user.tags.push(req.body.tag);
     await user.save();
     return res.json({success: "Successfully added status", tag: req.body.tag})
 }
@@ -517,7 +517,7 @@ controller.viewBalances = async function(req, res) {
     const platform = await setup(Platform);
     const users = await User.find({authenticated: true});
     if (!platform || !users) {
-        req.flash('error', 'Could not find users');
+        await req.flash('error', 'Could not find users');
         return res.redirect('back');
     }
     return res.render('admin/balances.ejs', {platform, users});
@@ -540,14 +540,14 @@ controller.permanentDelete = async function(req, res) {
     const email = await Email.findByIdAndDelete(req.params.id);
 
     if (!email) {
-        req.flash('error', "Unable to remove email from database");
+        await req.flash('error', "Unable to remove email from database");
         return res.redirect('back');
     }
 
     const users = await User.find({authenticated: true, email: email.address});
 
     if (!users) {
-        req.flash('error', "Unable to delete users with this email");
+        await req.flash('error', "Unable to delete users with this email");
         return res.redirect('back');
     }
 
@@ -590,20 +590,20 @@ controller.permanentDelete = async function(req, res) {
         deletedComments = await ChatMessage.deleteMany({author: user._id});
 
     if (!deletedComments) {
-        req.flash('error', "Unable to delete your comments");
+        await req.flash('error', "Unable to delete your comments");
         return res.redirect('back');
     }
 
     deletedMessages = await InboxMessage.deleteMany({author: user._id});
 
     if (!deletedMessages) {
-        req.flash('error', "Unable to delete your messages");
+        await req.flash('error', "Unable to delete your messages");
         return res.redirect('back');
     }
 
     messagesReceived = await InboxMessage.find({});
     if (!messagesReceived) {
-        req.flash('error', "Unable to find your messages");
+        await req.flash('error', "Unable to find your messages");
         return res.redirect('back');
     }
 
@@ -612,7 +612,7 @@ controller.permanentDelete = async function(req, res) {
             messageUpdate = await InboxMessage.findByIdAndUpdate(message._id, {$pull: {recipients: user._id, read: req.user._id}});
 
             if (!messageUpdate) {
-                req.flash('error', "Unable to update your messages");
+                await req.flash('error', "Unable to update your messages");
                 return res.redirect('back');
             }
 
@@ -633,7 +633,7 @@ controller.permanentDelete = async function(req, res) {
           messageSender = await User.findById(message.author);
 
           if (!messageSender) {
-            req.flash('error', "Unable to update your messages");
+            await req.flash('error', "Unable to update your messages");
             return res.redirect('back');
           }
 
@@ -643,7 +643,7 @@ controller.permanentDelete = async function(req, res) {
         messageUpdate = await InboxMessage.findByIdAndDelete(message._id);
 
         if (!messageUpdate) {
-          req.flash('error', "Unable to update your messages");
+          await req.flash('error', "Unable to update your messages");
           return res.redirect('back');
         }
       }
@@ -651,13 +651,13 @@ controller.permanentDelete = async function(req, res) {
 
     emptyMessages = await InboxMessage.deleteMany({recipients: []});
     if (!emptyMessages) {
-        req.flash('error', "Unable to delete your messages");
+        await req.flash('error', "Unable to delete your messages");
         return res.redirect('back');
     }
 
     anns = await Announcement.find({author: user._id});
     if (!anns) {
-        req.flash('error', "Unable to delete your announcements");
+        await req.flash('error', "Unable to delete your announcements");
         return res.redirect('back');
     }
 
@@ -692,14 +692,14 @@ controller.permanentDelete = async function(req, res) {
 
     orders = await Order.find({customer: user._id});
     if (!orders) {
-      req.flash('error', "Unable to find your orders");
+      await req.flash('error', "Unable to find your orders");
       return res.redirect('back');
     }
 
     for (let order of orders) {
       deletedOrder = await Order.findByIdAndDelete(order._id).populate('items.item');
       if (!deletedOrder) {
-        req.flash("error", "Unable to delete orders");
+        await req.flash("error", "Unable to delete orders");
         return res.redirect('back');
       }
 
@@ -714,7 +714,7 @@ controller.permanentDelete = async function(req, res) {
 
     roomsCreated = await ChatRoom.find({});
     if (!roomsCreated) {
-      req.flash('error', "Unable to delete your rooms");
+      await req.flash('error', "Unable to delete your rooms");
       return res.redirect('back');
     }
 
@@ -722,7 +722,7 @@ controller.permanentDelete = async function(req, res) {
         if (room.creator.toString() == user._id.toString()) {
       	deletedRoomCreated = await ChatRoom.findByIdAndDelete(room._id);
             if (!deletedRoomCreated) {
-                req.flash('error', "Unable to delete your rooms");
+                await req.flash('error', "Unable to delete your rooms");
                 return res.redirect('back');
             }
         }
@@ -730,7 +730,7 @@ controller.permanentDelete = async function(req, res) {
 
     roomsPartOf = await ChatRoom.find({});
     if (!roomsPartOf) {
-        req.flash('error', "Unable to find your rooms");
+        await req.flash('error', "Unable to find your rooms");
         return res.redirect('back');
     }
 
@@ -744,34 +744,34 @@ controller.permanentDelete = async function(req, res) {
     for (let room of roomUpdates) {
         updatedRoom = await ChatRoom.findByIdAndUpdate(room, {$pull: {members: user._id}});
         if (!updatedRoom) {
-            req.flash('error', "Unable to access your rooms");
+            await req.flash('error', "Unable to access your rooms");
             return res.redirect('back');
         }
     }
 
     deletedProjectsPosted = await Project.deleteMany({poster: user._id});
     if (!deletedProjectsPosted) {
-        req.flash('error', "Unable to remove you from your projects");
+        await req.flash('error', "Unable to remove you from your projects");
         return res.redirect('back');
     }
 
     projectsCreated = await Project.find({});
     if (!projectsCreated) {
-        req.flash('error', "Unable to find your projects");
+        await req.flash('error', "Unable to find your projects");
         return res.redirect('back');
     }
 
     projectUpdates = [];
     for (let project of projectsCreated) {
         if (project.creators.includes(user._id)) {
-            projectUpdates.push(project._id);
+            await projectUpdates.push(project._id);
         }
     }
 
         for (let project of projectUpdates) {
             updatedProject = await Project.findByIdAndUpdate(project, {$pull: {creators: user._id}});
             if (!updatedProject) {
-                req.flash('error', "Unable to access your projects");
+                await req.flash('error', "Unable to access your projects");
                 return res.redirect('back');
             }
         }
@@ -781,13 +781,13 @@ controller.permanentDelete = async function(req, res) {
 	for (let user of users) {
 		deletedUser = await User.findByIdAndDelete(user._id);
 		if (!deletedUser) {
-			req.flash('error', 'Unable to delete account');
+			await req.flash('error', 'Unable to delete account');
 			return res.redirect('back');
 		}
         await sendGridEmail(deletedUser.email, 'Profile Deletion Notice', `<p>Hello ${deletedUser.firstName},</p><p>You are receiving this email because your email has been removed from Saberchat's email accesslist. Your account and all of its data has been deleted. Please contact a faculty member if  you think there has been a mistake.</p>`, false);
 	}
 
-	req.flash('success', "Email Removed From Access List! Any users with this email have been removed.");
+	await req.flash('success', "Email Removed From Access List! Any users with this email have been removed.");
 	return res.redirect('/admin/accesslist');
 }
 

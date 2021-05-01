@@ -20,7 +20,7 @@ controller.index = async function(req, res) {
     const platform = await setup(Platform);
     const courses = await Course.find({});
     if (!platform || !courses) {
-        req.flash('error', "Unable to find courses");
+        await req.flash('error', "Unable to find courses");
         return res.redirect('back');
     }
 
@@ -64,7 +64,7 @@ controller.createCourse = async function(req, res) {
     });
 
     if (!course) {
-        req.flash('error', "Unable to create course");
+        await req.flash('error', "Unable to create course");
         return res.redirect('back');
     }
 
@@ -75,7 +75,7 @@ controller.createCourse = async function(req, res) {
             const processedBuffer = await autoCompress(file.originalname, file.buffer);
             const [cloudErr, cloudResult] = await cloudUpload(file.originalname, processedBuffer);
             if (cloudErr || !cloudResult) {
-                req.flash("error", "Upload failed");
+                await req.flash("error", "Upload failed");
                 return res.redirect("back");
             }
 
@@ -88,7 +88,7 @@ controller.createCourse = async function(req, res) {
             await course.save();
         }
     }
-    req.flash('success', "Successfully created course");
+    await req.flash('success', "Successfully created course");
     return res.redirect('/tutoringCenter');
 }
 
@@ -96,7 +96,7 @@ controller.createCourse = async function(req, res) {
 controller.joinCourse = async function(req, res) {
     const platform = await setup(Platform);
     if (!platform) {
-        req.flash("error", "An Error Occurred");
+        await req.flash("error", "An Error Occurred");
         return res.redirect("back");
     }
 
@@ -104,11 +104,11 @@ controller.joinCourse = async function(req, res) {
         if (req.user.tags.includes("Tutor")) {
             const course = await Course.findOne({joinCode: req.body.joincode});
             if (!course) {
-                req.flash('error', "No courses matching this join code were found.");
+                await req.flash('error', "No courses matching this join code were found.");
                 return res.redirect('back');
             }
 
-            course.tutors.push({
+            await course.tutors.push({
                 tutor: req.user,
                 bio: req.body.bio,
                 slots: parseInt(req.body.slots),
@@ -117,10 +117,10 @@ controller.joinCourse = async function(req, res) {
                 dateJoined: new Date(Date.now())
             });
             await course.save();
-            req.flash('success', `Successfully joined ${course.name} as a tutor!`);
+            await req.flash('success', `Successfully joined ${course.name} as a tutor!`);
             return res.redirect(`/tutoringCenter/${course._id}`);
         }
-        req.flash('error', `You do not have permission to do that`);
+        await req.flash('error', `You do not have permission to do that`);
         return res.redirect(`back`);
     }
 
@@ -128,16 +128,16 @@ controller.joinCourse = async function(req, res) {
     if (platform.studentStatuses.includes(req.user.status)) {
         const course = await Course.findOne({joinCode: req.body.joincode});
         if (!course) {
-            req.flash('error', "No courses matching this join code were found.");
+            await req.flash('error', "No courses matching this join code were found.");
             return res.redirect('back');
         }
 
         course.members.push(req.user);
         await course.save();
-        req.flash('success', `Successfully joined ${course.name}!`);
+        await req.flash('success', `Successfully joined ${course.name}!`);
         return res.redirect(`/tutoringCenter/${course._id}`);
     }
-    req.flash('error', `You do not have permission to do that`);
+    await req.flash('error', `You do not have permission to do that`);
     return res.redirect(`back`);
 }
 
@@ -145,7 +145,7 @@ controller.showCourse = async function(req, res) {
     const platform = await setup(Platform);
     const course = await Course.findById(req.params.id).populate('creator members tutors.tutor tutors.reviews blocked');
     if (!platform || !course) {
-        req.flash('error', "Unable to find course");
+        await req.flash('error', "Unable to find course");
         return res.redirect('back');
     }
 
@@ -180,7 +180,7 @@ controller.showCourse = async function(req, res) {
 
     const teachers = await User.find({authenticated: true, status: platform.teacherStatus, _id: {$ne: req.user._id}});
     if (!teachers) {
-        req.flash('error', "Unable to find teachers");
+        await req.flash('error', "Unable to find teachers");
         return res.redirect('back');
     }
     return res.render('tutoringCenter/show', {platform, course, studentIds, tutorIds, tutors, teachers, objectArrIndex, data: platform.features[objectArrIndex(platform.features, "route", "tutoringCenter")]}); //Export function for ejs evaluation
@@ -189,7 +189,7 @@ controller.showCourse = async function(req, res) {
 controller.unenrollStudent = async function(req, res) {
     const course = await Course.findByIdAndUpdate(req.params.id, {$pull: {members: req.user._id}}).populate("tutors.tutor");
     if (!course) {
-        req.flash('error', "Unable to find course");
+        await req.flash('error', "Unable to find course");
         return res.redirect('back');
     }
 
@@ -197,12 +197,12 @@ controller.unenrollStudent = async function(req, res) {
     let deletedRoom;
     for (let tutor of course.tutors) {
         if (objectArrIndex(tutor.members, "student", req.user._id) > -1) { //Update the tutor's members array
-            tutor.formerStudents.push({
+            await tutor.formerStudents.push({
                 student: req.user._id,
                 lessons: tutor.members[objectArrIndex(tutor.members, "student", req.user._id)].lessons
             });
             deletedRoom = await ChatRoom.findByIdAndDelete(tutor.members[objectArrIndex(tutor.members, "student", req.user._id)].room);
-            tutor.members.splice(objectArrIndex(tutor.members, "student", req.user._id), 1);
+            await tutor.members.splice(objectArrIndex(tutor.members, "student", req.user._id), 1);
             tutor.slots++;
             tutor.available = true;
 
@@ -214,14 +214,14 @@ controller.unenrollStudent = async function(req, res) {
         }
     }
     await course.save();
-    req.flash('success', `Unenrolled from ${course.name}!`);
+    await req.flash('success', `Unenrolled from ${course.name}!`);
     return res.redirect('/tutoringCenter');
 }
 
 controller.unenrollTutor = async function(req, res) {
     const course = await Course.findById(req.params.id).populate('tutors.tutor tutors.members.student');
     if (!course) {
-        req.flash('error', "Unable to find course");
+        await req.flash('error', "Unable to find course");
         return res.redirect('back');
     }
 
@@ -231,7 +231,7 @@ controller.unenrollTutor = async function(req, res) {
             for (let student of course.tutors[i].members) {
                 deletedRoom = await ChatRoom.findByIdAndDelete(student.room);
                 if (!deletedRoom) {
-                    req.flash('error', "Unable to remove chat room");
+                    await req.flash('error', "Unable to remove chat room");
                     return res.redirect('back');
                 }
 
@@ -241,19 +241,19 @@ controller.unenrollTutor = async function(req, res) {
                 await removeIfIncluded(req.user.newRoomCount, deletedRoom._id);
                 await req.user.save();
             }
-            course.tutors.splice(i, 1); //Remove tutor from course
+            await course.tutors.splice(i, 1); //Remove tutor from course
             break;
         }
     }
     await course.save();
-    req.flash('success', `Unenrolled from ${course.name}!`);
+    await req.flash('success', `Unenrolled from ${course.name}!`);
     return res.redirect('/tutoringCenter');
 }
 
 controller.updateSettings = async function(req, res) {
     const course = await Course.findById(req.params.id);
     if (!course) {
-        req.flash("error", "An error occurred");
+        await req.flash("error", "An error occurred");
         return res.redirect("back");
     }
 
@@ -271,7 +271,7 @@ controller.updateSettings = async function(req, res) {
         if (course.thumbnailFile.filename) {
             [cloudErr, cloudResult] = await cloudDelete(course.thumbnailFile.filename, "image");
             if (cloudErr || !cloudResult) {
-                req.flash("error", "Error deleting uploaded image");
+                await req.flash("error", "Error deleting uploaded image");
                 return res.redirect("back");
             }
         }
@@ -281,7 +281,7 @@ controller.updateSettings = async function(req, res) {
             const processedBuffer = await autoCompress(file.originalname, file.buffer);
             [cloudErr, cloudResult] = await cloudUpload(file.originalname, processedBuffer);
             if (cloudErr || !cloudResult) {
-                req.flash("error", "Upload failed");
+                await req.flash("error", "Upload failed");
                 return res.redirect("back");
             }
 
@@ -295,14 +295,14 @@ controller.updateSettings = async function(req, res) {
     }
 
     await course.save();
-    req.flash("success", "Updated course settings")
+    await req.flash("success", "Updated course settings")
     return res.redirect(`/tutoringCenter/${course._id}`);
 }
 
 controller.deleteCourse = async function(req, res) {
     const course = await Course.findOne({_id: req.params.id, joinCode: req.body.joinCode}).populate("tutors.tutor tutors.members.student");
     if (!course) {
-        req.flash("error", "Incorrect join code");
+        await req.flash("error", "Incorrect join code");
         return res.redirect("back");
     }
 
@@ -311,7 +311,7 @@ controller.deleteCourse = async function(req, res) {
         for (let student of tutor.members) {
             deletedRoom = await ChatRoom.findByIdAndDelete(student.room);
             if (!deletedRoom) {
-                req.flash("error", "Unable to find room");
+                await req.flash("error", "Unable to find room");
                 return res.redirect("back");
             }
             await removeIfIncluded(tutor.tutor.newRoomCount, student.room);
@@ -323,10 +323,10 @@ controller.deleteCourse = async function(req, res) {
 
     const deletedCourse = await Course.findByIdAndDelete(course._id);
     if (!deletedCourse) {
-        req.flash("error", "An error occurred");
+        await req.flash("error", "An error occurred");
         return res.redirect("back");
     }
-    req.flash("success", `Deleted ${course.name}!`);
+    await req.flash("success", `Deleted ${course.name}!`);
     return res.redirect("/tutoringCenter");
 }
 
@@ -335,24 +335,24 @@ controller.deleteCourse = async function(req, res) {
 controller.updateTeacher = async function(req, res) { //Update course teacher
     const course = await Course.findById(req.params.id);
     if (!course) {
-        req.flash("error", "Unable to find course");
+        await req.flash("error", "Unable to find course");
         return res.redirect("back");
     }
 
     if (!(course.joinCode == req.body.joinCodeConfirm)) {
-        req.flash("error", "Join code is invalid");
+        await req.flash("error", "Join code is invalid");
         return res.redirect("back");
     }
 
     const newTeacher = await User.findById(req.body.teacher);
     if (!newTeacher) {
-        req.flash("error", "Error finding teacher");
+        await req.flash("error", "Error finding teacher");
         return res.redirect("back");
     }
 
     course.creator = newTeacher;
     await course.save();
-    req.flash("success", "Updated course teacher!");
+    await req.flash("success", "Updated course teacher!");
     return res.redirect("/tutoringCenter");
 }
 
@@ -436,7 +436,7 @@ controller.removeTutor = async function(req, res) { //Remove tutor from course
     } else {
         tutorId = await User.findById(req.query.tutorId);
         if (!tutorId) {
-            req.flash("error", "Error removing tutor");
+            await req.flash("error", "Error removing tutor");
             return res.redirect("back");
         }
     }
@@ -445,7 +445,7 @@ controller.removeTutor = async function(req, res) { //Remove tutor from course
     if (!course) {
         if (req.body.show) {return res.json({error: "Error removing tutor"});
         } else {
-            req.flash("error", "Error removing tutor");
+            await req.flash("error", "Error removing tutor");
             return res.redirect("back");
         }
     }
@@ -458,7 +458,7 @@ controller.removeTutor = async function(req, res) { //Remove tutor from course
                 if (!deletedRoom) {
                     if (req.body.show) {return res.json({error: "Error removing tutor"});
                     } else {
-                        req.flash("error", "Error removing tutor");
+                        await req.flash("error", "Error removing tutor");
                         return res.redirect("back");
                     }
                 }
@@ -482,7 +482,7 @@ controller.removeTutor = async function(req, res) { //Remove tutor from course
                 if (req.body.show) {
                     return res.json({error: "Error removing tutor"});
                 } else {
-                    req.flash("error", "Error removing tutor");
+                    await req.flash("error", "Error removing tutor");
                     return res.redirect("back");
                 }
             }
@@ -501,7 +501,7 @@ controller.removeTutor = async function(req, res) { //Remove tutor from course
 
             if (req.body.show) {return res.json({success: "Succesfully removed tutor", tutor: tutorId, course});
             } else {
-                req.flash("success", "Succesfully Removed Tutor!");
+                await req.flash("success", "Succesfully Removed Tutor!");
                 return res.redirect(`/tutoringCenter/${course._id}`);
             }
         }
@@ -660,7 +660,7 @@ controller.markLesson = async function(req, res) {
             for (let student of tutor.members) {
                 for (let lesson of student.lessons) {lessons.push(lesson);}
                 if (student.student.equals(req.body.studentId)) {
-                    student.lessons.push(newLesson);
+                    await student.lessons.push(newLesson);
                     lessons.push(newLesson);
                     await course.save();
                     return res.json({success: "Succesfully updated", tutor, lessons});
@@ -681,7 +681,7 @@ controller.bookTutor = async function(req, res) {
         if (tutor.tutor._id.equals(req.body.tutorId) && tutor.available) {
             if (objectArrIndex(tutor.formerStudents, "student", req.user._id) > -1) { //Remove student from tutor's former members (if they were there)
                 formerStudent = true;
-                tutor.formerStudents.splice(objectArrIndex(tutor.formerStudents, "student", req.user._id), 1);
+                await tutor.formerStudents.splice(objectArrIndex(tutor.formerStudents, "student", req.user._id), 1);
             }
 
             tutor.slots--;
@@ -699,7 +699,7 @@ controller.bookTutor = async function(req, res) {
             room.date = dateFormat(room.created_at, "h:MM TT | mmm d");
             await room.save();
             tutor.tutor.newRoomCount.push(room._id);
-            req.user.newRoomCount.push(room._id);
+            await req.user.newRoomCount.push(room._id);
             await tutor.tutor.save();
             await req.user.save();
 
@@ -708,7 +708,7 @@ controller.bookTutor = async function(req, res) {
                 lessons: [],
                 room: room._id
             }
-            tutor.members.push(studentObject);
+            await tutor.members.push(studentObject);
             await course.save();
 
             //All current members of the tutor
@@ -750,7 +750,7 @@ controller.leaveTutor = async function(req, res) {
                         lessons: tutor.members[objectArrIndex(tutor.members, "student", req.user._id).lessons]
                     });
                 }
-                tutor.members.splice(objectArrIndex(tutor.members, "student", req.user._id), 1);
+                await tutor.members.splice(objectArrIndex(tutor.members, "student", req.user._id), 1);
                 tutor.slots++;
                 tutor.available = true;
 
@@ -772,7 +772,7 @@ controller.upvoteTutor = async function(req, res) {
                     await course.save();
                     return res.json({success: "Downvoted tutor", upvoteCount: tutor.upvotes.length});
                 }
-                tutor.upvotes.push(req.user._id);
+                await tutor.upvotes.push(req.user._id);
                 await course.save();
                 return res.json({success: "Upvoted tutor", upvoteCount: tutor.upvotes.length});
             }
@@ -793,7 +793,7 @@ controller.rateTutor = async function(req, res) {
 
                 review.date = dateFormat(review.created_at, "h:MM TT | mmm d");
                 await review.save();
-                tutor.reviews.push(review);
+                await tutor.reviews.push(review);
                 await course.save();
 
                 let averageRating = 0;
@@ -822,7 +822,7 @@ controller.likeReview = async function(req, res) {
         return res.json({success: "Removed a like", likeCount: review.likes.length, review});
     }
     
-    review.likes.push(req.user._id);
+    await review.likes.push(req.user._id);
     await review.save();
     return res.json({success: "Liked", likeCount: review.likes.length});
 }
@@ -870,7 +870,7 @@ controller.showTutor = async function(req, res) {
         populate: {path: "sender"}
     });
     if (!platform || !course) {
-        req.flash('error', "Unable to find course");
+        await req.flash('error', "Unable to find course");
         return res.redirect('back');
     }
 
@@ -887,7 +887,7 @@ controller.showTutor = async function(req, res) {
             let enrolledCourses = []; //Collect all courses which this tutor teaches (that are not the current one)
             const courses = await Course.find({_id: {$ne: course._id}}).populate("creator");
             if (!courses) {
-                req.flash('error', "Unable to find courses");
+                await req.flash('error', "Unable to find courses");
                 return res.redirect('back');
             }
 
@@ -904,7 +904,7 @@ controller.showTutor = async function(req, res) {
             //Collect info on all members who are members of this tutor
             const members = await User.find({authenticated: true, _id: {$in: parsePropertyArray(tutor.members, "student")}});
             if (!members) {
-                req.flash('error', "Unable to find members");
+                await req.flash('error', "Unable to find members");
                 return res.redirect('back');
             }
 
@@ -938,11 +938,11 @@ controller.showTutor = async function(req, res) {
                             data: platform.features[objectArrIndex(platform.features, "route", "tutoringCenter")]
                         });
                     }
-                    req.flash('error', "You do not have permission to view that student");
+                    await req.flash('error', "You do not have permission to view that student");
                     return res.redirect('back');
                 }
                 
-                req.flash('error', "You do not have permission to view that student");
+                await req.flash('error', "You do not have permission to view that student");
                 return res.redirect('back');
             }
 
