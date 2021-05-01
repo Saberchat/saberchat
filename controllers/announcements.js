@@ -130,7 +130,8 @@ controller.create = async function(req, res) {
     const announcement = await Announcement.create({
         sender: req.user,
         subject: req.body.subject,
-        text: req.body.message
+        text: req.body.message,
+        verified: !platform.postVerifiable //Announcement does not need to be verified if platform does not support verifying announcements
     });
     if (!platform || !announcement) {
         req.flash('error', 'Unable to create announcement');
@@ -138,7 +139,6 @@ controller.create = async function(req, res) {
     }
 
     if (req.body.images) {announcement.images = req.body.images;} //If any images were added (if not, the 'images' property is empty)
-    if (!platform.postVerifiable) {announcement.verified = true;} //Announcement does not need to be verified if platform does not support verifying announcements
 
     // if files were uploaded, process them
     if (req.files) {
@@ -165,21 +165,22 @@ controller.create = async function(req, res) {
     announcement.date = dateFormat(announcement.created_at, "h:MM TT | mmm d");
     await announcement.save();
 
-    const users = await User.find({authenticated: true, _id: {$ne: req.user._id}});
-    if (!users) {
-        req.flash('error', "An Error Occurred");
-        return res.redirect('back');
-    }
+    if (!platform.postVerifiable) {
+        const users = await User.find({authenticated: true, _id: {$ne: req.user._id}});
+        if (!users) {
+            req.flash('error', "An Error Occurred");
+            return res.redirect('back');
+        }
 
-    let imageString = ""; //Build string of all attached images
-    for (const image of announcement.images) {imageString += `<img src="${image}">`;}
-
-    for (let user of users) { //Send email to all users
-        if (user.receiving_emails) {
-            const emailText = `<p>Hello ${user.firstName},</p><p>${req.user.username} has recently posted a new announcement - '${announcement.subject}'.</p><p>${announcement.text}</p><p>You can access the full announcement at https://${platform.url}</p> ${imageString}`;
-            await sendGridEmail(user.email, `New Saberchat Announcement - ${announcement.subject}`, emailText, false);
-            user.annCount.push({announcement, version: "new"});
-            await user.save();
+        let imageString = ""; //Build string of all attached images
+        for (const image of announcement.images) {imageString += `<img src="${image}">`;}
+        for (let user of users) { //Send email to all users
+            if (user.receiving_emails) {
+                const emailText = `<p>Hello ${user.firstName},</p><p>${req.user.username} has recently posted a new announcement - '${announcement.subject}'.</p><p>${announcement.text}</p><p>You can access the full announcement at https://${platform.url}</p> ${imageString}`;
+                await sendGridEmail(user.email, `New Saberchat Announcement - ${announcement.subject}`, emailText, false);
+                user.annCount.push({announcement, version: "new"});
+                await user.save();
+            }
         }
     }
 
@@ -188,10 +189,30 @@ controller.create = async function(req, res) {
 };
 
 controller.verify = async function(req, res) {
+    const platform = await setup(Platform);
     const announcement = await Announcement.findByIdAndUpdate(req.params.id, {verified: true});
-    if (!announcement) {
+    if (!platform || !announcement) {
         req.flash('error', "Unable to access announcement");
         return res.redirect('back');
+    }
+
+    if (platform.postVerifiable) {
+        const users = await User.find({authenticated: true, _id: {$ne: req.user._id}});
+        if (!users) {
+            req.flash('error', "An Error Occurred");
+            return res.redirect('back');
+        }
+
+        let imageString = ""; //Build string of all attached images
+        for (const image of announcement.images) {imageString += `<img src="${image}">`;}
+        for (let user of users) { //Send email to all users
+            if (user.receiving_emails) {
+                const emailText = `<p>Hello ${user.firstName},</p><p>${req.user.username} has recently posted a new announcement - '${announcement.subject}'.</p><p>${announcement.text}</p><p>You can access the full announcement at https://${platform.url}</p> ${imageString}`;
+                await sendGridEmail(user.email, `New Saberchat Announcement - ${announcement.subject}`, emailText, false);
+                user.annCount.push({announcement, version: "new"});
+                await user.save();
+            }
+        }
     }
 
     req.flash("success", "Verified Announcement!");
@@ -215,7 +236,7 @@ controller.updateAnnouncement = async function(req, res) {
     const updatedAnnouncement = await Announcement.findByIdAndUpdate(req.params.id, {
         subject: req.body.subject,
         text: req.body.message,
-        verified: false
+        verified: !platform.postVerifiable //Announcement does not need to be verified if platform does not support verifying announcements
     });
     if (!updatedAnnouncement) {
         req.flash('error', "Unable to update announcement");
@@ -223,7 +244,6 @@ controller.updateAnnouncement = async function(req, res) {
     }
 
     if (req.body.images) {updatedAnnouncement.images = req.body.images;} //Only add images if any are provided
-    if (!platform.postVerifiable) {updatedAnnouncement.verified = true;} //Announcement does not need to be verified if platform does not support verifying announcements
 
     //Iterate through all selected media to remove and delete them
     let cloudErr;

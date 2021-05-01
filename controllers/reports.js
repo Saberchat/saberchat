@@ -1,8 +1,8 @@
 //LIBRARIES
-const {convertToLink} = require("../utils/convert-to-link");
+const {convertToLink, embedLink} = require("../utils/convert-to-link");
 const dateFormat = require('dateformat');
 const path = require('path');
-const {removeIfIncluded} = require("../utils/object-operations");
+const {removeIfIncluded, parsePropertyArray} = require("../utils/object-operations");
 const setup = require("../utils/setup");
 const {cloudUpload, cloudDelete} = require('../services/cloudinary');
 const {autoCompress} = require("../utils/image-compress");
@@ -17,9 +17,14 @@ const controller = {};
 // Report GET index
 controller.index = async function(req, res) {
     const platform = await setup(Platform);
+    const users = await User.find({});
     const reports = await Report.find({}).populate('sender');
-    if(!platform || !reports) {req.flash('error', 'Cannot find reports.'); return res.redirect('back');}
-    return res.render('reports/index', {platform, reports: reports.reverse()});
+    if(!platform || !users || !reports) {req.flash('error', 'Cannot find reports.'); return res.redirect('back');}
+
+    const userNames = await parsePropertyArray(users, "firstName").join(',').toLowerCase().split(',');
+    const reportTexts = embedLink(req.user, reports, userNames);
+
+    return res.render('reports/index', {platform, reports: reports.reverse(), reportTexts});
 };
 
 // Report GET new report

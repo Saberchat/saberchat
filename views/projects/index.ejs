@@ -251,15 +251,15 @@
 
                             <% if (currentUser) { %>
                                 <% if (project.text.split(" ").length > 70) { %>
-                                    <p class="project-description"><%= projectTexts.get(project._id).split(" ").slice(0, 71).join(" ") %> <a href="/projects/<%= project._id %>">(Read More)</a></p>
+                                    <p class="project-description"><span class="convertible-text"><%= projectTexts.get(project._id).split(" ").slice(0, 71).join(" ") %></span> <a href="/projects/<%= project._id %>">(Read More)</a></p>
                                 <% } else { %>
-                                    <p class="project-description"><%= projectTexts.get(project._id) %></p>
+                                    <p class="project-description convertible-text"><%= projectTexts.get(project._id) %></p>
                                 <% } %>
                             <% } else { %>
                                 <% if (project.text.split(" ").length > 70) { %>
-                                    <p class="project-description"><%= projectTexts.get(project._id).split(" ").slice(0, 71).join(" ") %><a href="/">(Create Account To Read More)</a></p>
+                                    <p class="project-description"><span class="convertible-text"><%= projectTexts.get(project._id).split(" ").slice(0, 71).join(" ") %></span> <a href="/">(Log In To Read More)</a></p>
                                 <% } else { %>
-                                    <p class="project-description"><%= projectTexts.get(project._id) %></p>
+                                    <p class="project-description convertible-text"><%= projectTexts.get(project._id) %></p>
                                 <% } %>
                             <% } %>
 
@@ -271,6 +271,7 @@
             <% }) %>
     </body>
     <script src="/javascript/postUtil.js"></script>
+    <script src="/javascript/embed.js"></script>
     <script src="/javascript/like.js"></script>
     <script src="/javascript/search.js"></script>
     <script>

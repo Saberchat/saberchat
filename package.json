@@ -1,5 +1,5 @@
 {
-  "name": "alsion-fb",
+  "name": "saberchat",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
@@ -9,14 +9,14 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/schavan04/alsion-fb.git"
+    "url": "git+https://github.com/Saberchat/saberchat.git"
   },
   "author": "",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/schavan04/alsion-fb/issues"
+    "url": "https://github.com/Saberchat/saberchat/issues"
   },
-  "homepage": "https://github.com/schavan04/alsion-fb#readme",
+  "homepage": "https://github.com/Saberchat/saberchat#readme",
   "dependencies": {
     "@editorjs/editorjs": "^2.18.0",
     "@editorjs/header": "^2.5.0",

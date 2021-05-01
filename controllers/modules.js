@@ -1,8 +1,8 @@
 //LIBRARIES
-const {convertToLink} = require("../utils/convert-to-link");
+const {convertToLink, embedLink} = require("../utils/convert-to-link");
 const dateFormat = require('dateformat');
 const path = require('path');
-const {objectArrIndex, removeIfIncluded} = require("../utils/object-operations");
+const {objectArrIndex, removeIfIncluded, parsePropertyArray} = require("../utils/object-operations");
 const setup = require("../utils/setup");
 const {cloudUpload, cloudDelete} = require('../services/cloudinary');
 const {autoCompress} = require("../utils/image-compress");
@@ -17,6 +17,7 @@ const controller = {};
 // Module GET index
 controller.index = async function(req, res) {
     const platform = await setup(Platform);
+    const users = await User.find({});
     let modules;
     if (req.user && platform.permissionsProperty.slice(platform.permissionsProperty.length-3).includes(req.user.permission)) {
         modules = await Module.find({}).populate('sender');
@@ -24,8 +25,12 @@ controller.index = async function(req, res) {
         modules = await Module.find({verified: true}).populate('sender');
     }
 
-    if(!platform || !modules) {req.flash('error', 'Cannot find modules.'); return res.redirect('back');}
-    return res.render('modules/index', {platform, modules: modules.reverse(), data: platform.features[objectArrIndex(platform.features, "route", "modules")]});
+    if(!platform || !users || !modules) {req.flash('error', 'Cannot find modules.'); return res.redirect('back');}
+
+    const userNames = await parsePropertyArray(users, "firstName").join(',').toLowerCase().split(',');
+    const moduleTexts = embedLink(req.user, modules, userNames);
+
+    return res.render('modules/index', {platform, modules: modules.reverse(), data: platform.features[objectArrIndex(platform.features, "route", "modules")], moduleTexts});
 };
 
 controller.new = async function(req, res) {

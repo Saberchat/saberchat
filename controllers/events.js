@@ -1,8 +1,8 @@
 //LIBRARIES
-const {convertToLink} = require("../utils/convert-to-link");
+const {convertToLink, embedLink} = require("../utils/convert-to-link");
 const dateFormat = require('dateformat');
 const path = require('path');
-const {objectArrIndex, removeIfIncluded} = require("../utils/object-operations");
+const {objectArrIndex, removeIfIncluded, parsePropertyArray} = require("../utils/object-operations");
 const setup = require("../utils/setup");
 const {cloudUpload, cloudDelete} = require('../services/cloudinary');
 const {autoCompress} = require("../utils/image-compress");
@@ -17,30 +17,29 @@ const controller = {};
 // Event GET index
 controller.index = async function(req, res) {
     const platform = await setup(Platform);
+    const users = await User.find({});
     let events;
     if (req.user && platform.permissionsProperty.slice(platform.permissionsProperty.length-3).includes(req.user.permission)) {
         events = await Event.find({}).populate('sender');
-    } else {
-        events = await Event.find({verified: true}).populate('sender');
-    }
-    if(!platform || !events) {req.flash('error', 'Cannot find events.'); return res.redirect('back');}
+    } else {events = await Event.find({verified: true}).populate('sender');}
+    if(!platform || !users || !events) {req.flash('error', 'Cannot find events.'); return res.redirect('back');}
 
     let current = [];
     let past = [];
     let date;
     for (let event of events) {
         date = new Date(parseInt(event.deadline.year), parseInt(event.deadline.month)-1, parseInt(event.deadline.day));
-        if (date.getTime > new Date().getTime()) {
-            past.push(event);
-        } else {
-            current.push(event);
-        }
+        if (date.getTime > new Date().getTime()) {past.push(event);}
+        else {current.push(event);}
     }
 
+    const userNames = await parsePropertyArray(users, "firstName").join(',').toLowerCase().split(',');
     if (req.query.past) {
+        const eventTexts = await embedLink(req.user, past, userNames);
         return res.render('events/index', {platform, events: past.reverse(), activeSearch: false, data: platform.features[objectArrIndex(platform.features, "route", "events")]});   
     }
-    return res.render('events/index', {platform, events: current.reverse(), activeSearch: true, data: platform.features[objectArrIndex(platform.features, "route", "events")]});
+    const eventTexts = await embedLink(req.user, current, userNames);
+    return res.render('events/index', {platform, events: current.reverse(), activeSearch: true, data: platform.features[objectArrIndex(platform.features, "route", "events")], eventTexts});
 };
 
 // Event GET new event
@@ -108,15 +107,14 @@ controller.create = async function(req, res) {
             day: req.body.day,
             month: req.body.month,
             year: req.body.year
-        }
+        },
+        verified: !platform.postVerifiable //Event does not need to be verified if platform does not support verifying events
     });
     if (!platform || !event) {
         req.flash('error', 'Unable to create event');
         return res.redirect('back');
     }
-
     for (let attr of ["images", "links"]) {if (req.body[attr]) {event[attr] = req.body[attr];}} //Add images and links
-    if (!platform.postVerifiable) {event.verified = true;} //Announcement does not need to be verified if platform does not support verifying announcements
 
     // if files were uploaded, process them
     if (req.files) {
@@ -179,15 +177,14 @@ controller.updateEvent = async function(req, res) {
             day: req.body.day,
             month: req.body.month,
             year: req.body.year
-        }
+        },
+        verified: !platform.postVerifiable //Event does not need to be verified if platform does not support verifying events
     });
     if (!updatedEvent) {
         req.flash('error', "Unable to update event");
         return res.redirect('back');
     }
-
     for (let attr of ["images", "links"]) {if (req.body[attr]) {updatedEvent[attr] = req.body[attr];}} //Add images and links
-    if (!platform.postVerifiable) {updatedEvent.verified = true;} //Event does not need to be verified if platform does not support verifying events
 
     //Iterate through all selected media to remove and delete them
     let cloudErr;
@@ -264,19 +261,13 @@ controller.comment = async function(req, res) {
             path: "comments",
             populate: {path: "sender"}
         });
-    if (!event) {
-        return res.json({
-            error: 'Error commenting'
-        });
-    }
+    if (!event) {return res.json({error: 'Error commenting'});}
 
     const comment = await PostComment.create({
         text: req.body.text.split('<').join('&lt'),
         sender: req.user
     });
-    if (!comment) {
-        return res.json({error: 'Error commenting'});
-    }
+    if (!comment) {return res.json({error: 'Error commenting'});}
 
     comment.date = dateFormat(comment.created_at, "h:MM TT | mmm d");
     await comment.save();
@@ -290,12 +281,7 @@ controller.comment = async function(req, res) {
     for (let line of comment.text.split(" ")) {
         if (line[0] == '@') {
             user = await User.findById(line.split("#")[1].split("_")[0]);
-
-            if (!user) {
-                return res.json({
-                    error: "Error accessing user"
-                });
-            }
+            if (!user) {return res.json({error: "Error accessing user"});}
             users.push(user);
         }
     }

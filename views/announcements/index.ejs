@@ -192,13 +192,13 @@
                     <div class="block-content mode">
                         <% if (currentUser) { %>
                             <% if (announcement.text.split(" ").length > 70) { %>
-                                <p class="announcement-text convertible-text"><%= announcementTexts.get(announcement._id).split(" ").slice(0, 71).join(" ") %> <a href="/announcements/<%= announcement._id %>">(Read More)</a></p>
+                                <p class="announcement-text"><span class="convertible-text"><%= announcementTexts.get(announcement._id).split(" ").slice(0, 71).join(" ")%></span> <a href="/announcements/<%= announcement._id %>">(Read More)</a></p>
                             <% } else { %>
                                 <p class="announcement-text convertible-text"><%= announcementTexts.get(announcement._id) %></p>
                             <% } %>
                         <% } else { %>
                             <% if (announcement.text.split(" ").length > 70) { %>
-                                <p class="announcement-text convertible-text"><%= announcementTexts.get(announcement._id).split(" ").slice(0, 71).join(" ") %><a href="/">(Create Account To Read More)</a></p>
+                                <p class="announcement-text convertible-text"><%= announcementTexts.get(announcement._id).split(" ").slice(0, 71).join(" ") %><a href="/">(Log In To Read More)</a></p>
                             <% } else { %>
                                 <p class="announcement-text convertible-text"><%= announcementTexts.get(announcement._id) %></p>
                             <% } %>

@@ -162,10 +162,10 @@
 
                     <div class="block-content mode">
                         <% if (event.text.split(" ").length > 30) { %>
-                            <p class="announcement-text"><%= event.text.split(" ").slice(0, 31).join(" ") %> <a
+                            <p class="announcement-text"><span class="convertible-text"><%= eventTexts.get(event._id).split(" ").slice(0, 31).join(" ") %></span> <a
                                         href="/events/<%= event._id %>">(Read More)</a></p>
                         <% } else { %>
-                            <p class="announcement-text"><%= event.text %></p>
+                            <p class="announcement-text convertible-text"><%= eventTexts.get(event._id) %></p>
                         <% } %>
 
                     </div>
@@ -177,6 +177,7 @@
     <% }) %>
 </div>
 </body>
+<script src="/javascript/embed.js"></script>
 <script>
     if (document.getElementById("search-input")) {
         document.getElementById("search-input").style.backgroundColor = colorScheme[colorScheme.length-1];

@@ -156,11 +156,11 @@
                             <iframe class="project-first-image" src="<%=module.links[0].split('/edit')[0]%>/embed" frameborder="0" width="400" height="240"></iframe>
                         <% } %>
 
-                        <% if (module.text.split(" ").length > 30) { %>
-                            <p class="announcement-text"><%= module.text.split(" ").slice(0, 31).join(" ") %> <a
-                                        href="/modules/<%= module._id %>">(Read More)</a></p>
+                        <% if (moduleTexts.get(module._id).split(" ").length > 30) { %>
+                            <p class="announcement-text"><span class="convertible-text"><%= moduleTexts.get(module._id).split(" ").slice(0, 31).join(" ") %></span> <a href="/modules/<%= module._id %>">(Read More)</a>
+                            </p>
                         <% } else { %>
-                            <p class="announcement-text"><%= module.text %></p>
+                            <p class="announcement-text convertible-text"><%= moduleTexts.get(module._id) %></p>
                         <% } %>
 
                     </div>
@@ -172,6 +172,7 @@
     <% }) %>
 </div>
 </body>
+<script src="/javascript/embed.js"></script>
 <script>
     if (document.getElementById("search-input")) {
         document.getElementById("search-input").style.backgroundColor = colorScheme[colorScheme.length-1];
