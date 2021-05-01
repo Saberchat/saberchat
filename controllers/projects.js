@@ -99,14 +99,18 @@ controller.createProject = async function(req, res) {
         }
     }
 
-    const project = await Project.create({subject: req.body.title, text: req.body.text, sender: req.user, creators}); //Create a new project with all the provided data
+    const project = await Project.create({
+        subject: req.body.title,
+        text: req.body.text,
+        sender: req.user,
+        creators,
+        verified: !platform.postVerifiable
+    });
     if (!project) {
         await req.flash('error', "Unable to create project");
         return res.redirect('back');
     }
-
     if (req.body.images) {project.images = req.body.images;} //If any images were added (if not, the 'images' property is null)
-    if (!platform.postVerifiable) {project.verified = true;}
 
     if (req.files) {
         if (req.files.mediaFile) { //Look for all attached files and upload them
@@ -133,40 +137,42 @@ controller.createProject = async function(req, res) {
     project.date = dateFormat(project.created_at, "h:MM TT | mmm d");
     await project.save();
 
-    const users = await User.find({authenticated: true, _id: {$ne: req.user._id}});
-    if (!users) {
-        await req.flash('error', "Unable to access your followers");
-        return res.redirect('back');
-    }
-
-    let notif;
-    let imageString = ``;
-    for (let image of project.images) {imageString += `<img style="width: 50%; height: 50%;" src="${image}"/>`;}
-
-    for (let user of users) {
-        notif = await  InboxMessage.create({
-            subject: "New Project Post",
-            author: req.user,
-            noReply: true,
-            recipients: [user],
-            read: [],
-            toEveryone: false,
-            images: project.images
-        }); //Create a notification to alert the user
-        if (!notif) {
-            await req.flash('error', 'Unable to send notification');
+    if (!platform.postVerifiable) {
+        const users = await User.find({authenticated: true, _id: {$ne: req.user._id}});
+        if (!users) {
+            await req.flash('error', "Unable to access your followers");
             return res.redirect('back');
         }
 
-        notif.date = dateFormat(notif.created_at, "h:MM TT | mmm d");
-        notif.text = `Hello ${user.firstName},\n\n${req.user.firstName} ${req.user.lastName} recently posted a new project: "${project.subject}". Check it out!`;
-        await notif.save();
-        if (user.receiving_emails) {
-            await sendGridEmail(user.email, `New Project Post - ${project.subject}`, `<p>Hello ${user.firstName},</p><p>${req.user.firstName} ${req.user.lastName} recently posted a new project: <strong>${project.subject}</strong>. Check it out!</p>${imageString}`, false);
-        }
+        let notif;
+        let imageString = ``;
+        for (let image of project.images) {imageString += `<img style="width: 50%; height: 50%;" src="${image}"/>`;}
 
-        await user.inbox.push({message: notif, new: true}); //Add notif to user's inbox
-        await user.save();
+        for (let user of users) {
+            notif = await InboxMessage.create({
+                subject: "New Project Post",
+                author: req.user,
+                noReply: true,
+                recipients: [user],
+                read: [],
+                toEveryone: false,
+                images: project.images
+            }); //Create a notification to alert the user
+            if (!notif) {
+                await req.flash('error', 'Unable to send notification');
+                return res.redirect('back');
+            }
+
+            notif.date = dateFormat(notif.created_at, "h:MM TT | mmm d");
+            notif.text = `Hello ${user.firstName},\n\n${req.user.firstName} ${req.user.lastName} recently posted a new project: "${project.subject}". Check it out!`;
+            await notif.save();
+            if (user.receiving_emails) {
+                await sendGridEmail(user.email, `New Project Post - ${project.subject}`, `<p>Hello ${user.firstName},</p><p>${req.user.firstName} ${req.user.lastName} recently posted a new project: <strong>${project.subject}</strong>. Check it out!</p>${imageString}`, false);
+            }
+
+            await user.inbox.push({message: notif, new: true}); //Add notif to user's inbox
+            await user.save();
+        }
     }
 
     await req.flash('success', `Project Posted! A ${platform.permissionsDisplay[platform.permissionsDisplay.length-1].toLowerCase()} will verify your post soon.`);
@@ -174,13 +180,52 @@ controller.createProject = async function(req, res) {
 }
 
 controller.verify = async function(req, res) {
+    const platform = await setup(Platform);
     const project = await Project.findByIdAndUpdate(req.params.id, {verified: true});
-    if (!project) {
+    if (!platform || !project) {
         await req.flash('error', "Unable to access project");
         return res.redirect('back');
     }
 
-    await req.flash("success", "Verified Project!");
+    if (!platform.postVerifiable) {
+        const users = await User.find({authenticated: true, _id: {$ne: req.user._id}});
+        if (!users) {
+            await req.flash('error', "Unable to access your followers");
+            return res.redirect('back');
+        }
+
+        let notif;
+        let imageString = ``;
+        for (let image of project.images) {imageString += `<img style="width: 50%; height: 50%;" src="${image}"/>`;}
+
+        for (let user of users) {
+            notif = await  InboxMessage.create({
+                subject: "New Project Post",
+                author: req.user,
+                noReply: true,
+                recipients: [user],
+                read: [],
+                toEveryone: false,
+                images: project.images
+            }); //Create a notification to alert the user
+            if (!notif) {
+                await req.flash('error', 'Unable to send notification');
+                return res.redirect('back');
+            }
+
+            notif.date = dateFormat(notif.created_at, "h:MM TT | mmm d");
+            notif.text = `Hello ${user.firstName},\n\n${req.user.firstName} ${req.user.lastName} recently posted a new project: "${project.subject}". Check it out!`;
+            await notif.save();
+            if (user.receiving_emails) {
+                await sendGridEmail(user.email, `New Project Post - ${project.subject}`, `<p>Hello ${user.firstName},</p><p>${req.user.firstName} ${req.user.lastName} recently posted a new project: <strong>${project.subject}</strong>. Check it out!</p>${imageString}`, false);
+            }
+
+            await user.inbox.push({message: notif, new: true}); //Add notif to user's inbox
+            await user.save();
+        }
+    }
+
+    req.flash("success", "Verified Project!");
     return res.redirect("/projects");
 }
 
@@ -249,8 +294,7 @@ controller.showProject = async function(req, res) {
     for (let media of project.mediaFiles) {
         fileExtensions.set(media.url, path.extname(media.url.split("SaberChat/")[1]));
     }
-    const convertedText = convertToLink(project.text);
-    return res.render('projects/show', {platform, project, convertedText, fileExtensions});
+    return res.render('projects/show', {platform, project, convertedText: convertToLink(project.text), fileExtensions});
 }
 
 
@@ -275,9 +319,7 @@ controller.updateProject = async function(req, res) {
                     return res.redirect('back');
                 }
 
-                for (let user of statusGroup) {
-                    creators.push(user);
-                }
+                for (let user of statusGroup) {creators.push(user);}
 
             } else {
                 individual = await User.findById(creator);
@@ -305,7 +347,7 @@ controller.updateProject = async function(req, res) {
         subject: req.body.title,
         creators,
         text: req.body.text,
-        verified: false
+        verified: !platform.postVerifiable
     });
 
     if (!updatedProject) {
@@ -314,7 +356,6 @@ controller.updateProject = async function(req, res) {
     }
 
     if (req.body.images) {updatedProject.images = req.body.images;} //If any images were added (if not, the 'images' property is null)
-    if (!platform.postVerifiable) {updatedProject.verified = true;} //Project does not need to be verified if platform does not support verifying projects
 
     let cloudErr;
     let cloudResult;

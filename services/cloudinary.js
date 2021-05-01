@@ -25,6 +25,7 @@ module.exports.cloudUpload = async function (fileName, fileBuffer) {
     if ([".mp3", ".mp4", ".m4a", ".mov"].includes(extension)) {
         type = 'video'
         options.resource_type = type;
+        options.quality = 50; // <- 2 weeks of r&d went into this
     } else if (extension == ".pdf") {
         type = 'pdf';
     }

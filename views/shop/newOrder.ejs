@@ -74,7 +74,7 @@
 
                         <% for (let item of category.items) { %>
                             <% if (frequentItems.toString().includes(item._id.toString())) { %>
-                                <div class="list-group-item list-group-item-info form-check menu-item <%= category.name %> shop"
+                                <div class="list-group-item form-check menu-item <%= category.name.replace(' ', '') %> shop"
                                      id="item-<%= item.id %>" title="You have frequently ordered this item">
 
                             <% } else { %>
@@ -107,10 +107,6 @@
                                         <span class="item-name"><%= item.name %></span>
                                         <%if(item.displayAvailability){%>(<%= item.availableItems %> orders available)<%}%> -
                                         <%if (platform.dollarPayment) {%>$<%= (item.price).toFixed(2)%><%} else {%> Credits: <%=item.price%><% } %>
-
-                                        <% if (frequentItems.toString().includes(item._id.toString())) { %>
-                                            <span class="popular">Frequently Ordered</span>
-                                        <% } %>
                                     </label>
 
                                     <div title="Upvotes" class="upvotes">
@@ -126,6 +122,9 @@
 
                                         <span id="upvoteCount-<%= item._id %>"> <%= item.upvotes.length %></span>
                                     </div>
+                                    <% if (frequentItems.toString().includes(item._id.toString())) { %>
+                                        <span class="popular">Frequently Ordered</span>
+                                    <% } %>
                                     <br/>
                                 </div>
                             </div>

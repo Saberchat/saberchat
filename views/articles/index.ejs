@@ -153,10 +153,10 @@
 
                     <div class="block-content mode">
                         <% if (article.text.split(" ").length > 30) { %>
-                            <p class="announcement-text"><%= article.text.split(" ").slice(0, 31).join(" ") %> <a
+                            <p class="announcement-text"><span class="convertible-text"><%= articleTexts.get(article._id).split(" ").slice(0, 31).join(" ") %></span> <a
                                         href="/articles/<%= article._id %>">(Read More)</a></p>
                         <% } else { %>
-                            <p class="announcement-text"><%= article.text %></p>
+                            <p class="announcement-text convertible-text"><%= articleTexts.get(article._id)%></p>
                         <% } %>
 
                     </div>
@@ -168,6 +168,7 @@
     <% }) %>
 </div>
 </body>
+<script src="/javascript/embed.js"></script>
 <script>
     if (document.getElementById("search-input")) {
         document.getElementById("search-input").style.backgroundColor = colorScheme[colorScheme.length-1];

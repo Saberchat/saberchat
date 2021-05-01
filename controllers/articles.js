@@ -1,9 +1,9 @@
 //LIBRARIES
-const {convertToLink} = require("../utils/convert-to-link");
+const {convertToLink, embedLink} = require("../utils/convert-to-link");
 const {sendGridEmail} = require("../services/sendGrid");
 const dateFormat = require('dateformat');
 const path = require('path');
-const {objectArrIndex, removeIfIncluded} = require("../utils/object-operations");
+const {objectArrIndex, removeIfIncluded, parsePropertyArray} = require("../utils/object-operations");
 const setup = require("../utils/setup");
 const {cloudUpload, cloudDelete} = require('../services/cloudinary');
 const {autoCompress} = require("../utils/image-compress");
@@ -18,6 +18,7 @@ const controller = {};
 // Article GET index
 controller.index = async function(req, res) {
     const platform = await setup(Platform);
+    const users = await User.find({});
     let articles;
     if (req.user && platform.permissionsProperty.slice(platform.permissionsProperty.length-3).includes(req.user.permission)) {
         articles = await ArticleLink.find({}).populate('sender');
@@ -25,10 +26,15 @@ controller.index = async function(req, res) {
         articles = await ArticleLink.find({verified: true}).populate('sender');
     }
 
-    if(!platform || !articles) {req.flash('error', 'Cannot find articles.'); return res.redirect('back');}
+    if(!platform || !users || !articles) {req.flash('error', 'Cannot find articles.'); return res.redirect('back');}
+
+    const userNames = await parsePropertyArray(users, "firstName").join(',').toLowerCase().split(',');
+    const articleTexts = await embedLink(req.user, articles, userNames);
+
     return res.render('articles/index', {
         platform, articles: articles.reverse(), 
-        data: platform.features[objectArrIndex(platform.features, "route", "articles")]
+        data: platform.features[objectArrIndex(platform.features, "route", "articles")],
+        articleTexts
     });
 };
 
@@ -89,15 +95,14 @@ controller.create = async function(req, res) {
     const article = await ArticleLink.create({ //Build article with error info
         sender: req.user,
         subject: req.body.subject,
-        text: req.body.message
+        text: req.body.message,
+        verified: !platform.postVerifiable //Article does not need to be verified if platform does not support verifying articles
     });
     if (!platform || !article) {
         await req.flash('error', 'Unable to create article');
         return res.redirect('back');
     }
-
     for (let attr of ["images", "links"]) {if (req.body[attr]) {article[attr] = req.body[attr];}}//Add images and links
-    if (!platform.postVerifiable) {article.verified = true;} //Event does not need to be verified if platform does not support verifying announcements
 
     // if files were uploaded, process them
     if (req.files) {
@@ -155,15 +160,13 @@ controller.updateArticle = async function(req, res) {
     const updatedArticle = await ArticleLink.findByIdAndUpdate(req.params.id, {
         subject: req.body.subject,
         text: req.body.message,
-        verified: false
+        verified: !platform.postVerifiable //Article does not need to be verified if platform does not support verifying articles
     });
     if (!updatedArticle) {
         await req.flash('error', "Unable to update article");
         return res.redirect('back');
     }
-
     for (let attr of ["images", "links"]) {if (req.body[attr]) {updatedArticle[attr] = req.body[attr];}}
-    if (!platform.postVerifiable) {updatedArticle.verified = true;} //Article does not need to be verified if platform does not support verifying articles
 
     //Iterate through all selected media to remove and delete them
     let cloudErr;

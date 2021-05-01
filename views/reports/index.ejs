@@ -209,11 +209,11 @@
                     </div>
 
                     <div class="block-content mode">
-                        <% if (report.text.split(" ").length > 30) { %>
-                            <p class="announcement-text"><%= report.text.split(" ").slice(0, 31).join(" ") %> <a
+                        <% if (reportTexts.get(report._id).split(" ").length > 30) { %>
+                            <p class="announcement-text"><span class="convertible-text"><%= reportTexts.get(report._id).split(" ").slice(0, 31).join(" ") %></span> <a
                                         href="/reports/<%= report._id %>">(Read More)</a></p>
                         <% } else { %>
-                            <p class="announcement-text"><%= report.text %></p>
+                            <p class="announcement-text convertible-text"><%= reportTexts.get(report._id) %></p>
                         <% } %>
 
                     </div>
@@ -225,6 +225,7 @@
     <% }) %>
 </div>
 </body>
+<script src="/javascript/embed.js"></script>
 <script>
     if (document.getElementById("search-input")) {
         document.getElementById("search-input").style.backgroundColor = colorScheme[colorScheme.length-1];

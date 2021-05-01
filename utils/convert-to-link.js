@@ -10,6 +10,7 @@ package.convertToLink = function(text) { //Convert text to contain embedded link
 
     //Final list of emails and links, and the converted text
     let emails = [];
+    let hashtags = [];
     let links = [];
     let phones = [];
     let convertedText = "";
@@ -23,8 +24,11 @@ package.convertToLink = function(text) { //Convert text to contain embedded link
 
     //Parse emails and links from deformatted text
     for (let line of deformatted) {
-        if ((line.includes('@')) && (!line.includes('/'))) { //All emails must include @, but do not include /, although some site URLs have @ and /)
+        if ((line.includes('@')) && (!line.includes('/'))) { //All emails must include @, but do not include /, although some site URLs have @ and /) (Social media tags also included)
             emails.push(text.slice(text.indexOf(line), text.indexOf(line) + line.length));
+        
+        } else if ((line.charAt(0) == '#') && (!line.includes('/'))) { //Hashtags
+            hashtags.push(text.slice(text.indexOf(line), text.indexOf(line) + line.length));
 
         //Money can be confused as a link, so $ expressions are discounted
         } else if (line.slice(0, line.length - 1).includes('.') && line.slice(0, line.length - 1).split('.')[1].length > 0 && !line.includes('$')) {
@@ -45,8 +49,25 @@ package.convertToLink = function(text) { //Convert text to contain embedded link
             if (line.includes(email)) {
                 embedded = true;
                 for (let segment of line.split('\n')) {
-                    if (segment.includes(email) && segment.indexOf('@') > 0) { //Check that a) email is included and b) it has an address before the @ (not a social media handle)
-                        convertedText += `<a class="embedded-link" href="mailto:${email}">${segment}</a>`;
+                    if (segment.includes(email)) { //Check that a) email is included and b) it has an address before the @ (not a social media handle)
+                        if (segment.indexOf('@') > 0) {
+                            convertedText += `<a class="embedded-link" href="mailto:${email}">${segment}</a>`;
+                        } else {
+                            convertedText += `<a class="embedded-link" target="_blank" href="https://www.instagram.com/${email.slice(1)}">${segment}</a>`;
+                        }
+                    } else {convertedText += `${segment}`;}
+                }
+                convertedText += ` `;
+                break;
+            }
+        }
+
+        for (let hashtag of hashtags) {
+            if (line.includes(hashtag)) {
+                embedded = true;
+                for (let segment of line.split('\n')) {
+                    if (segment.includes(hashtag)) {
+                        convertedText += `<a class="embedded-link" target="_blank" href="https://instagram.com/explore/tags/${hashtag.slice(1)}">${segment}</a>`;
                     } else {convertedText += `${segment}`;}
                 }
                 convertedText += ` `;
@@ -60,9 +81,7 @@ package.convertToLink = function(text) { //Convert text to contain embedded link
                 for (let segment of line.split('\n')) {
                     if (segment.includes(phone)) {
                         convertedText += `<a class="embedded-link" href="tel:${phone}">${segment}</a>`;
-                    } else {
-                        convertedText += `${segment}`;
-                    }
+                    } else {convertedText += `${segment}`;}
                 }
                 convertedText += ` `;
                 break;
@@ -72,9 +91,7 @@ package.convertToLink = function(text) { //Convert text to contain embedded link
         for (let link of links) {
             if (line.includes(link)) { //If there is a link somewhere in the line
                 embedded = true;
-
-                //Iterate through line and search for specific location of link
-                for (let segment of line.split('\r')) {
+                for (let segment of line.split('\r')) { //Iterate through line and search for specific location of link
                     if (segment.includes(link)) {
 
                         //Evaluates whether link includes https, and adds it accordingly
@@ -83,18 +100,13 @@ package.convertToLink = function(text) { //Convert text to contain embedded link
                         } else {
                             convertedText += `<a class="embedded-link" href="${link}" target="_blank">${segment}</a>`;
                         }
-
-                    } else {
-                        convertedText += `${segment}`; //If no link is included, add plain text
-                    }
+                    } else {convertedText += `${segment}`;}  //If no link is included, add plain text
                 }
                 convertedText += ` `;
                 break;
             }
         }
-        if (!embedded) { //If there is no link in the line at all, add plain text
-            convertedText += `${line} `;
-        }
+        if (!embedded) {convertedText += `${line} `;} //If there is no link in the line at all, add plain text
     }
     return convertedText;
 }
@@ -113,7 +125,7 @@ package.embedLink = function(user, objects, hide) {
                 containedName = "";
                 containedInitial = "";
                 for (let name of hide) { //Iterate through each name
-                    if (word.toLowerCase().includes(name)) {
+                    if (word.toLowerCase().indexOf(name.toLowerCase()) == 0) {
                         containedName = name; //Track the name that appears
                         containedInitial = `${containedName.charAt(0).toUpperCase()}`; //Encode the name as its initial
                         if (word.charAt(word.length-1) != '.') { //If word does not end with period, add one for end initial
