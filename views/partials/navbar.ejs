@@ -51,28 +51,47 @@
 
                             <div class="dropdown-menu" aria-labelledby="navbarDropdown">
                                 <a class="dropdown-item" href="/reports"><i class="fas fa-exclamation-circle"></i> Error Reports</a>
-                                <% if (platform.name == "Alsion") { %>
-                                    <a class="dropdown-item" href="https://witherlyheights.org/" target="_blank"><i class="fas fa-newspaper"></i> Witherly Heights</a>
-                                <% } %>
                                 <a class="dropdown-item" href="/chat"><i class="fas fa-comment-dots"></i> Chat
                                     <span id="new-chat"
                                     <% if (currentUser.newRoomCount.length <= 0) { %> hidden <% } %>
                                     class="badge badge-pill badge-danger"><%= currentUser.newRoomCount.length %></span>
                                 </a>
                                 <% for (let feature of platform.features) { %>
-                                    <a class="dropdown-item" href="/<%=feature.route%>">
-                                        <i class="fas fa-<%=feature.icon%>"></i>
-                                        <%=feature.name%>
-                                    </a>
+                                    <% if (feature.route.includes("http")) {%>
+                                        <a class="dropdown-item" href="<%=feature.route%>" target="_blank">
+                                    <% } else {%>
+                                        <a class="dropdown-item" href="/<%=feature.route%>">
+                                    <% } %>
+                                    <i class="fas fa-<%=feature.icon%>"></i> <%=feature.name%></a>
                                 <% } %>
                             </div>
                         </li>
 
                     <% } else { %>
-                        <% for (let feature of platform.publicFeatures) { %>
-                            <li class="nav-item">
-                                <a class="nav-link" <% if (platform.navDark) {%> style="color: black;"<%}%> href="/<%=feature.route%>"><i class="fas fa-<%=feature.icon%>"></i> <%=feature.name%></a>
+                        <% if (platform.publicFeatures.length > 2) { %>
+                            <% for (let feature of platform.publicFeatures.slice(0, 2)) { %>
+                                <li class="nav-item">
+                                    <a class="nav-link" <% if (platform.navDark) {%> style="color: black;"<%}%> href="/<%=feature.route%>"><i class="fas fa-<%=feature.icon%>"></i> <%=feature.name%></a>
+                                </li>
+                            <% } %>
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button"
+                                data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" <% if (platform.navDark) {%> style="color: black;"<%}%>>
+                                <i class="fas fa-align-justify"></i> More</a>
+
+                                <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                                    <% for (let feature of platform.publicFeatures.slice(2)) { %>
+                                        <a class="dropdown-item" <% if (platform.navDark) {%> style="color: black;"<%}%> href="/<%=feature.route%>"><i class="fas fa-<%=feature.icon%>"></i> <%=feature.name%></a>
+                                    <% } %>
+                                </div>
                             </li>
+
+                        <% } else { %>
+                            <% for (let feature of platform.publicFeatures) { %>
+                                <li class="nav-item">
+                                    <a class="nav-link" <% if (platform.navDark) {%> style="color: black;"<%}%> href="/<%=feature.route%>"><i class="fas fa-<%=feature.icon%>"></i> <%=feature.name%></a>
+                                </li>
+                            <% } %>
                         <% } %>
                     <% } %>
 
