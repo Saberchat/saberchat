@@ -367,7 +367,7 @@ const setStudentsShow = function (courseId) { //For tutors to set how many stude
         document.getElementById("change-message").hidden = false;
         setTimeout(() => {
             document.getElementById("change-message").hidden = true;
-        }, 1000);
+        }, 2000);
     });
 }
 

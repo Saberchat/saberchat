@@ -72,7 +72,7 @@ const changeJoinCode = function (courseID, event) { //Change course join code (i
 
             setTimeout(() => { //Hide loading button
                 document.getElementById('loading').hidden = true;
-            }, 1000);
+            }, 2000);
 
         } else { //If there is an error
             document.getElementById('loading').hidden = false;
@@ -81,7 +81,7 @@ const changeJoinCode = function (courseID, event) { //Change course join code (i
 
             setTimeout(() => {
                 document.getElementById('loading').hidden = true;
-            }, 1000);
+            }, 2000);
         }
     });
     event.preventDefault(); //Prevent page from automatically refreshing

@@ -21,7 +21,7 @@ const ignoreComment = function (button) { //Ignore a reported comment
 
             setTimeout(() => { //After a second, remove the error message
                 document.getElementById("mod-error").style.display = "none";
-            }, 1000);
+            }, 2000);
         }
     });
 }
@@ -47,7 +47,7 @@ const deleteComment = function (button) { //Delete a reported comment
 
             setTimeout(() => {
                 document.getElementById("mod-error").style.display = "none";
-            }, 1000);
+            }, 2000);
         }
     });
 }

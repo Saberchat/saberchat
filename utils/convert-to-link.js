@@ -5,6 +5,7 @@ const package = {};
 package.convertToLink = function(text) { //Convert text to contain embedded links
     const delimeter = new RegExp(/[\"\'\r]/, 'g'); //Regex for most troublesome link characters
     const alpha = new RegExp(/[a-z]/, 'g')
+    const nonAlpha = new RegExp(/^[a-z]/, 'g')
     let deformatted = []; //Holds words/links from text
     let embedded = false; //Boolean value to check if link/email is embedded in each line of text
 
@@ -60,10 +61,10 @@ package.convertToLink = function(text) { //Convert text to contain embedded link
                 embedded = true;
                 for (let segment of line.split('\n')) {
                     if (segment.includes(email)) { //Check that a) email is included and b) it has an address before the @ (not a social media handle)
-                        if (segment.indexOf('@') > 0) {
+                        if (segment.split('(').join('').split(')').join('').indexOf('@') > 0) {
                             convertedText += `<a class="embedded-link" href="mailto:${email}">${segment}</a>`;
                         } else { //If email consists of an @ with nothing before it, link it as a social media handle (Instagram default)
-                            convertedText += `<a class="embedded-link" target="_blank" href="https://www.instagram.com/${email.slice(1)}">${segment}</a>`;
+                            convertedText += `<a class="embedded-link" target="_blank" href="https://www.instagram.com/${email.split(')').join('').split('(').join('').split(',').join('').slice(1)}">${segment}</a>`;
                         }
                     } else {convertedText += `${segment}`;} //If no match is found, add segment without any attached link
                 }

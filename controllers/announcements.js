@@ -190,7 +190,7 @@ controller.create = async function(req, res) {
 
 controller.verify = async function(req, res) {
     const platform = await setup(Platform);
-    const announcement = await Announcement.findByIdAndUpdate(req.params.id, {verified: true});
+    const announcement = await Announcement.findByIdAndUpdate(req.params.id, {verified: true}).populate("sender");
     if (!platform || !announcement) {
         await req.flash('error', "Unable to access announcement");
         return res.redirect('back');
@@ -207,7 +207,7 @@ controller.verify = async function(req, res) {
         for (const image of announcement.images) {imageString += `<img src="${image}">`;}
         for (let user of users) { //Send email to all users
             if (user.receiving_emails) {
-                const emailText = `<p>Hello ${user.firstName},</p><p>${req.user.username} has recently posted a new announcement - '${announcement.subject}'.</p><p>${announcement.text}</p><p>You can access the full announcement at https://${platform.url}</p> ${imageString}`;
+                const emailText = `<p>Hello ${user.firstName},</p><p>${announcement.sender.username} has recently posted a new announcement - '${announcement.subject}'.</p><p>${announcement.text}</p><p>You can access the full announcement at https://${platform.url}</p> ${imageString}`;
                 await sendGridEmail(user.email, `New Saberchat Announcement - ${announcement.subject}`, emailText, false);
                 await user.annCount.push({announcement, version: "new"});
                 await user.save();

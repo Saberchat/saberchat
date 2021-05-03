@@ -22,7 +22,7 @@ const addEmail = function(event, version) { //Add an email to access list/blocke
 
             setTimeout(() => { //After a second, remove the laoding message
                 document.getElementById("loading").style.display = "none";
-            }, 1000);
+            }, 2000);
         }
     });
 }
@@ -45,7 +45,7 @@ const removeEmail = function (button) { //Remove email from access list/blocked 
 
             setTimeout(() => { //After a second, remove the loading message
                 document.getElementById("loading").style.display = "none";
-            }, 1000);
+            }, 2000);
         }
     });
 }
@@ -64,7 +64,7 @@ const authenticateUser = function(button, action) { //Authenticate or remove use
 
             setTimeout(() => { //After a second, remove the loading message
                 document.getElementById("loading").style.display = "none";
-            }, 1000);
+            }, 2000);
 
             if (document.getElementsByClassName("user").length == 0) {
                 const noUsers = document.createElement("h1");
@@ -79,7 +79,7 @@ const authenticateUser = function(button, action) { //Authenticate or remove use
 
             setTimeout(() => { //After a second, remove the loading message
                 document.getElementById("loading").style.display = "none";
-            }, 1000);
+            }, 2000);
         }
     });
 }

@@ -18,7 +18,7 @@ const updateStatus = function (select) { //Update a user's official stautus
 
         setTimeout(() => { //After a second, hide the message
             loading.style.display = "none";
-        }, 1000);
+        }, 2000);
 
         if (data.user) { //If a user was updated, change their displayed status
             for (let option of select) {

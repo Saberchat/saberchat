@@ -18,7 +18,7 @@ const updateRole = function(select) { //Update user's permission
 
         setTimeout(() => { //After a second, hide the message
             loading.style.display = "none";
-        }, 1000);
+        }, 2000);
 
         if (data.user) { //If a user was updated, change their displayed permission
             for (let option of select) {
@@ -66,7 +66,7 @@ const updateBalance = function(form, event, dollarPayment) {
             loading.style.color = 'red';
             loading.innerHTML = data.error;
         }
-        setTimeout(() => {loading.style.display = "none";}, 1000); //After a second, hide the message
+        setTimeout(() => {loading.style.display = "none";}, 2000); //After a second, hide the message
     });
     event.preventDefault();
 }
