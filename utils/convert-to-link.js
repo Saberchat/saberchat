@@ -23,11 +23,14 @@ package.convertToLink = function(text) { //Convert text to contain embedded link
     }
 
     //Parse emails and links from deformatted text
-    for (let line of deformatted) {
+    let line;
+    for (let i = 0; i < deformatted.length; i++) {
+        line = deformatted[i];
+
         if ((line.includes('@')) && (!line.includes('/'))) { //All emails must include @, but do not include /, although some site URLs have @ and /) (Social media tags also included)
             emails.push(text.slice(text.indexOf(line), text.indexOf(line) + line.length));
         
-        } else if ((line.charAt(0) == '#') && (!line.includes('/'))) { //Hashtags
+        } else if ((line.charAt(0) == '#') && (!line.includes('/'))) { //Hashtags (any sequences preceded with a pound sign)
             hashtags.push(text.slice(text.indexOf(line), text.indexOf(line) + line.length));
 
         //Money can be confused as a link, so $ expressions are discounted
@@ -39,56 +42,67 @@ package.convertToLink = function(text) { //Convert text to contain embedded link
         //Pick up phone numbers (Only US works) by identifying 10-digit numerical series
         } else if (parseInt(line.split('-').join('').split('(').join('').split(')').join('')).toString().length == 10) {
             phones.push(text.slice(text.indexOf(line), text.indexOf(line) + line.length));
+
+        //Pick up phone numbers with spaces in between (Only US works) by concatenating neighboring 3-7 numerical series
+        } else if ((i < deformatted.length - 1) && (parseInt(`${line}${deformatted[i+1]}`.split('-').join('').split('(').join('').split(')').join('')).toString().length == 10)) {
+            phones.push(`${line} ${deformatted[i+1]}`);
         }
     }
 
     //Build converted string using HTML hrefs
-    for (let line of text.split(' ')) {
+    let counter = 0;
+    while (counter < text.split(' ').length) {
+        line = text.split(' ')[counter];
         embedded = false;
-        for (let email of emails) {
+
+        for (let email of emails) { //Iterate through the emails and search for segments that contain them
             if (line.includes(email)) {
                 embedded = true;
                 for (let segment of line.split('\n')) {
                     if (segment.includes(email)) { //Check that a) email is included and b) it has an address before the @ (not a social media handle)
                         if (segment.indexOf('@') > 0) {
                             convertedText += `<a class="embedded-link" href="mailto:${email}">${segment}</a>`;
-                        } else {
+                        } else { //If email consists of an @ with nothing before it, link it as a social media handle (Instagram default)
                             convertedText += `<a class="embedded-link" target="_blank" href="https://www.instagram.com/${email.slice(1)}">${segment}</a>`;
                         }
-                    } else {convertedText += `${segment}`;}
+                    } else {convertedText += `${segment}`;} //If no match is found, add segment without any attached link
                 }
-                convertedText += ` `;
+                convertedText += ` `; //Space concludes line segment
                 break;
             }
         }
 
-        for (let hashtag of hashtags) {
+        for (let hashtag of hashtags) { //Iterate through hashtags and add any matches
             if (line.includes(hashtag)) {
                 embedded = true;
                 for (let segment of line.split('\n')) {
                     if (segment.includes(hashtag)) {
                         convertedText += `<a class="embedded-link" target="_blank" href="https://instagram.com/explore/tags/${hashtag.slice(1)}">${segment}</a>`;
-                    } else {convertedText += `${segment}`;}
+                    } else {convertedText += `${segment}`;} //If no match is found, add segment without any attached link
                 }
-                convertedText += ` `;
+                convertedText += ` `; //Space concludes line segment
                 break;
             }
         }
 
-        for (let phone of phones) {
-            if (line.includes(phone)) {
+        for (let phone of phones) { //Iterate through phones and search for any matches
+            if (line.includes(phone)) { //If segment directly contains phone, add it 
                 embedded = true;
                 for (let segment of line.split('\n')) {
                     if (segment.includes(phone)) {
                         convertedText += `<a class="embedded-link" href="tel:${phone}">${segment}</a>`;
-                    } else {convertedText += `${segment}`;}
+                    } else {convertedText += `${segment}`;} //If no match is found, add segment without any attached link
                 }
-                convertedText += ` `;
+                convertedText += ` `; //Space concludes line segment
                 break;
+            } else if (`${line} ${text.split(' ')[counter+1]}` == phone) { //If phone is listed between two split segments, format them
+                embedded = true;
+                convertedText += `<a class="embedded-link" href="tel:${phone}">${phone}</a> `;
+                counter ++; //Skip the second line segment
             }
         }
 
-        for (let link of links) {
+        for (let link of links) { //Iterate through regular URLs and search for any matches
             if (line.includes(link)) { //If there is a link somewhere in the line
                 embedded = true;
                 for (let segment of line.split('\r')) { //Iterate through line and search for specific location of link
@@ -100,13 +114,14 @@ package.convertToLink = function(text) { //Convert text to contain embedded link
                         } else {
                             convertedText += `<a class="embedded-link" href="${link}" target="_blank">${segment}</a>`;
                         }
-                    } else {convertedText += `${segment}`;}  //If no link is included, add plain text
+                    } else {convertedText += `${segment}`;}  //If no match is found, add segment without any attached link
                 }
                 convertedText += ` `;
-                break;
+                break; //Space concludes line segment
             }
         }
         if (!embedded) {convertedText += `${line} `;} //If there is no link in the line at all, add plain text
+        counter ++;
     }
     return convertedText;
 }
