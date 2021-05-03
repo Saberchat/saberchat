@@ -228,33 +228,43 @@ controller.authenticateDelete = async function(req, res) {
 controller.moderateGet = async function(req, res) { //Show all reported comments
     const platform = await setup(Platform);
     const comments = await ChatMessage.find({status: 'flagged'}).populate("author statusBy room");
-    if (!platform || !comments) {
+    const rooms = await ChatRoom.find();
+    if (!platform || !comments || !rooms) {
         await req.flash('error', 'An Error Occurred');
         return res.redirect('/admin');
     }
-    return res.render('admin/mod', {platform, comments});
+    const roomMap = new Map();
+    for (let comment of comments) {
+        for (let room of rooms) {
+            if (room.comments.includes(comment._id)) {roomMap.set(comment._id, room);}
+        }
+    }
+    return res.render('admin/mod', {platform, comments, rooms: roomMap});
 }
 
 controller.getContext = async function(req, res) { //Get context for reported comment
     const reportedComment = await ChatMessage.findById(req.body.commentId).populate("author");
-    if (!reportedComment) {
-        return res.json({error: "Unable to find comment"});
-    }
+    if (!reportedComment) {return res.json({error: "Unable to find comment"});}
 
-    const allComments = await ChatMessage.find({room: reportedComment.room}).populate("author"); //All comments from the reported comment's room
-    if (!allComments) {
-        return res.json({error: "Unable to find other comments"});
-    }
-
-    const commentIndex = objectArrIndex(allComments, "_id", reportedComment._id); //Get index of reported comment
+    let allComments; //All comments from reported room
+    let commentIndex;
     let context = []; //Comments 5 before and 5 after
+    const rooms = await ChatRoom.find({}).populate({path: "comments", populate: "author"});
+    for (let room of rooms) {
+        if (await objectArrIndex(room.comments, "_id", reportedComment._id) > -1) {
+            allComments = room.comments;
+            commentIndex = await objectArrIndex(allComments, "_id", reportedComment._id);  //Get pos of reported comment
+            break;
+        }
+    }
 
     //Find the comments 5 before and 5 after the reported one, and add to array
     for (let i = -5; i <= 5; i++) {
-        if (commentIndex + i > 0 && allComments[commentIndex + i].author) {
+        if (commentIndex + i >= 0 && allComments[commentIndex + i].author) {
             await context.push(allComments[commentIndex + i]);
         }
     }
+
     return res.json({success: "Succesfully collected data", context});
 }
 

@@ -57,8 +57,8 @@
                 <ul class="list-group mt-3 mode">
                     <% comments.forEach(comment => { %>
                         <li class="list-group-item reported-comment mode darkmode-outline" id="comment-<%=comment._id%>">
-                            <% if (comment.room) { %>
-                                <h4>Room: <%= comment.room.name %></h4>
+                            <% if (rooms.has(comment._id)) { %>
+                                <h4>Room: <%= rooms.get(comment._id).name %></h4>
                             <% } %>
                             <p>Reported by <b><%= comment.statusBy.username %></b></p>
                             <span><b><%= comment.author.username %>:</b> <%= comment.text %></span>
