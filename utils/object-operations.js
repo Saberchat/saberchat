@@ -93,12 +93,14 @@ package.multiplyArrays = function(arr, number) { //Take an array and return mult
 }
 
 package.sortAlph = function(arr, property) {
-    const sortedProperties = package.parsePropertyArray(arr, property, true).sort();
-    let sortedArr = [];
-    for (let element of sortedProperties) {
-        sortedArr.push(arr[package.objectArrIndex(arr, property, element, null, true)]);
+    for (let i = 0; i < arr.length; i++) { //Sort array alphabetically with simple bubblesort
+        for (let j = 0; j < arr.length-1; j++) {
+            if (arr[j][property].toLowerCase() > arr[j+1][property].toLowerCase()) {
+                [arr[j], arr[j+1]] = [arr[j+1], arr[j]]; //Swap elements if they are out of order
+            }
+        }
     }
-    return sortedArr;
+    return arr;
 }
 
 module.exports = package;

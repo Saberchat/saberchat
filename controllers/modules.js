@@ -129,7 +129,11 @@ controller.create = async function(req, res) {
     module.date = dateFormat(module.created_at, "h:MM TT | mmm d");
     await module.save();
 
-    await req.flash('success', `Module Posted! A ${platform.permissionsDisplay[platform.permissionsDisplay.length-1].toLowerCase()} will verify your post soon.`);
+    if (platform.postVerifiable) {
+        await req.flash('success', `Module Posted! A ${platform.permissionsDisplay[platform.permissionsDisplay.length-1].toLowerCase()} will verify your post soon.`);
+    } else {
+        await req.flash('success', `Module Posted!`);
+    }
     return res.redirect(`/modules`);
 };
 

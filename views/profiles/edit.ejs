@@ -89,7 +89,7 @@
                     <% if (changeStatus) { %>
                         <label for="status">Select Status</label>
                         <select class="form-control mode" id="status" name="status">
-                            <option selected value="<%= currentUser.status %>"><%= currentUser.status %></option>
+                            <option selected value=''><%= currentUser.status %></option>
                             <% for (let status of statuses) { %>
                                 <% if (currentUser.status.toLowerCase() != status.toLowerCase()) { %>
                                     <option value="<%= status %>"><%= status %></option>

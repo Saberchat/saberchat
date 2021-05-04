@@ -141,7 +141,11 @@ controller.create = async function(req, res) {
     event.date = dateFormat(event.created_at, "h:MM TT | mmm d");
     await event.save();
 
-    await req.flash('success', `Event Posted! A ${platform.permissionsDisplay[platform.permissionsDisplay.length-1].toLowerCase()} will verify your post soon.`);
+    if (platform.postVerifiable) {
+        await req.flash('success', `Event Posted! A ${platform.permissionsDisplay[platform.permissionsDisplay.length-1].toLowerCase()} will verify your post soon.`);
+    } else {
+        await req.flash('success', `Event Posted!`);
+    }
     return res.redirect(`/events`);
 };
 

@@ -45,15 +45,11 @@ package.getHours = function(dates) {
 
 package.sortTimes = function(times, formattedTimes) { //Sort times in increasing order
     let temp;
-    //Use sorting principles to iterate through times and format them
+    //Simple bubblesort algorithm sorts times
     for (let i = 0; i < times.length-1; i ++) {
         for (let j = 0; j < times.length-1; j ++) {
-            temp = times[j];
-            times[j] = times[j+1];
-            times[j+1] = temp;
-            temp = formattedTimes[j];
-            formattedTimes[j] = formattedTimes[j+1];
-            formattedTimes[j+1] = temp;
+            [times[j], times[j+1]] = [times[j+1], times[j]]; //Swap times if they are out of order
+            [formattedTimes[j], formattedTimes[j+1]] = [formattedTimes[j+1], formattedTimes[j]]; //Swap formatted times if they are out of order
         }
     }
     return {times, formattedTimes};

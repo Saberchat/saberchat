@@ -19,14 +19,10 @@ package.getPopularityCoefficiant = function(objects, likeFactor, dateFactor) {
 
 package.sortByPopularity = function(objects, likeFactor, dateFactor, fields) { //Sort objects by popularity coefficiant
     let sorted = {popular: [], unpopular: []}; //Object holds both popular and unpopular items
-
-    let temp; //Sort objects by order of popularity coefficiant
-    for (let i = 0; i < objects.length - 1; i++) {
+    for (let i = 0; i < objects.length - 1; i++) { //Sort objects by order of popularity coefficiant (Bubblesort Algorithm)
         for (let j = 0; j < objects.length - 1; j++) {
             if (package.getPopularityCoefficiant([objects[j]], likeFactor, dateFactor) < package.getPopularityCoefficiant([objects[j + 1]], likeFactor, dateFactor)) {
-                temp = objects[j];
-                objects[j] = objects[j + 1];
-                objects[j + 1] = temp;
+                [objects[j], objects[j+1]] = [objects[j+1], objects[j]]; //Swap elements if they are out of order
             }
         }
     }

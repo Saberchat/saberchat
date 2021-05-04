@@ -129,7 +129,11 @@ controller.create = async function(req, res) {
     article.date = dateFormat(article.created_at, "h:MM TT | mmm d");
     await article.save();
 
-    await req.flash('success', `Article Posted! A ${platform.permissionsDisplay[platform.permissionsDisplay.length-1].toLowerCase()} will verify your post soon.`);
+    if (platform.postVerifiable) {
+        await req.flash('success', `Article Posted! A ${platform.permissionsDisplay[platform.permissionsDisplay.length-1].toLowerCase()} will verify your post soon.`);
+    } else {
+        await req.flash('success', `Article Posted!`);
+    }
     return res.redirect(`/articles`);
 };
 

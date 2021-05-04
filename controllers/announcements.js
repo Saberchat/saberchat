@@ -184,7 +184,11 @@ controller.create = async function(req, res) {
         }
     }
 
-    await req.flash('success', `Announcement Posted! A ${platform.permissionsDisplay[platform.permissionsDisplay.length-1].toLowerCase()} will verify your post soon.`);
+    if (platform.postVerifiable) {
+        await req.flash('success', `Announcement Posted! A ${platform.permissionsDisplay[platform.permissionsDisplay.length-1].toLowerCase()} will verify your post soon.`);
+    } else {
+        await req.flash('success', `Announcement Posted!`);
+    }
     return res.redirect(`/announcements`);
 };
 

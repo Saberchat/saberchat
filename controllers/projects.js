@@ -175,7 +175,11 @@ controller.createProject = async function(req, res) {
         }
     }
 
-    await req.flash('success', `Project Posted! A ${platform.permissionsDisplay[platform.permissionsDisplay.length-1].toLowerCase()} will verify your post soon.`);
+    if (platform.postVerifiable) {
+        await req.flash('success', `Project Posted! A ${platform.permissionsDisplay[platform.permissionsDisplay.length-1].toLowerCase()} will verify your post soon.`);
+    } else {
+        await req.flash('success', `Project Posted!`);
+    }
     return res.redirect(`/projects`);
 }
 

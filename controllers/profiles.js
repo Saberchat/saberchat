@@ -44,7 +44,7 @@ controller.index = async function(req, res) {
 	for (let status of statuses) {
 		status[2] = [];
 		for (let permission of reversedPerms) {
-			for (let user of sortAlph(users, "email")) {
+			for (let user of sortAlph(users, "firstName")) {
 				if (status[0] == user.status && permission == user.permission) {status[2].push(user);}
 			}
 		}
@@ -147,7 +147,7 @@ controller.update = async function(req, res) {
 	if (req.body.status == '' || !platform.statusesProperty.includes(req.body.status)) { //If no new status is selected, keep the current user's status
 		status = req.user.status;
 	} else { //If a new status is selected, move to that
-		if (req.user.status == platform.teacherStatus) { //If user is currently teaching a course, they cannot lose their teacher status
+		if (req.user.status == platform.teacherStatus && req.body.status != '') { //If user is currently teaching a course, they cannot lose their teacher status
 			const courses = await Course.find({});
 			if (!courses) {
 				await req.flash('error', "Could not find courses");
@@ -265,9 +265,7 @@ controller.tagPut = async function(req, res) {
 	if (req.user.tags.includes(req.body.tag)) {
 		if (req.body.tag == "Tutor") { //If tag is for tutor, check that user is not an active tutor
 			const courses = await Course.find({});
-			if (!courses) {
-				return res.json({error: 'Error. Could not change'});
-			}
+			if (!courses) {return res.json({error: 'Error. Could not change'});}
 			
 			for (let course of courses) {
 				if (objectArrIndex(course.tutors, "tutor", req.user._id) > -1) { //If user is a tutor
@@ -275,7 +273,7 @@ controller.tagPut = async function(req, res) {
 				}
 			}
 		}
-		removeIfIncluded(req.user.tags, req.body.tag); //If no issue, remove tag
+		await removeIfIncluded(req.user.tags, req.body.tag); //If no issue, remove tag
 		await req.user.save();
 		return res.json({success: "Succesfully removed status", tag: req.body.tag, user: req.user._id});
 	}
