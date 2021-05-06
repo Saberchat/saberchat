@@ -137,7 +137,7 @@
                         <% if (currentUser.permission == platform.permissionsProperty[platform.permissionsProperty.length-3]) { %>
                             <li class="nav-item dropdown">
                                 <a class="nav-link dropdown-toggle" href="" id="navbarDropdownMenuLink" role="button"
-                                   data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i
+                                   data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" <% if (platform.navDark) {%>style="color: black;"<%}%>><i
                                             class="fas fa-align-justify"></i> Mod</a>
                                 <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
                                     <a href="/admin/status" class="dropdown-item"><i class="fas fa-user"></i> Change
