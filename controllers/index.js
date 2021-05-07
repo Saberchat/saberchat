@@ -146,9 +146,9 @@ controller.register = async function(req, res) {
 
     // if registration is successful, login user.
     if (!platform.principalAuthenticate) {
-        await req.flash("success", "Welcome to Saberchat " + user.firstName + "! Go to your email to verify your account");
+        await req.flash("success", `Welcome to Saberchat ${user.firstName}! Go to your email to verify your account`);
     } else {
-        await req.flash("success", "Welcome to Saberchat " + user.firstName + "! Your account will be evaluated and authenticated soon");
+        await req.flash("success", `Welcome to Saberchat ${user.firstName}! Your account will be evaluated and authenticated soon`);
     }
     return res.redirect("/");
 }
@@ -187,7 +187,7 @@ controller.authenticate = async function(req, res) {
         });
 
         await sendGridEmail(user.email, 'Welcome To Saberchat!', `<p>Hello ${user.firstName},</p><p>Welcome to Saberchat! A confirmation of your account:</p><ul><li>Your username is ${user.username}.</li><li>Your full name is ${user.firstName} ${user.lastName}.</li><li>Your linked email is ${user.email}</li></ul><p>You will be assigned a role and status soon.</p>`, false);
-        await req.flash('success', 'Welcome ' + user.firstName);
+        await req.flash('success', `Welcome ${user.firstName}`);
         return res.redirect('/');
     }
 
@@ -218,7 +218,7 @@ controller.login = function(req, res, next) { //No need for async as login recor
             }
             user.logins.push(new Date());
             user.save();
-            req.flash('success', 'Welcome ' + user.firstName);
+            req.flash('success', `Welcome ${user.firstName}`);
             return res.redirect('/');
         });
     })(req, res, next);

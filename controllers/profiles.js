@@ -319,7 +319,7 @@ controller.changeEmailPut = async function(req, res) { //Update email
 	}
 
 	//Send SendGrid confirmation email to new email address
-	const url = process.env.SENDGRID_BASE_URL + '/mail/send';
+	const url = `${process.env.SENDGRID_BASE_URL}/mail/send`;
 	const data = {
 		"personalizations": [{
 			"to": [{"email": req.body.email}],
@@ -337,7 +337,7 @@ controller.changeEmailPut = async function(req, res) { //Update email
 
 	axios({
 		method: 'post', url, data,
-		headers: {"Authorization": "Bearer " + process.env.SENDGRID_KEY}
+		headers: {"Authorization": `Bearer ${process.env.SENDGRID_KEY}`}
 	}).then(response => {console.log(`Email Sent with status code: ${response.status}`);
 	}).catch(error => {console.log(error);});
 
@@ -394,7 +394,7 @@ controller.changePasswordPut = async function(req, res) {
 		await user.changePassword(req.body.oldPassword, req.body.newPassword); //Update user's password
 		await sendGridEmail(req.user.email, 'Password Update Confirmation', `<p>Hello ${req.user.firstName},</p><p>You are receiving this email because you recently made changes to your Saberchat password. This is a confirmation of your profile.\n\nYour username is ${req.user.username}.\nYour full name is ${req.user.firstName} ${req.user.lastName}.\nYour email is ${req.user.email}\n\nIf you did not recently change your password, reset it immediately and contact a faculty member.</p>`, false);
 		await req.flash('success', 'Successfully changed your password');
-		return res.redirect('/profiles/' + req.user._id);
+		return res.redirect(`/profiles/${req.user._id}`);
 	}
 	await req.flash('error', "Passwords do not match");
 	return res.redirect('back');

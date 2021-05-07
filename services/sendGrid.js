@@ -8,7 +8,7 @@ const axios = require('axios');
 
 module.exports.sendGridEmail = async function(email, subject, content, mandatory) {
     if(process.env.SENDING_EMAILS === 'true' || mandatory) { //If message is mandatory, or emails are being sent
-        const url = process.env.SENDGRID_BASE_URL + '/mail/send';
+        const url = `${process.env.SENDGRID_BASE_URL}/mail/send`;
         const data = { //Set up email data object
             "personalizations": [{
                 "to": [{
@@ -30,9 +30,7 @@ module.exports.sendGridEmail = async function(email, subject, content, mandatory
             method: 'post',
             url: url,
             data: data,
-            headers: {
-                "Authorization": "Bearer " + process.env.SENDGRID_KEY
-            }
+            headers: {"Authorization": `Bearer ${process.env.SENDGRID_KEY}`}
         });
         console.log(`Email Sent with status code: ${response.status}`);
     }

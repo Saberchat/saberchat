@@ -49,9 +49,9 @@ const appSetup = async function() {
     const port = process.env.PORT || 3000;
 
     // APP CONFIGURATION
-    await app.use(favicon(__dirname + '/public/images/favicon.ico')); // use favicon
-    await app.use(express.static(__dirname + "/public")); // make public dir accessible in all views
-    await app.use('/editor', express.static(__dirname + "/node_modules/@editorjs")); // try serving editorjs package to frontend
+    await app.use(favicon(`${__dirname}/public/images/favicon.ico`)); // use favicon
+    await app.use(express.static(`${__dirname}/public`)); // make public dir accessible in all views
+    await app.use('/editor', express.static(`${__dirname}/node_modules/@editorjs`)); // try serving editorjs package to frontend
     await app.use(express.urlencoded({extended: true})); // express has bodyparser integrated as of 4.16>=
     await app.use(express.json()); // parse content-type application/json. 
 
@@ -128,8 +128,7 @@ const appSetup = async function() {
 
     // Start server
     const running = await http.listen(port, process.env.IP);
-    if (running) { await console.log(":: App listening on port " + port + " ::");}
- 
+    if (running) { await console.log(`:: App listening on port ${port} ::`);}
 }
 
 // connect to db.

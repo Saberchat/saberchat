@@ -18,9 +18,9 @@ const updateDisplay = function () { //Update room display based on edited button
 }
 
 const searchFunction = function (mode) { //Search for users within a chat room
-    let input = document.getElementById(mode + "-search-input");
+    let input = document.getElementById(`${mode}-search-input`);
     let filter = input.value.toUpperCase();
-    let list = document.getElementById(mode + "-user-list");
+    let list = document.getElementById(`${mode}-user-list`);
     let users = list.getElementsByClassName('form-check');
     for (i = 0; i < users.length; i++) {
         let user = users[i].getElementsByTagName('label')[0];

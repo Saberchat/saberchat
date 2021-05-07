@@ -33,12 +33,12 @@ const addText = (() => {
     <button class="delete-btn btn btn-danger" onclick="remove(this)"><i class="far fa-trash-alt"></i></button>
   </div>`
     );
-    document.getElementById('t-' + textCount).onkeydown = e => {
+    document.getElementById(`t-${textCount}`).onkeydown = e => {
         if (e.keyCode == 9 || e.which == 9) {
             e.preventDefault();
             let s = this.selectionStart;
-            this.value = this.value.substring(0, this.selectionStart) + "\t" + this.value.substring(this.selectionEnd);
-            this.selectionEnd = s + 1;
+            this.value = `${this.value.substring(0, this.selectionStart)}\t${this.value.substring(this.selectionEnd)}`;
+            this.selectionEnd = s + 1);
         }
     }
 });
@@ -63,7 +63,7 @@ for (let i = 0; i < count; i++) {
         if (e.keyCode == 9 || e.which == 9) {
             e.preventDefault();
             let s = this.selectionStart;
-            this.value = this.value.substring(0, this.selectionStart) + "\t" + this.value.substring(this.selectionEnd);
+            this.value = `${this.value.substring(0, this.selectionStart)}\t${this.value.substring(this.selectionEnd)}`;
             this.selectionEnd = s + 1;
         }
     }
@@ -96,7 +96,7 @@ const remove = (element => {
 // auto grows textareas
 const autoGrow = (element => {
     element.style.height = "5px";
-    element.style.height = (element.scrollHeight) + "px";
+    element.style.height = `${(element.scrollHeight)}px`;
 });
 
 // submit article

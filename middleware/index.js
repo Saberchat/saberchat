@@ -94,7 +94,7 @@ middleware.checkRoomOwnership = async function(req, res, next) {
 
     if (room.creator.equals(req.user._id)) { return next();}
     req.flash('error', 'You do not have permission to do that');
-    return res.redirect('/chat/' + room._id);
+    return res.redirect(`/chat/${room._id}`);
 }
 
 middleware.isPrincipal = async function(req, res, next) {

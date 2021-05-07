@@ -367,7 +367,7 @@ controller.updateRoom = async function(req, res) {
 
     await room.save();
     await req.flash('success', 'Updated your group');
-    return res.redirect('/chat/' + room._id);
+    return res.redirect(`/chat/${room._id}`);
 }
 
 controller.deleteRoom = async function(req, res) {

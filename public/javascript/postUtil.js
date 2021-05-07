@@ -5,10 +5,10 @@ const sendPostReq = function(url, data, callback) {
         body: JSON.stringify(data)
     })
     .then(response => {
-        if (!response.ok) {throw new Error('HTTP-Error: ' + response.status);}
+        if (!response.ok) {throw new Error(`HTTP-Error: ${response.status}`);}
         return response.json();
     })
     .then(data => {return callback(data);})
-    .catch(error => {console.log('Error:\n' + String(error));});
+    .catch(error => {console.log(`Error:\n${String(error)}`);});
 }
 
