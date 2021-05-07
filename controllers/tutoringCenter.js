@@ -515,7 +515,7 @@ controller.unblock = async function(req, res) { //Unblock a previously blocked u
     if (!blockedId || !course) {return res.json({error: "Unable to access course"});}
     if (!course.blocked.includes(blockedId._id)) {return res.json({error: "User is not blocked from this course"});} //If the user is not blocked, they cannot be unblocked
     
-    removeIfIncluded(course.blocked, blockedId._id); //Unblock user
+    await removeIfIncluded(course.blocked, blockedId._id); //Unblock user
     await course.save();
     const notif = await InboxMessage.create({  //Create a notification to alert the user
         subject: `Unblocked from ${course.name}`,
@@ -768,7 +768,7 @@ controller.upvoteTutor = async function(req, res) {
     for (let tutor of course.tutors) {
         if (tutor.tutor.equals(req.body.tutorId)) { //Search for tutor until they are found
             if (objectArrIndex(tutor.members.concat(tutor.formerStudents), "student", req.user._id) > -1) { //Only current/former members of a tutor can upvote them
-                if (removeIfIncluded(tutor.upvotes, req.user._id)) { //If tutor is currently upvoted by this user, downvote them
+                if (await removeIfIncluded(tutor.upvotes, req.user._id)) { //If tutor is currently upvoted by this user, downvote them
                     await course.save();
                     return res.json({success: "Downvoted tutor", upvoteCount: tutor.upvotes.length});
                 }
@@ -817,7 +817,7 @@ controller.likeReview = async function(req, res) {
     const review = await Review.findById(req.params.id);
     if (!review) {return res.json({error: "Error accessing review"});}
 
-    if (removeIfIncluded(review.likes, req.user._id)) { //If user has liked this review, remove a like
+    if (await removeIfIncluded(review.likes, req.user._id)) { //If user has liked this review, remove a like
         await review.save();
         return res.json({success: "Removed a like", likeCount: review.likes.length, review});
     }

@@ -135,8 +135,8 @@
                 </div>
                 <div class="form-group">
                     <br />
-                    <label for="profile-input">Profile Image Upload</label><br/>
-                    <input type="file" accept="image/png, image/jpg, image/jpeg" name="mediaFile">
+                    <label for="profile-file-input">Profile Image Upload</label><br/>
+                    <input type="file" accept="image/png, image/jpg, image/jpeg" name="mediaFile" id="profile-file-input">
                     <% if (currentUser.mediaFile.filename) { %>
                         <div>
                             <br/><img class="profile-image" src="<%= currentUser.mediaFile.url%>" alt="Image Does Not Exist"/>

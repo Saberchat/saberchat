@@ -5,6 +5,8 @@ const dateFormat = require('dateformat');
 const {sendGridEmail} = require("../services/sendGrid");
 const {removeIfIncluded, concatMatrix, multiplyArrays, sortAlph} = require("../utils/object-operations");
 const setup = require("../utils/setup");
+const {cloudUpload, cloudDelete} = require('../services/cloudinary');
+const {autoCompress} = require("../utils/image-compress");
 
 //SCHEMA
 const Platform = require("../models/platform");
@@ -26,7 +28,7 @@ controller.index = async function(req, res) {
     }
 
     let commentObject = {};
-    for (let room of rooms) {
+    for (let room of rooms) { //Tracks most recent comments from each room, for display
         commentObject[room._id.toString()] = null;
         for (let comment of room.comments.reverse()) {
             if (comment.status != "deleted") {
@@ -36,13 +38,22 @@ controller.index = async function(req, res) {
         }
     }
 
+    let filteredRooms = {joined: [], private: []}; //Tracks rooms that user has joined, or has not joined
+    for (let room of rooms) {
+        if (!room.private || room.members.includes(req.user._id)) {
+            filteredRooms.joined.push(room);
+        } else if (room.private && !(room.members.includes(req.user._id)) && room.mutable) {
+            filteredRooms.private.push(room);
+        }
+    }
+
     //Track all of the current user's requests
     const requests = await AccessRequest.find({author: req.user._id, status: "pending"});
     if (!requests) {
         await req.flash('error', 'Unable to find access requests');
         return res.redirect('back');
     }
-    return res.render('chat/index', {platform, rooms, requests, commentObject});
+    return res.render('chat/index', {platform, rooms, requests, commentObject, filteredRooms});
 }
 
 controller.newRoom = async function(req, res) {
@@ -70,7 +81,7 @@ controller.showRoom = async function(req, res) {
         await room.confirmed.push(req.user._id);
         await room.save();
     }
-    removeIfIncluded(req.user.newRoomCount, room._id); //If user has not seen room before, remove it
+    await removeIfIncluded(req.user.newRoomCount, room._id); //If user has not seen room before, remove it
     await req.user.save();
     return res.render('chat/show', {platform, room});
 }
@@ -83,19 +94,19 @@ controller.showMembers = async function(req, res) {
         return res.redirect('back');
     }
 
-    let statuses = concatMatrix([
+    let statuses = await concatMatrix([
 		platform.statusesProperty,
 		platform.statusesPlural,
 		multiplyArrays([], platform.statusesProperty.length)
 	]).reverse();
 
     let reversedPerms = [];
-	for (let permission of platform.permissionsProperty) {reversedPerms.unshift(permission);}
+	for (let permission of platform.permissionsProperty) {await reversedPerms.unshift(permission);}
 
     for (let status of statuses) {
 		status[2] = [];
 		for (let permission of reversedPerms) {
-			for (let user of sortAlph(room.members, "email")) {
+			for (let user of await sortAlph(room.members, "email")) {
 				if (status[0] == user.status && permission == user.permission) {status[2].push(user);}
 			}
 		}
@@ -104,14 +115,14 @@ controller.showMembers = async function(req, res) {
     if (room.private) {
         return res.render('chat/people', {
             platform, room, statuses,
-            permMap: new Map(concatMatrix([
+            permMap: new Map(await concatMatrix([
                 platform.permissionsProperty.slice(1),
                 platform.permissionsDisplay.slice(1)
             ])),
-            emptyStatuses: concatMatrix([
+            emptyStatuses: await concatMatrix([
                 platform.statusesProperty,
                 platform.statusesPlural,
-                multiplyArrays([], platform.statusesProperty.length)
+                await multiplyArrays([], platform.statusesProperty.length)
             ]).reverse()
         });
     }
@@ -136,69 +147,77 @@ controller.editRoom = async function(req, res) {
 }
 
 controller.createRoom = async function(req, res) {
+    const platform = await setup(Platform);
     const rooms = await ChatRoom.find({});
-    if (!rooms) {
+    if (!platform || !rooms) {
         await req.flash('error', "Unable to access data");
         return res.redirect('back');
     }
 
     let roomCount = 0;
-    //Iterate through rooms and see how many rooms this user has created
-    for (let room of rooms) {
-        if (room.creator.equals(req.user._id)) {
-            roomCount++;
-        }
-    }
-    if (roomCount >= 3) {
+    for (let room of rooms) {if (room.creator.equals(req.user._id)) {roomCount++;}} //Iterate through rooms and see how many rooms this user has created
+    if (platform.restrictPosts && roomCount >= 3) {
         await req.flash('error', "You have already created 3 rooms");
         return res.redirect('back');
     }
 
-    const roomObject = {
+    const room = await ChatRoom.create({
         name: filter.clean(req.body.name),
         creator: req.user._id,
-        members: [req.user._id]
-    };
-
-    const room = await ChatRoom.create(roomObject);
+        members: [req.user._id],
+        moderate: req.body.moderate == "false",
+        thumbnail: {
+            url: req.body.thumbnail,
+            display: (req.body.showThumbnail == "url")
+        },
+    });
     if (!room) {
         await req.flash('error', 'Room could not be created');
         return res.redirect('/chat/new');
-
-    } else {
-        //If room is marked as private
-        if (req.body.type == 'true') {
-            for (const user in req.body.check) {
-                room.members.push(user);
-            }
-            room.private = true;
-        }
-
-        //If room is marked to have moderation
-        if (req.body.moderate == 'false') {
-            room.moderate = false;
-        }
-
-        //If room has a description
-        if (req.body.description) {
-            room.description = filter.clean(req.body.description);
-        }
-
-        room.date = dateFormat(room.created_at, "h:MM TT | mmm d");
-        await room.save();
-
-        const members = await User.find({authenticated: true, _id: {$in: room.members, $ne: req.user._id}});
-        if (!members) {
-            await req.flash('error', 'Members could not be found');
-            return res.redirect('/chat/new');
-        }
-
-        for (let member of members) { //Iterate through all new members and add room to their newRoomCount
-            await member.newRoomCount.push(room._id);
-            await member.save();
-        }
-        return res.redirect('/chat/' + room._id);
     }
+    console.log(room);
+
+    if (req.files) {
+        if (req.files.mediaFile) {
+            const file = req.files.mediaFile[0];
+            const processedBuffer = await autoCompress(file.originalname, file.buffer);
+            const [cloudErr, cloudResult] = await cloudUpload(file.originalname, processedBuffer);
+            if (cloudErr || !cloudResult) {
+                await req.flash("error", "Upload failed");
+                return res.redirect("back");
+            }
+
+            // Add info to image file
+            room.thumbnailFile = {
+                filename: cloudResult.public_id,
+                url: cloudResult.secure_url,
+                originalName: file.originalname,
+                display: req.body.showThumbnail == "upload"
+            };
+        }
+    }
+
+    if (req.body.type == 'true') { //If room is marked as private
+        for (let user in req.body.check) {room.members.push(user);}
+        room.private = true;
+    }
+
+    if (req.body.description) {room.description = await filter.clean(req.body.description);} //If room has a description (otherwise default applied)
+    room.date = await dateFormat(room.created_at, "h:MM TT | mmm d");
+    await room.save();
+
+    const members = await User.find({authenticated: true, _id: {$in: room.members, $ne: req.user._id}});
+    if (!members) {
+        await req.flash('error', 'Members could not be found');
+        return res.redirect('/chat/new');
+    }
+
+    for (let member of members) { //Iterate through all new members and add room to their newRoomCount
+        await member.newRoomCount.push(room._id);
+        await member.save();
+    }
+    await req.flash("Created room!");
+    return res.redirect(`/chat/${room._id}`);
 }
 
 controller.leaveRoom = async function(req, res) {
@@ -219,41 +238,31 @@ controller.leaveRoom = async function(req, res) {
     }
 
     const request = await AccessRequest.findOne({author: req.user._id, room: room._id, status: 'accepted'});
-    if (request) { // will delete past request for now
-        await request.remove();
-    }
+    if (request) {await request.remove();} // Will delete past request for now
 
     //remove user from room's member list and confirmed list
-    removeIfIncluded(room.members, req.user._id);
-    removeIfIncluded(room.confirmed, req.user._id);
+    await removeIfIncluded(room.members, req.user._id);
+    await removeIfIncluded(room.confirmed, req.user._id);
     await room.save();
 
-    await req.flash('success', 'You have left ' + room.name);
+    await req.flash('success', `You have left "${room.name}"`);
     return res.redirect('/chat');
 }
 
 controller.requestJoin = async function(req, res) {
     const platform = await setup(Platform);
     const room = await ChatRoom.findById(req.params.id); // find the room
-    if (!platform || !room) {
-        return res.json({error: 'Room does not Exist'});
-    }
+    if (!platform || !room) {return res.json({error: 'Room does not Exist'});}
 
-    if (room.type == 'public') {
-        return res.json({error: 'Room is public'});
-
-    } else if (!room.mutable) { //If room cannot get new members
-        return res.json({error: 'Room does not accept access requests'});
-    }
+    if (room.type == 'public') {return res.json({error: 'Room is public'});
+    } else if (!room.mutable) {return res.json({error: 'Room does not accept access requests'});} //If room cannot get new members
 
     // find if the request already exists to prevent spam
     const existingRequest = await AccessRequest.findOne({author: req.user._id, room: room._id});
     if (existingRequest && existingRequest.status != 'pending') {
         return res.json({error: `Request has already been ${existingRequest.status}`});
 
-    } else if (existingRequest) {
-        return res.json({error: 'Identical request has already been sent'});
-    }
+    } else if (existingRequest) {return res.json({error: 'Identical request has already been sent'});}
 
     const request = {
         author: req.user._id,
@@ -268,9 +277,7 @@ controller.requestJoin = async function(req, res) {
         User.findById(room.creator)
     ]);
 
-    if (!createdReq || !roomCreator) {
-        return res.json({error: 'An error occurred'});
-    }
+    if (!createdReq || !roomCreator) {return res.json({error: 'An error occurred'});}
 
     //Add access request to room creator's inbox
     await roomCreator.requests.push(createdReq._id);
@@ -284,15 +291,13 @@ controller.requestJoin = async function(req, res) {
 
 controller.requestCancel = async function(req, res) {
     const room = await ChatRoom.findById(req.params.id).populate("creator");
-    if (!room) {
-        return res.json({error: "Unable to find room"});
-    }
+    if (!room) {return res.json({error: "Unable to find room"});}
 
     let deletedReq = await AccessRequest.findOne({room: room._id, author: req.user._id, status: "pending"});
     if (!deletedReq) {return res.json({error: "Unable to find request"});}
 
     //Remove Access Request From from creator's inbox
-    removeIfIncluded(room.creator.requests, deletedReq._id);
+    await removeIfIncluded(room.creator.requests, deletedReq._id);
     await room.creator.save();
 
     //Delete after removing from inbox (Will not return _id, so cannot be used earlier)
@@ -304,7 +309,11 @@ controller.requestCancel = async function(req, res) {
 controller.updateRoom = async function(req, res) {
     const room = await ChatRoom.findByIdAndUpdate(req.params.id, {
         name: filter.clean(req.body.name),
-        description: filter.clean(req.body.description)
+        description: filter.clean(req.body.description),
+        thumbnail: {
+            url: req.body.thumbnail,
+            display: req.body.showThumbnail == "url"
+        }
     });
     if (!room) {
         await req.flash('error', 'An Error Occurred');
@@ -313,21 +322,47 @@ controller.updateRoom = async function(req, res) {
 
     if (req.body.type == 'true') { //If room is private, iterate through users that need to be removed and added
         for (const rUser in req.body.checkRemove) {
-            removeIfIncluded(room.members, rUser);
-            removeIfIncluded(room.confirmed, rUser);
+            await removeIfIncluded(room.members, rUser);
+            await removeIfIncluded(room.confirmed, rUser);
         }
-        for (const aUser in req.body.checkAdd) {
-            await room.members.push(aUser);
-        }
+        for (const aUser in req.body.checkAdd) {await room.members.push(aUser);}
         room.private = true;
-    } else {
-        room.private = false;
-    }
+    } else {room.private = false;}
 
-    if (req.body.moderate == 'false') {
-        room.moderate = false;
-    } else {
-        room.moderate = true;
+    if (req.body.moderate == 'false') {room.moderate = false;
+    } else {room.moderate = true;}
+
+    room.thumbnailFile.display = (req.body.showThumbnail == "upload");
+    if (req.files) {
+        if (req.files.mediaFile) {
+            let cloudErr;
+            let cloudResult;
+            if (room.thumbnailFile && room.thumbnailFile.filename) {
+                [cloudErr, cloudResult] = await cloudDelete(room.thumbnailFile.filename, "image");
+                if (cloudErr || !cloudResult || cloudResult.result !== "ok") {
+                    console.log(cloudErr);
+                    console.log(cloudResult);
+                    await req.flash("error", "Error deleting uploaded image");
+                    return res.redirect("back");
+                }
+            }
+            
+            const file = req.files.mediaFile[0];
+            const processedBuffer = await autoCompress(file.originalname, file.buffer);
+            [cloudErr, cloudResult] = await cloudUpload(file.originalname, processedBuffer);
+            if (cloudErr || !cloudResult) {
+                await req.flash("error", "Upload failed");
+                return res.redirect("back");
+            }
+
+            // Add info to image file
+            room.thumbnailFile = {
+                filename: cloudResult.public_id,
+                url: cloudResult.secure_url,
+                originalName: file.originalname,
+                display: room.thumbnailFile.display
+            };
+        }
     }
 
     await room.save();
@@ -361,7 +396,7 @@ controller.deleteRoom = async function(req, res) {
 
     let deletedRequest; 
     for (let request of requests) { //Iterate through all active join requests and remove them from room creator's inbox
-        removeIfIncluded(room.creator.requests, request._id);
+        await removeIfIncluded(room.creator.requests, request._id);
         deletedRequest = await AccessRequest.findByIdAndDelete(request._id);
         if (!deletedRequest) {
             await req.flash('error', 'Unable to delete requests');
@@ -376,36 +411,31 @@ controller.deleteRoom = async function(req, res) {
         return res.redirect('back');
     }
 
-    for (let member of deletedChatRoom.members) { //Remove room from all members' newRoomCounts
-        removeIfIncluded(member.newRoomCount, deletedChatRoom._id);
+    // delete any uploads
+    if (room.thumbnailFile && room.thumbnailFile.filename) {
+        const [cloudErr, cloudResult] = await cloudDelete(room.thumbnailFile.filename, "image");
+        if (cloudErr || !cloudResult || cloudResult.result !== "ok") {
+            await req.flash("error", "Error deleting uploaded image");
+            return res.redirect("back");
+        }
+    }
+
+    for (let member of deletedRoom.members) { //Remove room from all members' newRoomCounts
+        await removeIfIncluded(member.newRoomCount, deletedRoom._id);
         await member.save();
     }
-    await req.flash('success', 'Deleted room');
+    await req.flash('success', 'Deleted room!');
     return res.redirect('/chat');
 }
 
 controller.reportComment = async function(req, res) {
     const comment = await ChatMessage.findById(req.params.id);
-    if (!comment) {
-        return res.json('Error finding comment');
-    }
-
     const room = await ChatRoom.findById(req.body.roomId);
-    if (!room) {
-        return res.json("Error finding comment");
-    }
-
-    if (!room.moderate) {
-        return res.json('Reporting Is Disabled');
-    }
+    if (!room || !comment) {return res.json('Error finding comment');}
     
-    if (comment.status == 'flagged') {
-        return res.json('Already Reported');
-    }
-    
-    if (comment.status == 'ignored') {
-        return res.json('Report Ignored by Mod');
-    }
+    if (!room.moderate) {return res.json('Reporting Is Disabled');}
+    if (comment.status == 'flagged') {return res.json('Already Reported');}
+    if (comment.status == 'ignored') {return res.json('Report Ignored by Mod');}
     
     comment.status = 'flagged'; // set status to flagged
     comment.statusBy = req.body.user; // remember who flagged it

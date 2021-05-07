@@ -56,12 +56,16 @@
                 </div>
                 <p class="mb-1 darkmode-header">Rooms you are a member of.</p>
             </li>
-            <% rooms.forEach(room => { %>
-                <% if (!room.private || room.members.includes(currentUser._id)) { %>
+            <% if (filteredRooms.joined.length > 0) { %>
+                <% for (let room of filteredRooms.joined) { %>
                     <a href="chat/<%= room._id %>" class="list-group-item list-group-item-action shop">
-                        <% if (commentObject[room._id.toString()]) { %>
+                        <% if (room.thumbnailFile.display) { %>
+                            <img src="<%=room.thumbnailFile.url%>" alt="Room Thumbnail" class="user-image">
+                        <% } else if (room.thumbnail.display && room.thumbnail.url && room.thumbnail.url != '') { %>
+                            <img src="<%=room.thumbnail.url%>" alt="Room Thumbnail" class="user-image">
+                        <% } else if (commentObject[room._id.toString()]) { %>
                             <img src="<% if (commentObject[room._id.toString()].author.mediaFile.display) {%> <%= commentObject[room._id.toString()].author.mediaFile.url%><%} else {%> <%=commentObject[room._id.toString()].author.imageUrl.url%><%}%>" alt="user"
-                                 class="user-image">
+                                    class="user-image">
                         <% } else if (room.creator) { %>
                             <img src="<% if (room.creator.mediaFile.display) {%> <%= room.creator.mediaFile.url%><%} else {%> <%=room.creator.imageUrl.url%><%}%>" alt="user" class="user-image">
                         <% } %>
@@ -94,47 +98,51 @@
                         </div>
                     </a>
                 <% } %>
-            <% }) %>
+            <% } %>
         </div>
     </div>
 
     <br/>
-    <div class="row mb-5">
-        <div class="col-12">
-            <ul class="list-group">
-                <li class="list-group-item list-group-item-info darkmode-outline">
-                    <div class="d-flex w-100 justify-content-between">
-                        <h2 class="mb-1 darkmode-header"><i class="fas fa-door-open"></i> Other rooms to join</h2>
-                    </div>
-                    <p class="mb-1 darkmode-header">Request access to join new rooms.</p>
-                </li>
-                <% rooms.forEach(room => { %>
-                    <% if (room.private && !(room.members.includes(currentUser._id)) && room.mutable) { %>
-                        <li class="list-group-item list-group-item-action shop">
-                            <%= room.name %>
-                            <% let roomRequested = false; %>
-                            <% for (let request of requests) { %>
-                                <% if (request.room.equals(room._id)) { %>
-                                    <% roomRequested = true; %>
-                                    <% break; %>
+    <% if (filteredRooms.private.length > 0) { %>
+        <% for (let room of filteredRooms.private) { %>
+            <div class="row mb-5">
+                <div class="col-12">
+                    <ul class="list-group">
+                        <li class="list-group-item list-group-item-info darkmode-outline">
+                            <div class="d-flex w-100 justify-content-between">
+                                <h2 class="mb-1 darkmode-header"><i class="fas fa-door-open"></i> Other rooms to join</h2>
+                            </div>
+                            <p class="mb-1 darkmode-header">Request access to join new rooms.</p>
+                        </li>
+                        <% rooms.forEach(room => { %>
+                            <% if (room.private && !(room.members.includes(currentUser._id)) && room.mutable) { %>
+                                <li class="list-group-item list-group-item-action shop">
+                                    <%= room.name %>
+                                    <% let roomRequested = false; %>
+                                    <% for (let request of requests) { %>
+                                        <% if (request.room.equals(room._id)) { %>
+                                            <% roomRequested = true; %>
+                                            <% break; %>
+                                        <% } %>
+                                    <% } %>
+
+                                    <% if (roomRequested) { %>
+                                        <button class="btn btn-danger btn-sm float-right" id="cancel-<%= room._id %>"
+                                                onclick="cancelRequest(this)"><i class="fas fa-window-close"></i> Cancel Request
+                                        </button>
+                                </li>
+                                <% } else { %>
+                                    <button class="btn btn-success btn-sm float-right" id="request-<%= room._id %>"
+                                            onclick="request(this)"><i class="fas fa-hand-paper"></i> Request Access
+                                    </button></li>
                                 <% } %>
                             <% } %>
-
-                            <% if (roomRequested) { %>
-                                <button class="btn btn-danger btn-sm float-right" id="cancel-<%= room._id %>"
-                                        onclick="cancelRequest(this)"><i class="fas fa-window-close"></i> Cancel Request
-                                </button>
-                        </li>
-                        <% } else { %>
-                            <button class="btn btn-success btn-sm float-right" id="request-<%= room._id %>"
-                                    onclick="request(this)"><i class="fas fa-hand-paper"></i> Request Access
-                            </button></li>
-                        <% } %>
-                    <% } %>
-                <% }) %>
-            </ul>
-        </div>
-    </div>
+                        <% }) %>
+                    </ul>
+                </div>
+            </div>
+        <% } %>
+    <% } %>
 </div>
 </body>
 <script>

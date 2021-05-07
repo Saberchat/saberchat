@@ -454,7 +454,7 @@ controller.likeProject = async function(req, res) {
         return res.json({error: 'Error updating project'});
     }
 
-    if (removeIfIncluded(project.likes, req.user._id)) { //Remove like
+    if (await removeIfIncluded(project.likes, req.user._id)) { //Remove like
         await project.save();
         return res.json({
             success: `Removed a like from ${project.subject}`,
@@ -549,7 +549,7 @@ controller.likeComment = async function(req, res) {
         return res.json({error: 'Error updating comment'});
     }
 
-    if (removeIfIncluded(comment.likes, req.user._id)) { //Remove Like
+    if (await removeIfIncluded(comment.likes, req.user._id)) { //Remove Like
         await comment.save();
         return res.json({
             success: `Removed a like from a comment`,

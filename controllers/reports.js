@@ -216,7 +216,7 @@ controller.likeReport = async function(req, res) {
     const report = await Report.findById(req.body.reportId);
     if(!report) {return res.json({error: 'Error updating report.'});}
 
-    if (removeIfIncluded(report.likes, req.user._id)) { //Remove like
+    if (await removeIfIncluded(report.likes, req.user._id)) { //Remove like
         await report.save();
         return res.json({
             success: `Removed a like from ${report.subject}`,
@@ -286,7 +286,7 @@ controller.likeComment = async function(req, res) {
     const comment = await PostComment.findById(req.body.commentId);
     if(!comment) {return res.json({error: 'Error finding comment'});}
 
-    if (removeIfIncluded(comment.likes, req.user._id)) { //Remove Like
+    if (await removeIfIncluded(comment.likes, req.user._id)) { //Remove Like
         await comment.save();
         return res.json({
             success: `Removed a like`,

@@ -224,7 +224,7 @@ controller.likeArticle = async function(req, res) {
     const article = await ArticleLink.findById(req.body.articleId);
     if(!article) {return res.json({error: 'Error updating article.'});}
 
-    if (removeIfIncluded(article.likes, req.user._id)) { //Remove like
+    if (await removeIfIncluded(article.likes, req.user._id)) { //Remove like
         await article.save();
         return res.json({
             success: `Removed a like from ${article.subject}`,
@@ -294,7 +294,7 @@ controller.likeComment = async function(req, res) {
     const comment = await PostComment.findById(req.body.commentId);
     if(!comment) {return res.json({error: 'Error finding comment'});}
 
-    if (removeIfIncluded(comment.likes, req.user._id)) { //Remove Like
+    if (await removeIfIncluded(comment.likes, req.user._id)) { //Remove Like
         await comment.save();
         return res.json({
             success: `Removed a like`,

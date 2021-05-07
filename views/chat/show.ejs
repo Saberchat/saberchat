@@ -41,7 +41,13 @@
 
 <header class="text-center header">
     <div class="container">
-        <h1 class="display-4 text-dark"><%= room.name %></h1>
+        <h1 class="display-6 text-dark">
+            <% if (room.thumbnailFile.display) { %>
+                <img src="<%=room.thumbnailFile.url%>" alt="user" class="user-image">
+            <% } else if (room.thumbnail.display && room.thumbnail.url && room.thumbnail.url != '') { %>
+                <img src="<%=room.thumbnail.url%>" alt="user" class="user-image">
+            <% } %>
+        <%= room.name %></h1>
         <p class="text-dark lead mb-3"><%= room.description %></p>
         <a href="/chat" class="btn btn-primary" class="exit-button"><i class="fas fa-arrow-left"></i> Exit</a>
         <% if (room.mutable) { %>

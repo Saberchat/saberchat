@@ -242,7 +242,7 @@ controller.likeEvent = async function(req, res) {
     const event = await Event.findById(req.body.eventId);
     if(!event) {return res.json({error: 'Error updating event.'});}
 
-    if (removeIfIncluded(event.likes, req.user._id)) { //Remove like
+    if (await removeIfIncluded(event.likes, req.user._id)) { //Remove like
         await event.save();
         return res.json({
             success: `Removed a like from ${event.subject}`,
@@ -301,7 +301,7 @@ controller.likeComment = async function(req, res) {
     const comment = await PostComment.findById(req.body.commentId);
     if(!comment) {return res.json({error: 'Error finding comment'});}
 
-    if (removeIfIncluded(comment.likes, req.user._id)) { //Remove Like
+    if (await removeIfIncluded(comment.likes, req.user._id)) { //Remove Like
         await comment.save();
         return res.json({
             success: `Removed a like`,

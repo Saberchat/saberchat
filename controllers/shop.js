@@ -498,7 +498,7 @@ controller.deleteItem = async function(req, res) {
 
     // delete any uploads
     if (item.mediaFile && item.mediaFile.filename) {
-        [cloudErr, cloudResult] = await cloudDelete(item.mediaFile.filename, "image");
+        const [cloudErr, cloudResult] = await cloudDelete(item.mediaFile.filename, "image");
         if (cloudErr || !cloudResult || cloudResult.result !== "ok") {
             await req.flash("error", "Error deleting uploaded image");
             return res.redirect("back");
@@ -512,7 +512,7 @@ controller.deleteItem = async function(req, res) {
     }
 
     for (let category of categories) { //If the category includes this item, remove the item from that category"s item list
-        removeIfIncluded(category.items, item._id);
+        await removeIfIncluded(category.items, item._id);
         await category.save();
     }
 
@@ -778,7 +778,7 @@ controller.deleteCategory = async function(req, res) {
         return res.redirect("back");
     }
 
-    removeIfIncluded(shop.categories, category._id);
+    await removeIfIncluded(shop.categories, category._id);
     await shop.save();
 
     for (let item of category.items) {
@@ -796,7 +796,7 @@ controller.upvoteItem = async function(req, res) {
         return res.json({error: "Error upvoting item"});
     }
 
-    if (removeIfIncluded(item.upvotes, req.user._id)) {
+    if (await removeIfIncluded(item.upvotes, req.user._id)) {
         await item.save();
         return res.json({success: `Downvoted ${item.name}`, upvoteCount: item.upvotes.length});
     }
@@ -896,7 +896,7 @@ controller.updateItemInfo = async function(req, res) {
     }
 
     for (let t of categories) { //Remove this item from its old item category (if the category has not changed, it"s fine because we" add it back in a moment anyway)
-        removeIfIncluded(t.items, item._id);
+        await removeIfIncluded(t.items, item._id);
         await t.save();
     }
 
@@ -912,7 +912,7 @@ controller.updateItemInfo = async function(req, res) {
         }
     }
 
-    removeIfIncluded(category.items, item._id); //If item is already in category, remove it so you can put the updated category back (we don"t know whether the category will be there or not, so it"s better to just cover all bases)
+    await removeIfIncluded(category.items, item._id); //If item is already in category, remove it so you can put the updated category back (we don"t know whether the category will be there or not, so it"s better to just cover all bases)
     await category.items.push(item);
     await category.save();
 

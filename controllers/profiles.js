@@ -417,7 +417,7 @@ controller.unfollow = async function(req, res) {
 	if (!user) {return res.json({error: "Error finding user"});}
 
 	//Try to unfollow; if user is not following person, then do not process
-	if (removeIfIncluded(user.followers, req.user._id)) {
+	if (await removeIfIncluded(user.followers, req.user._id)) {
 		await user.save();
 		return res.json({success: "Unfollowed user", user: req.user});
 	}
@@ -429,7 +429,7 @@ controller.remove = async function(req, res) {
 	if (!user) {return res.json({error: "Error finding user"});}
 
 	//Try to remove follower from user; if person is not following user, then do not process
-	if (removeIfIncluded(req.user.followers, user._id)) {
+	if (await removeIfIncluded(req.user.followers, user._id)) {
 		await req.user.blocked.push(user._id);
 		await req.user.save();
 		return res.json({success: "Succesfully removed user"});
@@ -442,7 +442,7 @@ controller.unblock = async function(req, res) {
 	if (!user) {return res.json({error: "Error finding user"});}
 
 	//Try to remove follower from user's blocked list; if person is not following user, then do not process
-	if (removeIfIncluded(req.user.blocked, user._id)) {
+	if (await removeIfIncluded(req.user.blocked, user._id)) {
 		await req.user.save();
 		return res.json({success: "Succesfully unblocked user"});
 	}

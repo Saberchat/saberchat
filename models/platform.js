@@ -20,6 +20,7 @@ var platformSchema = new mongoose.Schema({
     contactPhotoDisplay: {type: Boolean, default: true}, //Display photos of platform administrators on contact page
     principalAuthenticate: {type: Boolean, default: false}, //Check if users have to be validated by principal first
     enableDarkmode: {type: Boolean, default: true}, //Check if users can enable darkmode
+    restrictPosts: {type: Boolean, default: true}, //Restrictions for order and chat room creation
     emailExtension: {type: String, default: ''},
     officialEmail: {type: String, default: ''},
     balanceMessage: {type: String, default: ''},

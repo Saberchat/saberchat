@@ -48,7 +48,7 @@ package.parsePropertyArray = function(arr, property, lower) { //Build an array w
     return final;
 }
 
-package.removeIfIncluded = function(arr, element, property) {
+package. removeIfIncluded = function(arr, element, property) {
     if (property) { //If a specific property in the element needs to be evaluated, evaluate element's property
         if (package.objectArrIndex(arr, property, element) > -1) {
             arr.splice(package.objectArrIndex(arr, property, element), 1);

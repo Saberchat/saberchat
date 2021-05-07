@@ -1,6 +1,7 @@
 // Chat rooms routes control the creation and management of rooms and comments
 const express = require('express');
 const middleware = require('../middleware');
+const {singleUpload} = require('../middleware/multer');
 const {validateRoom} = require('../middleware/validation');
 const wrapAsync = require('../utils/wrapAsync');
 const chat = require('../controllers/chat'); //Controller
@@ -8,13 +9,13 @@ const router = express.Router(); //Router
 
 router.route('/')
     .get(wrapAsync(middleware.isLoggedIn), wrapAsync(chat.index)) //Show index of chat rooms
-    .post(wrapAsync(middleware.isLoggedIn), validateRoom, wrapAsync(chat.createRoom)); //Create new chat room
+    .post(wrapAsync(middleware.isLoggedIn), singleUpload, validateRoom, wrapAsync(chat.createRoom)); //Create new chat room
 
 router.get('/new', wrapAsync(middleware.isLoggedIn), wrapAsync(chat.newRoom)); //Form to create new chat room
 
 router.route('/:id')
     .get(wrapAsync(middleware.isLoggedIn), wrapAsync(middleware.checkIfMember), wrapAsync(chat.showRoom)) //View specific chat room
-    .put(wrapAsync(middleware.isLoggedIn), wrapAsync(middleware.checkRoomOwnership), validateRoom, wrapAsync(chat.updateRoom)) //Update specific chat room
+    .put(wrapAsync(middleware.isLoggedIn), wrapAsync(middleware.checkRoomOwnership), singleUpload, validateRoom, wrapAsync(chat.updateRoom)) //Update specific chat room
     .delete(wrapAsync(middleware.isLoggedIn), wrapAsync(middleware.checkRoomOwnership), wrapAsync(chat.deleteRoom)) //Delete specific chat room
 
 router.get('/:id/people', wrapAsync(middleware.isLoggedIn), wrapAsync(middleware.checkIfMember), wrapAsync(chat.showMembers)); //Show people in a chat room

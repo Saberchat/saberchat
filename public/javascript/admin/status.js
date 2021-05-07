@@ -55,9 +55,7 @@ const updateTag = function (select) { //Update a user's status tags
 
             } else { //If a tag has been removed, iterate through tags until the right tag is found, and remove it
                 for (let t of tags) {
-                    if (data.tag.toLowerCase() == t.innerText.toLowerCase()) {
-                        field.removeChild(t);
-                    }
+                    if (data.tag.toLowerCase() == t.innerText.toLowerCase()) {field.removeChild(t);}
                 }
             }
 
@@ -67,9 +65,9 @@ const updateTag = function (select) { //Update a user's status tags
         }
 
         for (let option of select) { //Make the option with no value (the top option) the default selected option
-            if (option.value == "") {
-                option.selected = true;
-            }
+            if (option.value == "") {option.selected = true;}
         }
+
+        setInterval(() => {loading.style.display = "none";}, 2000)
     });
 }

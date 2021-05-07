@@ -25,7 +25,7 @@ shop.order = async function(io, socket, itemList, itemCount, instructions, addre
         if (!activeOrders) {return console.log('error accessing orders');}
 
         //If user has made three or more orders that are still active (have not been delivered)
-        if (activeOrders.length >= 3) {return console.log("Max orders made");}
+        if (platform.restrictPosts && activeOrders.length >= 3) {return console.log("Max orders made");}
 
         const orderItems = await Item.find({_id: {$in: itemList}}); //Find all items that are part of the user's order (itemList was generated in shop-socket FE)
         if (!orderItems) {return console.log('error accessing order items');}

@@ -148,6 +148,11 @@
                         </div>
 
                         <div class="form-group">
+                            <label for="restrict-input">Restrict Ordering and Creating Rooms to 3</label>
+                            <input id="restrict-input" class="mode" type="checkbox" name="restrictPosts" <% if (platform.restrictPosts) { %> checked <% } %>>
+                        </div>
+
+                        <div class="form-group">
                             <label for="update-time-input">Student Status Update Time</label><br/>
                             <select name="month" class="mode" style="width: 30%;">
                             <% let months = ["None", "January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];%>

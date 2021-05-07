@@ -16,10 +16,7 @@ const updateRole = function(select) { //Update user's permission
             loading.innerHTML = data.error;
         }
 
-        setTimeout(() => { //After a second, hide the message
-            loading.style.display = "none";
-        }, 2000);
-
+        setTimeout(() => {loading.style.display = "none";}, 2000);  //After a second, hide the message
         if (data.user) { //If a user was updated, change their displayed permission
             for (let option of select) {
                 if (option.value == data.user.permission) {
@@ -34,7 +31,6 @@ const incBalance = function(userId, dollarPayment) { //Add 1 to balance
     const input = document.getElementById(`balance-${userId}`);
     if (dollarPayment) {input.value = (parseFloat(input.value) + 1).toFixed(2);
     } else {input.value = (parseFloat(input.value) + 1);}
-
     updateBalance(document.getElementById(userId), event);
 }
 

@@ -11,6 +11,7 @@
     <link rel="stylesheet" href="/stylesheets/components/navbar.css">
     <link rel="stylesheet" href="/stylesheets/components/header.css">
     <link rel="stylesheet" href="/stylesheets/chat/edit.css">
+    <link rel="stylesheet" href="/stylesheets/profiles/edit.css">
     <%if (currentUser) {%>
       <%if (currentUser.darkmode) { %>
         <link rel="stylesheet" href="/stylesheets/projects/dark.css">
@@ -25,6 +26,7 @@
     <!-- I'm using my fontawesome kit -->
     <script src="https://kit.fontawesome.com/dccc745c41.js" crossorigin="anonymous"></script>
     <script defer src="/javascript/chat/edit.js"></script>
+    <script src="/javascript/profiles/update.js"></script>
     <%- include('../partials/analytics') %>
   </head>
   <body class="mode">
@@ -43,8 +45,7 @@
     <div class="row">
         <div class="col-md-8 offset-md-2 col-12">
 
-            <form action="/chat/<%= room._id %>?_method=put" method="post">
-
+            <form action="/chat/<%= room._id %>?_method=put" method="post" enctype="multipart/form-data">
                 <div class="form-group">
                     <label for="usernameInput">Name</label>
                     <input id="usernameInput" class="form-control mode" type="text" name="name" value="<%= room.name %>"
@@ -56,12 +57,29 @@
                               placeholder="(max 300) Enter room description" maxlength="300"
                               rows="5"><%= room.description %></textarea>
                 </div>
+                <div class="form-group mode">
+                    <label for="profile-input">Thumbnail URL</label>
+                    <input id="profile-input" class="form-control mode" oninput="updateImage(this)" type="text" name="thumbnail" placeholder="Enter URL For Room Image Thumbnail" value="<%=room.thumbnail.url%>">
+                    <br><img class="profile-image" id="profile-image" src="<%=room.thumbnail.url%>" alt="Image Does Not Exist"/>
+                </div>
+                <div class="form-group">
+                    <label for="profile-file-input">Thumbnail Image Upload</label><br/>
+                    <input type="file" accept="image/png, image/jpg, image/jpeg" name="mediaFile" id="profile-file-input">
+                </div><br>
+                <div class="form-check mb-3">
+                    <input name="showThumbnail" value="url" type="radio" class="form-check-input" id="showThumbnailUrl" <% if (room.thumbnail.display) {%>checked<%}%>>
+                    <label for="showThumbnailUrl" class="form-check-label">Display Thumbnail URL</label><br>
+                    <input name="showThumbnail" value="upload" type="radio" class="form-check-input" id="showThumbnailFile" <% if (room.thumbnailFile.display) {%>checked<%}%>>
+                    <label for="showThumbnailFile" class="form-check-label">Display Thumbnail File</label><br>
+                    <input name="showThumbnail" value="none" type="radio" class="form-check-input" id="showThumbnailNone" <% if (!(room.thumbnail.display || room.thumbnailFile.display)) {%>checked<%}%>>
+                    <label for="showThumbnailNone" class="form-check-label">Display Neither</label><br><br>
+                    <% if (room.thumbnailFile && room.thumbnailFile.filename) { %>
+                        <img class="profile-image" src="<%= room.thumbnailFile.url%>" alt="Image Does Not Exist"/>
+                    <% } %>
+                </div>
                 <div class="form-check mb-3">
                     <input name="moderate" id="moderate" type="checkbox" class="form-check-input" value="false"
-                    <% if (!room.moderate) { %>
-                           checked
-                            <% } %>
-                    >
+                    <% if (!room.moderate) { %>checked<% } %>>
                     <label for="moderate" class="form-check-label">Disable moderation and reporting comments (enabled if
                         left blank)</label>
                 </div>

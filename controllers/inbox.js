@@ -192,7 +192,7 @@ controller.createMsg = async function(req, res) {
             const status = platform.statusesProperty[i];
             if(recipients.includes(status)) {
                 selStatuses.push(status);
-                removeIfIncluded(recipients, status);
+                await removeIfIncluded(recipients, status);
             }
         }
 
@@ -365,13 +365,13 @@ controller.reply = async function(req, res) {
     }
 
     //Iterates through the recipients and sees if the author is part of them. If not, then no reply has been sent yet, but since the author has sent the message, they have 'read' it. Hence, they are added to the readRecipients array.
-    removeIfIncluded(message.recipients, message.author._id, "_id"); //If the original author is already part of the recipients, remove them just in case
+    await removeIfIncluded(message.recipients, message.author._id, "_id"); //If the original author is already part of the recipients, remove them just in case
     await message.recipients.push(message.author); //Add original author to recipient list (code above ensures that they are not added multiple times)
     message.read = [req.user]; //Since the current user replied to this message, they've seen the completely updated message. Nobody else has
     await message.save();
 
     for (let recipient of message.recipients) { //Remove original message and add it back so that it appears 'new'
-        removeIfIncluded(recipient.inbox, message._id, "message"); //Remove message from recipient's inbox
+        await removeIfIncluded(recipient.inbox, message._id, "message"); //Remove message from recipient's inbox
         if (!(recipient._id.equals(req.user._id))) { //Add new message to everyone except current replier's inbox
             await recipient.inbox.push({message: message._id, new: true});
             await recipient.save();
@@ -391,9 +391,7 @@ controller.delete = async function(req, res) {
     const messages = await InboxMessage.find({_id: {$in: parseKeysOrValues(req.body, "keys")}}); //Extract message ids from form body
     if(!messages) {req.flash('error', 'Could not find messages'); return res.redirect('back');}
 
-    messages.forEach( message => { //Iterate through messages and remove any selected ones from user's inbox
-        removeIfIncluded(req.user.inbox, message._id, "message");
-    });
+    messages.forEach( message => {removeIfIncluded(req.user.inbox, message._id, "message");}); //Iterate through messages and remove any selected ones from user's inbox
     await req.user.save();
     return res.redirect('back');
 };
@@ -432,7 +430,7 @@ controller.acceptReq = async function(req, res) { //Accept access request
     if(!room) { req.flash("error", "An Error Occurred");return res.redirect('back'); }
     await room.members.push(request.author);
     request.status = 'accepted'; //Update request status
-    removeIfIncluded(req.user.requests, request._id);
+    await removeIfIncluded(req.user.requests, request._id);
     await room.save();
     await request.save();
     await req.user.save();
@@ -466,7 +464,7 @@ controller.rejectReq = async function(req, res) { //Reject access request
 
     //Update request status
     request.status = 'rejected';
-    removeIfIncluded(req.user.requests, request._id);
+    await removeIfIncluded(req.user.requests, request._id);
     await request.save();
     await req.user.save();
 

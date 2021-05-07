@@ -11,6 +11,11 @@ const chatSchema = Joi.object({
     description: Joi.string().allow('').max(500).escapeHtml().messages({
         "string.max": "Descrip. max 500 characters."
     }),
+    thumbnail: Joi.string().pattern(new RegExp(/https:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,4}\b([-a-zA-Z0-9@:%_\+.~#?&//=]*)/)).required().allow('').messages({
+        "string.empty": "Thumbnail url is required.",
+        "string.pattern.base": "Image Url should be an https link."
+    }),
+    showThumbnail: Joi.string(),
     moderate: Joi.boolean(),
     type: Joi.boolean(),
     check: Joi.object().pattern(/^[a-f\d]{24}$/, [Joi.string().valid('')]),

@@ -178,7 +178,7 @@ controller.likeComment = async function(req, res) {
         return res.json({error: 'Error updating comment'});
     }
 
-    if (removeIfIncluded(comment.likes, req.user._id)) { //Remove Like
+    if (await removeIfIncluded(comment.likes, req.user._id)) { //Remove Like
         await comment.save();
         return res.json({
             success: `Removed a like from a comment`,

@@ -69,7 +69,7 @@ controller.updatePlatform = async function(req, res) {
         platform[attr] = req.body[attr];
     }
 
-    for (let attr of ["navDark", "contactPhotoDisplay", "postVerifiable", "enableDarkmode", "homepageInfo"]) {
+    for (let attr of ["navDark", "contactPhotoDisplay", "postVerifiable", "enableDarkmode", "homepageInfo", "restrictPosts"]) {
         platform[attr] = (req.body[attr] != undefined);
     }
 

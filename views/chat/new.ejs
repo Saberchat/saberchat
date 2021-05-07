@@ -11,6 +11,7 @@
       <link rel="stylesheet" href="/stylesheets/components/navbar.css">
       <link rel="stylesheet" href="/stylesheets/components/header.css">
       <link rel="stylesheet" href="/stylesheets/chat/new.css">
+      <link rel="stylesheet" href="/stylesheets/profiles/edit.css">
       <%if (currentUser) {%>
         <%if (currentUser.darkmode) { %>
           <link rel="stylesheet" href="/stylesheets/darkmode.css">
@@ -24,6 +25,7 @@
       <!-- I'm using my fontawesome kit -->
       <script src="https://kit.fontawesome.com/dccc745c41.js" crossorigin="anonymous"></script>
       <script src="/javascript/chat/new.js"></script>
+      <script src="/javascript/profiles/update.js"></script>
     <%- include('../partials/analytics') %>
   </head>
   <body class="mode">
@@ -41,7 +43,7 @@
           </div>
           <div class="row">
               <div class="col-md-8 offset-md-2 col-12">
-                  <form action="/chat" method="post">
+                  <form action="/chat" method="post" enctype="multipart/form-data">
                     <div class="form-group mode">
                         <label for="usernameInput">Name</label>
                         <input id="usernameInput" class="form-control mode" type="text" name="name" placeholder="(max 45) Enter Room Name" maxlength="45" required>
@@ -49,6 +51,23 @@
                     <div class="form-group mode">
                         <label for="descInput">Description</label>
                         <textarea id="descInput" class="form-control mode" name="description" placeholder="(max 300) Enter a short description about the room" maxlength="300" rows="5"></textarea>
+                    </div>
+                    <div class="form-group mode">
+                        <label for="thumbnailInput">Thumbnail URL</label>
+                        <input id="profile-input" class="form-control mode" type="text" oninput="updateImage(this)" name="thumbnail" placeholder="Enter URL For Room Image Thumbnail">
+                        <br><img class="profile-image" id="profile-image" alt="Image Does Not Exist" hidden/>
+                    </div>
+                    <div class="form-group">
+                        <label for="profile-input">Thumbnail Image Upload</label><br/>
+                        <input type="file" accept="image/png, image/jpg, image/jpeg" name="mediaFile">
+                    </div><br>
+                    <div class="form-check mb-3">
+                        <input name="showThumbnail" value="url" type="radio" class="form-check-input" id="showThumbnailUrl" checked>
+                        <label for="showThumbnailUrl" class="form-check-label">Display Thumbnail URL</label><br>
+                        <input name="showThumbnail" value="upload" type="radio" class="form-check-input" id="showThumbnailFile">
+                        <label for="showThumbnailFile" class="form-check-label">Display Thumbnail File</label><br>
+                        <input name="showThumbnail" value="none" type="radio" class="form-check-input" id="showThumbnailNone">
+                        <label for="showThumbnailNone" class="form-check-label">Display Neither</label><br><br>
                     </div>
                     <div class="form-check mb-3">
                         <input name="moderate" id="moderate" type="checkbox" class="form-check-input" value="false">
@@ -71,8 +90,7 @@
                         <% users.forEach(user => { %>
                             <% if (!(user._id.equals(currentUser._id))) { %>
                                 <div class="form-check">
-                                    <input name="check[<%= user._id %>]" id="<%= user._id %>" class="form-check-input"
-                                           type="checkbox" value="">
+                                    <input name="check[<%= user._id %>]" id="<%= user._id %>" class="form-check-input" type="checkbox" value="">
                                     <label class="form-check-label" for="<%= user._id %>"><%= user.username %>
                                         (<%= user.firstName.charAt(0) %>.<%= user.lastName.charAt(0) %>.)</label>
                                 </div>
