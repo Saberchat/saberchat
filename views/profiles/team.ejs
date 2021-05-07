@@ -12,10 +12,13 @@
     <link rel="stylesheet" href="/stylesheets/home/index.css">
     <link rel="stylesheet" href="/stylesheets/components/background.css">
     <link rel="stylesheet" href="/stylesheets/components/navbar.css">
+    <link rel="stylesheet" href="/stylesheets/announcements/index.css">
+    <link rel="stylesheet" href="/stylesheets/profiles/index.css">
+    <link rel="stylesheet" href="/stylesheets/profiles/edit.css">
     <link rel="stylesheet" href="/stylesheets/other/index.css">
     <%if (currentUser) {%>
       <%if (currentUser.darkmode) { %>
-        <link rel="stylesheet" href="/stylesheets/darkmode.css">
+        <link rel="stylesheet" href="/stylesheets/projects/dark.css">
       <%}%>
     <%}%>
 
@@ -52,52 +55,36 @@
 <main id="main-container">
     <div class="container mt-5">
         <% let block;%>
-        <% let i = 0;%>
         <% for (let status of platform.statusesProperty.slice(platform.statusesProperty.length-2).reverse()) { %>
             <% for (let user of users) { %>
                 <% if (user.status == status)  { %>
-                    <% if (i%2 == 0) { %>
-                        <div class="row text-element">
-                            <div class="col-lg-6">
+                    <div class="row text-element">
+                        <div class="col-lg-12">
+                            <a href="/profiles/<%=user._id%>" style="color: black;" class="announcement-sender">
                                 <article class="text-block mode">
                                     <div class="block-header green">
-                                        <h1><%=user.firstName%> <%=user.lastName%></h1>
+                                        <h1><%=user.firstName%> <%=user.lastName%> (<%=platform.statusesSingular[platform.statusesProperty.indexOf(user.status)]%>)</h1>
                                     </div>
                                     <div class="block-content mode">
                                         <h4>
-                                            <%=platform.statusesSingular[platform.statusesProperty.indexOf(user.status)]%>
-                                            <% if (user.title && user.title.split(' ').join('') != '') { %>(<%=user.title%>)<% } %>
+                                            <% if (user.title && user.title.split(' ').join('') != '') { %>
+                                                <%=user.title%>
+                                            <% } else {%>
+                                                <%=platform.name%> <%=platform.permissionsDisplay[platform.permissionsProperty.indexOf(user.permission)]%>
+                                            <% } %>
                                         </h4>
-                                        <p style="font-size: 110%;"><%=user.description%></p>
-                                    </div>
+                                        <p style="font-size: 110%;">
+                                            <% if (user.description.split(' ').join('') != '') { %>
+                                                <%=user.description%>
+                                            <% } else {%>
+                                                No Description Provided.
+                                            <% } %>
+                                        </p>
+                                        <img style="float: left; margin-bottom: 15px;" class="profile-image project-first-image" src="<% if (user.mediaFile.display) { %> <%= user.mediaFile.url%> <%} else {%> <%=user.imageUrl.url%><%}%>" alt="profile picture">
                                 </article>
-                            </div>
-                            <div class="col-lg-6 block">
-                                <img class="image-block" src="<% if (user.imageUrl.display) { %> <%=user.imageUrl.url%> <% } else { %> <%=user.mediaFile.url%> <% } %>"
-                                    alt="Image Does Not Exist">
-                            </div>
+                            </a>
                         </div>
-
-                    <% } else { %>
-                        <div class="row text-element">
-                            <div class="col-lg-6 block">
-                                <img class="image-block" src="<% if (user.imageUrl.display) { %> <%=user.imageUrl.url%> <% } else { %> <%=user.mediaFile.url%> <% } %>"
-                                    alt="Image Does Not Exist">
-                            </div>
-                            <div class="col-lg-6">
-                                <article class="text-block mode">
-                                    <div class="block-header green">
-                                        <h1><%=user.firstName%> <%=user.lastName%></h1>
-                                    </div>
-                                    <div class="block-content mode">
-                                        <h4><%=platform.statusesSingular[platform.statusesProperty.indexOf(user.status)]%></h4>
-                                        <p style="font-size: 110%;"><%=user.description%></p>
-                                    </div>
-                                </article>
-                            </div>
-                        </div>
-                    <% } %>
-                    <%i++;%>
+                    </div>
                 <% } %>
             <% } %>
         <% } %>

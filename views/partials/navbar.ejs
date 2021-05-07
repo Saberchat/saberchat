@@ -300,12 +300,17 @@
 </div>
 <%- include('forgot-password') %>
 <%- include('agreement') %>
+
+<script>
+    const body = document.getElementsByTagName("body")[0];
+    body.style.fontFamily = '<%=platform.font%>';
+</script>
+
 <% if (!currentUser || !currentUser.darkmode) { %>
     <script>
         const body = document.getElementsByTagName("body")[0];
         let colorScheme = [];
         let platformColors;
-        body.style.fontFamily = '<%=platform.font%>';
 
         platformColors = '<%=platform.colorScheme%>'.split(',');
         for (let i = 0; i < platformColors.length; i+= 3) {

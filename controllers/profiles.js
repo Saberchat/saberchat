@@ -44,7 +44,7 @@ controller.index = async function(req, res) {
 	for (let status of statuses) {
 		status[2] = [];
 		for (let permission of reversedPerms) {
-			for (let user of sortAlph(users, "firstName")) {
+			for (let user of await sortAlph(users, "firstName")) {
 				if (status[0] == user.status && permission == user.permission) {status[2].push(user);}
 			}
 		}
@@ -74,7 +74,7 @@ controller.team = async function(req, res) {
 		await req.flash("error", "An error occurred");
 		return res.redirect("back");
 	}
-	return res.render("profiles/team", {platform, users});
+	return res.render("profiles/team", {platform, users: sortAlph(users, "firstName")});
 }
 
 controller.edit = async function(req, res) {
