@@ -26,24 +26,24 @@ controller.index = async function(req, res) {
 
     let courseList = [];
     for (let course of courses) {
-        if ((course.creator.equals(req.user._id)) || (course.members.includes(req.user._id))) {
-            courseList.push(course);
+        if ((await course.creator.equals(req.user._id)) || (await course.members.includes(req.user._id))) {
+            await courseList.push(course);
         } else {
             for (let tutor of course.tutors) {
-                if (tutor.tutor.equals(req.user._id)) {
-                    courseList.push(course);
+                if (await tutor.tutor.equals(req.user._id)) {
+                    await courseList.push(course);
                 }
             }
         }
     }
-    return res.render('tutoringCenter/index', {platform, courses: courseList, studentStatuses: platform.studentStatuses, data: platform.features[objectArrIndex(platform.features, "route", "tutoringCenter")]});
+    return res.render('tutoringCenter/index', {platform, courses: courseList, studentStatuses: platform.studentStatuses, data: platform.features[await objectArrIndex(platform.features, "route", "tutoringCenter")]});
 }
 
 controller.createCourse = async function(req, res) {
     let charSetMatrix = []; //Build unique join code for course
-    charSetMatrix.push('qwertyuiopasdfghjklzxcvbnm'.split(''));
-    charSetMatrix.push('QWERTYUIOPASDFGHJKLZXCVBNM'.split(''));
-    charSetMatrix.push('1234567890'.split(''));
+    await charSetMatrix.push('qwertyuiopasdfghjklzxcvbnm'.split(''));
+    await charSetMatrix.push('QWERTYUIOPASDFGHJKLZXCVBNM'.split(''));
+    await charSetMatrix.push('1234567890'.split(''));
 
     let code_length = Math.round((Math.random() * 15)) + 10;
     let joinCode = "";
@@ -101,7 +101,7 @@ controller.joinCourse = async function(req, res) {
     }
 
     if (req.body.bio) { //Join as tutor
-        if (req.user.tags.includes("Tutor")) {
+        if (await req.user.tags.includes("Tutor")) {
             const course = await Course.findOne({joinCode: req.body.joincode});
             if (!course) {
                 await req.flash('error', "No courses matching this join code were found.");
@@ -111,9 +111,9 @@ controller.joinCourse = async function(req, res) {
             await course.tutors.push({
                 tutor: req.user,
                 bio: req.body.bio,
-                slots: parseInt(req.body.slots),
-                cost: parseInt(req.body.cost),
-                available: (parseInt(req.body.slots) > 0),
+                slots: await parseInt(req.body.slots),
+                cost: await parseInt(req.body.cost),
+                available: (await parseInt(req.body.slots) > 0),
                 dateJoined: new Date(Date.now())
             });
             await course.save();
@@ -125,14 +125,14 @@ controller.joinCourse = async function(req, res) {
     }
 
     //Join as student
-    if (platform.studentStatuses.includes(req.user.status)) {
+    if (await platform.studentStatuses.includes(req.user.status)) {
         const course = await Course.findOne({joinCode: req.body.joincode});
         if (!course) {
             await req.flash('error', "No courses matching this join code were found.");
             return res.redirect('back');
         }
 
-        course.members.push(req.user);
+        await course.members.push(req.user);
         await course.save();
         await req.flash('success', `Successfully joined ${course.name}!`);
         return res.redirect(`/tutoringCenter/${course._id}`);
@@ -153,7 +153,7 @@ controller.showCourse = async function(req, res) {
     let tutorIds = [];
     let tutors = [];
     for (let student of course.members) {
-        studentIds.push(student._id.toString());
+        await studentIds.push(await student._id.toString());
     }
 
     let averageRating = 0; //Collect info on tutors and their ratings
@@ -161,29 +161,29 @@ controller.showCourse = async function(req, res) {
     for (let tutor of course.tutors) {
         averageRating = 0;
         tutorObject = {};
-        tutorIds.push(tutor.tutor._id.toString());
+        await tutorIds.push(await tutor.tutor._id.toString());
         for (let review of tutor.reviews) {
             averageRating += review.rating;
         }
-        averageRating = Math.round(averageRating / tutor.reviews.length);
+        averageRating = (await Math.round(averageRating / tutor.reviews.length));
         tutorObject = tutor;
         tutorObject.averageRating = averageRating;
-        tutors.push(tutorObject)
+        await tutors.push(tutorObject)
     }
 
     //Sort tutors for display by two characteristics - average rating and reviews
     tutors = await sortByPopularity(tutors, "averageRating", "dateJoined", null).unpopular
-    .concat(sortByPopularity(tutors, "averageRating", "dateJoined", null).popular);
+    .concat(await sortByPopularity(tutors, "averageRating", "dateJoined", null).popular);
 
     tutors = await sortByPopularity(tutors, "reviews", "dateJoined", null).unpopular
-    .concat(sortByPopularity(tutors, "reviews", "dateJoined", null).popular);
+    .concat(await sortByPopularity(tutors, "reviews", "dateJoined", null).popular);
 
     const teachers = await User.find({authenticated: true, status: platform.teacherStatus, _id: {$ne: req.user._id}});
     if (!teachers) {
         await req.flash('error', "Unable to find teachers");
         return res.redirect('back');
     }
-    return res.render('tutoringCenter/show', {platform, course, studentIds, tutorIds, tutors, teachers, objectArrIndex, data: platform.features[objectArrIndex(platform.features, "route", "tutoringCenter")]}); //Export function for ejs evaluation
+    return res.render('tutoringCenter/show', {platform, course, studentIds, tutorIds, tutors, teachers, objectArrIndex, data: platform.features[await objectArrIndex(platform.features, "route", "tutoringCenter")]}); //Export function for ejs evaluation
 }
 
 controller.unenrollStudent = async function(req, res) {
@@ -196,13 +196,13 @@ controller.unenrollStudent = async function(req, res) {
     //Remove user from all tutors they have signed up with, and delete corresponding chat rooms
     let deletedRoom;
     for (let tutor of course.tutors) {
-        if (objectArrIndex(tutor.members, "student", req.user._id) > -1) { //Update the tutor's members array
+        if (await objectArrIndex(tutor.members, "student", req.user._id) > -1) { //Update the tutor's members array
             await tutor.formerStudents.push({
                 student: req.user._id,
-                lessons: tutor.members[objectArrIndex(tutor.members, "student", req.user._id)].lessons
+                lessons: tutor.members[await objectArrIndex(tutor.members, "student", req.user._id)].lessons
             });
-            deletedRoom = await ChatRoom.findByIdAndDelete(tutor.members[objectArrIndex(tutor.members, "student", req.user._id)].room);
-            await tutor.members.splice(objectArrIndex(tutor.members, "student", req.user._id), 1);
+            deletedRoom = await ChatRoom.findByIdAndDelete(tutor.members[await objectArrIndex(tutor.members, "student", req.user._id)].room);
+            await tutor.members.splice(await objectArrIndex(tutor.members, "student", req.user._id), 1);
             tutor.slots++;
             tutor.available = true;
 
@@ -226,7 +226,7 @@ controller.unenrollTutor = async function(req, res) {
     }
 
     for (let i = course.tutors.length - 1; i >= 0; i--) {
-        if (course.tutors[i].tutor._id.equals(req.user._id)) { //If the selected tutor is the current user
+        if (await course.tutors[i].tutor._id.equals(req.user._id)) { //If the selected tutor is the current user
             let deletedRoom;
             for (let student of course.tutors[i].members) {
                 deletedRoom = await ChatRoom.findByIdAndDelete(student.room);
@@ -258,10 +258,10 @@ controller.updateSettings = async function(req, res) {
     }
 
     for (let attr in req.body) { //Iterate through each of the data's keys and update the course with the corresponding value
-        if (attr != "thumbnail" && req.body[attr].split(' ').join('') != '') {course[attr] = req.body[attr];}
+        if (attr != "thumbnail" && (await req.body[attr].split(' ').join('') != '')) {course[attr] = req.body[attr];}
     }
 
-    if (req.body.thumbnail.split(' ').join('') != '') {course.thumbnail = {url: req.body.thumbnail, display: req.body.showThumbnail == "url"};}
+    if ((await req.body.thumbnail.split(' ').join('')) != '') {course.thumbnail = {url: req.body.thumbnail, display: req.body.showThumbnail == "url"};}
     course.thumbnailFile.display = req.body.showThumbnail == "upload";
 
     //Iterate through newly uploaded thumbnail file, handle with cloudinary
@@ -359,9 +359,9 @@ controller.updateTeacher = async function(req, res) { //Update course teacher
 controller.updateJoinCode = async function(req, res) {
     //Build new join code
     let charSetMatrix = [];
-    charSetMatrix.push('qwertyuiopasdfghjklzxcvbnm'.split(''));
-    charSetMatrix.push('QWERTYUIOPASDFGHJKLZXCVBNM'.split(''));
-    charSetMatrix.push('1234567890'.split(''));
+    await charSetMatrix.push('qwertyuiopasdfghjklzxcvbnm'.split(''));
+    await charSetMatrix.push('QWERTYUIOPASDFGHJKLZXCVBNM'.split(''));
+    await charSetMatrix.push('1234567890'.split(''));
 
     let code_length = Math.round((Math.random() * 15)) + 10;
     let joinCode = "";
@@ -387,12 +387,12 @@ controller.removeStudent = async function(req, res) {
 
     let deletedRoom;
     for (let tutor of course.tutors) { //Iterate through tutors and remove the student
-        if (objectArrIndex(tutor.members, "student", studentId._id, "_id") > -1) {
+        if (await objectArrIndex(tutor.members, "student", studentId._id, "_id") > -1) {
             await tutor.formerStudents.push({ //Add student to list of former studnts
                 student: studentId._id,
-                lessons: tutor.members[objectArrIndex(tutor.members, "student", studentId._id, "_id")].lessons
+                lessons: tutor.members[await objectArrIndex(tutor.members, "student", studentId._id, "_id")].lessons
             });
-            deletedRoom = await ChatRoom.findByIdAndDelete(tutor.members[objectArrIndex(tutor.members, "student", studentId._id, "_id")].room);
+            deletedRoom = await ChatRoom.findByIdAndDelete(tutor.members[await objectArrIndex(tutor.members, "student", studentId._id, "_id")].room);
             if (!deletedRoom) {return res.json({error: "Error removing room"});}
 
             //Update newRoomCount for student and tutor, and remove student from list of tutor's current members
@@ -400,7 +400,7 @@ controller.removeStudent = async function(req, res) {
             await studentId.save();
             await removeIfIncluded(tutor.tutor.newRoomCount, deletedRoom._id);
             await tutor.tutor.save();
-            await tutor.members.splice(objectArrIndex(tutor.members, "student", studentId._id, "_id"), 1);
+            await tutor.members.splice(await objectArrIndex(tutor.members, "student", studentId._id, "_id"), 1);
         }
     }
 
@@ -451,7 +451,7 @@ controller.removeTutor = async function(req, res) { //Remove tutor from course
     }
 
     for (let i = 0; i < course.tutors.length; i++) {
-        if (course.tutors[i].tutor._id.equals(tutorId._id)) {
+        if (await course.tutors[i].tutor._id.equals(tutorId._id)) {
             let deletedRoom;
             for (let student of course.tutors[i].members) { //For all of the tutor's rooms, remove room and update members' new room counts
                 deletedRoom = await ChatRoom.findByIdAndDelete(student.room);
@@ -513,7 +513,7 @@ controller.unblock = async function(req, res) { //Unblock a previously blocked u
     const course = await Course.findById(req.params.id);
 
     if (!blockedId || !course) {return res.json({error: "Unable to access course"});}
-    if (!course.blocked.includes(blockedId._id)) {return res.json({error: "User is not blocked from this course"});} //If the user is not blocked, they cannot be unblocked
+    if (!(await course.blocked.includes(blockedId._id))) {return res.json({error: "User is not blocked from this course"});} //If the user is not blocked, they cannot be unblocked
     
     await removeIfIncluded(course.blocked, blockedId._id); //Unblock user
     await course.save();
@@ -528,10 +528,10 @@ controller.unblock = async function(req, res) { //Unblock a previously blocked u
     });
     if (!notif) {return res.json({error: "Error removing student"});}
 
-    notif.date = dateFormat(notif.created_at, "h:MM TT | mmm d");
+    notif.date = await dateFormat(notif.created_at, "h:MM TT | mmm d");
     await notif.save();
 
-    blockedId.inbox.push({message: notif, new: true});
+    await blockedId.inbox.push({message: notif, new: true});
     await blockedId.save();
     if (blockedId.receiving_emails) {
         await sendGridEmail(blockedId.email, `Removal from ${course.name}`, `<p>Hello ${blockedId.firstName},</p><p>${notif.text}</p>`, false);
@@ -546,9 +546,9 @@ controller.markPayment = async function(req, res) {
     if (!course) {return res.json({error: "Unable to find course"});}
 
     for (let tutor of course.tutors) {
-        if (tutor.tutor.equals(req.user._id)) {
+        if (await tutor.tutor.equals(req.user._id)) {
             for (let student of tutor.members) {
-                if (student.student.equals(req.body.studentId)) {
+                if (await student.student.equals(req.body.studentId)) {
                     if (student.lessons[req.body.index]) {
                         student.lessons[req.body.index].paid = !student.lessons[req.body.index].paid;
                         await course.save();
@@ -561,7 +561,7 @@ controller.markPayment = async function(req, res) {
                                 if (!lesson.paid) {cost += (lesson.time/60)*tutor.cost;}
                             }
                         }
-                        if (platform.purchasable) {costString = cost.toFixed(2);
+                        if (platform.purchasable) {costString = (await cost.toFixed(2));
                         } else {costString = cost;}
                         return res.json({success: "Successfully changed", time, cost: costString});
                     }
@@ -578,7 +578,7 @@ controller.updateBio = async function(req, res) {
     if (!course) {return res.json({error: "Unable to find course"});}
 
     for (let tutor of course.tutors) { //Iterate through tutors and search for current user
-        if (tutor.tutor.equals(req.user._id)) {
+        if (await tutor.tutor.equals(req.user._id)) {
             tutor.bio = req.body.bio;
             await course.save();
             return res.json({success: "Successfully changed"})
@@ -591,7 +591,7 @@ controller.closeLessons = async function(req, res) {
     if (!course) {return res.json({error: "Error closing lessons"});}
 
     for (let tutor of course.tutors) {
-        if (tutor.tutor.equals(req.user._id)) { //If the selected tutor matches the current user, shut down availability
+        if (await tutor.tutor.equals(req.user._id)) { //If the selected tutor matches the current user, shut down availability
             tutor.available = false;
             await course.save();
             return res.json({success: "Successfully closed lessons"});
@@ -604,7 +604,7 @@ controller.reopenLessons = async function(req, res) {
     if (!course) {return res.json({error: "Error closing lessons"});}
 
     for (let tutor of course.tutors) {
-        if (tutor.tutor.equals(req.user._id)) { //If the selected tutor matches the current user, reopen availability
+        if (await tutor.tutor.equals(req.user._id)) { //If the selected tutor matches the current user, reopen availability
             tutor.available = true;
             await course.save();
             return res.json({success: "Successfully closed lessons"});
@@ -617,9 +617,9 @@ controller.setStudents = async function(req, res) {
     if (!course) {return res.json({error: "Error accessing course"});}
 
     for (let tutor of course.tutors) { //Search through tutors to find requested tutor
-        if (tutor.tutor.equals(req.user._id)) {
-            tutor.slots = parseInt(req.body.slots) - tutor.members.length; //Update slots based on data
-            if ((parseInt(req.body.slots) - tutor.members.length) == 0) { //Update availability based on new slot info
+        if (await tutor.tutor.equals(req.user._id)) {
+            tutor.slots = await parseInt(req.body.slots) - tutor.members.length; //Update slots based on data
+            if ((await parseInt(req.body.slots) - tutor.members.length) == 0) { //Update availability based on new slot info
                 tutor.available = false;
             }
             await course.save();
@@ -634,8 +634,8 @@ controller.setCost = async function(req, res) {
     if (!course) {return res.json({error: "Error accessing course"});}
 
     for (let tutor of course.tutors) { //Search through tutors to find requested tutor
-        if (tutor.tutor.equals(req.user._id)) {
-            tutor.cost = parseInt(req.body.cost);
+        if (await tutor.tutor.equals(req.user._id)) {
+            tutor.cost = await parseInt(req.body.cost);
             await course.save();
             return res.json({success: "Succesfully changed", tutor});
         }
@@ -648,20 +648,20 @@ controller.markLesson = async function(req, res) {
     if (!course) {return res.json({error: "Error accessing course"});}
 
     const newLesson = {
-        time: parseInt(req.body.time),
-        date: dateFormat(new Date(), "mmm d"),
+        time: await parseInt(req.body.time),
+        date: await dateFormat(new Date(), "mmm d"),
         summary: req.body.summary
     };
 
     //Find specific tutor and add lesson for their student
     for (let tutor of course.tutors) {
-        if (tutor.tutor.equals(req.user._id)) {
+        if (await tutor.tutor.equals(req.user._id)) {
             let lessons = [];
             for (let student of tutor.members) {
-                for (let lesson of student.lessons) {lessons.push(lesson);}
-                if (student.student.equals(req.body.studentId)) {
+                for (let lesson of student.lessons) {await lessons.push(lesson);}
+                if (await student.student.equals(req.body.studentId)) {
                     await student.lessons.push(newLesson);
-                    lessons.push(newLesson);
+                    await lessons.push(newLesson);
                     await course.save();
                     return res.json({success: "Succesfully updated", tutor, lessons});
                 }
@@ -678,10 +678,10 @@ controller.bookTutor = async function(req, res) {
 
     let formerStudent = false;
     for (let tutor of course.tutors) { //Iterate through tutors and search for the corresponding one
-        if (tutor.tutor._id.equals(req.body.tutorId) && tutor.available) {
-            if (objectArrIndex(tutor.formerStudents, "student", req.user._id) > -1) { //Remove student from tutor's former members (if they were there)
+        if (await tutor.tutor._id.equals(req.body.tutorId) && tutor.available) {
+            if (await objectArrIndex(tutor.formerStudents, "student", req.user._id) > -1) { //Remove student from tutor's former members (if they were there)
                 formerStudent = true;
-                await tutor.formerStudents.splice(objectArrIndex(tutor.formerStudents, "student", req.user._id), 1);
+                await tutor.formerStudents.splice(await objectArrIndex(tutor.formerStudents, "student", req.user._id), 1);
             }
 
             tutor.slots--;
@@ -696,9 +696,9 @@ controller.bookTutor = async function(req, res) {
             });
             if (!room) {return res.json({error: "Error creating room"});}
 
-            room.date = dateFormat(room.created_at, "h:MM TT | mmm d");
+            room.date = await dateFormat(room.created_at, "h:MM TT | mmm d");
             await room.save();
-            tutor.tutor.newRoomCount.push(room._id);
+            await tutor.tutor.newRoomCount.push(room._id);
             await req.user.newRoomCount.push(room._id);
             await tutor.tutor.save();
             await req.user.save();
@@ -712,11 +712,11 @@ controller.bookTutor = async function(req, res) {
             await course.save();
 
             //All current members of the tutor
-            const studentIds = await User.find({authenticated: true, _id: {$in: parsePropertyArray(tutor.members, "student")}});
+            const studentIds = await User.find({authenticated: true, _id: {$in: await parsePropertyArray(tutor.members, "student")}});
             if (!studentIds) {return res.json({error: "Error accessing members"});}
 
             //All former members of the tutor
-            const formerStudents = await User.find({authenticated: true, _id: {$in: parsePropertyArray(tutor.formerStudents, "student")}});
+            const formerStudents = await User.find({authenticated: true, _id: {$in: await parsePropertyArray(tutor.formerStudents, "student")}});
             if (!formerStudents) {return res.json({error: "Error accessing members"});}
 
             return res.json({
@@ -734,23 +734,23 @@ controller.leaveTutor = async function(req, res) {
 
     let deletedRoom;
     for (let tutor of course.tutors) { //If the selected tutor is the one being left, and the user is a student of that tutor, leave
-        if (tutor.tutor._id.equals(req.body.tutorId)) {
-            if (objectArrIndex(tutor.members, "student", req.user._id) > -1) {
-                deletedRoom = await ChatRoom.findByIdAndDelete(tutor.members[objectArrIndex(tutor.members, "student", req.user._id)].room);
+        if (await tutor.tutor._id.equals(req.body.tutorId)) {
+            if (await objectArrIndex(tutor.members, "student", req.user._id) > -1) {
+                deletedRoom = await ChatRoom.findByIdAndDelete(tutor.members[await objectArrIndex(tutor.members, "student", req.user._id)].room);
                 if (!deletedRoom) {return res.json({error: "Error deleting room"});}
 
                 //Remove room, add student to tutor's former members
-                await removeIfIncluded(tutor.tutor.newRoomCount, tutor.members[objectArrIndex(tutor.members, "student", req.user._id)].room);
+                await removeIfIncluded(tutor.tutor.newRoomCount, tutor.members[await objectArrIndex(tutor.members, "student", req.user._id)].room);
                 await tutor.tutor.save();
-                await removeIfIncluded(req.user.newRoomCount, tutor.members[objectArrIndex(tutor.members, "student", req.user._id)].room)
+                await removeIfIncluded(req.user.newRoomCount, tutor.members[await objectArrIndex(tutor.members, "student", req.user._id)].room)
                 await req.user.save();
-                if (objectArrIndex(tutor.formerStudents, "student", req.user._id) == -1) {
-                    tutor.formerStudents.push({
+                if (await objectArrIndex(tutor.formerStudents, "student", req.user._id) == -1) {
+                    await tutor.formerStudents.push({
                         student: req.user._id,
-                        lessons: tutor.members[objectArrIndex(tutor.members, "student", req.user._id).lessons]
+                        lessons: tutor.members[await objectArrIndex(tutor.members, "student", req.user._id).lessons]
                     });
                 }
-                await tutor.members.splice(objectArrIndex(tutor.members, "student", req.user._id), 1);
+                await tutor.members.splice(await objectArrIndex(tutor.members, "student", req.user._id), 1);
                 tutor.slots++;
                 tutor.available = true;
 
@@ -766,8 +766,8 @@ controller.upvoteTutor = async function(req, res) {
     if (!course) {return res.json({error: "Error upvoting tutor"});}
 
     for (let tutor of course.tutors) {
-        if (tutor.tutor.equals(req.body.tutorId)) { //Search for tutor until they are found
-            if (objectArrIndex(tutor.members.concat(tutor.formerStudents), "student", req.user._id) > -1) { //Only current/former members of a tutor can upvote them
+        if (await tutor.tutor.equals(req.body.tutorId)) { //Search for tutor until they are found
+            if (await objectArrIndex((await tutor.members.concat(tutor.formerStudents), "student", req.user._id) > -1)) { //Only current/former members of a tutor can upvote them
                 if (await removeIfIncluded(tutor.upvotes, req.user._id)) { //If tutor is currently upvoted by this user, downvote them
                     await course.save();
                     return res.json({success: "Downvoted tutor", upvoteCount: tutor.upvotes.length});
@@ -786,12 +786,12 @@ controller.rateTutor = async function(req, res) {
     if (!course) {return res.json({error: "Error reviewing tutor"});}
 
     for (let tutor of course.tutors) {
-        if (tutor.tutor.equals(req.body.tutorId)) {
-            if (objectArrIndex(tutor.members.concat(tutor.formerStudents), "student", req.user._id) > -1) { //Only current/former members of a tutor can upvote them
+        if (await tutor.tutor.equals(req.body.tutorId)) {
+            if (await objectArrIndex(await tutor.members.concat(tutor.formerStudents), "student", req.user._id) > -1) { //Only current/former members of a tutor can upvote them
                 const review = await Review.create({text: req.body.text.split('<').join('&lt'), sender: req.user, rating: req.body.rating}); //Create comment with review
                 if (!review) {return res.json({error: "Error reviewing tutor"});}
 
-                review.date = dateFormat(review.created_at, "h:MM TT | mmm d");
+                review.date = await dateFormat(review.created_at, "h:MM TT | mmm d");
                 await review.save();
                 await tutor.reviews.push(review);
                 await course.save();
@@ -831,9 +831,9 @@ controller.approveLesson = async function(req, res) {
     const course = await Course.findById(req.params.id);
     if (!course) { return res.json({error: "Unable to find course"});}
     for (let tutor of course.tutors) {
-        if (tutor.tutor.equals(req.body.tutorId)) {
+        if (await tutor.tutor.equals(req.body.tutorId)) {
             for (let student of tutor.members) {
-                if (student.student.equals(req.user._id)) {
+                if (await student.student.equals(req.user._id)) {
                     if (student.lessons[req.body.index]) {
                         student.lessons[req.body.index].approved = !student.lessons[req.body.index].approved;
                         await course.save();
@@ -844,12 +844,10 @@ controller.approveLesson = async function(req, res) {
                         for (let lesson of student.lessons) {
                             if (lesson.approved) {
                                 time += lesson.time;
-                                if (!lesson.paid) {
-                                    cost += (lesson.time/60)*tutor.cost;
-                                }
+                                if (!lesson.paid) {cost += (lesson.time/60)*tutor.cost;}
                             }
                         }
-                        if (platform.dollarPayment) {costString = cost.toFixed(2);
+                        if (platform.dollarPayment) {costString = await cost.toFixed(2);
                         } else {costString = cost;}
                         return res.json({success: "Successfully changed", time, cost: costString});
                     }
@@ -875,14 +873,14 @@ controller.showTutor = async function(req, res) {
     }
 
     let tutorIds = [];
-    for (let tutor of course.tutors) {tutorIds.push(tutor.tutor._id.toString());}
+    for (let tutor of course.tutors) {await tutorIds.push(await tutor.tutor._id.toString());}
     let courseStudents = [];
-    for (let student of course.members) {courseStudents.push(student.toString());}
+    for (let student of course.members) {await courseStudents.push(await student.toString());}
 
     for (let tutor of course.tutors) {
-        if (tutor.tutor._id.equals(req.query.tutorId)) {
+        if (await tutor.tutor._id.equals(req.query.tutorId)) {
             let studentIds = []; //Collect info on all course members 
-            for (let student of course.members) {studentIds.push(student.toString());}
+            for (let student of course.members) {await studentIds.push(await student.toString());}
 
             let enrolledCourses = []; //Collect all courses which this tutor teaches (that are not the current one)
             const courses = await Course.find({_id: {$ne: course._id}}).populate("creator");
@@ -893,7 +891,7 @@ controller.showTutor = async function(req, res) {
 
             for (let c of courses) {
                 for (let t of c.tutors) {
-                    if (t.tutor.equals(tutor.tutor._id)) {enrolledCourses.push(c);}
+                    if (await t.tutor.equals(tutor.tutor._id)) {await enrolledCourses.push(c);}
                 }
             }
 
@@ -902,7 +900,7 @@ controller.showTutor = async function(req, res) {
             averageRating = Math.round(averageRating / tutor.reviews.length);
             
             //Collect info on all members who are members of this tutor
-            const members = await User.find({authenticated: true, _id: {$in: parsePropertyArray(tutor.members, "student")}});
+            const members = await User.find({authenticated: true, _id: {$in: await parsePropertyArray(tutor.members, "student")}});
             if (!members) {
                 await req.flash('error', "Unable to find members");
                 return res.redirect('back');
@@ -912,7 +910,7 @@ controller.showTutor = async function(req, res) {
             let time = 0;
             let costMap = new Map();
             let cost = 0;
-            for (let student of tutor.members.concat(tutor.formerStudents)) {
+            for (let student of (await tutor.members.concat(tutor.formerStudents))) {
                 time = 0;
                 cost = 0;
                 for (let lesson of student.lessons) {
@@ -921,21 +919,21 @@ controller.showTutor = async function(req, res) {
                         if (!lesson.paid) {cost += (lesson.time/60)*tutor.cost;}
                     }
                 }
-                lessonMap.set(student.student._id.toString(), time);
-                if (platform.dollarPayment) {costMap.set(student.student._id.toString(), cost.toFixed(2));
-                } else {costMap.set(student.student._id.toString(), cost);}
+                await lessonMap.set((await student.student._id.toString()), time);
+                if (platform.dollarPayment) {await costMap.set((await student.student._id.toString()), (await cost.toFixed(2)));
+                } else {await costMap.set((await student.student._id.toString()), cost);}
             }
 
             if (req.query.studentId) { //If query is to show a tutor's lessons with a specific student
-                const allStudents = tutor.members.concat(tutor.formerStudents);
-                if (objectArrIndex(allStudents, "student", req.query.studentId, "_id") > -1) {
+                const allStudents = await (tutor.members.concat(tutor.formerStudents));
+                if (await objectArrIndex(allStudents, "student", req.query.studentId, "_id") > -1) {
                     //Check that user is either a student of this tutor, this tutor, or the course's teacher
-                    if (allStudents[objectArrIndex(allStudents, "student", req.query.studentId, "_id")].student._id.equals(req.user._id) || tutor.tutor._id.equals(req.user._id) || course.creator.equals(req.user._id)) {
+                    if (allStudents[await objectArrIndex(allStudents, "student", req.query.studentId, "_id")].student._id.equals(req.user._id) || (await tutor.tutor._id.equals(req.user._id)) || (await course.creator.equals(req.user._id))) {
                         return res.render('tutoringCenter/lessons', {
-                            platform, course, tutor, student: allStudents[objectArrIndex(allStudents, "student", req.query.studentId, "_id")], objectArrIndex,
-                            time: lessonMap.get(allStudents[objectArrIndex(allStudents, "student", req.query.studentId, "_id")].student._id.toString()), 
-                            cost: costMap.get(allStudents[objectArrIndex(allStudents, "student", req.query.studentId, "_id")].student._id.toString()),
-                            data: platform.features[objectArrIndex(platform.features, "route", "tutoringCenter")]
+                            platform, course, tutor, student: allStudents[await objectArrIndex(allStudents, "student", req.query.studentId, "_id")], objectArrIndex,
+                            time: await lessonMap.get(allStudents[await objectArrIndex(allStudents, "student", req.query.studentId, "_id")].student._id.toString()), 
+                            cost: await costMap.get(allStudents[await objectArrIndex(allStudents, "student", req.query.studentId, "_id")].student._id.toString()),
+                            data: platform.features[await objectArrIndex(platform.features, "route", "tutoringCenter")]
                         });
                     }
                     await req.flash('error', "You do not have permission to view that student");
@@ -949,7 +947,7 @@ controller.showTutor = async function(req, res) {
             return res.render('tutoringCenter/tutor-show', {
                 platform, course, tutor, students: members, studentIds, averageRating,
                 lessons: lessonMap, courses: enrolledCourses, objectArrIndex,
-                data: platform.features[objectArrIndex(platform.features, "route", "tutoringCenter")]
+                data: platform.features[await objectArrIndex(platform.features, "route", "tutoringCenter")]
             });
         }
     }

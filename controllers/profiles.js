@@ -20,9 +20,7 @@ const {Course, ChatRoom} = require('../models/group');
 
 const controller = {};
 
-if (process.env.NODE_ENV !== "production") {
-	require('dotenv').config();
-}
+if (process.env.NODE_ENV !== "production") {require('dotenv').config();}
 
 controller.index = async function(req, res) {
 	const platform = await setup(Platform);
@@ -32,34 +30,34 @@ controller.index = async function(req, res) {
 		return res.redirect("back");
 	}
 
-	let statuses = concatMatrix([
+	let statuses = await concatMatrix([
 		platform.statusesProperty,
 		platform.statusesPlural,
-		multiplyArrays([], platform.statusesProperty.length)
+		await multiplyArrays([], platform.statusesProperty.length)
 	]).reverse();
 
 	let reversedPerms = [];
-	for (let permission of platform.permissionsProperty) {reversedPerms.unshift(permission);}
+	for (let permission of platform.permissionsProperty) {await reversedPerms.unshift(permission);}
 
 	for (let status of statuses) {
 		status[2] = [];
 		for (let permission of reversedPerms) {
 			for (let user of await sortAlph(users, "firstName")) {
-				if (status[0] == user.status && permission == user.permission) {status[2].push(user);}
+				if (status[0] == user.status && permission == user.permission) {await status[2].push(user);}
 			}
 		}
 	}
 
 	return res.render("profiles/index", {
 		platform, users, statuses,
-		permMap: new Map(concatMatrix([
-			platform.permissionsProperty.slice(1),
-			platform.permissionsDisplay.slice(1)
+		permMap: new Map(await concatMatrix([
+			await platform.permissionsProperty.slice(1),
+			await platform.permissionsDisplay.slice(1)
 		])),
-		emptyStatuses: concatMatrix([
+		emptyStatuses: await concatMatrix([
 			platform.statusesProperty,
 			platform.statusesPlural,
-			multiplyArrays([], platform.statusesProperty.length)
+			await multiplyArrays([], platform.statusesProperty.length)
 		]).reverse()
 	});
 }
@@ -68,13 +66,13 @@ controller.team = async function(req, res) {
 	const platform = await setup(Platform);
 	const users = await User.find({
 		authenticated: true,
-		status: {$in: platform.statusesProperty.slice(platform.statusesProperty.length-2)}
+		status: {$in: await platform.statusesProperty.slice(platform.statusesProperty.length-2)}
 	});
 	if (!platform || !users) {
 		await req.flash("error", "An error occurred");
 		return res.redirect("back");
 	}
-	return res.render("profiles/team", {platform, users: sortAlph(users, "firstName")});
+	return res.render("profiles/team", {platform, users: await sortAlph(users, "firstName")});
 }
 
 controller.edit = async function(req, res) {
@@ -83,7 +81,7 @@ controller.edit = async function(req, res) {
 		platform,
 		statuses: platform.statusesProperty,
 		tags: platform.tags,
-		changeStatus: platform.permissionsProperty.slice(platform.permissionsProperty.length-2, platform.permissionsProperty.length).includes(req.user.permission)
+		changeStatus: await platform.permissionsProperty.slice(platform.permissionsProperty.length-2, platform.permissionsProperty.length).includes(req.user.permission)
 	});
 }
 
@@ -105,7 +103,7 @@ controller.show = async function(req, res) {
 	}
 
 	//Build list of current followers and following
-	let followerIds = parsePropertyArray(user.followers, "_id");
+	let followerIds = await parsePropertyArray(user.followers, "_id");
 	let following = [];
 	let currentUserFollowing = [];
 
@@ -116,15 +114,15 @@ controller.show = async function(req, res) {
 	}
 
 	for (let u of users) { //Iterate through all users and see if this user is following them
-		if (u.followers.includes(user._id)) {following.push(u);}
-		if (u.followers.includes(req.user._id)) {currentUserFollowing.push(u);}
+		if (await u.followers.includes(user._id)) {await following.push(u);}
+		if (await u.followers.includes(req.user._id)) {await currentUserFollowing.push(u);}
 	}
 
 	return res.render('profiles/show', {
 		platform, user, following, followerIds,
-		convertedDescription: convertToLink(user.description),
-		perms: new Map(concatMatrix([platform.permissionsProperty, platform.permissionsDisplay])),
-		statuses: new Map(concatMatrix([platform.statusesProperty, platform.statusesSingular]))
+		convertedDescription: await convertToLink(user.description),
+		perms: new Map(await concatMatrix([platform.permissionsProperty, platform.permissionsDisplay])),
+		statuses: new Map(await concatMatrix([platform.statusesProperty, platform.statusesSingular]))
 	});
 }
 
@@ -132,7 +130,7 @@ controller.update = async function(req, res) {
 	const platform = await setup(Platform);
 	const overlap = await User.find({
 		authenticated: true,
-		username: filter.clean(req.body.username),
+		username: await filter.clean(req.body.username),
 		_id: {$ne: req.user._id}
 	});
 	if (!platform || !overlap) {
@@ -144,7 +142,7 @@ controller.update = async function(req, res) {
 	}
 
 	let status;
-	if (req.body.status == '' || !platform.statusesProperty.includes(req.body.status)) { //If no new status is selected, keep the current user's status
+	if (req.body.status == '' || !(await platform.statusesProperty.includes(req.body.status))) { //If no new status is selected, keep the current user's status
 		status = req.user.status;
 	} else { //If a new status is selected, move to that
 		if (req.user.status == platform.teacherStatus && req.body.status != '') { //If user is currently teaching a course, they cannot lose their teacher status
@@ -155,7 +153,7 @@ controller.update = async function(req, res) {
 			}
 	
 			for (let course of courses) {
-				if (course.creator.equals(req.user._id)) {
+				if (await course.creator.equals(req.user._id)) {
 					await req.flash('error', "You are currently teaching a course, and cannot lose your status");
 					return res.redirect('back');
 				}
@@ -168,10 +166,10 @@ controller.update = async function(req, res) {
 	let user = { //Updated user object
 		firstName: req.body.firstName,
 		lastName: req.body.lastName,
-		username: filter.clean(req.body.username),
-		description: filter.clean(req.body.description),
-		title: filter.clean(req.body.title),
-		status: status.toLowerCase(),
+		username: await filter.clean(req.body.username),
+		description: await filter.clean(req.body.description),
+		title: await filter.clean(req.body.title),
+		status: await status.toLowerCase(),
 		mediaFile: {
 			url: req.user.mediaFile.url,
 			filename: req.user.mediaFile.filename,
@@ -262,13 +260,13 @@ controller.update = async function(req, res) {
 }
 
 controller.tagPut = async function(req, res) {
-	if (req.user.tags.includes(req.body.tag)) {
+	if (await req.user.tags.includes(req.body.tag)) {
 		if (req.body.tag == "Tutor") { //If tag is for tutor, check that user is not an active tutor
 			const courses = await Course.find({});
 			if (!courses) {return res.json({error: 'Error. Could not change'});}
 			
 			for (let course of courses) {
-				if (objectArrIndex(course.tutors, "tutor", req.user._id) > -1) { //If user is a tutor
+				if (await objectArrIndex(course.tutors, "tutor", req.user._id) > -1) { //If user is a tutor
 					return res.json({error: "You are an active tutor"});
 				}
 			}
@@ -300,7 +298,7 @@ controller.changeEmailPut = async function(req, res) { //Update email
 	//Check if new email is allowed, not blocked, and not already taken
 	const allowedEmail = await Email.findOne({address: req.body.email, version: "accesslist"});
 	if (!allowedEmail) {
-		if (platform.emailExtension != '' && req.body.email.split("@")[1] != platform.emailExtension) {
+		if (platform.emailExtension != '' && (await req.body.email.split("@")[1] != platform.emailExtension)) {
 			await req.flash('error', "New email must be a platform-verified email");
 			return res.redirect('back');
 		}
@@ -354,29 +352,28 @@ controller.confirmEmail = async function(req, res) {
 
 	//Update authentication token
 	let charSetMatrix = [];
-	charSetMatrix.push('qwertyuiopasdfghjklzxcvbnm'.split(''));
-	charSetMatrix.push('QWERTYUIOPASDFGHJKLZXCVBNM'.split(''));
-	charSetMatrix.push('1234567890'.split(''));
-	charSetMatrix.push('()%!~$#*[){]|,.<>');
+	await charSetMatrix.push('qwertyuiopasdfghjklzxcvbnm'.split(''));
+	await charSetMatrix.push('QWERTYUIOPASDFGHJKLZXCVBNM'.split(''));
+	await charSetMatrix.push('1234567890'.split(''));
+	await charSetMatrix.push('()%!~$#*[){]|,.<>'.split(''));
 
 	let tokenLength = Math.round((Math.random() * 15)) + 15;
 	let token = "";
 
 	let charSet; //Which character set to choose from
-
 	for (let i = 0; i < tokenLength; i += 1) {
 		charSet = charSetMatrix[Math.floor(Math.random() * 4)];
 		token += charSet[Math.floor((Math.random() * charSet.length))];
 	}
 
 	//If user's authentication matches queried token (meaning origin is correct)
-	if (req.query.token.toString() == user.authenticationToken) {
+	if ((await req.query.token.toString()) == user.authenticationToken) {
 		user.email = req.query.email;
 		user.authenticationToken = token;
 		await user.save();
 
 		await sendGridEmail(user, 'Email Update Confirmation', `<p>Hello ${user.firstName},</p><p>You are receiving this email because you recently made changes to your Saberchat email. This is a confirmation of your profile.</p><p>Your username is ${user.username}.</p><p>Your full name is ${user.firstName} ${user.lastName}.</p><p>Your email is ${user.email}.</p>`, false);
-		req.flash('success', "Email updated!")
+		await req.flash('success', "Email updated!")
 		return res.redirect('/');
 	}
 	await req.flash('error', "Invalid authentication token");
@@ -387,7 +384,7 @@ controller.changePasswordPut = async function(req, res) {
 	if (req.body.newPassword == req.body.newPasswordConfirm) {  //If confirmation passwords match
 		const user = await User.findById(req.user._id);
 		if (!user) {
-			req.flash('error', 'Error, cannot find user');
+			await req.flash('error', 'Error, cannot find user');
 			return res.redirect('/');
 		}
 
@@ -403,9 +400,9 @@ controller.changePasswordPut = async function(req, res) {
 controller.follow = async function(req, res) {
 	const user = await User.findById(req.params.id);
 	if (!user) {return res.json({error: "Error finding user"});}
-	if (user.followers.includes(req.user._id)) {return res.json({error: "You are already following this user"});}
-	if (user.blocked.includes(req.user._id)) {return res.json({error: "User has blocked you"});}
-	if (user._id.equals(req.user._id)) {return res.json({error: "You may not follow yourself"});}
+	if (await user.followers.includes(req.user._id)) {return res.json({error: "You are already following this user"});}
+	if (await user.blocked.includes(req.user._id)) {return res.json({error: "User has blocked you"});}
+	if (await user._id.equals(req.user._id)) {return res.json({error: "You may not follow yourself"});}
 
 	await user.followers.push(req.user);
 	await user.save();

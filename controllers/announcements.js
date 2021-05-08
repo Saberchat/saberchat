@@ -26,7 +26,7 @@ controller.index = async function(req, res) {
     }
 
     let announcements;
-    if (req.user && platform.permissionsProperty.slice(platform.permissionsProperty.length-3).includes(req.user.permission)) {
+    if (req.user && await platform.permissionsProperty.slice(platform.permissionsProperty.length-3).includes(req.user.permission)) {
         announcements = await Announcement.find({}).populate('sender');
     } else {
         announcements = await Announcement.find({verified: true}).populate('sender');
@@ -39,7 +39,7 @@ controller.index = async function(req, res) {
     const userNames = await parsePropertyArray(users, "firstName").join(',').toLowerCase().split(',');
     const announcementTexts = await embedLink(req.user, announcements, userNames);
 
-    return res.render('announcements/index', {platform, announcements: announcements.reverse(), announcementTexts});
+    return res.render('announcements/index', {platform, announcements: await announcements.reverse(), announcementTexts});
 };
 
 // Announcement GET new ann
@@ -62,8 +62,8 @@ controller.markAll = async function(req, res) {
 
 // Announcement GET mark one ann as read
 controller.markOne = async function(req, res) {
-    if (objectArrIndex(req.user.annCount, "announcement", req.params.id) > -1) { //If user's annCount includes announcement, remove it
-        await req.user.annCount.splice(objectArrIndex(req.user.annCount, "announcement", req.params.id), 1);
+    if (await objectArrIndex(req.user.annCount, "announcement", req.params.id) > -1) { //If user's annCount includes announcement, remove it
+        await req.user.annCount.splice(await objectArrIndex(req.user.annCount, "announcement", req.params.id), 1);
         await req.user.save();
     }
     await req.flash('success', 'Announcement Marked As Read!');
@@ -83,22 +83,22 @@ controller.show = async function(req, res) {
         await req.flash('error', 'Could not find announcement');
         return res.redirect('back');
 
-    } else if (!announcement.verified && !platform.permissionsProperty.slice(platform.permissionsProperty.length-3).includes(req.user.permission)) {
+    } else if (!announcement.verified && !(await platform.permissionsProperty.slice(platform.permissionsProperty.length-3).includes(req.user.permission))) {
         await req.flash('error', 'You cannot view that announcement');
         return res.redirect('back');
     }
 
     if(req.user) {
         //If this announcement is new to the user, it is no longer new, so remove it
-        if (objectArrIndex(req.user.annCount, "announcement", announcement._id, "_id") > -1) {
-            await req.user.annCount.splice(objectArrIndex(req.user.annCount, "announcement", announcement._id, "_id"), 1);
+        if (await objectArrIndex(req.user.annCount, "announcement", announcement._id, "_id") > -1) {
+            await req.user.annCount.splice(await objectArrIndex(req.user.annCount, "announcement", announcement._id, "_id"), 1);
             await req.user.save();
         }
     }
 
     let fileExtensions = new Map(); //Track which file format each attachment is in
     for (let media of announcement.mediaFiles) {
-        fileExtensions.set(media.url, path.extname(media.url.split("SaberChat/")[1]));
+        await fileExtensions.set(media.url, await path.extname(media.url.split("SaberChat/")[1]));
     }
     const convertedText = await convertToLink(announcement.text); //Parse and add hrefs to all links in text
     return res.render('announcements/show', {platform, announcement, convertedText, fileExtensions});
@@ -112,14 +112,14 @@ controller.updateForm = async function(req, res) {
         await req.flash('error', 'Could not find announcement');
         return res.redirect('back');
     }
-    if(!announcement.sender.equals(req.user._id)) { //Only the sender may edit the announcement
+    if(!(await announcement.sender.equals(req.user._id))) { //Only the sender may edit the announcement
         await req.flash('error', 'You do not have permission to do that.');
         return res.redirect('back');
     }
 
     let fileExtensions = new Map(); //Track which file format each attachment is in
     for (let media of announcement.mediaFiles) {
-        fileExtensions.set(media.url, path.extname(media.url.split("SaberChat/")[1]));
+        await fileExtensions.set(media.url, await path.extname(await media.url.split("SaberChat/")[1]));
     }
     return res.render('announcements/edit', {platform, announcement, fileExtensions});
 };
@@ -185,7 +185,7 @@ controller.create = async function(req, res) {
     }
 
     if (platform.postVerifiable) {
-        await req.flash('success', `Announcement Posted! A ${platform.permissionsDisplay[platform.permissionsDisplay.length-1].toLowerCase()} will verify your post soon.`);
+        await req.flash('success', `Announcement Posted! A platform ${await platform.permissionsDisplay[platform.permissionsDisplay.length-1].toLowerCase()} will verify your post soon.`);
     } else {
         await req.flash('success', `Announcement Posted!`);
     }
@@ -219,7 +219,7 @@ controller.verify = async function(req, res) {
         }
     }
 
-    req.flash("success", "Verified Announcement!");
+    await req.flash("success", "Verified Announcement!");
     return res.redirect("/announcements");
 }
 
@@ -232,7 +232,7 @@ controller.updateAnnouncement = async function(req, res) {
         return res.redirect('back');
     }
 
-    if (announcement.sender._id.toString() != req.user._id.toString()) {
+    if ((await announcement.sender._id.toString()) != (await req.user._id.toString())) {
         await req.flash('error', "You can only update announcements which you have sent");
         return res.redirect('back');
     }
@@ -254,9 +254,9 @@ controller.updateAnnouncement = async function(req, res) {
     let cloudResult;
     for (let i = updatedAnnouncement.mediaFiles.length-1; i >= 0; i--) {
         if (req.body[`deleteUpload-${updatedAnnouncement.mediaFiles[i].url}`] && updatedAnnouncement.mediaFiles[i] && updatedAnnouncement.mediaFiles[i].filename) {
-            if ([".mp3", ".mp4", ".m4a", ".mov"].includes(path.extname(updatedAnnouncement.mediaFiles[i].url.split("SaberChat/")[1]).toLowerCase())) {
+            if (await (await path.extname(await updatedAnnouncement.mediaFiles[i].url.split("SaberChat/")[1]).toLowerCase())) {
                 [cloudErr, cloudResult] = await cloudDelete(updatedAnnouncement.mediaFiles[i].filename, "video");
-            } else if (path.extname(updatedAnnouncement.mediaFiles[i].url.split("SaberChat/")[1]).toLowerCase() == ".pdf") {
+            } else if (await path.extname(await updatedAnnouncement.mediaFiles[i].url.split("SaberChat/")[1]).toLowerCase() == ".pdf") {
                 [cloudErr, cloudResult] = await cloudDelete(updatedAnnouncement.mediaFiles[i].filename, "pdf");
             } else {
                 [cloudErr, cloudResult] = await cloudDelete(updatedAnnouncement.mediaFiles[i].filename, "image");
@@ -266,7 +266,7 @@ controller.updateAnnouncement = async function(req, res) {
                 await req.flash('error', 'Error deleting uploaded image');
                 return res.redirect('back');
             }
-            updatedAnnouncement.mediaFiles.splice(i, 1);
+            await updatedAnnouncement.mediaFiles.splice(i, 1);
         }
     }
 
@@ -302,7 +302,7 @@ controller.updateAnnouncement = async function(req, res) {
     for (let image of announcement.images) {imageString += `<img src="${image}">`;}
     for (let user of users) {
         //If announcement not already in user's annCount, add it
-        if (objectArrIndex(user.annCount, "announcement", updatedAnnouncement._id) == -1) {
+        if (await objectArrIndex(user.annCount, "announcement", updatedAnnouncement._id) == -1) {
             await user.annCount.push({announcement: updatedAnnouncement, version: "updated"});
             await user.save();
         }
@@ -343,7 +343,7 @@ controller.comment = async function(req, res) {
     if (!announcement) {return res.json({error: 'Error commenting'});}
 
     const comment = await PostComment.create({
-        text: req.body.text.split('<').join('&lt'),
+        text: await req.body.text.split('<').join('&lt'),
         sender: req.user
     });
     if (!comment) {return res.json({error: 'Error commenting'});}
@@ -356,9 +356,9 @@ controller.comment = async function(req, res) {
 
     let users = [];
     let user;
-    for (let line of comment.text.split(" ")) {
+    for (let line of await comment.text.split(" ")) {
         if (line[0] == '@') {
-            user = await User.findById(line.split("#")[1].split("_")[0]);
+            user = await User.findById(await line.split("#")[1].split("_")[0]);
             if (!user) {return res.json({error: "Error accessing user"});}
             await users.push(user);
         }
@@ -423,7 +423,7 @@ controller.deleteAnnouncement = async function(req, res) {
         return res.redirect('back');
     }
 
-    if (announcement.sender._id.toString() != req.user._id.toString()) {
+    if ((await announcement.sender._id.toString()) != (await req.user._id.toString())) {
         await req.flash('error', "You can only delete announcements that you have posted");
         return res.redirect('back');
     }
@@ -433,9 +433,9 @@ controller.deleteAnnouncement = async function(req, res) {
     let cloudResult;
     for (let file of announcement.mediaFiles) {
         if (file && file.filename) {
-            if ([".mp3", ".mp4", ".m4a", ".mov"].includes(path.extname(file.url.split("SaberChat/")[1]).toLowerCase())) {
+            if (await [".mp3", ".mp4", ".m4a", ".mov"].includes(await path.extname(await file.url.split("SaberChat/")[1]).toLowerCase())) {
                 [cloudErr, cloudResult] = await cloudDelete(file.filename, "video");
-            } else if (path.extname(file.url.split("SaberChat/")[1]).toLowerCase() == ".pdf") {
+            } else if (await path.extname(await file.url.split("SaberChat/")[1]).toLowerCase() == ".pdf") {
                 [cloudErr, cloudResult] = await cloudDelete(file.filename, "pdf");
             } else {
                 [cloudErr, cloudResult] = await cloudDelete(file.filename, "image");
@@ -461,8 +461,8 @@ controller.deleteAnnouncement = async function(req, res) {
     }
 
     for (let user of users) {
-        if (objectArrIndex(user.annCount, "announcement", deletedAnnouncement._id) > -1) {
-            await user.annCount.splice(objectArrIndex(user.annCount, "announcement", deletedAnnouncement._id), 1);
+        if (await objectArrIndex(user.annCount, "announcement", deletedAnnouncement._id) > -1) {
+            await user.annCount.splice(await objectArrIndex(user.annCount, "announcement", deletedAnnouncement._id), 1);
             await user.save();
         }
     }

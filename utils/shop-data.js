@@ -26,18 +26,18 @@ module.exports = async function(customers, items, orders) {
         }
 
         //Add objects with each group of data to arrays
-        data.popularCustomers.push({customer, orderCount: customerOrders.length, date: customer.created_at});
-        data.longestOrderCustomers.push({customer, orderLength, date: customer.created_at});
-        data.lucrativeCustomers.push({customer, spent, avgCharge: Math.round((spent/orders.length)*100)/100, date: customer.created_at});
+        await data.popularCustomers.push({customer, orderCount: customerOrders.length, date: customer.created_at});
+        await data.longestOrderCustomers.push({customer, orderLength, date: customer.created_at});
+        await data.lucrativeCustomers.push({customer, spent, avgCharge: Math.round((spent/orders.length)*100)/100, date: customer.created_at});
     }
 
     //Sort objects
-    data.popularCustomers = sortByPopularity(data.popularCustomers, "orderCount", "date", null).popular;
-    data.longestOrderCustomers = sortByPopularity(data.longestOrderCustomers, "orderLength", "date", null).popular;
-    data.lucrativeCustomers = sortByPopularity(data.lucrativeCustomers, "spent", "date", null).popular;
+    data.popularCustomers = await sortByPopularity(data.popularCustomers, "orderCount", "date", null).popular;
+    data.longestOrderCustomers = await sortByPopularity(data.longestOrderCustomers, "orderLength", "date", null).popular;
+    data.lucrativeCustomers = await sortByPopularity(data.lucrativeCustomers, "spent", "date", null).popular;
 
     //Evaluate the most purchased and upvoted items
-    data.upvotedItems = sortByPopularity(items, "upvotes", "created_at", null).popular;
+    data.upvotedItems = await sortByPopularity(items, "upvotes", "created_at", null).popular;
     let orderedItems = [];
     data.orderedQuantities = [];
 
@@ -48,7 +48,7 @@ module.exports = async function(customers, items, orders) {
         itemOrderedCount = 0;
         for (let order of orders) { //Iterate through orders and increment the amount ordered
             for (let orderItem of order.items) {
-                if (orderItem.item.equals(item._id)) {
+                if (await orderItem.item.equals(item._id)) {
                     itemCount += orderItem.quantity;
                     itemOrderedCount ++;
                 }
@@ -56,28 +56,26 @@ module.exports = async function(customers, items, orders) {
         }
 
         //Add objects with packaged data
-        orderedItems.push({item, orderCount: itemCount, date: item.created_at});
+        await orderedItems.push({item, orderCount: itemCount, date: item.created_at});
         if (itemOrderedCount == 0) {
-            data.orderedQuantities.push({item, numOrders: itemOrderedCount, orderCount: itemCount, avgQuantity: 0});
+            await data.orderedQuantities.push({item, numOrders: itemOrderedCount, orderCount: itemCount, avgQuantity: 0});
         } else {
-            data.orderedQuantities.push({item, numOrders: itemOrderedCount, orderCount: itemCount, avgQuantity: itemCount/itemOrderedCount});
+            await data.orderedQuantities.push({item, numOrders: itemOrderedCount, orderCount: itemCount, avgQuantity: itemCount/itemOrderedCount});
         }
     }
-    data.popularOrderedItems = sortByPopularity(orderedItems, "orderCount", "date", null).popular;
+    data.popularOrderedItems = await sortByPopularity(orderedItems, "orderCount", "date", null).popular;
 
     //Calculate common item combinations
     let itemCombos = [];
     let itemCombo = [];
     for (let order of orders) {
         itemCombo = [];
-        for (let item of order.items) {
-            itemCombo.push(item.item);
-        }
-        itemCombos.push({items: itemCombo});
+        for (let item of order.items) {await itemCombo.push(item.item);}
+        await itemCombos.push({items: itemCombo});
     }
 
     //Sort combinations
-    let combinations = equateObjects(itemCombos, "items");
+    let combinations = await equateObjects(itemCombos, "items");
     data.combinations = [];
     let populatedCombination = [];
     let populatedItem;
@@ -87,33 +85,29 @@ module.exports = async function(customers, items, orders) {
         for (let object of combo.objects) {
             populatedItem = await Item.findById(object);
             if (!populatedItem) {return false;}
-            populatedCombination.push(populatedItem);
+            await populatedCombination.push(populatedItem);
         }
-        data.combinations.push({combination: populatedCombination, instances: combo.instances});
+        await data.combinations.push({combination: populatedCombination, instances: combo.instances});
     }
 
     data.pricepoints = new Map(); //Calculate popularity at various price points
-    for (let item of items) {
-        data.pricepoints.set(item._id.toString(), new Map());
-    }
+    for (let item of items) {await data.pricepoints.set(item._id.toString(), new Map());}
 
     for (let order of orders) { //Iterate through orders and set their price points
         for (let item of order.items) {
-            if (data.pricepoints.get(item.item._id.toString()).has(item.price)) {
-                data.pricepoints.get(item.item._id.toString()).set(item.price, data.pricepoints.get(item.item._id.toString()).get(item.price) + 1);
+            if (await data.pricepoints.get(item.item._id.toString()).has(item.price)) {
+                await data.pricepoints.get(item.item._id.toString()).set(item.price, data.pricepoints.get(item.item._id.toString()).get(item.price) + 1);
             } else {
-                data.pricepoints.get(item.item._id.toString()).set(item.price, 1);
+                await data.pricepoints.get(item.item._id.toString()).set(item.price, 1);
             }
         }
     }
 
     let times = []; //Calculate most common timeframes using the times package
-    for (let order of orders) {
-        times.push(new Date(order.created_at));
-    }
+    for (let order of orders) {await times.push(new Date(order.created_at));}
 
-    data.times = sortTimes(getHours(times).finalTimesUnformatted, getHours(times).finalTimes).formattedTimes;
-    data.timeStats = getStats(sortTimes(getHours(times).finalTimesUnformatted, getHours(times).finalTimes).times);
+    data.times = await sortTimes(getHours(times).finalTimesUnformatted, getHours(times).finalTimes).formattedTimes;
+    data.timeStats = await getStats(sortTimes(getHours(times).finalTimesUnformatted, getHours(times).finalTimes).times);
 
     return data;
 }

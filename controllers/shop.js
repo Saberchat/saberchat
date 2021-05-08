@@ -31,7 +31,7 @@ controller.index = async function(req, res) {
         await req.flash("error", "Unable to find orders");
         return res.redirect("back");
     }
-    return res.render("shop/index", {market, platform, orders, data: platform.features[objectArrIndex(platform.features, "route", "shop")]});
+    return res.render("shop/index", {market, platform, orders, data: platform.features[await objectArrIndex(platform.features, "route", "shop")]});
 }
 
 controller.orderForm = async function(req, res) {
@@ -54,7 +54,7 @@ controller.orderForm = async function(req, res) {
     for (let category of categories) {
         if (category.items.length > 0) {
             sortedCategory = category;
-            sortedCategory.items = sortByPopularity(category.items, "upvotes", "created_at", null).popular.concat(sortByPopularity(category.items, "upvotes", "created_at", null).unpopular);
+            sortedCategory.items = await sortByPopularity(category.items, "upvotes", "created_at", null).popular.concat(await sortByPopularity(category.items, "upvotes", "created_at", null).unpopular);
             for (let i = sortedCategory.items.length-1; i > 0; i--) {
                 if (!sortedCategory.items[i].availableItems > 0) {
                     await sortedCategory.items.splice(i, 1);
@@ -70,7 +70,7 @@ controller.orderForm = async function(req, res) {
         for (let item of order.items) {
             overlap = false;
             for (let itemObject of orderedItems) {
-                if (itemObject.item.equals(item.item._id)) {
+                if (await itemObject.item.equals(item.item._id)) {
                     itemObject.totalOrdered += item.quantity;
                     overlap = true;
                     break;
@@ -85,7 +85,7 @@ controller.orderForm = async function(req, res) {
             }
         }
     }
-    frequentItems = sortByPopularity(orderedItems, "totalOrdered", "created_at", ["item"]).popular;
+    frequentItems = await sortByPopularity(orderedItems, "totalOrdered", "created_at", ["item"]).popular;
 
     if (req.query.order) { //SHOW NEW ORDER FORM
         if (!platform.purchasable || !req.user) {
@@ -102,7 +102,7 @@ controller.orderForm = async function(req, res) {
             await req.flash("error", "You have made the maximum number of orders for the day");
             return res.redirect("back");
         }
-        return res.render("shop/newOrder", {platform, categories: sortedCategories, frequentItems, data: platform.features[objectArrIndex(platform.features, "route", "shop")]});
+        return res.render("shop/newOrder", {platform, categories: sortedCategories, frequentItems, data: platform.features[await objectArrIndex(platform.features, "route", "shop")]});
     }
 
     if (req.query.menu) { //SHOW MENU
@@ -118,16 +118,16 @@ controller.orderForm = async function(req, res) {
         for (let category of categories) {
             for (let item of category.items) {
                 itemDescription = [];
-                for (let element of convertToLink(item.description).split('\n')) {
-                    if (element.split('\r').join('').split(' ').join('') != '') {itemDescription.push(element);}
+                for (let element of await convertToLink(item.description).split('\n')) {
+                    if ((await element.split('\r').join('').split(' ').join('')) != '') {await itemDescription.push(element);}
                 }
                 itemDescriptions[item._id] = itemDescription;
                 if (item.mediaFile.filename) {
-                    await fileExtensions.set(item.mediaFile.url, path.extname(item.mediaFile.url.split("SaberChat/")[1]));
+                    await fileExtensions.set(item.mediaFile.url, await path.extname(await item.mediaFile.url.split("SaberChat/")[1]));
                 }
             }
         }
-        return res.render("shop/menu", {platform, categories: sortedCategories, itemDescriptions, frequentItems, fileExtensions, data: platform.features[objectArrIndex(platform.features, "route", "shop")]});
+        return res.render("shop/menu", {platform, categories: sortedCategories, itemDescriptions, frequentItems, fileExtensions, data: platform.features[await objectArrIndex(platform.features, "route", "shop")]});
     }
 }
 
@@ -163,18 +163,18 @@ controller.order = async function(req, res) {
     }
 
     for (let item of orderedItems) { //Search for unavailable items
-        if (item.availableItems < parseInt(req.body[item.name])) {
+        if (item.availableItems < await parseInt(req.body[item.name])) {
             await req.flash("error", "Some items are unavailable in the quantities you requested. Please order again.");
             return res.redirect("back");
         }
     }
 
     let charge = 0; //Track order charge to compare with balance
-    for (let item of orderedItems) {charge += (item.price * parseInt(req.body[item.name]));} //Increment charge
+    for (let item of orderedItems) {charge += (item.price * await parseInt(req.body[item.name]));} //Increment charge
 
     if (!req.body.payingInPerson) {
         if (charge > req.user.balance) { //Check to see if you are ordering more than you can
-            await req.flash("error", `You do not have enough money in your account for this order. Contact a platform ${platform.permissionsDisplay[platform.permissionsDisplay.length-1].toLowerCase()} if there has been a mistake.`);
+            await req.flash("error", `You do not have enough money in your account for this order. Contact a platform ${await platform.permissionsDisplay[platform.permissionsDisplay.length-1].toLowerCase()} if there has been a mistake.`);
             return res.redirect("/shop");
         }
         req.user.balance -= charge;
@@ -184,7 +184,7 @@ controller.order = async function(req, res) {
 
     for (let item of orderedItems) { //Update items
         if (item.displayAvailability) {
-            item.availableItems -= parseInt(req.body[item.name]);
+            item.availableItems -= await parseInt(req.body[item.name]);
             await item.save();
         }
     }
@@ -204,14 +204,14 @@ controller.confirmOrder = async function(req, res) {
     if (order.customer.receiving_emails) {
         let itemText = []; //This will have all the decoded info about the order
         for (let i = 0; i < order.items.length; i++) {
-            itemText.push(` - ${order.items[i].item.name}: ${order.items[i].quantity} order(s)`);
+            await itemText.push(` - ${order.items[i].item.name}: ${order.items[i].quantity} order(s)`);
         }
 
         let emailText = '';
         if (platform.dollarPayment) {
-            emailText =  `<p>Your order has been confirmed! Please alert us if there are any problems, etc.<p><p>${itemText.join(", ")}</p><p>Extra Instructions: ${order.instructions}</p><p>Total Cost: $${(order.charge).toFixed(2)}</p>`;
+            emailText =  `<p>Your order has been confirmed! Please alert us if there are any problems, etc.<p><p>${await itemText.join(", ")}</p><p>Extra Instructions: ${order.instructions}</p><p>Total Cost: $${await (order.charge).toFixed(2)}</p>`;
         } else {
-            emailText =  `<p>Your order has been confirmed! Please alert us if there are any problems, etc.<p><p>${itemText.join(", ")}</p><p>Extra Instructions: ${order.instructions}</p><p>Total Cost: ${(order.charge)} Credits</p>`;
+            emailText =  `<p>Your order has been confirmed! Please alert us if there are any problems, etc.<p><p>${await itemText.join(", ")}</p><p>Extra Instructions: ${order.instructions}</p><p>Total Cost: ${(order.charge)} Credits</p>`;
         }
         if (order.customer.receiving_emails) {
             await sendGridEmail(order.customer.email, "Order Confirmed", `<p>Hello ${order.customer.firstName},</p>${emailText}`, false);
@@ -235,21 +235,21 @@ controller.processOrder = async function(req, res) {
     });
 
     if (!notif) {return res.json({error: "Unable to send notification"});}
-    notif.date = dateFormat(notif.created_at, "h:MM TT | mmm d");
+    notif.date = await dateFormat(notif.created_at, "h:MM TT | mmm d");
 
     let itemText = []; //This will have all the decoded info about the order
     for (var i = 0; i < order.items.length; i++) {
-        itemText.push(` - ${order.items[i].item.name}: ${order.items[i].quantity} order(s)`);
+        await itemText.push(` - ${order.items[i].item.name}: ${order.items[i].quantity} order(s)`);
     }
 
     //Formats the charge in money format
     let emailText = "";
     if (platform.dollarPayment) {
-        notif.text = `Your order is on its way!\n ${itemText.join("\n")} \n\nExtra Instructions: ${order.instructions} \nTotal Cost: $${(order.charge).toFixed(2)}`;
-        emailText =  `<p>Your order is on its way!<p><p>${itemText.join(", ")}</p><p>Extra Instructions: ${order.instructions}</p><p>Total Cost: $${(order.charge).toFixed(2)}</p>`;
+        notif.text = `Your order is on its way!\n ${await itemText.join("\n")} \n\nExtra Instructions: ${order.instructions} \nTotal Cost: $${await (order.charge).toFixed(2)}`;
+        emailText =  `<p>Your order is on its way!<p><p>${await itemText.join(", ")}</p><p>Extra Instructions: ${order.instructions}</p><p>Total Cost: $${await (order.charge).toFixed(2)}</p>`;
     } else {
-        notif.text = `Your order is on its way!\n ${itemText.join("\n")} \n\nExtra Instructions: ${order.instructions} \nTotal Cost: ${(order.charge)} Credits`;
-        emailText =  `<p>Your order is on its way!<p><p>${itemText.join(", ")}</p><p>Extra Instructions: ${order.instructions}</p><p>Total Cost: ${(order.charge)} Credits</p>`;
+        notif.text = `Your order is on its way!\n ${await itemText.join("\n")} \n\nExtra Instructions: ${order.instructions} \nTotal Cost: ${(order.charge)} Credits`;
+        emailText =  `<p>Your order is on its way!<p><p>${await itemText.join(", ")}</p><p>Extra Instructions: ${order.instructions}</p><p>Total Cost: ${(order.charge)} Credits</p>`;
     }
     await notif.save();
     if (order.customer.receiving_emails) {
@@ -272,7 +272,7 @@ controller.processOrder = async function(req, res) {
 //REJECT OR CANCEL ORDER
 controller.deleteOrder = async function(req, res) {
     if (req.body.rejectionReason) {
-        if (!req.user.tags.includes("Cashier")) {return res.json({error: "You do not have permission to do that"});}
+        if (!(await req.user.tags.includes("Cashier"))) {return res.json({error: "You do not have permission to do that"});}
         const platform = await setup(Platform);
         const order = await Order.findById(req.params.id).populate("items.item").populate("customer");
         if (!platform || !order) {return res.json({error: "Could not find order"});}
@@ -293,29 +293,29 @@ controller.deleteOrder = async function(req, res) {
             images: []
         });
         if (!notif) {return res.json({error: "Could not send notification"});}
-        notif.date = dateFormat(notif.created_at, "h:MM TT | mmm d");
+        notif.date = await dateFormat(notif.created_at, "h:MM TT | mmm d");
 
         let itemText = []; //This will have all the decoded info about the order
         for (var i = 0; i < order.items.length; i++) {
-            itemText.push(` - ${order.items[i].item.name}: ${order.items[i].quantity} order(s)`);
+            await itemText.push(` - ${order.items[i].item.name}: ${order.items[i].quantity} order(s)`);
         }
 
         let emailText = "";
         if (platform.dollarPayment) {
             if (req.body.rejectionReason == '') {
-                notif.text = `Your order was rejected. This is most likely because we suspect your order is not genuine. Contact us if you think there has been a mistake. No reason was provided for rejection.\n ${itemText.join("\n")} \n\nExtra Instructions: ${order.instructions} \nTotal Cost: $${(order.charge).toFixed(2)}`;
-                emailText = `<p>Your order was rejected. This is most likely because we suspect your order is not genuine. Contact us if you think there has been a mistake. No reason was provided for rejection.</p><p>${itemText.join(", ")}</p><p>Extra Instructions: ${order.instructions}</p><p>Total Cost: $${(order.charge).toFixed(2)}</p>`;
+                notif.text = `Your order was rejected. This is most likely because we suspect your order is not genuine. Contact us if you think there has been a mistake. No reason was provided for rejection.\n ${await itemText.join("\n")} \n\nExtra Instructions: ${order.instructions} \nTotal Cost: $${await (order.charge).toFixed(2)}`;
+                emailText = `<p>Your order was rejected. This is most likely because we suspect your order is not genuine. Contact us if you think there has been a mistake. No reason was provided for rejection.</p><p>${await itemText.join(", ")}</p><p>Extra Instructions: ${order.instructions}</p><p>Total Cost: $${await (order.charge).toFixed(2)}</p>`;
             } else {
-                notif.text = `Your order was rejected. This is most likely because we suspect your order is not genuine. Contact us if you think there has been a mistake. The reason was provided for rejection was the following: \"${req.body.rejectionReason}\"\n ${itemText.join("\n")} \n\nExtra Instructions: $${order.instructions} \nTotal Cost: ${(order.charge).toFixed(2)}`;
-                emailText = `<p>Your order was rejected. This is most likely because we suspect your order is not genuine. Contact us if you think there has been a mistake. The reason was provided for rejection was the following: "${req.body.rejectionReason}"</p><p>${itemText.join(", ")}</p><p>Extra Instructions: ${order.instructions}</p><p>Total Cost: $${(order.charge).toFixed(2)}</p>`;
+                notif.text = `Your order was rejected. This is most likely because we suspect your order is not genuine. Contact us if you think there has been a mistake. The reason was provided for rejection was the following: \"${req.body.rejectionReason}\"\n ${await itemText.join("\n")} \n\nExtra Instructions: $${order.instructions} \nTotal Cost: ${await (order.charge).toFixed(2)}`;
+                emailText = `<p>Your order was rejected. This is most likely because we suspect your order is not genuine. Contact us if you think there has been a mistake. The reason was provided for rejection was the following: "${req.body.rejectionReason}"</p><p>${await itemText.join(", ")}</p><p>Extra Instructions: ${order.instructions}</p><p>Total Cost: $${await (order.charge).toFixed(2)}</p>`;
             }
         } else {
             if (req.body.rejectionReason == '') {
-                notif.text = `Your order was rejected. This is most likely because we suspect your order is not genuine. Contact us if you think there has been a mistake. No reason was provided for rejection.\n ${itemText.join("\n")} \n\nExtra Instructions: ${order.instructions} \nTotal Cost: ${order.charge} Credits`;
-                emailText = `<p>Your order was rejected. This is most likely because we suspect your order is not genuine. Contact us if you think there has been a mistake. No reason was provided for rejection.</p><p>${itemText.join(", ")}</p><p>Extra Instructions: ${order.instructions}</p><p>Total Cost: ${order.charge} Credits</p>`;
+                notif.text = `Your order was rejected. This is most likely because we suspect your order is not genuine. Contact us if you think there has been a mistake. No reason was provided for rejection.\n ${await itemText.join("\n")} \n\nExtra Instructions: ${order.instructions} \nTotal Cost: ${order.charge} Credits`;
+                emailText = `<p>Your order was rejected. This is most likely because we suspect your order is not genuine. Contact us if you think there has been a mistake. No reason was provided for rejection.</p><p>${await itemText.join(", ")}</p><p>Extra Instructions: ${order.instructions}</p><p>Total Cost: ${order.charge} Credits</p>`;
             } else {
-                notif.text = `Your order was rejected. This is most likely because we suspect your order is not genuine. Contact us if you think there has been a mistake. The reason was provided for rejection was the following: \"${req.body.rejectionReason}\"\n ${itemText.join("\n")} \n\nExtra Instructions: ${order.instructions} \nTotal Cost: ${order.charge} Credits`;
-                emailText = `<p>Your order was rejected. This is most likely because we suspect your order is not genuine. Contact us if you think there has been a mistake. The reason was provided for rejection was the following: "${req.body.rejectionReason}"</p><p>${itemText.join(", ")}</p><p>Extra Instructions: ${order.instructions}</p><p>Total Cost: ${order.charge} Credits</p>`;
+                notif.text = `Your order was rejected. This is most likely because we suspect your order is not genuine. Contact us if you think there has been a mistake. The reason was provided for rejection was the following: \"${req.body.rejectionReason}\"\n ${await itemText.join("\n")} \n\nExtra Instructions: ${order.instructions} \nTotal Cost: ${order.charge} Credits`;
+                emailText = `<p>Your order was rejected. This is most likely because we suspect your order is not genuine. Contact us if you think there has been a mistake. The reason was provided for rejection was the following: "${req.body.rejectionReason}"</p><p>${await itemText.join(", ")}</p><p>Extra Instructions: ${order.instructions}</p><p>Total Cost: ${order.charge} Credits</p>`;
             }
         }
 
@@ -346,7 +346,7 @@ controller.deleteOrder = async function(req, res) {
 
     const order = await Order.findById(req.params.id);
     if (!order) {return res.json({error: "Could not find order"});}
-    if (!order.customer.equals(req.user._id)) {return res.json({error: "You can only delete your own orders"});}
+    if (!(await order.customer.equals(req.user._id))) {return res.json({error: "You can only delete your own orders"});}
     if (order.confirmed) {return res.json({error: "Order has been confirmed"});}
 
     const deletedOrder = await Order.findByIdAndDelete(req.params.id).populate("items.item");
@@ -378,7 +378,7 @@ controller.newItem = async function(req, res) {
         return res.redirect("back");
     }
 
-    return res.render("shop/newOrderItem", {platform, categories, data: platform.features[objectArrIndex(platform.features, "route", "shop")]});
+    return res.render("shop/newOrderItem", {platform, categories, data: platform.features[await objectArrIndex(platform.features, "route", "shop")]});
 }
 
 //CREATE NEW ITEM
@@ -398,7 +398,7 @@ controller.createItem = async function(req, res) {
 
     const item = await Item.create({
         name: req.body.name,
-        availableItems: parseInt(req.body.available),
+        availableItems: await parseInt(req.body.available),
         description: req.body.description,
         imgUrl: {url: req.body.image, display: req.body.showImage == "url"},
         imageLink: (req.body.imageLink != undefined),
@@ -435,7 +435,7 @@ controller.createItem = async function(req, res) {
     }
 
     //Create charge; once created, add to item"s info
-    if (parseFloat(req.body.price)) {item.price = parseFloat(req.body.price);
+    if (await parseFloat(req.body.price)) {item.price = await parseFloat(req.body.price);
     } else {item.price = 0;}
 
     let category = await ItemCategory.findOne({_id: {$in: shop.categories}, name: req.body.category}); //Find the category specified in the form
@@ -475,10 +475,10 @@ controller.viewItem = async function(req, res) {
 
     let fileExtensions = new Map();
     if (item.mediaFile.filename) {
-        fileExtensions.set(item.mediaFile.url, path.extname(item.mediaFile.url.split("SaberChat/")[1]));
+        await fileExtensions.set(item.mediaFile.url, await path.extname(await item.mediaFile.url.split("SaberChat/")[1]));
     }
 
-    return res.render("shop/show", {platform, categories, item, fileExtensions, data: platform.features[objectArrIndex(platform.features, "route", "shop")]});
+    return res.render("shop/show", {platform, categories, item, fileExtensions, data: platform.features[await objectArrIndex(platform.features, "route", "shop")]});
 }
 
 //UPDATE/UPVOTE ITEM
@@ -524,15 +524,11 @@ controller.deleteItem = async function(req, res) {
 
     for (let order of orders) { //If the order includes this item, remove the item from that order"s item list
         for (let i of order.items) {
-            if (!i.item) {
-                await order.items.splice(i, 1);
-            }
+            if (!i.item) {await order.items.splice(i, 1);}
         }
 
         order.charge = 0;
-        for (let i of order.items) {
-            order.charge += (i.item.price * i.quantity);
-        }
+        for (let i of order.items) {order.charge += (i.item.price * i.quantity);}
         await order.save();
     }
 
@@ -566,7 +562,7 @@ controller.manage = async function(req, res) {
         }
         data.platform = platform;
         data.market = market;
-        data.data = platform.features[objectArrIndex(platform.features, "route", "shop")];
+        data.data = platform.features[await objectArrIndex(platform.features, "route", "shop")];
         return res.render("shop/data", data);
 
     } else { //If route calls to display regular management
@@ -591,7 +587,7 @@ controller.updateSettings = async function(req, res) {
     }
 
     for (let attr of ["name", "description"]) {
-        platform.features[objectArrIndex(platform.features, "route", "shop")][attr] = req.body[attr];
+        platform.features[await objectArrIndex(platform.features, "route", "shop")][attr] = req.body[attr];
     }
     await platform.save();
     await req.flash("success", "Updated Settings!");
@@ -609,7 +605,7 @@ controller.newCategory = async function(req, res) {
         await req.flash("error", "Unable to find categories");
         return res.redirect("back");
     }
-    return res.render("shop/newItemCategory", {platform, categories, data: platform.features[objectArrIndex(platform.features, "route", "shop")]});
+    return res.render("shop/newItemCategory", {platform, categories, data: platform.features[await objectArrIndex(platform.features, "route", "shop")]});
 }
 
 //CREATE NEW ITEM CATEGORY
@@ -632,7 +628,7 @@ controller.createCategory = async function(req, res) {
         return res.redirect("back");
     }
 
-    shop.categories.push(category); //Add category to shop's settings
+    await shop.categories.push(category); //Add category to shop's settings
     await shop.save();
 
     const categories = await ItemCategory.find({_id: {$in: shop.categories}}); //Found categories, but represents all item categories
@@ -643,9 +639,7 @@ controller.createCategory = async function(req, res) {
 
     for (let t of categories) { //Now that we"ve created the category, we have to remove the newly selected items from all other categories
         for (let i = 0; i < t.items.length; i++) {
-            if (req.body[t.items[i].toString()]) {
-                t.items.splice(i, 1);
-            }
+            if (await req.body[t.items[i].toString()]) {await t.items.splice(i, 1);}
         }
         await t.save();
     }
@@ -657,9 +651,7 @@ controller.createCategory = async function(req, res) {
     }
 
     for (let item of items) { //If the item is selected, add it to this category (now that we"ve removed it from all other categories)
-        if (req.body[item._id.toString()]) {
-            await category.items.push(item);
-        }
+        if (await req.body[item._id.toString()]) {await category.items.push(item);}
     }
 
     await category.save();
@@ -688,7 +680,7 @@ controller.viewCategory = async function(req, res) {
         await req.flash("error", "An Error Occurred");
         return res.redirect("back");
     }
-    return res.render("shop/editItemCategory", {platform, category, categories, data: platform.features[objectArrIndex(platform.features, "route", "shop")]});
+    return res.render("shop/editItemCategory", {platform, category, categories, data: platform.features[await objectArrIndex(platform.features, "route", "shop")]});
 }
 
 //UPDATE ITEM CATEGORY
@@ -725,7 +717,7 @@ controller.updateCategory = async function(req, res) {
 
     for (let otherCategory of otherCategories) { //Iterate over other categories
         for (let item of items) {
-            if (otherCategory.items.includes(item._id) && req.body[item._id.toString()] == "on") {
+            if ((await otherCategory.items.includes(item._id)) && (await req.body[item._id.toString()] == "on")) {
                 await otherCategory.items.splice(otherCategory.items.indexOf(item._id), 1);
             }
         }
@@ -742,17 +734,13 @@ controller.updateCategory = async function(req, res) {
     }
 
     for (let item of category.items) {
-        if (!req.body[item._id.toString()]) { //Item is no longer checked
-            await other.items.push(item); //Move that item to "Other"
-        }
+        if (!(await req.body[item._id.toString()])) {await other.items.push(item);} //Item is no longer checked; move it to other
     }
     await other.save();
 
     category.items = []; //Empty category and push new items to its items[] array, based on the latest changes
     for (let item of items) {
-        if (req.body[item._id.toString()]) {
-            await category.items.push(item);
-        }
+        if (await req.body[item._id.toString()]) {await category.items.push(item);}
     }
 
     await category.save();
@@ -781,9 +769,7 @@ controller.deleteCategory = async function(req, res) {
     await removeIfIncluded(shop.categories, category._id);
     await shop.save();
 
-    for (let item of category.items) {
-        await other.items.push(item);
-    }
+    for (let item of category.items) {await other.items.push(item);}
 
     await other.save();
     await req.flash("success", "Item category deleted!");
@@ -807,7 +793,7 @@ controller.upvoteItem = async function(req, res) {
 }
 
 controller.updateItemInfo = async function(req, res) {
-    if (!req.user.tags.includes("Cashier")) {
+    if (!(await req.user.tags.includes("Cashier"))) {
         await req.flash("error", "You do not have permission to do that");
         return res.redirect("back");
     }
@@ -826,8 +812,8 @@ controller.updateItemInfo = async function(req, res) {
     }
     const item = await Item.findByIdAndUpdate(req.params.id, {
         name: req.body.name,
-        price: parseFloat(req.body.price),
-        availableItems: parseInt(req.body.available),
+        price: await parseFloat(req.body.price),
+        availableItems: await parseInt(req.body.available),
         description: req.body.description,
         imgUrl: {url: req.body.image, display: req.body.showImage == "url"},
         imageLink: (req.body.imageLink != undefined),
@@ -933,11 +919,11 @@ controller.manageShop = async function(req, res) {
     let sortedCategory;
     for (let category of categories) {
         sortedCategory = category;
-        sortedCategory.items = sortByPopularity(category.items, "upvotes", "created_at", null).popular.concat(sortByPopularity(category.items, "upvotes", "created_at", null).unpopular);
-        sortedCategories.push(sortedCategory);
+        sortedCategory.items = await sortByPopularity(category.items, "upvotes", "created_at", null).popular.concat(await sortByPopularity(category.items, "upvotes", "created_at", null).unpopular);
+        await sortedCategories.push(sortedCategory);
     }
 
-    return res.render("shop/manage", {platform, categories: sortedCategories, open: shop.open, data: platform.features[objectArrIndex(platform.features, "route", "shop")]});
+    return res.render("shop/manage", {platform, categories: sortedCategories, open: shop.open, data: platform.features[await objectArrIndex(platform.features, "route", "shop")]});
 }
 
 controller.manageOrders = async function(req, res) {
@@ -952,7 +938,7 @@ controller.manageOrders = async function(req, res) {
         await req.flash("error", "Could not find orders");
         return res.redirect("back");
     }
-    return res.render("shop/orderDisplay", {platform, orders, data: platform.features[objectArrIndex(platform.features, "route", "shop")]});
+    return res.render("shop/orderDisplay", {platform, orders, data: platform.features[await objectArrIndex(platform.features, "route", "shop")]});
 }
 
 module.exports = controller;

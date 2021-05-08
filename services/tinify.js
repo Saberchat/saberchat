@@ -31,12 +31,10 @@ async function compressImage(buffer) {
 
 // compresses image if possible, else just returns original buffer
 module.exports.autoCompress = async function(fileName, fileBuffer) {
-    const ext = path.extname(fileName).toLowerCase();
-    if([".png", ".jpg", ".jpeg"].includes(ext)) {
+    const ext = await path.extname(fileName).toLowerCase();
+    if(await [".png", ".jpg", ".jpeg"].includes(ext)) {
         const results = await compressImage(fileBuffer);
-        if(results.success) {
-            return results.buffer;
-        }
+        if(results.success) {return results.buffer;}
     }
     return fileBuffer;
 }

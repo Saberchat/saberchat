@@ -19,18 +19,21 @@ controller.index = async function(req, res) {
     const platform = await setup(Platform);
     const users = await User.find({});
     let modules;
-    if (req.user && platform.permissionsProperty.slice(platform.permissionsProperty.length-3).includes(req.user.permission)) {
+    if (req.user && (await platform.permissionsProperty.slice(platform.permissionsProperty.length-3).includes(req.user.permission))) {
         modules = await Module.find({}).populate('sender');
     } else {
         modules = await Module.find({verified: true}).populate('sender');
     }
 
-    if(!platform || !users || !modules) {req.flash('error', 'Cannot find modules.'); return res.redirect('back');}
+    if(!platform || !users || !modules) {
+        await req.flash('error', 'Cannot find modules.');
+        return res.redirect('back');
+    }
 
     const userNames = await parsePropertyArray(users, "firstName").join(',').toLowerCase().split(',');
-    const moduleTexts = embedLink(req.user, modules, userNames);
+    const moduleTexts = await embedLink(req.user, modules, userNames);
 
-    return res.render('modules/index', {platform, modules: modules.reverse(), data: platform.features[objectArrIndex(platform.features, "route", "modules")], moduleTexts});
+    return res.render('modules/index', {platform, modules: await modules.reverse(), data: platform.features[await objectArrIndex(platform.features, "route", "modules")], moduleTexts});
 };
 
 controller.new = async function(req, res) {
@@ -39,7 +42,7 @@ controller.new = async function(req, res) {
         await req.flash("error", "An error occurred");
         return res.redirect("back");
     }
-    return res.render('modules/new', {platform, data: platform.features[objectArrIndex(platform.features, "route", "modules")]});
+    return res.render('modules/new', {platform, data: platform.features[await objectArrIndex(platform.features, "route", "modules")]});
 };
 
 // Module GET show
@@ -52,36 +55,40 @@ controller.show = async function(req, res) {
             populate: {path: "sender"}
         });
     if(!platform || !module) {
-        await req.flash('error', 'Could not find module'); return res.redirect('back');
+        await req.flash('error', 'Could not find module');
+        return res.redirect('back');
 
-    } else if (!module.verified && !platform.permissionsProperty.slice(platform.permissionsProperty.length-3).includes(req.user.permission)) {
+    } else if (!module.verified && !(await platform.permissionsProperty.slice(platform.permissionsProperty.length-3).includes(req.user.permission))) {
         await req.flash('error', 'You cannot view that module');
         return res.redirect('back');
     }
 
     let fileExtensions = new Map(); //Track which file format each attachment is in
     for (let media of module.mediaFiles) {
-        fileExtensions.set(media.url, path.extname(media.url.split("SaberChat/")[1]));
+        await fileExtensions.set(media.url, await path.extname(await media.url.split("SaberChat/")[1]));
     }
-    const convertedText = convertToLink(module.text); //Parse and add hrefs to all links in text
-    return res.render('modules/show', {platform, module, convertedText, fileExtensions, data: platform.features[objectArrIndex(platform.features, "route", "modules")]});
+    return res.render('modules/show', {platform, module, convertedText: await convertToLink(module.text), fileExtensions, data: platform.features[await objectArrIndex(platform.features, "route", "modules")]});
 };
 
 // Module GET edit form
 controller.updateForm = async function(req, res) {
     const platform = await setup(Platform);
     const module = await Module.findById(req.params.id);
-    if(!platform || !module) {req.flash('error', 'Could not find module'); return res.redirect('back');}
-    if(!module.sender._id.equals(req.user._id)) {
+    if(!platform || !module) {
+        await req.flash('error', 'Could not find module');
+        return res.redirect('back');
+    }
+    
+    if(!(await module.sender._id.equals(req.user._id))) {
         await req.flash('error', 'You do not have permission to do that.');
         return res.redirect('back');
     }
 
     let fileExtensions = new Map(); //Track which file format each attachment is in
     for (let media of module.mediaFiles) {
-        fileExtensions.set(media.url, path.extname(media.url.split("SaberChat/")[1]));
+        await fileExtensions.set(media.url, await path.extname(media.url.split("SaberChat/")[1]));
     }
-    return res.render('modules/edit', {platform, module, fileExtensions, data: platform.features[objectArrIndex(platform.features, "route", "modules")]});
+    return res.render('modules/edit', {platform, module, fileExtensions, data: platform.features[await objectArrIndex(platform.features, "route", "modules")]});
 };
 
 // Module POST create
@@ -117,7 +124,7 @@ controller.create = async function(req, res) {
                     return res.redirect('back');
                 }
 
-                module.mediaFiles.push({
+                await module.mediaFiles.push({
                     filename: cloudResult.public_id,
                     url: cloudResult.secure_url,
                     originalName: file.originalname
@@ -126,11 +133,11 @@ controller.create = async function(req, res) {
         }
     }
 
-    module.date = dateFormat(module.created_at, "h:MM TT | mmm d");
+    module.date = await dateFormat(module.created_at, "h:MM TT | mmm d");
     await module.save();
 
     if (platform.postVerifiable) {
-        await req.flash('success', `Module Posted! A ${platform.permissionsDisplay[platform.permissionsDisplay.length-1].toLowerCase()} will verify your post soon.`);
+        await req.flash('success', `Module Posted! A platform ${await platform.permissionsDisplay[platform.permissionsDisplay.length-1].toLowerCase()} will verify your post soon.`);
     } else {
         await req.flash('success', `Module Posted!`);
     }
@@ -145,7 +152,7 @@ controller.updateModule = async function(req, res) {
         return res.redirect('back');
     }
 
-    if (module.sender._id.toString() != req.user._id.toString()) {
+    if ((await module.sender._id.toString()) != (await req.user._id.toString())) {
         await req.flash('error', "You can only update modules which you have sent");
         return res.redirect('back');
     }
@@ -167,9 +174,9 @@ controller.updateModule = async function(req, res) {
     let cloudResult;
     for (let i = updatedModule.mediaFiles.length-1; i >= 0; i--) {
         if (req.body[`deleteUpload-${updatedModule.mediaFiles[i].url}`] && updatedModule.mediaFiles[i] && updatedModule.mediaFiles[i].filename) {
-            if ([".mp3", ".mp4", ".m4a", ".mov"].includes(path.extname(updatedModule.mediaFiles[i].url.split("SaberChat/")[1]).toLowerCase())) {
+            if (await [".mp3", ".mp4", ".m4a", ".mov"].includes(await path.extname(await updatedModule.mediaFiles[i].url.split("SaberChat/")[1]).toLowerCase())) {
                 [cloudErr, cloudResult] = await cloudDelete(updatedModule.mediaFiles[i].filename, "video");
-            } else if (path.extname(updatedModule.mediaFiles[i].url.split("SaberChat/")[1]).toLowerCase() == ".pdf") {
+            } else if (await path.extname(await updatedModule.mediaFiles[i].url.split("SaberChat/")[1]).toLowerCase() == ".pdf") {
                 [cloudErr, cloudResult] = await cloudDelete(updatedModule.mediaFiles[i].filename, "pdf");
             } else {
                 [cloudErr, cloudResult] = await cloudDelete(updatedModule.mediaFiles[i].filename, "image");
@@ -179,7 +186,7 @@ controller.updateModule = async function(req, res) {
                 await req.flash('error', 'Error deleting uploaded image');
                 return res.redirect('back');
             }
-            updatedModule.mediaFiles.splice(i, 1);
+            await updatedModule.mediaFiles.splice(i, 1);
         }
     }
 
@@ -195,7 +202,7 @@ controller.updateModule = async function(req, res) {
                     return res.redirect('back');
                 }
 
-                updatedModule.mediaFiles.push({
+                await updatedModule.mediaFiles.push({
                     filename: cloudResult.public_id,
                     url: cloudResult.secure_url,
                     originalName: file.originalname
@@ -237,21 +244,14 @@ controller.comment = async function(req, res) {
             path: "comments",
             populate: {path: "sender"}
         });
-    if (!module) {
-        return res.json({
-            error: 'Error commenting'
-        });
-    }
+    if (!module) {return res.json({error: 'Error commenting'});}
 
     const comment = await PostComment.create({
-        text: req.body.text.split('<').join('&lt'),
+        text: await req.body.text.split('<').join('&lt'),
         sender: req.user
     });
-    if (!comment) {
-        return res.json({error: 'Error commenting'});
-    }
-
-    comment.date = dateFormat(comment.created_at, "h:MM TT | mmm d");
+    if (!comment) {return res.json({error: 'Error commenting'});}
+    comment.date = await dateFormat(comment.created_at, "h:MM TT | mmm d");
     await comment.save();
 
     await module.comments.push(comment);
@@ -260,16 +260,16 @@ controller.comment = async function(req, res) {
     let users = [];
     let user;
     //Search for any mentioned users
-    for (let line of comment.text.split(" ")) {
+    for (let line of await comment.text.split(" ")) {
         if (line[0] == '@') {
-            user = await User.findById(line.split("#")[1].split("_")[0]);
+            user = await User.findById(await line.split("#")[1].split("_")[0]);
 
             if (!user) {
                 return res.json({
                     error: "Error accessing user"
                 });
             }
-            users.push(user);
+            await users.push(user);
         }
     }
 
@@ -307,7 +307,7 @@ controller.deleteModule = async function(req, res) {
         return res.redirect('back');
     }
 
-    if (module.sender._id.toString() != req.user._id.toString()) { //Doublecheck that deleter is moduleer
+    if ((await module.sender._id.toString()) != (await req.user._id.toString())) { //Doublecheck that deleter is moduleer
         await req.flash('error', "You can only delete modules that you have posted");
         return res.redirect('back');
     }
@@ -317,15 +317,14 @@ controller.deleteModule = async function(req, res) {
     let cloudResult;
     for (let file of module.mediaFiles) {
         if (file && file.filename) {
-            if ([".mp3", ".mp4", ".m4a", ".mov"].includes(path.extname(file.url.split("SaberChat/")[1]).toLowerCase())) {
+            if (await [".mp3", ".mp4", ".m4a", ".mov"].includes(await path.extname(await file.url.split("SaberChat/")[1]).toLowerCase())) {
                 [cloudErr, cloudResult] = await cloudDelete(file.filename, "video");
-            } else if (path.extname(file.url.split("SaberChat/")[1]).toLowerCase() == ".pdf") {
+            } else if (await path.extname(await file.url.split("SaberChat/")[1]).toLowerCase() == ".pdf") {
                 [cloudErr, cloudResult] = await cloudDelete(file.filename, "pdf");
             } else {
                 [cloudErr, cloudResult] = await cloudDelete(file.filename, "image");
             }
-            // check for failure
-            if (cloudErr || !cloudResult || cloudResult.result !== 'ok') {
+            if (cloudErr || !cloudResult || cloudResult.result !== 'ok') { // check for failure
                 await req.flash('error', 'Error deleting uploaded image');
                 return res.redirect('back');
             }

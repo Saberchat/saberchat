@@ -24,10 +24,10 @@ controller.index = async function(req, res) {
     }
 
     let names = [];
-    for (let user of teachers) {names.push(`${user.firstName} ${user.lastName}`);} //Iterate through faculty and add their name to array
+    for (let user of teachers) {await names.push(`${user.firstName} ${user.lastName}`);} //Iterate through faculty and add their name to array
 
     if (platform.indexPlatformInfo) {
-        return res.render('other/platform-info', {platform, names: names.join(', '), objectArrIndex, description: (req.user != undefined && req.query.description != undefined)});
+        return res.render('other/platform-info', {platform, names: await names.join(', '), objectArrIndex, description: (req.user != undefined && req.query.description != undefined)});
     }
     return res.render('index', {platform});
 }
@@ -41,17 +41,17 @@ controller.info = async function(req, res) {
     }
 
     let names = [];
-    for (let user of teachers) {names.push(`${user.firstName} ${user.lastName}`);} //Iterate through faculty and add their name to array
+    for (let user of teachers) {await names.push(`${user.firstName} ${user.lastName}`);} //Iterate through faculty and add their name to array
 
     if (platform.indexPlatformInfo) {return res.render('index', {platform});}
-    return res.render('other/platform-info', {platform, names: names.join(', '), objectArrIndex, description: (req.user != undefined && req.query.description != undefined)});
+    return res.render('other/platform-info', {platform, names: await names.join(', '), objectArrIndex, description: (req.user != undefined && req.query.description != undefined)});
 }
 
 controller.register = async function(req, res) {
     const platform = await setup(Platform);
     const accesslistedEmail = await Email.findOne({address: req.body.email, version: "accesslist"});
     if (!platform || !accesslistedEmail) {
-        if (platform.emailExtension != '' && req.body.email.split("@")[1] != platform.emailExtension) {
+        if (platform.emailExtension != '' && (await req.body.email.split("@")[1] != platform.emailExtension)) {
             await req.flash('error', `Only members of the ${platform.name} community may sign up`);
             return res.redirect('/');
         }
@@ -90,9 +90,9 @@ controller.register = async function(req, res) {
 
     //Create authentication token
     let charSetMatrix = [];
-    charSetMatrix.push('qwertyuiopasdfghjklzxcvbnm'.split(''));
-    charSetMatrix.push('QWERTYUIOPASDFGHJKLZXCVBNM'.split(''));
-    charSetMatrix.push('1234567890'.split(''));
+    await charSetMatrix.push(await 'qwertyuiopasdfghjklzxcvbnm'.split(''));
+    await charSetMatrix.push(await 'QWERTYUIOPASDFGHJKLZXCVBNM'.split(''));
+    await charSetMatrix.push(await '1234567890'.split(''));
 
     let tokenLength = Math.round((Math.random() * 15)) + 15;
     let token = "";
@@ -109,7 +109,7 @@ controller.register = async function(req, res) {
             email: email,
             firstName: firstName,
             lastName: lastName,
-            username: filter.clean(username),
+            username: await filter.clean(username),
             annCount: [],
             authenticated: false,
             authenticationToken: token,
@@ -135,7 +135,7 @@ controller.register = async function(req, res) {
         return res.redirect("/");
     }
 
-    if (`${user.firstName} ${user.lastName}`.toLowerCase() == platform.principal.toLowerCase()) {
+    if ((await `${user.firstName} ${user.lastName}`.toLowerCase()) == (await platform.principal.toLowerCase())) {
         user.permission = platform.permissionsProperty[platform.permissionsProperty.length-1];
         await user.save();
     }
@@ -162,9 +162,9 @@ controller.authenticate = async function(req, res) {
 
     //Update authentication token
     let charSetMatrix = [];
-    charSetMatrix.push('qwertyuiopasdfghjklzxcvbnm'.split(''));
-    charSetMatrix.push('QWERTYUIOPASDFGHJKLZXCVBNM'.split(''));
-    charSetMatrix.push('1234567890'.split(''));
+    await charSetMatrix.push(await 'qwertyuiopasdfghjklzxcvbnm'.split(''));
+    await charSetMatrix.push(await 'QWERTYUIOPASDFGHJKLZXCVBNM'.split(''));
+    await charSetMatrix.push(await '1234567890'.split(''));
 
     let tokenLength = Math.round((Math.random() * 15)) + 15;
     let token = "";
@@ -175,7 +175,7 @@ controller.authenticate = async function(req, res) {
     }
 
     //If authentication token is a match
-    if (req.query.token.toString() == user.authenticationToken.toString()) {
+    if ((await req.query.token.toString()) == (await user.authenticationToken.toString())) {
         user.authenticated = true;
         user.authenticationToken = token;
         await user.save();
@@ -213,9 +213,7 @@ controller.login = function(req, res, next) { //No need for async as login recor
 
         //If authentication succeeds, log in user again
         req.logIn(user, (err) => {
-            if (err) {
-                return next(err);
-            }
+            if (err) {return next(err);}
             user.logins.push(new Date());
             user.save();
             req.flash('success', `Welcome ${user.firstName}`);
@@ -234,10 +232,10 @@ controller.forgotPassword = async function(req, res) {
 
     //Build temporary password for user to confirm their identity
     let charSetMatrix = [];
-    charSetMatrix.push('qwertyuiopasdfghjklzxcvbnm'.split(''));
-    charSetMatrix.push('QWERTYUIOPASDFGHJKLZXCVBNM'.split(''));
-    charSetMatrix.push('1234567890'.split(''));
-    charSetMatrix.push('()%!~$#*-=+[)\\{]|\'",.<>');
+    await charSetMatrix.push(await 'qwertyuiopasdfghjklzxcvbnm'.split(''));
+    await charSetMatrix.push(await 'QWERTYUIOPASDFGHJKLZXCVBNM'.split(''));
+    await charSetMatrix.push(await '1234567890'.split(''));
+    await charSetMatrix.push(await '()%!~$#*-=+[)\\{]|\'",.<>'.split(''));
 
     let pwd_length = Math.round((Math.random() * 15)) + 15;
     let pwd = "";

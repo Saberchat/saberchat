@@ -21,7 +21,7 @@ controller.index = async function(req, res) {
         await req.flash('error', 'An Error Occurred');
         return res.redirect('/wHeights');
     }
-    return res.render('wHeights/index', {platform, articles, icon: platform.features[objectArrIndex(platform.features, "route", "wHeights")].icon});
+    return res.render('wHeights/index', {platform, articles, icon: platform.features[await objectArrIndex(platform.features, "route", "wHeights")].icon});
 }
 
 // display form for creating articles
@@ -44,7 +44,7 @@ controller.new = async function(req, res) {
         return res.redirect('back');
     }
 
-    return res.render('wHeights/new', {platform, students, categories, icon: platform.features[objectArrIndex(platform.features, "route", "wHeights")].icon});
+    return res.render('wHeights/new', {platform, students, categories, icon: platform.features[await objectArrIndex(platform.features, "route", "wHeights")].icon});
 }
 
 // display specific article
@@ -61,24 +61,21 @@ controller.show = async function(req, res) {
         await req.flash('error', 'Cannot find article');
         return res.redirect('/wHeights');
     }
-    return res.render('wHeights/show', {platform, article, icon: platform.features[objectArrIndex(platform.features, "route", "wHeights")].icon});
+    return res.render('wHeights/show', {platform, article, icon: platform.features[await objectArrIndex(platform.features, "route", "wHeights")].icon});
 }
 
 //Create article
 controller.create = async function(req, res) {
-    const content = JSON.parse(req.body.content);
-
-    const articleObj = {
+    const content = await JSON.parse(req.body.content);
+    const article = await Article.create({
         title: req.body.title,
         content: content
-    };
-
-    const article = await Article.create(articleObj);
+    });
     if (!article) {
         await req.flash('error', "Error creating article");
         return res.redirect('/wHeights');
     }
-    article.date = dateFormat(article.created_at, "mmm d, yyyy - h:MM TT");
+    article.date = await dateFormat(article.created_at, "mmm d, yyyy - h:MM TT");
 
     const sender = await User.findById(req.body.sender);
     if (!sender) {
@@ -109,20 +106,16 @@ controller.comment = async function(req, res) {
             populate: {path: "sender"}
         });
 
-    if (!article) {
-        return res.json({error: 'Error commenting'});
-    }
+    if (!article) {return res.json({error: 'Error commenting'});}
 
     const comment = await PostComment.create({
-        text: req.body.text.split('<').join('&lt'),
+        text: await req.body.text.split('<').join('&lt'),
         sender: req.user,
-        date: dateFormat(new Date(), "h:MM TT | mmm d")
+        date: await dateFormat(new Date(), "h:MM TT | mmm d")
     });
-    if (!comment) {
-        return res.json({error: 'Error commenting'});
-    }
+    if (!comment) {return res.json({error: 'Error commenting'});}
 
-    comment.date = dateFormat(comment.created_at, "h:MM TT | mmm d");
+    comment.date = await dateFormat(comment.created_at, "h:MM TT | mmm d");
     await comment.save();
 
     await article.comments.push(comment);
@@ -132,14 +125,10 @@ controller.comment = async function(req, res) {
     let user;
 
     //Look for any mentioned users in comment text
-    for (let line of comment.text.split(" ")) {
+    for (let line of await comment.text.split(" ")) {
         if (line[0] == '@') {
-            user = await User.findById(line.split("#")[1].split("_")[0]);
-
-            if (!user) {
-                return res.json({error: "Error accessing user"});
-            }
-
+            user = await User.findById(await line.split("#")[1].split("_")[0]);
+            if (!user) {return res.json({error: "Error accessing user"});}
             await users.push(user);
         }
     }
@@ -159,7 +148,7 @@ controller.comment = async function(req, res) {
             return res.json({error: "Error creating notification"});
         }
 
-        notif.date = dateFormat(notif.created_at, "h:MM TT | mmm d");
+        notif.date = await dateFormat(notif.created_at, "h:MM TT | mmm d");
         notif.text = `Hello ${user.firstName},\n\n${req.user.firstName} ${req.user.lastName} mentioned you in a comment on "${article.title}":\n${comment.text}`;
         await notif.save();
         if (user.receiving_emails) {

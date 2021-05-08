@@ -20,21 +20,23 @@ controller.index = async function(req, res) {
     const platform = await setup(Platform);
     const users = await User.find({});
     let articles;
-    if (req.user && platform.permissionsProperty.slice(platform.permissionsProperty.length-3).includes(req.user.permission)) {
+    if (req.user && await platform.permissionsProperty.slice(platform.permissionsProperty.length-3).includes(req.user.permission)) {
         articles = await ArticleLink.find({}).populate('sender');
     } else {
         articles = await ArticleLink.find({verified: true}).populate('sender');
     }
 
-    if(!platform || !users || !articles) {req.flash('error', 'Cannot find articles.'); return res.redirect('back');}
+    if(!platform || !users || !articles) {
+        await req.flash('error', 'Cannot find articles.');
+        return res.redirect('back');
+    }
 
     const userNames = await parsePropertyArray(users, "firstName").join(',').toLowerCase().split(',');
     const articleTexts = await embedLink(req.user, articles, userNames);
 
     return res.render('articles/index', {
-        platform, articles: articles.reverse(), 
-        data: platform.features[objectArrIndex(platform.features, "route", "articles")],
-        articleTexts
+        platform, articles: await articles.reverse(), articleTexts,
+        data: platform.features[await objectArrIndex(platform.features, "route", "articles")]
     });
 };
 
@@ -45,7 +47,7 @@ controller.new = async function(req, res) {
         await req.flash("error", "An error occurred");
         return res.redirect("back");
     }
-    return res.render('articles/new', {platform, data: platform.features[objectArrIndex(platform.features, "route", "articles")]});
+    return res.render('articles/new', {platform, data: platform.features[await objectArrIndex(platform.features, "route", "articles")]});
 };
 
 // Article GET show
@@ -59,34 +61,37 @@ controller.show = async function(req, res) {
         });
     if(!platform || !article) {
         await req.flash('error', 'Could not find article'); return res.redirect('back');
-    } else if (!article.verified && !platform.permissionsProperty.slice(platform.permissionsProperty.length-3).includes(req.user.permission)) {
+    } else if (!article.verified && !(await platform.permissionsProperty.slice(platform.permissionsProperty.length-3).includes(req.user.permission))) {
         await req.flash('error', 'You cannot view that article');
         return res.redirect('back');
     }
 
     let fileExtensions = new Map(); //Track which file format each attachment is in
     for (let media of article.mediaFiles) {
-        fileExtensions.set(media.url, path.extname(media.url.split("SaberChat/")[1]));
+        await fileExtensions.set(media.url, await path.extname(await media.url.split("SaberChat/")[1]));
     }
-    const convertedText = convertToLink(article.text); //Parse and add hrefs to all links in text
-    return res.render('articles/show', {platform, article, convertedText, fileExtensions, data: platform.features[objectArrIndex(platform.features, "route", "articles")]});
+    const convertedText = await convertToLink(article.text); //Parse and add hrefs to all links in text
+    return res.render('articles/show', {platform, article, convertedText, fileExtensions, data: platform.features[await objectArrIndex(platform.features, "route", "articles")]});
 };
 
 // Article GET edit form
 controller.updateForm = async function(req, res) {
     const platform = await setup(Platform);
     const article = await ArticleLink.findById(req.params.id);
-    if(!platform || !article) {req.flash('error', 'Could not find article'); return res.redirect('back');}
-    if(!article.sender._id.equals(req.user._id)) {
+    if(!platform || !article) {
+        await req.flash('error', 'Could not find article');
+        return res.redirect('back');
+    }
+    if(!(await article.sender._id.equals(req.user._id))) {
         await req.flash('error', 'You do not have permission to do that.');
         return res.redirect('back');
     }
 
     let fileExtensions = new Map(); //Track which file format each attachment is in
     for (let media of article.mediaFiles) {
-        fileExtensions.set(media.url, path.extname(media.url.split("SaberChat/")[1]));
+        await fileExtensions.set(media.url, await path.extname(await media.url.split("SaberChat/")[1]));
     }
-    return res.render('articles/edit', {platform, article, fileExtensions, data: platform.features[objectArrIndex(platform.features, "route", "articles")]});
+    return res.render('articles/edit', {platform, article, fileExtensions, data: platform.features[await objectArrIndex(platform.features, "route", "articles")]});
 };
 
 // Article POST create
@@ -126,11 +131,11 @@ controller.create = async function(req, res) {
         }
     }
 
-    article.date = dateFormat(article.created_at, "h:MM TT | mmm d");
+    article.date = await dateFormat(article.created_at, "h:MM TT | mmm d");
     await article.save();
 
     if (platform.postVerifiable) {
-        await req.flash('success', `Article Posted! A ${platform.permissionsDisplay[platform.permissionsDisplay.length-1].toLowerCase()} will verify your post soon.`);
+        await req.flash('success', `Article Posted! A platform ${await platform.permissionsDisplay[platform.permissionsDisplay.length-1].toLowerCase()} will verify your post soon.`);
     } else {
         await req.flash('success', `Article Posted!`);
     }
@@ -156,7 +161,7 @@ controller.updateArticle = async function(req, res) {
         return res.redirect('back');
     }
 
-    if (article.sender._id.toString() != req.user._id.toString()) {
+    if ((await article.sender._id.toString()) != (await req.user._id.toString())) {
         await req.flash('error', "You can only update articles which you have sent");
         return res.redirect('back');
     }
@@ -177,9 +182,9 @@ controller.updateArticle = async function(req, res) {
     let cloudResult;
     for (let i = updatedArticle.mediaFiles.length-1; i >= 0; i--) {
         if (req.body[`deleteUpload-${updatedArticle.mediaFiles[i].url}`] && updatedArticle.mediaFiles[i] && updatedArticle.mediaFiles[i].filename) {
-            if ([".mp3", ".mp4", ".m4a", ".mov"].includes(path.extname(updatedArticle.mediaFiles[i].url.split("SaberChat/")[1]).toLowerCase())) {
+            if (await [".mp3", ".mp4", ".m4a", ".mov"].includes(await path.extname(await updatedArticle.mediaFiles[i].url.split("SaberChat/")[1]).toLowerCase())) {
                 [cloudErr, cloudResult] = await cloudDelete(updatedArticle.mediaFiles[i].filename, "video");
-            } else if (path.extname(updatedArticle.mediaFiles[i].url.split("SaberChat/")[1]).toLowerCase() == ".pdf") {
+            } else if (await path.extname(await updatedArticle.mediaFiles[i].url.split("SaberChat/")[1]).toLowerCase() == ".pdf") {
                 [cloudErr, cloudResult] = await cloudDelete(updatedArticle.mediaFiles[i].filename, "pdf");
             } else {
                 [cloudErr, cloudResult] = await cloudDelete(updatedArticle.mediaFiles[i].filename, "image");
@@ -254,14 +259,12 @@ controller.comment = async function(req, res) {
     }
 
     const comment = await PostComment.create({
-        text: req.body.text.split('<').join('&lt'),
+        text: await req.body.text.split('<').join('&lt'),
         sender: req.user
     });
-    if (!comment) {
-        return res.json({error: 'Error commenting'});
-    }
+    if (!comment) {return res.json({error: 'Error commenting'});}
 
-    comment.date = dateFormat(comment.created_at, "h:MM TT | mmm d");
+    comment.date = await dateFormat(comment.created_at, "h:MM TT | mmm d");
     await comment.save();
 
     await article.comments.push(comment);
@@ -270,16 +273,11 @@ controller.comment = async function(req, res) {
     let users = [];
     let user;
     //Search for any mentioned users
-    for (let line of comment.text.split(" ")) {
+    for (let line of await comment.text.split(" ")) {
         if (line[0] == '@') {
             user = await User.findById(line.split("#")[1].split("_")[0]);
-
-            if (!user) {
-                return res.json({
-                    error: "Error accessing user"
-                });
-            }
-            users.push(user);
+            if (!user) {return res.json({error: "Error accessing user"});}
+            await users.push(user);
         }
     }
 
@@ -317,7 +315,7 @@ controller.deleteArticle = async function(req, res) {
         return res.redirect('back');
     }
 
-    if (article.sender._id.toString() != req.user._id.toString()) { //Doublecheck that deleter is articleer
+    if ((await article.sender._id.toString()) != await (req.user._id.toString())) { //Doublecheck that deleter is articleer
         await req.flash('error', "You can only delete articles that you have posted");
         return res.redirect('back');
     }
@@ -327,9 +325,9 @@ controller.deleteArticle = async function(req, res) {
     let cloudResult;
     for (let file of article.mediaFiles) {
         if (file && file.filename) {
-            if ([".mp3", ".mp4", ".m4a", ".mov"].includes(path.extname(file.url.split("SaberChat/")[1]).toLowerCase())) {
+            if (await [".mp3", ".mp4", ".m4a", ".mov"].includes(await path.extname(await file.url.split("SaberChat/")[1]).toLowerCase())) {
                 [cloudErr, cloudResult] = await cloudDelete(file.filename, "video");
-            } else if (path.extname(file.url.split("SaberChat/")[1]).toLowerCase() == ".pdf") {
+            } else if (await path.extname(await file.url.split("SaberChat/")[1]).toLowerCase() == ".pdf") {
                 [cloudErr, cloudResult] = await cloudDelete(file.filename, "pdf");
             } else {
                 [cloudErr, cloudResult] = await cloudDelete(file.filename, "image");
@@ -354,12 +352,12 @@ controller.deleteArticle = async function(req, res) {
 
 controller.specificInfo = async function(req, res) {
     const platform = await setup(Platform);
-    return res.render('other/specific-info', {platform, description: platform.features[objectArrIndex(platform.features, "route", "articles/specific-info")].description});
+    return res.render('other/specific-info', {platform, description: platform.features[await objectArrIndex(platform.features, "route", "articles/specific-info")].description});
 }
 
 controller.donate = async function(req, res) {
     const platform = await setup(Platform);
-    return res.render('other/donate', {platform, description: platform.features[objectArrIndex(platform.features, "route", "articles/donate")].description, objectArrIndex});
+    return res.render('other/donate', {platform, description: platform.features[await objectArrIndex(platform.features, "route", "articles/donate")].description, objectArrIndex});
 }
 
 controller.advice = async function(req, res) {
@@ -380,8 +378,12 @@ controller.advice = async function(req, res) {
                         await req.flash('error', 'Upload failed');
                         return res.redirect('back');
                     }
-                    if ([".png", ".jpg"].includes(path.extname(cloudResult.url.split("SaberChat/")[1]))) {images.push(cloudResult.url);}
-                    else { pdfs.push({url: cloudResult.secure_url, name: file.originalname});}
+                    if (await [".png", ".jpg"].includes(await path.extname(await cloudResult.url.split("SaberChat/")[1]))) {
+                        await images.push(cloudResult.url);
+                    }
+                    else {
+                        await pdfs.push({url: cloudResult.secure_url, name: file.originalname});
+                    }
                 }
             }
         }

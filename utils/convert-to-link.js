@@ -1,5 +1,3 @@
-const { link } = require("joi");
-
 const package = {};
 
 package.convertToLink = function(text) { //Convert text to contain embedded links

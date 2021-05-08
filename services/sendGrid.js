@@ -1,9 +1,5 @@
 //Service to send emails
-
-if (process.env.NODE_ENV !== "production") {
-    require('dotenv').config();
-}
-
+if (process.env.NODE_ENV !== "production") {require('dotenv').config();}
 const axios = require('axios');
 
 module.exports.sendGridEmail = async function(email, subject, content, mandatory) {
@@ -32,6 +28,6 @@ module.exports.sendGridEmail = async function(email, subject, content, mandatory
             data: data,
             headers: {"Authorization": `Bearer ${process.env.SENDGRID_KEY}`}
         });
-        console.log(`Email Sent with status code: ${response.status}`);
+        return console.log(`Email Sent with status code: ${response.status}`);
     }
 }

@@ -36,10 +36,10 @@ chat.chatMessage = async function(io, socket, msg) { //Send Chat Room Message
     if (!comment) { return console.log(err);}
 
     msg.id = comment._id;
-    socket.to(socket.room).emit('chat message', msg); // broadcast message to all connected users in the room
-    comment.date = dateFormat(comment.created_at, "h:MM TT | mmm d");
+    await socket.to(socket.room).emit('chat message', msg); // broadcast message to all connected users in the room
+    comment.date = await dateFormat(comment.created_at, "h:MM TT | mmm d");
     await comment.save();
-    room.comments.push(comment._id);
+    await room.comments.push(comment._id);
     await room.save();
 
     if (profanity) { // checks if bad language was used        
@@ -47,9 +47,9 @@ chat.chatMessage = async function(io, socket, msg) { //Send Chat Room Message
         await io.in(socket.room).emit('announcement', notif);
 
         const newComment = await ChatMessage.create({text: notif, status: notif.status});
-        if (!newComment) {console.log(err);}
+        if (!newComment) {await console.log(err);}
 
-        newChatMessage.date = dateFormat(comment.created_at, "h:MM TT | mmm d");
+        newChatMessage.date = await dateFormat(comment.created_at, "h:MM TT | mmm d");
         await newChatMessage.save();
     }
 }

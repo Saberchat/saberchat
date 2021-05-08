@@ -19,12 +19,13 @@ controller.index = async function(req, res) {
     const platform = await setup(Platform);
     const users = await User.find({});
     const reports = await Report.find({}).populate('sender');
-    if(!platform || !users || !reports) {req.flash('error', 'Cannot find reports.'); return res.redirect('back');}
+    if(!platform || !users || !reports) {
+        await req.flash('error', 'Cannot find reports.');
+        return res.redirect('back');
+    }
 
     const userNames = await parsePropertyArray(users, "firstName").join(',').toLowerCase().split(',');
-    const reportTexts = embedLink(req.user, reports, userNames);
-
-    return res.render('reports/index', {platform, reports: reports.reverse(), reportTexts});
+    return res.render('reports/index', {platform, reports: await reports.reverse(), reportTexts: await embedLink(req.user, reports, userNames)});
 };
 
 // Report GET new report
@@ -46,29 +47,34 @@ controller.show = async function(req, res) {
             path: "comments",
             populate: {path: "sender"}
         });
-    if(!platform || !report) {req.flash('error', 'Could not find report'); return res.redirect('back');}
+    if(!platform || !report) {
+        await req.flash('error', 'Could not find report');
+        return res.redirect('back');
+    }
 
     let fileExtensions = new Map(); //Track which file format each attachment is in
     for (let media of report.mediaFiles) {
-        fileExtensions.set(media.url, path.extname(media.url.split("SaberChat/")[1]));
+        await fileExtensions.set(media.url, await path.extname(await media.url.split("SaberChat/")[1]));
     }
-    const convertedText = convertToLink(report.text); //Parse and add hrefs to all links in text
-    return res.render('reports/show', {platform, report, convertedText, fileExtensions});
+    return res.render('reports/show', {platform, report, convertedText: await convertToLink(report.text), fileExtensions});
 };
 
 // Report GET edit form
 controller.updateForm = async function(req, res) {
     const platform = await setup(Platform);
     const report = await Report.findById(req.params.id);
-    if(!platform || !report) {req.flash('error', 'Could not find report'); return res.redirect('back');}
-    if(!report.sender._id.equals(req.user._id)) {
+    if(!platform || !report) {
+        await req.flash('error', 'Could not find report');
+        return res.redirect('back');
+    }
+    if(!(await report.sender._id.equals(req.user._id))) {
         await req.flash('error', 'You do not have permission to do that.');
         return res.redirect('back');
     }
 
     let fileExtensions = new Map(); //Track which file format each attachment is in
     for (let media of report.mediaFiles) {
-        fileExtensions.set(media.url, path.extname(media.url.split("SaberChat/")[1]));
+        await fileExtensions.set(media.url, await path.extname(await media.url.split("SaberChat/")[1]));
     }
     return res.render('reports/edit', {platform, report, fileExtensions});
 };
@@ -87,9 +93,7 @@ controller.create = async function(req, res) {
 
     if (req.body.images) { //If any images were added (if not, the 'images' property is null)
         for (let image in req.body.images) {
-            if (image) {
-                await report.images.push(req.body.images[image]);
-            }
+            if (image) {await report.images.push(req.body.images[image]);}
         }
     }
 
@@ -115,7 +119,7 @@ controller.create = async function(req, res) {
         }
     }
 
-    report.date = dateFormat(report.created_at, "h:MM TT | mmm d");
+    report.date = await dateFormat(report.created_at, "h:MM TT | mmm d");
     await report.save();
 
     await req.flash('success', 'Report Posted to Bulletin!');
@@ -129,7 +133,7 @@ controller.updateReport = async function(req, res) {
         return res.redirect('back');
     }
 
-    if (report.sender._id.toString() != req.user._id.toString()) {
+    if ((await report.sender._id.toString()) != (await req.user._id.toString())) {
         await req.flash('error', "You can only update reports which you have sent");
         return res.redirect('back');
     }
@@ -148,9 +152,7 @@ controller.updateReport = async function(req, res) {
     updatedReport.images = []; //Empty image array so that you can fill it with whatever images are added (all images are there, not just new ones)
     if (req.body.images) { //Only add images if any are provided
         for (let image in req.body.images) {
-            if (image) {
-                await updatedReport.images.push(req.body.images[image]);
-            }
+            if (image) {await updatedReport.images.push(req.body.images[image]);}
         }
     }
 
@@ -159,9 +161,9 @@ controller.updateReport = async function(req, res) {
     let cloudResult;
     for (let i = updatedReport.mediaFiles.length-1; i >= 0; i--) {
         if (req.body[`deleteUpload-${updatedReport.mediaFiles[i].url}`] && updatedReport.mediaFiles[i] && updatedReport.mediaFiles[i].filename) {
-            if ([".mp3", ".mp4", ".m4a", ".mov"].includes(path.extname(updatedReport.mediaFiles[i].url.split("SaberChat/")[1]).toLowerCase())) {
+            if (await [".mp3", ".mp4", ".m4a", ".mov"].includes(await path.extname(await updatedReport.mediaFiles[i].url.split("SaberChat/")[1]).toLowerCase())) {
                 [cloudErr, cloudResult] = await cloudDelete(updatedReport.mediaFiles[i].filename, "video");
-            } else if (path.extname(updatedReport.mediaFiles[i].url.split("SaberChat/")[1]).toLowerCase() == ".pdf") {
+            } else if (await path.extname(await updatedReport.mediaFiles[i].url.split("SaberChat/")[1]).toLowerCase() == ".pdf") {
                 [cloudErr, cloudResult] = await cloudDelete(updatedReport.mediaFiles[i].filename, "pdf");
             } else {
                 [cloudErr, cloudResult] = await cloudDelete(updatedReport.mediaFiles[i].filename, "image");
@@ -171,7 +173,7 @@ controller.updateReport = async function(req, res) {
                 await req.flash('error', 'Error deleting uploaded image');
                 return res.redirect('back');
             }
-            updatedReport.mediaFiles.splice(i, 1);
+            await updatedReport.mediaFiles.splice(i, 1);
         }
     }
 
@@ -239,21 +241,15 @@ controller.comment = async function(req, res) {
             path: "comments",
             populate: {path: "sender"}
         });
-    if (!report) {
-        return res.json({
-            error: 'Error commenting'
-        });
-    }
+    if (!report) {return res.json({error: 'Error commenting'});}
 
     const comment = await PostComment.create({
-        text: req.body.text.split('<').join('&lt'),
+        text: await req.body.text.split('<').join('&lt'),
         sender: req.user
     });
-    if (!comment) {
-        return res.json({error: 'Error commenting'});
-    }
+    if (!comment) {return res.json({error: 'Error commenting'});}
 
-    comment.date = dateFormat(comment.created_at, "h:MM TT | mmm d");
+    comment.date = await dateFormat(comment.created_at, "h:MM TT | mmm d");
     await comment.save();
 
     await report.comments.push(comment);
@@ -262,16 +258,11 @@ controller.comment = async function(req, res) {
     let users = [];
     let user;
     //Search for any mentioned users
-    for (let line of comment.text.split(" ")) {
+    for (let line of await comment.text.split(" ")) {
         if (line[0] == '@') {
-            user = await User.findById(line.split("#")[1].split("_")[0]);
-
-            if (!user) {
-                return res.json({
-                    error: "Error accessing user"
-                });
-            }
-            users.push(user);
+            user = await User.findById(await line.split("#")[1].split("_")[0]);
+            if (!user) {return res.json({error: "Error accessing user"});}
+            await users.push(user);
         }
     }
 
@@ -309,7 +300,7 @@ controller.deleteReport = async function(req, res) {
         return res.redirect('back');
     }
 
-    if (report.sender._id.toString() != req.user._id.toString()) { //Doublecheck that deleter is reporter
+    if ((await report.sender._id.toString()) != (await req.user._id.toString())) { //Doublecheck that deleter is reporter
         await req.flash('error', "You can only delete reports that you have posted");
         return res.redirect('back');
     }
@@ -319,9 +310,9 @@ controller.deleteReport = async function(req, res) {
     let cloudResult;
     for (let file of report.mediaFiles) {
         if (file && file.filename) {
-            if ([".mp3", ".mp4", ".m4a", ".mov"].includes(path.extname(file.url.split("SaberChat/")[1]).toLowerCase())) {
+            if (await [".mp3", ".mp4", ".m4a", ".mov"].includes(await path.extname(await file.url.split("SaberChat/")[1]).toLowerCase())) {
                 [cloudErr, cloudResult] = await cloudDelete(file.filename, "video");
-            } else if (path.extname(file.url.split("SaberChat/")[1]).toLowerCase() == ".pdf") {
+            } else if (await path.extname(await file.url.split("SaberChat/")[1]).toLowerCase() == ".pdf") {
                 [cloudErr, cloudResult] = await cloudDelete(file.filename, "pdf");
             } else {
                 [cloudErr, cloudResult] = await cloudDelete(file.filename, "image");
@@ -339,7 +330,6 @@ controller.deleteReport = async function(req, res) {
         await req.flash('error', "Unable to delete report");
         return res.redirect('back');
     }
-
     await req.flash('success', 'Report Deleted!');
     return res.redirect('/reports/');
 }

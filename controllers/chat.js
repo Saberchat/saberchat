@@ -29,10 +29,10 @@ controller.index = async function(req, res) {
 
     let commentObject = {};
     for (let room of rooms) { //Tracks most recent comments from each room, for display
-        commentObject[room._id.toString()] = null;
-        for (let comment of room.comments.reverse()) {
+        commentObject[await room._id.toString()] = null;
+        for (let comment of await room.comments.reverse()) {
             if (comment.status != "deleted") {
-                commentObject[room._id.toString()] = comment;
+                commentObject[await room._id.toString()] = comment;
                 break;
             }
         }
@@ -40,10 +40,10 @@ controller.index = async function(req, res) {
 
     let filteredRooms = {joined: [], private: []}; //Tracks rooms that user has joined, or has not joined
     for (let room of rooms) {
-        if (!room.private || room.members.includes(req.user._id)) {
-            filteredRooms.joined.push(room);
-        } else if (room.private && !(room.members.includes(req.user._id)) && room.mutable) {
-            filteredRooms.private.push(room);
+        if (!room.private || (await room.members.includes(req.user._id))) {
+            await filteredRooms.joined.push(room);
+        } else if (room.private && !(await room.members.includes(req.user._id)) && room.mutable) {
+            await filteredRooms.private.push(room);
         }
     }
 
@@ -77,7 +77,7 @@ controller.showRoom = async function(req, res) {
         return res.redirect('/chat');
     }
 
-    if (!(room.confirmed.includes(req.user._id))) {
+    if (!(await room.confirmed.includes(req.user._id))) {
         await room.confirmed.push(req.user._id);
         await room.save();
     }
@@ -97,7 +97,7 @@ controller.showMembers = async function(req, res) {
     let statuses = await concatMatrix([
 		platform.statusesProperty,
 		platform.statusesPlural,
-		multiplyArrays([], platform.statusesProperty.length)
+		await multiplyArrays([], platform.statusesProperty.length)
 	]).reverse();
 
     let reversedPerms = [];
@@ -107,7 +107,7 @@ controller.showMembers = async function(req, res) {
 		status[2] = [];
 		for (let permission of reversedPerms) {
 			for (let user of await sortAlph(room.members, "email")) {
-				if (status[0] == user.status && permission == user.permission) {status[2].push(user);}
+				if (status[0] == user.status && permission == user.permission) {await status[2].push(user);}
 			}
 		}
 	}
@@ -116,8 +116,8 @@ controller.showMembers = async function(req, res) {
         return res.render('chat/people', {
             platform, room, statuses,
             permMap: new Map(await concatMatrix([
-                platform.permissionsProperty.slice(1),
-                platform.permissionsDisplay.slice(1)
+                await platform.permissionsProperty.slice(1),
+                await platform.permissionsDisplay.slice(1)
             ])),
             emptyStatuses: await concatMatrix([
                 platform.statusesProperty,
@@ -155,14 +155,14 @@ controller.createRoom = async function(req, res) {
     }
 
     let roomCount = 0;
-    for (let room of rooms) {if (room.creator.equals(req.user._id)) {roomCount++;}} //Iterate through rooms and see how many rooms this user has created
+    for (let room of rooms) {if (await room.creator.equals(req.user._id)) {roomCount++;}} //Iterate through rooms and see how many rooms this user has created
     if (platform.restrictPosts && roomCount >= 3) {
         await req.flash('error', "You have already created 3 rooms");
         return res.redirect('back');
     }
 
     const room = await ChatRoom.create({
-        name: filter.clean(req.body.name),
+        name: await filter.clean(req.body.name),
         creator: req.user._id,
         members: [req.user._id],
         moderate: req.body.moderate == "false",
@@ -175,7 +175,6 @@ controller.createRoom = async function(req, res) {
         await req.flash('error', 'Room could not be created');
         return res.redirect('/chat/new');
     }
-    console.log(room);
 
     if (req.files) {
         if (req.files.mediaFile) {
@@ -198,7 +197,7 @@ controller.createRoom = async function(req, res) {
     }
 
     if (req.body.type == 'true') { //If room is marked as private
-        for (let user in req.body.check) {room.members.push(user);}
+        for (let user in req.body.check) {await room.members.push(user);}
         room.private = true;
     }
 
@@ -227,7 +226,7 @@ controller.leaveRoom = async function(req, res) {
         return res.redirect('back');
     }
 
-    if (room.creator.equals(req.user._id)) {
+    if (await room.creator.equals(req.user._id)) {
         await req.flash('error', 'You cannot leave a room you created');
         return res.redirect('back');
     }
@@ -308,8 +307,8 @@ controller.requestCancel = async function(req, res) {
 
 controller.updateRoom = async function(req, res) {
     const room = await ChatRoom.findByIdAndUpdate(req.params.id, {
-        name: filter.clean(req.body.name),
-        description: filter.clean(req.body.description),
+        name: await filter.clean(req.body.name),
+        description: await filter.clean(req.body.description),
         thumbnail: {
             url: req.body.thumbnail,
             display: req.body.showThumbnail == "url"

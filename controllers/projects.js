@@ -36,14 +36,14 @@ controller.index = async function(req, res) {
         return res.redirect('back');
     }
 
-    const userNames =  parsePropertyArray(users, "firstName").join(',').toLowerCase().split(',');
-    const projectTexts = embedLink(req.user, projects, userNames);
+    const userNames = await parsePropertyArray(users, "firstName").join(',').toLowerCase().split(',');
+    const projectTexts = await embedLink(req.user, projects, userNames);
 
     //List of media with corresponding file extensions, so they can be displayed properly
     let fileExtensions = new Map();
     for (let project of projects) {
         for (let media of project.mediaFiles) {
-            fileExtensions.set(media.url, path.extname(media.url.split("SaberChat/")[1]));
+            await fileExtensions.set(media.url, await path.extname(media.url.split("SaberChat/")[1]));
         }
     }
     return res.render('projects/index', {platform, projects, fileExtensions, projectTexts});
@@ -60,7 +60,7 @@ controller.newProject = async function(req, res) {
     }
     return res.render('projects/new', {
         platform, students,
-        statuses: concatMatrix([
+        statuses: await concatMatrix([
             platform.statusesProperty,
             platform.statusesPlural
         ]),
@@ -78,15 +78,15 @@ controller.createProject = async function(req, res) {
     let individual; //Individual Creator ID
 
     if (req.body.creatorInput != '') {
-        for (let creator of req.body.creatorInput.split(',')) {
-            if (platform.studentStatuses.includes(creator)) { //If the 'creator' is one of the listed status groups
+        for (let creator of (await req.body.creatorInput.split(','))) {
+            if (await platform.studentStatuses.includes(creator)) { //If the 'creator' is one of the listed status groups
                 statusGroup = await User.find({authenticated: true, status: creator});  //Search for all users with that status
 
                 if (!statusGroup) {
                     await req.flash('error', "Unable to find the users you listed");
                     return res.redirect('back');
                 }
-                for (let user of statusGroup) {creators.push(user);}
+                for (let user of statusGroup) {await creators.push(user);}
 
             } else {
                 individual = await User.findById(creator);
@@ -94,7 +94,7 @@ controller.createProject = async function(req, res) {
                     await req.flash('error', "Unable to find the users you listed");
                     return res.redirect('back');
                 }
-                creators.push(individual);
+                await creators.push(individual);
             }
         }
     }
@@ -125,7 +125,7 @@ controller.createProject = async function(req, res) {
                     return res.redirect('back');
                 }
 
-                project.mediaFiles.push({
+                await project.mediaFiles.push({
                     filename: cloudResult.public_id,
                     url: cloudResult.secure_url,
                     originalName: file.originalname
@@ -134,7 +134,7 @@ controller.createProject = async function(req, res) {
         }
     }
 
-    project.date = dateFormat(project.created_at, "h:MM TT | mmm d");
+    project.date = await dateFormat(project.created_at, "h:MM TT | mmm d");
     await project.save();
 
     if (!platform.postVerifiable) {
@@ -163,7 +163,7 @@ controller.createProject = async function(req, res) {
                 return res.redirect('back');
             }
 
-            notif.date = dateFormat(notif.created_at, "h:MM TT | mmm d");
+            notif.date = await dateFormat(notif.created_at, "h:MM TT | mmm d");
             notif.text = `Hello ${user.firstName},\n\n${req.user.firstName} ${req.user.lastName} recently posted a new project: "${project.subject}". Check it out!`;
             await notif.save();
             if (user.receiving_emails) {
@@ -176,7 +176,7 @@ controller.createProject = async function(req, res) {
     }
 
     if (platform.postVerifiable) {
-        await req.flash('success', `Project Posted! A ${platform.permissionsDisplay[platform.permissionsDisplay.length-1].toLowerCase()} will verify your post soon.`);
+        await req.flash('success', `Project Posted! A platform ${await platform.permissionsDisplay[platform.permissionsDisplay.length-1].toLowerCase()} will verify your post soon.`);
     } else {
         await req.flash('success', `Project Posted!`);
     }
@@ -217,7 +217,7 @@ controller.verify = async function(req, res) {
                 return res.redirect('back');
             }
 
-            notif.date = dateFormat(notif.created_at, "h:MM TT | mmm d");
+            notif.date = await dateFormat(notif.created_at, "h:MM TT | mmm d");
             notif.text = `Hello ${user.firstName},\n\n${req.user.firstName} ${req.user.lastName} recently posted a new project: "${project.subject}". Check it out!`;
             await notif.save();
             if (user.receiving_emails) {
@@ -229,7 +229,7 @@ controller.verify = async function(req, res) {
         }
     }
 
-    req.flash("success", "Verified Project!");
+    await req.flash("success", "Verified Project!");
     return res.redirect("/projects");
 }
 
@@ -242,14 +242,14 @@ controller.editProject = async function(req, res) {
         await req.flash('error', 'Unable to find project');
         return res.redirect('back');
 
-    } else if (project.sender._id.toString() != req.user._id.toString()) { //If you didn't post the project, you can't edit it
+    } else if ((await project.sender._id.toString()) != (await req.user._id.toString())) { //If you didn't post the project, you can't edit it
         await req.flash('error', "You may only delete projects that you have posted");
         return res.redirect('back');
     }
 
     let creatornames = []; //Will store a list of all the project's creators' usernames
     for (let creator of project.creators) { //Add each creator's username to creatornames
-        creatornames.push(creator.username);
+        await creatornames.push(creator.username);
     }
 
     const students = await User.find({ //Find all students - all of whom are possible project creators
@@ -264,12 +264,12 @@ controller.editProject = async function(req, res) {
 
     let fileExtensions = new Map();
     for (let media of project.mediaFiles) {
-        fileExtensions.set(media.url, path.extname(media.url.split("SaberChat/")[1]));
+        await fileExtensions.set(media.url, await path.extname(media.url.split("SaberChat/")[1]));
     }
     return res.render('projects/edit', {
         platform, project, students,
         creatornames, fileExtensions,
-        statuses: concatMatrix([
+        statuses: await concatMatrix([
             platform.statusesProperty,
             platform.statusesPlural
         ]),
@@ -296,9 +296,9 @@ controller.showProject = async function(req, res) {
 
     let fileExtensions = new Map();
     for (let media of project.mediaFiles) {
-        fileExtensions.set(media.url, path.extname(media.url.split("SaberChat/")[1]));
+        await fileExtensions.set(media.url, await path.extname(media.url.split("SaberChat/")[1]));
     }
-    return res.render('projects/show', {platform, project, convertedText: convertToLink(project.text), fileExtensions});
+    return res.render('projects/show', {platform, project, convertedText: await onvertToLink(project.text), fileExtensions});
 }
 
 
@@ -314,16 +314,17 @@ controller.updateProject = async function(req, res) {
 
     if (req.body.creatorInput == '') {
         creators = [];
+        
     } else {
-        for (let creator of req.body.creatorInput.split(',')) { //Iterate throguh listed creators
-            if (platform.studentStatuses.includes(creator)) { //If 'creator' is one of the statuses (grades), find all users with that status
+        for (let creator of await req.body.creatorInput.split(',')) { //Iterate throguh listed creators
+            if (await platform.studentStatuses.includes(creator)) { //If 'creator' is one of the statuses (grades), find all users with that status
                 statusGroup = await User.find({authenticated: true, status: creator});
                 if (!statusGroup) {
                     await req.flash('error', "Unable to find the users you listed");
                     return res.redirect('back');
                 }
 
-                for (let user of statusGroup) {creators.push(user);}
+                for (let user of statusGroup) {await creators.push(user);}
 
             } else {
                 individual = await User.findById(creator);
@@ -331,7 +332,7 @@ controller.updateProject = async function(req, res) {
                     await req.flash('error', "Unable to find the users you listed");
                     return res.redirect('back');
                 }
-                creators.push(individual);
+                await creators.push(individual);
             }
         }
     }
@@ -342,7 +343,7 @@ controller.updateProject = async function(req, res) {
         return res.redirect('back');
     }
 
-    if (project.sender._id.toString() != req.user._id.toString()) {
+    if ((await project.sender._id.toString()) != (await req.user._id.toString())) {
         await req.flash('error', "You may only update projects that you have posted");
         return res.redirect('back');
     }
@@ -366,9 +367,9 @@ controller.updateProject = async function(req, res) {
     for (let i = updatedProject.mediaFiles.length-1; i >= 0; i--) { //Iterate through each image file and check if that file is checked on form
         //If checked, delete it
         if (req.body[`deleteUpload-${updatedProject.mediaFiles[i].url}`] && updatedProject.mediaFiles[i] && updatedProject.mediaFiles[i].filename) {
-            if ([".mp3", ".mp4", ".m4a", ".mov"].includes(path.extname(updatedProject.mediaFiles[i].url.split("SaberChat/")[1]).toLowerCase())) {
+            if (await [".mp3", ".mp4", ".m4a", ".mov"].includes(await path.extname(await updatedProject.mediaFiles[i].url.split("SaberChat/")[1]).toLowerCase())) {
                 [cloudErr, cloudResult] = await cloudDelete(updatedProject.mediaFiles[i].filename, "video");
-            } else if (path.extname(updatedProject.mediaFiles[i].url.split("SaberChat/")[1]).toLowerCase() == ".pdf") {
+            } else if (await path.extname(await updatedProject.mediaFiles[i].url.split("SaberChat/")[1]).toLowerCase() == ".pdf") {
                 [cloudErr, cloudResult] = await cloudDelete(updatedProject.mediaFiles[i].filename, "pdf");
             } else {
                 [cloudErr, cloudResult] = await cloudDelete(updatedProject.mediaFiles[i].filename, "image");
@@ -414,7 +415,7 @@ controller.deleteProject = async function(req, res) {
         await req.flash('error', "Unable to access project");
         return res.redirect('back');
 
-    } else if (project.sender._id.toString() != req.user._id.toString()) { //If you didn't post the project, you can't delete it
+    } else if ((await project.sender._id.toString()) != (await req.user._id.toString())) { //If you didn't post the project, you can't delete it
         await req.flash('error', "You may only delete projects that you have posted");
         return res.redirect('back');
     }
@@ -430,9 +431,9 @@ controller.deleteProject = async function(req, res) {
     let cloudResult;
     for (let file of project.mediaFiles) {
         if (file && file.filename) { //Check for extension and delete accordingly
-            if ([".mp3", ".mp4", ".m4a", ".mov"].includes(path.extname(file.url.split("SaberChat/")[1]).toLowerCase())) {
+            if (await [".mp3", ".mp4", ".m4a", ".mov"].includes(await path.extname(await file.url.split("SaberChat/")[1]).toLowerCase())) {
                 [cloudErr, cloudResult] = await cloudDelete(file.filename, "video");
-            } else if (path.extname(file.url.split("SaberChat/")[1]).toLowerCase() == ".pdf") {
+            } else if (await path.extname(await file.url.split("SaberChat/")[1]).toLowerCase() == ".pdf") {
                 [cloudErr, cloudResult] = await cloudDelete(file.filename, "pdf");
             } else {
                 [cloudErr, cloudResult] = await cloudDelete(file.filename, "image");
@@ -483,14 +484,14 @@ controller.comment = async function(req, res) {
     }
 
     const comment = await PostComment.create({
-        text: req.body.text.split('<').join('&lt'),
+        text: await req.body.text.split('<').join('&lt'),
         sender: req.user
     });
     if (!comment) {
         return res.json({error: 'Error commenting'});
     }
 
-    comment.date = dateFormat(comment.created_at, "h:MM TT | mmm d");
+    comment.date = await dateFormat(comment.created_at, "h:MM TT | mmm d");
     await comment.save();
 
     await project.comments.push(comment);
@@ -499,9 +500,9 @@ controller.comment = async function(req, res) {
     let users = [];
     let user;
     //Search for mentioned users in comment text
-    for (let line of comment.text.split(" ")) {
+    for (let line of await comment.text.split(" ")) {
         if (line[0] == '@') {
-            user = await User.findById(line.split("#")[1].split("_")[0]);
+            user = await User.findById(await line.split("#")[1].split("_")[0]);
             if (!user) {
                 return res.json({error: "Error accessing user"});
             }
@@ -525,7 +526,7 @@ controller.comment = async function(req, res) {
             return res.json({error: "Error creating notification"});
         }
 
-        notif.date = dateFormat(notif.created_at, "h:MM TT | mmm d");
+        notif.date = await dateFormat(notif.created_at, "h:MM TT | mmm d");
         notif.text = `Hello ${user.firstName},\n\n${req.user.firstName} ${req.user.lastName} mentioned you in a comment on "${project.subject}":\n${comment.text}`;
 
         await notif.save();

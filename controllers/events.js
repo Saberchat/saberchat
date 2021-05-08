@@ -19,27 +19,31 @@ controller.index = async function(req, res) {
     const platform = await setup(Platform);
     const users = await User.find({});
     let events;
-    if (req.user && platform.permissionsProperty.slice(platform.permissionsProperty.length-3).includes(req.user.permission)) {
+    if (req.user && (await platform.permissionsProperty.slice(platform.permissionsProperty.length-3).includes(req.user.permission))) {
         events = await Event.find({}).populate('sender');
     } else {events = await Event.find({verified: true}).populate('sender');}
-    if(!platform || !users || !events) {req.flash('error', 'Cannot find events.'); return res.redirect('back');}
+    if(!platform || !users || !events) {
+        await req.flash('error', 'Cannot find events.');
+        return res.redirect('back');
+    }
 
     let current = [];
     let past = [];
     let date;
     for (let event of events) {
-        date = new Date(parseInt(event.deadline.year), parseInt(event.deadline.month)-1, parseInt(event.deadline.day));
-        if (date.getTime > new Date().getTime()) {past.push(event);}
-        else {current.push(event);}
+        date = new Date(await parseInt(event.deadline.year), await parseInt(event.deadline.month)-1, await parseInt(event.deadline.day));
+        if ((await date.getTime) > (await new Date().getTime())) {await past.push(event);}
+        else {await current.push(event);}
     }
 
     const userNames = await parsePropertyArray(users, "firstName").join(',').toLowerCase().split(',');
+    let eventTexts;
     if (req.query.past) {
-        const eventTexts = await embedLink(req.user, past, userNames);
-        return res.render('events/index', {platform, events: past.reverse(), activeSearch: false, data: platform.features[objectArrIndex(platform.features, "route", "events")]});   
+        eventTexts = await embedLink(req.user, past, userNames);
+        return res.render('events/index', {platform, events: await past.reverse(), activeSearch: false, data: platform.features[await objectArrIndex(platform.features, "route", "events")], eventTexts});   
     }
-    const eventTexts = await embedLink(req.user, current, userNames);
-    return res.render('events/index', {platform, events: current.reverse(), activeSearch: true, data: platform.features[objectArrIndex(platform.features, "route", "events")], eventTexts});
+    eventTexts = await embedLink(req.user, current, userNames);
+    return res.render('events/index', {platform, events: await current.reverse(), activeSearch: true, data: platform.features[await objectArrIndex(platform.features, "route", "events")], eventTexts});
 };
 
 // Event GET new event
@@ -49,7 +53,7 @@ controller.new = async function(req, res) {
         await req.flash("error", "An error occurred");
         return res.redirect("back");
     }
-    return res.render('events/new', {platform, data: platform.features[objectArrIndex(platform.features, "route", "events")]});
+    return res.render('events/new', {platform, data: platform.features[await objectArrIndex(platform.features, "route", "events")]});
 };
 
 // Event GET show
@@ -63,37 +67,40 @@ controller.show = async function(req, res) {
         });
     if(!platform || !event) {
         await req.flash('error', 'Could not find event'); return res.redirect('back');
-    } else if (!event.verified && !platform.permissionsProperty.slice(platform.permissionsProperty.length-3).includes(req.user.permission)) {
+    } else if (!event.verified && !(await platform.permissionsProperty.slice(platform.permissionsProperty.length-3).includes(req.user.permission))) {
         await req.flash('error', 'You cannot view that event');
         return res.redirect('back');
     }
 
-    let date = new Date(parseInt(event.deadline.year), parseInt(event.deadline.month)-1, parseInt(event.deadline.day));
-    let version = (date.getTime < new Date().getTime());
+    let date = new Date(await parseInt(event.deadline.year), await parseInt(event.deadline.month)-1, await parseInt(event.deadline.day));
+    let version = ((await date.getTime) < (await new Date().getTime()));
 
     let fileExtensions = new Map(); //Track which file format each attachment is in
     for (let media of event.mediaFiles) {
-        fileExtensions.set(media.url, path.extname(media.url.split("SaberChat/")[1]));
+        await fileExtensions.set(media.url, await path.extname(media.url.split("SaberChat/")[1]));
     }
-    const convertedText = convertToLink(event.text); //Parse and add hrefs to all links in text
-    return res.render('events/show', {platform, event, convertedText, fileExtensions, version, data: platform.features[objectArrIndex(platform.features, "route", "events")]});
+    const convertedText = await convertToLink(event.text); //Parse and add hrefs to all links in text
+    return res.render('events/show', {platform, event, convertedText, fileExtensions, version, data: platform.features[await objectArrIndex(platform.features, "route", "events")]});
 };
 
 // Event GET edit form
 controller.updateForm = async function(req, res) {
     const platform = await setup(Platform);
     const event = await Event.findById(req.params.id);
-    if(!platform || !event) {req.flash('error', 'Could not find event'); return res.redirect('back');}
-    if(!event.sender._id.equals(req.user._id)) {
+    if(!platform || !event) {
+        await req.flash('error', 'Could not find event');
+        return res.redirect('back');
+    }
+    if(!(await event.sender._id.equals(req.user._id))) {
         await req.flash('error', 'You do not have permission to do that.');
         return res.redirect('back');
     }
 
     let fileExtensions = new Map(); //Track which file format each attachment is in
     for (let media of event.mediaFiles) {
-        fileExtensions.set(media.url, path.extname(media.url.split("SaberChat/")[1]));
+        await fileExtensions.set(media.url, await path.extname(await media.url.split("SaberChat/")[1]));
     }
-    return res.render('events/edit', {platform, event, fileExtensions, data: platform.features[objectArrIndex(platform.features, "route", "events")]});
+    return res.render('events/edit', {platform, event, fileExtensions, data: platform.features[await objectArrIndex(platform.features, "route", "events")]});
 };
 
 // Event POST create
@@ -138,11 +145,11 @@ controller.create = async function(req, res) {
         }
     }
 
-    event.date = dateFormat(event.created_at, "h:MM TT | mmm d");
+    event.date = await dateFormat(event.created_at, "h:MM TT | mmm d");
     await event.save();
 
     if (platform.postVerifiable) {
-        await req.flash('success', `Event Posted! A ${platform.permissionsDisplay[platform.permissionsDisplay.length-1].toLowerCase()} will verify your post soon.`);
+        await req.flash('success', `Event Posted! A platform ${await platform.permissionsDisplay[platform.permissionsDisplay.length-1].toLowerCase()} will verify your post soon.`);
     } else {
         await req.flash('success', `Event Posted!`);
     }
@@ -168,7 +175,7 @@ controller.updateEvent = async function(req, res) {
         return res.redirect('back');
     }
 
-    if (event.sender._id.toString() != req.user._id.toString()) {
+    if ((await event.sender._id.toString()) != (await req.user._id.toString())) {
         await req.flash('error', "You can only update events which you have sent");
         return res.redirect('back');
     }
@@ -195,9 +202,9 @@ controller.updateEvent = async function(req, res) {
     let cloudResult;
     for (let i = updatedEvent.mediaFiles.length-1; i >= 0; i--) {
         if (req.body[`deleteUpload-${updatedEvent.mediaFiles[i].url}`] && updatedEvent.mediaFiles[i] && updatedEvent.mediaFiles[i].filename) {
-            if ([".mp3", ".mp4", ".m4a", ".mov"].includes(path.extname(updatedEvent.mediaFiles[i].url.split("SaberChat/")[1]).toLowerCase())) {
+            if (await [".mp3", ".mp4", ".m4a", ".mov"].includes(await path.extname(await updatedEvent.mediaFiles[i].url.split("SaberChat/")[1]).toLowerCase())) {
                 [cloudErr, cloudResult] = await cloudDelete(updatedEvent.mediaFiles[i].filename, "video");
-            } else if (path.extname(updatedEvent.mediaFiles[i].url.split("SaberChat/")[1]).toLowerCase() == ".pdf") {
+            } else if (await path.extname(await updatedEvent.mediaFiles[i].url.split("SaberChat/")[1]).toLowerCase() == ".pdf") {
                 [cloudErr, cloudResult] = await cloudDelete(updatedEvent.mediaFiles[i].filename, "pdf");
             } else {
                 [cloudErr, cloudResult] = await cloudDelete(updatedEvent.mediaFiles[i].filename, "image");
@@ -268,12 +275,12 @@ controller.comment = async function(req, res) {
     if (!event) {return res.json({error: 'Error commenting'});}
 
     const comment = await PostComment.create({
-        text: req.body.text.split('<').join('&lt'),
+        text: await req.body.text.split('<').join('&lt'),
         sender: req.user
     });
     if (!comment) {return res.json({error: 'Error commenting'});}
 
-    comment.date = dateFormat(comment.created_at, "h:MM TT | mmm d");
+    comment.date = await dateFormat(comment.created_at, "h:MM TT | mmm d");
     await comment.save();
 
     await event.comments.push(comment);
@@ -282,9 +289,9 @@ controller.comment = async function(req, res) {
     let users = [];
     let user;
     //Search for any mentioned users
-    for (let line of comment.text.split(" ")) {
+    for (let line of await comment.text.split(" ")) {
         if (line[0] == '@') {
-            user = await User.findById(line.split("#")[1].split("_")[0]);
+            user = await User.findById(await line.split("#")[1].split("_")[0]);
             if (!user) {return res.json({error: "Error accessing user"});}
             await users.push(user);
         }
@@ -324,7 +331,7 @@ controller.deleteEvent = async function(req, res) {
         return res.redirect('back');
     }
 
-    if (event.sender._id.toString() != req.user._id.toString()) { //Doublecheck that deleter is eventer
+    if ((await event.sender._id.toString()) != (await req.user._id.toString())) { //Doublecheck that deleter is eventer
         await req.flash('error', "You can only delete events that you have posted");
         return res.redirect('back');
     }
@@ -334,9 +341,9 @@ controller.deleteEvent = async function(req, res) {
     let cloudResult;
     for (let file of event.mediaFiles) {
         if (file && file.filename) {
-            if ([".mp3", ".mp4", ".m4a", ".mov"].includes(path.extname(file.url.split("SaberChat/")[1]).toLowerCase())) {
+            if (await [".mp3", ".mp4", ".m4a", ".mov"].includes(await path.extname(await file.url.split("SaberChat/")[1]).toLowerCase())) {
                 [cloudErr, cloudResult] = await cloudDelete(file.filename, "video");
-            } else if (path.extname(file.url.split("SaberChat/")[1]).toLowerCase() == ".pdf") {
+            } else if (await path.extname(await file.url.split("SaberChat/")[1]).toLowerCase() == ".pdf") {
                 [cloudErr, cloudResult] = await cloudDelete(file.filename, "pdf");
             } else {
                 [cloudErr, cloudResult] = await cloudDelete(file.filename, "image");
