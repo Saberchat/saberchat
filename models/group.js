@@ -12,7 +12,7 @@ const Group = mongoose.model("Group", new mongoose.Schema({
     members: [{type: mongoose.Schema.Types.ObjectId, ref: "User"}],
     blocked: [{type: mongoose.Schema.Types.ObjectId, ref: 'User'}],
     thumbnail: {
-        url: {type: String, default: "https://wallpaper.dog/large/11001671.jpg"},
+        url: {type: String, default: "https://cdn.osxdaily.com/wp-content/uploads/2009/08/defaultdesktop.jpg"},
         display: {type: Boolean, default: true}
     },
     thumbnailFile: {
