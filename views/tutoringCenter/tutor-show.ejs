@@ -41,7 +41,7 @@
   </head>
   <body class="mode">
       <!-- include the navbar via ejs -->
-      <%- include('../partials/navbar') %>
+      <%- include('../partials/components/navbar') %>
 
       <!-- big background image -->
       <div id="banner" style="background-image: url('<% if (tutor.tutor.bannerFile.display) { %> <%= tutor.tutor.bannerFile.url %> <% } else { %> <%= tutor.tutor.bannerUrl.url %> <% } %>');"></div>

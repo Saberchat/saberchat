@@ -30,8 +30,8 @@
 </head>
 <body class="mode">
 <!-- include the navbar via ejs -->
-<%- include('../partials/navbar') %>
-<%- include('../partials/header') %>
+<%- include('../partials/components/navbar') %>
+<%- include('../partials/components/header') %>
 
 <!-- big background image -->
 <div id="banner" style="background-image: url('<% if (user.bannerFile.display) { %> <%= user.bannerFile.url %> <% } else { %> <%= user.bannerUrl.url %> <% } %>');">
