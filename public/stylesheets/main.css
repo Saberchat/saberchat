@@ -6,6 +6,12 @@ a:hover {
     cursor: pointer;
 }
 
+/* Fix for padding on mobile info page */
+
+div[class="col-lg-6 block"] {
+    padding-bottom: 1vh !important;
+}
+
 /* Makesure body and html elements go all the way down */
 html, body {
     min-height: 100vh;
