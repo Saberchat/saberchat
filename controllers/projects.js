@@ -298,7 +298,7 @@ controller.showProject = async function(req, res) {
     for (let media of project.mediaFiles) {
         await fileExtensions.set(media.url, await path.extname(media.url.split("SaberChat/")[1]));
     }
-    return res.render('projects/show', {platform, project, convertedText: await onvertToLink(project.text), fileExtensions});
+    return res.render('projects/show', {platform, project, convertedText: await convertToLink(project.text), fileExtensions});
 }
 
 
