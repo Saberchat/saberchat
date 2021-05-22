@@ -1,6 +1,7 @@
 .announcement-button, .announcement-button:hover, .announcement-sender, .announcement-sender:hover {
     color: white;
     text-decoration: none;
+    margin-bottom: 0.25rem; /* Button spacing fix */
 }
 
 .bottom-text {

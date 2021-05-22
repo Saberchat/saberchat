@@ -26,7 +26,7 @@ input#search-input {
 
 .list-group-item {
     line-height: 38px;
-    height: 65px;
+    /*height: 65px;*/
     overflow: hidden;
 }
 

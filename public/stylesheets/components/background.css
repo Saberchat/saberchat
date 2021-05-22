@@ -51,3 +51,11 @@ css for the background image and title
         font-weight: 400;
     }
 }
+
+/* fix for improper scaling on iphone X type screens */
+@media only screen and (max-width: 400px) {
+    .col-12.background-title > h1 {
+        font-size: 3rem;
+        font-weight: 400;
+    }
+}

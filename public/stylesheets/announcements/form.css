@@ -42,3 +42,9 @@ form {
 #image-block .image-group button, #media-block .media-group {
     float: right;
 }
+
+/* fix spacing on announcement form */
+.announcement-form {
+    margin-right: 1vh;
+    margin-left: 1vh;
+}
