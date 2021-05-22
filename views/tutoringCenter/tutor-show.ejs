@@ -1,15 +1,4 @@
-<!DOCTYPE html>
-<html>
-  <head>
-      <title>Saberchat</title>
-      <meta charset="utf-8">
-      <meta name="viewport" content="width=device-width, initial-scale=1">
-
-      <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css">
-      <link rel="stylesheet" href="/stylesheets/main.css">
-      <!-- link css for navbar. Don't need to include public/javascript/userForm.js since user is already logged in and does not need to access login and register forms.  -->
-      <link rel="stylesheet" href="/stylesheets/components/navbar.css">
-      <link rel="stylesheet" href="/stylesheets/components/header.css">
+<%- include('../partials/headStart') %>
       <link rel="stylesheet" href="/stylesheets/projects/index.css">
       <link rel="stylesheet" href="/stylesheets/announcements/index.css">
       <link rel="stylesheet" href="/stylesheets/home/index.css">
@@ -19,26 +8,17 @@
       <link rel="stylesheet" href="/stylesheets/profiles/show.css">
       <link rel="stylesheet" href="/stylesheets/tutoringCenter/show.css">
       <link rel="stylesheet" href="/stylesheets/tutoringCenter/tutor-show.css">
-      <%if (currentUser) {%>
-        <%if (currentUser.darkmode) { %>
+      <%if (currentUser && currentUser.darkmode) {%>
           <link rel="stylesheet" href="/stylesheets/tutoringCenter/tutoringCenter-dark.css">
-          <link rel="stylesheet" href="/stylesheets/darkmode.css">
-        <%}%>
       <%}%>
 
-      <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-      <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
-      <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js"></script>
-
-      <!-- I'm using my fontawesome kit -->
-      <script src="https://kit.fontawesome.com/dccc745c41.js" crossorigin="anonymous"></script>
       <script src="/javascript/postUtil.js"></script>
       <script src="/javascript/tutoringCenter/settings.js"></script>
       <script src="/javascript/tutoringCenter/upvote.js"></script>
       <script src="/javascript/tutoringCenter/actions.js"></script>
       <script src="/javascript/tutoringCenter/rating.js"></script>
-      <%- include('../partials/analytics') %>
-  </head>
+<%- include('../partials/headEnd') %>
+
   <body class="mode">
       <!-- include the navbar via ejs -->
       <%- include('../partials/components/navbar') %>
