@@ -75,13 +75,52 @@ const setAnonymous = function (check) { // toggles anonymous messaging
 
 const clearTags = function () { // clears user tags
     const tags = document.getElementsByClassName('user-tag');
+    while (tags[0]) {tags[0].parentNode.removeChild(tags[0]);}
+}
 
-    while (tags[0]) {
-        tags[0].parentNode.removeChild(tags[0]);
+const searchRecipients = function(input) {
+    const url = `/inbox/search-recipients`;
+    const dropdown = document.getElementById("user-select");
+    const data = {text: input.value};
+    let appendedRecipient;
+
+    if (input.value.length > 2) {
+        sendPostReq(url, data, data => {
+            if (data.success && data.recipients.length > 0) { //If there are recipients to display
+                dropdown.hidden = false;
+                while (dropdown.firstChild) {dropdown.removeChild(dropdown.firstChild);} //Empty dropdown from previous searches
+
+                //Add heading back to dropdown's list
+                const heading = document.createElement("option");
+                for (let attr of ["selected", "disabled"]) {
+                    heading[attr] = true;
+                }
+                heading.className = "recipient-group";
+                heading.innerText = "Select User/Group";
+                dropdown.appendChild(heading);
+
+                for (let recType of ["status", "user"]) {
+                    for (let recipient of data.recipients) { //Build dropdown option
+                        if (recipient.type == recType) {
+                            appendedRecipient = document.createElement("option");
+                            appendedRecipient.className = "recipient-group";
+                            appendedRecipient.innerText = recipient.displayValue;
+                            appendedRecipient.setAttribute("value", recipient.idValue);
+                            dropdown.appendChild(appendedRecipient); //Add dropdown option to menu
+                        }
+                    }
+                }
+            } else {
+                dropdown.hidden = true; //Hide dropdown if there are no matching elements
+            }
+        });
+    } else {
+        dropdown.hidden = true; //Hide dropdown if there is not a long enough input string
     }
 }
 
 const addRecipient = function (type) { // adds recipients to list
+    document.getElementById("recipient-list").value = "";
     if (type == 'user') {
         const id = userSelect.value;
         addTag(userSelect, id);

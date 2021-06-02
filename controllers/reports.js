@@ -17,7 +17,7 @@ const controller = {};
 // Report GET index
 controller.index = async function(req, res) {
     const platform = await setup(Platform);
-    const users = await User.find({});
+    const users = await User.find({authenticated: true});
     const reports = await Report.find({}).populate('sender');
     if(!platform || !users || !reports) {
         await req.flash('error', 'Cannot find reports.');

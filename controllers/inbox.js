@@ -125,6 +125,38 @@ controller.sent = async function(req, res) {
     return res.render('inbox/index_sent', {platform, inbox: await sent_msgs.reverse()});
 };
 
+//Inbox recipient search
+controller.searchRecipients = async function(req, res) {
+    const platform = await setup(Platform);
+    const users = await User.find({authenticated: true});
+    if (!platform || !users) {return res.json({error: "An error occurred"});}
+
+    let recipients = [];
+    let displayValue;
+    for (let status of platform.statusesProperty) { //Iterate through statuses and search for matches
+        displayValue = platform.statusesPlural[platform.statusesProperty.indexOf(status)];
+        if (await `${status} ${displayValue}`.toLowerCase().includes(await req.body.text.toLowerCase())) {
+            await recipients.push({ //Add status to array, using display and id values
+                displayValue,
+                idValue: status,
+                type: "status"
+            });
+        }
+    }
+
+    for (let user of users) { //Iterate through usernames and search for matches
+        if (await `${user.firstName} ${user.lastName} ${user.username}`.toLowerCase().includes(await req.body.text.toLowerCase())) {
+            await recipients.push({ //Add user to array, using username as display, and id as id value
+                displayValue: `${user.firstName} ${user.lastName} (${user.username})`, 
+                idValue: user._id,
+                type: "user"
+            });
+        }
+    }
+
+    return res.json({success: "Successfully collected data", recipients});
+}
+
 // Inbox POST create messsage
 controller.createMsg = async function(req, res) {
     const platform = await setup(Platform);

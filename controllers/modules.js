@@ -17,7 +17,7 @@ const controller = {};
 // Module GET index
 controller.index = async function(req, res) {
     const platform = await setup(Platform);
-    const users = await User.find({});
+    const users = await User.find({authenticated: true});
     let modules;
     if (req.user && (await platform.permissionsProperty.slice(platform.permissionsProperty.length-3).includes(req.user.permission))) {
         modules = await Module.find({}).populate('sender');

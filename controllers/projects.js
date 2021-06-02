@@ -19,7 +19,7 @@ const controller = {};
 
 controller.index = async function(req, res) {
     const platform = await setup(Platform);
-    const users = await User.find({});
+    const users = await User.find({authenticated: true});
     if (!platform || !users) {
         await req.flash('error', 'An Error Occurred');
         return res.redirect('back');
