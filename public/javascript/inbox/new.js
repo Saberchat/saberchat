@@ -5,10 +5,8 @@ const facultySelect = document.getElementById('faculty-select');
 const userDisplay = document.getElementById('user-display');
 
 const defaultMsg = document.getElementById('default-msg');
-const anonyMsg = document.getElementById('anony-msg');
 
 const everyoneCheck = document.getElementById('all-check');
-
 const anonymousCheck = document.getElementById('anonymous-check');
 const anonymousControl = document.getElementById('anonymous-control');
 
@@ -49,28 +47,13 @@ const updateTo = function (everyoneCheck) { // toggles recipients selection
 }
 
 const setAnonymous = function (check) { // toggles anonymous messaging
-    if (check.checked) {
-        userSelect.required = false;
-        defaultMsg.style.display = 'none';
-
-        facultySelect.required = true;
-        anonyMsg.style.display = 'block';
-
-        recipients = [];
-        clearTags();
-        facultySelect.value = '';
-
-    } else {
-        userSelect.required = true;
-        defaultMsg.style.display = 'block';
-
-        facultySelect.required = false;
-        anonyMsg.style.display = 'none';
-
-        recipients = [];
-        clearTags();
-        userSelect.value = '';
-    }
+    const placeholderMap = new Map([[true, "Recipients (Faculty)"], [false, "Recipients"]]);
+    document.getElementById("recipient-list").value = "";
+    recipients = [];
+    clearTags();
+    userSelect.hidden = true;
+    userSelect.value = '';
+    document.getElementById("recipient-list").placeholder = placeholderMap.get(check.checked);
 }
 
 const clearTags = function () { // clears user tags
@@ -80,42 +63,47 @@ const clearTags = function () { // clears user tags
 
 const searchRecipients = function(input) {
     const url = `/inbox/search-recipients`;
-    const dropdown = document.getElementById("user-select");
-    const data = {text: input.value};
+    const data = {
+        text: input.value,
+        anonymous: document.getElementById("anonymous-check").checked
+    };
     let appendedRecipient;
 
     if (input.value.length > 2) {
         sendPostReq(url, data, data => {
             if (data.success && data.recipients.length > 0) { //If there are recipients to display
-                dropdown.hidden = false;
-                while (dropdown.firstChild) {dropdown.removeChild(dropdown.firstChild);} //Empty dropdown from previous searches
+                userSelect.hidden = false;
+                while (userSelect.firstChild) {userSelect.removeChild(userSelect.firstChild);} //Empty userSelect from previous searches
 
-                //Add heading back to dropdown's list
+                //Add heading back to userSelect's list
                 const heading = document.createElement("option");
-                for (let attr of ["selected", "disabled"]) {
-                    heading[attr] = true;
-                }
+                for (let attr of ["selected", "disabled"]) {heading[attr] = true;}
                 heading.className = "recipient-group";
                 heading.innerText = "Select User/Group";
-                dropdown.appendChild(heading);
+                userSelect.appendChild(heading);
 
                 for (let recType of ["status", "user"]) {
-                    for (let recipient of data.recipients) { //Build dropdown option
+                    for (let recipient of data.recipients) { //Build userSelect option
                         if (recipient.type == recType) {
                             appendedRecipient = document.createElement("option");
-                            appendedRecipient.className = "recipient-group";
+                            if (recType == "user") {
+                                appendedRecipient.className = recipient.classValue;
+                            } else {
+                                appendedRecipient.className = "recipient-group";
+                            }
+
                             appendedRecipient.innerText = recipient.displayValue;
                             appendedRecipient.setAttribute("value", recipient.idValue);
-                            dropdown.appendChild(appendedRecipient); //Add dropdown option to menu
+                            userSelect.appendChild(appendedRecipient); //Add userSelect option to menu
                         }
                     }
                 }
             } else {
-                dropdown.hidden = true; //Hide dropdown if there are no matching elements
+                userSelect.hidden = true; //Hide dropdown if there are no matching elements
             }
         });
     } else {
-        dropdown.hidden = true; //Hide dropdown if there is not a long enough input string
+        userSelect.hidden = true; //Hide dropdown if there is not a long enough input string
     }
 }
 
@@ -131,7 +119,6 @@ const addRecipient = function (type) { // adds recipients to list
 }
 
 const addTag = function (select, id) { // adds the user tag to the display
-
     if (!(recipients.includes(id)) && !(recipients.includes(select.options[select.selectedIndex].className))) { //Check whether this user is already in the list, or whether their group (status) is already in the list
         const username = select.options[select.selectedIndex].text;
         recipients.push(id);
@@ -153,6 +140,7 @@ const addTag = function (select, id) { // adds the user tag to the display
             remRecipient(document.getElementsByClassName('user-tag')[del].getElementsByTagName('button')[0]);
         }
     }
+    userSelect.hidden = true; //Hide dropdown
 }
 
 const remRecipient = function (btn) { // remove recipients

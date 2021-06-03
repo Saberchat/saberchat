@@ -33,20 +33,7 @@
                                 </select>
                             </div>
                         </div>
-
-                <div id="anony-msg">
-                  <div class="form-group mode">
-                    <label for="faculty-select" class="label-custom">Recipients</label>
-                    <select id="faculty-select" class="form-control mode" onchange="addRecipient('faculty')">
-                      <option value="" selected disabled>Select Faculty</option>
-                      <% users.forEach(user => { %>
-                        <% if(!user._id.equals(currentUser._id) && user.status == platform.teacherStatus) { %>
-                          <option value="<%= user._id %>"><%= user.username %> (<%= user.firstName%> <%= user.lastName%>)</option>
-                        <% } %>
-                      <% }) %>
-                    </select>
-                  </div>
-                </div>
+                
                     <div id="user-display"></div>
 
                     <div class="form-check" id="anonymous-control">
@@ -67,12 +54,12 @@
                     </div>
                 </div>
 
-                    <div class="form-group mode">
+                    <div class="form-group darkmode-outline">
                         <label for="subject">Subject</label>
                         <input id="subject" placeholder="A short title..." class="form-control mode" type="text"
                                name="subject" required>
                     </div><br />
-                    <div class="form-group mode">
+                    <div class="form-group darkmode-outline">
                         <label for="message">Message</label>
                         <textarea name="message" id="message" placeholder="Message text..." rows="5"
                                   class="form-control mode" required></textarea>

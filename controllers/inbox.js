@@ -125,22 +125,33 @@ controller.sent = async function(req, res) {
     return res.render('inbox/index_sent', {platform, inbox: await sent_msgs.reverse()});
 };
 
-//Inbox recipient search
+//Inbox new message recipient search
 controller.searchRecipients = async function(req, res) {
     const platform = await setup(Platform);
-    const users = await User.find({authenticated: true});
-    if (!platform || !users) {return res.json({error: "An error occurred"});}
+    if (!platform) {return res.json({error: "An error occurred"});}
+
+    //Collect user data based on form
+    let users;
+    if (req.body.anonymous) {
+        users = await User.find({authenticated: true, _id: {$ne: req.user._id}, status: platform.teacherStatus});
+    } else {
+        users = await User.find({authenticated: true, _id: {$ne: req.user._id}});
+    }
+    if (!users) {return res.json({error: "An error occurred"});}
 
     let recipients = [];
     let displayValue;
-    for (let status of platform.statusesProperty) { //Iterate through statuses and search for matches
-        displayValue = platform.statusesPlural[platform.statusesProperty.indexOf(status)];
-        if (await `${status} ${displayValue}`.toLowerCase().includes(await req.body.text.toLowerCase())) {
-            await recipients.push({ //Add status to array, using display and id values
-                displayValue,
-                idValue: status,
-                type: "status"
-            });
+
+    if (!req.body.anonymous) { //Only add other statuses if the message is not anonymous
+        for (let status of platform.statusesProperty) { //Iterate through statuses and search for matches
+            displayValue = platform.statusesPlural[platform.statusesProperty.indexOf(status)];
+            if (await `${status} ${displayValue}`.toLowerCase().includes(await req.body.text.toLowerCase())) {
+                await recipients.push({ //Add status to array, using display and id values
+                    displayValue,
+                    idValue: status,
+                    type: "status"
+                });
+            }
         }
     }
 
@@ -149,6 +160,7 @@ controller.searchRecipients = async function(req, res) {
             await recipients.push({ //Add user to array, using username as display, and id as id value
                 displayValue: `${user.firstName} ${user.lastName} (${user.username})`, 
                 idValue: user._id,
+                classValue: user.status,
                 type: "user"
             });
         }
