@@ -1,105 +1,85 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <!-- home page -->
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta charset="utf-8">
-    <meta name="description" content="Intranet Communication Platform">
-    <meta name="title" property="og:title" content="Saberchat">
-    <meta property="og:type" content="Website">
-    <meta name="image" property="og:image" content="https://i.imgur.com/xmUW1Cn.png">
-    <meta name="author" content="Kabir Samsi, Alexander Zhou, Dmitry Pleshkov, Siddharth Chavan, Vibhav Darsha">
-
-    <title>Saberchat</title>
-
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css" integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk" crossorigin="anonymous">
-    <link rel="stylesheet" href="/stylesheets/main.css">
+<%- include('./partials/headStart') %> 
     <link rel="stylesheet" href="/stylesheets/home/index.css">
     <link rel="stylesheet" href="/stylesheets/components/background.css">
 
     <script src="/javascript/nav/userForm.js"></script>
-    
     <script src="/javascript/home/index.js"></script>
     <script>
         if (window.location.href.includes("herokuapp")) {
             window.location.href = "https://saberchat.net";
         }
     </script>
-<%- include('./partials/headStart') %> 
 <%- include('./partials/headEnd') %> 
-
 <body class="mode">
-
 <!-- insert navbar via ejs-->
-<%- include('./partials/components/navbar') %>
+    <%- include('./partials/components/navbar') %>
 
-<!-- Background image and text -->
-<section id="background" style="background-image: url('<%=platform.imageUrl%>'); background-size: cover;">
-    <div class="container-fluid text-center background-inner-div">
-        <div class="row">
-            <div class="col-12 background-title">
-                <h1 style="user-select: none; -moz-user-select: none;">Saberchat</h1>
-                <p style="user-select: none; -moz-user-select: none;"><%=platform.name%>'s very own Community Platform</p>
+    <!-- Background image and text -->
+    <section id="background" style="background-image: url('<%=platform.imageUrl%>'); background-size: cover;">
+        <div class="container-fluid text-center background-inner-div">
+            <div class="row">
+                <div class="col-12 background-title">
+                    <h1 style="user-select: none; -moz-user-select: none;">Saberchat</h1>
+                    <p style="user-select: none; -moz-user-select: none;"><%=platform.name%>'s very own Community Platform</p>
+                </div>
             </div>
         </div>
-    </div>
-</section>
+    </section>
 
-<!-- Home Page content -->
-<main id="main-container">
-    <div class="container mt-5 mode">
-        <!-- Block 1 -->
-        <div class="row element" id="about">
-            <div class="col-lg-6">
-                <article class="text-block">
-                    <div class="block-header <% if (platform.homepageInfo) {%> green <% } %>">
-                        <h1 style="user-select: none; -moz-user-select: none;">About</h1>
-                    </div>
-                    <div class="block-content mode">
-                        <p>Saberchat is an intranet platform that connects and centralizes your community's communication and notification platforms. It allows users to quickly share and access important information, and presents multiple platform-specific features for community projects. It is used across schools, clubs, organizations and more.</p>
-                        <span id="developers"><span id="developers-heading">Developers: </span>Alexander Zhou, Kabir Samsi, Siddharth Chavan, Vibhav Darsha, Dmitry Pleshkov</span>
-                    </div>
-                </article>
+    <!-- Home Page content -->
+    <main id="main-container">
+        <div class="container mt-5 mode">
+            <!-- Block 1 -->
+            <div class="row element" id="about">
+                <div class="col-lg-6">
+                    <article class="text-block">
+                        <div class="block-header <% if (platform.homepageInfo) {%> green <% } %>">
+                            <h1 style="user-select: none; -moz-user-select: none;">About</h1>
+                        </div>
+                        <div class="block-content mode">
+                            <p>Saberchat is an intranet platform that connects and centralizes your community's communication and notification platforms. It allows users to quickly share and access important information, and presents multiple platform-specific features for community projects. It is used across schools, clubs, organizations and more.</p>
+                            <span id="developers"><span id="developers-heading">Developers: </span>Alexander Zhou, Kabir Samsi, Siddharth Chavan, Vibhav Darsha, Dmitry Pleshkov</span>
+                        </div>
+                    </article>
+                </div>
+                <div class="col-lg-6 block">
+                    <% if (platform.displayVideo.url && platform.displayVideo.url != '') {%>
+                        <video width="520px" height="305px" src="<%=platform.displayVideo.url%>" type="video/*" controls class="image-block"></video>
+                    <% } else {%>
+                        <img class="image-block" src="<%=platform.displayImages[0]%>" alt="<%=platform.name%> image">
+                    <% } %>
+                </div>
             </div>
-            <div class="col-lg-6 block">
-                <% if (platform.displayVideo.url && platform.displayVideo.url != '') {%>
-                    <video width="520px" height="305px" src="<%=platform.displayVideo.url%>" type="video/*" controls class="image-block"></video>
-                <% } else {%>
-                    <img class="image-block" src="<%=platform.displayImages[0]%>" alt="<%=platform.name%> image">
-                <% } %>
+            <!-- Block 2 -->
+            <div class="row element" id="block-2">
+                <div class="col-lg-6 order-lg-2">
+                    <article class="text-block">
+                        <div class="block-header <% if (platform.homepageInfo) {%> yellow <% } %>">
+                            <h1 style="user-select: none; -moz-user-select: none;">Services</h1>
+                        </div>
+                        <div class="block-content mode">
+                            <ul>
+                                <% for (let service of platform.services) { %>
+                                    <li class="convertible-text"><%=service%></li>
+                                <% } %>
+                            </ul>
+                        </div>
+                    </article>
+                </div>
+                <div class="col-lg-6 block">
+                    <img class="image-block" src="<%=platform.displayImages[1]%>" alt="<%=platform.name%> image">
+                </div>
             </div>
         </div>
-        <!-- Block 2 -->
-        <div class="row element" id="block-2">
-            <div class="col-lg-6 order-lg-2">
-                <article class="text-block">
-                    <div class="block-header <% if (platform.homepageInfo) {%> yellow <% } %>">
-                        <h1 style="user-select: none; -moz-user-select: none;">Services</h1>
-                    </div>
-                    <div class="block-content mode">
-                        <ul>
-                            <% for (let service of platform.services) { %>
-                                <li class="convertible-text"><%=service%></li>
-                            <% } %>
-                        </ul>
-                    </div>
-                </article>
-            </div>
-            <div class="col-lg-6 block">
-                <img class="image-block" src="<%=platform.displayImages[1]%>" alt="<%=platform.name%> image">
-            </div>
-        </div>
-    </div>
-</main>
-<script>
-    window.onload = (() => {
-        window.onscroll = (() => {
-            updateNav();
-            animateDisplay();
+    </main>
+    <script>
+        window.onload = (() => {
+            window.onscroll = (() => {
+                updateNav();
+                animateDisplay();
+            });
         });
-    });
-</script>
-<script src="/javascript/embed.js"></script>
+    </script>
+    <script src="/javascript/embed.js"></script>
 </body>
 </html>

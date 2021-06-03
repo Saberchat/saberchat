@@ -7,77 +7,40 @@
     <script src="/javascript/home/index.js"></script>
 <%- include('../partials/headEnd') %>
 <body class="mode">
-<!-- insert navbar via ejs-->
-<%- include('../partials/components/navbar') %>
+    <!-- insert navbar via ejs-->
+    <%- include('../partials/components/navbar') %>
 
-<!-- Background image and text -->
-<% if ((platform.homepageInfo) || (!platform.homepageInfo && !description)) { %>
-    <section id="background" style="background-image: url('<%=platform.imageUrl%>'); background-size: cover;">
-        <div class="container-fluid text-center">
-            <div class="row">
-                <div class="col-12 background-title">
-                    <% if (platform.descriptionDisplay) { %>
-                        <h1><%=platform.description%></h1>
-                        <p style="font-size: 200%;"><%=platform.name%><% if (platform.postText){%>, <%=platform.postText%><%}%></p>
-                    <% } else { %>
-                        <h1><%=platform.name%></h1>
-                        <p><%=platform.description%><% if (platform.postText){%>, <%=platform.postText%><%}%></p>
-                    <% } %>
-                    <% if (currentUser && objectArrIndex(platform.features, "route", "articles/donate") > -1) {%>
-                        <a class="btn btn-primary" href="/articles/donate" style="height: 40%; padding-top: 10px;">
-                            <p style="color:white; font-size: 120%; margin-bottom: 10px;"><i class="fas fa-hand-holding-usd"></i> Help And Donate</p>
-                        </a>
-                    <% } %>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <% if (!platform.homepageInfo && !description) {%>
-        <% const block = platform.info[0];%>
-        <main id="main-container">
-            <div class="container mt-5">
-                <div class="row text-element">
-                    <div class="col-lg-6">
-                        <article class="text-block mode">
-                            <div class="block-header">
-                                <h1><%=block.heading%></h1>
-                            </div>
-                            <div class="block-content mode">
-                                <% for (let element of block.text) { %>
-                                    <p><%=element%></p>
-                                <% } %>
-                            </div>
-                        </article>
-                    </div>
-                    <div class="col-lg-6 block">
-                        <img class="image-block" src="<%=block.image%>"
-                            alt="Image Does Not Exist">
+    <!-- Background image and text -->
+    <% if ((platform.homepageInfo) || (!platform.homepageInfo && !description)) { %>
+        <section id="background" style="background-image: url('<%=platform.imageUrl%>'); background-size: cover;">
+            <div class="container-fluid text-center">
+                <div class="row">
+                    <div class="col-12 background-title">
+                        <% if (platform.descriptionDisplay) { %>
+                            <h1><%=platform.description%></h1>
+                            <p style="font-size: 200%;"><%=platform.name%><% if (platform.postText){%>, <%=platform.postText%><%}%></p>
+                        <% } else { %>
+                            <h1><%=platform.name%></h1>
+                            <p><%=platform.description%><% if (platform.postText){%>, <%=platform.postText%><%}%></p>
+                        <% } %>
+                        <% if (currentUser && objectArrIndex(platform.features, "route", "articles/donate") > -1) {%>
+                            <a class="btn btn-primary" href="/articles/donate" style="height: 40%; padding-top: 10px;">
+                                <p style="color:white; font-size: 120%; margin-bottom: 10px;"><i class="fas fa-hand-holding-usd"></i> Help And Donate</p>
+                            </a>
+                        <% } %>
                     </div>
                 </div>
             </div>
-        </main>
-    <% } %>
-<% } %>
+        </section>
 
-<!-- Home Page content -->
-<% if ((platform.homepageInfo) || (!platform.homepageInfo && description)) { %>
-    <% if (description) {%><br><br><% } %>
-    <main id="main-container">
-        <div class="container mt-5">
-            <% let block;%>
-            <% let counter = 0;%>
-            <% if (!platform.homepageInfo && description) { %>
-                <% counter = 1;%>
-            <%}%>
-            <% for (let i = counter; i < platform.info.length; i++) { %>
-                <% counter ++;%>
-                <% block = platform.info[i]%>
-                <% if (i%2 == 0) { %>
+        <% if (!platform.homepageInfo && !description) {%>
+            <% const block = platform.info[0];%>
+            <main id="main-container">
+                <div class="container mt-5">
                     <div class="row text-element">
                         <div class="col-lg-6">
                             <article class="text-block mode">
-                                <div class="block-header <% if (platform.homepageInfo) {%> green <% } %>">
+                                <div class="block-header">
                                     <h1><%=block.heading%></h1>
                                 </div>
                                 <div class="block-content mode">
@@ -92,77 +55,114 @@
                                 alt="Image Does Not Exist">
                         </div>
                     </div>
+                </div>
+            </main>
+        <% } %>
+    <% } %>
 
-                <% } else { %>
+    <!-- Home Page content -->
+    <% if ((platform.homepageInfo) || (!platform.homepageInfo && description)) { %>
+        <% if (description) {%><br><br><% } %>
+        <main id="main-container">
+            <div class="container mt-5">
+                <% let block;%>
+                <% let counter = 0;%>
+                <% if (!platform.homepageInfo && description) { %>
+                    <% counter = 1;%>
+                <%}%>
+                <% for (let i = counter; i < platform.info.length; i++) { %>
+                    <% counter ++;%>
+                    <% block = platform.info[i]%>
+                    <% if (i%2 == 0) { %>
+                        <div class="row text-element">
+                            <div class="col-lg-6">
+                                <article class="text-block mode">
+                                    <div class="block-header <% if (platform.homepageInfo) {%> green <% } %>">
+                                        <h1><%=block.heading%></h1>
+                                    </div>
+                                    <div class="block-content mode">
+                                        <% for (let element of block.text) { %>
+                                            <p><%=element%></p>
+                                        <% } %>
+                                    </div>
+                                </article>
+                            </div>
+                            <div class="col-lg-6 block">
+                                <img class="image-block" src="<%=block.image%>"
+                                    alt="Image Does Not Exist">
+                            </div>
+                        </div>
+
+                    <% } else { %>
+                        <div class="row text-element">
+                            <div class="col-lg-6 block">
+                                <img class="image-block" src="<%=block.image%>"
+                                    alt="Image Does Not Exist">
+                            </div>
+                            <div class="col-lg-6">
+                                <article class="text-block mode">
+                                    <div class="block-header <% if (platform.homepageInfo) {%> green <% } %>">
+                                        <h1><%=block.heading%></h1>
+                                    </div>
+                                    <div class="block-content mode">
+                                        <% for (let element of block.text) { %>
+                                            <p><%=element%></p>
+                                        <% } %>
+                                    </div>
+                                </article>
+                            </div>
+                        </div>
+                    <% } %>
+                <% } %>
+                <% if (counter%2 == 0) {%>
                     <div class="row text-element">
                         <div class="col-lg-6 block">
-                            <img class="image-block" src="<%=block.image%>"
-                                alt="Image Does Not Exist">
-                        </div>
-                        <div class="col-lg-6">
-                            <article class="text-block mode">
-                                <div class="block-header <% if (platform.homepageInfo) {%> green <% } %>">
-                                    <h1><%=block.heading%></h1>
+                            <article class="text-block">
+                                <div class="block-header <% if (platform.homepageInfo) {%> red <% } %>">
+                                    <h1 style="user-select: none; -moz-user-select: none;">Community</h1>
                                 </div>
                                 <div class="block-content mode">
-                                    <% for (let element of block.text) { %>
-                                        <p><%=element%></p>
-                                    <% } %>
+                                <% for (let para of platform.community) { %>
+                                    <p class="convertible-text"><%=para%></p>
+                                <% } %>
+                                </div>
+                            </article>
+                        </div>
+                        <div class="col-lg-6 block">
+                            <img class="image-block" src="<%=platform.displayImages[2]%>" alt="<%=platform.name%> image">
+                        </div>
+                    </div>
+                <% } else {%>
+                    <div class="row text-element">
+                        <div class="col-lg-6 block">
+                            <img class="image-block" src="<%=platform.displayImages[2]%>" alt="<%=platform.name%> image">
+                        </div>
+                        <div class="col-lg-6 block">
+                            <article class="text-block">
+                                <div class="block-header <% if (platform.homepageInfo) {%> red <% } %>">
+                                    <h1 style="user-select: none; -moz-user-select: none;">Community</h1>
+                                </div>
+                                <div class="block-content mode">
+                                <% for (let para of platform.community) { %>
+                                    <p class="convertible-text"><%=para%></p>
+                                <% } %>
                                 </div>
                             </article>
                         </div>
                     </div>
                 <% } %>
-            <% } %>
-            <% if (counter%2 == 0) {%>
-                <div class="row text-element">
-                    <div class="col-lg-6 block">
-                        <article class="text-block">
-                            <div class="block-header <% if (platform.homepageInfo) {%> red <% } %>">
-                                <h1 style="user-select: none; -moz-user-select: none;">Community</h1>
-                            </div>
-                            <div class="block-content mode">
-                            <% for (let para of platform.community) { %>
-                                <p class="convertible-text"><%=para%></p>
-                            <% } %>
-                            </div>
-                        </article>
-                    </div>
-                    <div class="col-lg-6 block">
-                        <img class="image-block" src="<%=platform.displayImages[2]%>" alt="<%=platform.name%> image">
-                    </div>
-                </div>
-            <% } else {%>
-                <div class="row text-element">
-                    <div class="col-lg-6 block">
-                        <img class="image-block" src="<%=platform.displayImages[2]%>" alt="<%=platform.name%> image">
-                    </div>
-                    <div class="col-lg-6 block">
-                        <article class="text-block">
-                            <div class="block-header <% if (platform.homepageInfo) {%> red <% } %>">
-                                <h1 style="user-select: none; -moz-user-select: none;">Community</h1>
-                            </div>
-                            <div class="block-content mode">
-                            <% for (let para of platform.community) { %>
-                                <p class="convertible-text"><%=para%></p>
-                            <% } %>
-                            </div>
-                        </article>
-                    </div>
-                </div>
-            <% } %>
-        </div>
-        </div>
-    </main>
-    <script>
-        window.onload = (() => {
-            window.onscroll = (() => {
-                updateNav();
-                animateDisplay();
+            </div>
+            </div>
+        </main>
+        <script>
+            window.onload = (() => {
+                window.onscroll = (() => {
+                    updateNav();
+                    animateDisplay();
+                });
             });
-        });
-    </script>
-    <script src="/javascript/embed.js"></script>
-<% } %>
+        </script>
+        <script src="/javascript/embed.js"></script>
+    <% } %>
 </body>
 </html>
