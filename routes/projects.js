@@ -15,6 +15,7 @@ router.get('/new', wrapAsync(middleware.isLoggedIn), wrapAsync(middleware.postPe
 router.get('/verify/:id', wrapAsync(middleware.isLoggedIn), wrapAsync(middleware.isFaculty), wrapAsync(projects.verify)); //Verify Project
 // router.get('/data', wrapAsync(middleware.isLoggedIn), wrapAsync(middleware.postPermission), wrapAsync(projects.data));
 
+router.post('/search-creators', wrapAsync(middleware.isLoggedIn), wrapAsync(middleware.postPermission), wrapAsync(projects.searchCreators)); //Search for creators in project create form
 router.put('/like', wrapAsync(middleware.isLoggedIn), wrapAsync(projects.likeProject)); //Like project
 router.put('/comment', wrapAsync(middleware.isLoggedIn), wrapAsync(projects.comment)); //Comment on project
 router.put('/like-comment', wrapAsync(middleware.isLoggedIn), wrapAsync(projects.likeComment)); //Like a comment on project

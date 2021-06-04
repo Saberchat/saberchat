@@ -108,7 +108,6 @@ const searchRecipients = function(input) {
 }
 
 const addRecipient = function (type) { // adds recipients to list
-    document.getElementById("recipient-list").value = "";
     if (type == 'user') {
         const id = userSelect.value;
         addTag(userSelect, id);
@@ -140,7 +139,9 @@ const addTag = function (select, id) { // adds the user tag to the display
             remRecipient(document.getElementsByClassName('user-tag')[del].getElementsByTagName('button')[0]);
         }
     }
-    userSelect.hidden = true; //Hide dropdown
+    //Hide dropdown and empty input
+    document.getElementById("recipient-list").value = "";
+    userSelect.hidden = true;
 }
 
 const remRecipient = function (btn) { // remove recipients

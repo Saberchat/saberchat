@@ -36,24 +36,9 @@
 
             <div class="form-group" id="creator-input-div">
                 <label for="creator-select" id="creator-input-label">Creators</label>
-                <select id="creator-select" class="form-control mode" onchange="addCreator('user')">
+                <input type="text" class="form-control mode" id="creator-list" placeholder="Creators" oninput="searchCreators(this)"><br>
+                <select id="creator-select" class="form-control mode" onchange="addCreator('user')" hidden>
                     <option class="creator-group" value="" selected disabled>Select Creators</option>
-                    <% for (let status of statuses) { %>
-                        <% if (platform.studentStatuses.includes(status[0])) { %>
-                            <option class="creator-group" value="<%=status[0]%>"><%=status[1]%></option>
-                        <% } %>
-                    <% } %>
-
-                    <% for (let status of platform.statusesProperty) { %>
-                        <% for (let student of students) { %>
-                            <% if (student.status == status) { %>
-                                <option class="<%= student.status %>" value="<%= student._id %>"><%= student.username %>
-                                    (<%= student.firstName %> <%= student.lastName %>)
-                                </option>
-                            <% } %>
-                        <% } %>
-                    <% } %>
-
                 </select>
                 <input type="text" id="creator-input" name="creatorInput" hidden/>
                 <br/>
@@ -139,6 +124,7 @@
 </div>
 </body>
 
+<script src="/javascript/postUtil.js"></script>
 <script src="/javascript/upload-input.js"></script>
 <script src="/javascript/image-url.js"></script>
 <script src="/javascript/projects/creators.js"></script>

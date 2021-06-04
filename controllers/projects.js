@@ -67,6 +67,45 @@ controller.newProject = async function(req, res) {
     });
 }
 
+//Project creator search
+controller.searchCreators = async function(req, res) {
+    const platform = await setup(Platform);
+    if (!platform) {return res.json({error: "An error occurred"});}
+
+    //Collect user data based on form
+    const users = await User.find({authenticated: true, _id: {$ne: req.user._id}, status: {$in: platform.studentStatuses}});
+    if (!users) {return res.json({error: "An error occurred"});}
+
+    let creators = [];
+    let displayValue;
+
+    if (!req.body.anonymous) { //Only add other statuses if the message is not anonymous
+        for (let status of platform.studentStatuses) { //Iterate through statuses and search for matches
+            displayValue = platform.statusesPlural[platform.statusesProperty.indexOf(status)];
+            if (await `${status} ${displayValue}`.toLowerCase().includes(await req.body.text.toLowerCase())) {
+                await creators.push({ //Add status to array, using display and id values
+                    displayValue,
+                    idValue: status,
+                    type: "status"
+                });
+            }
+        }
+    }
+
+    for (let user of users) { //Iterate through usernames and search for matches
+        if (await `${user.firstName} ${user.lastName} ${user.username}`.toLowerCase().includes(await req.body.text.toLowerCase())) {
+            await creators.push({ //Add user to array, using username as display, and id as id value
+                displayValue: `${user.firstName} ${user.lastName} (${user.username})`, 
+                idValue: user._id,
+                classValue: user.status,
+                type: "user"
+            });
+        }
+    }
+
+    return res.json({success: "Successfully collected data", creators});
+}
+
 controller.createProject = async function(req, res) {
     const platform = await setup(Platform);
     if (!platform) {
