@@ -17,7 +17,7 @@ const searchCreators = function(input) {
     if (input.value.length > 2) {
         sendPostReq(url, data, data => {
             if (data.success && data.creators.length > 0) { //If there are creators to display
-                creatorSelect.hidden = false;
+                creatorSelect.style.display = "block";
                 while (creatorSelect.firstChild) {creatorSelect.removeChild(creatorSelect.firstChild);} //Empty creatorSelect from previous searches
 
                 //Add heading back to creatorSelect's list
@@ -44,11 +44,11 @@ const searchCreators = function(input) {
                     }
                 }
             } else {
-                creatorSelect.hidden = true; //Hide dropdown if there are no matching elements
+                creatorSelect.style.display = "none"; //Hide dropdown if there are no matching elements
             }
         });
     } else {
-        creatorSelect.hidden = true; //Hide dropdown if there is not a long enough input string
+        creatorSelect.style.display = "none"; //Hide dropdown if there is not a long enough input string
     }
 }
 
@@ -78,7 +78,7 @@ const addCreator = function () { //Add creator to list of creators
     }
     //Empty input and hide dropdown
     document.getElementById("creator-list").value = "";
-    creatorSelect.hidden = true;
+    creatorSelect.style.display = "none";
 }
 
 const remCreator = function (btn) { //Remove creator from list of creators

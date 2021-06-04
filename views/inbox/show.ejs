@@ -17,15 +17,17 @@
                 <div class="msg-head">
                     <h1><%= message.subject %></h1>
                     <p>From:
-                        <a href="/profiles/<%= message.author._id %>" class="user-link">
+                        <% if (!message.anonymous) {%><a href="/profiles/<%= message.author._id %>" class="user-link"><%}%>
                     <span class="badge badge-pill badge-primary">
-                        <% if(message.author._id.equals(currentUser._id)) { %>
+                        <% if(!message.anonymous && message.author._id.equals(currentUser._id)) { %>
                             me
+                        <% } else if (message.anonymous) { %>
+                            Anonymous
                         <% } else { %>
                             <%= message.author.username %>
                         <% } %>
                     </span>
-                        </a>
+                    <% if (!message.anonymous) {%></a><%}%>
                     </p>
                     <p>To:
                         <% if(message.toEveryone) { %>
@@ -33,7 +35,7 @@
                         <% } else { %>
                             <% message.recipients.forEach(user => { %>
 
-                                <% if (!user._id.equals(message.author._id)) { %>
+                                <% if (message.anonymous || !user._id.equals(message.author._id)) { %>
                                     <a href="/profiles/<%= user._id %>" class="user-link">
                           <span class="badge badge-pill badge-secondary">
                               <% if(user._id.equals(currentUser._id)) { %>

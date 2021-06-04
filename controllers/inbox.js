@@ -52,13 +52,13 @@ controller.showMsg = async function(req, res) {
     }
 
     //Check message view permissions
-    if(!message.toEveryone && !(await message.recipients.includes(req.user._id)) && !(await message.author.equals(req.user._id))) {
+    if(!message.toEveryone && !(await message.recipients.includes(req.user._id)) && !(!message.anonymous && await message.author.equals(req.user._id))) {
         await req.flash('error', 'You do not have permission to view this message');
         return res.redirect('back');
     }
 
     //If message has not been read yet, mark it as read
-    if(!message.read.includes(req.user._id) && (await message.recipients.includes(req.user._id))) {
+    if(!message.read.includes(req.user._id) && (message.toEveryone || await message.recipients.includes(req.user._id))) {
         req.user.inbox[await objectArrIndex(req.user.inbox, "message", message._id)].new = false;
         await message.read.push(req.user._id);
         await req.user.save();
@@ -113,7 +113,7 @@ controller.sent = async function(req, res) {
 
     let sent_msgs = []; // array of user's sent messages
     for(let message of messages) { // if user sent the message, push and continue
-        if(await message.author.equals(req.user._id)) {
+        if(!message.anonymous && await message.author.equals(req.user._id)) {
             await sent_msgs.push(message);
             continue;
         }
@@ -236,7 +236,7 @@ controller.createMsg = async function(req, res) {
         }
         recipients = await parsePropertyArray(faculty, "_id");
         message.anonymous = true;
-        delete message.author;
+        message.author = null;
     }
 
     //If statuses are selected as 'recipients', find corresponding users

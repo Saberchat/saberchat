@@ -28,7 +28,7 @@
                             <div class="form-group">
                                 <label for="user-select" class="label-custom">Recipients</label>
                                 <input type="text" class="form-control mode" id="recipient-list" placeholder="Recipients" oninput="searchRecipients(this)"><br>
-                                <select hidden id="user-select" class="form-control mode" onchange="addRecipient('user')" required>
+                                <select id="user-select" class="form-control mode" onchange="addRecipient()" style="display: none;">
                                     <option class="recipient-group" value="" selected disabled>Select User/Group</option>
                                 </select>
                             </div>
@@ -43,8 +43,7 @@
                     </div>
 
                     <div class="form-check">
-                        <input onchange="updateTo(this)" type="checkbox" class="form-check-input" name="all"
-                                value="true" id="all-check">
+                        <input onchange="updateTo(this)" type="checkbox" class="form-check-input" name="all" value="true" id="all-check">
                         <label class="form-check-label" for="all-check">Send To Everyone</label>
                     </div>
 

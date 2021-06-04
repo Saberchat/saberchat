@@ -1,7 +1,7 @@
 const form = document.getElementById('message-form');
 
+const recipientList = document.getElementById("recipient-list");
 const userSelect = document.getElementById('user-select');
-const facultySelect = document.getElementById('faculty-select');
 const userDisplay = document.getElementById('user-display');
 
 const defaultMsg = document.getElementById('default-msg');
@@ -26,34 +26,45 @@ const process = function () { // processes all the selected recipients into form
     return true;
 }
 
-const updateTo = function (everyoneCheck) { // toggles recipients selection
-    if (everyoneCheck.checked) {
-        userSelect.required = false;
-        facultySelect.required = false;
+const updateTo = function (check) { // toggles recipients selection
+    if (check.checked) {
+        recipientList.style.display = "none";
+        userSelect.style.display = "none";
         defaultMsg.style.display = 'none';
-        anonyMsg.style.display = 'none';
         userDisplay.style.display = 'none';
         anonymousControl.style.display = 'none';
 
         recipients = [];
         clearTags();
-        facultySelect.value = '';
         userSelect.value = '';
+
+        if (anonymousCheck.checked) {
+            anonymousCheck.checked = false;
+        }
+
     } else {
-        setAnonymous(anonymousCheck);
+        recipientList.style.display = "block";
+        userSelect.style.display = "block";
+        defaultMsg.style.display = 'block';
         anonymousControl.style.display = 'block';
         userDisplay.style.display = 'block';
+        setAnonymous(anonymousCheck);
     }
 }
 
 const setAnonymous = function (check) { // toggles anonymous messaging
-    const placeholderMap = new Map([[true, "Recipients (Faculty)"], [false, "Recipients"]]);
-    document.getElementById("recipient-list").value = "";
-    recipients = [];
-    clearTags();
-    userSelect.hidden = true;
-    userSelect.value = '';
-    document.getElementById("recipient-list").placeholder = placeholderMap.get(check.checked);
+    if (everyoneCheck.checked) {
+        check.checked = false;
+    } else {
+        const placeholderMap = new Map([[true, "Recipients (Faculty)"], [false, "Recipients"]]);
+        recipientList.style.display = "block";
+        recipientList.value = "";
+        recipients = [];
+        clearTags();
+        userSelect.style.display = "none";
+        userSelect.value = '';
+        recipientList.placeholder = placeholderMap.get(check.checked);
+    }
 }
 
 const clearTags = function () { // clears user tags
@@ -72,7 +83,7 @@ const searchRecipients = function(input) {
     if (input.value.length > 2) {
         sendPostReq(url, data, data => {
             if (data.success && data.recipients.length > 0) { //If there are recipients to display
-                userSelect.hidden = false;
+                userSelect.style.display = "block";
                 while (userSelect.firstChild) {userSelect.removeChild(userSelect.firstChild);} //Empty userSelect from previous searches
 
                 //Add heading back to userSelect's list
@@ -99,22 +110,16 @@ const searchRecipients = function(input) {
                     }
                 }
             } else {
-                userSelect.hidden = true; //Hide dropdown if there are no matching elements
+                userSelect.style.display = "none"; //Hide dropdown if there are no matching elements
             }
         });
     } else {
-        userSelect.hidden = true; //Hide dropdown if there is not a long enough input string
+        userSelect.style.display = "none"; //Hide dropdown if there is not a long enough input string
     }
 }
 
-const addRecipient = function (type) { // adds recipients to list
-    if (type == 'user') {
-        const id = userSelect.value;
-        addTag(userSelect, id);
-    } else if (type == 'faculty') {
-        const id = facultySelect.value;
-        addTag(facultySelect, id);
-    }
+const addRecipient = function () { // adds recipients to list
+    addTag(userSelect, userSelect.value);
 }
 
 const addTag = function (select, id) { // adds the user tag to the display
@@ -140,8 +145,8 @@ const addTag = function (select, id) { // adds the user tag to the display
         }
     }
     //Hide dropdown and empty input
-    document.getElementById("recipient-list").value = "";
-    userSelect.hidden = true;
+    recipientList.value = "";
+    userSelect.style.display = "none";
 }
 
 const remRecipient = function (btn) { // remove recipients

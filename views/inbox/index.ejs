@@ -89,9 +89,9 @@
                           <a href="/inbox/<%= msg._id %>" class="message-body darkmode" >
                             <div class="message-head darkmode">
                               <% if (msg.read.includes(currentUser._id)) { %>
-                                  <div class="message-from darkmode ">(<%=1+msg.replies.length%>) <%= msg.author.username %></div>
+                                  <div class="message-from darkmode ">(<%=1+msg.replies.length%>) <% if (msg.anonymous) {%> Anonymous<% } else {%> <%= msg.author.username %> <% } %></div>
                               <% } else { %>
-                                  <div class="message-from darkmode unread">(<%=1+msg.replies.length%>) <%= msg.author.username %></div>
+                                  <div class="message-from darkmode unread">(<%=1+msg.replies.length%>) <% if (msg.anonymous) {%> Anonymous<% } else {%> <%= msg.author.username %> <% } %></div>
                               <% } %>
                               <% if (msg.read.includes(currentUser._id)) { %>
                                 <div class="message-subject read"><span><%= msg.subject %></span></div>

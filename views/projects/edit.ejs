@@ -37,7 +37,7 @@
             <div class="form-group" id="creator-input-div">
                 <label for="creator-select" id="creator-input-label">Creators</label>
                 <input type="text" class="form-control mode" id="creator-list" placeholder="Creators" oninput="searchCreators(this)"><br>
-                <select id="creator-select" class="form-control mode" onchange="addCreator('user')" hidden>
+                <select id="creator-select" class="form-control mode" onchange="addCreator('user')" style="display: none;">
                     <option class="creator-group" value="" selected disabled>Select Creators</option>
                 </select>
                 <input type="text" id="creator-input" name="creatorInput" hidden/>
