@@ -43,7 +43,7 @@ const searchFunction = function(statusString) { //Search for users on index page
     let statusBreaks = document.getElementsByClassName('status-page-break')
     statusString = statusString.split(',');
     let statuses = [];
-    for (let i = 0; i < statusString.length; i+=3) { //Build statuses array based on platform's stored statuses
+    for (let i = 0; i < statusString.length; i += 3) { //Build statuses array based on platform's stored statuses
         statuses.push([statusString[i], statusString[i+1], []])
     }
 
@@ -55,8 +55,7 @@ const searchFunction = function(statusString) { //Search for users on index page
 
     for (i = 0; i < a.length; i++) { //Iterate through each user's text and search for text overlap
         user = a[i].getElementsByClassName('username')[0];
-        txtValue = user.textContent;
-        if (txtValue.toUpperCase().includes(filter) || user.classList.toString().toUpperCase().includes(filter)) {
+        if (user.textContent.toUpperCase().includes(filter) || user.classList.toString().toUpperCase().includes(filter)) {
             listItems[i].style.display = "block";
         } else {
             listItems[i].style.display = "none";
@@ -67,7 +66,7 @@ const searchFunction = function(statusString) { //Search for users on index page
     for (let status of statuses) { //Iterate through statuses and see if any users under this status match the keyword
         statusIncluded = false;
         for (let member of document.getElementsByClassName(status[0])) {
-            if ((member.textContent.toUpperCase().indexOf(filter) > -1) || (member.classList.toString().toUpperCase().indexOf(filter) > -1)) {
+            if (member.textContent.toUpperCase().includes(filter) || member.classList.toString().toUpperCase().includes(filter)) {
                 statusIncluded = true;
                 break;
             }

@@ -254,14 +254,22 @@ controller.updateAnnouncement = async function(req, res) {
     let cloudResult;
     for (let i = updatedAnnouncement.mediaFiles.length-1; i >= 0; i--) {
         if (req.body[`deleteUpload-${updatedAnnouncement.mediaFiles[i].url}`] && updatedAnnouncement.mediaFiles[i] && updatedAnnouncement.mediaFiles[i].filename) {
-            if (await (await path.extname(await updatedAnnouncement.mediaFiles[i].url.split("SaberChat/")[1]).toLowerCase())) {
-                [cloudErr, cloudResult] = await cloudDelete(updatedAnnouncement.mediaFiles[i].filename, "video");
-            } else if (await path.extname(await updatedAnnouncement.mediaFiles[i].url.split("SaberChat/")[1]).toLowerCase() == ".pdf") {
-                [cloudErr, cloudResult] = await cloudDelete(updatedAnnouncement.mediaFiles[i].filename, "pdf");
-            } else {
-                [cloudErr, cloudResult] = await cloudDelete(updatedAnnouncement.mediaFiles[i].filename, "image");
+            //Evaluate filetype to decide on file deletion strategy
+            switch(await path.extname(await updatedAnnouncement.mediaFiles[i].url.split("SaberChat/")[1]).toLowerCase()) {
+                case ".mp3":
+                case ".mp4":
+                case ".m4a":
+                case ".mov":
+                    [cloudErr, cloudResult] = await cloudDelete(updatedAnnouncement.mediaFiles[i].filename, "video");
+                    break;
+                case ".pdf":
+                    [cloudErr, cloudResult] = await cloudDelete(updatedAnnouncement.mediaFiles[i].filename, "pdf");
+                    break;
+                default:
+                    [cloudErr, cloudResult] = await cloudDelete(updatedAnnouncement.mediaFiles[i].filename, "image");
             }
-            // check for failure
+
+            // Check For Failure
             if (cloudErr || !cloudResult || cloudResult.result !== 'ok') {
                 await req.flash('error', 'Error deleting uploaded image');
                 return res.redirect('back');
@@ -433,13 +441,21 @@ controller.deleteAnnouncement = async function(req, res) {
     let cloudResult;
     for (let file of announcement.mediaFiles) {
         if (file && file.filename) {
-            if (await [".mp3", ".mp4", ".m4a", ".mov"].includes(await path.extname(await file.url.split("SaberChat/")[1]).toLowerCase())) {
-                [cloudErr, cloudResult] = await cloudDelete(file.filename, "video");
-            } else if (await path.extname(await file.url.split("SaberChat/")[1]).toLowerCase() == ".pdf") {
-                [cloudErr, cloudResult] = await cloudDelete(file.filename, "pdf");
-            } else {
-                [cloudErr, cloudResult] = await cloudDelete(file.filename, "image");
+            //Evaluate deleted files' filetype and delete accordingly
+            switch(await path.extname(await file.url.split("SaberChat/")[1]).toLowerCase()) {
+                case ".mp3":
+                case ".mp4":
+                case ".m4a":
+                case ".mov":
+                    [cloudErr, cloudResult] = await cloudDelete(file.filename, "video");
+                    break;
+                case ".pdf":
+                    [cloudErr, cloudResult] = await cloudDelete(file.filename, "pdf");
+                    break;
+                default:
+                    [cloudErr, cloudResult] = await cloudDelete(file.filename, "image");
             }
+
             // check for failure
             if (cloudErr || !cloudResult || cloudResult.result !== 'ok') {
                 await req.flash('error', 'Error deleting uploaded image');
