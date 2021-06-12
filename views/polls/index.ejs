@@ -1,14 +1,16 @@
 <%- include('../partials/headStart') %>
 <%- include('../partials/headEnd') %>
 <body>
+    <%- include('../partials/components/navbar') %>
+    <%- include('../partials/components/header') %>
     <div class="container">
         <div class="row">
-            <div class="col-12 col-lg-8 offset-lg-2">
+            <div class="col-12 col-lg-8 offset-lg-2 my-5">
                 <!-- jumbotron was deprecated. Custom jumbo. -->
-                <div class="bg-light text-center rounded-3">
+                <div class="bg-light text-center rounded-5">
                     <div class="container-fluid py-5">
-                        <h1 class="display-5 fw-bold">Hello World</h1>
-                        <p class="fs-4">Lorem ipsum dolor sit amet, consectetur adipisicing elit. Aut autem quas odio porro quaerat minima culpa sed eos, dolor officia, modi dicta voluptates a magni amet eum rem ea iure.</p>
+                        <h1 class="display-5 fw-bold"><i class="fas fa-<%=data.icon%>"></i> <%= data.name %></h1>
+                        <p class="fs-4"><%= data.description %></p>
                     </div>
                 </div>
 
@@ -16,6 +18,7 @@
         </div>
         <div class="row">
             <div class="col-12 col-lg-8 offset-lg-2">
+                <h4 class="fs-5">Current Polls</h4>
                 <div class="list-group">
                     <a href="#" class="list-group-item list-group-item-action">
                         link item
