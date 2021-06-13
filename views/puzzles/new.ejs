@@ -1,0 +1,58 @@
+<%- include('../partials/headStart') %>
+    <link rel="stylesheet" href="/stylesheets/announcements/form.css">
+<%- include('../partials/headEnd') %>
+
+<body id="body" class="mode">
+
+<%- include('../partials/components/navbar') %>
+<%- include('../partials/components/header') %>
+
+<div class="container mt-5">
+    <div class="row">
+        <div class="col-12">
+          <div class="jumbotron text-center header">
+            <h1><i class="fas fa-<%=data.icon%>"></i> Post Puzzle</h1>
+            <a class="btn btn-primary" href="/puzzles"><i class="fas fa-arrow-left"></i> Back</a>
+          </div>
+
+        </div>
+    </div>
+</div>
+
+
+<div class="row puzzle-form">
+	<div class="col-md-8 offset-md-2 col-12">
+		<div class="form-container">
+			<form action="/puzzles/" method="post" enctype="multipart/form-data">
+				<div class="form-group mode">
+					<label for="subject">Subject</label>
+					<input type="text" class="form-control mode" name="subject" placeholder="A short title..." maxlength="50" required>
+				</div><br />
+
+				<div class="form-group mode">
+					<label for="message">Message</label>
+					<textarea minlength="50" class="form-control mode" name="message" rows="5" placeholder="What it is about..." required></textarea>
+				</div>
+
+				<div id="media-header">
+					<button type="button" onclick="upload()" class="btn btn-primary"><i class="fas fa-plus"></i> File Upload</button>
+					<br/><br/>
+				</div>
+				<div id="uploads"></div>
+				
+				<div id="image-header">
+					<button type="button" onclick="addImg()" class="btn btn-primary"><i class="fas fa-plus"></i> Image URL</button>
+					<br/><br/>
+				</div>
+				<div id="image-block"></div>
+				
+				<button type="submit" class="btn btn-primary btn-block">Post</button>
+				<br/>
+			</form>
+		</div>
+	</div>
+</div>
+<script src="/javascript/upload-input.js"></script>
+<script src="/javascript/image-url.js"></script>
+</body>
+</html>

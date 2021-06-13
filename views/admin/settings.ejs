@@ -165,6 +165,7 @@
                         <% } %>
                         <h4>Feature Settings</h4>
                         <div class="form-group">
+                            <p>Visit <a href="https://fontawesome.com/v5.15/icons?d=gallery">this link</a> to view usable icons</p>
                             <% for (let feature of platform.features) { %>
                                 <label for="<%=feature.name%>"><i id="display-icon-<%=feature.name%>" class="fas fa-<%=feature.icon%>"></i> <span id="feature-name-<%=feature.name%>"><%=feature.name%></span></label>
                                 <input oninput="changeFeatureName(this)"  type="text" id="<%=feature.name%>" class="form-control mode" placeholder="Enter feature name" value="<%=feature.name%>" name="feature"><br>
