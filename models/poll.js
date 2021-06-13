@@ -10,6 +10,7 @@ module.exports = mongoose.model('Poll', new mongoose.Schema({
             text: String,
             options:[
                 {
+                    id: Number,
                     type: String
                 }
             ]
@@ -21,7 +22,10 @@ module.exports = mongoose.model('Poll', new mongoose.Schema({
             response: [
                 {
                     id: Number,
-                    answer: String
+                    answer: {
+                        text: String,
+                        id: Number
+                    }
                 }
             ]
         }
