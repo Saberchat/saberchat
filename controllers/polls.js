@@ -20,4 +20,11 @@ controller.index = async function(req, res) {
     });
 }
 
+controller.create = async function(req, res) {
+    const platform = await setup(Platform);
+    const featureIndex = platform.features.findIndex(i => i.route === 'polls');
+
+    res.render('polls/new', { platform, data: platform.features[featureIndex]});
+}
+
 module.exports = controller;

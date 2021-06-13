@@ -1,0 +1,30 @@
+<%- include('../partials/headStart') %>
+<%- include('../partials/headEnd') %>
+<body>
+    <%- include('../partials/components/navbar') %>
+    <%- include('../partials/components/header') %>
+    <div class="container">
+        <div class="row">
+            <div class="col-12 col-lg-8 offset-lg-2 my-5">
+                <!-- jumbotron was deprecated in v5. Custom jumbo. -->
+                <div class="bg-light text-center rounded-5">
+                    <div class="container-fluid py-5">
+                        <h1 class="display-5 fw-bold">New <%= data.name %></h1>
+                        <a href="/polls" class="btn btn-secondary">Back</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-12 col-lg-8 offset-lg-2">
+                <form action="/polls" method="post">
+                    <div class="form-group">
+                        <label for="title">Title</label>
+                        <input class="form-control" id="title" name="title" type="text" placeholder="Ex. Favorite Color...">
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

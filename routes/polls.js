@@ -3,14 +3,17 @@
 //LIBRARIES
 const express = require('express');
 const middleware = require('../middleware/index');
-const {multipleUpload} = require('../middleware/multer');
 const wrapAsync = require('../utils/wrapAsync');
 const polls = require('../controllers/polls'); // Controller
 const router = express.Router(); //Router
 
 //ROUTES
 
+// Index page
 router.get('/', wrapAsync(middleware.isLoggedIn), wrapAsync(polls.index));
+
+// Create poll form
+router.get('/new', wrapAsync(middleware.isLoggedIn), middleware.isPollster, wrapAsync(polls.create));
 
 
 module.exports = router;
