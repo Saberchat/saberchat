@@ -49,5 +49,10 @@ module.exports = { //All subclass Schema
     Event: Post.discriminator("Event", new mongoose.Schema({ //Scheduled Future event
         links: [{type: String}],
         deadline: {day: String, month: String, year: String}
+    })),
+    Poll: Post.discriminator('Poll', new mongoose.Schema({
+        googleFormUrl: String,
+        width: {type: Number, default: 480},
+        height: {type: Number, default: 640}
     }))
 };

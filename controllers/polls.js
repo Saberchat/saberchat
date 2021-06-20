@@ -3,7 +3,7 @@ const setup = require("../utils/setup");
 //SCHEMA
 const Platform = require("../models/platform");
 const User = require('../models/user');
-const Poll = require('../models/poll');
+const {Poll} = require('../models/post');
 
 const controller = {}
 
