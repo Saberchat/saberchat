@@ -711,6 +711,10 @@ controller.bookTutor = async function(req, res) {
             await tutor.members.push(studentObject);
             await course.save();
 
+            if (tutor.tutor.receiving_emails) {
+                await sendGridEmail(tutor.tutor.email, `New student in ${course.name}`, `<p>Hello ${tutor.tutor.firstName},</p><p>${req.user.username} has signed up as your student in ${course.name}.</p>`, false);
+            }
+
             //All current members of the tutor
             const studentIds = await User.find({authenticated: true, _id: {$in: await parsePropertyArray(tutor.members, "student")}});
             if (!studentIds) {return res.json({error: "Error accessing members"});}
