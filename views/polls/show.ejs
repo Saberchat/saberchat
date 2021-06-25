@@ -1,0 +1,39 @@
+<%- include('../partials/headStart') %>
+<link rel="stylesheet" href="/stylesheets/polls/show.css">
+<%- include('../partials/headEnd') %>
+<body>
+    <%- include('../partials/components/navbar') %>
+    <%- include('../partials/components/header') %>
+    <div class="container">
+        <div class="row">
+            <div class="col-12 col-lg-8 offset-lg-2 my-5">
+                <!-- jumbotron was deprecated. Custom jumbo. -->
+                <div class="bg-light text-center rounded-5">
+                    <div class="container-fluid py-5">
+                        <h1 class="display-5 fw-bold"><%= poll.subject %></h1>
+                        <a href="/polls" class="btn btn-secondary">Go Back</a>
+                        <% if(currentUser._id.equals(poll.sender._id) && !poll.closed) { %> 
+                            <form class="d-inline-block" action="/polls/<%= poll._id %>/toggle-close" method="post">
+                                <button class="btn btn-danger" type="submit">Close Poll</button>
+                            </form>
+                        <% } %> 
+                    </div>
+                </div>
+
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-12 col-lg-8 offset-lg-2 form-div">
+                <iframe 
+                    src="<%= poll.googleFormUrl %>" 
+                    width="<%= poll.width %>"
+                    height="<%= poll.height %>" 
+                    marginheight="0"
+                    marginwidth="0"
+                    scrolling="auto"
+                    frameborder="0">Loading...</iframe>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
