@@ -25,13 +25,18 @@
 		<div class="form-container">
 			<form action="/puzzles/" method="post" enctype="multipart/form-data">
 				<div class="form-group mode">
-					<label for="subject">Subject</label>
-					<input type="text" class="form-control mode" name="subject" placeholder="A short title..." maxlength="50" required>
+					<label for="subject">Puzzle Title</label>
+					<input type="text" class="form-control mode" name="subject" placeholder="Name Your Puzzle!" maxlength="50" required>
 				</div><br />
 
 				<div class="form-group mode">
-					<label for="message">Message</label>
-					<textarea minlength="50" class="form-control mode" name="message" rows="5" placeholder="What it is about..." required></textarea>
+					<label for="message">Description</label>
+					<textarea minlength="20" class="form-control mode" name="message" rows="3" placeholder="Describe the challenge!" required></textarea>
+				</div>
+
+				<div class="form-group mode">
+					<label for="message">Solution</label>
+					<textarea minlength="20" class="form-control mode" name="message" rows="5" placeholder="Answer Explanation..." required></textarea>
 				</div>
 
 				<div id="media-header">
