@@ -55,6 +55,13 @@ controller.show = async function(req, res) {
     });
 }
 
+controller.instructions = async function(req, res) {
+    const platform = await setup(Platform);
+    const featureIndex = platform.features.findIndex(i => i.route === 'polls');
+
+    res.render('polls/instructions', { platform, data: platform.features[featureIndex]});
+}
+
 controller.form = async function(req, res) {
     const platform = await setup(Platform);
     const featureIndex = platform.features.findIndex(i => i.route === 'polls');

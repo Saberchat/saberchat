@@ -15,6 +15,9 @@ router.get('/', wrapAsync(middleware.isLoggedIn), wrapAsync(polls.index));
 // Create poll form
 router.get('/new', wrapAsync(middleware.isLoggedIn), middleware.isPollster, wrapAsync(polls.form));
 
+// Get poll link instructions
+router.get('/new/instructions', wrapAsync(middleware.isLoggedIn), middleware.isPollster, wrapAsync(polls.instructions));
+
 // Show poll
 router.get('/:id', wrapAsync(middleware.isLoggedIn), wrapAsync(polls.show));
 

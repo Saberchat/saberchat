@@ -18,7 +18,7 @@
         </div>
         <div class="row">
             <div class="col-12 col-lg-8 offset-lg-2">
-                <form action="/polls" method="post">
+                <form action="/polls" method="post" class="mb-5">
                     <div class="form-group">
                         <label class="form-label" for="formTitle">Title</label>
                         <input 
@@ -26,29 +26,41 @@
                             type="text" placeholder="The form's display name..." required maxlength="80">
                     </div>
                     <div class="form-group">
-                        <label class="form-label" for="googleFormUrl">Google Forms Share Url</label>
-                        <a href="#" class="d-block">Where do I find this?</a>
+                        <label class="form-label" for="googleFormUrl">Google Forms Share Url/Link</label>
+                        <a href="/polls/new/instructions" class="d-block" target="_blank" rel="noopener noreferrer">Where do I find this?</a>
                         <input 
                             class="form-control" id="googleFormUrl" name="googleFormUrl" 
                             type="text" required 
                             placeholder="Ex. https://docs.google.com/forms/d/e/.../viewform?usp=sf_link">
+                        <p class="my-2 text-muted">The Google Form's non-shortened share link</p>
                     </div>
                     <div class="form-group">
                         <label class="form-label" for="formWidth">Form Width (px) [optional]</label>
                         <input 
-                            class="form-control" name="formWidth" type="number" 
+                            class="form-control" id="formWidth" name="formWidth" type="number" 
                             placeholder="480" min="250">
                     </div>
                     <div class="form-group">
                         <label class="form-label" for="formHeight">Form Height (px) [optional]</label>
                         <input 
-                            class="form-control" name="formHeight" type="number" 
+                            class="form-control" id="formHeight" name="formHeight" type="number" 
                             placeholder="640" min="300">
                     </div>
                     <button class="btn btn-success" type="submit">Create</button>
                 </form>
+                <hr>
+                <h4>Preview</h4>
+                <div class="preview-container">
+                    <iframe 
+                        src="" width="480" height="480" id="formRenderer"
+                        frameborder="0" marginwidth="0" marginheight="0" scrolling="auto"
+                        >Loading...</iframe>
+
+                </div>
+                
             </div>
         </div>
     </div>
+    <script src="/javascript/polls/new.js"></script>
 </body>
 </html>

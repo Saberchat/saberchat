@@ -2,3 +2,13 @@
     font-size: 1.3rem;
     margin-top: 1rem;
 }
+
+#formRenderer {
+    background-color: antiquewhite;
+    overflow: scroll;
+}
+
+.preview-container {
+    max-width: 100%;
+    overflow: scroll;
+}
