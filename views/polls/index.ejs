@@ -1,4 +1,5 @@
 <%- include('../partials/headStart') %>
+<link rel="stylesheet" href="/stylesheets/polls/index.css">
 <%- include('../partials/headEnd') %>
 <body>
     <%- include('../partials/components/navbar') %>
@@ -20,19 +21,33 @@
             </div>
         </div>
         <div class="row">
-            <div class="col-12 col-lg-8 offset-lg-2">
-                <h4 class="fs-5">Current Polls</h4>
-                <div class="list-group">
-                    <a href="#" class="list-group-item list-group-item-action">
-                        link item
-                    </a>
-                    <a href="#" class="list-group-item list-group-item-action">
-                        link item
-                    </a>
-                    <a href="#" class="list-group-item list-group-item-action">
-                        link item
-                    </a>
-                  </div>
+            <div class="col-12 col-lg-8 offset-lg-2 mb-5">
+                <h4>Current Polls</h4>
+                <ul class="list-group">
+                    <% openPolls.forEach(function(poll) { %>
+                        <li class="list-group-item list-group-item-action">
+                            <span class="poll-user"><%= poll.sender.username %></span> (<%= poll.date %>): <%= poll.subject %> 
+                            <a href="/polls/<%= poll._id %>" class="btn btn-info float-right">View</a> 
+                        </li>
+                    <% }); %> 
+                    </ul>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-12 col-lg-8 offset-lg-2 my-5">
+                <h4>Closed Polls</h4>
+                <ul class="list-group">
+                    <% closedPolls.forEach(function(poll) { %>
+                        <li class="list-group-item list-group-item-action">
+                            <span class="poll-user"><%= poll.sender.username %></span> (<%= poll.date %>): <%= poll.subject %> 
+                            <% if(currentUser && poll.sender._id.equals(currentUser._id)) { %> 
+                                <form class="d-inline-block float-right" action="/polls/<%= poll._id %>/toggle-close" method="post">
+                                    <button class="btn btn-info" type="submit">Reopen Poll</button>
+                                </form> 
+                            <% } %> 
+                        </li>
+                    <% }); %> 
+                    </ul>
             </div>
         </div>
     </div>

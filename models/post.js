@@ -53,6 +53,7 @@ module.exports = { //All subclass Schema
     Poll: Post.discriminator('Poll', new mongoose.Schema({
         googleFormUrl: String,
         width: {type: Number, default: 480},
-        height: {type: Number, default: 640}
+        height: {type: Number, default: 640},
+        closed: {type:Boolean, default: false}
     }))
 };

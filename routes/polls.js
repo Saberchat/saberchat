@@ -13,7 +13,15 @@ const router = express.Router(); //Router
 router.get('/', wrapAsync(middleware.isLoggedIn), wrapAsync(polls.index));
 
 // Create poll form
-router.get('/new', wrapAsync(middleware.isLoggedIn), middleware.isPollster, wrapAsync(polls.create));
+router.get('/new', wrapAsync(middleware.isLoggedIn), middleware.isPollster, wrapAsync(polls.form));
 
+// Show poll
+router.get('/:id', wrapAsync(middleware.isLoggedIn), wrapAsync(polls.show));
+
+// Create poll POST
+router.post('/', wrapAsync(middleware.isLoggedIn), middleware.isPollster, wrapAsync(polls.create));
+
+//
+router.post('/:id/toggle-close', wrapAsync(middleware.isLoggedIn), middleware.isPollster, wrapAsync(polls.toggleClosed));
 
 module.exports = router;
