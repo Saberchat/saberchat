@@ -55,12 +55,12 @@
     color: white;
 }
 
-#new-announcement-text {
+#new-post-text {
     margin-top: 20px;;
     margin-bottom: 10px;
 }
 
-.announcement-bar {
+.post-bar {
     background-color: white;
     width: 400px;
     height: 650px;
@@ -71,12 +71,12 @@
     float: left;
 }
 
-.announcement-notification {
+.post-notification {
     margin-bottom: 5px;
     font-size: 10px;
 }
 
-#announcement-bar-header {
+#post-bar-header {
     text-align: center;
     padding-top: 10px;
     font-size: 15px;
@@ -101,24 +101,24 @@
     color: orange;
 }
 
-#new-announcement-message, #new-announcement-txt {
+#new-post-message, #new-post-txt {
     width: 100%;
     margin-left: 300px;
     margin-right: 300px;
 }
 
-#new-announcement-txt {
+#new-post-txt {
     height: 200px;
 }
 
 @media only screen and (max-width: 768px) {
-    #new-announcement-message, #new-announcement-txt {
+    #new-post-message, #new-post-txt {
         width: 100%;
         margin-left: 50px;
         margin-right: 50px;
     }
 
-    #new-announcement-txt {
+    #new-post-txt {
         height: 100px;
     }
 

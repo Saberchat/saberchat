@@ -42,12 +42,12 @@
                     <span style="color: black;"><%= puzzle.date %></span>
 
                     <% if(puzzle.sender._id.equals(currentUser._id)) { %>
-                        <div class="puzzle-row">
+                        <div class="post-row">
                             <a href="/puzzles/<%= puzzle._id %>/edit" class="btn btn-info"><i
                                         class="fas fa-cog"></i> Edit</a>
                             <form action="/puzzles/<%= puzzle._id %>?_method=delete" method="post"
                                     id="delete-form">
-                                <button class="btn btn-danger puzzle-button" type="button" data-toggle="modal"
+                                <button class="btn btn-danger post-button" type="button" data-toggle="modal"
                                         data-target="#modal-<%= puzzle._id %>"><i
                                             class="far fa-trash-alt"></i> Delete
                                 </button>
@@ -79,21 +79,50 @@
                                 </div>
                             </form>
                         </div>
-                        <br/>
+                    <% } else {%>
+                        <form action="/puzzles/answer/<%= puzzle._id %>?_method=put" method="post"
+                            class="delete-post">
+                            <button class="btn btn-success edit-button post-button" type="button"
+                                    data-toggle="modal"
+                                    data-target="#modal-answer-<%= puzzle._id %>"><i
+                                        class="fas fa-pen-square"></i>Answer
+                            </button>
+                            <div class="modal fade" id="modal-answer-<%= puzzle._id %>" tabindex="-1"
+                                aria-labelledby="deleteModalLabel" aria-hidden="true">
+                                <div class="modal-dialog">
+                                    <div class="modal-content mode">
+                                        <div class="modal-header mode">
+                                            <h5 class="modal-title" id="exampleModalLabel">Submit Answer</h5>
+                                            <button type="button" class="close mode" data-dismiss="modal"
+                                                    aria-label="Close">
+                                                <span aria-hidden="true">&times;</span>
+                                            </button>
+                                        </div>
+                                        <div class="modal-body mode">
+                                            <textarea class="form-control mode" id="answer-<%=puzzle._id%>" name="answer" placeholder="Enter Your Answer" rows="5" cols="10"></textarea>
+                                        </div>
+                                        <div class="modal-footer mode">
+                                            <button type="button" class="btn btn-secondary"data-dismiss="modal">Back</button>
+                                            <button type="submit" class="btn btn-success">Submit Answer
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
                     <% } %>
+                    <br/><br/>
 
-                    <div class="puzzle-row">
+                    <div class="post-row">
                         <% if (puzzle.likes.includes(currentUser._id)) { %>
-                            <span id="puzzle-like-row"><i id="like-<%= puzzle._id %>-show"
-                                                                onclick="like(this, 'puzzle', 'puzzles')"
-                                                                class="fas fa-thumbs-up liked-puzzle"></i> <span
-                                        id="like-count"
-                                        class="likeCount-<%= puzzle._id %>"><%= puzzle.likes.length %></span></span>
+                            <span id="post-like-row"><i id="like-<%= puzzle._id %>-show" onclick="like(this, 'puzzle', 'puzzles')"
+                                class="fas fa-thumbs-up liked-post"></i>
+                            <span id="like-count" class="likeCount-<%= puzzle._id %>"><%= puzzle.likes.length %></span></span>
 
                         <% } else { %>
-                            <span id="puzzle-like-row"><i id="like-<%= puzzle._id %>-show"
+                            <span id="post-like-row"><i id="like-<%= puzzle._id %>-show"
                                                                 onclick="like(this, 'puzzle', 'puzzles')"
-                                                                class="fas fa-thumbs-up unliked-puzzle"></i> <span
+                                                                class="fas fa-thumbs-up unliked-post"></i> <span
                                         id="like-count"
                                         class="likeCount-<%= puzzle._id %>"><%= puzzle.likes.length %></span></span>
 
@@ -103,7 +132,7 @@
                     </div>
                 </div>
                 <div class="ann-body">
-                    <p class="puzzle-text convertible-text"><%= convertedText %></p>
+                    <p class="post-text convertible-text"><%= convertedText %></p>
                     <hr>
                     <div class="ann-images">
                         <% for (let img of puzzle.images) { %>

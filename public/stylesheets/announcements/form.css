@@ -44,7 +44,7 @@ form {
 }
 
 /* fix spacing on announcement form */
-.announcement-form {
+.post-form {
     margin-right: 1vh;
     margin-left: 1vh;
 }

@@ -48,11 +48,11 @@
                         <div class="block-header grey">
                             <h5>
                                 <a class="edit-button-text" href="articles/<%= article._id %>"><%= article.title %></a>
-                                <a class="float-right project-info date" class="article-date">placeholder:
+                                <a class="float-right post-info date" class="article-date">placeholder:
                                     12/25/2020</a>
                             </h5>
 
-                            <div class="project-header">
+                            <div class="post-header">
                     <span class="edit-button-text">
                       <img src="<% if (article.author.mediaFile.display) {%> <%= article.author.mediaFile.url%><%} else {%> <%=article.author.imageUrl.url%><%}%>" alt="profile pic" class="author-profile">
                       <%= article.author.firstName %> <%= article.author.lastName %>

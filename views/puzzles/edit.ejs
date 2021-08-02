@@ -21,12 +21,16 @@
           <form action="/puzzles/<%= puzzle._id %>?_method=put" method="post" enctype="multipart/form-data">
             <div class="form-group mode">
               <label for="subject">Subject</label>
-              <input type="num" class="form-control mode" name="subject" placeholder="A short title..." maxlength="50" required value="<%= puzzle.subject %>">
+              <input type="num" class="form-control mode" name="subject" placeholder="Name Your Puzzle!" maxlength="50" required value="<%= puzzle.subject %>">
             </div>
             <div class="form-group mode">
               <label for="message">Message</label>
-              <textarea class="form-control mode" name="message" rows="5" placeholder="What it is about..." required><%= puzzle.text %></textarea>
+              <textarea class="form-control mode" name="message" rows="5" placeholder="Describe The Challenge!" required><%= puzzle.text %></textarea>
             </div>
+            <div class="form-group mode">
+                <label for="solution">Solution</label>
+                <textarea class="form-control mode" name="solution" rows="5" placeholder="Answer Explanation..." required><%= puzzle.solution %></textarea>
+              </div>
 
                 <% for (let media of puzzle.mediaFiles) { %>
                     <% if(media.filename) { %>

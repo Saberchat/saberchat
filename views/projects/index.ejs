@@ -6,7 +6,6 @@
     <%if (currentUser && currentUser.darkmode) {%>
         <link rel="stylesheet" href="/stylesheets/projects/dark.css">
     <%}%>
-
     
     <script src="/javascript/nav/userForm.js"></script>
     <script src="/javascript/home/index.js"></script>
@@ -52,8 +51,8 @@
                         <div class="block-header grey">
                             <h5>
                                 <% if (currentUser) { %>
-                                    <a class="project-info" href="projects/<%= project._id %>"><%= project.subject %></a>
-                                    <span class="float-right project-info date"><%= project.date %></span>
+                                    <a class="post-info" href="projects/<%= project._id %>"><%= project.subject %></a>
+                                    <span class="float-right post-info date"><%= project.date %></span>
                                     <% if (platform.postVerifiable && !project.verified && currentUser.status == platform.teacherStatus) { %>
                                         <a href="/projects/verify/<%= project._id %>">
                                             <span class="badge badge-pill badge-primary" id="mark">Verify</span>
@@ -61,21 +60,21 @@
                                     <% } %>
 
                                 <% } else { %>
-                                    <span class="project-info"><%= project.subject %></span>
-                                    <span class="float-right project-info date"><%= project.date %></span>
+                                    <span class="post-info"><%= project.subject %></span>
+                                    <span class="float-right post-info date"><%= project.date %></span>
                                 <% } %>
                             </h5>
 
-                            <div class="project-header">
+                            <div class="post-header">
                                 <% if (currentUser) { %>
-                                    <a class="project-info" href="../profiles/<%= project.sender._id %>">
+                                    <a class="post-info" href="../profiles/<%= project.sender._id %>">
                                         <img src="<% if (project.sender.mediaFile.display) {%> <%= project.sender.mediaFile.url%><%} else {%> <%=project.sender.imageUrl.url%><%}%>" alt="profile pic"
                                              class="sender-profile mode">
                                         <%= project.sender.firstName %> <%= project.sender.lastName %>
                                     </a>
 
                                 <% } else { %>
-                                    <span class="project-info">
+                                    <span class="post-info">
                                         <img src="<% if (project.sender.mediaFile.display) {%> <%= project.sender.mediaFile.url%><%} else {%> <%=project.sender.imageUrl.url%><%}%>" alt="profile pic" class="sender-profile">
                                         <%= project.sender.firstName.charAt(0) %>.<%= project.sender.lastName.charAt(0) %>.
                                     </span>
@@ -83,12 +82,12 @@
 
                                 <% if (currentUser) { %>
                                     <% if (currentUser._id.toString() == project.sender._id.toString()) { %>
-                                        <button type="button" class="btn btn-info edit-button"><a class="project-info"
+                                        <button type="button" class="btn btn-info edit-button"><a class="post-info"
                                                                                                   href="projects/<%= project._id %>/edit"><i
                                                         class="fas fa-cog"></i> Edit</a></button>
                                         <form action="projects/<%= project._id %>?_method=delete" method="post"
                                               class="delete-project">
-                                            <button class="btn btn-danger project-info" type="button"
+                                            <button class="btn btn-danger post-info" type="button"
                                                     data-toggle="modal"
                                                     data-target="#modal-<%= project._id %>"><i
                                                         class="far fa-trash-alt"></i>
@@ -146,11 +145,11 @@
 
                         <div class="block-content mode">
                             <% if (project.images.length > 0) { %>
-                                <img class="project-first-image" src="<%= project.images[0] %>"/>
+                                <img class="post-first-image" src="<%= project.images[0] %>"/>
                             <% } else { %>
                                 <% for (let media of project.mediaFiles) { %>
                                     <% if (media.filename && [".png", ".jpg", ".jpeg", ".gif"].includes(fileExtensions.get(media.url).toLowerCase())) { %>
-                                        <img class="project-first-image" src="<%= media.url%>"/>
+                                        <img class="post-first-image" src="<%= media.url%>"/>
                                         <% break;%>
                                     <% } %>
                                 <% } %>
@@ -231,15 +230,15 @@
 
                             <% if (currentUser) { %>
                                 <% if (project.text.split(" ").length > 70) { %>
-                                    <p class="project-description"><span class="convertible-text"><%= projectTexts.get(project._id).split(" ").slice(0, 71).join(" ") %></span> <a href="/projects/<%= project._id %>">(Read More)</a></p>
+                                    <p class="post-description"><span class="convertible-text"><%= projectTexts.get(project._id).split(" ").slice(0, 71).join(" ") %></span> <a href="/projects/<%= project._id %>">(Read More)</a></p>
                                 <% } else { %>
-                                    <p class="project-description convertible-text"><%= projectTexts.get(project._id) %></p>
+                                    <p class="post-description convertible-text"><%= projectTexts.get(project._id) %></p>
                                 <% } %>
                             <% } else { %>
                                 <% if (project.text.split(" ").length > 70) { %>
-                                    <p class="project-description"><span class="convertible-text"><%= projectTexts.get(project._id).split(" ").slice(0, 71).join(" ") %></span> <a href="/">(Log In To Read More)</a></p>
+                                    <p class="post-description"><span class="convertible-text"><%= projectTexts.get(project._id).split(" ").slice(0, 71).join(" ") %></span> <a href="/">(Log In To Read More)</a></p>
                                 <% } else { %>
-                                    <p class="project-description convertible-text"><%= projectTexts.get(project._id) %></p>
+                                    <p class="post-description convertible-text"><%= projectTexts.get(project._id) %></p>
                                 <% } %>
                             <% } %>
 

@@ -50,5 +50,8 @@ module.exports = { //All subclass Schema
         links: [{type: String}],
         deadline: {day: String, month: String, year: String}
     })),
-    Puzzle: Post.discriminator("Puzzle", new mongoose.Schema({})) //Weekly Puzzle Posts
+    Puzzle: Post.discriminator("Puzzle", new mongoose.Schema({ //Weekly Puzzle Posts
+        solution: String,
+        answers: [{type: mongoose.Schema.Types.ObjectId, ref: "PostComment"}]
+    })) 
 };

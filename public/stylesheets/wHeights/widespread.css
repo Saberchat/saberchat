@@ -1,4 +1,4 @@
-.announcement-button, .announcement-button:hover, .announcement-sender, .announcement-sender:hover {
+.post-button, .post-button:hover, .post-sender, .post-sender:hover {
     color: white;
     text-decoration: none;
 }
@@ -10,7 +10,7 @@
 /*'widespread.css'*/
 
 
-.announcement-subject-header, .announcement-subject-header:hover {
+.post-subject-header, .post-subject-header:hover {
     text-decoration: none;
     color: white;
     margin-right: 10px;
@@ -24,7 +24,7 @@
     text-align: left;
 }
 
-.announcement-date {
+.post-date {
     color: white;
     font-size: 80%;
 }
@@ -40,7 +40,7 @@
     margin-left: 10px;
 }
 
-.delete-announcement {
+.delete-post {
     display: inline-block;
 }
 
@@ -50,7 +50,7 @@
     margin-left: 10px;
 }
 
-.announcement-text {
+.post-text {
     white-space: pre-wrap;
 }
 
@@ -74,7 +74,7 @@
     display: inline;
 }
 
-.announcement-row {
+.post-row {
     margin-bottom: 15px;
     margin-top: -15px;
 }
@@ -122,15 +122,15 @@
     font-size: 80%;
 }
 
-.like-comment-active, .liked-announcement {
+.like-comment-active, .liked-post {
     color: #03a5fc;
 }
 
-.like-comment-inactive, .unliked-announcement {
+.like-comment-inactive, .unliked-post {
     color: grey;
 }
 
-#announcement-like-row, #like-count {
+#post-like-row, #like-count {
     display: inline;
 }
 

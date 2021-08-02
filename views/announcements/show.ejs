@@ -42,12 +42,12 @@
                     <span style="color: black;"><%= announcement.date %></span>
 
                     <% if(announcement.sender._id.equals(currentUser._id)) { %>
-                        <div class="announcement-row">
+                        <div class="post-row">
                             <a href="/announcements/<%= announcement._id %>/edit" class="btn btn-info"><i
                                         class="fas fa-cog"></i> Edit</a>
                             <form action="/announcements/<%= announcement._id %>?_method=delete" method="post"
                                     id="delete-form">
-                                <button class="btn btn-danger announcement-button" type="button" data-toggle="modal"
+                                <button class="btn btn-danger post-button" type="button" data-toggle="modal"
                                         data-target="#modal-<%= announcement._id %>"><i
                                             class="far fa-trash-alt"></i> Delete
                                 </button>
@@ -82,18 +82,18 @@
                         <br/>
                     <% } %>
 
-                    <div class="announcement-row">
+                    <div class="post-row">
                         <% if (announcement.likes.includes(currentUser._id)) { %>
-                            <span id="announcement-like-row"><i id="like-<%= announcement._id %>-show"
+                            <span id="post-like-row"><i id="like-<%= announcement._id %>-show"
                                                                 onclick="like(this, 'announcement', 'announcements')"
-                                                                class="fas fa-thumbs-up liked-announcement"></i> <span
+                                                                class="fas fa-thumbs-up liked-post"></i> <span
                                         id="like-count"
                                         class="likeCount-<%= announcement._id %>"><%= announcement.likes.length %></span></span>
 
                         <% } else { %>
-                            <span id="announcement-like-row"><i id="like-<%= announcement._id %>-show"
+                            <span id="post-like-row"><i id="like-<%= announcement._id %>-show"
                                                                 onclick="like(this, 'announcement', 'announcements')"
-                                                                class="fas fa-thumbs-up unliked-announcement"></i> <span
+                                                                class="fas fa-thumbs-up unliked-post"></i> <span
                                         id="like-count"
                                         class="likeCount-<%= announcement._id %>"><%= announcement.likes.length %></span></span>
 
@@ -103,7 +103,7 @@
                     </div>
                 </div>
                 <div class="ann-body">
-                    <p class="announcement-text convertible-text"><%= convertedText %></p>
+                    <p class="post-text convertible-text"><%= convertedText %></p>
                     <hr>
                     <div class="ann-images">
                         <% for (let img of announcement.images) { %>

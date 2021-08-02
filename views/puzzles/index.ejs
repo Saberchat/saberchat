@@ -2,12 +2,16 @@
     <link rel="stylesheet" href="/stylesheets/announcements/index.css">
     <link rel="stylesheet" href="/stylesheets/home/index.css">
     <link rel="stylesheet" href="/stylesheets/chat/new.css">
+    <%if (currentUser && currentUser.darkmode) {%>
+        <link rel="stylesheet" href="/stylesheets/projects/dark.css">
+    <%}%>
 
     <script src="/javascript/nav/userForm.js"></script>
     <script src="/javascript/home/index.js"></script>
     <script src="/javascript/search.js"></script>
     <script src="/javascript/postUtil.js"></script>
     <script src="/javascript/like.js"></script>
+    
 <%- include('../partials/headEnd') %>
 <body class="mode">
     <%- include('../partials/components/navbar') %>
@@ -21,7 +25,7 @@
                 <p><%=data.description%></p>
                 <% if (currentUser) { %>
                     <% if (platform.postVerifiable || platform.permissionsProperty.slice(platform.permissionsProperty.length-2).includes(currentUser.permission) || currentUser.status == platform.teacherStatus) { %>
-                        <a href="/puzzles/new" class="btn btn-primary puzzle-button"><i
+                        <a href="/puzzles/new" class="btn btn-primary post-button"><i
                                     class="fas fa-<%=data.icon%>"></i> Post Puzzle</a>
                     <% } %>
                 <% } %>
@@ -45,8 +49,8 @@
                         <h5>
 
                             <% if (currentUser) { %>
-                                <a class="puzzle-button" href="/puzzles/<%= puzzle._id %>">
-                                    <span class="puzzle-subject-header"><%= puzzle.subject %></span>
+                                <a class="post-button" href="/puzzles/<%= puzzle._id %>">
+                                    <span class="post-subject-header"><%= puzzle.subject %></span>
                                         <% let index = -1 %>
                                         <% for (let i = 0; i < currentUser.annCount.length; i += 1) { %>
                                             <% if (currentUser.annCount[i].puzzle.toString() == puzzle._id.toString()) { %>
@@ -56,14 +60,14 @@
 
                                         <% if (index != -1) { %>
                                             <% if (currentUser.annCount[index].version == "new") { %>
-                                                <span class="badge badge-pill badge-danger puzzle-button">New!</span>
+                                                <span class="badge badge-pill badge-danger post-button">New!</span>
                                             <% } else if (currentUser.annCount[index].version == "updated") { %>
-                                                <span class="badge badge-pill badge-info puzzle-button">Updated!</span>
+                                                <span class="badge badge-pill badge-info post-button">Updated!</span>
                                             <% } %>
                                         <% } %>
 
                                         <% if (index != -1) { %>
-                                            <a href="/puzzles/mark/<%= puzzle._id %>"><span class="badge badge-pill badge-success puzzle-button">Mark As Read</span></a>
+                                            <a href="/puzzles/mark/<%= puzzle._id %>"><span class="badge badge-pill badge-success post-button">Mark As Read</span></a>
                                         <% } %>
                                     </a>
                                     <% if (platform.postVerifiable && !puzzle.verified && platform.permissionsProperty.slice(platform.permissionsProperty.length-3).includes(currentUser.permission)) { %>
@@ -72,23 +76,23 @@
                                         </a>
                                     <% } %>
                                 <% } else { %>
-                                    <span class="puzzle-button">
-                                        <span class="puzzle-subject-header"><%= puzzle.subject %></span>
+                                    <span class="post-button">
+                                        <span class="post-subject-header"><%= puzzle.subject %></span>
                                     </span>
                                 <% } %>
-                            <span class="float-right puzzle-date"><%= puzzle.date %></span>
+                            <span class="float-right post-date"><%= puzzle.date %></span>
                         </h5>
 
                         <div class="bottom-text">
                             <% if (currentUser) { %>
-                                <a class="puzzle-sender" href="../profiles/<%= puzzle.sender._id %>">
+                                <a class="post-sender" href="../profiles/<%= puzzle.sender._id %>">
                                     <img src="<% if (puzzle.sender.mediaFile.display) {%> <%= puzzle.sender.mediaFile.url%><%} else {%> <%=puzzle.sender.imageUrl.url%><%}%>" alt="profile pic"
                                          class="sender-profile-image">
                                     <%= puzzle.sender.firstName %> <%= puzzle.sender.lastName %>
                                 </a>
 
                             <% } else { %>
-                                <span class="puzzle-sender">
+                                <span class="post-sender">
                         <img src="<% if (puzzle.sender.mediaFile.display) {%> <%= puzzle.sender.mediaFile.url%><%} else {%> <%=puzzle.sender.imageUrl.url%><%}%>" alt="profile pic" class="sender-profile-image">
                         <%= puzzle.sender.firstName.charAt(0) %>.<%= puzzle.sender.lastName.charAt(0)%>.
                       </span>
@@ -97,13 +101,13 @@
                             <% if (currentUser) { %>
                                 <% if (currentUser._id.toString() == puzzle.sender._id.toString()) { %>
                                     <button type="button" class="edit-button btn btn-info"><a
-                                                class="puzzle-button"
+                                                class="post-button"
                                                 href="/puzzles/<%= puzzle._id %>/edit"><i
                                                     class="fas fa-cog"></i> Edit</a></button>
 
                                     <form action="/puzzles/<%= puzzle._id %>?_method=delete" method="post"
-                                          class="delete-puzzle">
-                                        <button class="btn btn-danger puzzle-button" type="button"
+                                          class="delete-post">
+                                        <button class="btn btn-danger post-button" type="button"
                                                 data-toggle="modal"
                                                 data-target="#modal-<%= puzzle._id %>"><i
                                                     class="far fa-trash-alt"></i>
@@ -139,6 +143,39 @@
                                             </div>
                                         </div>
                                     </form>
+
+                                <% } else {%>
+                                    <form action="/puzzles/answer/<%= puzzle._id %>?_method=put" method="post"
+                                        class="delete-post">
+                                      <button class="btn btn-success edit-button post-button" type="button"
+                                              data-toggle="modal"
+                                              data-target="#modal-answer-<%= puzzle._id %>"><i
+                                                  class="fas fa-pen-square"></i>
+                                          Answer
+                                      </button>
+                                      <div class="modal fade" id="modal-answer-<%= puzzle._id %>" tabindex="-1"
+                                           aria-labelledby="deleteModalLabel" aria-hidden="true">
+                                          <div class="modal-dialog">
+                                              <div class="modal-content mode">
+                                                  <div class="modal-header mode">
+                                                      <h5 class="modal-title" id="exampleModalLabel">Submit Answer</h5>
+                                                      <button type="button" class="close mode" data-dismiss="modal"
+                                                              aria-label="Close">
+                                                          <span aria-hidden="true">&times;</span>
+                                                      </button>
+                                                  </div>
+                                                  <div class="modal-body mode">
+                                                      <textarea class="form-control mode" id="answer-<%=puzzle._id%>" name="answer" placeholder="Enter Your Answer" rows="5" cols="10"></textarea>
+                                                  </div>
+                                                  <div class="modal-footer mode">
+                                                      <button type="button" class="btn btn-secondary"data-dismiss="modal">Back</button>
+                                                      <button type="submit" class="btn btn-success">Submit Answer
+                                                      </button>
+                                                  </div>
+                                              </div>
+                                          </div>
+                                      </div>
+                                  </form>
                                 <% } %>
 
                                 <% if (puzzle.likes.includes(currentUser._id)) { %>
@@ -164,15 +201,15 @@
                     <div class="block-content mode">
                         <% if (currentUser) { %>
                             <% if (puzzle.text.split(" ").length > 70) { %>
-                                <p class="puzzle-text"><span class="convertible-text"><%= puzzleTexts.get(puzzle._id).split(" ").slice(0, 71).join(" ")%></span> <a href="/puzzles/<%= puzzle._id %>">(Read More)</a></p>
+                                <p class="post-text"><span class="convertible-text"><%= puzzleTexts.get(puzzle._id).split(" ").slice(0, 71).join(" ")%></span> <a href="/puzzles/<%= puzzle._id %>">(Read More)</a></p>
                             <% } else { %>
-                                <p class="puzzle-text convertible-text"><%= puzzleTexts.get(puzzle._id) %></p>
+                                <p class="post-text convertible-text"><%= puzzleTexts.get(puzzle._id) %></p>
                             <% } %>
                         <% } else { %>
                             <% if (puzzle.text.split(" ").length > 70) { %>
-                                <p class="puzzle-text convertible-text"><%= puzzleTexts.get(puzzle._id).split(" ").slice(0, 71).join(" ") %><a href="/">(Log In To Read More)</a></p>
+                                <p class="post-text convertible-text"><%= puzzleTexts.get(puzzle._id).split(" ").slice(0, 71).join(" ") %><a href="/">(Log In To Read More)</a></p>
                             <% } else { %>
-                                <p class="puzzle-text convertible-text"><%= puzzleTexts.get(puzzle._id) %></p>
+                                <p class="post-text convertible-text"><%= puzzleTexts.get(puzzle._id) %></p>
                             <% } %>
                         <% } %>
 

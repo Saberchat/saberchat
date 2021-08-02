@@ -2,12 +2,16 @@
     <link rel="stylesheet" href="/stylesheets/announcements/index.css">
     <link rel="stylesheet" href="/stylesheets/home/index.css">
     <link rel="stylesheet" href="/stylesheets/chat/new.css">
+    <%if (currentUser && currentUser.darkmode) {%>
+        <link rel="stylesheet" href="/stylesheets/projects/dark.css">
+    <%}%>
 
     <script src="/javascript/nav/userForm.js"></script>
     <script src="/javascript/home/index.js"></script>
     <script src="/javascript/search.js"></script>
     <script src="/javascript/postUtil.js"></script>
     <script src="/javascript/like.js"></script>
+
 <%- include('../partials/headEnd') %>
 <body class="mode">
     <%- include('../partials/components/navbar') %>
@@ -21,10 +25,10 @@
                 <p>The latest news from the community</p>
                 <% if (currentUser) { %>
                     <% if (platform.postVerifiable || platform.permissionsProperty.slice(platform.permissionsProperty.length-2).includes(currentUser.permission) || currentUser.status == platform.teacherStatus) { %>
-                        <a href="/announcements/new" class="btn btn-primary announcement-button"><i
+                        <a href="/announcements/new" class="btn btn-primary post-button"><i
                                     class="fas fa-bullhorn"></i> Send Announcement</a>
                     <% } %>
-                    <a href="/announcements/mark-all" class="btn btn-success announcement-button"><i
+                    <a href="/announcements/mark-all" class="btn btn-success post-button"><i
                                 class="fas fa-check-square"></i> Mark All As Read</a>
                 <% } %>
             </div>
@@ -47,8 +51,8 @@
                         <h5>
 
                             <% if (currentUser) { %>
-                                <a class="announcement-button" href="/announcements/<%= announcement._id %>">
-                                    <span class="announcement-subject-header"><%= announcement.subject %></span>
+                                <a class="post-button" href="/announcements/<%= announcement._id %>">
+                                    <span class="post-subject-header"><%= announcement.subject %></span>
                                         <% let index = -1 %>
                                         <% for (let i = 0; i < currentUser.annCount.length; i += 1) { %>
                                             <% if (currentUser.annCount[i].announcement.toString() == announcement._id.toString()) { %>
@@ -58,14 +62,14 @@
 
                                         <% if (index != -1) { %>
                                             <% if (currentUser.annCount[index].version == "new") { %>
-                                                <span class="badge badge-pill badge-danger announcement-button">New!</span>
+                                                <span class="badge badge-pill badge-danger post-button">New!</span>
                                             <% } else if (currentUser.annCount[index].version == "updated") { %>
-                                                <span class="badge badge-pill badge-info announcement-button">Updated!</span>
+                                                <span class="badge badge-pill badge-info post-button">Updated!</span>
                                             <% } %>
                                         <% } %>
 
                                         <% if (index != -1) { %>
-                                            <a href="/announcements/mark/<%= announcement._id %>"><span class="badge badge-pill badge-success announcement-button">Mark As Read</span></a>
+                                            <a href="/announcements/mark/<%= announcement._id %>"><span class="badge badge-pill badge-success post-button">Mark As Read</span></a>
                                         <% } %>
                                     </a>
                                     <% if (platform.postVerifiable && !announcement.verified && platform.permissionsProperty.slice(platform.permissionsProperty.length-3).includes(currentUser.permission)) { %>
@@ -74,23 +78,23 @@
                                         </a>
                                     <% } %>
                                 <% } else { %>
-                                    <span class="announcement-button">
-                                        <span class="announcement-subject-header"><%= announcement.subject %></span>
+                                    <span class="post-button">
+                                        <span class="post-subject-header"><%= announcement.subject %></span>
                                     </span>
                                 <% } %>
-                            <span class="float-right announcement-date"><%= announcement.date %></span>
+                            <span class="float-right post-date"><%= announcement.date %></span>
                         </h5>
 
                         <div class="bottom-text">
                             <% if (currentUser) { %>
-                                <a class="announcement-sender" href="../profiles/<%= announcement.sender._id %>">
+                                <a class="post-sender" href="../profiles/<%= announcement.sender._id %>">
                                     <img src="<% if (announcement.sender.mediaFile.display) {%> <%= announcement.sender.mediaFile.url%><%} else {%> <%=announcement.sender.imageUrl.url%><%}%>" alt="profile pic"
                                          class="sender-profile-image">
                                     <%= announcement.sender.firstName %> <%= announcement.sender.lastName %>
                                 </a>
 
                             <% } else { %>
-                                <span class="announcement-sender">
+                                <span class="post-sender">
                         <img src="<% if (announcement.sender.mediaFile.display) {%> <%= announcement.sender.mediaFile.url%><%} else {%> <%=announcement.sender.imageUrl.url%><%}%>" alt="profile pic" class="sender-profile-image">
                         <%= announcement.sender.firstName.charAt(0) %>.<%= announcement.sender.lastName.charAt(0)%>.
                       </span>
@@ -99,13 +103,13 @@
                             <% if (currentUser) { %>
                                 <% if (currentUser._id.toString() == announcement.sender._id.toString()) { %>
                                     <button type="button" class="edit-button btn btn-info"><a
-                                                class="announcement-button"
+                                                class="post-button"
                                                 href="/announcements/<%= announcement._id %>/edit"><i
                                                     class="fas fa-cog"></i> Edit</a></button>
 
                                     <form action="/announcements/<%= announcement._id %>?_method=delete" method="post"
-                                          class="delete-announcement">
-                                        <button class="btn btn-danger announcement-button" type="button"
+                                          class="delete-post">
+                                        <button class="btn btn-danger post-button" type="button"
                                                 data-toggle="modal"
                                                 data-target="#modal-<%= announcement._id %>"><i
                                                     class="far fa-trash-alt"></i>
@@ -166,15 +170,15 @@
                     <div class="block-content mode">
                         <% if (currentUser) { %>
                             <% if (announcement.text.split(" ").length > 70) { %>
-                                <p class="announcement-text"><span class="convertible-text"><%= announcementTexts.get(announcement._id).split(" ").slice(0, 71).join(" ")%></span> <a href="/announcements/<%= announcement._id %>">(Read More)</a></p>
+                                <p class="post-text"><span class="convertible-text"><%= announcementTexts.get(announcement._id).split(" ").slice(0, 71).join(" ")%></span> <a href="/announcements/<%= announcement._id %>">(Read More)</a></p>
                             <% } else { %>
-                                <p class="announcement-text convertible-text"><%= announcementTexts.get(announcement._id) %></p>
+                                <p class="post-text convertible-text"><%= announcementTexts.get(announcement._id) %></p>
                             <% } %>
                         <% } else { %>
                             <% if (announcement.text.split(" ").length > 70) { %>
-                                <p class="announcement-text convertible-text"><%= announcementTexts.get(announcement._id).split(" ").slice(0, 71).join(" ") %><a href="/">(Log In To Read More)</a></p>
+                                <p class="post-text convertible-text"><%= announcementTexts.get(announcement._id).split(" ").slice(0, 71).join(" ") %><a href="/">(Log In To Read More)</a></p>
                             <% } else { %>
-                                <p class="announcement-text convertible-text"><%= announcementTexts.get(announcement._id) %></p>
+                                <p class="post-text convertible-text"><%= announcementTexts.get(announcement._id) %></p>
                             <% } %>
                         <% } %>
 

@@ -57,12 +57,12 @@
 
                     <% if (currentUser) { %>
                         <% if(report.sender._id.equals(currentUser._id)) { %>
-                            <div class="announcement-row">
+                            <div class="post-row">
                                 <a href="/reports/<%= report._id %>/edit" class="btn btn-info"><i
                                             class="fas fa-cog"></i> Edit</a>
                                 <form action="/reports/<%= report._id %>?_method=delete" method="post"
                                       id="delete-form">
-                                    <button class="btn btn-danger announcement-button" type="button" data-toggle="modal"
+                                    <button class="btn btn-danger post-button" type="button" data-toggle="modal"
                                             data-target="#modal-<%= report._id %>"><i
                                                 class="far fa-trash-alt"></i> Delete
                                     </button>
@@ -97,16 +97,16 @@
                             <br/>
                         <% } %>
 
-                        <div class="announcement-row">
+                        <div class="post-row">
                             <% if (report.likes.includes(currentUser._id)) { %>
-                                <span id="announcement-like-row"><i id="like-<%= report._id %>-show"
+                                <span id="post-like-row"><i id="like-<%= report._id %>-show"
                                                                     onclick="like(this, 'report', 'reports')"
                                                                     class="fas fa-thumbs-up liked-report"></i> <span
                                             id="like-count"
                                             class="likeCount-<%= report._id %>"><%= report.likes.length %></span></span>
 
                             <% } else { %>
-                                <span id="announcement-like-row"><i id="like-<%= report._id %>-show"
+                                <span id="post-like-row"><i id="like-<%= report._id %>-show"
                                                                     onclick="like(this, 'report', 'reports')"
                                                                     class="fas fa-thumbs-up unliked-report"></i> <span
                                             id="like-count"
@@ -120,7 +120,7 @@
                     <% } %>
                 </div>
                 <div class="ann-body">
-                    <p class="announcement-text convertible-text"><%= convertedText %></p>
+                    <p class="post-text convertible-text"><%= convertedText %></p>
                     <hr>
                     <div class="ann-images">
                         <% for (let img of report.images) { %>

@@ -27,9 +27,9 @@ controller.index = async function(req, res) {
 
     let puzzles;
     if (await platform.permissionsProperty.slice(platform.permissionsProperty.length-3).includes(req.user.permission)) {
-        puzzles = await Puzzle.find({}).populate('sender');
+        puzzles = await Puzzle.find({}).populate('sender').populate("answers");
     } else {
-        puzzles = await Puzzle.find({verified: true}).populate('sender');
+        puzzles = await Puzzle.find({verified: true}).populate('sender').populate("answers");;
     }
     if(!puzzles) {
         await req.flash('error', 'Cannot find puzzles.');
@@ -38,6 +38,13 @@ controller.index = async function(req, res) {
 
     const userNames = await parsePropertyArray(users, "firstName").join(',').toLowerCase().split(',');
     const puzzleTexts = await embedLink(req.user, puzzles, userNames);
+    const answeredPuzzles = new Map();
+
+    for (let puzzle of puzzles) {
+        if (objectArrIndex(puzzle.answers, "sender", req.user._id) > -1) {
+            answeredPuzzles.set(puzzle._id, answer.text);
+        }
+    }
 
     return res.render('puzzles/index', {
         platform, puzzles: await puzzles.reverse(), puzzleTexts,
@@ -62,6 +69,10 @@ controller.show = async function(req, res) {
         .populate('sender')
         .populate({
             path: "comments",
+            populate: {path: "sender"}
+        })
+        .populate({
+            path: "answers",
             populate: {path: "sender"}
         });
     if(!platform || !puzzle) {
@@ -111,6 +122,7 @@ controller.create = async function(req, res) {
         sender: req.user,
         subject: req.body.subject,
         text: req.body.message,
+        solution: req.body.solution,
         verified: !platform.postVerifiable //Puzzle does not need to be verified if platform does not support verifying puzzles
     });
     if (!platform || !puzzle) {
@@ -218,6 +230,7 @@ controller.updatePuzzle = async function(req, res) {
     const updatedPuzzle = await Puzzle.findByIdAndUpdate(req.params.id, {
         subject: req.body.subject,
         text: req.body.message,
+        solution: req.body.solution,
         verified: !platform.postVerifiable //Puzzle does not need to be verified if platform does not support verifying puzzles
     });
     if (!updatedPuzzle) {
@@ -374,6 +387,38 @@ controller.comment = async function(req, res) {
     });
 }
 
+// Puzzle PUT answer
+controller.answer = async function(req, res) {
+    const puzzle = await Puzzle.findById(req.params.id).populate("answers");
+    if (!puzzle) {
+        await req.flash("error", "Unable to post answer");
+        return res.redirect("back");
+    }
+
+    if (objectArrIndex(puzzle.answers, "sender", req.user._id) > -1) {
+        await req.flash("error", "You have already answered this post");
+        return res.redirect("back");
+    }
+
+    const answer = await PostComment.create({
+        text: await req.body.answer.split('<').join('&lt'),
+        sender: req.user
+    });
+    if (!answer) {
+        await req.flash("error", "Unable to post answer");
+        return res.redirect("back");
+    }
+
+    answer.date = dateFormat(answer.created_at, "h:MM TT | mmm d");
+    await answer.save();
+
+    await puzzle.answers.push(answer);
+    await puzzle.save();
+
+    await req.flash("Successfully posted answer!")
+    return res.redirect("/puzzles");
+}
+ 
 // Puzzle PUT like comment
 controller.likeComment = async function(req, res) {
     const comment = await PostComment.findById(req.body.commentId);
