@@ -1,4 +1,4 @@
-const changeTab = function (tab, darkmode) { //Change the current tab
+const changeTab = function(tab, darkmode) { //Change the current tab
     const colorMode = new Map([[true, ["#7FFFD4", "white"]], [false, ["blue", "black"]]]); //Color change depending on darkmode
 
     for (let t of document.getElementsByClassName("tab-header")) { //Iterate through tabs and change them based on darkmode
@@ -10,7 +10,7 @@ const changeTab = function (tab, darkmode) { //Change the current tab
     tab.style.color = colorMode.get(darkmode)[0];
 }
 
-const changeThumbnailInit = function () { //Display thumbnail during course initialization
+const changeThumbnailInit = function() { //Display thumbnail during course initialization
     if (document.getElementById('thumbnail').value.replaceAll(' ', '' != "")) {
         document.getElementById('thumbnail-photo').src = document.getElementById('thumbnail').value;
         document.getElementById('thumbnail-photo').hidden = false;
@@ -20,7 +20,7 @@ const changeThumbnailInit = function () { //Display thumbnail during course init
     }
 }
 
-const changeThumbnail = function (input) { //Display thumbnail image based on radio buttons clicked
+const changeThumbnail = function(input) { //Display thumbnail image based on radio buttons clicked
     if (document.getElementById("showLinkImage").checked) {
         document.getElementsByClassName("jumbotron")[0].style.backgroundImage = `url('${input.value}`; //Change jumbotron background image
     } else {
@@ -48,15 +48,15 @@ const changeThumbnailUrl = function(url, backup) { //Change URL of course thumbn
     }
 }
 
-const changeInfo = function (input) { //Change course description based on input
+const changeInfo = function(input) { //Change course description based on input
     document.getElementById("courseDescription").innerText = document.getElementById("descInput").value;
 }
 
-const changeName = function (input) { //Change course name based on input
+const changeName = function(input) { //Change course name based on input
     document.getElementById("courseName").innerText = document.getElementById("newName").value;
 }
 
-const changeJoinCode = function (courseID, event) { //Change course join code (in case security is compromised)
+const changeJoinCode = function(courseID, event) { //Change course join code (in case security is compromised)
     const url = `/tutoringCenter/joinCode/${courseID}?_method=put`;
     const data = {};
 

@@ -20,25 +20,25 @@ $(() => {
 });
 
 // class animations for the signup form
-const next = function () {
+const next = function() {
     $('.user-info').removeClass('display');
     $('.login-info').addClass('display');
 }
 
-const back = function () {
+const back = function() {
     $('.user-info').addClass('display');
     $('.login-info').removeClass('display');
 }
 
-const disableBtn = function () { // prevents double clicking the form submit
+const disableBtn = function() { // prevents double clicking the form submit
     document.getElementById('register-button').disabled = true;
 }
 
-const enableBtn = function () { // reactivates button on invalid form submit
+const enableBtn = function() { // reactivates button on invalid form submit
     document.getElementById('register-button').disabled = false;
 }
 
-const validateForm = function () { // validates signup form
+const validateForm = function() { // validates signup form
     let form = document.forms.signup;
     if (form.firstName.value == '') {
         enableBtn();
@@ -79,7 +79,7 @@ const validateForm = function () { // validates signup form
     }
 }
 
-const submitActions = function () {
+const submitActions = function() {
     disableBtn();
     return validateForm();
 }

@@ -1,4 +1,4 @@
-const updateStatus = function (select) { //Update a user's official stautus
+const updateStatus = function(select) { //Update a user's official stautus
     const loading = document.getElementById('loading');
     loading.style.display = 'block';
     loading.style.color = 'gray';
@@ -30,7 +30,7 @@ const updateStatus = function (select) { //Update a user's official stautus
     });
 }
 
-const updateTag = function (select) { //Update a user's status tags
+const updateTag = function(select) { //Update a user's status tags
     const loading = document.getElementById('loading');
     loading.style.color = 'gray';
     loading.innerHTML = 'Waiting...';

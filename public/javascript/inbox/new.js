@@ -12,7 +12,7 @@ const anonymousControl = document.getElementById('anonymous-control');
 
 let recipients = [];
 
-const process = function () { // processes all the selected recipients into form info
+const process = function() { // processes all the selected recipients into form info
     if (!recipients.length > 0 && !everyoneCheck.checked) {
         return false;
     } else if (!everyoneCheck.checked) {
@@ -26,7 +26,7 @@ const process = function () { // processes all the selected recipients into form
     return true;
 }
 
-const updateTo = function (check) { // toggles recipients selection
+const updateTo = function(check) { // toggles recipients selection
     if (check.checked) {
         recipientList.style.display = "none";
         userSelect.style.display = "none";
@@ -52,7 +52,7 @@ const updateTo = function (check) { // toggles recipients selection
     }
 }
 
-const setAnonymous = function (check) { // toggles anonymous messaging
+const setAnonymous = function(check) { // toggles anonymous messaging
     if (everyoneCheck.checked) {
         check.checked = false;
     } else {
@@ -67,7 +67,7 @@ const setAnonymous = function (check) { // toggles anonymous messaging
     }
 }
 
-const clearTags = function () { // clears user tags
+const clearTags = function() { // clears user tags
     const tags = document.getElementsByClassName('user-tag');
     while (tags[0]) {tags[0].parentNode.removeChild(tags[0]);}
 }
@@ -118,11 +118,11 @@ const searchRecipients = function(input) {
     }
 }
 
-const addRecipient = function () { // adds recipients to list
+const addRecipient = function() { // adds recipients to list
     addTag(userSelect, userSelect.value);
 }
 
-const addTag = function (select, id) { // adds the user tag to the display
+const addTag = function(select, id) { // adds the user tag to the display
     if (!(recipients.includes(id)) && !(recipients.includes(select.options[select.selectedIndex].className))) { //Check whether this user is already in the list, or whether their group (status) is already in the list
         const username = select.options[select.selectedIndex].text;
         recipients.push(id);
@@ -149,7 +149,7 @@ const addTag = function (select, id) { // adds the user tag to the display
     userSelect.style.display = "none";
 }
 
-const remRecipient = function (btn) { // remove recipients
+const remRecipient = function(btn) { // remove recipients
     const id = btn.id;
     const i = recipients.indexOf(id);
     if (i > -1) {

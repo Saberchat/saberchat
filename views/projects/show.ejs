@@ -84,12 +84,12 @@
                     <div id="like-div">
                         <% if (project.likes.includes(currentUser._id)) { %>
                             <span id="project-like-row"><i id="like-<%= project._id %>-show" onclick="like(this, 'project', 'projects')"
-                                class="fas fa-thumbs-up liked-project"></i></span>
+                                class="fas fa-thumbs-up liked-post"></i></span>
                                 <span id="like-count" class="likeCount-<%= project._id %>"><%= project.likes.length %></span>
 
                         <% } else { %>
                             <span id="project-like-row"><i id="like-<%= project._id %>-show" onclick="like(this, 'project', 'projects')"
-                                class="fas fa-thumbs-up unliked-project"></i></span>
+                                class="fas fa-thumbs-up unliked-post"></i></span>
                                 <span id="like-count" class="likeCount-<%= project._id %>"><%= project.likes.length %></span>
 
                         <% } %>

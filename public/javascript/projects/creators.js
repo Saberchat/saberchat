@@ -52,7 +52,7 @@ const searchCreators = function(input) {
     }
 }
 
-const addCreator = function () { //Add creator to list of creators
+const addCreator = function() { //Add creator to list of creators
     if ((!creatorList.includes(creatorSelect.value)) && !(creatorList.includes(creatorSelect[creatorSelect.selectedIndex].className))) { //Make sure that if the status has been selected, nothing else is selected
         creatorList.push(creatorSelect.value);
         creatorInput.value = creatorList.toString();
@@ -81,7 +81,7 @@ const addCreator = function () { //Add creator to list of creators
     creatorSelect.style.display = "none";
 }
 
-const remCreator = function (btn) { //Remove creator from list of creators
+const remCreator = function(btn) { //Remove creator from list of creators
     const id = btn.id;
 
     const userTags = document.getElementsByClassName('user-tag');

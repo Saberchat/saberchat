@@ -1,4 +1,4 @@
-const changeFollowerTab = function (newTab) {
+const changeFollowerTab = function(newTab) {
     //Map relates tabs to their respective lists
     const tabMap = new Map([['followers-button', ['following-button', 'following-list']], ['following-button', ['followers-button', 'followers-list']]]);
     

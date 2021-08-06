@@ -1,4 +1,4 @@
-const confirm = function (button) { //Send request that order is ready
+const confirm = function(button) { //Send request that order is ready
     const orderId = button.id.split('-')[0];
     const url = `/shop/order/confirm/${orderId}?_method=put`;
     const data = {};
@@ -11,7 +11,7 @@ const confirm = function (button) { //Send request that order is ready
     });
 }
 
-const ready = function (button) { //Send request that order is ready
+const ready = function(button) { //Send request that order is ready
     const orderId = button.id.split('-')[0];
     const url = `/shop/order/${orderId}?_method=put`;
     const data = {};
@@ -31,7 +31,7 @@ const ready = function (button) { //Send request that order is ready
     });
 }
 
-const reject = function (button) { //Send request that order is rejected
+const reject = function(button) { //Send request that order is rejected
     const orderId = button.id.split('-')[0];
     const rejectionReason = document.getElementById(`rejection-reason-${orderId}`).value;
     const url = `/shop/order/${orderId}?_method=delete`;
@@ -52,7 +52,7 @@ const reject = function (button) { //Send request that order is rejected
     });
 }
 
-const cancel = function (button) { //Send request to cancel order
+const cancel = function(button) { //Send request to cancel order
     const orderId = button.id.split('-')[0];
     const url = `/shop/order/${orderId}?_method=delete`;
     const data = {};
@@ -66,7 +66,7 @@ const cancel = function (button) { //Send request to cancel order
     });
 }
 
-const changeShopStatus = function () { //Send request to close/open shop
+const changeShopStatus = function() { //Send request to close/open shop
     const url = `/shop/manage?_method=put`;
     const data = {};
 

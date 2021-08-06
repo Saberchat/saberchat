@@ -20,7 +20,7 @@ let balanceBox;
 let formattedCost;
 
 //Changes the order confirmation on the form
-const changeOrderConfirmation = function (dollarPayment) {
+const changeOrderConfirmation = function(dollarPayment) {
     sum = 0;
     while (orderConfirm.firstChild) { //Remove all the items in the 'confirm order' section
         orderConfirm.removeChild(orderConfirm.firstChild);

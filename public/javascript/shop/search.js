@@ -1,4 +1,4 @@
-const search = function () { //Item search function
+const search = function() { //Item search function
     const catHeaders = document.getElementsByClassName('category-header'); //Category header
     const catBreaks = document.getElementsByClassName('category-break'); //Category page break
     const menuItems = document.getElementsByClassName('menu-item');

@@ -122,11 +122,11 @@
     font-size: 80%;
 }
 
-.like-comment-active, .liked-announcement {
+.like-comment-active, .liked-post {
     color: #03a5fc;
 }
 
-.like-comment-inactive, .unliked-announcement {
+.like-comment-inactive, .unliked-post {
     color: grey;
 }
 

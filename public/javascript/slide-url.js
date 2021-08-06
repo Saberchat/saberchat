@@ -1,7 +1,7 @@
 const slideContainer = document.getElementById('links');
 let j = document.getElementsByClassName("image-group").length;
 
-const addSlide = function () { //Add slide input field
+const addSlide = function() { //Add slide input field
     const slide = document.createElement('div');
     slide.className = "image-group";
     slide.id = `slideblock-${j}`;
@@ -10,7 +10,7 @@ const addSlide = function () { //Add slide input field
     j++;
 }
 
-const deleteSlide = function (btn) { //Remove input field
+const deleteSlide = function(btn) { //Remove input field
     const parent = btn.parentNode;
     parent.remove();
     j--;

@@ -99,14 +99,14 @@
     margin-left: 10px;
 }
 
-.liked-project, .unliked-project {
+.liked-post, .unliked-post {
     color: #03a5fc;
     text-decoration: none;
     font-size: 140%;
     display: inline;
 }
 
-.unliked-project {
+.unliked-post {
     color: grey;
     text-decoration: none;
     font-size: 160%;

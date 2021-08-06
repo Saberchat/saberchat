@@ -342,7 +342,7 @@ controller.statusGet = async function(req, res) { //Show page with all users and
     });
 }
 
-controller.permissionsPut = async function (req, res) { //Update a user's permissions
+controller.permissionsPut = async function(req, res) { //Update a user's permissions
     const platform = await setup(Platform);
     const user = await User.findById(req.body.userId);
     if (!platform || !user) {
@@ -427,7 +427,7 @@ controller.accesslistGet = async function(req, res) { //Show page with all permi
     return res.render('admin/accesslist', {platform, emails, users, version: "accesslist"});
 }
 
-controller.addEmail = async function (req, res) { //Add email to access list/blocked list
+controller.addEmail = async function(req, res) { //Add email to access list/blocked list
     const platform = await setup(Platform);
     if (!platform) {return res.json({error: "Unable to find platform"});}
 
@@ -450,7 +450,7 @@ controller.addEmail = async function (req, res) { //Add email to access list/blo
     return res.json({success: "Email added", email});
 }
 
-controller.deleteEmail = async function (req, res) { //Remove email from access list/blocked list
+controller.deleteEmail = async function(req, res) { //Remove email from access list/blocked list
     const email = await Email.findById(req.body.emailId);
     if (!email) {return res.json({error: "Unable to find email"});}
 

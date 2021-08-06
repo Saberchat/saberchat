@@ -94,14 +94,14 @@
                             <% if (event.likes.includes(currentUser._id)) { %>
                                 <span id="announcement-like-row"><i id="like-<%= event._id %>-show"
                                                                     onclick="like(this, 'event', 'events')"
-                                                                    class="fas fa-thumbs-up liked-announcement"></i> <span
+                                                                    class="fas fa-thumbs-up liked-post"></i> <span
                                             id="like-count"
                                             class="likeCount-<%= event._id %>"><%= event.likes.length %></span></span>
 
                             <% } else { %>
                                 <span id="announcement-like-row"><i id="like-<%= event._id %>-show"
                                                                     onclick="like(this, 'event', 'events')"
-                                                                    class="fas fa-thumbs-up unliked-announcement"></i> <span
+                                                                    class="fas fa-thumbs-up unliked-post"></i> <span
                                             id="like-count"
                                             class="likeCount-<%= event._id %>"><%= event.likes.length %></span></span>
 

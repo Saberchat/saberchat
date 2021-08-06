@@ -27,7 +27,7 @@ const addEmail = function(event, version) { //Add an email to access list/blocke
     });
 }
 
-const removeEmail = function (button) { //Remove email from access list/blocked list
+const removeEmail = function(button) { //Remove email from access list/blocked list
     const emailId = button.id.split('-')[1];
     const url = `/admin/accesslist?_method=delete`;
     const data = {emailId};

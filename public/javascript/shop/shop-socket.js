@@ -1,8 +1,8 @@
-const order = function (form, customer, dollarPayment) {
+const order = function(form, customer, dollarPayment) {
     let socket = io();
     let items = document.getElementById('item-list');
 
-    $(form).submit(function (e) {
+    $(form).submit(function(e) {
 
         let payingInPerson;
         if (dollarPayment == "true") {payingInPerson = document.getElementById('payingInPerson').checked;   
@@ -25,7 +25,7 @@ const order = function (form, customer, dollarPayment) {
         let itemList = [];
         let itemCount = [];
 
-        $('#item-list > .form-check > .style-div').each(function (index) {
+        $('#item-list > .form-check > .style-div').each(function(index) {
 
             if ($(this).find('input').is(':checked')) {
                 let currentItemName = $(this).find('input').attr('id');
@@ -43,12 +43,12 @@ const order = function (form, customer, dollarPayment) {
     });
 }
 
-const getOrders = function (outputStream, dollarPayment) { //Build order card once order has been successfully sent in shop
+const getOrders = function(outputStream, dollarPayment) { //Build order card once order has been successfully sent in shop
     let socket = io();
 
     socket.on('connect', () => {console.log("connection from shop use");});
     socket.on('order', (order, foundItems) => {
-        const getInstructions = function () {
+        const getInstructions = function() {
             if (!order.instructions || order.instructions == "") {
                 return `<p class="card-text">No extra instructions</p>`;
             } else {
@@ -56,7 +56,7 @@ const getOrders = function (outputStream, dollarPayment) { //Build order card on
             }
         }
 
-        const getAddress = function () {
+        const getAddress = function() {
             if (!order.address || order.address == "") {
                 return `<p class="card-text">No address provided</p>`;
             } else {
@@ -64,7 +64,7 @@ const getOrders = function (outputStream, dollarPayment) { //Build order card on
             }
         }
 
-        const getItems = function () {
+        const getItems = function() {
             let str = ``;
             for (let i = 0; i < order.items.length; i++) {
                 str += `<li class="list-group-item">${foundItems[i].name}: ${order.quantities[i]} order(s)</li>\n`;
