@@ -3,7 +3,7 @@ const creatorDiv = document.getElementById('creator-input-div');
 const creatorInput = document.getElementById('creator-input');
 let creatorList = [];
 
-$("#project-image").hide();
+$("#post-image").hide();
 for (let creator of document.getElementsByClassName('user-tag')) {
     creatorList.push(creator.id)
     creatorInput.value = creatorList.toString()

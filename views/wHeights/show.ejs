@@ -37,7 +37,7 @@
                     <h1><%= article.title %></h1>
 
                     <span class="">By <a href="../profiles/<%= article.author._id %>"><%= article.author.username %></a></span><br/>
-                    <span id="project-date">Posted <%= date %></span>
+                    <span id="post-date">Posted <%= date %></span>
                     <br/><br/>
 
                     <% article.content.forEach(element => { %>
@@ -49,7 +49,7 @@
 
                     <% }); %>
 
-                    <div class="container article-content project-description">
+                    <div class="container article-content post-description">
                         <% for (let segment of article.content) { %>
 
                             <% if (segment.type == "text") { %>

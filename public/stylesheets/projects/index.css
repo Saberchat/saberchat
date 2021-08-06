@@ -259,11 +259,11 @@ Scroll To Bottom Button
     background-color: #e6e4e4;
 }
 
-.project-header {
+.post-header {
     padding-bottom: 20px;
 }
 
-.project-info, .project-info:hover {
+.post-info, .post-info:hover {
     color: white;
     text-decoration: none;
 }
@@ -295,7 +295,7 @@ Scroll To Bottom Button
     text-align: center;
 }
 
-.project-first-image {
+.post-first-image {
     width: 25%;
     height: 25%;
     float: left;
@@ -315,7 +315,7 @@ Scroll To Bottom Button
     border-radius: 50%;
 }
 
-.project-description {
+.post-description {
     white-space: pre-wrap;
 }
 

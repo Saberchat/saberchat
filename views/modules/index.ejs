@@ -21,7 +21,7 @@
                 <h1><i class="fas fa-<%=data.icon%>"></i> <%=data.name%></h1>
                 <p><%=data.description%></p>
                 <% if (currentUser.status == platform.teacherStatus) { %>
-                    <a href="/modules/new" class="btn btn-primary announcement-button">
+                    <a href="/modules/new" class="btn btn-primary post-button">
                         <i class="fas fa-plus-circle"></i> Create New Module
                     </a>
                 <% } %>
@@ -44,32 +44,32 @@
                     <div class="block-header grey">
                         <h5 style="margin-bottom: 20px;">
 
-                            <a class="announcement-button" href="/modules/<%= module._id %>">
-                                <span class="announcement-subject-header"><%= module.subject %></span>
+                            <a class="post-button" href="/modules/<%= module._id %>">
+                                <span class="post-subject-header"><%= module.subject %></span>
                                 <% if (platform.postVerifiable && !module.verified && platform.permissionsProperty.slice(platform.permissionsProperty.length-3).includes(currentUser.permission)) { %>
                                     <a href="/modules/verify/<%= module._id %>">
                                         <span class="badge badge-pill badge-primary" id="mark">Verify</span>
                                     </a>
                                 <% } %>
                             </a>
-                            <span class="float-right announcement-date"><%= module.date %></span>
+                            <span class="float-right post-date"><%= module.date %></span>
                         </h5>
 
                         <div class="bottom-text">
-                            <a class="announcement-sender" href="../profiles/<%= module.sender._id %>">
+                            <a class="post-sender" href="../profiles/<%= module.sender._id %>">
                                 <img src="<% if (module.sender.mediaFile.display) {%> <%= module.sender.mediaFile.url%><%} else {%> <%=module.sender.imageUrl.url%><%}%>" alt="profile pic"
                                         class="sender-profile-image">
                                 <%= module.sender.firstName %> <%= module.sender.lastName %>
                             </a>
                             <% if (currentUser._id.toString() == module.sender._id.toString()) { %>
                                 <button type="button" class="edit-button btn btn-info"><a
-                                            class="announcement-button"
+                                            class="post-button"
                                             href="/modules/<%= module._id %>/edit"><i
                                                 class="fas fa-cog"></i> Edit</a></button>
 
                                 <form action="/modules/<%= module._id %>?_method=delete" method="post" style="display: inline-block;"
                                         class="delete-module">
-                                    <button class="btn btn-danger announcement-button" type="button"
+                                    <button class="btn btn-danger post-button" type="button"
                                             data-toggle="modal"
                                             data-target="#modal-<%= module._id %>"><i
                                                 class="far fa-trash-alt"></i>
@@ -127,14 +127,14 @@
 
                     <div class="block-content mode">
                         <% if (module.links.length > 0) { %>
-                            <iframe class="project-first-image" src="<%=module.links[0].split('/edit')[0]%>/embed" frameborder="0" width="400" height="240"></iframe>
+                            <iframe class="post-first-image" src="<%=module.links[0].split('/edit')[0]%>/embed" frameborder="0" width="400" height="240"></iframe>
                         <% } %>
 
                         <% if (moduleTexts.get(module._id).split(" ").length > 30) { %>
-                            <p class="announcement-text"><span class="convertible-text"><%= moduleTexts.get(module._id).split(" ").slice(0, 31).join(" ") %></span> <a href="/modules/<%= module._id %>">(Read More)</a>
+                            <p class="post-text"><span class="convertible-text"><%= moduleTexts.get(module._id).split(" ").slice(0, 31).join(" ") %></span> <a href="/modules/<%= module._id %>">(Read More)</a>
                             </p>
                         <% } else { %>
-                            <p class="announcement-text convertible-text"><%= moduleTexts.get(module._id) %></p>
+                            <p class="post-text convertible-text"><%= moduleTexts.get(module._id) %></p>
                         <% } %>
 
                     </div>

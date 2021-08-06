@@ -31,13 +31,13 @@
             <article class="ann-container">
                 <div class="ann-head">
                     <h1><%= project.subject %></h1>
-                    <a class="project-info" href="../profiles/<%= project.sender._id %>">
+                    <a class="post-info" href="../profiles/<%= project.sender._id %>">
                         <img src="<% if (project.sender.mediaFile.display) {%> <%= project.sender.mediaFile.url%><%} else {%> <%=project.sender.imageUrl.url%><%}%>" alt="profile pic" id="sender-profile">
                         <%= project.sender.firstName %> <%= project.sender.lastName %>
                     </a>
                     <br/><br/>
 
-                    <span id="project-date" style="color: black;"><%= project.date %></span>
+                    <span id="post-date" style="color: black;"><%= project.date %></span>
 
                     <% if (currentUser.username == project.sender.username) { %>
                         <div id="edit-div">
@@ -83,12 +83,12 @@
 
                     <div id="like-div">
                         <% if (project.likes.includes(currentUser._id)) { %>
-                            <span id="project-like-row"><i id="like-<%= project._id %>-show" onclick="like(this, 'project', 'projects')"
+                            <span id="post-like-row"><i id="like-<%= project._id %>-show" onclick="like(this, 'project', 'projects')"
                                 class="fas fa-thumbs-up liked-post"></i></span>
                                 <span id="like-count" class="likeCount-<%= project._id %>"><%= project.likes.length %></span>
 
                         <% } else { %>
-                            <span id="project-like-row"><i id="like-<%= project._id %>-show" onclick="like(this, 'project', 'projects')"
+                            <span id="post-like-row"><i id="like-<%= project._id %>-show" onclick="like(this, 'project', 'projects')"
                                 class="fas fa-thumbs-up unliked-post"></i></span>
                                 <span id="like-count" class="likeCount-<%= project._id %>"><%= project.likes.length %></span>
 
@@ -144,16 +144,16 @@
                         <p><span id="creator-heading">Creators:</span> <span id="creator-div">None</span></p>
                     <% } %>
 
-                    <p class="project-description convertible-text"><%= convertedText %></p>
+                    <p class="post-description convertible-text"><%= convertedText %></p>
 
                     <% for (let img of project.images) { %>
-                        <img class="project-image" src="<%= img %>"/>
+                        <img class="post-image" src="<%= img %>"/>
                         <br/><br/>
                     <% } %>
                     <% for (let media of project.mediaFiles) { %>
                         <% if (media.filename) { %>
                             <% if ([".png", ".jpg", ".jpeg", ".gif"].includes(fileExtensions.get(media.url).toLowerCase())) { %>
-                                <img class="project-image" src="<%=media.url %>"/>
+                                <img class="post-image" src="<%=media.url %>"/>
                             <% } else if (fileExtensions.get(media.url).toLowerCase() == ".mp4") { %>
                                 <video width="600px" height="375px" src="<%=media.url%>" type="video/*" controls></video>
                             <% } else if ([".mp3", ".m4a"].includes(fileExtensions.get(media.url).toLowerCase())) {%>

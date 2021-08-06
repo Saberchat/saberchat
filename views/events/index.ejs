@@ -19,16 +19,16 @@
                 <h1><i class="fas fa-<%=data.icon%>"></i> <%=data.name%> (<% if (activeSearch) { %>Current Events<% } else {%>Past Events<%}%>)</h1>
                 <p><%=data.description%></p>
                 <% if (platform.postVerifiable || currentUser.status == platform.teacherStatus) { %>
-                    <a href="/events/new" class="btn btn-primary announcement-button">
+                    <a href="/events/new" class="btn btn-primary post-button">
                         <i class="fas fa-plus-circle"></i> Add New Event
                     </a>
                 <% } %>
                 <% if (activeSearch) { %>
-                    <a href="/events?past=true" class="btn btn-danger announcement-button">
+                    <a href="/events?past=true" class="btn btn-danger post-button">
                         <i class="fas fa-arrow-left"></i> View Past Events
                     </a>
                 <% } else { %>
-                    <a href="/events" class="btn btn-success announcement-button">
+                    <a href="/events" class="btn btn-success post-button">
                         <i class="fas fa-arrow-right"></i> View Current Events
                     </a>
                 <% } %>
@@ -51,8 +51,8 @@
                     <div class="block-header grey">
                         <h5 style="margin-bottom: 20px;">
 
-                            <a class="announcement-button" href="/events/<%= event._id %>">
-                                <span class="announcement-subject-header"><%= event.subject %></span>
+                            <a class="post-button" href="/events/<%= event._id %>">
+                                <span class="post-subject-header"><%= event.subject %></span>
                                 <% if (platform.postVerifiable && !event.verified && platform.permissionsProperty.slice(platform.permissionsProperty.length-3).includes(currentUser.permission)) { %>
                                     <a href="/events/verify/<%= event._id %>">
                                         <span class="badge badge-pill badge-primary" id="mark">Verify</span>
@@ -63,20 +63,20 @@
                         </h5>
 
                         <div class="bottom-text">
-                            <a class="announcement-sender" href="../profiles/<%= event.sender._id %>">
+                            <a class="post-sender" href="../profiles/<%= event.sender._id %>">
                                 <img src="<% if (event.sender.mediaFile.display) {%> <%= event.sender.mediaFile.url%><%} else {%> <%=event.sender.imageUrl.url%><%}%>" alt="profile pic"
                                         class="sender-profile-image">
                                 <%= event.sender.firstName %> <%= event.sender.lastName %>
                             </a>
                             <% if (currentUser._id.toString() == event.sender._id.toString()) { %>
                                 <button type="button" class="edit-button btn btn-info"><a
-                                            class="announcement-button"
+                                            class="post-button"
                                             href="/events/<%= event._id %>/edit"><i
                                                 class="fas fa-cog"></i> Edit</a></button>
 
                                 <form action="/events/<%= event._id %>?_method=delete" method="post" style="display: inline-block;"
                                         class="delete-event">
-                                    <button class="btn btn-danger announcement-button" type="button"
+                                    <button class="btn btn-danger post-button" type="button"
                                             data-toggle="modal"
                                             data-target="#modal-<%= event._id %>"><i
                                                 class="far fa-trash-alt"></i>
@@ -134,10 +134,10 @@
 
                     <div class="block-content mode">
                         <% if (event.text.split(" ").length > 30) { %>
-                            <p class="announcement-text"><span class="convertible-text"><%= eventTexts.get(event._id).split(" ").slice(0, 31).join(" ") %></span> <a
+                            <p class="post-text"><span class="convertible-text"><%= eventTexts.get(event._id).split(" ").slice(0, 31).join(" ") %></span> <a
                                         href="/events/<%= event._id %>">(Read More)</a></p>
                         <% } else { %>
-                            <p class="announcement-text convertible-text"><%= eventTexts.get(event._id) %></p>
+                            <p class="post-text convertible-text"><%= eventTexts.get(event._id) %></p>
                         <% } %>
 
                     </div>

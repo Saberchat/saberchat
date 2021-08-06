@@ -5,7 +5,7 @@
     padding-bottom: 50px;
 }
 
-.project-info, #exampleModalLabel, .modal-body, .creator-name, .creator-div, .project-info:hover {
+.post-info, #exampleModalLabel, .modal-body, .creator-name, .creator-div, .post-info:hover {
     color: black;
 }
 
@@ -16,7 +16,7 @@
     border-radius: 50%;
 }
 
-#project-date {
+#post-date {
     color: #6e6e6e;
 }
 
@@ -57,13 +57,13 @@
     display: inline;
 }
 
-.project-description {
+.post-description {
     margin-top: 10px;
     white-space: pre-wrap;
     text-align: left;
 }
 
-.project-image {
+.post-image {
     width: 40%;
     height: 40%;
     object-fit: contain;
@@ -124,7 +124,7 @@
     margin-left: 10px;
 }
 
-#project-like-row {
+#post-like-row {
     display: inline;
 }
 

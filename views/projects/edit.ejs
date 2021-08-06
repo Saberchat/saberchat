@@ -25,11 +25,11 @@
 
 <div class="row">
     <div class="col-md-8 offset-md-2 col-12">
-        <form action="/projects/<%= project._id %>?_method=put" method="post" id="submit-project-edits" enctype="multipart/form-data">
+        <form action="/projects/<%= project._id %>?_method=put" method="post" id="submit-post-edits" enctype="multipart/form-data">
 
             <div class="form-group">
-                <label for="new-project-message" id="title-label">Title</label>
-                <input id="new-project-title" name="title" maxlength="50" type="text" class="form-control mode"
+                <label for="new-post-message" id="title-label">Title</label>
+                <input id="new-post-title" name="title" maxlength="50" type="text" class="form-control mode"
                        value="<%= project.subject %>" placeholder="Enter Project Name" aria-label="Username"
                        aria-describedby="basic-addon1" required>
             </div>
@@ -54,8 +54,8 @@
             <!-- <input id="creators" class="form-control" autocomplete="off" name="creators" type="text" aria-describedby="basic-addon2" value = "<%= creatornames.join(', ') %>" placeholder="Creators" required/> -->
 
             <div class="form-group">
-                <label for="new-project-description" id="description-label">Description</label>
-                <textarea id="new-project-description" minlength="50" rows="6" name="text"
+                <label for="new-post-description" id="description-label">Description</label>
+                <textarea id="new-post-description" minlength="50" rows="6" name="text"
                           placeholder="Write a little about the project" class="form-control mode" aria-label="With textarea"
                           required><%= project.text %></textarea>
             </div>
