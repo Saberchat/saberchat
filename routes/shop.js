@@ -13,6 +13,7 @@ router.route('/')
     .put(wrapAsync(middleware.isLoggedIn), wrapAsync(middleware.accessToFeature), middleware.isCashier, wrapAsync(shop.updateSettings)); //Update Name/Description
 
 //View menu or view new order form
+router.post('/search-customers', wrapAsync(middleware.isLoggedIn), wrapAsync(shop.searchCustomers)); //Search for cafe customers
 router.get('/order', wrapAsync(middleware.isLoggedIn), wrapAsync(middleware.accessToFeature), wrapAsync(middleware.shopOpen), wrapAsync(shop.orderForm));
 
 //SPECIFIC ORDER ROUTES

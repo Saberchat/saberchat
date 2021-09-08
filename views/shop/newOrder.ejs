@@ -38,6 +38,14 @@
                     </div>
                 </div>
 
+                <% if (currentUser.tags.includes("Cafe Admin")) { %>
+                    <br>
+                    <label for="user-select">Enter Your Name</label>
+                    <input class="form-control mode" type="text" id="customer-username" placeholder="Username, First Name or Last Name" oninput="searchCustomers(this)"><br>
+                    <select id="user-select" class="form-control mode" onchange="setCustomer(this, <%=platform.dollarPayment%>)" style="display: none;" name="customer_id">
+                        <option class="recipient-group" value="" selected disabled>Select User</option>
+                    </select>
+                <% } %>
                 <div id="item-list">
 
                     <% for (let category of categories) { %>
@@ -175,7 +183,13 @@
         element.style.backgroundColor = colorScheme[1];
     }
 </script>
-<script>
-    order(orderForm, '<%= currentUser._id %>', "<%=platform.dollarPayment%>");
-</script>
+<% if (currentUser.tags.includes("Cafe Admin")) { %>
+    <script>
+        order(orderForm, "customer", "<%=platform.dollarPayment%>");
+    </script>
+<% } else { %>
+    <script>
+        order(orderForm, '<%= currentUser._id %>', "<%=platform.dollarPayment%>");
+    </script>
+<% } %>
 </html>

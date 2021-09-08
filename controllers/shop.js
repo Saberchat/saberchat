@@ -12,6 +12,7 @@ const {autoCompress} = require("../utils/image-compress");
 
 //SCHEMA
 const Platform = require("../models/platform");
+const User = require("../models/user");
 const Order = require("../models/shop/order");
 const Item = require("../models/shop/orderItem");
 const {InboxMessage} = require("../models/notification");
@@ -131,6 +132,30 @@ controller.orderForm = async function(req, res) {
     }
 }
 
+//Inbox new message recipient search
+controller.searchCustomers = async function(req, res) {
+    const platform = await setup(Platform);
+    if (!platform) {return res.json({error: "An error occurred"});}
+
+    //Collect user data based on form
+    let users = await User.find({authenticated: true, _id: {$ne: req.user._id}});
+    if (!users) {return res.json({error: "An error occurred"});}
+
+    let customers = [];
+
+    for (let user of users) { //Iterate through usernames and search for matches
+        if (await `${user.firstName} ${user.lastName} ${user.username}`.toLowerCase().includes(await req.body.text.toLowerCase())) {
+            await customers.push({ //Add user to array, using username as display, and id as id value
+                displayValue: `${user.firstName} ${user.lastName} (${user.username})`, 
+                idValue: user._id,
+                balance: user.balance
+            });
+        }
+    }
+
+    return res.json({success: "Successfully collected data", customers});
+}
+
 //-----------GENERAL ORDER ROUTES-----------//
 
 //CREATE ORDER
@@ -140,12 +165,24 @@ controller.order = async function(req, res) {
         await req.flash("error", "An Error Occurred");
         return res.redirect("back");
     }
+
+    let user;
+    if (req.body.customer_id) {
+        user = await User.findById(req.body.customer_id.split(' ')[0]);
+        if (!user) {
+            req.flash("error", "An Error Occurred");
+            return res.redirect("back");
+        }
+    } else {
+        user = req.user;
+    }
+
     if (!req.body.check) { //If any items are selected
         await req.flash("error", "Cannot send empty order"); //If no items were checked
         return res.redirect("back");
     }
 
-    const sentOrders = await Order.find({name: `${req.user.firstName} ${req.user.lastName}`, present: true});
+    const sentOrders = await Order.find({name: `${user.firstName} ${user.lastName}`, present: true});
     if (!sentOrders) {
         await req.flash("error", "Unable to find orders");
         return res.redirect("back");
@@ -173,13 +210,13 @@ controller.order = async function(req, res) {
     for (let item of orderedItems) {charge += (item.price * await parseInt(req.body[item.name]));} //Increment charge
 
     if (!req.body.payingInPerson) {
-        if (charge > req.user.balance) { //Check to see if you are ordering more than you can
+        if (charge > user.balance) { //Check to see if you are ordering more than you can
             await req.flash("error", `You do not have enough money in your account for this order. Contact a platform ${await platform.permissionsDisplay[platform.permissionsDisplay.length-1].toLowerCase()} if there has been a mistake.`);
             return res.redirect("/shop");
         }
-        req.user.balance -= charge;
-        req.user.debt += charge;
-        await req.user.save();
+        user.balance -= charge;
+        user.debt += charge;
+        await user.save();
     }
 
     for (let item of orderedItems) { //Update items

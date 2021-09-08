@@ -161,7 +161,13 @@ middleware.isCashier = function(req, res, next) {
 }
 
 middleware.isEditor = function(req, res, next) {
-    if (('Editor')) { return next();}
+    if (req.user.tags.includes('Editor')) { return next();}
+    req.flash('error', 'You do not have permission to do that');
+    return res.redirect('back');
+}
+
+middleware.isCafeAdmin = function(req, res, next) {
+    if (req.user.tags.includes('Cafe Admin')) { return next();}
     req.flash('error', 'You do not have permission to do that');
     return res.redirect('back');
 }

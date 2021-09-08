@@ -14,8 +14,8 @@
 	"author": "",
 	"license": "ISC",
 	"bugs": {
-    	"url": "https://github.com/Saberchat/saberchat/issues"
-  	},
+		"url": "https://github.com/Saberchat/saberchat/issues"
+	},
 	"homepage": "https://github.com/Saberchat/saberchat#readme",
 	"dependencies": {
 		"@editorjs/editorjs": "^2.18.0",

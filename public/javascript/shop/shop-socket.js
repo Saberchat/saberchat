@@ -13,6 +13,10 @@ const order = function(form, customer, dollarPayment) {
         let balance;
         let charge;
 
+        if (customer == "customer") {
+            customer = document.getElementById("user-select").value.split(' ')[0];
+        }
+
         //If paying is online, collect DOM elements of balance and charge to evaluate
         if (dollarPayment == "true" && !payingInPerson) {
             balance = parseFloat(document.getElementById('balance-box').innerText.split("$")[1]);

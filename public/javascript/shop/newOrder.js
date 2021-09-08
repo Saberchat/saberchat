@@ -10,7 +10,7 @@ const extraInstructions = document.getElementById('extra-instructions');
 const total = document.getElementById('total-cost');
 const orderConfirm = document.getElementById("order-confirm");
 const payingInPerson = document.getElementById("payingInPerson");
-const balanceString = document.getElementById("balance-box").innerText;
+let balanceString = document.getElementById("balance-box").innerText;
 let orderedItem; //Order that will show up in your 'confirm order' page
 let sum = 0;
 let instructionsNew;
@@ -18,6 +18,52 @@ let totalNew;
 let payingStyleNew;
 let balanceBox;
 let formattedCost;
+let currentCustomer;
+let currentBalance = 0;
+
+const searchCustomers = function(input) { //Check list of customers for online ordering from centralized computer
+    const url = `/shop/search-customers`;
+    const data = {text: input.value};
+    const userSelect = document.getElementById("user-select");
+    let appendedCustomer;
+
+    if (input.value.length > 2) {
+        sendPostReq(url, data, data => {
+            if (data.success && data.customers.length > 0) { //If there are customers to display
+                userSelect.style.display = "block";
+                while (userSelect.firstChild) {userSelect.removeChild(userSelect.firstChild);} //Empty userSelect from previous searches
+
+                //Add heading back to userSelect's list
+                const heading = document.createElement("option");
+                for (let attr of ["selected", "disabled"]) {heading[attr] = true;}
+                heading.className = "recipient-group";
+                heading.innerText = "Select User";
+                userSelect.appendChild(heading);
+
+                for (let customer of data.customers) { //Build userSelect option
+                    appendedCustomer = document.createElement("option");
+                    appendedCustomer.className = customer.classValue;
+
+                    appendedCustomer.innerText = customer.displayValue;
+                    appendedCustomer.setAttribute("value", `${customer.idValue} ${customer.balance}`);
+                    userSelect.appendChild(appendedCustomer); //Add userSelect option to menu
+                }
+            } else {
+                userSelect.style.display = "none"; //Hide dropdown if there are no matching elements
+            }
+        });
+    } else {
+        userSelect.style.display = "none"; //Hide dropdown if there is not a long enough input string
+    }
+}
+
+const setCustomer = function(dropdown, dollarPayment) {
+    currentCustomer = dropdown.value.split(' ')[0];
+    currentBalance = parseInt(dropdown.value.split(' ')[1]);
+    balanceString = `Current Balance: $${currentBalance.toFixed(2)}`;
+    document.getElementById("balance-box").innerText = balanceString;
+    changeOrderConfirmation(dollarPayment);
+}
 
 //Changes the order confirmation on the form
 const changeOrderConfirmation = function(dollarPayment) {
