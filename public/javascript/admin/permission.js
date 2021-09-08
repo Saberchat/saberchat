@@ -56,7 +56,7 @@ const updateBalance = function(form, event, dollarPayment) {
         if (data.success) { //If successful, display success info
             loading.style.color = 'green';
             loading.innerHTML = data.success;
-            if (dollarPayment) {balanceInput.value = data.balance.toFixed(2);
+            if (dollarPayment) {balanceInput.value = parseFloat(data.balance).toFixed(2);
             } else {balanceInput.value = data.balance}
         } else if (data.error) { //If unsuccessful, display error message
             loading.style.color = 'red';

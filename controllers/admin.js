@@ -516,7 +516,7 @@ controller.updateBalances = async function(req, res) {
     const user = await User.findByIdAndUpdate(req.body.userId, {balance: await parseFloat(req.body.bal)});
     if (!platform || !user) { return res.json({error: "Error. Could not change"});}
     if (platform.dollarPayment) {
-        await sendGridEmail(user.email, "Balance Update", `<p>Hello ${user.firstName},</p><p>Your balance has been updated to $${await user.balance.toFixed(2)}!</p><p>${platform.balanceMessage}</p><p>Visit ${url} to check out our merchandise.</p>`, false);
+        await sendGridEmail(user.email, "Balance Update", `<p>Hello ${user.firstName},</p><p>Your balance has been updated to $${await user.balance.toFixed(2)}!</p><p>${platform.balanceMessage}</p><p>Visit ${platform.url} to check out our merchandise.</p>`, false);
     } else {
         await sendGridEmail(user.email, "Balance Update", `<p>Hello ${user.firstName},</p><p>Your balance has been updated to ${user.balance} Credits!</p><p>${platform.balanceMessage}</p><p>Visit ${platform.url}/shop to check out our merchandise.</p>`, false);
     }
