@@ -14,6 +14,11 @@ const {Course, ChatRoom} = require('../models/group');
 
 const controller = {};
 
+controller.ecdocs = async function(req, res) {
+    const platform = await setup(Platform);
+    return res.render("admin/ecdocs", {platform});
+}
+
 controller.updatePlatformForm = async function(req, res) {
     const platform = await setup(Platform);
     if (!platform) {

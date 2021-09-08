@@ -1,0 +1,110 @@
+<%- include('../partials/headStart') %>
+    <link rel="stylesheet" href="/stylesheets/home/index.css">
+    <link rel="stylesheet" href="/stylesheets/components/background.css">
+    <link rel="stylesheet" href="/stylesheets/other/index.css">
+
+    <script src="/javascript/nav/userForm.js"></script>
+    <script src="/javascript/home/index.js"></script>
+<%- include('../partials/headEnd') %>
+<body class="mode">
+    <!-- insert navbar via ejs-->
+    <%- include('../partials/components/navbar') %>
+
+    <!-- Background image and text -->
+    <section id="background" style="background-image: url('<%=platform.imageUrl%>'); background-size: cover;">
+        <div class="container-fluid text-center">
+            <div class="row">
+                <div class="col-12 background-title">
+                    <h1>Alsion Early College</h1>
+                    <p>Important information and documents about Alsion's Early College Program</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <main id="main-container">
+        <div class="container mt-5">
+            <div class="row text-element">
+                <div class="col-lg-6">
+                    <article class="text-block mode">
+                        <div class="block-header">
+                            <h2>AP Literature and Language</h2>
+                        </div>
+                        <div class="block-content mode">
+                            <p>Alsion Early College offers two English courses in the 10th grade to prepare students for college-level reading and writing: AP English Language and AP English Literature. These courses, certified by the CollegeBoard, provide students an opportunity to learn critical reading and writing skills necessary to thrive in college and beyond. Each course culminates in an end-of-year exam designed by the CollegeBoard. Passing the exam with a composite score of 3 out of 5 or higher also earns students college credit that satisfies most English general education requirements at select colleges and universities. Alsion’s 10th-grade program is an intensive study in these two courses (which are typically taken in 11th and 12th grades in most public schools).</p>
+                            <p><a target="_blank" href="https://docs.google.com/document/d/1ongXa6a3u8p3i1HMTnkDQ9foMZSghNfbnPS8YzxxMro/edit?usp=drive_web">Click Here</a> to view the entire syllabus for both AP Literature and AP Language.</p>
+                        </div>
+                    </article>
+                </div>
+                <div class="col-lg-6 block">
+                    <img class="image-block" src="https://alsionschool.org/images/student-life/study_center_2.jpg"
+                        alt="Image Does Not Exist">
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Home Page content -->
+    <main id="main-container">
+        <div class="container mt-5">
+            <div class="row text-element">
+                <div class="col-lg-6 block">
+                    <img class="image-block" src="https://alsionschool.org/images/community/gallery/Garden2.jpg"
+                        alt="Image Does Not Exist">
+                </div>
+                <div class="col-lg-6">
+                    <article class="text-block mode">
+                        <div class="block-header">
+                            <h2>EC Graduation Requirements</h2>
+                        </div>
+                        <div class="block-content mode">
+                            <p>In order to officially graduate high school, Alsion Early College students are required to take a range of courses in multiple areas targeted towards developing them into well-rounded students. They are also required to complete a minimum of 40 certified volunteering hours.</p>
+                            <p>Please find attached below two documents. The first one displays the California A-G course requirements for graduation, while the second is a volunteer hours form for students to fill out to certify their mandated 40 hours of community service.</p>
+                            <ul>
+                                <h5><li><a target="_blank" href="https://drive.google.com/file/d/1U9D9lXaiklTlihmW9gLCygElSJL22Kw9/view?usp=sharing">California A-G Course Requirements</a></li></h5>
+                                <h5><li><a target="_blank" href="https://drive.google.com/file/d/18ut-lW9KedWMQymcsUkGECvFf8TECPM2/view?usp=sharing">Volunteering Hours Form</a></li></h5>
+                            </ul>
+                        </div>
+                    </article>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <main id="main-container">
+        <div class="container mt-5">
+            <div class="row text-element">
+                <div class="col-lg-6">
+                    <article class="text-block mode">
+                        <div class="block-header">
+                            <h2>Navigating Ohlone College</h2>
+                        </div>
+                        <div class="block-content mode">
+                            <p>Alsion's Early College Program gives them a strong head start on college. It offers the opportunity to pursue unique courses not accessible at any other High School institutions through Ohlone College. However, navigating the courses, website, textbook purchases and payments at Ohlone can be fairly daunting. Our Early College director, John Lubushkin, has compiled a set of videos to help incoming students navigate this process.</p>
+                            <p>Please find attached the following YouTube videos which display a full presentation of the Early College, and a guide to navigating Ohlone College's website.</p>
+                            <ul>
+                                <h5><li><a target="_blank" href="https://www.youtube.com/watch?v=yK0TuE2q8_M">Fall 2021 Early College Meeting</a></li></h5>
+                                <h5><li><a target="_blank" href="https://www.youtube.com/watch?v=1Xb2gF5_yM0">How To Buy Textbooks At Ohlone</a></li></h5>
+                            </ul>
+                        </div>
+                    </article>
+                </div>
+                <div class="col-lg-6 block">
+                    <img class="image-block" src="https://www.ohlone.edu/sites/default/files/styles/hero_slideshow/public/images/hero-banners/untitled-1.jpg?itok=DibPGEpp"
+                        alt="Image Does Not Exist">
+                </div>
+            </div>
+        </div>
+    </main>
+    
+        <script>
+            window.onload = (() => {
+                window.onscroll = (() => {
+                    updateNav();
+                    animateDisplay();
+                });
+            });
+        </script>
+        <script src="/javascript/embed.js"></script>
+</body>
+</html>

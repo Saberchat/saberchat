@@ -71,7 +71,11 @@
                         <% if (platform.publicFeatures.length > 2) { %>
                             <% for (let feature of platform.publicFeatures.slice(0, 2)) { %>
                                 <li class="nav-item">
-                                    <a class="nav-link" <% if (platform.navDark) {%> style="color: black;"<%}%> href="/<%=feature.route%>"><i class="fas fa-<%=feature.icon%>"></i> <%=feature.name%></a>
+                                    <% if (feature.route.includes("http")) {%>
+                                        <a class="nav-link" <% if (platform.navDark) {%> style="color: black;"<%}%> href="<%=feature.route%>" target="_blank" ><i class="fas fa-<%=feature.icon%>"></i> <%=feature.name%></a>
+                                    <% } else {%>
+                                        <a class="nav-link" <% if (platform.navDark) {%> style="color: black;"<%}%> href="/<%=feature.route%>"><i class="fas fa-<%=feature.icon%>"></i> <%=feature.name%></a>
+                                    <% } %>
                                 </li>
                             <% } %>
                             <li class="nav-item dropdown">
@@ -81,7 +85,11 @@
 
                                 <div class="dropdown-menu" aria-labelledby="navbarDropdown">
                                     <% for (let feature of platform.publicFeatures.slice(2)) { %>
-                                        <a class="dropdown-item" <% if (platform.navDark) {%> style="color: black;"<%}%> href="/<%=feature.route%>"><i class="fas fa-<%=feature.icon%>"></i> <%=feature.name%></a>
+                                        <% if (feature.route.includes("http")) {%>
+                                            <a class="dropdown-item" target="_blank" <% if (platform.navDark) {%> style="color: black;"<%}%> href="<%=feature.route%>"><i class="fas fa-<%=feature.icon%>"></i> <%=feature.name%></a>
+                                        <% } else {%>
+                                            <a class="dropdown-item" <% if (platform.navDark) {%> style="color: black;"<%}%> href="/<%=feature.route%>"><i class="fas fa-<%=feature.icon%>"></i> <%=feature.name%></a>
+                                        <% } %>
                                     <% } %>
                                 </div>
                             </li>
