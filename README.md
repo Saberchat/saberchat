@@ -9,16 +9,17 @@ PLATFORM LINKS
 TABLE OF DIRECTORY CONTENTS
 -----------------------------------------
 - App: Website's main file, implements all routes and libraries
-- Controllers: Server logic files that are used in the callbacks of routes\
-- JoiValidation: schema for form validation\
-- Middleware: express middleware for permissions, uploads and form validation\
-- Models: Mongoose DB models for collection schema\
-- Procfile: Tells Heroku what command to call on app start (No longer in usage)\
-- Public: Contains All Front-End CSS, JS and Static Display Images\
-- Routes: Server routes, accessed in app.js\
-- Services: Configurations for libraries and APIs such as image uploads and email sending\
-- Utils: Functions used platform-wide in both controllers and EJS logic\
-- Views: EJS files of front end code for all pages\
+- Controllers: Server logic files that are used in the callbacks of routes
+- JoiValidation: schema for form validation
+- Middleware: express middleware for permissions, uploads and form validation
+- Models: Mongoose DB models for collection schema
+- Procfile: Tells Heroku what command to call on app start (Deprecated)
+- Public: Contains All Front-End CSS, JS and Static Display Images
+- Routes: Server routes, accessed in app.js
+- Services: Configurations for libraries and APIs such as image uploads and email sending
+- Socket: Controls callback for real-time socket.io calls
+- Utils: Functions used platform-wide in both controllers and EJS logic
+- Views: EJS files of front end code for all pages
 
 
 NPM LIBRARIES
