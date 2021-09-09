@@ -1,0 +1,66 @@
+<%- include('../partials/headStart') %>
+    <!-- <link rel="stylesheet" href="/stylesheets/projects/index.css"> -->
+    <link rel="stylesheet" href="/stylesheets/announcements/index.css">
+    <link rel="stylesheet" href="/stylesheets/home/index.css">
+    <link rel="stylesheet" href="/stylesheets/chat/new.css">
+
+    <%if (currentUser && currentUser.darkmode) {%>
+        <link rel="stylesheet" href="/stylesheets/darkmode.css">
+        <link rel="stylesheet" href="/stylesheets/profiles/dark-profile.css">
+    <%}%>
+
+    <link rel="stylesheet" href="/stylesheets/profiles/index.css">
+    <link rel="stylesheet" href="/stylesheets/profiles/show.css">
+    <link rel="stylesheet" href="/stylesheets/tutoringCenter/tutor-show.css">
+
+      <script src="/javascript/postUtil.js"></script>
+      <script src="/javascript/tutoringCenter/settings.js"></script>
+      <script src="/javascript/tutoringCenter/upvote.js"></script>
+      <script src="/javascript/tutoringCenter/actions.js"></script>
+      <script src="/javascript/tutoringCenter/rating.js"></script>
+
+<%- include('../partials/headEnd') %>
+
+<body class="mode">
+    <!-- include the navbar via ejs -->
+    <%- include('../partials/components/navbar') %>
+
+    <div id="banner" style="background-image: url('<% if (currentUser.bannerFile.display) { %> <%= currentUser.bannerFile.url %> <% } else { %> <%= currentUser.bannerUrl.url %> <% } %>');"></div>
+
+    <div class="container mb-5 tutor-info">
+        <img src="<% if (currentUser.mediaFile.display) {%> <%= currentUser.mediaFile.url%><%} else {%> <%=currentUser.imageUrl.url%><%}%>" alt="profile image" class="profile-image">
+        <h1 class="username mode">Transaction History For <%=currentUser.firstName%> <%=currentUser.lastName%></h1>
+    </div>
+
+    <div class="container mt-5">
+        <% if (transactions.length > 0) { %>
+            <ul id="lesson-info-<%= currentUser._id %>" class="list-group">
+                <li class="list-group-item list-group-item-success status-header darkmode-outline">
+                    <div class="d-flex w-100 justify-content-between">
+                        <h2 class="mb-1 darkmode-header"><%= transactions.length %> Transactions (Current Balance: $<%=currentUser.balance.toFixed(2)%>)</h2>
+                    </div>
+                </li>
+
+                <% for (let transaction of transactions.reverse()) { %>
+                    <li class="list-group-item list-group-item-action tutor-profile menu-item shop">
+                        <span class="lesson-info"><%= transaction.date %> | $<%= transaction.price.toFixed(2) %> (<%=["Deposit", "Withdrawal"][transaction.type]%>)</span><br/>
+                        <p><%= transaction.summary%></p>
+                    </li>
+                <% } %>
+            </ul>
+        <% } else { %>
+            <% if (platform.dollarPayment) { %>
+                <h1 id="no-lessons">No Transactions ($0.00)</h1>
+            <% } else { %>
+                <h1 id="no-lessons">No Transactions (0 Credits)</h1>
+            <% } %>
+        <% } %>
+    </div>
+</body>
+<script>
+    document.getElementById("time-count").innerText = getTime(document.getElementById("time-count").innerText.split(' ')[0]);
+    for (let element of document.getElementsByClassName("shop")) {
+        element.style.backgroundColor = colorScheme[1];
+    }
+</script>
+</html>

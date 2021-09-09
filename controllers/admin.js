@@ -4,6 +4,7 @@ const {objectArrIndex, concatMatrix, removeIfIncluded} = require("../utils/objec
 const setup = require("../utils/setup");
 const {cloudUpload, cloudDelete} = require('../services/cloudinary');
 const {autoCompress} = require("../utils/image-compress");
+const dateFormat = require("dateformat");
 
 //SCHEMA
 const Platform = require("../models/platform");
@@ -513,13 +514,29 @@ controller.viewBalances = async function(req, res) {
 
 controller.updateBalances = async function(req, res) {
     const platform = await setup(Platform);
-    const user = await User.findByIdAndUpdate(req.body.userId, {balance: await parseFloat(req.body.bal)});
+    const user = await User.findById(req.body.userId);
+
     if (!platform || !user) { return res.json({error: "Error. Could not change"});}
+    if (user.balance - (await parseFloat(req.body.bal))) {
+
+    }
+
+    if (user.balance - (await parseFloat(req.body.bal))) { //If deposit is positive (money is not removed), then user's transactions are updated
+        user.deposits.push({
+            amount: user.balance - (await parseFloat(req.body.bal)),
+            added: new Date()
+        });
+    }
+
+    user.balance =  await parseFloat(req.body.bal);
+    await user.save();
+
     if (platform.dollarPayment) {
         await sendGridEmail(user.email, "Balance Update", `<p>Hello ${user.firstName},</p><p>Your balance has been updated to $${await user.balance.toFixed(2)}!</p><p>${platform.balanceMessage}</p><p>Visit ${platform.url} to check out our merchandise.</p>`, false);
     } else {
         await sendGridEmail(user.email, "Balance Update", `<p>Hello ${user.firstName},</p><p>Your balance has been updated to ${user.balance} Credits!</p><p>${platform.balanceMessage}</p><p>Visit ${platform.url}/shop to check out our merchandise.</p>`, false);
     }
+    
     if (platform.dollarPayment) {return res.json({success: 'Succesfully changed', balance: (await parseFloat(req.body.bal)).toFixed(2)});}
     return res.json({success: 'Succesfully changed', balance: (await parseInt(req.body.bal))});
 }

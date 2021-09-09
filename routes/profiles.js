@@ -14,6 +14,7 @@ router.get('/team', wrapAsync(middleware.isLoggedIn), wrapAsync(middleware.acces
 router.get('/edit', wrapAsync(middleware.isLoggedIn), wrapAsync(profiles.edit)); //renders profiles edit page
 router.get('/change-login-info', wrapAsync(middleware.isLoggedIn), wrapAsync(profiles.changeLoginInfo)); //renders the email/password edit page
 router.get('/confirm-email/:id', wrapAsync(profiles.confirmEmail)); //Confirm new email
+router.get('/transactions', wrapAsync(middleware.isLoggedIn), wrapAsync(profiles.transactions)); //Show logged in user's transactions
 router.get('/:id', wrapAsync(middleware.isLoggedIn), wrapAsync(profiles.show)); //Show specific user's profiles
 
 router.put('/profiles', wrapAsync(middleware.isLoggedIn), multipleUpload, validateUserUpdate, wrapAsync(profiles.profilesPut)); // update user route.

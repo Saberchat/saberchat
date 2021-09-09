@@ -8,6 +8,7 @@ const {cloudUpload, cloudDelete} = require('../services/cloudinary');
 const {objectArrIndex, removeIfIncluded, concatMatrix, multiplyArrays, parsePropertyArray, sortAlph} = require('../utils/object-operations');
 const setup = require("../utils/setup");
 const {autoCompress} = require("../utils/image-compress");
+const dateFormat = require("dateformat");
 
 //SCHEMA
 const Platform = require("../models/platform");
@@ -124,6 +125,46 @@ controller.show = async function(req, res) {
 		perms: new Map(await concatMatrix([platform.permissionsProperty, platform.permissionsDisplay])),
 		statuses: new Map(await concatMatrix([platform.statusesProperty, platform.statusesSingular]))
 	});
+}
+
+controller.transactions = async function(req, res) {
+	let transactions = []
+	const platform = await setup(Platform);
+	const orders = await Order.find({customer: req.user._id});
+	if (!platform || !orders) {
+		req.flash("error", "An Error Occurred");
+		return res.redirect("back");
+	}
+
+	for (let order of orders) { //Add all orders as purchase transactions
+		transactions.push({
+			type: 1,
+			price: order.charge,
+			summary: `Item Purchase`,
+			created_at: order.created_at,
+			date: order.date
+		});
+	}
+
+	for (let deposit of req.user.deposits) { //Lists all deposits as deposit transactions
+		transactions.push({
+			type: 0,
+			price: Math.abs(deposit.amount),
+			summary: `Balance Deposit`,
+			added_at: deposit.added_at,
+			date: dateFormat(deposit.added_at, "mmm d, h:MM TT")
+		});
+	}
+
+	for (let i = 0; i < transactions.length-1; i++) { //Bubblesort algorithm sorts transactions in order
+		for (let j = 0; j < transactions.length-(i+1); j++) {
+			if (new Date(transactions[j].created_at).getTime() < new Date(transactions[j+1].added_at).getTime()) {
+				[transactions[j], transactions[j+1]] = [transactions[j+1], transactions[j]];
+			}
+		}
+	}
+
+	return res.render("profiles/transactions", {platform, transactions});
 }
 
 controller.update = async function(req, res) {

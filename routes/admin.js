@@ -33,8 +33,8 @@ router.route("/settings")
 router.put('/tag', wrapAsync(middleware.isLoggedIn), wrapAsync(middleware.isMod), wrapAsync(admin.tag));
 
 router.route('/balances')
-    .get(wrapAsync(middleware.isLoggedIn), middleware.isCashier, wrapAsync(admin.viewBalances))
-    .put(wrapAsync(middleware.isLoggedIn), middleware.isCashier, wrapAsync(admin.updateBalances));
+    .get(wrapAsync(middleware.isLoggedIn), wrapAsync(middleware.isPrincipal), wrapAsync(admin.viewBalances))
+    .put(wrapAsync(middleware.isLoggedIn), wrapAsync(middleware.isPrincipal), wrapAsync(admin.updateBalances));
 
 router.route('/authenticate')
     .get(wrapAsync(middleware.isLoggedIn), wrapAsync(middleware.isPrincipal), wrapAsync(admin.authenticateGet))
