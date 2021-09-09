@@ -1,32 +1,23 @@
 <%- include('../partials/headStart') %>
-    <!-- <link rel="stylesheet" href="/stylesheets/projects/index.css"> -->
-    <link rel="stylesheet" href="/stylesheets/announcements/index.css">
-    <link rel="stylesheet" href="/stylesheets/home/index.css">
+    <link rel="stylesheet" href="/stylesheets/announcements/index.css">    
+    <link rel="stylesheet" href="/stylesheets/profiles/show.css">
+    <link rel="stylesheet" href="/stylesheets/tutoringCenter/tutor-show.css">
     <link rel="stylesheet" href="/stylesheets/chat/new.css">
+    <link rel="stylesheet" href="/stylesheets/profiles/index.css">
+    <link rel="stylesheet" href="/stylesheets/profiles/show.css">
 
     <%if (currentUser && currentUser.darkmode) {%>
         <link rel="stylesheet" href="/stylesheets/darkmode.css">
         <link rel="stylesheet" href="/stylesheets/profiles/dark-profile.css">
     <%}%>
-
-    <link rel="stylesheet" href="/stylesheets/profiles/index.css">
-    <link rel="stylesheet" href="/stylesheets/profiles/show.css">
-    <link rel="stylesheet" href="/stylesheets/tutoringCenter/tutor-show.css">
-
-      <script src="/javascript/postUtil.js"></script>
-      <script src="/javascript/tutoringCenter/settings.js"></script>
-      <script src="/javascript/tutoringCenter/upvote.js"></script>
-      <script src="/javascript/tutoringCenter/actions.js"></script>
-      <script src="/javascript/tutoringCenter/rating.js"></script>
-
 <%- include('../partials/headEnd') %>
 
 <body class="mode">
     <!-- include the navbar via ejs -->
     <%- include('../partials/components/navbar') %>
 
+    <!-- big background image -->
     <div id="banner" style="background-image: url('<% if (currentUser.bannerFile.display) { %> <%= currentUser.bannerFile.url %> <% } else { %> <%= currentUser.bannerUrl.url %> <% } %>');"></div>
-
     <div class="container mb-5 tutor-info">
         <img src="<% if (currentUser.mediaFile.display) {%> <%= currentUser.mediaFile.url%><%} else {%> <%=currentUser.imageUrl.url%><%}%>" alt="profile image" class="profile-image">
         <h1 class="username mode">Transaction History For <%=currentUser.firstName%> <%=currentUser.lastName%></h1>

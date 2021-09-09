@@ -17,7 +17,10 @@ const controller = {};
 
 controller.ecdocs = async function(req, res) {
     const platform = await setup(Platform);
-    return res.render("admin/ecdocs", {platform});
+    if (objectArrIndex(platform.features, "route", "admin/ecdocs") > -1) { //Alsion-native platform
+        return res.render("admin/ecdocs", {platform});
+    }
+    return res.redirect("/");
 }
 
 controller.updatePlatformForm = async function(req, res) {

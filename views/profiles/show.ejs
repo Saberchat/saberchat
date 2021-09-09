@@ -14,8 +14,7 @@
     <%- include('../partials/components/navbar') %>
 
     <!-- big background image -->
-    <div id="banner" style="background-image: url('<% if (user.bannerFile.display) { %> <%= user.bannerFile.url %> <% } else { %> <%= user.bannerUrl.url %> <% } %>');">
-    </div>
+    <div id="banner" style="background-image: url('<% if (user.bannerFile.display) { %> <%= user.bannerFile.url %> <% } else { %> <%= user.bannerUrl.url %> <% } %>');"></div>
     <div class="container mb-5">
         <img src="<% if (user.mediaFile.display) {%> <%= user.mediaFile.url%><%} else {%> <%=user.imageUrl.url%><%}%>" alt="profile image" class="profile-image">
         <h1 class="username mode"><%= user.username %></h1>

@@ -41,7 +41,7 @@
                         <div class="col-lg-12">
                             <a href="/profiles/<%=user._id%>" style="color: black;" class="post-sender">
                                 <article class="text-block mode">
-                                    <div class="block-header green">
+                                    <div class="block-header <% if (platform.homepageInfo) {%> green <% } %>">
                                         <h1><%=user.firstName%> <%=user.lastName%> (<%=platform.statusesSingular[platform.statusesProperty.indexOf(user.status)]%>)</h1>
                                     </div>
                                     <div class="block-content mode">
