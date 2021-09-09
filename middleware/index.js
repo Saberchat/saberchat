@@ -166,12 +166,6 @@ middleware.isEditor = function(req, res, next) {
     return res.redirect('back');
 }
 
-middleware.isCafeAdmin = function(req, res, next) {
-    if (req.user.tags.includes('Cafe Admin')) { return next();}
-    req.flash('error', 'You do not have permission to do that');
-    return res.redirect('back');
-}
-
 //Whether shop is open to orders
 middleware.shopOpen = async function(req, res, next) {
     const shop = await setup(Market);

@@ -38,7 +38,7 @@
                     </div>
                 </div>
 
-                <% if (currentUser.tags.includes("Cafe Admin")) { %>
+                <% if (currentUser.tags.includes("Cashier")) { %>
                     <br>
                     <label for="user-select">Enter Your Name</label>
                     <input class="form-control mode" type="text" id="customer-username" placeholder="Username, First Name or Last Name" oninput="searchCustomers(this)"><br>
@@ -183,7 +183,7 @@
         element.style.backgroundColor = colorScheme[1];
     }
 </script>
-<% if (currentUser.tags.includes("Cafe Admin")) { %>
+<% if (currentUser.tags.includes("Cashier")) { %>
     <script>
         order(orderForm, "customer", "<%=platform.dollarPayment%>");
     </script>
