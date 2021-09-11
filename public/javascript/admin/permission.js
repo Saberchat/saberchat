@@ -27,22 +27,6 @@ const updateRole = function(select) { //Update user's permission
     });
 }
 
-const incBalance = function(userId, dollarPayment) { //Add 1 to balance
-    const input = document.getElementById(`balance-${userId}`);
-    if (dollarPayment) {input.value = (parseFloat(input.value) + 1).toFixed(2);
-    } else {input.value = (parseFloat(input.value) + 1);}
-    updateBalance(document.getElementById(userId), event);
-}
-
-const decBalance = function(userId, dollarPayment) { //Remove 1 from balance
-    const input = document.getElementById(`balance-${userId}`);
-    if (parseFloat(input.value) -1 >= 0) { //Check that balance still > 0
-        if (dollarPayment) {input.value = (parseFloat(input.value) - 1).toFixed(2);
-        } else {input.value = (parseFloat(input.value) - 1);}
-        updateBalance(document.getElementById(userId), event);
-    }
-}
-
 const updateBalance = function(form, event, dollarPayment) {
     const loading = document.getElementById('loading'); //Button which shows request status
     loading.style.display = 'block';

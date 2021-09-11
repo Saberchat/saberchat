@@ -47,8 +47,6 @@
                                     <% } else { %>
                                       <input class="form-control mode" type="text" id="balance-<%=user._id%>" placeholder="price" maxlength="10" required value="<%=(user.balance)%>">
                                     <% } %>
-                                    <button class="btn btn-primary balance-button" type="button" id="add-<%=user._id%>" onclick="incBalance('<%=user._id%>', <%=platform.dollarPayment%>)"><i class="fas fa-plus-circle"></i></button>
-                                    <button class="btn btn-danger balance-button" type="button" id="subtract-<%=user._id%>" onclick="decBalance('<%=user._id%>', <%=platform.dollarPayment%>)"><i class="fas fa-minus-circle"></i></button>
                                   </div>
                               </div>
                             </li>
