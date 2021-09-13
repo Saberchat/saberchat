@@ -138,7 +138,7 @@ controller.searchCustomers = async function(req, res) {
     if (!platform) {return res.json({error: "An error occurred"});}
 
     //Collect user data based on form
-    let users = await User.find({authenticated: true, _id: {$ne: req.user._id}});
+    let users = await User.find({authenticated: true});
     if (!users) {return res.json({error: "An error occurred"});}
 
     let customers = [];

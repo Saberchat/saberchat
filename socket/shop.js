@@ -18,7 +18,6 @@ shop.order = async function(io, socket, itemList, itemCount, instructions, addre
     if (!shop) {return console.log('error accessing shop');}
 
     if (shop.open) { //If the shop is open, run everything else. Otherwise, nothing matters since orders aren't being accepted
-        console.log(customerId);
         const user = await User.findById(customerId);
         if (!user) {return console.log('error accessing user');}
 
