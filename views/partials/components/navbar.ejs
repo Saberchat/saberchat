@@ -69,7 +69,7 @@
 
                     <% } else { %>
                         <% if (platform.publicFeatures.length > 2) { %>
-                            <% for (let feature of platform.publicFeatures.slice(0, 2)) { %>
+                            <% for (let feature of platform.publicFeatures.slice(0, 3)) { %>
                                 <li class="nav-item">
                                     <% if (feature.route.includes("http")) {%>
                                         <a class="nav-link" <% if (platform.navDark) {%> style="color: black;"<%}%> href="<%=feature.route%>" target="_blank" ><i class="fas fa-<%=feature.icon%>"></i> <%=feature.name%></a>
@@ -84,7 +84,7 @@
                                 <i class="fas fa-align-justify"></i> More</a>
 
                                 <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-                                    <% for (let feature of platform.publicFeatures.slice(2)) { %>
+                                    <% for (let feature of platform.publicFeatures.slice(3)) { %>
                                         <% if (feature.route.includes("http")) {%>
                                             <a class="dropdown-item" target="_blank" <% if (platform.navDark) {%> style="color: black;"<%}%> href="<%=feature.route%>"><i class="fas fa-<%=feature.icon%>"></i> <%=feature.name%></a>
                                         <% } else {%>
