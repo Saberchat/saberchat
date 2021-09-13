@@ -33,7 +33,7 @@
 
                   <% for (let status of platform.statusesProperty.reverse()) { %>
                     <% for (let user of users) { %>
-                        <% if(!user._id.equals(currentUser._id) && user.status == status){ %>
+                        <% if(user.status == status){ %>
                           <form onsubmit="updateBalance(this, event, <%=platform.dollarPayment%>)" id="<%=user._id%>">
                             <li class="list-group-item user shop <%=status.toLowerCase()%> <%=user.permission%>" id="user-<%=user._id%>">
                               <%= user.firstName %> <%= user.lastName %> (<%= user.username %>)
