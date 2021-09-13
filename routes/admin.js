@@ -5,8 +5,6 @@ const {singleUpload} = require('../middleware/multer')
 const admin = require("../controllers/admin"); //Controller
 const router = express.Router(); //Router
 
-router.get('/ecdocs', wrapAsync(admin.ecdocs)); //EC info
-
 router.route("/moderate")
     .get(wrapAsync(middleware.isLoggedIn), wrapAsync(middleware.isMod), wrapAsync(admin.moderateGet)) //View all reported comments
     .post(wrapAsync(middleware.isLoggedIn), wrapAsync(middleware.isMod), wrapAsync(admin.getContext)) //Get context for reported comment

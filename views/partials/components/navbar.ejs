@@ -59,7 +59,9 @@
                                 <% for (let feature of platform.features) { %>
                                     <% if (feature.route.includes("http")) {%>
                                         <a class="dropdown-item" href="<%=feature.route%>" target="_blank">
-                                    <% } else {%>
+                                    <% } else if (feature.route.includes("/")) { %>
+                                        <a class="dropdown-item" href="<%=feature.route%>">
+                                    <% } else { %>
                                         <a class="dropdown-item" href="/<%=feature.route%>">
                                     <% } %>
                                     <i class="fas fa-<%=feature.icon%>"></i> <%=feature.name%></a>
