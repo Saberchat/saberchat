@@ -207,9 +207,6 @@ controller.update = async function(req, res) {
 	let user = { //Updated user object
 		firstName: req.body.firstName,
 		lastName: req.body.lastName,
-		username: await filter.clean(req.body.username),
-		description: await filter.clean(req.body.description || ''),
-		title: await filter.clean(req.body.title || ''),
 		status: await status.toLowerCase(),
 		mediaFile: {
 			url: req.user.mediaFile.url,
@@ -222,6 +219,13 @@ controller.update = async function(req, res) {
 			display: req.body.showBannerImage == "upload"
 		},
 	};
+
+	//Update separately to avoid errors in empty fields
+	for (let attr of ["username", "description", "title"]) {
+		if (req.body[attr])  {
+			user[attr] = await filter.clean(req.body[attr]);
+		} else {user[attr] = " ";}
+	}
 
 	//Build user's image info based on display options on form
 	if (req.body.imageUrl) {
