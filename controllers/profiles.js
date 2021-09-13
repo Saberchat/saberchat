@@ -208,8 +208,8 @@ controller.update = async function(req, res) {
 		firstName: req.body.firstName,
 		lastName: req.body.lastName,
 		username: await filter.clean(req.body.username),
-		description: await filter.clean(req.body.description),
-		title: await filter.clean(req.body.title),
+		description: await filter.clean(req.body.description || ''),
+		title: await filter.clean(req.body.title || ''),
 		status: await status.toLowerCase(),
 		mediaFile: {
 			url: req.user.mediaFile.url,
