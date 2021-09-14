@@ -85,7 +85,7 @@
                                     <em class="item-description convertible-text"><%=para%></em>
                                     <% if ((i+1) < itemDescriptions[item._id.toString()].length) {%><br/><br/><%}%>
                                 <% } %><br/>
-                        <% if (item.mediaFile.display && [".png", ".jpg", ".jpeg", ".gif"].includes(fileExtensions.get(item.mediaFile.url).toLowerCase())) { %>
+                        <% if (item.mediaFile.display && fileExtensions.get(item.mediaFile.url) && [".png", ".jpg", ".jpeg", ".gif"].includes(fileExtensions.get(item.mediaFile.url).toLowerCase())) { %>
                             <% if (item.imageLink) {%>
                                 <a href="<%=item.mediaFile.url%>" target="_blank">
                                     <img class="item-image" src="<%= item.mediaFile.url %>"/>
@@ -101,7 +101,7 @@
                                 <a href="<%=item.imgUrl.url%>" target="_blank">
                                     <img class="item-image" src="<%= item.imgUrl.url %>"/>
                                 </a>
-                            <% } else {%>
+                            <% } else if (item.imgUrl.url) { %>
                                 <div class="no-link-container">
                                     <img class="item-image" src="<%= item.imgUrl.url %>"/>
                                 </div>
