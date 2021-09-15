@@ -147,13 +147,23 @@ controller.transactions = async function(req, res) {
 	}
 
 	for (let deposit of req.user.deposits) { //Lists all deposits as deposit transactions
-		transactions.push({
-			type: 0,
-			price: Math.abs(deposit.amount),
-			summary: `Balance Deposit`,
-			added_at: deposit.added_at,
-			date: dateFormat(deposit.added_at, "mmm d, h:MM TT")
-		});
+		if (deposit.amount > 0) {
+			transactions.push({
+				type: 0,
+				price: deposit.amount,
+				summary: `Balance Deposit`,
+				added_at: deposit.added_at,
+				date: dateFormat(deposit.added_at, "mmm d, h:MM TT")
+			});
+		} else {
+			transactions.push({
+				type: 1,
+				price: deposit.amount,
+				summary: `Balance Deposit`,
+				added_at: deposit.added_at,
+				date: dateFormat(deposit.added_at, "mmm d, h:MM TT")
+			});
+		}
 	}
 
 	for (let i = 0; i < transactions.length-1; i++) { //Bubblesort algorithm sorts transactions in order

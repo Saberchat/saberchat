@@ -317,6 +317,7 @@ Scroll To Bottom Button
 
 .post-description {
     white-space: pre-wrap;
+    text-align: left;
 }
 
 .comment-button {

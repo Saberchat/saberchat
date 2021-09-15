@@ -173,9 +173,7 @@ controller.order = async function(req, res) {
             req.flash("error", "An Error Occurred");
             return res.redirect("back");
         }
-    } else {
-        user = req.user;
-    }
+    } else user = req.user;
 
     if (!req.body.check) { //If any items are selected
         await req.flash("error", "Cannot send empty order"); //If no items were checked

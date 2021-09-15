@@ -512,11 +512,8 @@ controller.updateBalances = async function(req, res) {
     const user = await User.findById(req.body.userId);
 
     if (!platform || !user) { return res.json({error: "Error. Could not change"});}
-    if (user.balance - (await parseFloat(req.body.bal))) {
 
-    }
-
-    if (user.balance - (await parseFloat(req.body.bal))) { //If deposit is positive (money is not removed), then user's transactions are updated
+    if (user.balance - (await parseFloat(req.body.bal)) != 0) { //If deposit is not 0 then user's transactions are updated
         user.deposits.push({
             amount: user.balance - (await parseFloat(req.body.bal)),
             added: new Date()

@@ -28,11 +28,11 @@ const updateRole = function(select) { //Update user's permission
 }
 
 const updateBalance = function(form, event, dollarPayment) {
-    const loading = document.getElementById('loading'); //Button which shows request status
+    const userId = form.id;
+    const loading = document.getElementById(`loading-${userId}`); //Button which shows request status
     loading.style.display = 'block';
     loading.style.color = 'gray';
     loading.innerHTML = 'Waiting...';
-    const userId = form.id;
     const balanceInput = document.getElementById(`balance-${userId}`);
     const url = '/admin/balances?_method=put';
     const data = {userId, bal: balanceInput.value};

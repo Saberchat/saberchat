@@ -13,7 +13,6 @@
           <div class="row">
             <div class="col-12">
               <h1>Change <% if (platform.dollarPayment) { %> Balances <% } else {%> Donation Credits <% } %></h1>
-              <span id="loading"></span>
               <hr>
 
               <div class="search-filter mb-3 search">
@@ -37,6 +36,7 @@
                           <form onsubmit="updateBalance(this, event, <%=platform.dollarPayment%>)" id="<%=user._id%>">
                             <li class="list-group-item user shop <%=status.toLowerCase()%> <%=user.permission%>" id="user-<%=user._id%>">
                               <%= user.firstName %> <%= user.lastName %> (<%= user.username %>)
+                              <br><span style="display: inline;" id="loading-<%=user._id%>"></span>
                               <div class="col">
                                 <div class="input-group balance-input">
                                     <div class="input-group-prepend">
@@ -44,9 +44,11 @@
                                     </div>
                                     <% if (platform.dollarPayment) {%>
                                       <input class="form-control mode" type="text" id="balance-<%=user._id%>" placeholder="price" maxlength="10" required value="<%=(user.balance).toFixed(2)%>">
+                                      <span style="display: inline;" id="loading-<%=user._id%>"></span>
                                     <% } else { %>
                                       <input class="form-control mode" type="text" id="balance-<%=user._id%>" placeholder="price" maxlength="10" required value="<%=(user.balance)%>">
                                     <% } %>
+                                    <button type="submit" class="btn btn-success" style="margin-left: 20px; display: inline;">Update</button>
                                   </div>
                               </div>
                             </li>

@@ -55,9 +55,9 @@
 
             <div class="form-group">
                 <label for="new-post-description" id="description-label">Description</label>
-                <textarea id="new-post-description" minlength="50" rows="6" name="text"
+                <textarea id="new-post-description" rows="6" name="text"
                           placeholder="Write a little about the project" class="form-control mode" aria-label="With textarea"
-                          required><%= project.text %></textarea>
+                          ><%= project.text %></textarea>
             </div>
 
             <% for (let media of project.mediaFiles) { %>
