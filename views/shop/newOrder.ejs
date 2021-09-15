@@ -40,10 +40,11 @@
 
                 <% if (currentUser.tags.includes("Cashier")) { %>
                     <br>
-                    <label for="user-select">Enter Your Name</label>
+                    <label id="current-name" for="user-select" class="<%=currentUser._id%>">Current Customer: <%=currentUser.firstName%> <%=currentUser.lastName%> (<%=currentUser.username%>)</label>
                     <input class="form-control mode" type="text" id="customer-username" placeholder="Username, First Name or Last Name" oninput="searchCustomers(this)"><br>
-                    <select id="user-select" class="form-control mode" onchange="setCustomer(this, <%=platform.dollarPayment%>)" style="display: none;" name="customer_id">
-                        <option class="recipient-group" value="" selected disabled>Select User</option>
+                    <select required id="user-select" class="form-control mode" onchange="setCustomer(this, <%=platform.dollarPayment%>)" name="customer_id">
+                        <option class="recipient-group" value="" disabled>Select User</option>
+                        <option class="recipient-group" value="<%=currentUser._id%>" selected><%=currentUser.firstName%> <%=currentUser.lastName%> (<%=currentUser.username%>)</option>
                     </select>
                 <% } %>
                 <div id="item-list">
@@ -59,6 +60,7 @@
                         </li>
 
                         <% for (let item of category.items) { %>
+                            <% if (item.availableItems > 0) { %>
                             <% if (frequentItems.toString().includes(item._id.toString())) { %>
                                 <div class="list-group-item form-check menu-item <%= category.name.replace(' ', '') %> shop"
                                      id="item-<%= item.id %>" title="You have frequently ordered this item">
@@ -114,6 +116,7 @@
                                     <br/>
                                 </div>
                             </div>
+                        <% } %>
                         <% } %>
 
                         <% if (category.items.length > 0) { %>

@@ -45,7 +45,7 @@ const searchCustomers = function(input) { //Check list of customers for online o
                     appendedCustomer.className = customer.classValue;
 
                     appendedCustomer.innerText = customer.displayValue;
-                    appendedCustomer.setAttribute("value", `${customer.idValue} ${customer.balance}`);
+                    appendedCustomer.setAttribute("value", `${customer.idValue} ${customer.balance} | ${customer.displayValue}`);
                     userSelect.appendChild(appendedCustomer); //Add userSelect option to menu
                 }
             } else {
@@ -58,6 +58,8 @@ const searchCustomers = function(input) { //Check list of customers for online o
 }
 
 const setCustomer = function(dropdown, dollarPayment) {
+    document.getElementById("current-name").innerText = `Current Customer: ${dropdown.value.split('| ')[1]}`;
+    document.getElementById("current-name").className = dropdown.value.split(' ')[0];
     currentCustomer = dropdown.value.split(' ')[0];
     currentBalance = parseInt(dropdown.value.split(' ')[1]);
     balanceString = `Current Balance: $${currentBalance.toFixed(2)}`;

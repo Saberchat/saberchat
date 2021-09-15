@@ -13,9 +13,8 @@ const order = function(form, customer, dollarPayment) {
         let balance;
         let charge;
 
-        if (customer == "customer") {
-            customer = document.getElementById("user-select").value.split(' ')[0];
-        }
+        //If cashier is ordering, access name from menu as opposed to account info
+        if (customer == "customer") {customer = document.getElementById("current-name").className};
 
         //If paying is online, collect DOM elements of balance and charge to evaluate
         if (dollarPayment == "true" && !payingInPerson) {
