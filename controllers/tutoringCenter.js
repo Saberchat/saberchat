@@ -542,8 +542,9 @@ controller.unblock = async function(req, res) { //Unblock a previously blocked u
 //-----------TUTOR ROUTES -----------//
 
 controller.markPayment = async function(req, res) {
+    const platform = await setup(Platform);
     const course = await Course.findById(req.params.id);
-    if (!course) {return res.json({error: "Unable to find course"});}
+    if (!platform || !course) {return res.json({error: "Unable to find course"});}
 
     for (let tutor of course.tutors) {
         if (await tutor.tutor.equals(req.user._id)) {
@@ -831,15 +832,16 @@ controller.likeReview = async function(req, res) {
     return res.json({success: "Liked", likeCount: review.likes.length});
 }
 
-controller.approveLesson = async function(req, res) {
+controller.approveLesson = async function(req, res) { //Approve lesson as user
+    const platform = await setup(Platform);
     const course = await Course.findById(req.params.id);
-    if (!course) { return res.json({error: "Unable to find course"});}
+    if (!platform || !course) { return res.json({error: "Unable to find course"});}
     for (let tutor of course.tutors) {
-        if (await tutor.tutor.equals(req.body.tutorId)) {
+        if (await tutor.tutor.equals(req.body.tutorId)) { //Iterate through tutors until correct user has been found
             for (let student of tutor.members) {
-                if (await student.student.equals(req.user._id)) {
+                if (await student.student.equals(req.user._id)) { //Iterate through tutor's students until correct user has been found
                     if (student.lessons[req.body.index]) {
-                        student.lessons[req.body.index].approved = !student.lessons[req.body.index].approved;
+                        student.lessons[req.body.index].approved = !student.lessons[req.body.index].approved; //Mark lesson as approved
                         await course.save();
 
                         let cost = 0;

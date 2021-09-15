@@ -56,7 +56,7 @@ module.exports = { //All subclasses
                 student: {type: mongoose.Schema.Types.ObjectId, ref: 'User'},
                 lessons: [{
                     time: Number, date: String, summary: String,
-                    validated: {type: Boolean, default: false},
+                    approved: {type: Boolean, default: false},
                     paid: {type: Boolean, default: false}
                 }],
                 room: {type: mongoose.Schema.Types.ObjectId, ref: 'Room'}
