@@ -179,7 +179,7 @@ middleware.shopOpen = async function(req, res, next) {
     return res.redirect('back');
 }
 
-middleware.platformPurchasable = async function(req, req, next) {
+middleware.platformPurchasable = async function(req, res, next) {
     const platform = await setup(Platform);
     if (platform.purchasable) { return next();}
     await req.flash('error', `This feature is not enabled on ${platform.name} Saberchat`);
