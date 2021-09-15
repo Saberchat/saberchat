@@ -227,6 +227,9 @@ controller.order = async function(req, res) {
     }
 
     await req.flash("success", "Order Sent!");
+    if (req.user.tags.includes("Cashier")) {
+        return res.redirect("/shop/manage?orders=true");
+    }
     return res.redirect("/shop");
 }
 

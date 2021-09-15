@@ -80,3 +80,22 @@ const changeShopStatus = function() { //Send request to close/open shop
         }
     });
 }
+
+const switchOrders = function(button) { //Switch order panel from active orders to past orders
+    if (button.id == "past-order-button") {
+        document.getElementById("output-stream-old").hidden = false;
+        document.getElementById("output-stream").hidden = true;
+        document.getElementById("button-text").innerText = " View Active Orders";
+        document.getElementById("order-type").innerText = " Past Orders";
+        document.getElementById("order-subheading").innerText = "All Past Orders";
+        button.id = "active-order-button";
+
+    } else {
+        document.getElementById("output-stream-old").hidden = true;
+        document.getElementById("output-stream").hidden = false;
+        document.getElementById("button-text").innerText = " View Past Orders";
+        document.getElementById("order-type").innerText = " Active Orders";
+        document.getElementById("order-subheading").innerText = "All Active Orders";
+        button.id = "past-order-button";
+    }
+}
