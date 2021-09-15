@@ -1,41 +1,43 @@
 <%- include('../partials/headStart') %>
-    <link rel="stylesheet" href="/stylesheets/home/index.css">
-    <link rel="stylesheet" href="/stylesheets/chat/new.css">
-    <link rel="stylesheet" href="/stylesheets/shop/show.css">
+<link rel="stylesheet" href="/stylesheets/home/index.css">
+<link rel="stylesheet" href="/stylesheets/chat/new.css">
+<link rel="stylesheet" href="/stylesheets/shop/show.css">
 
-    <script src="/javascript/postUtil.js"></script>
-    <script src="/javascript/shop/actions.js"></script>
+<script src="/javascript/postUtil.js"></script>
+<script src="/javascript/shop/actions.js"></script>
 
-    <script src="/socket.io/socket.io.js"></script>
-    <!-- Cdn for formatting the dates -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-dateFormat/1.0/jquery.dateFormat.min.js"></script>
-    <script src="/javascript/shop/shop-socket.js" charset="utf-8"></script>
+<script src="/socket.io/socket.io.js"></script>
+<!-- Cdn for formatting the dates -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-dateFormat/1.0/jquery.dateFormat.min.js"></script>
+<script src="/javascript/shop/shop-socket.js" charset="utf-8"></script>
 <%- include('../partials/headEnd') %>
 
-  <body class="mode">
-    <%- include("../partials/components/navbar") %>
-    <%- include('../partials/components/header') %>
+<body class="mode">
+<%- include("../partials/components/navbar") %>
+<%- include('../partials/components/header') %>
 
 <div class="container mt-5">
     <div class="row">
         <div class="col-12">
-          <div class="jumbotron text-center header">
-            <h1><i class="fas fa-<%=data.icon%>"></i> Orders</h1>
-            <p>All New Orders</p>
-            <a class="btn btn-primary" href="manage"><i class="fas fa-arrow-left"></i> Back</a>
-          </div>
+            <div class="jumbotron text-center header">
+                <h1><i class="fas fa-<%= data.icon %>"></i> Orders</h1>
+                <p>All New Orders</p>
+                <a class="btn btn-primary" href="manage"><i class="fas fa-arrow-left"></i> Back</a>
+            </div>
         </div>
     </div>
 </div>
 
 <div id="output-stream" class="container mt-3">
 
-      <div class="search-filter mb-3 search">
+    <div class="search-filter mb-3 search">
         <i class="fas fa-search"></i>
-        <input id="search-input" oninput="searchFunction(this, 'card')" class="form-control search" type="text" placeholder="Search..." title="Type in an order segment"/>
-      </div><br />
+        <input id="search-input" oninput="searchFunction(this, 'card')" class="form-control search" type="text"
+               placeholder="Search..." title="Type in an order segment"/>
+    </div>
+    <br/>
 
-    <% if (orders.length == 0) { %>
+    <% if (orders.length === 0) { %>
         <h2>No New Orders</h2>
     <% } else { %>
         <% orders.reverse().forEach((order) => { %>
@@ -43,20 +45,26 @@
                 <div class="card-body">
                     <h5 class="card-title">Order for <%= order.name %></h5>
                     <p class="card-text"><span class="instructions">Extra Instructions:</span> <%= order.instructions %>
-                    <% if (!platform.dollarPayment) {%><p class="card-text"><span class="instructions">Deliver To:</span> <%= order.address %><%}%>
+                    <% if (!platform.dollarPayment) { %>
+                    <p class="card-text"><span class="instructions">Deliver To:</span> <%= order.address %>
+                        <% } %>
                     </p>
                     <ul class="list-group">
                         <% for (let item of order.items) { %>
                             <li class="list-group-item shop">
                                 <% let itemCharge = (item.quantity * item.item.price); %>
                                 <%= item.item.name %> (<%= item.quantity %> order(s)) -
-                                <% if (platform.dollarPayment) {%>$<%= itemCharge.toFixed(2)%><%} else {%><%= itemCharge%> Credits<%}%>
+                                <% if (platform.dollarPayment) { %>$<%= itemCharge.toFixed(2) %>
+                                <% } else { %><%= itemCharge %> Credits
+                                <% } %>
                             </li>
                         <% } %>
                     </ul>
 
                     <p class="card-text mt-3"><span class="cost">Cost:</span>
-                        <% if (platform.dollarPayment) {%>$<%= order.charge.toFixed(2)%><%} else {%><%= order.charge%> Credits<%}%>
+                        <% if (platform.dollarPayment) { %>$<%= order.charge.toFixed(2) %>
+                        <% } else { %><%= order.charge %> Credits
+                        <% } %>
                     </p>
 
                     <p class="paying-in-person">
@@ -70,37 +78,48 @@
                     <p class="card-text"><%= order.date %></p>
 
                     <% if (currentUser.tags.includes("Cashier")) { %>
-                        <form class="ready-form" action="<%= order._id %>/ready" method="post" id="ready-form-<%=order._id%>">
-                            <% if (!order.confirmed) {%>
-                                <button type="button" data-toggle="modal" data-target="#modal-<%= order._id %>-confirm" id="confirm-<%=order._id%>" class="btn btn-success" name="button">Confirm Order</button>
+                        <form class="ready-form" action="<%= order._id %>/ready" method="post"
+                              id="ready-form-<%= order._id %>">
+                            <% if (!order.confirmed) { %>
+                                <button type="button" data-toggle="modal" data-target="#modal-<%= order._id %>-confirm"
+                                        id="confirm-<%= order._id %>" class="btn btn-success" name="button">Confirm
+                                    Order
+                                </button>
                             <% } %>
-                            <button type="button" data-toggle="modal" data-target="#modal-<%= order._id %>-ready" class="btn btn-primary" name="button">Order Ready</button>
-                            <button type="button" data-toggle="modal" data-target="#modal-<%= order._id %>-reject" class="btn btn-danger" name="button">Reject Order</button>
+                            <button type="button" data-toggle="modal" data-target="#modal-<%= order._id %>-ready"
+                                    class="btn btn-primary" name="button">Order Ready
+                            </button>
+                            <button type="button" data-toggle="modal" data-target="#modal-<%= order._id %>-reject"
+                                    class="btn btn-danger" name="button">Reject Order
+                            </button>
 
                             <div class="modal fade" id="modal-<%= order._id %>-confirm" tabindex="-1"
-                                aria-labelledby="deleteModalLabel" aria-hidden="true">
-                               <div class="modal-dialog mode">
-                                   <div class="modal-content mode">
-                                       <div class="modal-header mode">
-                                           <h5 class="modal-title" id="exampleModalLabel">Confirm Receiving Order?</h5>
-                                           <button type="button" class="close mode" data-dismiss="modal" aria-label="Close">
-                                               <span aria-hidden="true">&times;</span>
-                                           </button>
-                                       </div>
-                                       <div class="modal-body mode">
-                                           This will notify the customer that their order has been received, and is being processed. They will not be able to cancel their order once you confirm it.
-                                       </div>
-                                       <div class="modal-footer mode">
-                                           <button type="button" class="btn btn-secondary" data-dismiss="modal">No, Go
-                                               Back
-                                           </button>
-                                           <button type="button" class="btn btn-success" id="<%= order._id %>-confirm"
-                                                   onclick="confirm(this)">Yes, Send Confirmation Email
-                                           </button>
-                                       </div>
-                                   </div>
-                               </div>
-                           </div>
+                                 aria-labelledby="deleteModalLabel" aria-hidden="true">
+                                <div class="modal-dialog mode">
+                                    <div class="modal-content mode">
+                                        <div class="modal-header mode">
+                                            <h5 class="modal-title" id="exampleModalLabel">Confirm Receiving Order?</h5>
+                                            <button type="button" class="close mode" data-dismiss="modal"
+                                                    aria-label="Close">
+                                                <span aria-hidden="true">&times;</span>
+                                            </button>
+                                        </div>
+                                        <div class="modal-body mode">
+                                            This will notify the customer that their order has been received, and is
+                                            being processed. They will not be able to cancel their order once you
+                                            confirm it.
+                                        </div>
+                                        <div class="modal-footer mode">
+                                            <button type="button" class="btn btn-secondary" data-dismiss="modal">No, Go
+                                                Back
+                                            </button>
+                                            <button type="button" class="btn btn-success" id="<%= order._id %>-confirm"
+                                                    onclick="confirm(this)">Yes, Send Confirmation Email
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
 
                             <div class="modal fade" id="modal-<%= order._id %>-ready" tabindex="-1"
                                  aria-labelledby="deleteModalLabel" aria-hidden="true">
@@ -108,7 +127,8 @@
                                     <div class="modal-content mode">
                                         <div class="modal-header mode">
                                             <h5 class="modal-title" id="exampleModalLabel">Order Ready?</h5>
-                                            <button type="button" class="close mode" data-dismiss="modal" aria-label="Close">
+                                            <button type="button" class="close mode" data-dismiss="modal"
+                                                    aria-label="Close">
                                                 <span aria-hidden="true">&times;</span>
                                             </button>
                                         </div>
@@ -133,7 +153,8 @@
                                     <div class="modal-content mode">
                                         <div class="modal-header mode">
                                             <h5 class="modal-title" id="exampleModalLabel">Reject Order?</h5>
-                                            <button type="button" class="close mode" data-dismiss="modal" aria-label="Close">
+                                            <button type="button" class="close mode" data-dismiss="modal"
+                                                    aria-label="Close">
                                                 <span aria-hidden="true">&times;</span>
                                             </button>
                                         </div>
@@ -166,14 +187,73 @@
         <% }); %>
     <% } %>
 </div>
+
+<div class="container mt-5">
+    <div class="row">
+        <div class="col-12">
+            <div class="jumbotron text-center header">
+                <h1><i class="fas fa-<%= data.icon %>"></i> Past Orders</h1>
+                <p>Today's Past Orders</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="output-stream-old" class="container mt-3">
+    <% if (ordersToday.length === 0) { %>
+        <h2>No Orders Today</h2>
+    <% } else { %>
+        <% ordersToday.reverse().forEach((order) => { %>
+            <div class="card mt-3 order-card darkmode-outline" id="<%= order._id %>">
+                <div class="card-body">
+                    <h5 class="card-title">Order for <%= order.name %></h5>
+                    <p class="card-text"><span class="instructions">Extra Instructions:</span> <%= order.instructions %>
+                        <% if (!platform.dollarPayment) { %>
+                    <p class="card-text"><span class="instructions">Deliver To:</span> <%= order.address %>
+                        <% } %>
+                    </p>
+                    <ul class="list-group">
+                        <% for (let item of order.items) { %>
+                            <li class="list-group-item shop">
+                                <% let itemCharge = (item.quantity * item.item.price); %>
+                                <%= item.item.name %> (<%= item.quantity %> order(s)) -
+                                <% if (platform.dollarPayment) { %>$<%= itemCharge.toFixed(2) %>
+                                <% } else { %><%= itemCharge %> Credits
+                                <% } %>
+                            </li>
+                        <% } %>
+                    </ul>
+
+                    <p class="card-text mt-3"><span class="cost">Cost:</span>
+                        <% if (platform.dollarPayment) { %>$<%= order.charge.toFixed(2) %>
+                        <% } else { %><%= order.charge %> Credits
+                        <% } %>
+                    </p>
+
+                    <p class="paying-in-person">
+                        <% if (order.payingInPerson) { %>
+                            Paying In-Person
+                        <% } else { %>
+                            Paying Online
+                        <% } %>
+                    </p>
+
+                    <p class="card-text"><%= order.date %></p>
+                </div>
+            </div>
+        <% }); %>
+    <% } %>
+</div>
+<br>
+
 <script src="/javascript/shop/search.js"></script>
 <script src="/javascript/admin/search.js"></script>
 <script>
     if (document.getElementById("search-input")) {
-        document.getElementById("search-input").style.backgroundColor = colorScheme[colorScheme.length-1];
+        document.getElementById("search-input").style.backgroundColor = colorScheme[colorScheme.length - 1];
     }
-    
-    getOrders("#output-stream", "<%=platform.dollarPayment%>");
+
+    getOrders("#output-stream", "<%= platform.dollarPayment %>");
 </script>
 </body>
 </html>

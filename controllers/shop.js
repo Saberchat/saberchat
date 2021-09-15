@@ -78,7 +78,7 @@ controller.orderForm = async function(req, res) {
                 }
             }
             if (!overlap) {
-                await orderedItems.push({
+                orderedItems.push({
                     item: item.item._id,
                     totalOrdered: item.quantity,
                     created_at: item.item.created_at
@@ -971,11 +971,15 @@ controller.manageOrders = async function(req, res) {
     }
 
     const orders = await Order.find({present: true}).populate("items.item");
+
+    let now = new Date();
+    let startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    const ordersToday = await Order.find({created_at: {$gte: startOfToday}, present: false}).populate("items.item");
     if (!platform || !orders) {
         await req.flash("error", "Could not find orders");
         return res.redirect("back");
     }
-    return res.render("shop/orderDisplay", {platform, orders, data: platform.features[await objectArrIndex(platform.features, "route", "shop")]});
+    return res.render("shop/orderDisplay", {platform, orders, ordersToday, data: platform.features[await objectArrIndex(platform.features, "route", "shop")]});
 }
 
 module.exports = controller;
