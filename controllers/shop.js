@@ -89,21 +89,25 @@ controller.orderForm = async function(req, res) {
     frequentItems = await sortByPopularity(orderedItems, "totalOrdered", "created_at", ["item"]).popular;
 
     if (req.query.order) { //SHOW NEW ORDER FORM
-        if (!platform.purchasable || !req.user) {
-            await req.flash('error', `This feature is not enabled on ${platform.name} Saberchat`);
-            return res.redirect('back');        
-        }
-        
-        const sentOrders = await Order.find({name: `${req.user.firstName} ${req.user.lastName}`, present: true}); //Find all of this user"s orders that are currently active
-        if (!sentOrders) {
-            await req.flash("error", "Unable to find orders");
-            return res.redirect("back");
+        if (req.user.tags.includes("Cashier")) {
+            if (!platform.purchasable || !req.user) {
+                await req.flash('error', `This feature is not enabled on ${platform.name} Saberchat`);
+                return res.redirect('back');        
+            }
+            
+            const sentOrders = await Order.find({name: `${req.user.firstName} ${req.user.lastName}`, present: true}); //Find all of this user"s orders that are currently active
+            if (!sentOrders) {
+                await req.flash("error", "Unable to find orders");
+                return res.redirect("back");
 
-        } else if (sentOrders.length > 2) {
-            await req.flash("error", "You have made the maximum number of orders for the day");
-            return res.redirect("back");
+            } else if (sentOrders.length > 2) {
+                await req.flash("error", "You have made the maximum number of orders for the day");
+                return res.redirect("back");
+            }
+            return res.render("shop/newOrder", {platform, categories: sortedCategories, frequentItems, data: platform.features[await objectArrIndex(platform.features, "route", "shop")]});
         }
-        return res.render("shop/newOrder", {platform, categories: sortedCategories, frequentItems, data: platform.features[await objectArrIndex(platform.features, "route", "shop")]});
+        await req.flash("error", "You do not have permission to do that");
+        return res.redirect("back");
     }
 
     if (req.query.menu) { //SHOW MENU
