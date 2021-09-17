@@ -558,12 +558,33 @@
                     </div>
 
                     <img class="thumbnail-backup" id="thumbnail-backup" src="<% if (!course.thumbnailFile.display) { %> <%=course.thumbnailFile.url%> <%} else { %> <%= course.thumbnail.url %> <% } %>" alt="Image Does Not Exist"/>
-                    <br />
                     <button type="submit" class="btn btn-lg btn-primary btn-block">Confirm Changes</button>
                     <br/>
                 </form>
-
                 <br/>
+
+                <form id="update-tutors" action="/tutoringCenter/updateTutors/<%=course._id%>?_method=put" method="post">
+                    <h4>Add Tutors</h4>
+                    <div class="form-group">
+                        <input type="text" class="form-control mode" id="tutor-list" placeholder="Tutors" oninput="searchTutors(this)"><br>
+                        <select id="tutor-select" class="form-control mode" onchange="addTutor('user')" style="display: none;" hidden></select>
+                        <input type="text" id="tutor-input" name="tutorInput" hidden/>
+                    </div>
+                    <button type="submit" class="btn btn-lg btn-primary btn-block" data-toggle="modal"
+                    data-target="#modal-change-teacher">Confirm New Tutors</button>
+                </form><br><br>
+
+                <form id="update-students" action="/tutoringCenter/updateStudents/<%=course._id%>?_method=put" method="post">
+                    <h4>Add Students</h4>
+                    <div class="form-group">
+                        <input type="text" class="form-control mode" id="student-list" placeholder="Students" oninput="searchStudents(this)"><br>
+                        <select id="student-select" class="form-control mode" onchange="addStudent('user')" style="display: none;" hidden></select>
+                        <input type="text" id="student-input" name="studentInput" hidden/>
+                    </div>
+                    <button type="submit" class="btn btn-lg btn-primary btn-block" data-toggle="modal"
+                    data-target="#modal-change-teacher">Confirm New Students</button>
+                </form><br><br>
+
                 <form id="update-teacher" action="/tutoringCenter/updateTeacher/<%= course._id %>?_method=put" method="post">
                     <h4>Change Teacher</h4>
                     <div class="form-group">

@@ -22,6 +22,9 @@ router.route('/:id')
 //Show a specific tutor
 router.get('/tutors/:id', wrapAsync(middleware.isLoggedIn), wrapAsync(middleware.accessToFeature), wrapAsync(middleware.memberOfCourse), wrapAsync(tutoringCenter.showTutor)); //RESTful routing "tutors/show" page
 
+//Search Requests
+router.post('/search-tutors', wrapAsync(middleware.isLoggedIn), wrapAsync(middleware.accessToFeature), wrapAsync(middleware.isFaculty), wrapAsync(middleware.memberOfCourse), wrapAsync(tutoringCenter.searchTutors)); //Search for given tutor as faculty
+
 //Join/leave requests
 router.post('/join', wrapAsync(middleware.isLoggedIn), wrapAsync(middleware.accessToFeature), wrapAsync(middleware.notMemberOfCourse), wrapAsync(tutoringCenter.joinCourse)) //Join course as tutor or student
 router.post('/unenroll-student/:id', wrapAsync(middleware.isLoggedIn), wrapAsync(middleware.accessToFeature), wrapAsync(middleware.isStudent), wrapAsync(middleware.memberOfCourse), wrapAsync(tutoringCenter.unenrollStudent)); //Leave course as a student

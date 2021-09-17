@@ -380,6 +380,48 @@ controller.updateJoinCode = async function(req, res) {
     return res.json({success: "Succesfully Updated Join Code", joinCode});
 }
 
+//Project creator search
+controller.searchTutors = async function(req, res) {
+    console.log("REQUEST")
+    const platform = await setup(Platform);
+    if (!platform) {return res.json({error: "An error occurred"});}
+
+    //Collect user data based on form
+    const users = await User.find({authenticated: true, _id: {$ne: req.user._id}, status: {$in: platform.studentStatuses}});
+    if (!users) {return res.json({error: "An error occurred"});}
+
+    let tutors = [];
+    let displayValue;
+
+    if (!req.body.anonymous) { //Only add other statuses if the message is not anonymous
+        for (let status of platform.studentStatuses) { //Iterate through statuses and search for matches
+            displayValue = platform.statusesPlural[platform.statusesProperty.indexOf(status)];
+            if (await `${status} ${displayValue}`.toLowerCase().includes(await req.body.text.toLowerCase())) {
+                await tutors.push({ //Add status to array, using display and id values
+                    displayValue,
+                    idValue: status,
+                    type: "status"
+                });
+            }
+        }
+    }
+
+    for (let user of users) { //Iterate through usernames and search for matches
+        //Check that user is not currently tutoring this course, is a verified tutor and is part of search
+        if (await objectArrIndex(course.tutors, "tutor", user._id) == -1 && await user.tags.includes("Tutor") && await `${user.firstName} ${user.lastName} ${user.username}`.toLowerCase().includes(await req.body.text.toLowerCase())) {
+            await tutors.push({ //Add user to array, using username as display, and id as id value
+                displayValue: `${user.firstName} ${user.lastName} (${user.username})`, 
+                idValue: user._id,
+                classValue: user.status,
+                type: "user"
+            });
+        }
+    }
+
+    await console.log(tutors);
+    return res.json({success: "Successfully collected data", tutors});
+}
+
 controller.removeStudent = async function(req, res) {
     const studentId = await User.findById(req.body.studentId);
     const course = await Course.findById(req.params.id).populate('tutors.tutor tutors.members.student');

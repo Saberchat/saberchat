@@ -56,6 +56,136 @@ const changeName = function(input) { //Change course name based on input
     document.getElementById("courseName").innerText = document.getElementById("newName").value;
 }
 
+const searchTutors = function(input) {
+    const url = `/tutoringCenter/search-tutors`;
+    const data = {text: input.value};
+    const tutorSelect = document.getElementById("tutor-select");
+    let appendedTutor;
+
+    if (input.value.length > 2) {
+        sendPostReq(url, data, data => {
+            if (data.success && data.tutors.length > 0) { //If there are tutors to display
+                tutorSelect.style.display = "block";
+                while (tutorSelect.firstChild) {tutorSelect.removeChild(tutorSelect.firstChild);} //Empty tutorSelect from previous searches
+
+                //Add heading back to tutorSelect's list
+                const heading = document.createElement("option");
+                for (let attr of ["selected", "disabled"]) {heading[attr] = true;}
+                heading.className = "tutor-group";
+                heading.innerText = "Select User/Group";
+                tutorSelect.appendChild(heading);
+
+                for (let recType of ["status", "user"]) {
+                    for (let tutor of data.tutors) { //Build tutorSelect option
+                        if (tutor.type == recType) {
+                            appendedTutor = document.createElement("option");
+                            if (recType == "user") {
+                                appendedTutor.className = tutor.classValue;
+                            } else {
+                                appendedTutor.className = "tutor-group";
+                            }
+
+                            appendedTutor.innerText = tutor.displayValue;
+                            appendedTutor.setAttribute("value", tutor.idValue);
+                            tutorSelect.appendChild(appendedTutor); //Add tutorSelect option to menu
+                        }
+                    }
+                }
+            } else {
+                console.log(data);
+                tutorSelect.style.display = "none"; //Hide dropdown if there are no matching elements
+            }
+        });
+    } else {
+        tutorSelect.style.display = "none"; //Hide dropdown if there is not a long enough input string
+    }
+}
+
+const addTutor = function() { //Add tutor to list of tutors
+    if ((!tutorList.includes(tutorSelect.value)) && !(tutorList.includes(tutorSelect[tutorSelect.selectedIndex].className))) { //Make sure that if the status has been selected, nothing else is selected
+        tutorList.push(tutorSelect.value);
+        tutorInput.value = tutorList.toString();
+
+        let newTutor = document.createElement('div');
+        newTutor.classList.add('user-tag');
+        newTutor.classList.add(`${tutorSelect[tutorSelect.selectedIndex].className}`); //Put the user status in the tag
+        newTutor.id = `${tutorSelect.value}`;
+        newTutor.innerHTML = `<span name="tutors" value="${tutorSelect.value}">${tutorSelect.options[tutorSelect.selectedIndex].text}</span><button type="button" id="${tutorSelect.value}" onclick="remTutor(this)">&times;</button>`;
+        tutorDiv.appendChild(newTutor);
+
+        let deletes = []; //List of usernames to be removed
+
+        for (let t = 0; t < document.getElementsByClassName('user-tag').length; t++) { //Go through list of tutors, remove any users who have this className (if the added 'username' is a status e.g. '12th', it removes any excess 12th graders)
+            if (document.getElementsByClassName('user-tag')[t].classList.contains(tutorSelect[tutorSelect.selectedIndex].value)) {
+                deletes.push(t);
+            }
+        }
+
+        for (let del of deletes.reverse()) { //Iterate through list of usernames to remove
+            remTutor(document.getElementsByClassName('user-tag')[del].getElementsByTagName('button')[0]);
+        }
+    }
+    //Empty input and hide dropdown
+    document.getElementById("tutor-list").value = "";
+    tutorSelect.style.display = "none";
+}
+
+const remTutor = function(btn) { //Remove tutor from list of tutors
+    const id = btn.id;
+
+    const userTags = document.getElementsByClassName('user-tag');
+    for (let tag of userTags) { //Iterate through tags until the one with the remove ID is found
+        if (tag.id == id) {
+            tutorDiv.removeChild(tag);
+            tutorList.splice(tutorList.indexOf(id), 1);
+            tutorInput.value = tutorList.toString();
+        }
+    }
+}
+
+const searchStudents = function(input) {
+    const url = `/projects/search-students`;
+    const data = {text: input.value};
+    let appendedStudent;
+
+    if (input.value.length > 2) {
+        sendPostReq(url, data, data => {
+            if (data.success && data.students.length > 0) { //If there are students to display
+                studentSelect.style.display = "block";
+                while (studentSelect.firstChild) {studentSelect.removeChild(studentSelect.firstChild);} //Empty studentSelect from previous searches
+
+                //Add heading back to studentSelect's list
+                const heading = document.createElement("option");
+                for (let attr of ["selected", "disabled"]) {heading[attr] = true;}
+                heading.className = "student-group";
+                heading.innerText = "Select User/Group";
+                studentSelect.appendChild(heading);
+
+                for (let recType of ["status", "user"]) {
+                    for (let student of data.students) { //Build studentSelect option
+                        if (student.type == recType) {
+                            appendedStudent = document.createElement("option");
+                            if (recType == "user") {
+                                appendedStudent.className = student.classValue;
+                            } else {
+                                appendedStudent.className = "student-group";
+                            }
+
+                            appendedStudent.innerText = student.displayValue;
+                            appendedStudent.setAttribute("value", student.idValue);
+                            studentSelect.appendChild(appendedStudent); //Add studentSelect option to menu
+                        }
+                    }
+                }
+            } else {
+                studentSelect.style.display = "none"; //Hide dropdown if there are no matching elements
+            }
+        });
+    } else {
+        studentSelect.style.display = "none"; //Hide dropdown if there is not a long enough input string
+    }
+}
+
 const changeJoinCode = function(courseID, event) { //Change course join code (in case security is compromised)
     const url = `/tutoringCenter/joinCode/${courseID}?_method=put`;
     const data = {};
