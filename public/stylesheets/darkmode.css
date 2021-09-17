@@ -51,3 +51,22 @@
 #exampleModalLabel {
     color: white;
 }
+
+#extra-instructions {
+  color:  rgb(47, 185, 172);
+  font-weight: bold;
+}
+
+#balance-heading {
+  font-weight: bold;
+}
+
+#balance-box {
+  color: rgb(47, 185, 172);
+  font-weight: bold;
+}
+
+#total-cost {
+  color: rgb(47, 185, 172);
+  font-weight: bold;
+}

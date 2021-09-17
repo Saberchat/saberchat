@@ -2,6 +2,7 @@
     <link rel="stylesheet" href="/stylesheets/chat/new.css">
     <link rel="stylesheet" href="/stylesheets/shop/new.css">
     <link rel="stylesheet" href="/stylesheets/shop/menu.css">
+    <link rel="stylesheet" href="/stylesheets/darkmode.css">
 
     <script src="/socket.io/socket.io.js"></script>
     
@@ -10,7 +11,7 @@
 
 <%- include('../partials/headEnd') %>
 
-<body class="mode" onclick="changeOrderConfirmation(<%=platform.dollarPayment%>)">
+<body class="mode" onclick="changeOrderConfirmation(<%=platform.dollarPayment%>, <%=currentUser.darkmode%>)">
 <!-- include the navbar via ejs -->
 <%- include('../partials/components/navbar') %>
 <%- include('../partials/components/header') %>
@@ -42,7 +43,7 @@
                     <br>
                     <label id="current-name" for="user-select" class="<%=currentUser._id%>">Current Customer: <%=currentUser.firstName%> <%=currentUser.lastName%> (<%=currentUser.username%>)</label>
                     <input class="form-control mode" type="text" id="customer-username" placeholder="Username, First Name or Last Name" oninput="searchCustomers(this)"><br>
-                    <select required id="user-select" class="form-control mode" onchange="setCustomer(this, <%=platform.dollarPayment%>)" name="customer_id">
+                    <select required id="user-select" class="form-control mode" onchange="setCustomer(this, <%=platform.dollarPayment%>, <%+currentUser.darkmode%>)" name="customer_id">
                         <option class="recipient-group" value="" disabled>Select User</option>
                         <option class="recipient-group" value="<%=currentUser._id%>" selected><%=currentUser.firstName%> <%=currentUser.lastName%> (<%=currentUser.username%>)</option>
                     </select>
@@ -76,7 +77,7 @@
                                     <input name="check[<%= item._id %>]" id="<%= item._id %>" class="form-check-input"
                                            type="checkbox" value="">
                                     <select class="num-orders mode" id="dd_<%= item._id %>" name="<%= item.name %>"
-                                            onchange="changeOrderConfirmation(<%=platform.dollarPayment%>)">
+                                            onchange="changeOrderConfirmation(<%=platform.dollarPayment%>, <%=currentUser.darkmode%>)">
                                         <% let val = 1 %>
                                         <% if (item.availableItems > 3) { %>
                                             <% while (val <= 3) { %>
@@ -128,7 +129,7 @@
                     <div class="form-group mt-3">
                         <% if (platform.dollarPayment) { %>
                             <input type="checkbox" name="payingInPerson" id="payingInPerson"
-                                onchange="changeOrderConfirmation(<%=platform.dollarPayment%>)"/>
+                                onchange="changeOrderConfirmation(<%=platform.dollarPayment%>, <%=currentUser.darkmode%>)"/>
                             <label class="shoptext" for="payingInPerson"
                                 title="Paying in person will not subtract money from your online balance">In-Person
                                 Payment</label>
@@ -136,7 +137,7 @@
                         <% } %>
                         <textarea id="descInput" class="form-control shop" name="instructions"
                                   placeholder="Add special instructions for your order" maxlength="100" rows="5"
-                                  oninput="changeOrderConfirmation(<%=platform.dollarPayment%>)"></textarea>
+                                  oninput="changeOrderConfirmation(<%=platform.dollarPayment%>, <%=currentUser.darkmode%>)"></textarea>
                         <br/>
                         <% if (!platform.dollarPayment) { %>
                             <textarea id="addressInput" class="form-control shop" name="address"

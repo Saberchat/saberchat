@@ -65,7 +65,7 @@ h1 {
 }
 
 #extra-instructions {
-    color:  rgb(47, 185, 172);
+    color:  blue;
     font-weight: bold;
 }
 
@@ -74,16 +74,16 @@ h1 {
 }
 
 #balance-box {
-    color: rgb(47, 185, 172);
+    color: purple;
     font-weight: bold;
 }
 
 #total-cost {
-    color: rgb(47, 185, 172);
+    color: green;
     font-weight: bold;
 }
 
 #paying-style {
-    color: rgb(47, 185, 172);
+    color: rgb(255, 0, 0);
     font-weight: bold;
 }

@@ -127,7 +127,7 @@
                                    <label for="request-address-<%=item._id%>">Your Mailing Address</label>
                                    <input id="request-address-<%=item._id%>" class="form-control mode" type="text" placeholder="Enter your mailing address" name="address" required><br>
                                    <label for="quantity--<%=item._id%>">Number Of Items</label>
-                                   <select class="num-orders mode" id="quantity-<%= item._id %>" name="quantity" onchange="changeOrderConfirmation()">
+                                   <select class="num-orders mode" id="quantity-<%= item._id %>" name="quantity" onchange="changeOrderConfirmation(), <%=currentUser.darkmode%>">
                                 <% let val = 1 %>
                                 <% if (item.availableItems > 3) { %>
                                     <% while (val <= 3) { %>

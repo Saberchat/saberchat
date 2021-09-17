@@ -57,18 +57,18 @@ const searchCustomers = function(input) { //Check list of customers for online o
     }
 }
 
-const setCustomer = function(dropdown, dollarPayment) {
+const setCustomer = function(dropdown, dollarPayment, darkmode) {
     document.getElementById("current-name").innerText = `Current Customer: ${dropdown.value.split('| ')[1]}`;
     document.getElementById("current-name").className = dropdown.value.split(' ')[0];
     currentCustomer = dropdown.value.split(' ')[0];
     currentBalance = parseInt(dropdown.value.split(' ')[1]);
     balanceString = `Current Balance: $${currentBalance.toFixed(2)}`;
     document.getElementById("balance-box").innerText = balanceString;
-    changeOrderConfirmation(dollarPayment);
+    changeOrderConfirmation(dollarPayment, darkmode);
 }
 
 //Changes the order confirmation on the form
-const changeOrderConfirmation = function(dollarPayment) {
+const changeOrderConfirmation = function(dollarPayment, darkmode) {
     sum = 0;
     while (orderConfirm.firstChild) { //Remove all the items in the 'confirm order' section
         orderConfirm.removeChild(orderConfirm.firstChild);
@@ -106,7 +106,6 @@ const changeOrderConfirmation = function(dollarPayment) {
     }
 
     instructionsNew = document.createElement('span'); //Once this process is finished, create an element to render the extra instructions and total cost
-    instructionsNew.style = 'color: blue;';
     instructionsNew.className = "list-group-item list-group-item-action form-check darkmode-outline";
     instructionsNew.id = "extra-instructions";
 
@@ -117,14 +116,23 @@ const changeOrderConfirmation = function(dollarPayment) {
     }
 
     balanceBox = document.createElement('strong');
-    balanceBox.style = 'color: purple;';
+    
     balanceBox.className = "list-group-item list-group-item-action form-check darkmode-outline";
     balanceBox.id = "balance-box";
     balanceBox.innerText = balanceString;
     totalNew = document.createElement('span');
-    totalNew.style = 'color: green;';
     totalNew.className = "list-group-item list-group-item-action form-check darkmode-outline";
     totalNew.id = "total-cost";
+
+    if (!darkmode) {
+        balanceBox.style = 'color: purple;';
+        totalNew.style = 'color: green;';
+        instructionsNew.style = 'color: blue;';
+    } else {
+        balanceBox.style = 'color: turquoise;';
+        totalNew.style = 'color: turquoise;';
+        instructionsNew.style = 'color: turquoise;';
+    }
 
     if (dollarPayment) {totalNew.innerHTML = `<strong>Total: $${sum.toFixed(2)}</strong>`;
     } else {totalNew.innerHTML = `<strong>Total: ${sum} Credits</strong>`;}
