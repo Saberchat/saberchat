@@ -21,7 +21,9 @@ const Post = mongoose.model("Post", new mongoose.Schema({
 }));
 
 module.exports = { //All subclass Schema
-    Announcement: Post.discriminator("Announcement", new mongoose.Schema({})), //Faculty/administrator announcements
+    Announcement: Post.discriminator("Announcement", new mongoose.Schema({ // Faculty/administrator announcements
+        public: {type: Boolean, default: true}
+    })), 
     PostComment: Post.discriminator("PostComment", new mongoose.Schema({})), //Comments on projects/announcements/reports
     
     //SUBCLASSES WITH APPENDED FIELDS
