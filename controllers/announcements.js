@@ -139,7 +139,7 @@ controller.create = async function(req, res) {
         return res.redirect('back');
     }
     if (req.body.public && req.body.public === 'False') {
-        announcement.public = false; // no access to non-alsion users
+        announcement.public = false; // no access to visitors without accounts/not logged in
     }
 
     if (req.body.images) {announcement.images = req.body.images;} //If any images were added (if not, the 'images' property is empty)
@@ -252,7 +252,7 @@ controller.updateAnnouncement = async function(req, res) {
     }
 
     if (req.body.public && req.body.public === 'False') {
-        updatedAnnouncement.public = false; // no access to non-alsion users
+        updatedAnnouncement.public = false; // no access to visitors without accounts/not logged in
     } else {
         updatedAnnouncement.public = true;
     }
