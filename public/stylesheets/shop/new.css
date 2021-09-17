@@ -65,7 +65,7 @@ h1 {
 }
 
 #extra-instructions {
-    color: blue;
+    color:  rgb(47, 185, 172);
     font-weight: bold;
 }
 
@@ -74,12 +74,12 @@ h1 {
 }
 
 #balance-box {
-    color: purple;
+    color: rgb(47, 185, 172);
     font-weight: bold;
 }
 
 #total-cost {
-    color: green;
+    color: rgb(47, 185, 172);
     font-weight: bold;
 }
 
