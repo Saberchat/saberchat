@@ -186,21 +186,30 @@ controller.updatePlatform = async function(req, res) {
     return res.redirect("/admin/settings");
 }
 
-controller.authenticateGet = async function(req, res) {
+controller.authenticateGet = async function(req, res) { //Access page where users are authenticated
     const platform = await setup(Platform);
-    const users = await User.find({authenticated: false});
+    let users = await User.find({authenticated: false});
     if (!platform || !users) {
         await req.flash('error', "Unable to find users");
         return res.redirect('back');
     }
-    if (!platform.principalAuthenticate) {
-        await req.flash('error', `Principal Authentication is not enabled on ${platform.name} Saberchat`);
+
+    if (!platform.principalAuthenticate) { //If principal does not have perms to authenticate users
+        await req.flash('error', `${platform.permissionsDisplay[platform.permissionsDisplay.length-1]} Authentication is not enabled on ${platform.name} Saberchat`);
         return res.redirect('back');
+    }
+
+    let accesslistedEmail;
+    for (let i = users.length-1; i >= 0; i--) { //Iterate through users and check if any of them already have permissions to create account
+        accesslistedEmail = await Email.findOne({address: req.user.email, version: "accesslist"});
+        if (accesslistedEmail || (await users[i].email.split(' ').join('').split("@")[1] == platform.emailExtension)) {
+            await users.splice(i, 1);
+        }
     }
     return res.render('admin/authenticate', {platform, users});
 }
 
-controller.authenticatePut = async function(req, res) {
+controller.authenticatePut = async function(req, res) { //Authenticate new user from principal's control panel
     const platform = await setup(Platform);
     if (!platform) { return res.json({error: "Unable to set up platform"});}
     if (!platform.principalAuthenticate) {
@@ -414,7 +423,7 @@ controller.accesslistGet = async function(req, res) { //Show page with all permi
         return res.redirect('back');
     }
 
-    const users = await User.find({authenticated: true});
+    const users = await User.find({});
     if (!users) {
         await req.flash('error', "Unable to find users");
         return res.redirect('back');
@@ -430,10 +439,11 @@ controller.accesslistGet = async function(req, res) { //Show page with all permi
 
 controller.addEmail = async function(req, res) { //Add email to access list/blocked list
     const platform = await setup(Platform);
-    if (!platform) {return res.json({error: "Unable to find platform"});}
+    const user = await User.findOne({email: req.body.address});
+    if (!platform || !user) {return res.json({error: "An error occurred"});}
 
     if (req.body.version === "accesslist") {
-        if (platform.emailExtension != '' && ((await req.body.address.split('@')[1]) === platform.emailExtension)) { //These emails are already verified
+        if (user || (platform.emailExtension != '' && ((await req.body.address.split('@')[1]) === platform.emailExtension))) { //These emails are already verified
             return res.json({error: `${platform.name} emails do not need to be added to the Access List`});
         }
     }
@@ -442,7 +452,6 @@ controller.addEmail = async function(req, res) { //Add email to access list/bloc
     if (overlap) {return res.json({error: "Email is already either in Access List or Blocked List"});} //If any emails overlap, don't create the new email
 
     if (req.body.version == "blockedlist") {
-        const user = await User.findOne({email: req.body.address});
         if (user) {return res.json({error: "A user with that email already exists"});}
     }
 
@@ -455,7 +464,7 @@ controller.deleteEmail = async function(req, res) { //Remove email from access l
     const email = await Email.findById(req.body.emailId);
     if (!email) {return res.json({error: "Unable to find email"});}
 
-    const users = await User.find({authenticated: true, email: email.address}); //Find users with this email
+    const users = await User.find({email: email.address}); //Find users with this email
     if (!users) {return res.json({error: "Unable to find users"});}
 
     if (users.length === 0) { //If nobody currently has this email, remove it
@@ -463,7 +472,7 @@ controller.deleteEmail = async function(req, res) { //Remove email from access l
         if (!deletedEmail) {return res.json({error: "Unable to delete email"});}
         return res.json({success: "Deleted email"});
     }
-    return res.json({error: "Active user has this email"}); //If someone has this email, don't remove it
+    return res.json({error: "A user with this email exists"}); //If someone has this email, don't remove it
 }
 
 controller.tag = async function(req, res) { //Add/remove status tag to user
