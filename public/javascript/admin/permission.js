@@ -34,16 +34,53 @@ const updateBalance = function(form, event, dollarPayment) {
     loading.style.color = 'gray';
     loading.innerHTML = 'Waiting...';
     const balanceInput = document.getElementById(`balance-${userId}`);
+    const balanceDisplay = document.getElementById(`balance-tag-${userId}`);
     const url = '/admin/balances?_method=put';
-    const data = {userId, bal: balanceInput.value};
-    sendPostReq(url, data, (data) => {
+    const data = {userId, bal: parseFloat(balanceInput.value)};
+    sendPostReq(url, data, data => {
         if (data.success) { //If successful, display success info
             loading.style.color = 'green';
             loading.innerHTML = data.success;
-            if (dollarPayment) {balanceInput.value = parseFloat(data.balance).toFixed(2);
-            } else {balanceInput.value = data.balance}
+            if (dollarPayment) {
+                balanceInput.value = "0.00";
+                balanceDisplay.innerText = parseFloat(data.balance).toFixed(2);
+            } else {
+                balanceInput.value = "0";
+                balanceDisplay.innerText = data.balance;
+            }
         } else if (data.error) { //If unsuccessful, display error message
-            loading.style.color = 'red';
+            loading.style.color = 'red'; 
+            loading.innerHTML = data.error;
+        }
+        setTimeout(() => {loading.style.display = "none";}, 2000); //After a second, hide the message
+    });
+    event.preventDefault();
+}
+
+const removeBalance = function(button, event, dollarPayment) {
+    const userId = button.id.split('-')[2];
+    const loading = document.getElementById(`loading-${userId}`); //Button which shows request status
+    loading.style.display = 'block';
+    loading.style.color = 'gray';
+    loading.innerHTML = 'Waiting...';
+    
+    const balanceInput = document.getElementById(`balance-${userId}`);
+    const balanceDisplay = document.getElementById(`balance-tag-${userId}`);
+    const url = '/admin/balances?_method=put';
+    const data = {userId, bal: -1*parseFloat(balanceInput.value)};
+    sendPostReq(url, data, data => {
+        if (data.success) { //If successful, display success info
+            loading.style.color = 'green';
+            loading.innerHTML = data.success;
+            if (dollarPayment) {
+                balanceInput.value = "0.00";
+                balanceDisplay.innerText = parseFloat(data.balance).toFixed(2);
+            } else {
+                balanceInput.value = "0";
+                balanceDisplay.innerText = data.balance;
+            }
+        } else if (data.error) { //If unsuccessful, display error message
+            loading.style.color = 'red'; 
             loading.innerHTML = data.error;
         }
         setTimeout(() => {loading.style.display = "none";}, 2000); //After a second, hide the message

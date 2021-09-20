@@ -541,14 +541,15 @@ controller.updateBalances = async function(req, res) {
 
     if (!platform || !user) { return res.json({error: "Error. Could not change"});}
 
-    if (user.balance - (await parseFloat(req.body.bal)) != 0) { //If deposit is not 0 then user's transactions are updated
+    if (req.body.bal != 0) { //If deposit is not 0 then user's transactions are updated
         user.deposits.push({
-            amount: user.balance - (await parseFloat(req.body.bal)),
+            amount: req.body.bal,
             added: new Date()
         });
     }
 
-    user.balance =  await parseFloat(req.body.bal);
+    user.balance += req.body.bal;
+    if (user.balance < 0) {user.balance = 0;}
     await user.save();
 
     if (platform.dollarPayment) {
@@ -557,8 +558,17 @@ controller.updateBalances = async function(req, res) {
         await sendGridEmail(user.email, "Balance Update", `<p>Hello ${user.firstName},</p><p>Your balance has been updated to ${user.balance} Credits!</p><p>${platform.balanceMessage}</p><p>Visit ${platform.url}/shop to check out our merchandise.</p>`, false);
     }
     
-    if (platform.dollarPayment) {return res.json({success: 'Succesfully changed', balance: (await parseFloat(req.body.bal)).toFixed(2)});}
-    return res.json({success: 'Succesfully changed', balance: (await parseInt(req.body.bal))});
+    if (platform.dollarPayment) {
+        return res.json({
+            success: 'Succesfully changed',
+            balance: await user.balance.toFixed(2)
+        });
+    }
+
+    return res.json({
+        success: 'Succesfully changed',
+        balance: user.balance
+    });
 }
 
 module.exports = controller;
