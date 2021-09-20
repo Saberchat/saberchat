@@ -24,18 +24,15 @@
             </form>
             <% if (platform.purchasable) { %>
                 <button id="shop-status-button" onclick="changeShopStatus()"
-                <% if (open) { %>
-                class="btn btn-danger" ><i class="fas fa-lock-open"></i> Close
+                <% if (open) { %> class="btn btn-danger" ><i class="fas fa-lock-open"></i> Close
+                <% } else { %> class="btn btn-success"><i class="fas fa-lock"></i> Open
+                <% } %></button>
 
-                        <% } else { %>
-                            class="btn btn-success"><i class="fas fa-lock"></i> Open
-                        <% } %>
-                    </button>
-
-                    <a href="/shop/manage?orders=true" class="btn btn-primary"><i class="fas fa-<%=data.icon%>"></i> Orders</a>
+                <a href="/shop/order?order=true" class="btn btn-info"><i class="fas fa-plus-circle"></i> New Order</a>
+                <a href="/shop/manage?orders=true" class="btn btn-primary"><i class="fas fa-<%=data.icon%>"></i> Orders</a>
                 <% } %>
                 <a href="/shop/item" class="btn btn-warning"><i class="fas fa-plus-circle"></i> Add New Item</a>
-                <a href="/shop/category" class="btn btn-info"><i class="fas fa-plus-circle"></i> Add New Category</a>
+                <a href="/shop/category" class="btn btn-success"><i class="fas fa-plus-circle"></i> Add New Category</a>
                 <!-- <a href="/shop/manage?data=true" class="btn btn-secondary"><i class="fas fa-chart-bar"></i> Purchase Analytics</a> -->
             </div>
         </div>

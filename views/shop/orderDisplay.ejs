@@ -22,6 +22,7 @@
             <div class="jumbotron text-center header">
                 <h1><i class="fas fa-<%= data.icon %>"></i><span id="order-type"> Active Orders</span></h1>
                 <p id="order-subheading">All Active Orders</p>
+                <a href="/shop/order?order=true" class="btn btn-info"><i class="fas fa-plus-circle"></i> New Order</a>
                 <button class="btn btn-success" id="past-order-button" onclick="switchOrders(this)"><i class="fas fa-clock"></i><span id="button-text"> View Past Orders</span></button>
                 <a class="btn btn-primary" href="manage"><i class="fas fa-arrow-left"></i> Back</a>
             </div>
