@@ -4,6 +4,7 @@
     <link rel="stylesheet" href="/stylesheets/shop/menu.css">
     <%if (currentUser && currentUser.darkmode) {%>
         <link rel="stylesheet" href="/stylesheets/tutoringCenter/tutoringCenter-dark.css">
+        <link rel="stylesheet" href="/stylesheets/darkmode.css">
     <%}%>
 
     <script src="/javascript/postUtil.js"></script>
@@ -106,7 +107,7 @@
             <ul class="list-group" id="students">
               <li class="list-group-item list-group-item-success mode darkmode-outline" id="students-heading">Students</li>
               <% for (let student of course.members) { %>
-                <li class="list-group-item shop" id="item-<%=student._id%>">
+                <li class="list-group-item shop mode" id="item-<%=student._id%>">
                   <a href="../profiles/<%=student._id%>"class="user-element-text shop">
                     <img class="profile-image" src="<% if (student.mediaFile.display) {%> <%= student.mediaFile.url%><%} else {%> <%=student.imageUrl.url%><%}%>" alt="profile picture">
                     <span class="username <%=student.status%> <%=student.permission%> <%=student.tags.join(' ')%>"><span class="enrolled-name"><%=student.firstName%> <%=student.lastName%></span> <span class="enrolled-username"><%=student.username%></span></span>
