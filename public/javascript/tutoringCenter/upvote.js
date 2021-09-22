@@ -14,12 +14,8 @@ const upvote = function(button, location) { //Upvote a tutor
             }
 
             if (location) { //Styling works different on tutor-show page
-                if (location == "show") {
-                    button.innerHTML += "<br>"
-                }
+                if (location == "show") button.innerHTML += "<br>"
             }
-        } else {
-            console.log(data);
         }
     });
 }
@@ -31,11 +27,8 @@ const likeReview = function(button) { //Like a tutor's review (restricted to stu
 
     sendPostReq(url, data, data => {
         if (data.success) {
-            if (data.success.includes("Liked")) {
-                button.style.color = "#03a5fc";
-            } else {
-                button.style.color = "white";
-            }
+            if (data.success.includes("Liked")) button.style.color = "#03a5fc";
+            else button.style.color = "white";
             document.getElementById(`like-count-${reviewId}`).innerText = data.likeCount;
         }
     });

@@ -2,7 +2,9 @@
     <link rel="stylesheet" href="/stylesheets/chat/new.css">
     <link rel="stylesheet" href="/stylesheets/shop/new.css">
     <link rel="stylesheet" href="/stylesheets/shop/menu.css">
-    <link rel="stylesheet" href="/stylesheets/darkmode.css">
+    <% if (currentUser.darkmode) { %>
+        <link rel="stylesheet" href="/stylesheets/darkmode.css">
+    <% } %>
 
     <script src="/socket.io/socket.io.js"></script>
     
