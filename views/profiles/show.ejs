@@ -14,11 +14,11 @@
     <%- include('../partials/components/navbar') %>
 
     <!-- big background image -->
-    <div id="banner" style="background-image: url('<% if (user.bannerFile.display) { %> <%= user.bannerFile.url %> <% } else { %> <%= user.bannerUrl.url %> <% } %>');">
-    </div>
+    <div id="banner" style="background-image: url('<% if (user.bannerFile.display) { %> <%= user.bannerFile.url %> <% } else { %> <%= user.bannerUrl.url %> <% } %>');"></div>
     <div class="container mb-5">
         <img src="<% if (user.mediaFile.display) {%> <%= user.mediaFile.url%><%} else {%> <%=user.imageUrl.url%><%}%>" alt="profile image" class="profile-image">
         <h1 class="username mode"><%= user.username %></h1>
+        
         <div class="col-md-4 col-12 order-md-2 profile-box">
             <section class="profile-card mode">
                 <div class="profile-head">
@@ -38,6 +38,10 @@
                     <p class="embedded-link"><a href="mailto:<%= user.email %>"><%= user.email %></a></p>
 
                     <% if (currentUser._id.toString() == user._id.toString()) { %>
+
+                        <h4 id="balance">Balance</h4>
+                        <p>$<%= user.balance.toFixed(2) %></p>
+
                         <button class="btn btn-primary edit-button" id="edit-profile">
                             <a class="edit-button-text" href="/profiles/edit">Edit Profile Settings</a>
                         </button>

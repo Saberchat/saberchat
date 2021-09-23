@@ -1,4 +1,4 @@
-const book = function (button, location, darkmode) { //Book a tutor
+const book = function(button, location, darkmode) { //Book a tutor
     const courseId = button.id.split('-')[0];
     const tutorId = button.id.split('-')[1];
     const url = `/tutoringCenter/book/${courseId}?_method=put`;
@@ -134,7 +134,7 @@ const book = function (button, location, darkmode) { //Book a tutor
     });
 }
 
-const leave = function (button, location, darkmode) { //Leave a tutor
+const leave = function(button, location, darkmode) { //Leave a tutor
     const courseId = button.id.split('-')[0];
     const tutorId = button.id.split('-')[1];
     const url = `/tutoringCenter/leave/${courseId}?_method=put`;
@@ -244,7 +244,7 @@ const markPayment = function(button) {
     });
 }
 
-const closeLessons = function (button, location) {
+const closeLessons = function(button, location) {
     const courseId = button.id.split('-')[0];
     const tutorId = button.id.split('-')[1];
     const url = `/tutoringCenter/close-lessons/${courseId}?_method=put`;
@@ -272,7 +272,7 @@ const closeLessons = function (button, location) {
     });
 }
 
-const reopenLessons = function (button, location) { //For tutors to reopen lessons that they had closed earlier
+const reopenLessons = function(button, location) { //For tutors to reopen lessons that they had closed earlier
     const courseId = button.id.split('-')[0];
     const tutorId = button.id.split('-')[1];
     const url = `/tutoringCenter/reopen-lessons/${courseId}?_method=put`;
@@ -301,11 +301,11 @@ const reopenLessons = function (button, location) { //For tutors to reopen lesso
     });
 }
 
-const setStudents = function () { //For tutors to set how many students they can take in a specific course while joining
+const setStudents = function() { //For tutors to set how many students they can take in a specific course while joining
     document.getElementById("slots-label").innerText = `Number of Student Slots: ${document.getElementById('slots').value}`;
 }
 
-const setCost = function (dollarPayment) { //For tutors to set their price while joining course
+const setCost = function(dollarPayment) { //For tutors to set their price while joining course
     if (dollarPayment) {
         document.getElementById("cost-label").innerText = `Hourly Cost: $${document.getElementById('cost').value}.00`;
     } else {
@@ -313,12 +313,12 @@ const setCost = function (dollarPayment) { //For tutors to set their price while
     }
 }
 
-const setStudentsTutorShow = function (slider) { //For tutors to set how many students they can take in a specific course on their own profile page
+const setStudentsTutorShow = function(slider) { //For tutors to set how many students they can take in a specific course on their own profile page
     const courseId = slider.id.split('-')[1];
     document.getElementById(`slots-label-${courseId}`).innerText = `Number of Student Slots: ${slider.value}`;
 }
 
-const setCostTutorShow = function (slider, dollarPayment) { //For tutors to set their price on their own profile page
+const setCostTutorShow = function(slider, dollarPayment) { //For tutors to set their price on their own profile page
     const courseId = slider.id.split('-')[1];
     if (dollarPayment) {
         document.getElementById(`cost-label-${courseId}`).innerText = `Hourly Cost: $${slider.value}.00`;
@@ -327,7 +327,7 @@ const setCostTutorShow = function (slider, dollarPayment) { //For tutors to set 
     }
 }
 
-const setCostShow = function (courseId) { //For tutors to set their price (not while joining course)
+const setCostShow = function(courseId) { //For tutors to set their price (not while joining course)
     const url = `/tutoringCenter/set-cost/${courseId}?_method=put`;
     const cost = document.getElementById('cost').value;
     const data = {courseId, cost};
@@ -340,7 +340,7 @@ const setCostShow = function (courseId) { //For tutors to set their price (not w
     });
 }
 
-const setStudentsShow = function (courseId) { //For tutors to set how many students they can take in a specific course (not while joining)
+const setStudentsShow = function(courseId) { //For tutors to set how many students they can take in a specific course (not while joining)
     const url = `/tutoringCenter/set-students/${courseId}?_method=put`;
     const slots = document.getElementById('slots').value;
     const data = {courseId, slots};
@@ -371,7 +371,7 @@ const setStudentsShow = function (courseId) { //For tutors to set how many stude
     });
 }
 
-const removeStudent = function (button) {
+const removeStudent = function(button) {
     const courseId = button.id.split('-')[0];
     const studentId = button.id.split('-')[1];
     const reason = document.getElementById(`reason-${studentId}`).value;  //Listed reason that student is being blocked
@@ -422,7 +422,7 @@ const removeStudent = function (button) {
     });
 }
 
-const removeTutor = function (button) { //Remove tutor from course
+const removeTutor = function(button) { //Remove tutor from course
     const courseId = button.id.split('-')[0];
     const tutorId = button.id.split('-')[1];
     const reason = document.getElementById(`reason-${tutorId}`).value; //Listed reason that tutor is being blocked
@@ -482,7 +482,7 @@ const removeTutor = function (button) { //Remove tutor from course
     });
 }
 
-const unblock = function (button) { //Unblock user from course
+const unblock = function(button) { //Unblock user from course
     const courseId = button.id.split('-')[0];
     const blockedId = button.id.split('-')[1];
     const url = `/tutoringCenter/unblock/${courseId}?_method=put`;
@@ -506,7 +506,7 @@ const unblock = function (button) { //Unblock user from course
     });
 }
 
-const changeBio = function (button) { //Change tutor's bio
+const changeBio = function(button) { //Change tutor's bio
     const courseId = button.id.split('-')[2];
     const bio = document.getElementById(`edit-bio-field`).value;
     const url = `/tutoringCenter/bio/${courseId}?_method=put`;
@@ -520,12 +520,12 @@ const changeBio = function (button) { //Change tutor's bio
     });
 }
 
-const setTime = function (input) { //Update displayed time based on slider value
+const setTime = function(input) { //Update displayed time based on slider value
     const studentId = input.id.split('-')[1];
     document.getElementById(`time-label-${studentId}`).innerText = input.value;
 }
 
-const getTime = function (experience) { //Format time in minutes, hours, days, etc. by dividing until there is no remainder
+const getTime = function(experience) { //Format time in minutes, hours, days, etc. by dividing until there is no remainder
     let result;
     experience = parseInt(experience);
     if (experience < 60) {
@@ -552,7 +552,7 @@ const getTime = function (experience) { //Format time in minutes, hours, days, e
     return result;
 }
 
-const mark = function (button) { //MArk a student's lesson
+const mark = function(button) { //MArk a student's lesson
     const courseId = button.id.split('-')[1];
     const studentId = button.id.split('-')[2];
     const time = parseInt(document.getElementById(`time-${studentId}`).value);

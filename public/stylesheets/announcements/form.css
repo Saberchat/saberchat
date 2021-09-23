@@ -8,6 +8,17 @@ form {
     margin-bottom: 5rem;
 }
 
+/* custom checkbox styles */
+.form-check-input {
+    width: 17px;
+    height: 17px;
+    margin-top: 0.1rem;
+}
+
+.form-check-label {
+    margin-left: 0.5rem;
+}
+
 /* Image block/area */
 #image-block, #links {
     margin: 2rem 0;
@@ -44,7 +55,7 @@ form {
 }
 
 /* fix spacing on announcement form */
-.announcement-form {
+.post-form {
     margin-right: 1vh;
     margin-left: 1vh;
 }

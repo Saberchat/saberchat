@@ -1,4 +1,4 @@
-const updateDisplay = function () { //Update room display based on edited buttons that are clicked
+const updateDisplay = function() { //Update room display based on edited buttons that are clicked
     let userSelect = document.getElementById('roomType');
     let display1 = document.getElementById('add-block');
     let display2 = document.getElementById('remove-block');
@@ -17,7 +17,7 @@ const updateDisplay = function () { //Update room display based on edited button
     }
 }
 
-const searchFunction = function (mode) { //Search for users within a chat room
+const searchFunction = function(mode) { //Search for users within a chat room
     let input = document.getElementById(`${mode}-search-input`);
     let filter = input.value.toUpperCase();
     let list = document.getElementById(`${mode}-user-list`);

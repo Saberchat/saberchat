@@ -65,7 +65,7 @@ h1 {
 }
 
 #extra-instructions {
-    color: blue;
+    color:  blue;
     font-weight: bold;
 }
 
@@ -84,6 +84,6 @@ h1 {
 }
 
 #paying-style {
-    color: red;
+    color: rgb(255, 0, 0);
     font-weight: bold;
 }

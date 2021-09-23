@@ -16,7 +16,7 @@ cloudinary.config({
 const cloudUploader = util.promisify(cloudinary.uploader.upload);
 const cloudDestroyer = util.promisify(cloudinary.uploader.destroy);
 
-module.exports.cloudUpload = async function (fileName, fileBuffer) {
+module.exports.cloudUpload = async function(fileName, fileBuffer) {
     const imgFile = await parseBuffer(fileName, fileBuffer).content; // turn file into buffer
     const options = {folder: 'SaberChat'}; // upload to cloudinary
     let type = 'image';

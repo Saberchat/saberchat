@@ -10,6 +10,7 @@
       <link rel="stylesheet" href="/stylesheets/tutoringCenter/tutor-show.css">
       <%if (currentUser && currentUser.darkmode) {%>
           <link rel="stylesheet" href="/stylesheets/tutoringCenter/tutoringCenter-dark.css">
+          <link rel="stylesheet" href="/stylesheets/darkmode.css">
       <%}%>
 
       <script src="/javascript/postUtil.js"></script>
@@ -512,17 +513,17 @@
                           <article class="text-block" id="<%= c._id %>">
                               <div class="block-header grey">
                                   <h5>
-                                      <a class="announcement-button">
-                                          <span class="announcement-subject-header"><%= c.name %></span>
+                                      <a class="post-button">
+                                          <span class="post-subject-header"><%= c.name %></span>
                                       </a>
-                                      <span class="float-right project-info date">Tutors: <%= c.tutors.length %></span>
+                                      <span class="float-right post-info date">Tutors: <%= c.tutors.length %></span>
                                       <br/>
-                                      <span class="float-right project-info date">Students: <%= c.members.length %></span>
+                                      <span class="float-right post-info date">Students: <%= c.members.length %></span>
                                   </h5>
 
-                                  <div class="project-header">
+                                  <div class="post-header">
                             <span>
-                              <a class="project-info" href="/profiles/<%= c.creator._id %>">
+                              <a class="post-info" href="/profiles/<%= c.creator._id %>">
                                 <img src="<% if (c.creator.mediaFile.display) {%> <%=c.creator.mediaFile.url%> <%} else {%> <%=c.creator.imageUrl.url%> <%}%>" alt="profile pic" class="sender-profile-image">
                                 <%= c.creator.firstName %> <%= c.creator.lastName %>
                               </a>
@@ -616,8 +617,8 @@
                               </div>
 
                               <div class="block-content mode">
-                                  <img class="project-first-image" src="<%= c.thumbnail.url %>"/>
-                                  <p class="announcement-text"><%= c.description %></p>
+                                  <img class="post-first-image" src="<%= c.thumbnail.url %>"/>
+                                  <p class="post-text"><%= c.description %></p>
                               </div>
 
                           </article>

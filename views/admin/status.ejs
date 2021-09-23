@@ -31,7 +31,7 @@
 
                   <% for (let status of statusMatrix) { %>
                       <% for (let user of users) { %>
-                          <% if(!user._id.equals(currentUser._id) && user.status.toLowerCase() == status[0].toLowerCase()){ %>
+                          <% if(user.status.toLowerCase() == status[0].toLowerCase()){ %>
                               <% for (let perm of permMatrix) { %>
                                 <% if (perm[0].toLowerCase() == user.permission.toLowerCase())  { %>
                                   <li class="list-group-item user <%=status[0].toLowerCase()%> <%=status[1].toLowerCase()%> <%=perm[0]%> <%=user.tags.join(' ')%> shop" id="user-<%=user._id%>">

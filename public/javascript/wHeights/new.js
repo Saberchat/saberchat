@@ -59,7 +59,7 @@ const textareas = document.getElementsByTagName('textarea');
 const count = textareas.length;
 
 for (let i = 0; i < count; i++) {
-    textareas[i].onkeydown = function (e) {
+    textareas[i].onkeydown = function(e) {
         if (e.keyCode == 9 || e.which == 9) {
             e.preventDefault();
             let s = this.selectionStart;

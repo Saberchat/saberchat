@@ -1,4 +1,4 @@
-const follow = function (button, location) { //Follow user
+const follow = function(button, location) { //Follow user
     const userId = button.id.split('-')[2];
     const url = `/profiles/follow/${userId}?_method=put`;
     const data = {};
@@ -28,7 +28,7 @@ const follow = function (button, location) { //Follow user
     });
 }
 
-const unfollow = function (button, location) { //Unfollow user
+const unfollow = function(button, location) { //Unfollow user
     const userId = button.id.split('-')[2];
     const url = `/profiles/unfollow/${userId}?_method=put`;
     const data = {};
@@ -54,7 +54,7 @@ const unfollow = function (button, location) { //Unfollow user
     });
 }
 
-const unfollow_show = function (button) { //Unfollow on show page (on user's own following page)
+const unfollow_show = function(button) { //Unfollow on show page (on user's own following page)
     const userId = button.id.split('-')[1];
     const url = `/profiles/unfollow/${userId}?_method=put`;
     const data = {};

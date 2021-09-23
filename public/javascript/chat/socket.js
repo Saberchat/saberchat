@@ -5,13 +5,13 @@ const messageDisplay = document.getElementById('message-display');
 const scrollBtn = document.getElementsByClassName('btn-scrolldown')[0];
 
 // function for auto scrolling to new messages
-const scrollToElement = function (innerElement) {
+const scrollToElement = function(innerElement) {
     var topPos = innerElement.offsetTop;
     messageDisplay.scrollTop = topPos - 10;
 }
 
 // function for reporting messages
-const report = function (element) {
+const report = function(element) {
     let id = element.id;
     let url = `/chat/comments/${id}/report?_method=put`;
     let data = {user: userId, roomId: room};
@@ -25,7 +25,7 @@ const report = function (element) {
 }
 
 // function for scrolling to very bottom
-const scrollBottom = function () {
+const scrollBottom = function() {
     let messages = document.getElementsByClassName('media');
     let message = messages[messages.length - 1];
     if (message) {
@@ -47,7 +47,7 @@ messageDisplay.addEventListener('scroll', () => {
 }, false);
 
 //create function that sets up the socket chat
-const chatInit = function (username, userId, messageForm, input, chatDisplay, room, userImage) {
+const chatInit = function(username, userId, messageForm, input, chatDisplay, room, userImage) {
 
     var socket = io();
 

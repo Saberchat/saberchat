@@ -28,6 +28,8 @@ controller.index = async function(req, res) {
     let announcements;
     if (req.user && await platform.permissionsProperty.slice(platform.permissionsProperty.length-3).includes(req.user.permission)) {
         announcements = await Announcement.find({}).populate('sender');
+    } else if (!req.user) {
+        announcements = await Announcement.find({verified: true, public: { $ne: false }}).populate('sender');
     } else {
         announcements = await Announcement.find({verified: true}).populate('sender');
     }
@@ -82,7 +84,6 @@ controller.show = async function(req, res) {
     if(!platform || !announcement) {
         await req.flash('error', 'Could not find announcement');
         return res.redirect('back');
-
     } else if (!announcement.verified && !(await platform.permissionsProperty.slice(platform.permissionsProperty.length-3).includes(req.user.permission))) {
         await req.flash('error', 'You cannot view that announcement');
         return res.redirect('back');
@@ -136,6 +137,9 @@ controller.create = async function(req, res) {
     if (!platform || !announcement) {
         await req.flash('error', 'Unable to create announcement');
         return res.redirect('back');
+    }
+    if (req.body.public && req.body.public === 'False') {
+        announcement.public = false; // no access to visitors without accounts/not logged in
     }
 
     if (req.body.images) {announcement.images = req.body.images;} //If any images were added (if not, the 'images' property is empty)
@@ -245,6 +249,12 @@ controller.updateAnnouncement = async function(req, res) {
     if (!updatedAnnouncement) {
         await req.flash('error', "Unable to update announcement");
         return res.redirect('back');
+    }
+
+    if (req.body.public && req.body.public === 'False') {
+        updatedAnnouncement.public = false; // no access to visitors without accounts/not logged in
+    } else {
+        updatedAnnouncement.public = true;
     }
 
     if (req.body.images) {updatedAnnouncement.images = req.body.images;} //Only add images if any are provided

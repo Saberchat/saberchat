@@ -49,10 +49,19 @@ controller.info = async function(req, res) {
 
 controller.register = async function(req, res) {
     const platform = await setup(Platform);
+    if (!platform) {
+        await req.flash("error", "An error occurred");
+        return res.redirect("back");
+    }
+
     const accesslistedEmail = await Email.findOne({address: req.body.email, version: "accesslist"});
-    if (!platform || !accesslistedEmail) {
-        if (platform.emailExtension != '' && (await req.body.email.split("@")[1] != platform.emailExtension)) {
-            await req.flash('error', `Only members of the ${platform.name} community may sign up`);
+    const blocklistedEmail = await Email.findOne({address: req.body.email, version: "blockedlist"});
+    if (!accesslistedEmail) { //Check if principal has to authenticate email, or if user has to have their account authenticated first
+        if (!platform.principalAuthenticate && platform.emailExtension != '' && (await req.body.email.split("@")[1] != platform.emailExtension)) {
+            await req.flash('error', `Only members of the ${platform.name} community may sign up. Contact a platform ${platform.permissionsDisplay[platform.permissionsDisplay.length-1]} to verify your email.`);
+            return res.redirect('/');
+        } else if (blocklistedEmail) {
+            await req.flash('error', `Only members of the ${platform.name} community may sign up.`);
             return res.redirect('/');
         }
     }
@@ -104,18 +113,16 @@ controller.register = async function(req, res) {
     }
 
     //creates new user from form info
-    let newUser = new User(
-        {
-            email: email,
-            firstName: firstName,
-            lastName: lastName,
-            username: await filter.clean(username),
-            annCount: [],
-            authenticated: false,
-            authenticationToken: token,
-            bannerUrl: {url: platform.imageUrl, display: true}
-        }
-    );
+    let newUser = new User({
+        email: email,
+        firstName: firstName,
+        lastName: lastName,
+        username: await filter.clean(username),
+        annCount: [],
+        authenticated: false,
+        authenticationToken: token,
+        bannerUrl: {url: platform.imageUrl, display: true}
+    });
 
     //Update annCount with all announcements
     const anns = await Announcement.find({});
@@ -123,10 +130,7 @@ controller.register = async function(req, res) {
         await req.flash('error', "Unable to find announcements");
         return res.redirect('back');
     }
-
-    for (let ann of anns) {
-        await newUser.annCount.push({announcement: ann, version: "new"});
-    }
+    for (let ann of anns) await newUser.annCount.push({announcement: ann, version: "new"});
 
     //registers the user
     const user = await User.register(newUser, req.body.password);
@@ -140,13 +144,14 @@ controller.register = async function(req, res) {
         await user.save();
     }
 
-    if (!platform.principalAuthenticate) { //If principal does not have to authenticate user, user authenticates themself with email
+    //If principal does not have to authenticate user, user authenticates themself with email
+    if (!platform.principalAuthenticate || accesslistedEmail || (platform.emailExtension != '' && (await req.body.email.split("@")[1] == platform.emailExtension))) {
         await sendGridEmail(user.email, 'Verify Saberchat Account', `<p>Hello ${newUser.firstName},</p><p>Welcome to Saberchat! A confirmation of your account:</p><ul><li>Your username is ${newUser.username}.</li><li>Your full name is ${newUser.firstName} ${newUser.lastName}.</li><li>Your linked email is ${newUser.email}</li></ul><p>Click <a href="https://${platform.url}/authenticate/${newUser._id}?token=${token}">this link</a> to verify your account.</p>`, true);
     }
 
     // if registration is successful, login user.
-    if (!platform.principalAuthenticate) {
-        await req.flash("success", `Welcome to Saberchat ${user.firstName}! Go to your email to verify your account`);
+    if (!platform.principalAuthenticate || accesslistedEmail || (platform.emailExtension != '' && (await req.body.email.split("@")[1] == platform.emailExtension))) {
+        await req.flash("success", `Welcome to Saberchat ${user.firstName}! Go to your email to verify your account.`);
     } else {
         await req.flash("success", `Welcome to Saberchat ${user.firstName}! Your account will be evaluated and authenticated soon`);
     }
@@ -319,6 +324,14 @@ controller.darkmode = async function(req, res) {
     if (platform.enableDarkmode) { req.user.darkmode = !req.user.darkmode;}
     await req.user.save();
     return res.redirect('back');
+}
+
+controller.ecdocs = async function(req, res) {
+    const platform = await setup(Platform);
+    if (objectArrIndex(platform.features, "route", "/ecdocs") > -1) { //Alsion-native platform
+        return res.render("other/ecdocs", {platform});
+    }
+    return res.redirect("/");
 }
 
 module.exports = controller;

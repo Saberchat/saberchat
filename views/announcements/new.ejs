@@ -20,7 +20,7 @@
 </div>
 
 
-<div class="row announcement-form">
+<div class="row post-form">
 	<div class="col-md-8 offset-md-2 col-12">
 		<div class="form-container">
 			<form action="/announcements/" method="post" enctype="multipart/form-data">
@@ -31,7 +31,12 @@
 
 				<div class="form-group mode">
 					<label for="message">Message</label>
-					<textarea minlength="50" class="form-control mode" name="message" rows="5" placeholder="What it is about..." required></textarea>
+					<textarea class="form-control mode" name="message" rows="5" placeholder="What it is about..."></textarea>
+				</div>
+
+				<div class="form-check">
+					<input type="checkbox" class="form-check-input" value="False" id="public" name="public">
+					<label for="public" class="form-check-label">Restrict to be only accessible by Alsion members</label>
 				</div>
 
 				<div id="media-header">

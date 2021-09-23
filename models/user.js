@@ -56,6 +56,10 @@ module.exports = mongoose.model("User", new mongoose.Schema({
     tags: [{type: String}],
     balance: {type: Number, default: 0},
     debt: {type: Number, default: 0},
+    deposits: [{
+        amount: Number,
+        added: Date,
+    }],
     darkmode: {type: Boolean, default: false},
     logins: [{type: Date}]
 }, {timestamps: {createdAt: 'created_at'}

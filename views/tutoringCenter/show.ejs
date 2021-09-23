@@ -1,13 +1,16 @@
 <%- include('../partials/headStart') %>
     <link rel="stylesheet" href="/stylesheets/home/index.css">
     <link rel="stylesheet" href="/stylesheets/tutoringCenter/show.css">
+    <link rel="stylesheet" href="/stylesheets/projects/index.css">
     <link rel="stylesheet" href="/stylesheets/shop/menu.css">
     <%if (currentUser && currentUser.darkmode) {%>
         <link rel="stylesheet" href="/stylesheets/tutoringCenter/tutoringCenter-dark.css">
+        <link rel="stylesheet" href="/stylesheets/darkmode.css">
     <%}%>
 
     <script src="/javascript/postUtil.js"></script>
     <script src="/javascript/tutoringCenter/settings.js"></script>
+    <script src="/javascript/tutoringCenter/search.js"></script>
     <script src="/javascript/tutoringCenter/upvote.js"></script>
     <script src="/javascript/tutoringCenter/rating.js"></script>
     <script src="/javascript/tutoringCenter/actions.js"></script>
@@ -106,7 +109,7 @@
             <ul class="list-group" id="students">
               <li class="list-group-item list-group-item-success mode darkmode-outline" id="students-heading">Students</li>
               <% for (let student of course.members) { %>
-                <li class="list-group-item shop" id="item-<%=student._id%>">
+                <li class="list-group-item shop mode" id="item-<%=student._id%>">
                   <a href="../profiles/<%=student._id%>"class="user-element-text shop">
                     <img class="profile-image" src="<% if (student.mediaFile.display) {%> <%= student.mediaFile.url%><%} else {%> <%=student.imageUrl.url%><%}%>" alt="profile picture">
                     <span class="username <%=student.status%> <%=student.permission%> <%=student.tags.join(' ')%>"><span class="enrolled-name"><%=student.firstName%> <%=student.lastName%></span> <span class="enrolled-username"><%=student.username%></span></span>
@@ -558,12 +561,31 @@
                     </div>
 
                     <img class="thumbnail-backup" id="thumbnail-backup" src="<% if (!course.thumbnailFile.display) { %> <%=course.thumbnailFile.url%> <%} else { %> <%= course.thumbnail.url %> <% } %>" alt="Image Does Not Exist"/>
-                    <br />
                     <button type="submit" class="btn btn-lg btn-primary btn-block">Confirm Changes</button>
                     <br/>
                 </form>
-
                 <br/>
+
+                <form id="update-tutors" action="/tutoringCenter/update-tutors/<%=course._id%>?_method=put" method="post">
+                    <h4>Add Tutors</h4>
+                    <div class="form-group mode" id="tutor-input-div">
+                        <input type="text" class="form-control mode" id="tutor-list" placeholder="Tutors" oninput="searchTutors(this, '<%=course._id%>')"><br>
+                        <select id="tutor-select" class="form-control mode" onchange="addTutor('user')" style="display: none;"></select><br>
+                        <input type="text" id="tutor-input" name="tutorInput" hidden/>
+                    </div>
+                    <button type="submit" class="btn btn-lg btn-primary btn-block">Confirm New Tutors</button>
+                </form><br><br>
+
+                <form id="update-students" action="/tutoringCenter/update-students/<%=course._id%>?_method=put" method="post">
+                    <h4>Add Students</h4>
+                    <div class="form-group mode" id="student-input-div">
+                        <input type="text" class="form-control mode" id="student-list" placeholder="Students" oninput="searchStudents(this, '<%=course._id%>')"><br>
+                        <select id="student-select" class="form-control mode" onchange="addStudent('user')" style="display: none;"></select><br>
+                        <input type="text" id="student-input" name="studentInput" hidden/>
+                    </div>
+                    <button type="submit" class="btn btn-lg btn-primary btn-block">Confirm New Students</button>
+                </form><br><br>
+
                 <form id="update-teacher" action="/tutoringCenter/updateTeacher/<%= course._id %>?_method=put" method="post">
                     <h4>Change Teacher</h4>
                     <div class="form-group">

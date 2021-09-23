@@ -10,7 +10,7 @@ const extraInstructions = document.getElementById('extra-instructions');
 const total = document.getElementById('total-cost');
 const orderConfirm = document.getElementById("order-confirm");
 const payingInPerson = document.getElementById("payingInPerson");
-const balanceString = document.getElementById("balance-box").innerText;
+let balanceString = document.getElementById("balance-box").innerText;
 let orderedItem; //Order that will show up in your 'confirm order' page
 let sum = 0;
 let instructionsNew;
@@ -18,9 +18,57 @@ let totalNew;
 let payingStyleNew;
 let balanceBox;
 let formattedCost;
+let currentCustomer;
+let currentBalance = 0;
+
+const searchCustomers = function(input) { //Check list of customers for online ordering from centralized computer
+    const url = `/shop/search-customers`;
+    const data = {text: input.value};
+    const userSelect = document.getElementById("user-select");
+    let appendedCustomer;
+
+    if (input.value.length > 2) {
+        sendPostReq(url, data, data => {
+            if (data.success && data.customers.length > 0) { //If there are customers to display
+                userSelect.style.display = "block";
+                while (userSelect.firstChild) {userSelect.removeChild(userSelect.firstChild);} //Empty userSelect from previous searches
+
+                //Add heading back to userSelect's list
+                const heading = document.createElement("option");
+                for (let attr of ["selected", "disabled"]) {heading[attr] = true;}
+                heading.className = "recipient-group";
+                heading.innerText = "Select User";
+                userSelect.appendChild(heading);
+
+                for (let customer of data.customers) { //Build userSelect option
+                    appendedCustomer = document.createElement("option");
+                    appendedCustomer.className = customer.classValue;
+
+                    appendedCustomer.innerText = customer.displayValue;
+                    appendedCustomer.setAttribute("value", `${customer.idValue} ${customer.balance} | ${customer.displayValue}`);
+                    userSelect.appendChild(appendedCustomer); //Add userSelect option to menu
+                }
+            } else {
+                userSelect.style.display = "none"; //Hide dropdown if there are no matching elements
+            }
+        });
+    } else {
+        userSelect.style.display = "none"; //Hide dropdown if there is not a long enough input string
+    }
+}
+
+const setCustomer = function(dropdown, dollarPayment, darkmode) {
+    document.getElementById("current-name").innerText = `Current Customer: ${dropdown.value.split('| ')[1]}`;
+    document.getElementById("current-name").className = dropdown.value.split(' ')[0];
+    currentCustomer = dropdown.value.split(' ')[0];
+    currentBalance = parseInt(dropdown.value.split(' ')[1]);
+    balanceString = `Current Balance: $${currentBalance.toFixed(2)}`;
+    document.getElementById("balance-box").innerText = balanceString;
+    changeOrderConfirmation(dollarPayment, darkmode);
+}
 
 //Changes the order confirmation on the form
-const changeOrderConfirmation = function (dollarPayment) {
+const changeOrderConfirmation = function(dollarPayment, darkmode) {
     sum = 0;
     while (orderConfirm.firstChild) { //Remove all the items in the 'confirm order' section
         orderConfirm.removeChild(orderConfirm.firstChild);
@@ -58,7 +106,6 @@ const changeOrderConfirmation = function (dollarPayment) {
     }
 
     instructionsNew = document.createElement('span'); //Once this process is finished, create an element to render the extra instructions and total cost
-    instructionsNew.style = 'color: blue;';
     instructionsNew.className = "list-group-item list-group-item-action form-check darkmode-outline";
     instructionsNew.id = "extra-instructions";
 
@@ -69,14 +116,23 @@ const changeOrderConfirmation = function (dollarPayment) {
     }
 
     balanceBox = document.createElement('strong');
-    balanceBox.style = 'color: purple;';
+    
     balanceBox.className = "list-group-item list-group-item-action form-check darkmode-outline";
     balanceBox.id = "balance-box";
     balanceBox.innerText = balanceString;
     totalNew = document.createElement('span');
-    totalNew.style = 'color: green;';
     totalNew.className = "list-group-item list-group-item-action form-check darkmode-outline";
     totalNew.id = "total-cost";
+
+    if (!darkmode) {
+        balanceBox.style = 'color: purple;';
+        totalNew.style = 'color: green;';
+        instructionsNew.style = 'color: blue;';
+    } else {
+        balanceBox.style = 'color: turquoise;';
+        totalNew.style = 'color: turquoise;';
+        instructionsNew.style = 'color: turquoise;';
+    }
 
     if (dollarPayment) {totalNew.innerHTML = `<strong>Total: $${sum.toFixed(2)}</strong>`;
     } else {totalNew.innerHTML = `<strong>Total: ${sum} Credits</strong>`;}

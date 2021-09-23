@@ -1,0 +1,96 @@
+<%- include('../partials/headStart') %>
+    <link rel="stylesheet" href="/stylesheets/announcements/form.css">
+    <link rel="stylesheet" href="/stylesheets/announcements/edit.css">
+<%- include('../partials/headEnd') %>
+
+<body class="mode">
+<%- include('../partials/components/navbar') %>
+<%- include('../partials/components/header') %>
+
+<div class="container my-5">
+    <div class="row">
+        <div class="col-12">
+          <div class="jumbotron text-center header">
+            <h1><i class="fas fa-cog"></i> Edit Puzzle</h1>
+            <a href="/puzzles/<%=puzzle._id%>" class="btn btn-primary"><i class="fas fa-arrow-left"></i> Back</a>
+          </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-8 offset-md-2 col-12">
+          <form action="/puzzles/<%= puzzle._id %>?_method=put" method="post" enctype="multipart/form-data">
+            <div class="form-group mode">
+              <label for="subject">Subject</label>
+              <input type="num" class="form-control mode" name="subject" placeholder="Name Your Puzzle!" maxlength="50" required value="<%= puzzle.subject %>">
+            </div>
+            <div class="form-group mode">
+              <label for="message">Message</label>
+              <textarea class="form-control mode" name="message" rows="5" placeholder="Describe The Challenge!" required><%= puzzle.text %></textarea>
+            </div>
+            <div class="form-group mode">
+                <label for="solution">Solution</label>
+                <textarea class="form-control mode" name="solution" rows="5" placeholder="Answer Explanation..." required><%= puzzle.solution %></textarea>
+              </div>
+
+                <% for (let media of puzzle.mediaFiles) { %>
+                    <% if(media.filename) { %>
+                        <% if ([".png", ".jpg", ".jpeg", ".gif"].includes(fileExtensions.get(media.url).toLowerCase())) { %>
+                            <img src="<%= media.url %>" alt="attached image" class="img-fluid rounded past-upload">
+                        <% } else if ([".mp3", ".m4a"].includes(fileExtensions.get(media.url).toLowerCase())) { %>
+                            <audio controls>
+                                <source src="<%=media.url%>" type="audio/mpeg"></source>
+                            </audio>
+                        <% } else if (fileExtensions.get(media.url).toLowerCase() == ".mp4") {%>
+                            <video width="800px" height="500px" src="<%=media.url%>" type="video/*" controls></video>
+                        <% } else if ([".mov", ".heic"].includes(fileExtensions.get(media.url).toLowerCase())) {%>
+                            <a href="<%=media.url%>" download><h5><i class="fas fa-paperclip"></i> Download "<%=media.originalName%>"</h5></a>
+                        <% } else if (fileExtensions.get(media.url).toLowerCase() == ".pdf") {%>
+                            <iframe src="<%=media.url%>" height="300" width="250"></iframe>
+                            <a href="<%=media.url%>" target="_blank"><h5>Open "<%=media.originalName%>" In New Tab  </h5></a>
+                        <% } %>
+                        <div class="form-check">
+                            <input type="checkbox" name="deleteUpload-<%=media.url%>" id="deleteUpload-<%=media.url%>" class="form-check-input">
+                            <label class="form-check-label" for="deleteUpload-<%=media.url%>">Remove uploaded media</label>
+                        </div>
+                        <br />
+                    <% } %>
+                <% } %>
+
+                <div id="media-header">
+                    <button type="button" onclick="upload(<%=puzzle.mediaFiles.length%>)" class="btn btn-primary"><i class="fas fa-plus"></i> File Upload</button>
+                    <br/><br/>
+                  </div>
+                <div id="uploads"></div>
+    
+                <div id="image-header">
+                    <button type="button" onclick="addImg()" class="btn btn-primary"><i class="fas fa-plus"></i> Image URL</button>
+                    <br/><br/>
+                </div>
+
+                <div id="image-block">
+                    <% for( let i = 0; i < puzzle.images.length; i++ ) { %>
+                        <div class="image-group">
+                            <div class="input-container" id="imageblock-<%=i%>">
+                                <input type="text" id="<%=i%>" class="form-control"
+                                       oninput="createImg(this)" placeholder="Url..."
+                                       name="images" required
+                                       value="<%= puzzle.images[i] %>">
+                                <img id="image-<%=i%>"
+                                     style="width: 50%; height: 50%; margin-top: 10px; border-radius: 15px;"
+                                     src="<%=puzzle.images[i] %>" alt="Image Does Not Exist"/>
+                            </div>
+                            <button type="button" onclick="deleteImg(this)" class="btn btn-danger">
+                                <i class="fas fa-minus"></i>
+                            </button>
+                        </div>
+                    <% } %>
+                </div>
+                <button type="submit" class="btn btn-info btn-block">Save Changes</button>
+            </form>
+        </div>
+    </div>
+</div>
+<script src="/javascript/upload-input.js"></script>
+<script src="/javascript/image-url.js"></script>
+</body>
+</html>

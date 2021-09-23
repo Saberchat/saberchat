@@ -1,4 +1,4 @@
-const updateDisplayNewRoom = function () { //Update the list of new users, if room is switched from public to private
+const updateDisplayNewRoom = function() { //Update the list of new users, if room is switched from public to private
     let userSelect = document.getElementById('roomType');
     let display = document.getElementById('user-selection');
     if (userSelect.checked == true) { //If any users are selected from dropdown

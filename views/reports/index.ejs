@@ -20,7 +20,7 @@
             <div class="jumbotron text-center header">
                 <h1><i class="fas fa-exclamation-circle"></i> Error Reports</h1>
                 <p>Your Bug Reports and New Feature Suggestions</p>
-                <a href="/reports/new" class="btn btn-primary announcement-button">
+                <a href="/reports/new" class="btn btn-primary post-button">
                     <i class="fas fa-exclamation-circle"></i> Send Report
                 </a>
             </div>
@@ -37,21 +37,21 @@
     <main id="main-container">
         <div class="container mt-5">
             <!-- Block 1 -->
-            <% const developers = [["Alexander Zhou", "alexanderz@alsionschool.org", "GZiDjGU"], ["Kabir Samsi", "kabirs@alsionschool.org", "yPUBQdY"], ["Siddharth Chavan", "siddharthc@alsionschool.org", "TnIpW88"], ["Vibhav Darsha", "vibhavec@alsionschool.org", "1NNmHrE"], ["Dmitry Pleshkov", "dmitry@alsionschool.org", "yJalLUC"]]; %>
+            <% const developers = [["Kabir Samsi", "kabirs@alsionschool.org", "yPUBQdY", "CEO, VP Engineering and Business Development"], ["Alexander Zhou", "alexanderz@alsionschool.org", "GZiDjGU", "Second-In Command, Lead Frontend Developer"], ["Dmitry Pleshkov", "dmitry@alsionschool.org", "yJalLUC", "VP Cybersecurity, System Reliability Engineer"], ["Siddharth Chavan", "siddharthc@alsionschool.org", "TnIpW88", "Associate Frontend and Backend Developer"], ["Vibhav Darsha", "vibhavec@alsionschool.org", "1NNmHrE", "Finance and Marketing Representative"]]; %>
             <div class="row text-element">
                 <div class="col-lg-6">
                     <article class="text-block mode">
-                        <div class="block-header green">
+                        <div class="block-header <% if (platform.homepageInfo) {%> green <% } %>">
                             <h1>Developers</h1>
                         </div>
                         <div class="block-content mode">
                         <p>
-                            Alexander Zhou, Kabir Samsi, Siddharth Chavan, Vibhav Darsha and Dmitry Pleshkov are high school juniors at Alsion Montessori High School. They developed Saberchat over the 2020
+                            Kabir Samsi, Alexander Zhou, Dmitry Pleshkov, Siddharth Chavan and Vibhav Darsha are high school seniors at Alsion Montessori High School. They developed Saberchat over the 2020
                             Summer Break in an effort to improve the their school's community by connecting its communication forums.
                         </p>
 
                         <% developers.forEach(developer => { %>
-                            <span class="developer-info"><%=developer[0]%></span>
+                            <span class="developer-info"><%=developer[0]%></span> <span class="developer-description">(<%=developer[3]%>)</span>
                             <p><a href="mailto: <%=developer[1]%>"><%=developer[1]%></a></p>
                         <% }); %>
 
@@ -94,8 +94,8 @@
                     <div class="block-header grey">
                         <h5 style="margin-bottom: 20px;">
 
-                            <a class="announcement-button" href="/reports/<%= report._id %>">
-                                <span class="announcement-subject-header"><%= report.subject %></span>
+                            <a class="post-button" href="/reports/<%= report._id %>">
+                                <span class="post-subject-header"><%= report.subject %></span>
                             </a>
                             <% if (report.handled) { %>
                                 <span class="badge badge-pill badge-success" id="marked">Report Has Been Handled</span>
@@ -108,24 +108,24 @@
                                     <span class="badge badge-pill badge-warning" id="unmarked">Report Not Yet Handled</span>
                                 <% } %>
                             <% } %>
-                            <span class="float-right announcement-date"><%= report.date %></span>
+                            <span class="float-right post-date"><%= report.date %></span>
                         </h5>
 
                         <div class="bottom-text">
-                            <a class="announcement-sender" href="../profiles/<%= report.sender._id %>">
+                            <a class="post-sender" href="../profiles/<%= report.sender._id %>">
                                 <img src="<% if (report.sender.mediaFile.display) {%> <%= report.sender.mediaFile.url%><%} else {%> <%=report.sender.imageUrl.url%><%}%>" alt="profile pic"
                                         class="sender-profile-image">
                                 <%= report.sender.firstName %> <%= report.sender.lastName %>
                             </a>
                             <% if (currentUser._id.toString() == report.sender._id.toString()) { %>
                                 <button type="button" class="edit-button btn btn-info"><a
-                                            class="announcement-button"
+                                            class="post-button"
                                             href="/reports/<%= report._id %>/edit"><i
                                                 class="fas fa-cog"></i> Edit</a></button>
 
                                 <form action="/reports/<%= report._id %>?_method=delete" method="post" style="display: inline-block;"
                                         class="delete-report">
-                                    <button class="btn btn-danger announcement-button" type="button"
+                                    <button class="btn btn-danger post-button" type="button"
                                             data-toggle="modal"
                                             data-target="#modal-<%= report._id %>"><i
                                                 class="far fa-trash-alt"></i>
@@ -183,10 +183,10 @@
 
                     <div class="block-content mode">
                         <% if (reportTexts.get(report._id).split(" ").length > 30) { %>
-                            <p class="announcement-text"><span class="convertible-text"><%= reportTexts.get(report._id).split(" ").slice(0, 31).join(" ") %></span> <a
+                            <p class="post-text"><span class="convertible-text"><%= reportTexts.get(report._id).split(" ").slice(0, 31).join(" ") %></span> <a
                                         href="/reports/<%= report._id %>">(Read More)</a></p>
                         <% } else { %>
-                            <p class="announcement-text convertible-text"><%= reportTexts.get(report._id) %></p>
+                            <p class="post-text convertible-text"><%= reportTexts.get(report._id) %></p>
                         <% } %>
 
                     </div>

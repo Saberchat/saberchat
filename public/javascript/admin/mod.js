@@ -1,6 +1,6 @@
 let loaded = []; //Stores which comments have had their contexts loaded (so that comments are not doubled)
 
-const ignoreComment = function (button) { //Ignore a reported comment
+const ignoreComment = function(button) { //Ignore a reported comment
     const url = '/admin/moderate?_method=put';
     const commentId = button.id.split('-')[1];
     const listItem = document.getElementById(`comment-${commentId}`);
@@ -26,7 +26,7 @@ const ignoreComment = function (button) { //Ignore a reported comment
     });
 }
 
-const deleteComment = function (button) { //Delete a reported comment
+const deleteComment = function(button) { //Delete a reported comment
     const url = '/admin/moderate?_method=delete';
     const commentId = button.id.split('-')[1];
     const listItem = document.getElementById(`comment-${commentId}`);
@@ -52,7 +52,7 @@ const deleteComment = function (button) { //Delete a reported comment
     });
 }
 
-const getContext = function (button) {
+const getContext = function(button) {
     const url = '/admin/moderate';
     const commentId = button.id.split('-')[1];
     const data = {commentId};

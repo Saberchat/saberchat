@@ -1,4 +1,4 @@
-const confirm = function (button) { //Send request that order is ready
+const confirm = function(button) { //Send request that order is ready
     const orderId = button.id.split('-')[0];
     const url = `/shop/order/confirm/${orderId}?_method=put`;
     const data = {};
@@ -11,7 +11,7 @@ const confirm = function (button) { //Send request that order is ready
     });
 }
 
-const ready = function (button) { //Send request that order is ready
+const ready = function(button) { //Send request that order is ready
     const orderId = button.id.split('-')[0];
     const url = `/shop/order/${orderId}?_method=put`;
     const data = {};
@@ -31,7 +31,7 @@ const ready = function (button) { //Send request that order is ready
     });
 }
 
-const reject = function (button) { //Send request that order is rejected
+const reject = function(button) { //Send request that order is rejected
     const orderId = button.id.split('-')[0];
     const rejectionReason = document.getElementById(`rejection-reason-${orderId}`).value;
     const url = `/shop/order/${orderId}?_method=delete`;
@@ -52,7 +52,7 @@ const reject = function (button) { //Send request that order is rejected
     });
 }
 
-const cancel = function (button) { //Send request to cancel order
+const cancel = function(button) { //Send request to cancel order
     const orderId = button.id.split('-')[0];
     const url = `/shop/order/${orderId}?_method=delete`;
     const data = {};
@@ -66,7 +66,7 @@ const cancel = function (button) { //Send request to cancel order
     });
 }
 
-const changeShopStatus = function () { //Send request to close/open shop
+const changeShopStatus = function() { //Send request to close/open shop
     const url = `/shop/manage?_method=put`;
     const data = {};
 
@@ -79,4 +79,43 @@ const changeShopStatus = function () { //Send request to close/open shop
             document.getElementById("shop-status-button").innerHTML = `<i class="fas fa-${change.get(data.open)[1]}"></i> ${change.get(data.open)[2]}`;
         }
     });
+}
+
+const switchOrders = function(button) { //Switch order panel from active orders to past orders
+    if (button.id == "past-order-button") {
+        document.getElementById("output-stream-old").hidden = false;
+        document.getElementById("output-stream").hidden = true;
+        document.getElementById("button-text").innerText = " View Active Orders";
+        document.getElementById("order-type").innerText = " Past Orders";
+        document.getElementById("order-subheading").innerText = "All Past Orders";
+        button.id = "active-order-button";
+
+    } else {
+        document.getElementById("output-stream-old").hidden = true;
+        document.getElementById("output-stream").hidden = false;
+        document.getElementById("button-text").innerText = " View Past Orders";
+        document.getElementById("order-type").innerText = " Active Orders";
+        document.getElementById("order-subheading").innerText = "All Active Orders";
+        button.id = "past-order-button";
+    }
+}
+
+const filterDate = function() {
+    const startInput = document.getElementById('startDateInput');
+    const endInput = document.getElementById('endDateInput');
+
+    if(!startInput.value && !endInput.value) {
+        const errMsg = document.getElementById('date-filter-err-msg');
+        return errMsg.style.display = 'block';
+    }
+
+    const urlParams = new URLSearchParams(window.location.search);
+    
+    urlParams.set('past', 'true');
+
+    if(startInput.value) { urlParams.set('start_date', startInput.value)};
+    if(endInput.value) { urlParams.set('end_date', endInput.value)};
+
+
+    window.location.search = urlParams;
 }

@@ -8,6 +8,7 @@ const {cloudUpload, cloudDelete} = require('../services/cloudinary');
 const {objectArrIndex, removeIfIncluded, concatMatrix, multiplyArrays, parsePropertyArray, sortAlph} = require('../utils/object-operations');
 const setup = require("../utils/setup");
 const {autoCompress} = require("../utils/image-compress");
+const dateFormat = require("dateformat");
 
 //SCHEMA
 const Platform = require("../models/platform");
@@ -126,6 +127,56 @@ controller.show = async function(req, res) {
 	});
 }
 
+controller.transactions = async function(req, res) {
+	let transactions = []
+	const platform = await setup(Platform);
+	const orders = await Order.find({customer: req.user._id});
+	if (!platform || !orders) {
+		req.flash("error", "An Error Occurred");
+		return res.redirect("back");
+	}
+
+	for (let order of orders) { //Add all orders as purchase transactions
+		transactions.push({
+			type: 1,
+			price: order.charge,
+			summary: `Item Purchase`,
+			created_at: order.created_at,
+			date: order.date
+		});
+	}
+
+	for (let deposit of req.user.deposits) { //Lists all deposits as deposit transactions
+		if (deposit.amount > 0) {
+			transactions.push({
+				type: 0,
+				price: deposit.amount,
+				summary: `Balance Deposit`,
+				added_at: deposit.added_at,
+				date: dateFormat(deposit.added_at, "mmm d, h:MM TT")
+			});
+		} else {
+			transactions.push({
+				type: 1,
+				price: deposit.amount,
+				summary: `Balance Deposit`,
+				added_at: deposit.added_at,
+				date: dateFormat(deposit.added_at, "mmm d, h:MM TT")
+			});
+		}
+	}
+
+	for (let i = 0; i < transactions.length-1; i++) { //Bubblesort algorithm sorts transactions in order
+		for (let j = 0; j < transactions.length-(i+1); j++) {
+			if (new Date(transactions[j].created_at).getTime() < new Date(transactions[j+1].added_at).getTime()) {
+				[transactions[j], transactions[j+1]] = [transactions[j+1], transactions[j]];
+			}
+		}
+	}
+
+	return res.render("profiles/transactions", {platform, transactions});
+}
+
 controller.update = async function(req, res) {
 	const platform = await setup(Platform);
 	const overlap = await User.find({
@@ -166,9 +217,6 @@ controller.update = async function(req, res) {
 	let user = { //Updated user object
 		firstName: req.body.firstName,
 		lastName: req.body.lastName,
-		username: await filter.clean(req.body.username),
-		description: await filter.clean(req.body.description),
-		title: await filter.clean(req.body.title),
 		status: await status.toLowerCase(),
 		mediaFile: {
 			url: req.user.mediaFile.url,
@@ -181,6 +229,13 @@ controller.update = async function(req, res) {
 			display: req.body.showBannerImage == "upload"
 		},
 	};
+
+	//Update separately to avoid errors in empty fields
+	for (let attr of ["username", "description", "title"]) {
+		if (req.body[attr])  {
+			user[attr] = await filter.clean(req.body[attr]);
+		} else {user[attr] = " ";}
+	}
 
 	//Build user's image info based on display options on form
 	if (req.body.imageUrl) {

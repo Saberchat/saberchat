@@ -23,7 +23,7 @@ html, body {
     text-decoration: underline;
 }
 
-.announcement-bar {
+.post-bar {
     background-color: white;
     width: 400px;
     height: 750px;
@@ -32,12 +32,12 @@ html, body {
     float: left;
 }
 
-.announcement-notification {
+.post-notification {
     margin-bottom: 5px;
     font-size: 10px;
 }
 
-#announcement-bar-header {
+#post-bar-header {
     text-align: center;
     padding-top: 10px;
     font-size: 15px;

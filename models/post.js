@@ -21,7 +21,9 @@ const Post = mongoose.model("Post", new mongoose.Schema({
 }));
 
 module.exports = { //All subclass Schema
-    Announcement: Post.discriminator("Announcement", new mongoose.Schema({})), //Faculty/administrator announcements
+    Announcement: Post.discriminator("Announcement", new mongoose.Schema({ // Faculty/administrator announcements
+        public: {type: Boolean, default: true}
+    })), 
     PostComment: Post.discriminator("PostComment", new mongoose.Schema({})), //Comments on projects/announcements/reports
     
     //SUBCLASSES WITH APPENDED FIELDS
@@ -55,5 +57,9 @@ module.exports = { //All subclass Schema
         width: {type: Number, default: 480},
         height: {type: Number, default: 640},
         closed: {type:Boolean, default: false}
+    })),
+    Puzzle: Post.discriminator("Puzzle", new mongoose.Schema({ //Weekly Puzzle Posts
+        solution: String,
+        answers: [{type: mongoose.Schema.Types.ObjectId, ref: "PostComment"}]
     }))
 };

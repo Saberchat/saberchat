@@ -59,7 +59,9 @@
                                 <% for (let feature of platform.features) { %>
                                     <% if (feature.route.includes("http")) {%>
                                         <a class="dropdown-item" href="<%=feature.route%>" target="_blank">
-                                    <% } else {%>
+                                    <% } else if (feature.route.includes("/")) { %>
+                                        <a class="dropdown-item" href="<%=feature.route%>">
+                                    <% } else { %>
                                         <a class="dropdown-item" href="/<%=feature.route%>">
                                     <% } %>
                                     <i class="fas fa-<%=feature.icon%>"></i> <%=feature.name%></a>
@@ -69,9 +71,13 @@
 
                     <% } else { %>
                         <% if (platform.publicFeatures.length > 2) { %>
-                            <% for (let feature of platform.publicFeatures.slice(0, 2)) { %>
+                            <% for (let feature of platform.publicFeatures.slice(0, 3)) { %>
                                 <li class="nav-item">
-                                    <a class="nav-link" <% if (platform.navDark) {%> style="color: black;"<%}%> href="/<%=feature.route%>"><i class="fas fa-<%=feature.icon%>"></i> <%=feature.name%></a>
+                                    <% if (feature.route.includes("http")) {%>
+                                        <a class="nav-link" <% if (platform.navDark) {%> style="color: black;"<%}%> href="<%=feature.route%>" target="_blank" ><i class="fas fa-<%=feature.icon%>"></i> <%=feature.name%></a>
+                                    <% } else {%>
+                                        <a class="nav-link" <% if (platform.navDark) {%> style="color: black;"<%}%> href="/<%=feature.route%>"><i class="fas fa-<%=feature.icon%>"></i> <%=feature.name%></a>
+                                    <% } %>
                                 </li>
                             <% } %>
                             <li class="nav-item dropdown">
@@ -80,8 +86,12 @@
                                 <i class="fas fa-align-justify"></i> More</a>
 
                                 <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-                                    <% for (let feature of platform.publicFeatures.slice(2)) { %>
-                                        <a class="dropdown-item" <% if (platform.navDark) {%> style="color: black;"<%}%> href="/<%=feature.route%>"><i class="fas fa-<%=feature.icon%>"></i> <%=feature.name%></a>
+                                    <% for (let feature of platform.publicFeatures.slice(3)) { %>
+                                        <% if (feature.route.includes("http")) {%>
+                                            <a class="dropdown-item" target="_blank" <% if (platform.navDark) {%> style="color: black;"<%}%> href="<%=feature.route%>"><i class="fas fa-<%=feature.icon%>"></i> <%=feature.name%></a>
+                                        <% } else {%>
+                                            <a class="dropdown-item" <% if (platform.navDark) {%> style="color: black;"<%}%> href="/<%=feature.route%>"><i class="fas fa-<%=feature.icon%>"></i> <%=feature.name%></a>
+                                        <% } %>
                                     <% } %>
                                 </div>
                             </li>
@@ -181,6 +191,7 @@
                                         Access List</a>
                                     <a href="/admin/accesslist?version=blockedlist" class="dropdown-item"><i class="fas fa-inbox"></i> Email
                                         Blocked List</a>
+                                    <a href="/admin/balances" class="dropdown-item"><i class="fas fa-dollar-sign"></i> User Balances</a>
                                     <a href="/admin/settings" class="dropdown-item"><i class="fas fa-cog"></i> Platform Settings</a>
                                 </div>
                             </li>
@@ -194,8 +205,8 @@
                                 <%= currentUser.firstName.charAt(0) %>.<%= currentUser.lastName.charAt(0) %>.
                             </a>
                             <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
-                                <a class="dropdown-item" href="/profiles/<%= currentUser._id %>"><i
-                                            class="fas fa-user"></i> View Profile</a>
+                                <a class="dropdown-item" href="/profiles/<%= currentUser._id %>"><i class="fas fa-user"></i> View Profile</a>
+                                <a class="dropdown-item" href="/profiles/transactions"><i class="fas fa-dollar-sign"></i> View Transactions</a>
                                 
                                 <% if (platform.enableDarkmode) { %>
                                     <% if (currentUser.darkmode) { %>

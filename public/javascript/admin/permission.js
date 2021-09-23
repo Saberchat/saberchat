@@ -27,39 +27,60 @@ const updateRole = function(select) { //Update user's permission
     });
 }
 
-const incBalance = function(userId, dollarPayment) { //Add 1 to balance
-    const input = document.getElementById(`balance-${userId}`);
-    if (dollarPayment) {input.value = (parseFloat(input.value) + 1).toFixed(2);
-    } else {input.value = (parseFloat(input.value) + 1);}
-    updateBalance(document.getElementById(userId), event);
-}
-
-const decBalance = function(userId, dollarPayment) { //Remove 1 from balance
-    const input = document.getElementById(`balance-${userId}`);
-    if (parseFloat(input.value) -1 >= 0) { //Check that balance still > 0
-        if (dollarPayment) {input.value = (parseFloat(input.value) - 1).toFixed(2);
-        } else {input.value = (parseFloat(input.value) - 1);}
-        updateBalance(document.getElementById(userId), event);
-    }
-}
-
 const updateBalance = function(form, event, dollarPayment) {
-    const loading = document.getElementById('loading'); //Button which shows request status
+    const userId = form.id;
+    const loading = document.getElementById(`loading-${userId}`); //Button which shows request status
     loading.style.display = 'block';
     loading.style.color = 'gray';
     loading.innerHTML = 'Waiting...';
-    const userId = form.id;
     const balanceInput = document.getElementById(`balance-${userId}`);
+    const balanceDisplay = document.getElementById(`balance-tag-${userId}`);
     const url = '/admin/balances?_method=put';
-    const data = {userId, bal: balanceInput.value};
-    sendPostReq(url, data, (data) => {
+    const data = {userId, bal: parseFloat(balanceInput.value)};
+    sendPostReq(url, data, data => {
         if (data.success) { //If successful, display success info
             loading.style.color = 'green';
             loading.innerHTML = data.success;
-            if (dollarPayment) {balanceInput.value = data.balance.toFixed(2);
-            } else {balanceInput.value = data.balance}
+            if (dollarPayment) {
+                balanceInput.value = "0.00";
+                balanceDisplay.innerText = parseFloat(data.balance).toFixed(2);
+            } else {
+                balanceInput.value = "0";
+                balanceDisplay.innerText = data.balance;
+            }
         } else if (data.error) { //If unsuccessful, display error message
-            loading.style.color = 'red';
+            loading.style.color = 'red'; 
+            loading.innerHTML = data.error;
+        }
+        setTimeout(() => {loading.style.display = "none";}, 2000); //After a second, hide the message
+    });
+    event.preventDefault();
+}
+
+const removeBalance = function(button, event, dollarPayment) {
+    const userId = button.id.split('-')[2];
+    const loading = document.getElementById(`loading-${userId}`); //Button which shows request status
+    loading.style.display = 'block';
+    loading.style.color = 'gray';
+    loading.innerHTML = 'Waiting...';
+    
+    const balanceInput = document.getElementById(`balance-${userId}`);
+    const balanceDisplay = document.getElementById(`balance-tag-${userId}`);
+    const url = '/admin/balances?_method=put';
+    const data = {userId, bal: -1*parseFloat(balanceInput.value)};
+    sendPostReq(url, data, data => {
+        if (data.success) { //If successful, display success info
+            loading.style.color = 'green';
+            loading.innerHTML = data.success;
+            if (dollarPayment) {
+                balanceInput.value = "0.00";
+                balanceDisplay.innerText = parseFloat(data.balance).toFixed(2);
+            } else {
+                balanceInput.value = "0";
+                balanceDisplay.innerText = data.balance;
+            }
+        } else if (data.error) { //If unsuccessful, display error message
+            loading.style.color = 'red'; 
             loading.innerHTML = data.error;
         }
         setTimeout(() => {loading.style.display = "none";}, 2000); //After a second, hide the message

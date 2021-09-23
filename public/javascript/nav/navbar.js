@@ -1,4 +1,4 @@
-const updateNav = function () { //Scroll through navbar
+const updateNav = function() { //Scroll through navbar
     const nav = document.getElementById('nav-component');
     let scrollTop = window.pageYOffset || (document.documentElement || document.body.parentNode || document.body).scrollTop;
     if (scrollTop >= 300) {

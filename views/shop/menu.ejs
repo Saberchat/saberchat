@@ -85,7 +85,7 @@
                                     <em class="item-description convertible-text"><%=para%></em>
                                     <% if ((i+1) < itemDescriptions[item._id.toString()].length) {%><br/><br/><%}%>
                                 <% } %><br/>
-                        <% if (item.mediaFile.display && [".png", ".jpg", ".jpeg", ".gif"].includes(fileExtensions.get(item.mediaFile.url).toLowerCase())) { %>
+                        <% if (item.mediaFile.display && fileExtensions.get(item.mediaFile.url) && [".png", ".jpg", ".jpeg", ".gif"].includes(fileExtensions.get(item.mediaFile.url).toLowerCase())) { %>
                             <% if (item.imageLink) {%>
                                 <a href="<%=item.mediaFile.url%>" target="_blank">
                                     <img class="item-image" src="<%= item.mediaFile.url %>"/>
@@ -101,7 +101,7 @@
                                 <a href="<%=item.imgUrl.url%>" target="_blank">
                                     <img class="item-image" src="<%= item.imgUrl.url %>"/>
                                 </a>
-                            <% } else {%>
+                            <% } else if (item.imgUrl.url) { %>
                                 <div class="no-link-container">
                                     <img class="item-image" src="<%= item.imgUrl.url %>"/>
                                 </div>
@@ -127,7 +127,7 @@
                                    <label for="request-address-<%=item._id%>">Your Mailing Address</label>
                                    <input id="request-address-<%=item._id%>" class="form-control mode" type="text" placeholder="Enter your mailing address" name="address" required><br>
                                    <label for="quantity--<%=item._id%>">Number Of Items</label>
-                                   <select class="num-orders mode" id="quantity-<%= item._id %>" name="quantity" onchange="changeOrderConfirmation()">
+                                   <select class="num-orders mode" id="quantity-<%= item._id %>" name="quantity" onchange="changeOrderConfirmation(), <%=currentUser.darkmode%>">
                                 <% let val = 1 %>
                                 <% if (item.availableItems > 3) { %>
                                     <% while (val <= 3) { %>

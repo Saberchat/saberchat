@@ -112,7 +112,9 @@ const appSetup = async function() {
     await app.use(await require("./routes/index")); //Index routes (no prefix)
     for (let route of generalRoutes) { await app.use(`/${route}`, await require(`./routes/${route}`));} //General Routes for all platforms
     for (let feature of platform.features) { //Platform-Specific Routes (For features in their own route directories)
-        if (!(await feature.route.includes('/'))) {await app.use(`/${feature.route}`, await require(`./routes/${feature.route}`));}
+        if (!(await feature.route.includes('/'))) {
+            await app.use(`/${feature.route}`, await require(`./routes/${feature.route}`));
+        }
     }
     await app.get('*', (req, res) => {return res.redirect('/');}); // Catch-all route
 

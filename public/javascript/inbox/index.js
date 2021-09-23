@@ -29,7 +29,7 @@ const delSelForm = document.getElementById('del-select-form');
 let inboxDisplay = 'message';
 let reqDisplay = 'current';
 
-const setMessages = function () { // changes view to messages
+const setMessages = function() { // changes view to messages
     if (inboxDisplay == 'request') {
         messageActions.classList.add('display');
         messageList.classList.add('display');
@@ -45,7 +45,7 @@ const setMessages = function () { // changes view to messages
     }
 }
 
-const setRequests = function () { //changes view to requests
+const setRequests = function() { //changes view to requests
     if (inboxDisplay == 'message') {
         requestActions.classList.add('display');
         requestList.classList.add('display');
@@ -61,11 +61,11 @@ const setRequests = function () { //changes view to requests
     }
 }
 
-const submitDelete = function () { // sends form info for deleting selected messages
+const submitDelete = function() { // sends form info for deleting selected messages
     delSelForm.submit();
 }
 
-const updateDelete = function () { // switches between delete all to delete selected
+const updateDelete = function() { // switches between delete all to delete selected
     const inputs = document.getElementsByClassName('del-form-input');
     let selected = false;
     for (let i = 0; i < inputs.length; i++) {

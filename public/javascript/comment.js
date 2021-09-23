@@ -1,15 +1,16 @@
-const comment = function (form, object, route, event) {
+let replyId; //Stores address of comment to which reply is directed
+
+const comment = function(form, object, route, event) {
     if (document.getElementById('comment-input').value.split(' ').join('') != '') {
         const id = form.id.split("-")[1];
         const url = `/${route}/comment?_method=put`;
-        const data = {text: document.getElementById('comment-input').value};
+        const data = {text: document.getElementById('comment-input').value, replyId};
         data[`${object}Id`] = id;
         document.getElementById('comment-input').value = ""; //Empty input field
 
         sendPostReq(url, data, data => {
             if (data.success) {
-                // DOM Elements that change with new comment
-                const allComments = document.getElementById('all-comments');
+                const allComments = document.getElementById('all-comments'); // DOM Elements that change with new comment
 
                 //Update the two HTML comment counters
                 document.getElementById('comments-count-icon').innerHTML = `<i class="fas fa-comment-dots"></i> ${data.comments.length}`;
@@ -48,7 +49,6 @@ const comment = function (form, object, route, event) {
     }
 }
 
-const reply = function (comment) {
+const reply = function(comment) {
     document.getElementById('comment-input').value = `@${comment.id.split("comment-")[1]}_ `;
-    // document.getElementById('comment-input').value = `Replying to @${comment.id.split("comment-")[1]}: `;
 }

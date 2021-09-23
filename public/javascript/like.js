@@ -1,4 +1,4 @@
-const like = function (button, object, route) { //Like an object
+const like = function(button, object, route) { //Like an object
     const id = button.id.split("-")[1];
     const url = `/${route}/like?_method=put`;
     const data = {};
@@ -19,7 +19,7 @@ const like = function (button, object, route) { //Like an object
     });
 }
 
-const likeComment = function (button, object, route) { //Like a comment on an object
+const likeComment = function(button, object, route) { //Like a comment on an object
     const commentId = button.id.split("-")[1];
     const url = `/${route}/like-comment?_method=put`;
     const data = {commentId};
