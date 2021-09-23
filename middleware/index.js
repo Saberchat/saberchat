@@ -160,6 +160,12 @@ middleware.isCashier = function(req, res, next) {
     return res.redirect('back');
 }
 
+middleware.isPollster = function(req, res, next) {
+    if (req.user.tags.includes('Pollster')) { return next();}
+    req.flash('error', 'You do not have permission to do that');
+    return res.redirect('back');
+}
+
 middleware.isEditor = function(req, res, next) {
     if (req.user.tags.includes('Editor')) { return next();}
     req.flash('error', 'You do not have permission to do that');

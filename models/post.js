@@ -52,8 +52,14 @@ module.exports = { //All subclass Schema
         links: [{type: String}],
         deadline: {day: String, month: String, year: String}
     })),
+    Poll: Post.discriminator('Poll', new mongoose.Schema({
+        googleFormUrl: String,
+        width: {type: Number, default: 480},
+        height: {type: Number, default: 640},
+        closed: {type:Boolean, default: false}
+    })),
     Puzzle: Post.discriminator("Puzzle", new mongoose.Schema({ //Weekly Puzzle Posts
         solution: String,
         answers: [{type: mongoose.Schema.Types.ObjectId, ref: "PostComment"}]
-    })) 
+    }))
 };

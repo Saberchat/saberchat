@@ -1,0 +1,43 @@
+<%- include('../partials/headStart') %>
+<link rel="stylesheet" href="/stylesheets/polls/instructions.css">
+<%- include('../partials/headEnd') %>
+<body>
+    <%- include('../partials/components/navbar') %>
+    <%- include('../partials/components/header') %>
+    <div class="container">
+        <div class="row">
+            <div class="col-12 col-lg-8 offset-lg-2 my-5">
+                <!-- jumbotron was deprecated. Custom jumbo. -->
+                <div class="bg-light text-center rounded-5">
+                    <div class="container-fluid py-5">
+                        <h1 class="display-5 fw-bold">Instructions</h1>
+                        <a href="/polls/new" class="btn btn-secondary">Go Back</a>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+        <div class="row">
+            <article class="col-12 col-lg-8 offset-lg-2 mb-5">
+                <h4>1. Click Send</h4>
+                <p>In the form editor, click the send button at the top right.</p>
+                <img class="img-fluid rounded mb-5" src="https://i.imgur.com/93EF4Wi.png" alt="send button at top right">
+
+                <h4>2. Click the link icon</h4>
+                <p>In the popup, select the paperclip/link icon in the middle.</p>
+                <img class="img-fluid rounded mb-5" src="https://i.imgur.com/UNH7AG3.png" alt="link button in middle">
+
+                <h4>3. Click Copy</h4>
+                <p>Click "copy" at the bottom right. <em>Do not shorten the Url!</em></p>
+                <img class="img-fluid rounded mb-5" src="https://i.imgur.com/vowSJ6T.png" alt="click copy">
+
+                <h4>4. Enter the link</h4>
+                <p>Paste the link into the Google url box</p>
+                <img class="img-fluid rounded mb-3" src="https://i.imgur.com/FPUnC1S.png" alt="google url input">
+
+                <a href="/polls/new" class="btn btn-info">Go Back</a>
+            </article>
+        </div>
+    </div>
+</body>
+</html>
