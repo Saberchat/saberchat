@@ -99,3 +99,23 @@ const switchOrders = function(button) { //Switch order panel from active orders 
         button.id = "past-order-button";
     }
 }
+
+const filterDate = function() {
+    const startInput = document.getElementById('startDateInput');
+    const endInput = document.getElementById('endDateInput');
+
+    if(!startInput.value && !endInput.value) {
+        const errMsg = document.getElementById('date-filter-err-msg');
+        return errMsg.style.display = 'block';
+    }
+
+    const urlParams = new URLSearchParams(window.location.search);
+    
+    urlParams.set('past', 'true');
+
+    if(startInput.value) { urlParams.set('start_date', startInput.value)};
+    if(endInput.value) { urlParams.set('end_date', endInput.value)};
+
+
+    window.location.search = urlParams;
+}

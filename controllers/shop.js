@@ -974,17 +974,64 @@ controller.manageOrders = async function(req, res) {
         await req.flash('error', `This feature is not enabled on ${platform.name} Saberchat`);
         return res.redirect('back');        
     }
+    let viewPast = false;
+    if(req.query.past) {
+        viewPast = true;
+    }
 
-    const orders = await Order.find({present: true}).populate("items.item");
+    const now = new Date();
+    // set defaults
+    let startDate = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    let endDate = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    // end datetime is technically beginning of next day
+    endDate.setDate(endDate.getDate() + 1);
 
-    let now = new Date();
-    let startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-    const ordersToday = await Order.find({created_at: {$gte: startOfToday}, present: false}).populate("items.item");
-    if (!platform || !orders) {
+    const startDateParam = req.query.start_date;
+    const endDateParam = req.query.end_date;
+
+    // expects queryparam of format YYYY-MM-DD
+    if(startDateParam && typeof startDateParam === 'string' && startDateParam.length === 10) { 
+        try {
+            startDate = new Date(startDateParam);
+        } catch (error) {
+            // do nothing
+        }
+    }
+
+    if(endDateParam && typeof endDateParam === 'string' && endDateParam.length === 10) { 
+        try {
+            endDate = new Date(endDateParam);
+            // end datetime is technically beginning of next day
+            endDate.setDate(endDate.getDate() + 1);
+        } catch (error) {
+            // do nothing
+        }
+    }
+
+    const activeOrders = await Order.find({present: true}).sort({created_at: -1}).populate("items.item");
+    if (!platform || !activeOrders) {
         await req.flash("error", "Could not find orders");
         return res.redirect("back");
     }
-    return res.render("shop/orderDisplay", {platform, orders, ordersToday, data: platform.features[await objectArrIndex(platform.features, "route", "shop")]});
+
+    const filteredOrders = await Order.find({
+            created_at: { $gte: startDate, $lte: endDate }, 
+            present: false
+        }).sort({created_at: -1}).populate("items.item");
+
+
+    // remove the extra day added for fe display purposes
+    endDate.setDate(endDate.getDate() - 1);
+
+    return res.render("shop/orderDisplay", {
+        platform, 
+        activeOrders, 
+        filteredOrders, 
+        startDate: startDate.toISOString().split('T')[0],
+        endDate: endDate.toISOString().split('T')[0],
+        data: platform.features[await objectArrIndex(platform.features, "route", "shop")],
+        viewPast: viewPast
+    });
 }
 
 module.exports = controller;
