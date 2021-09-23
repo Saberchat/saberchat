@@ -14,3 +14,26 @@ h2 {
 .cost {
     font-weight: bold;
 }
+
+#date-filter-err-msg {
+    display: none;
+}
+
+#startDateInput, #endDateInput {
+    margin-right: 1rem;
+}
+
+.filter-title {
+    font-size: 1.2rem;
+    font-weight: normal;
+    margin-bottom: 0.7rem;
+}
+
+.table-container.col-12 {
+    overflow-x: scroll;
+    padding: 0;
+}
+
+.table {
+    min-width: 700px;
+}

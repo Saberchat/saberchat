@@ -39,10 +39,10 @@
     </div>
     <br/>
 
-    <% if (orders.length === 0) { %>
+    <% if (activeOrders.length === 0) { %>
         <h2>No New Orders</h2>
     <% } else { %>
-        <% orders.reverse().forEach((order) => { %>
+        <% activeOrders.forEach((order) => { %>
             <div class="card mt-3 order-card darkmode-outline" id="<%= order._id %>">
                 <div class="card-body">
                     <h5 class="card-title">Order for <%= order.name %></h5>
@@ -191,48 +191,73 @@
 </div>
 
 <div id="output-stream-old" class="container mt-3" hidden>
-    <% if (ordersToday.length === 0) { %>
-        <h2>No Orders Today</h2>
+    <div class="date-filter">
+        <div class="row">
+            <div class="col-12">
+                <h4 class="filter-title">Search By Date Range</h4>
+                <label for="startDateInput">From</label>
+                <input type="date" name="startDate" id="startDateInput">
+                <label for="endDateInput">To</label>
+                <input type="date" name="endDate" id="endDateInput">
+            
+                <button class="btn btn-info" onclick="filterDate()">Search</button>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-12">
+                <p id="date-filter-err-msg" class="my-3 text-danger">Please select a start and/or end date</p>
+            </div>
+        </div>
+    </div>
+
+    <hr>
+
+    <% if (filteredOrders.length === 0) { %>
+        <h2>No Orders Found</h2>
     <% } else { %>
-        <% ordersToday.reverse().forEach((order) => { %>
-            <div class="card mt-3 order-card darkmode-outline" id="<%= order._id %>">
-                <div class="card-body">
-                    <h5 class="card-title">Order for <%= order.name %></h5>
-                    <p class="card-text"><span class="instructions">Extra Instructions:</span> <%= order.instructions %>
-                        <% if (!platform.dollarPayment) { %>
-                    <p class="card-text"><span class="instructions">Deliver To:</span> <%= order.address %>
-                        <% } %>
-                    </p>
-                    <ul class="list-group">
-                        <% for (let item of order.items) { %>
-                            <li class="list-group-item shop">
+        <div class="col-12 table-container">
+            <table class="table table-striped table-bordered">
+                <tr class="bg-secondary text-light">
+                    <th>Date</th>
+                    <th>Customer</th>
+                    <th>Order Items</th>
+                    <th>Total Cost</th>
+                    <th>Payment Type</th>
+                </tr>
+                <% filteredOrders.forEach((order) => { %>
+                    <tr>
+                        <td><%= order.date %></td>
+                        <td><%= order.name %></td>
+                        <td>
+                            <% for(const item of order.items) { %> 
                                 <% let itemCharge = (item.quantity * item.item.price); %>
                                 <%= item.item.name %> (<%= item.quantity %> order(s)) -
-                                <% if (platform.dollarPayment) { %>$<%= itemCharge.toFixed(2) %>
-                                <% } else { %><%= itemCharge %> Credits
-                                <% } %>
-                            </li>
-                        <% } %>
-                    </ul>
-
-                    <p class="card-text mt-3"><span class="cost">Cost:</span>
-                        <% if (platform.dollarPayment) { %>$<%= order.charge.toFixed(2) %>
-                        <% } else { %><%= order.charge %> Credits
-                        <% } %>
-                    </p>
-
-                    <p class="paying-in-person">
-                        <% if (order.payingInPerson) { %>
-                            Paying In-Person
-                        <% } else { %>
-                            Paying Online
-                        <% } %>
-                    </p>
-
-                    <p class="card-text"><%= order.date %></p>
-                </div>
-            </div>
-        <% }); %>
+                                <% if(platform.dollarPayment) { %>
+                                    $<%= itemCharge.toFixed(2) %>
+                                <% } else { %> 
+                                    <%= itemCharge %> Credits
+                                <% } %>  
+                                <br>
+                            <% } %> 
+                        </td>
+                        <td>
+                            <% if (platform.dollarPayment) { %>
+                                $<%= order.charge.toFixed(2) %>
+                            <% } else { %>
+                                <%= order.charge %> Credits
+                            <% } %>
+                        </td>
+                        <td>
+                            <% if (order.payingInPerson) { %>
+                                In-Person
+                            <% } else { %>
+                                Online
+                            <% } %>
+                        </td>
+                    </tr>
+                <% }); %> 
+            </table>
+        </div>
     <% } %>
 </div>
 <br>
@@ -244,7 +269,15 @@
         document.getElementById("search-input").style.backgroundColor = colorScheme[colorScheme.length - 1];
     }
 
+    document.getElementById('startDateInput').value = "<%= startDate %>";
+    document.getElementById('endDateInput').value = "<%= endDate %>";
+
     getOrders("#output-stream", "<%= platform.dollarPayment %>");
 </script>
+<% if(viewPast) { %>
+    <script>
+        switchOrders({id: 'past-order-button'});
+    </script>
+<% } %>  
 </body>
 </html>
