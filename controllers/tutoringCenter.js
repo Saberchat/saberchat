@@ -380,11 +380,12 @@ controller.updateJoinCode = async function(req, res) {
     return res.json({success: "Succesfully Updated Join Code", joinCode});
 }
 
-//Project creator search
+//Course tutor search
 controller.searchTutors = async function(req, res) {
-    console.log("REQUEST")
+    //Initialize platform and specific course
     const platform = await setup(Platform);
-    if (!platform) {return res.json({error: "An error occurred"});}
+    const course = await Course.findById(req.params.id);
+    if (!platform || !course) {return res.json({error: "An error occurred"});}
 
     //Collect user data based on form
     const users = await User.find({authenticated: true, _id: {$ne: req.user._id}, status: {$in: platform.studentStatuses}});
@@ -393,16 +394,14 @@ controller.searchTutors = async function(req, res) {
     let tutors = [];
     let displayValue;
 
-    if (!req.body.anonymous) { //Only add other statuses if the message is not anonymous
-        for (let status of platform.studentStatuses) { //Iterate through statuses and search for matches
-            displayValue = platform.statusesPlural[platform.statusesProperty.indexOf(status)];
-            if (await `${status} ${displayValue}`.toLowerCase().includes(await req.body.text.toLowerCase())) {
-                await tutors.push({ //Add status to array, using display and id values
-                    displayValue,
-                    idValue: status,
-                    type: "status"
-                });
-            }
+    for (let status of platform.studentStatuses) { //Iterate through statuses and search for matches
+        displayValue = platform.statusesPlural[platform.statusesProperty.indexOf(status)];
+        if (await `${status} ${displayValue}`.toLowerCase().includes(await req.body.text.toLowerCase())) {
+            await tutors.push({ //Add status to array, using display and id values
+                displayValue,
+                idValue: status,
+                type: "status"
+            });
         }
     }
 
@@ -417,9 +416,116 @@ controller.searchTutors = async function(req, res) {
             });
         }
     }
+    return res.json({success: "Successfully collected data", tutors}); //Send data to frontend
+}
 
-    await console.log(tutors);
-    return res.json({success: "Successfully collected data", tutors});
+//Course student search
+controller.searchStudents = async function(req, res) {
+    //Initialize platform and specific course
+    const platform = await setup(Platform);
+    const course = await Course.findById(req.params.id);
+    if (!platform || !course) {return res.json({error: "An error occurred"});}
+
+    //Collect user data based on form
+    const users = await User.find({authenticated: true, _id: {$ne: req.user._id}, status: {$in: platform.studentStatuses}});
+    if (!users) {return res.json({error: "An error occurred"});}
+
+    let students = [];
+    let displayValue;
+
+    for (let status of platform.studentStatuses) { //Iterate through statuses and search for matches
+        displayValue = platform.statusesPlural[platform.statusesProperty.indexOf(status)];
+        if (await `${status} ${displayValue}`.toLowerCase().includes(await req.body.text.toLowerCase())) {
+            await students.push({ //Add status to array, using display and id values
+                displayValue,
+                idValue: status,
+                type: "status"
+            });
+        }
+    }
+
+    for (let user of users) { //Iterate through usernames and search for matches
+        //Check that user is not currently a student in this course
+        if (!(await course.members.includes(user._id)) && await `${user.firstName} ${user.lastName} ${user.username}`.toLowerCase().includes(await req.body.text.toLowerCase())) {
+            await students.push({ //Add user to array, using username as display, and id as id value
+                displayValue: `${user.firstName} ${user.lastName} (${user.username})`, 
+                idValue: user._id,
+                classValue: user.status,
+                type: "user"
+            });
+        }
+    }
+    return res.json({success: "Successfully collected data", students}); //Send data to frontend
+}
+
+controller.updateTutors = async function(req, res) { //Add tutors to course, as a faculty member
+    const platform = await setup(Platform);
+    const course = await Course.findById(req.params.id);
+    if (!platform || !course) {
+        await req.flash("An error occurred");
+        return res.redirect("back");
+    }
+
+    if (req.body.tutorInput != '') {
+        for (let user of req.body.tutorInput.split(',')) {
+            if (platform.studentStatuses.includes(user)) { //Added 'tutor' is a full status of users
+                for (let u of await User.find({status: user})) {
+                    if (!(await course.members.includes(u._id)) && (await objectArrIndex(course.tutors, "tutor", u._id) == -1)) {
+                        await course.tutors.push({
+                            tutor: u._id,
+                            bio: '',
+                            slots: 0,
+                            cost: 10,
+                            available: 0,
+                            dateJoined: new Date(Date.now())
+                        });
+                    }
+                }
+
+            } else if (!(await course.members.includes(user)) && (await objectArrIndex(course.tutors, "tutor", user) == -1)) { //Added student is a user ID
+                await course.tutors.push({
+                    tutor: await User.findById(user),
+                    bio: '',
+                    slots: 0,
+                    cost: 10,
+                    available: 0,
+                    dateJoined: new Date(Date.now())
+                });
+            }
+        }
+        await course.save();
+        await req.flash("success", "Successfully added tutors!");
+    }
+    return res.redirect(`/tutoringCenter/${req.params.id}`);
+}
+
+controller.updateStudents = async function(req, res) { //Add students to a course, as a faculty member
+    await console.log(req.body);
+    const platform = await setup(Platform);
+    const course = await Course.findById(req.params.id);
+    if (!platform || !course) {
+        await req.flash("An error occurred");
+        return res.redirect("back");
+    }
+
+    if (req.body.studentInput != '') {
+        for (let user of req.body.studentInput.split(',')) {
+            if (platform.studentStatuses.includes(user)) { //Added 'student' is a full status of usrs
+                for (let u of await User.find({status: user})) {
+                    if (!(await course.members.includes(u._id)) && (await objectArrIndex(course.tutors, "tutor", u._id)) == -1) { //Check that each user is not a current tutor for this course
+                        await course.members.push(u);
+                    }
+                };
+            } else { //Added student represents user ID
+                if (!(await course.members.includes(user)) && (await objectArrIndex(course.tutors, "tutor", user) == -1)) { //Check that user is not a current tutor for this course
+                    await course.members.push(await User.findById(user));
+                }
+            }
+        }
+        await course.save();
+        await req.flash("success", "Successfully added students!");
+    }
+    return res.redirect(`/tutoringCenter/${req.params.id}`);
 }
 
 controller.removeStudent = async function(req, res) {

@@ -1,6 +1,7 @@
 <%- include('../partials/headStart') %>
     <link rel="stylesheet" href="/stylesheets/home/index.css">
     <link rel="stylesheet" href="/stylesheets/tutoringCenter/show.css">
+    <link rel="stylesheet" href="/stylesheets/projects/index.css">
     <link rel="stylesheet" href="/stylesheets/shop/menu.css">
     <%if (currentUser && currentUser.darkmode) {%>
         <link rel="stylesheet" href="/stylesheets/tutoringCenter/tutoringCenter-dark.css">
@@ -9,6 +10,7 @@
 
     <script src="/javascript/postUtil.js"></script>
     <script src="/javascript/tutoringCenter/settings.js"></script>
+    <script src="/javascript/tutoringCenter/search.js"></script>
     <script src="/javascript/tutoringCenter/upvote.js"></script>
     <script src="/javascript/tutoringCenter/rating.js"></script>
     <script src="/javascript/tutoringCenter/actions.js"></script>
@@ -564,26 +566,24 @@
                 </form>
                 <br/>
 
-                <form id="update-tutors" action="/tutoringCenter/updateTutors/<%=course._id%>?_method=put" method="post">
+                <form id="update-tutors" action="/tutoringCenter/update-tutors/<%=course._id%>?_method=put" method="post">
                     <h4>Add Tutors</h4>
-                    <div class="form-group">
-                        <input type="text" class="form-control mode" id="tutor-list" placeholder="Tutors" oninput="searchTutors(this)"><br>
-                        <select id="tutor-select" class="form-control mode" onchange="addTutor('user')" style="display: none;" hidden></select>
+                    <div class="form-group mode" id="tutor-input-div">
+                        <input type="text" class="form-control mode" id="tutor-list" placeholder="Tutors" oninput="searchTutors(this, '<%=course._id%>')"><br>
+                        <select id="tutor-select" class="form-control mode" onchange="addTutor('user')" style="display: none;"></select><br>
                         <input type="text" id="tutor-input" name="tutorInput" hidden/>
                     </div>
-                    <button type="submit" class="btn btn-lg btn-primary btn-block" data-toggle="modal"
-                    data-target="#modal-change-teacher">Confirm New Tutors</button>
+                    <button type="submit" class="btn btn-lg btn-primary btn-block">Confirm New Tutors</button>
                 </form><br><br>
 
-                <form id="update-students" action="/tutoringCenter/updateStudents/<%=course._id%>?_method=put" method="post">
+                <form id="update-students" action="/tutoringCenter/update-students/<%=course._id%>?_method=put" method="post">
                     <h4>Add Students</h4>
-                    <div class="form-group">
-                        <input type="text" class="form-control mode" id="student-list" placeholder="Students" oninput="searchStudents(this)"><br>
-                        <select id="student-select" class="form-control mode" onchange="addStudent('user')" style="display: none;" hidden></select>
+                    <div class="form-group mode" id="student-input-div">
+                        <input type="text" class="form-control mode" id="student-list" placeholder="Students" oninput="searchStudents(this, '<%=course._id%>')"><br>
+                        <select id="student-select" class="form-control mode" onchange="addStudent('user')" style="display: none;"></select><br>
                         <input type="text" id="student-input" name="studentInput" hidden/>
                     </div>
-                    <button type="submit" class="btn btn-lg btn-primary btn-block" data-toggle="modal"
-                    data-target="#modal-change-teacher">Confirm New Students</button>
+                    <button type="submit" class="btn btn-lg btn-primary btn-block">Confirm New Students</button>
                 </form><br><br>
 
                 <form id="update-teacher" action="/tutoringCenter/updateTeacher/<%= course._id %>?_method=put" method="post">
