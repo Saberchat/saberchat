@@ -58,3 +58,8 @@ html, body {
 #developers-heading, .feature-description {
     font-weight: bold;
 }
+
+#cafeMenuButton:hover {
+    filter: brightness(95%);
+    cursor: pointer;
+}
