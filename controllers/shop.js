@@ -100,7 +100,7 @@ controller.orderForm = async function(req, res) {
                 await req.flash("error", "Unable to find orders");
                 return res.redirect("back");
 
-            } else if (sentOrders.length > 2) {
+            } else if (sentOrders.length > 2000) {
                 await req.flash("error", "You have made the maximum number of orders for the day");
                 return res.redirect("back");
             }
@@ -190,7 +190,7 @@ controller.order = async function(req, res) {
         return res.redirect("back");
     }
 
-    if (sentOrders.length > 2) { //If more than two orders are already made, you cannot order again
+    if (sentOrders.length > 2000) { //If more than two orders are already made, you cannot order again
         await req.flash("error", "You have made the maximum number of orders for the day");
         return res.redirect("back");
     }
