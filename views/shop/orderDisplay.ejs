@@ -62,13 +62,11 @@
                             </li>
                         <% } %>
                     </ul>
-
                     <p class="card-text mt-3"><span class="cost">Cost:</span>
                         <% if (platform.dollarPayment) { %>$<%= order.charge.toFixed(2) %>
                         <% } else { %><%= order.charge %> Credits
                         <% } %>
                     </p>
-
                     <p class="paying-in-person">
                         <% if (order.payingInPerson) { %>
                             Paying In-Person
@@ -76,9 +74,7 @@
                             Paying Online
                         <% } %>
                     </p>
-
                     <p class="card-text"><%= order.date %></p>
-
                     <% if (currentUser.tags.includes("Cashier")) { %>
                         <form class="ready-form" action="<%= order._id %>/ready" method="post"
                               id="ready-form-<%= order._id %>">
@@ -94,7 +90,6 @@
                             <button type="button" data-toggle="modal" data-target="#modal-<%= order._id %>-reject"
                                     class="btn btn-danger" name="button">Reject Order
                             </button>
-
                             <div class="modal fade" id="modal-<%= order._id %>-confirm" tabindex="-1"
                                  aria-labelledby="deleteModalLabel" aria-hidden="true">
                                 <div class="modal-dialog mode">
@@ -122,7 +117,6 @@
                                     </div>
                                 </div>
                             </div>
-
                             <div class="modal fade" id="modal-<%= order._id %>-ready" tabindex="-1"
                                  aria-labelledby="deleteModalLabel" aria-hidden="true">
                                 <div class="modal-dialog mode">
@@ -148,7 +142,6 @@
                                     </div>
                                 </div>
                             </div>
-
                             <div class="modal fade" id="modal-<%= order._id %>-reject" tabindex="-1"
                                  aria-labelledby="deleteModalLabel" aria-hidden="true">
                                 <div class="modal-dialog mode">
@@ -189,7 +182,6 @@
         <% }); %>
     <% } %>
 </div>
-
 <div id="output-stream-old" class="container mt-3" hidden>
     <div class="date-filter">
         <div class="row">
@@ -209,9 +201,7 @@
             </div>
         </div>
     </div>
-
     <hr>
-
     <% if (filteredOrders.length === 0) { %>
         <h2>No Orders Found</h2>
     <% } else { %>
@@ -265,17 +255,14 @@
     <% } %>
 </div>
 <br>
-
 <script src="/javascript/shop/search.js"></script>
 <script src="/javascript/admin/search.js"></script>
 <script>
     if (document.getElementById("search-input")) {
         document.getElementById("search-input").style.backgroundColor = colorScheme[colorScheme.length - 1];
     }
-
     document.getElementById('startDateInput').value = "<%= startDate %>";
     document.getElementById('endDateInput').value = "<%= endDate %>";
-
     getOrders("#output-stream", "<%= platform.dollarPayment %>");
 </script>
 <% if(viewPast) { %>
