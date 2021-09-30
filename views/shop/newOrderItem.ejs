@@ -94,7 +94,16 @@
                         <input type="checkbox" name="imageLink" id="imageLink"/>
                         <label for="imageLink">Allow Display Image To Link To Larger Image</label>
                     </div>
+
+                    <div class="form-group">
+                      <label><strong>Item Tags</strong></label><br />
+                      <% for (let tag of shop.itemTags) { %>
+                        <input type="checkbox" name="<%=tag%>" id="<%=tag.split(' ').join('')%>"/>
+                        <label for="<%=tag.split(' ').join('')%>"><%=tag%></label><br>
+                      <% } %>
+                  </div>
                 </div>
+
                 <div class="form-group">
                     <label for="descInput">Description</label>
                     <textarea id="descInput" class="form-control mode" name="description" placeholder="Enter a short description about the item" rows="5"></textarea>

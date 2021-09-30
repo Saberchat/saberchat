@@ -414,13 +414,14 @@ controller.deleteOrder = async function(req, res) {
 //FORM TO CREATE NEW ITEM
 controller.newItem = async function(req, res) {
     const platform = await setup(Platform);
+    const shop = await setup(Market);
     const categories = await ItemCategory.find({});
     if (!platform || !categories) {
         await req.flash("error", "An Error Occurred");
         return res.redirect("back");
     }
 
-    return res.render("shop/newOrderItem", {platform, categories, data: platform.features[await objectArrIndex(platform.features, "route", "shop")]});
+    return res.render("shop/newOrderItem", {platform, shop, categories, data: platform.features[await objectArrIndex(platform.features, "route", "shop")]});
 }
 
 //CREATE NEW ITEM
@@ -452,6 +453,10 @@ controller.createItem = async function(req, res) {
         return res.redirect("back");
     }
     if (!item.displayAvailability) {item.availableItems = 10;}
+
+    for (let tag of shop.itemTags) { //Iterate through shop tags and add tag if listed for item
+        if (req.body[tag]) {item.tags.push(tag);}
+    }
 
     item.mediaFile.display = req.body.showImage == "upload";
     if (!platform.purchasable) {item.link = req.body.url;}
@@ -503,6 +508,7 @@ controller.createItem = async function(req, res) {
 //VIEW/EDIT ITEM
 controller.viewItem = async function(req, res) {
     const platform = await setup(Platform);
+    const shop = await setup(Market);
     const item = await Item.findById(req.params.id);
     if (!platform || !item) {
         await req.flash("error", "Unable to find item");
@@ -520,7 +526,7 @@ controller.viewItem = async function(req, res) {
         await fileExtensions.set(item.mediaFile.url, await path.extname(await item.mediaFile.url.split("SaberChat/")[1]));
     }
 
-    return res.render("shop/show", {platform, categories, item, fileExtensions, data: platform.features[await objectArrIndex(platform.features, "route", "shop")]});
+    return res.render("shop/show", {platform, shop, categories, item, fileExtensions, data: platform.features[await objectArrIndex(platform.features, "route", "shop")]});
 }
 
 //UPDATE/UPVOTE ITEM
@@ -623,7 +629,8 @@ controller.changeStatus = async function(req, res) {
 
 controller.updateSettings = async function(req, res) {
     const platform = await setup(Platform);
-    if (!platform) {
+    const shop = await setup(Market);
+    if (!platform || !shop) {
         await req.flash("error", "Could not access platform");
         return res.redirect("back");
     }
@@ -631,6 +638,24 @@ controller.updateSettings = async function(req, res) {
     for (let attr of ["name", "description"]) {
         platform.features[await objectArrIndex(platform.features, "route", "shop")][attr] = req.body[attr];
     }
+    
+    shop.itemTags = req.body.tagInput.split(',');
+    await shop.save()
+    
+    //Update tags on order items
+    const items = await Item.find({});
+    if (!items) {
+        await req.flash("error", "Could not access items");
+        return res.redirect("back");
+    }
+
+    for (let item of items) {
+        for (let tag of item.tags) {
+            if (!await shop.itemTags.includes(tag)) {await item.tags.splice(item.tags.indexOf(tag), 1);} //If tag is no longer used, remove it from item
+        }
+        await item.save();
+    }
+
     await platform.save();
     await req.flash("success", "Updated Settings!");
     return res.redirect("/shop/manage");
@@ -654,7 +679,7 @@ controller.newCategory = async function(req, res) {
 controller.createCategory = async function(req, res) {
     const shop = await setup(Market);
     const overlap = await ItemCategory.find({_id: {$in: shop.categories}, name: req.body.name}); //Find all item categories with this name that already exist
-    if (!overlap) {
+    if (!shop || !overlap) {
         await req.flash("error", "Unable to find item categories");
         return res.redirect("back");
     }
@@ -859,7 +884,8 @@ controller.updateItemInfo = async function(req, res) {
         description: req.body.description,
         imgUrl: {url: req.body.image, display: req.body.showImage == "url"},
         imageLink: (req.body.imageLink != undefined),
-        displayAvailability: (req.body.displayAvailability != undefined)
+        displayAvailability: (req.body.displayAvailability != undefined),
+        tags: [] //Reset tags to be added back from form
     });
     if (!item) {
         await req.flash("error", "item not found");
@@ -867,6 +893,10 @@ controller.updateItemInfo = async function(req, res) {
     }
 
     if (!item.displayAvailability) {item.availableItems = 10;}
+    for (let tag of shop.itemTags) { //Iterate through shop tags and add tag if listed for item
+        if (req.body[tag]) {item.tags.push(tag);}
+    }
+
     if (!platform.purchasable) {item.link = req.body.url;}
     item.mediaFile.display = req.body.showImage == "upload";
     if (req.files) {
@@ -965,7 +995,7 @@ controller.manageShop = async function(req, res) {
         await sortedCategories.push(sortedCategory);
     }
 
-    return res.render("shop/manage", {platform, categories: sortedCategories, open: shop.open, data: platform.features[await objectArrIndex(platform.features, "route", "shop")]});
+    return res.render("shop/manage", {platform, shop, categories: sortedCategories, data: platform.features[await objectArrIndex(platform.features, "route", "shop")]});
 }
 
 controller.manageOrders = async function(req, res) {

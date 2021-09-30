@@ -42,7 +42,8 @@ module.exports = { //All subclasses
         open: {type: Boolean, default: false},
         revenue: {type: Number, default: 0},
         expenditures: {type: Number, default: 0},
-        categories: [{type: mongoose.Schema.Types.ObjectId, ref: "ItemCategory"}]
+        categories: [{type: mongoose.Schema.Types.ObjectId, ref: "ItemCategory"}],
+        itemTags: [{type: String}]
     })),
     Course: Group.discriminator("Course", new mongoose.Schema({ //Tutoring center courses
         tutors: [{

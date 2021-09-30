@@ -500,7 +500,6 @@ controller.updateTutors = async function(req, res) { //Add tutors to course, as 
 }
 
 controller.updateStudents = async function(req, res) { //Add students to a course, as a faculty member
-    await console.log(req.body);
     const platform = await setup(Platform);
     const course = await Course.findById(req.params.id);
     if (!platform || !course) {

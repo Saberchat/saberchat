@@ -1,3 +1,5 @@
+let tagList = document.getElementById("tag-input").value.split(','); //Create array storing all current tags
+
 const confirm = function(button) { //Send request that order is ready
     const orderId = button.id.split('-')[0];
     const url = `/shop/order/confirm/${orderId}?_method=put`;
@@ -118,4 +120,32 @@ const filterDate = function() {
 
 
     window.location.search = urlParams;
+}
+
+const addTag = function(e) { //Add creator to list of creators
+    e.preventDefault();
+    const input = document.getElementById("new-tag-input");
+    tagList.push(input.value);
+    document.getElementById("tag-input").value = tagList.toString();
+
+    let newTag = document.createElement('div');
+    newTag.classList.add('user-tag');
+    newTag.id = input.value;
+    newTag.innerHTML = `<span name="tags" value="${input.value}">${input.value}</span><button type="button" id="${input.value}" onclick="remTag(this)">&times;</button>`;
+    document.getElementById("cafe-info-div").appendChild(newTag);
+
+    //Empty input
+    input.value = "";
+}
+
+const remTag = function(btn) { //Remove tag from list of cafe item tags
+    const id = btn.id;
+    const itemTags = document.getElementsByClassName('user-tag');
+    for (let tag of itemTags) { //Iterate through tags until the one with the remove ID is found
+        if (tag.id == id) {
+            document.getElementById("cafe-info-div").removeChild(tag);
+            tagList.splice(tagList.indexOf(id), 1);
+            document.getElementById("tag-input").value = tagList.toString();
+        }
+    }
 }

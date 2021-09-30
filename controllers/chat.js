@@ -339,8 +339,6 @@ controller.updateRoom = async function(req, res) {
             if (room.thumbnailFile && room.thumbnailFile.filename) {
                 [cloudErr, cloudResult] = await cloudDelete(room.thumbnailFile.filename, "image");
                 if (cloudErr || !cloudResult || cloudResult.result !== "ok") {
-                    console.log(cloudErr);
-                    console.log(cloudResult);
                     await req.flash("error", "Error deleting uploaded image");
                     return res.redirect("back");
                 }

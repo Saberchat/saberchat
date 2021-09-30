@@ -54,6 +54,7 @@
                                 <span class="list-group-item list-group-item-action menu-item <%= category.name.split(' ').join('') %>  shop"
                                     id="item-<%= item.id %>">
                             <% } %>
+
                                 <span class="item-name"><%= item.name %> <% if (item.displayAvailability){%>(<%= item.availableItems %> in stock)<%}%></span> - <% if (platform.dollarPayment) {%>$<%=(item.price).toFixed(2)%><% } else {%><%=(item.price)%> Credits<%}%>
                                 <% if (currentUser) { %>
                                     <div title="Upvotes" class="upvotes">
@@ -74,12 +75,16 @@
                                     <span class="popular">Frequently Ordered</span>
                                 <% } %>
 
+                                <% for (let tag of item.tags) { %>
+                                    <li><em><strong><%=tag%></strong></em></li>
+                                <% } %>
+
                                 <% if (!platform.purchasable && item.price <= currentUser.balance) { %>
                                     <button class="btn btn-success popular" style="color: white;" data-toggle="modal" data-target="#modal-<%= item._id %>-request">Purchase Request</button>
                                 <% } %>
 
                                 <% if (!platform.purchasable && item.link != '') {%><br><strong>Order Here:</strong> <a target="_blank" href="<%=item.link%>"> <%=item.link%></a><% } %>
-                                <br><br/>
+                                <br>
                                 <% for (let i = 0; i < itemDescriptions[item._id.toString()].length; i++) {%>
                                     <% let para = itemDescriptions[item._id.toString()][i];%>
                                     <em class="item-description convertible-text"><%=para%></em>

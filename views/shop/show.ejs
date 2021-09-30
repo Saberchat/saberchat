@@ -114,6 +114,14 @@
                         <input type="checkbox" name="imageLink" id="imageLink" <%if(item.imageLink){%>checked<%}%>/>
                         <label for="imageLink">Allow Display Image To Link To Larger Image</label>
                     </div>
+
+                    <div class="form-group">
+                        <label><strong>Item Tags</strong></label><br />
+                        <% for (let tag of shop.itemTags) { %>
+                          <input type="checkbox" name="<%=tag%>" id="<%=tag.split(' ').join('')%>" <% if (item.tags.includes(tag)) {%> checked <% } %>/>
+                          <label for="<%=tag.split(' ').join('')%>"><%=tag%></label><br>
+                        <% } %>
+                    </div>
                 </div>
                 <div class="form-group">
                     <label for="descInput">Description</label>
