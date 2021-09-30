@@ -122,7 +122,7 @@ const filterDate = function() {
     window.location.search = urlParams;
 }
 
-const addTag = function(e) { //Add creator to list of creators
+const addTag = function(e) { //Add tag to list of cafe item tags
     e.preventDefault();
     const input = document.getElementById("new-tag-input");
     tagList.push(input.value);
