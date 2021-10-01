@@ -1,6 +1,6 @@
 let tagList = []
 if (document.getElementById("tag-input")) {
-    tagList = document.getElementById("tag-input");
+    tagList = document.getElementById("tag-input").value.split(',');
 } else {
     tagList = [];
 }
