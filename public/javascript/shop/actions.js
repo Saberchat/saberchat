@@ -1,4 +1,9 @@
-let tagList = document.getElementById("tag-input").value.split(','); //Create array storing all current tags
+let tagList = []
+if (document.getElementById("tag-input")) {
+    tagList = document.getElementById("tag-input");
+} else {
+    tagList = [];
+}
 
 const confirm = function(button) { //Send request that order is ready
     const orderId = button.id.split('-')[0];

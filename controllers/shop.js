@@ -100,7 +100,7 @@ controller.orderForm = async function(req, res) {
                 await req.flash("error", "Unable to find orders");
                 return res.redirect("back");
 
-            } else if (sentOrders.length > 2000) {
+            } else if (sentOrders.length > 3) {
                 await req.flash("error", "You have made the maximum number of orders for the day");
                 return res.redirect("back");
             }
