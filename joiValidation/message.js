@@ -8,9 +8,9 @@ const msgSchema = Joi.object({
         "string.empty": "Subject is required.",
         "string.max": "Subject max 100 characters."
     }),
-    message: Joi.string().required().max(500).escapeHtml().messages({
+    message: Joi.string().required().max(1000).escapeHtml().messages({
         "string.empty": "Message is required.",
-        "string.max": "Message max 500 characters."
+        "string.max": "Message max 1000 characters."
     }),
     recipients: Joi.string().escapeHtml(),
     all: Joi.boolean().valid(true),
