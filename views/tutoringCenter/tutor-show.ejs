@@ -422,16 +422,15 @@
                               <span class="<%=student.student.permission%> <%=student.student.status%> <%=student.student.tags.join(' ')%> student-block"><span class="span-tag-name"><%=student.student.firstName%> <%=student.student.lastName%></span> <span class="span-tag-username"><%=student.student.username%></span></span>
                         </a>
                         <% if (tutor.tutor._id.equals(currentUser._id) || student.student._id.equals(currentUser._id) || course.creator.equals(currentUser._id)) { %>
-                            <a class="btn btn-info lesson-button" href="/tutoringCenter/tutors/<%=course._id%>?tutorId=<%=tutor.tutor._id%>&studentId=<%=student.student._id%>">Lesson Information</a>
+                          <a class="btn btn-info lesson-button" href="/tutoringCenter/tutors/<%=course._id%>?tutorId=<%=tutor.tutor._id%>&studentId=<%=student.student._id%>">Lesson Information</a>
                         <% } %>
 
                         <% if (tutor.tutor._id.equals(currentUser._id)) { %>
-                          <button type="button" data-toggle="modal" data-target="#modal-<%= student.student._id %>-mark"
-                                  id="mark-<%= student.student._id %>" class="btn btn-success mark-button">Mark Lesson
-                          </button>
+                          <a class="btn btn-success lesson-button" href="/chat/<%=student.room%>" style="float: right;">Chat</a>  
+                          <button type="button" data-toggle="modal" data-target="#modal-<%= student.student._id %>-mark" id="mark-<%= student.student._id %>" class="btn btn-primary mark-button">Mark Lesson</button>
                       <% } %>
                       <% if (tutor.tutor._id.equals(currentUser._id) || student.student._id.equals(currentUser._id) || course.creator._id.equals(currentUser._id)) { %>
-                          <span class="lessons-length">
+                          <span class="lessons-length" style="margin-top: 15px;" >
                               <span id="lessons-length-<%= student.student._id %>"><%= student.lessons.length%></span> lesson(s)</span>
                       <% } %>
                   </div>
@@ -467,11 +466,11 @@
                           </div>
                       </div>
                     </div>
-                  </div>
                 <% } %>
             <% } else { %>
                 <h1 class="empty-field">No Students</h1>
             <% } %>
+          </div>
             <br/><br/>
 
           <% if (tutor.formerStudents.length > 0) { %>

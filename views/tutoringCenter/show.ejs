@@ -119,10 +119,8 @@
                   <% } else if (currentUser.tags.includes("Tutor")) {%>
                     <% for (let tutor of course.tutors) { %>
                         <% if (tutor.tutor._id.equals(currentUser._id)) { %>
-                            <% for (let s of tutor.members) { %>
-                                <% if (s.student.equals(student._id)) { %>
-                                    <a style="margin-left: 10px;" class="btn btn-success" href="/chat/<%=s.room%>">Chat</a>
-                                <% } %>
+                            <% if (objectArrIndex(tutor.members, "student", student._id) > -1) { %>
+                                <a style="margin-left: 10px;" class="btn btn-success" href="/chat/<%=tutor.members[objectArrIndex(tutor.members, 'student', student._id)].room%>">Chat</a>
                             <% } %>
                         <% } %>
                     <% } %>

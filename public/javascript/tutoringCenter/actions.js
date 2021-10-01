@@ -125,7 +125,9 @@ const book = function(button, location, darkmode) { //Book a tutor
                 //Add students list and heading to page 
                 studentDiv.appendChild(studentsList);
                 studentDiv.innerHTML += "<br/><br/>"
-                studentDiv.appendChild(formerStudentsList);
+                if (data.formerStudents.length > 0) {
+                    studentDiv.appendChild(formerStudentsList);
+                }
                 studentDiv.hidden = true;
                 document.getElementById("options-bar").insertBefore(studentHeading, document.getElementById("courses"));
                 document.getElementsByClassName("courses")[0].parentNode.insertBefore(studentDiv, document.getElementsByClassName("courses")[0]);
