@@ -58,7 +58,7 @@ controller.showMsg = async function(req, res) {
     }
 
     //If message has not been read yet, mark it as read
-    if(!message.read.includes(req.user._id) && (message.toEveryone || await message.recipients.includes(req.user._id))) {
+    if((!message.author.equals(req.user._id)) && !message.read.includes(req.user._id) && (message.toEveryone || await message.recipients.includes(req.user._id))) {
         req.user.inbox[await objectArrIndex(req.user.inbox, "message", message._id)].new = false;
         await message.read.push(req.user._id);
         await req.user.save();
