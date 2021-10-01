@@ -85,9 +85,9 @@
                 <a class="nav-link">Settings</a>
             </li>
 
-            <li class="nav-item tab-header tab" id="blocked" onclick="changeTab(this, <%=currentUser.darkmode%>)">
+            <!-- <li class="nav-item tab-header tab" id="blocked" onclick="changeTab(this, <%=currentUser.darkmode%>)">
                 <a class="nav-link">Blocked</a>
-            </li>
+            </li> -->
         <% } %>
     </ul>
 
@@ -116,7 +116,17 @@
                   </a>
                   <% if (course.creator._id.equals(currentUser._id)) { %>
                     <button class="btn btn-danger leave-button" id="remove-button-<%=student._id%>" data-toggle="modal" data-target="#modal-index-remove-<%=student._id%>">Remove Student</button>
-                  <% } %>
+                  <% } else if (currentUser.tags.includes("Tutor")) {%>
+                    <% for (let tutor of course.tutors) { %>
+                        <% if (tutor.tutor._id.equals(currentUser._id)) { %>
+                            <% for (let s of tutor.members) { %>
+                                <% if (s.student.equals(student._id)) { %>
+                                    <a style="margin-left: 10px;" class="btn btn-success" href="/chat/<%=s.room%>">Chat</a>
+                                <% } %>
+                            <% } %>
+                        <% } %>
+                    <% } %>
+                 <% } %>
                 </li>
 
                 <div class="modal fade" id="modal-index-remove-<%=student._id%>" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
@@ -150,7 +160,7 @@
                 <li class="list-group-item list-group-item-action tutor-profile menu-item shop" id="item-<%=tutor.tutor._id%>">
                   <a href="/tutoringCenter/tutors/<%=course._id%>?tutorId=<%=tutor.tutor._id%>" class="user-element-text shop">
                     <img class="profile-image" src="<% if (tutor.tutor.mediaFile.display) {%> <%= tutor.tutor.mediaFile.url%><%} else {%> <%=tutor.tutor.imageUrl.url%><%}%>" alt="profile picture">
-                    <span class="username <%=tutor.tutor.status%> <%=tutor.tutor.permission%> <%=tutor.tutor.tags.join(' ')%>"><span class="enrolled-name"><%=tutor.tutor.firstName%> <%=tutor.tutor.lastName%></span> <span class="enrolled-username"><%=tutor.tutor.username%></span></span>
+                    <span class="username <%=tutor.tutor.status%> <%=tutor.tutor.permission%> <%=tutor.tutor.tags.join(' ')%>"><span class="enrolled-name"><%=tutor.tutor.firstName%> <%=tutor.tutor.lastName%> <% if (tutor.tutor._id.equals(currentUser._id)) {%> (Me) <% } %></span> <span class="enrolled-username"><%=tutor.tutor.username%></span></span>
                   </a>
                   <% if (course.creator._id.equals(currentUser._id)) { %>
                     <button class="btn btn-danger leave-button" id="remove-button-<%=tutor.tutor._id%>" data-toggle="modal" data-target="#modal-index-remove-<%=tutor.tutor._id%>">Remove Tutor</button>
@@ -197,7 +207,7 @@
                   <li class="list-group-item list-group-item-action tutor-profile menu-item shop" id="tutor-<%=tutor.tutor._id%>">
                     <a href="/tutoringCenter/tutors/<%=course._id%>?tutorId=<%=tutor.tutor._id%>" class="tutor-link shop">
                       <img class="profile-image" src="<% if (tutor.tutor.mediaFile.display) {%> <%= tutor.tutor.mediaFile.url%><%} else {%> <%=tutor.tutor.imageUrl.url%><%}%>" alt="profile picture">
-                      <span class="tutor-name <%=tutor.tutor.status%> <%=tutor.tutor.permission%> <%=tutor.tutor.tags.join(' ')%>"><%=tutor.tutor.firstName%> <%=tutor.tutor.lastName%></span>
+                      <span class="tutor-name <%=tutor.tutor.status%> <%=tutor.tutor.permission%> <%=tutor.tutor.tags.join(' ')%>"><%=tutor.tutor.firstName%> <%=tutor.tutor.lastName%> <% if (tutor.tutor._id.equals(currentUser._id)) {%> (Me) <% } %></span>
                     </a>
 
                     <% if (studentIds.includes(currentUser._id.toString())) { %>
@@ -303,15 +313,13 @@
                                             id="slots-heading">Number of Student Slots:</span>
                                     <span id="slots-count"><%= tutor.slots + tutor.members.length %></span></label>
                             
-                                <span id="change-message" hidden></span>
                                 <br/>
-                                <input type="range" min="<%= tutor.members.length %>"
-                                       max="<%= tutor.slots + tutor.members.length + 10 %>"
-                                       value="<%= tutor.slots + tutor.members.length %>" class="slider" id="slots"
-                                       name="slots"
-                                       onchange="setStudentsShow('<%= course._id %>')">
+                                <select class="form-control mode" name="slots" onchange="setStudentsShow('<%= course._id %>')" id="slots" style="max-width: 100px;">
+                                    <% for (let i = tutor.members.length; i < tutor.slots + tutor.members.length + 10; i++) { %>
+                                        <option value="<%=i%>"><%=i%></option>
+                                    <% } %>
+                                </select>
 
-                                <br>
                                 <label for="cost" id="cost-label" class="darkmode-header"><span
                                 id="cost-heading">Hourly Cost: </span>
                                 <% if (platform.dollarPayment) {%>
@@ -319,12 +327,15 @@
                                 <% } else {%>
                                     <span id="cost-count"><%=(tutor.cost)%> Credits</span></label><br>
                                 <% } %>
-                                <input type="range" min="10" max="30" value="<%=tutor.cost%>" class="slider" id="cost" name="cost" onchange="setCostShow('<%= course._id %>')">
-
+                                <select class="form-control mode" name="cost" onchange="setCostShow('<%= course._id %>')" id="cost" style="max-width: 100px;">
+                                    <% for (let i = 5; i <= 30; i+=5) { %>
+                                        <option value="<%=i%>" <% if (tutor.cost == i) {%> selected <%}%>><%=i.toFixed(2)%></option>
+                                    <% } %>
+                                </select>
                             <% } %>
 
                             <p class="tutor-bio"><%= tutor.bio %></p>
-                        </li>
+                        </li><br>
 
                         <div class="modal fade" id="modal-book-<%= tutor.tutor._id %>" tabindex="-1"
                              aria-labelledby="deleteModalLabel" aria-hidden="true">
@@ -666,7 +677,7 @@
             </div>
         </div>
 
-        <div class="row blocked" hidden>
+        <!-- <div class="row blocked" hidden>
             <div class="col-12" id="blocked-column">
                 <% if (course.blocked.length > 0) { %>
                     <ul class="list-group" id="blocked-div">
@@ -722,7 +733,7 @@
                     </div>
                 <% } %>
             </div>
-        </div>
+        </div> -->
     <% } %>
 </div>
 </body>

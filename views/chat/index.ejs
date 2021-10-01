@@ -31,7 +31,7 @@
                 <p class="mb-1 darkmode-header">Rooms you are a member of.</p>
             </li>
             <% if (filteredRooms.joined.length > 0) { %>
-                <% for (let room of filteredRooms.joined) { %>
+                <% for (let room of filteredRooms.joined.reverse()) { %>
                     <a href="chat/<%= room._id %>" class="list-group-item list-group-item-action shop">
                         <% if (room.thumbnailFile.display) { %>
                             <img src="<%=room.thumbnailFile.url%>" alt="Room Thumbnail" class="user-image">

@@ -569,7 +569,7 @@ controller.removeStudent = async function(req, res) {
     if (studentId.receiving_emails) {
         await sendGridEmail(studentId.email, `Removal from ${course.name}`, `<p>Hello ${studentId.firstName},</p><p>${notif.text}</p>`, false);
     }
-    await course.blocked.push(studentId);
+    // await course.blocked.push(studentId);
     await removeIfIncluded(course.members, studentId._id); //Remove student
     await course.save();
     return res.json({success: "Succesfully removed student", student: studentId, course});
@@ -642,7 +642,7 @@ controller.removeTutor = async function(req, res) { //Remove tutor from course
                 await sendGridEmail(tutorId.email, `Removal from ${course.name}`, `<p>Hello ${tutorId.firstName},</p><p>${notif.text}</p>`, false);
             }
 
-            await course.blocked.push(tutorId); //Remove tutor and block them
+            // await course.blocked.push(tutorId); //Remove tutor and block them
             await course.tutors.splice(i, 1);
             await course.save();
 
@@ -825,10 +825,12 @@ controller.bookTutor = async function(req, res) {
     if (!course) {return res.json({error: "Error accessing course"});}
 
     let formerStudent = false;
+    let lessons = [];
     for (let tutor of course.tutors) { //Iterate through tutors and search for the corresponding one
         if (await tutor.tutor._id.equals(req.body.tutorId) && tutor.available) {
             if (await objectArrIndex(tutor.formerStudents, "student", req.user._id) > -1) { //Remove student from tutor's former members (if they were there)
                 formerStudent = true;
+                lessons = await objectArrIndex(tutor.formerStudents, "student", req.user._id).lessons;
                 await tutor.formerStudents.splice(await objectArrIndex(tutor.formerStudents, "student", req.user._id), 1);
             }
 
@@ -852,8 +854,7 @@ controller.bookTutor = async function(req, res) {
             await req.user.save();
 
             const studentObject = {
-                student: req.user._id,
-                lessons: [],
+                student: req.user._id, lessons,
                 room: room._id
             }
             await tutor.members.push(studentObject);
@@ -873,7 +874,7 @@ controller.bookTutor = async function(req, res) {
 
             return res.json({
                 success: "Succesfully joined tutor", user: req.user,
-                room: studentObject,  tutor,  formerStudent, 
+                room: studentObject,  tutor, formerStudent, 
                 members: studentIds, formerStudents
             });
         }

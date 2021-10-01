@@ -78,7 +78,7 @@ const book = function(button, location, darkmode) { //Book a tutor
                 studentsList.innerHTML = `<li class="list-group-item list-group-item-success status-header darkmode-outline"> <div class="d-flex w-100 justify-content-between"> <h2 class="mb-1 darkmode-header">Students</h2> </div> </li>`;
 
                 let userElement;
-                for (let student of data.students) { //Build HTML elements for each of the tutor's students
+                for (let student of data.members) { //Build HTML elements for each of the tutor's students
                     userElement = document.createElement("div");
                     userElement.className = "list-group-item list-group-item-action user-element shop";
                     userElement.innerHTML += `<a href="/profiles/${student._id}" class="student-profile user-element shoptext">`;
@@ -347,10 +347,6 @@ const setStudentsShow = function(courseId) { //For tutors to set how many studen
 
     sendPostReq(url, data, data => {
         if (data.success) {
-            document.getElementById("slots-count").innerText = `${slots}`;
-            document.getElementById("change-message").style.color = "green";
-            document.getElementById("change-message").innerText = "Succesfully Changed";
-
             if (!data.tutor.available) {
                 const lessonButton = document.getElementsByClassName("lesson-action")[0];
                 lessonButton.className = "btn btn-success reopen-lessons lesson-action";
@@ -358,16 +354,7 @@ const setStudentsShow = function(courseId) { //For tutors to set how many studen
                 lessonButton.setAttribute("data-target", `#modal-reopen-${data.tutor.tutor}`);
                 lessonButton.innerText = "Reopen Lessons";
             }
-
-        } else if (data.error) {
-            document.getElementById("change-message").style.color = "red";
-            document.getElementById("change-message").innerText = "An Error Occurred";
         }
-
-        document.getElementById("change-message").hidden = false;
-        setTimeout(() => {
-            document.getElementById("change-message").hidden = true;
-        }, 2000);
     });
 }
 

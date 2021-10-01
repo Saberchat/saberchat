@@ -160,6 +160,22 @@ middleware.isCashier = function(req, res, next) {
     return res.redirect('back');
 }
 
+middleware.isStudentCouncil = async function(req, res, next) {
+    const platform = await setup(Platform);
+    if (!platform) {
+        await req.flash("error", "An error occurred");
+        return res.redirect("back");
+    }
+
+    if ((await platform.permissionsProperty.slice(platform.permissionsProperty.length-2).includes(req.user.permission))) {
+        return next();
+    } else if (req.user.tags.includes("Student Council")) {
+        return next();
+    }
+    await req.flash('error', 'You do not have permission to do that');
+    return res.redirect('/');
+}
+
 middleware.isPollster = function(req, res, next) {
     if (req.user.tags.includes('Pollster')) { return next();}
     req.flash('error', 'You do not have permission to do that');

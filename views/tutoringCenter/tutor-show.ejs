@@ -448,12 +448,14 @@
                               </div>
                               <div class="modal-body mode">
                                   <label for="time-<%= student.student._id %>">Lesson Time: <span
-                                              id="time-label-<%= student.student._id %>">0</span> minutes</label><br/>
-                                  <input type="range" min="0" max="60" value="0" class="slider time mode"
-                                          id="time-<%= student.student._id %>" onchange="setTime(this)">
-                                  <textarea minlength="20" maxlength="500" rows="5" class="form-control summary mode"
-                                            id="summary-<%= student.student._id %>"
-                                            placeholder="Lesson Summary"></textarea>
+                                              id="time-label-<%= student.student._id %>">5</span> minutes</label><br/>
+
+                                  <select class="form-control time mode" onchange="setTime(this)" id="time-<%=student.student._id%>" style="max-width: 100px;">
+                                    <% for (let i = 5; i <= 60; i+= 5) { %>
+                                        <option value="<%=i%>"><%=i%></option>
+                                    <% } %>
+                                </select>
+                                <textarea minlength="20" maxlength="500" rows="5" class="form-control summary mode"  id="summary-<%= student.student._id %>" placeholder="Lesson Summary"></textarea>
                               </div>
                               <div class="modal-footer mode">
                                   <button type="button" class="btn btn-secondary" data-dismiss="modal">Back
@@ -626,8 +628,6 @@
                   </div>
                   <br class="text-break" id="break-<%= c._id %>"/>
               <% } %>
-          <% } else { %>
-              <h1 class="empty-field">No Other Courses</h1>
           <% } %>
       </div>
     </div>
