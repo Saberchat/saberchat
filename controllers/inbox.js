@@ -288,11 +288,15 @@ controller.createMsg = async function(req, res) {
         });
     }
 
-    const recipientList = await User.find({authenticated: true, _id: { $in: recipients}});
-    let imageString = "";
-    for (let image of newMessage.images) {
-    imageString += `<img src="${image}">`;
+    let recipientList = [];
+    if (message.toEveryone) {
+        recipientList = await User.find({_id: {$ne: req.user._id}});
+    } else {
+        recipientList = recipients;
     }
+
+    let imageString = "";
+    for (let image of newMessage.images) {imageString += `<img src="${image}">`;}
 
     let recipientArr = [];
     for (const r of recipientList) {

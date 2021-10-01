@@ -18,7 +18,7 @@
           <div class="jumbotron text-center header">
             <h1><i class="fas fa-<%=data.icon%>"></i> Manage <%=data.name%></h1><br />
             <form onsubmit="addTag(event)" id="cafe-info-div">
-                <input class="form-control mode" id="new-tag-input" type="text" placeholder="Enter New Tag Name"><br>
+                <input class="form-control" id="new-tag-input" type="text" placeholder="Enter New Tag Name"><br>
                 <% for (let tag of shop.itemTags) { %>
                     <div class="user-tag" id="<%= tag %>">
                     <span name="tags" value="<%=tag%>"><%=tag%></span>
