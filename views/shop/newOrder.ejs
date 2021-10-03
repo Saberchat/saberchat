@@ -32,15 +32,6 @@
         <div class="row">
             <div class="col-md-8 offset-md-2 col-12">
                 <form id="orderForm" action="/shop" method="post">
-                    <div id="item-selection">
-
-                        <div class="search-filter mb-3 search">
-                            <i class="fas fa-search"></i>
-                            <input id="search-input" oninput="search()" class="form-control search" type="text"
-                                placeholder="Search..." title="Type in product"/>
-                        </div>
-                    </div>
-
                     <% if (currentUser.tags.includes("Cashier")) { %>
                         <br>
                         <label id="current-name" for="user-select" class="<%=currentUser._id%>">Current Customer: <%=currentUser.firstName%> <%=currentUser.lastName%> (<%=currentUser.username%>)</label>
@@ -50,80 +41,100 @@
                             <option class="recipient-group" value="<%=currentUser._id%>" selected><%=currentUser.firstName%> <%=currentUser.lastName%> (<%=currentUser.username%>)</option>
                         </select>
                     <% } %>
+
+                    <br>
+                    <div id="item-selection">
+                        <div class="search-filter mb-3 search">
+                            <i class="fas fa-search"></i>
+                            <input id="search-input" oninput="search()" class="form-control search" type="text"
+                                placeholder="Search For Items..." title="Type in product"/>
+                        </div>
+                    </div>
+
                     <div id="item-list">
 
+                        <% let itemsAvailable = false;%>
                         <% for (let category of categories) { %>
-
-                            <li class="list-group-item list-group-item-success category-header shop"
-                                id="<%= category._id %>-header">
-                                <div class="d-flex w-100 justify-content-between shop">
-                                    <h2 class="mb-1"><%= category.name %></h2>
-                                    <span><%= category.items.length %> item(s)</span>
-                                </div>
-                            </li>
-
+                            <% itemsAvailable = false;%>
                             <% for (let item of category.items) { %>
                                 <% if (item.availableItems > 0) { %>
-                                <% if (frequentItems.toString().includes(item._id.toString())) { %>
-                                    <div class="list-group-item form-check menu-item <%= category.name.replace(' ', '') %> shop"
-                                        id="item-<%= item.id %>" title="You have frequently ordered this item">
+                                    <%itemsAvailable = true;%>
+                                    <%break;%>
+                                <%}%>
+                            <% } %>
+                            
+                            <% if (itemsAvailable) { %>
+                                <li class="list-group-item list-group-item-success category-header shop"
+                                    id="<%= category._id %>-header">
+                                    <div class="d-flex w-100 justify-content-between shop">
+                                        <h2 class="mb-1"><%= category.name %></h2>
+                                        <span><%= category.items.length %> item(s)</span>
+                                    </div>
+                                </li>
 
-                                <% } else { %>
-                                    <div class="list-group-item form-check menu-item <%= category.name.replace(' ', '') %> shop"
-                                    id="item-<%= item.id %>">
+                                <% for (let item of category.items) { %>
+                                    <% if (item.availableItems > 0) { %>
+                                        <% if (frequentItems.toString().includes(item._id.toString())) { %>
+                                            <div class="list-group-item form-check menu-item <%= category.name.replace(' ', '') %> shop"
+                                                id="item-<%= item.id %>" title="You have frequently ordered this item">
+
+                                        <% } else { %>
+                                            <div class="list-group-item form-check menu-item <%= category.name.replace(' ', '') %> shop"
+                                            id="item-<%= item.id %>">
+                                        <% } %>
+
+                                            <!-- Div to put margins on text inside outer div -->
+                                            <div class="style-div">
+
+                                                <input name="check[<%= item._id %>]" id="<%= item._id %>" class="form-check-input"
+                                                    type="checkbox" value="">
+                                                <select class="num-orders mode" id="dd_<%= item._id %>" name="<%= item.name %>"
+                                                        onchange="changeOrderConfirmation(<%=platform.dollarPayment%>, <%=currentUser.darkmode%>)">
+                                                    <% let val = 1 %>
+                                                    <% if (item.availableItems > 3) { %>
+                                                        <% while (val <= 3) { %>
+                                                            <option><%= val %></option>
+                                                            <% val++; %>
+                                                        <% } %>
+                                                    <% } else { %>
+                                                        <% while (val <= item.availableItems) { %>
+                                                            <option><%= val %></option>
+                                                            <% val++; %>
+                                                        <% } %>
+                                                    <% } %>
+                                                </select>
+
+                                                <label class="form-check-label" for="<%= item._id %>">
+                                                    <span class="item-name"><%= item.name %></span>
+                                                    <%if(item.displayAvailability){%>(<%= item.availableItems %> orders available)<%}%> -
+                                                    <%if (platform.dollarPayment) {%>$<%= (item.price).toFixed(2)%><%} else {%> Credits: <%=item.price%><% } %>
+                                                </label>
+
+                                                <div title="Upvotes" class="upvotes">
+
+                                                    <% if (item.upvotes.includes(currentUser._id)) { %>
+                                                        <span class="upvoted" id="upvote-<%= item._id %>" onclick="upvote(this)"><i
+                                                                    class="fas fa-arrow-circle-up"></i></span>
+
+                                                    <% } else { %>
+                                                        <span class="not-upvoted" id="upvote-<%= item._id %>" onclick="upvote(this)"><i
+                                                                    class="fas fa-arrow-circle-up"></i></span>
+                                                    <% } %>
+
+                                                    <span id="upvoteCount-<%= item._id %>"> <%= item.upvotes.length %></span>
+                                                </div>
+                                                <% if (frequentItems.toString().includes(item._id.toString())) { %>
+                                                    <span class="popular">Frequently Ordered</span>
+                                                <% } %>
+                                                <br/>
+                                            </div>
+                                        </div>
+                                    <% } %>
                                 <% } %>
 
-                                    <!-- Div to put margins on text inside outer div -->
-                                    <div class="style-div">
-
-                                        <input name="check[<%= item._id %>]" id="<%= item._id %>" class="form-check-input"
-                                            type="checkbox" value="">
-                                        <select class="num-orders mode" id="dd_<%= item._id %>" name="<%= item.name %>"
-                                                onchange="changeOrderConfirmation(<%=platform.dollarPayment%>, <%=currentUser.darkmode%>)">
-                                            <% let val = 1 %>
-                                            <% if (item.availableItems > 3) { %>
-                                                <% while (val <= 3) { %>
-                                                    <option><%= val %></option>
-                                                    <% val++; %>
-                                                <% } %>
-                                            <% } else { %>
-                                                <% while (val <= item.availableItems) { %>
-                                                    <option><%= val %></option>
-                                                    <% val++; %>
-                                                <% } %>
-                                            <% } %>
-                                        </select>
-
-                                        <label class="form-check-label" for="<%= item._id %>">
-                                            <span class="item-name"><%= item.name %></span>
-                                            <%if(item.displayAvailability){%>(<%= item.availableItems %> orders available)<%}%> -
-                                            <%if (platform.dollarPayment) {%>$<%= (item.price).toFixed(2)%><%} else {%> Credits: <%=item.price%><% } %>
-                                        </label>
-
-                                        <div title="Upvotes" class="upvotes">
-
-                                            <% if (item.upvotes.includes(currentUser._id)) { %>
-                                                <span class="upvoted" id="upvote-<%= item._id %>" onclick="upvote(this)"><i
-                                                            class="fas fa-arrow-circle-up"></i></span>
-
-                                            <% } else { %>
-                                                <span class="not-upvoted" id="upvote-<%= item._id %>" onclick="upvote(this)"><i
-                                                            class="fas fa-arrow-circle-up"></i></span>
-                                            <% } %>
-
-                                            <span id="upvoteCount-<%= item._id %>"> <%= item.upvotes.length %></span>
-                                        </div>
-                                        <% if (frequentItems.toString().includes(item._id.toString())) { %>
-                                            <span class="popular">Frequently Ordered</span>
-                                        <% } %>
-                                        <br/>
-                                    </div>
-                                </div>
-                            <% } %>
-                            <% } %>
-
-                            <% if (category.items.length > 0) { %>
-                                <br class="category-break" id="<%= category._id %>-break"/>
+                                <% if (category.items.length > 0) { %>
+                                    <br class="category-break" id="<%= category._id %>-break"/>
+                                <% } %>
                             <% } %>
                         <% } %>
                         </div>

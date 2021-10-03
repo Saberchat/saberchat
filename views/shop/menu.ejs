@@ -27,15 +27,25 @@
             <div class="search-filter">
                 <i class="fas fa-search search"></i>
                 <input id="search-input" oninput="search()" class="form-control search" type="text"
-                       placeholder="Search..." title="Type in Product">
+                       placeholder="Search For Items..." title="Type in Product">
             </div>
         </div>
     </div>
     <div class="row">
         <div class="col-12">
 
+            
+            <% let itemsAvailable = false;%>
             <% categories.forEach(category => { %>
-
+                <% itemsAvailable = false;%>
+                <% for (let item of category.items) { %>
+                    <% if (item.availableItems > 0) { %>
+                        <%itemsAvailable = true;%>
+                        <%break;%>
+                    <%}%>
+                <% } %>
+                
+                <% if (itemsAvailable) { %>
                     <li class="list-group-item list-group-item-success category-header shop"
                         id="<%= category._id %>-header">
                         <div class="d-flex w-100 justify-content-between">
@@ -155,9 +165,10 @@
                        </div>
                    </div>
                 <% }) %>
-            <br class="category-break" id="<%= category._id %>-break"/>
-            <% }) %>
-            <br/>
+                <br class="category-break" id="<%= category._id %>-break"/>
+            <% } %>
+        <% }) %>
+        <br/>
         </div>
     </div>
 </div>

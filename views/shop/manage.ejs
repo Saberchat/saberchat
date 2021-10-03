@@ -30,7 +30,7 @@
                 <input name="name" type="text" class="form-control" value="<%=data.name%>" placeholder="Name"><br>
                 <textarea name="description" class="form-control" placeholder="Description"><%=data.description%></textarea><br>
                 <input hidden id="tag-input" name="tagInput" value="<%=shop.itemTags%>" type="text"> <br>
-                <button type="submit" class="btn btn-primary btn-block">Submit Changes</button><br>
+                <button type="submit" class="btn btn-primary btn-block">Confirm Changes</button><br>
             </form>
             <% if (platform.purchasable) { %>
                 <button id="shop-status-button" onclick="changeShopStatus()"

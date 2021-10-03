@@ -25,6 +25,10 @@ const controller = {};
 
 //SHOW CAFE HOMEPAGE
 controller.index = async function(req, res) {
+    if (req.user.tags.includes("Cashier")) {
+        return controller.manage(req, res);
+    }
+
     const platform = await setup(Platform);
     const market = await setup(Market);
     const orders = await Order.find({customer: req.user._id}).populate("items.item"); //Find all of the orders that you have ordered, and populate info on their items
@@ -32,6 +36,7 @@ controller.index = async function(req, res) {
         await req.flash("error", "Unable to find orders");
         return res.redirect("back");
     }
+    
     return res.render("shop/index", {market, platform, orders, data: platform.features[await objectArrIndex(platform.features, "route", "shop")]});
 }
 
