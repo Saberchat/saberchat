@@ -21,6 +21,7 @@ router.route('/:id')
 
 //Show a specific tutor
 router.get('/tutors/:id', wrapAsync(middleware.isLoggedIn), wrapAsync(middleware.accessToFeature), wrapAsync(middleware.memberOfCourse), wrapAsync(tutoringCenter.showTutor)); //RESTful routing "tutors/show" page
+router.get('/book/:id', wrapAsync(middleware.isLoggedIn), wrapAsync(middleware.accessToFeature), wrapAsync(middleware.isStudent), wrapAsync(middleware.memberOfCourse), wrapAsync(tutoringCenter.bookTutor)); //Book a tutor
 
 //Search Requests
 router.post('/search-tutors/:id', wrapAsync(middleware.isLoggedIn), wrapAsync(middleware.accessToFeature), wrapAsync(middleware.isFaculty), wrapAsync(middleware.memberOfCourse), wrapAsync(tutoringCenter.searchTutors)); //Search for tutors as faculty
@@ -28,8 +29,8 @@ router.post('/search-students/:id', wrapAsync(middleware.isLoggedIn), wrapAsync(
 
 //Join/leave requests
 router.post('/join', wrapAsync(middleware.isLoggedIn), wrapAsync(middleware.accessToFeature), wrapAsync(middleware.notMemberOfCourse), wrapAsync(tutoringCenter.joinCourse)) //Join course as tutor or student
-router.post('/unenroll-student/:id', wrapAsync(middleware.isLoggedIn), wrapAsync(middleware.accessToFeature), wrapAsync(middleware.isStudent), wrapAsync(middleware.memberOfCourse), wrapAsync(tutoringCenter.unenrollStudent)); //Leave course as a student
-router.post('/unenroll-tutor/:id', wrapAsync(middleware.isLoggedIn), wrapAsync(middleware.accessToFeature), middleware.isTutor, wrapAsync(middleware.memberOfCourse), wrapAsync(tutoringCenter.unenrollTutor)); //Leave course as a tutor
+// router.post('/unenroll-student/:id', wrapAsync(middleware.isLoggedIn), wrapAsync(middleware.accessToFeature), wrapAsync(middleware.isStudent), wrapAsync(middleware.memberOfCourse), wrapAsync(tutoringCenter.unenrollStudent)); //Leave course as a student
+// router.post('/unenroll-tutor/:id', wrapAsync(middleware.isLoggedIn), wrapAsync(middleware.accessToFeature), middleware.isTutor, wrapAsync(middleware.memberOfCourse), wrapAsync(tutoringCenter.unenrollTutor)); //Leave course as a tutor
 
 //Teacher put requests
 router.put('/updateTeacher/:id', wrapAsync(middleware.isLoggedIn), wrapAsync(middleware.accessToFeature), wrapAsync(middleware.isFaculty), wrapAsync(middleware.memberOfCourse), wrapAsync(tutoringCenter.updateTeacher)); //Update course teacher
@@ -50,7 +51,6 @@ router.put("/mark/:id", wrapAsync(middleware.isLoggedIn), wrapAsync(middleware.a
 router.put('/mark-payment/:id', wrapAsync(middleware.isLoggedIn), wrapAsync(middleware.accessToFeature), middleware.isTutor, wrapAsync(tutoringCenter.markPayment)); //Mark student's payment
 
 //Student put requests
-router.put('/book/:id', wrapAsync(middleware.isLoggedIn), wrapAsync(middleware.accessToFeature), wrapAsync(middleware.isStudent), wrapAsync(middleware.memberOfCourse), wrapAsync(tutoringCenter.bookTutor)); //Book a tutor
 router.put('/leave/:id', wrapAsync(middleware.isLoggedIn), wrapAsync(middleware.accessToFeature), wrapAsync(middleware.isStudent), wrapAsync(middleware.memberOfCourse), wrapAsync(tutoringCenter.leaveTutor)); //Leave Tutor
 router.put('/upvote/:id', wrapAsync(middleware.isLoggedIn), wrapAsync(middleware.accessToFeature), wrapAsync(middleware.isStudent), wrapAsync(middleware.memberOfCourse), wrapAsync(tutoringCenter.upvoteTutor)); //Upvote a tutor
 router.put('/rate/:id', wrapAsync(middleware.isLoggedIn), wrapAsync(middleware.accessToFeature), wrapAsync(middleware.isStudent), wrapAsync(middleware.memberOfCourse), wrapAsync(tutoringCenter.rateTutor)); //Submit a review for a tutor
