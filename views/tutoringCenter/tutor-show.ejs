@@ -111,31 +111,53 @@
                                     data-target="#modal-review-<%= tutor.tutor._id %>">Leave A Review
                             </button>
                             <% if (objectArrIndex(tutor.members, "student", currentUser._id, "_id") > -1) { %>
-                                <button class="btn btn-danger action-button" id="leave-button-<%= tutor.tutor._id %>"
-                                        data-toggle="modal"
-                                        data-target="#modal-stop-<%= tutor.tutor._id %>">Stop Lessons
-                                </button>
+                                <% if (false) {%>
+                                  <button class="btn btn-danger action-button" id="leave-button-<%= tutor.tutor._id %>"
+                                          data-toggle="modal"
+                                          data-target="#modal-stop-<%= tutor.tutor._id %>">Stop Lessons
+                                  </button>
+                                <% } %>
                                 <a id="chat-button-<%= tutor.tutor._id %>" class="btn btn-success action-button"
                                     href="/chat/<%=tutor.members[objectArrIndex(tutor.members, 'student', currentUser._id, '_id')].room._id %>" target="_blank">Chat
                                 </a>
                             <% } else { %>
-                                <% if (tutor.available) { %>
+                              <% let enrolled = false;%>
+                              <% for (let t of course.tutors) {%>
+                                <% for (let s of t.members) {%>
+                                  <% if (s.student._id.equals(currentUser._id)) { %>
+                                    <%enrolled = true;%>
+                                    <%break;%>
+                                  <% } %>
+                                <%}%>
+                              <% } %>
+
+                                <% if (!enrolled && tutor.available) { %>
                                     <button class="btn btn-info action-button" id="book-button-<%= tutor.tutor._id %>"
                                             data-toggle="modal"
                                             data-target="#modal-book-<%= tutor.tutor._id %>">Book This Tutor
                                     </button>
-                                <% } else { %>
+                                <% } else if (!enrolled) { %>
                                     <span class="unavailable-tutor">Tutor Is Unavailable</span>
                                 <% } %>
                             <% } %>
 
                         <% } else { %>
-                            <% if (tutor.available) { %>
+                            <% enrolled = false;%>
+                            <% for (let t of course.tutors) {%>
+                              <% for (let s of t.members) {%>
+                                <% if (s.student._id.equals(currentUser._id)) { %>
+                                  <%enrolled = true;%>
+                                  <%break;%>
+                                <% } %>
+                              <%}%>
+                            <% } %>
+
+                            <% if (!enrolled && tutor.available) { %>
                                 <button class="btn btn-info action-button" id="book-button-<%= tutor.tutor._id %>"
                                         data-toggle="modal"
                                         data-target="#modal-book-<%= tutor.tutor._id %>">Book This Tutor
                                 </button>
-                            <% } else { %>
+                            <% } else if (!enrolled) { %>
                                 <span class="unavailable-tutor">Tutor Is Unavailable</span>
                             <% } %>
                         <% } %>
@@ -191,6 +213,7 @@
                         </div>
                     </form>
                 <% } %>
+                <br>
 
                       <div class="modal fade" id="modal-book-<%=tutor.tutor._id%>" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
                         <div class="modal-dialog mode">
@@ -205,11 +228,8 @@
                               You will be able to schedule meeting times and work with <%=tutor.tutor.firstName%> on your classwork.
                             </div>
                             <div class="modal-footer mode">
-                                <button type="button" class="btn btn-secondary" data-dismiss="modal">No, Go Back
-                                </button>
-                                <button type="button" class="btn btn-info" id="<%= course._id %>-<%= tutor.tutor._id %>"
-                                        onclick="book(this, 'tutor-show',  <%=currentUser.darkmode%>)">Yes, Book Lessons
-                                </button>
+                                <button type="button" class="btn btn-secondary" data-dismiss="modal">No, Go Back</button>
+                                <a href="/tutoringCenter/book/<%=course._id%>?tutorId=<%=tutor.tutor._id%>" class="btn btn-info" id="<%= course._id %>-<%= tutor.tutor._id %>">Yes, Book Lessons</a>
                             </div>
                         </div>
                     </div>
@@ -630,6 +650,7 @@
           <% } %>
       </div>
     </div>
+    <br>
 </body>
 <script>
     document.getElementById("experience").innerText = getTime(document.getElementById("experience").innerText.split(' ')[0]);

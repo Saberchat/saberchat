@@ -822,12 +822,20 @@ controller.markLesson = async function(req, res) {
 
 controller.bookTutor = async function(req, res) {
     const course = await Course.findById(req.params.id).populate('tutors.tutor');
-    if (!course) {return res.json({error: "Error accessing course"});}
+    if (!course) {
+        await req.flash("error", "Unable to find course");
+        return res.redirect("back");
+    }
 
     let formerStudent = false;
     let lessons = [];
     for (let tutor of course.tutors) { //Iterate through tutors and search for the corresponding one
-        if (await tutor.tutor._id.equals(req.body.tutorId) && tutor.available) {
+        if (await objectArrIndex(tutor.members, "student", req.user._id) > -1) {
+            await req.flash("error", "You are already have a tutor"); //Don't allow student to sign up if they already have a tutor
+            return res.redirect("back");
+        }
+
+        if (await tutor.tutor._id.equals(req.query.tutorId) && tutor.available) {
             if (await objectArrIndex(tutor.formerStudents, "student", req.user._id) > -1) { //Remove student from tutor's former members (if they were there)
                 formerStudent = true;
                 lessons = await objectArrIndex(tutor.formerStudents, "student", req.user._id).lessons;
@@ -844,7 +852,10 @@ controller.bookTutor = async function(req, res) {
                 private: true,
                 mutable: false
             });
-            if (!room) {return res.json({error: "Error creating room"});}
+            if (!room) {
+                await req.flash("error", "Unable to create chat room;");
+                return res.redirect("back");
+            }
 
             room.date = await dateFormat(room.created_at, "h:MM TT | mmm d");
             await room.save();
@@ -866,17 +877,20 @@ controller.bookTutor = async function(req, res) {
 
             //All current members of the tutor
             const studentIds = await User.find({authenticated: true, _id: {$in: await parsePropertyArray(tutor.members, "student")}});
-            if (!studentIds) {return res.json({error: "Error accessing members"});}
+            if (!studentIds) {
+                await req.flash("error", "Error accessing students");
+                return res.redirect("back");
+            }
 
             //All former members of the tutor
             const formerStudents = await User.find({authenticated: true, _id: {$in: await parsePropertyArray(tutor.formerStudents, "student")}});
-            if (!formerStudents) {return res.json({error: "Error accessing members"});}
+            if (!formerStudents) {
+                await req.flash("error", "Error accessing students");
+                return res.redirect("back");
+            }
 
-            return res.json({
-                success: "Succesfully joined tutor", user: req.user,
-                room: studentObject,  tutor, formerStudent, 
-                members: studentIds, formerStudents
-            });
+            await req.flash("success", `Congratulations, ${req.user.firstName}. You have signed up with ${tutor.tutor.firstName} ${tutor.tutor.lastName} for tutoring!`);
+            return res.redirect(`/chat/${room._id}`);
         }
     }
 }
@@ -920,7 +934,7 @@ controller.upvoteTutor = async function(req, res) {
 
     for (let tutor of course.tutors) {
         if (await tutor.tutor.equals(req.body.tutorId)) { //Search for tutor until they are found
-            if (await objectArrIndex((await tutor.members.concat(tutor.formerStudents), "student", req.user._id) > -1)) { //Only current/former members of a tutor can upvote them
+            if (await objectArrIndex(await tutor.members.concat(tutor.formerStudents), "student", req.user._id) > -1) { //Only current/former members of a tutor can upvote them
                 if (await removeIfIncluded(tutor.upvotes, req.user._id)) { //If tutor is currently upvoted by this user, downvote them
                     await course.save();
                     return res.json({success: "Downvoted tutor", upvoteCount: tutor.upvotes.length});

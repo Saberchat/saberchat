@@ -31,7 +31,8 @@
                     <p id="courseDescription"><%= course.description %></p>
                     <a id="back-button" class="btn btn-primary" href="/tutoringCenter"><i class="fas fa-arrow-left"></i> Back</a>
 
-                    <% if (studentIds.includes(currentUser._id.toString()) || tutorIds.includes(currentUser._id.toString())) { %>
+                    <!-- Removed Unenrollment Button -->
+                    <% if (false && studentIds.includes(currentUser._id.toString()) || tutorIds.includes(currentUser._id.toString())) { %>
                         <form
                         <% if (studentIds.includes(currentUser._id.toString())) { %>
                             action="/tutoringCenter/unenroll-student/<%= course._id %>"
@@ -216,34 +217,48 @@
                                             data-toggle="modal" data-target="#modal-review-<%= tutor.tutor._id %>">Leave A Review
                                     </button>
                                     <% if (objectArrIndex(tutor.members, "student", currentUser._id) > -1) { %>
-                                        <button class="btn btn-danger leave-button"
-                                                id="leave-button-<%= tutor.tutor._id %>"
-                                                data-toggle="modal"
-                                                data-target="#modal-stop-<%= tutor.tutor._id %>">Stop Lessons
-                                        </button>
+                                        <% if (false) { %>
+                                            <button class="btn btn-danger leave-button"
+                                                    id="leave-button-<%= tutor.tutor._id %>"
+                                                    data-toggle="modal"
+                                                    data-target="#modal-stop-<%= tutor.tutor._id %>">Stop Lessons
+                                            </button>
+                                        <% } %>
                                         <a id="chat-button-<%= tutor.tutor._id %>"
                                             class="btn btn-success leave-button"
                                             href="/chat/<%=tutor.members[objectArrIndex(tutor.members, 'student', currentUser._id)].room%>">Chat
                                         </a>
                                     <% } else { %>
-                                        <% if (tutor.available) { %>
+                                        <% let enrolled = false;%>
+                                        <% for (let tutor of course.tutors) {%>
+                                            <% if (objectArrIndex(tutor.members, "student", currentUser._id) > -1) {%>
+                                                <%enrolled = true;%>
+                                            <% }%>
+                                        <%}%>
+                                        <% if (!enrolled && tutor.available) { %>
                                             <button class="btn btn-info book-button"
                                                     id="book-button-<%= tutor.tutor._id %>"
                                                     data-toggle="modal"
                                                     data-target="#modal-book-<%= tutor.tutor._id %>">Book This Tutor
                                             </button>
-                                        <% } else { %>
+                                        <% } else if (!enrolled) { %>
                                             <span class="unavailable-tutor">Tutor Is Unavailable</span>
                                         <% } %>
                                     <% } %>
                                 <% } else { %>
-                                    <% if (tutor.available) { %>
+                                    <% let enrolled = false;%>
+                                    <% for (let tutor of course.tutors) {%>
+                                        <% if (objectArrIndex(tutor.members, "student", currentUser._id) > -1) {%>
+                                            <%enrolled = true;%>
+                                        <% }%>
+                                    <%}%>
+                                    <% if (!enrolled && tutor.available) { %>
                                         <button class="btn btn-info book-button"
                                                 id="book-button-<%= tutor.tutor._id %>"
                                                 data-toggle="modal"
                                                 data-target="#modal-book-<%= tutor.tutor._id %>">Book This Tutor
                                         </button>
-                                    <% } else { %>
+                                    <% } else if (!enrolled) { %>
                                         <span class="unavailable-tutor">Tutor Is Unavailable</span>
                                     <% } %>
                                 <% } %>
@@ -314,7 +329,7 @@
                                 <br/>
                                 <select class="form-control mode" name="slots" onchange="setStudentsShow('<%= course._id %>')" id="slots" style="max-width: 100px;">
                                     <% for (let i = tutor.members.length; i < tutor.slots + tutor.members.length + 10; i++) { %>
-                                        <option value="<%=i%>"><%=i%></option>
+                                        <option value="<%=i%>" <% if (i == tutor.slots){%> selected<%}%>><%=i%></option>
                                     <% } %>
                                 </select>
 
@@ -333,7 +348,7 @@
                             <% } %>
 
                             <p class="tutor-bio"><%= tutor.bio %></p>
-                        </li><br>
+                        </li>
 
                         <div class="modal fade" id="modal-book-<%= tutor.tutor._id %>" tabindex="-1"
                              aria-labelledby="deleteModalLabel" aria-hidden="true">
@@ -353,11 +368,7 @@
                                     <div class="modal-footer mode">
                                         <button type="button" class="btn btn-secondary" data-dismiss="modal">No, Go Back
                                         </button>
-                                        <button type="button" class="btn btn-info"
-                                                id="<%= course._id %>-<%= tutor.tutor._id %>"
-                                                onclick="book(this, 'show')">
-                                            Yes, Book Lessons
-                                        </button>
+                                        <a href="/tutoringCenter/book/<%=course._id%>?tutorId=<%=tutor.tutor._id%>" class="btn btn-info" id="<%= course._id %>-<%= tutor.tutor._id %>">Yes, Book Lessons</a>
                                     </div>
                                 </div>
                             </div>
@@ -511,7 +522,7 @@
                         </div>
 
                     <% } %>
-                </ul>
+                </ul><br>
 
             <% } else { %>
                 <div class="empty-field" id="no-tutors">
