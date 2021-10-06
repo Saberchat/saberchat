@@ -29,9 +29,4 @@ package.quicksort = function(arr, from, to) { //Implement recursive quicksort al
     }
 }
 
-let arr3 = [69, 43, 12, 135, 24, 564, 232, 4];
-console.log(arr3);
-quicksort(arr3, 0, arr3.length-1);
-console.log(arr3);
-
 module.exports = package;
