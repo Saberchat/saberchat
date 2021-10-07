@@ -166,7 +166,7 @@
         <% } else { %>
             <% for (let course of courses) { %>
                 <div class="card course-title darkmode-outline" title="<%= course.name %>">
-                    <img class="card-img-top course-thumbnail" src="<% if (course.thumbnailFile.display) { %> <%=course.thumbnailFile.url%> <%} else { %> <%= course.thumbnail.url %> <% } %>" alt="Card image cap">
+                    <img class="card-img-top course-thumbnail" src="<% if (course.thumbnailFile.display) { %> <%=course.thumbnailFile.url%> <%} else { %> <%= course.thumbnail.url %> <% } %>" alt="Card image cap" style="height: 200px;">
                     <div class="card-body">
                         <h5 class="card-title"><%= course.name.slice(0, 25) %>
                             <% if (course.name.length > 25) { %>...
@@ -188,8 +188,8 @@
                             <% } %>
                         </span><br/>
 
-                        <p class="card-text course-description"><%= course.description.slice(0, 151) %>
-                            <% if (course.description.length > 150) { %>...
+                        <p class="card-text course-description"><%= course.description.slice(0, 101) %>
+                            <% if (course.description.length > 100) { %>...
                             <% } %>
                         </p>
                         <a href="tutoringCenter/<%= course._id %>" class="btn btn-primary">Go to Course</a>

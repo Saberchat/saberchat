@@ -300,7 +300,8 @@ controller.updateSettings = async function(req, res) {
 }
 
 controller.deleteCourse = async function(req, res) {
-    const course = await Course.findOne({_id: req.params.id, joinCode: req.body.joinCode}).populate("tutors.tutor tutors.members.student");
+    console.log(req.body.joinCode);
+    const course = await Course.findOne({_id: req.params.id, joinCode: req.body.joincode}).populate("tutors.tutor tutors.members.student");
     if (!course) {
         await req.flash("error", "Incorrect join code");
         return res.redirect("back");
@@ -417,6 +418,59 @@ controller.searchTutors = async function(req, res) {
         }
     }
     return res.json({success: "Successfully collected data", tutors}); //Send data to frontend
+}
+
+controller.assignTutor = async function(req, res) { //Assign user to tutor a course's student (as a teacher)
+    const platform = await setup(Platform);
+    const course = await Course.findById(req.params.id).populate("tutors.tutor"); //Populate tutor data
+    const student = await User.findById(req.query.student); //Populate student data
+    if (!platform || !course || !student) {
+        await req.flash("error", "An error occurred");
+        return res.redirect("back");
+    }
+
+    for (let tutor of course.tutors) { //Iterate through course tutors and check that student does not have any other current tutors
+        if (tutor.members.includes(student._id)) {
+            await req.flash("error", "Student is already enrolled with another tutor");
+            return res.redirect("back");
+        }
+    }
+
+    let selectedTutor;
+    for (let tutor of course.tutors) { //Iterate through course tutors and add student to correct tutor
+        if (tutor.tutor._id.equals(req.body.assignTutor)) {
+            selectedTutor = tutor;
+            break;
+        }
+    }
+
+    const room = await ChatRoom.create({ //Create chat room between student and tutor
+        name: `${student.firstName}'s Tutoring Sessions With ${selectedTutor.tutor.firstName} - ${course.name}`,
+        creator: selectedTutor.tutor._id,
+        members: [student._id, selectedTutor.tutor._id],
+        private: true,
+        mutable: false
+    });
+    if (!room) {
+        await req.flash("error", "An error occurred");
+        return res.redirect("back");
+    }
+    
+    await selectedTutor.members.push({student, room, lessons: []});
+    await course.save();
+    
+    //Update newRoomCount for both student and tutor
+    await selectedTutor.tutor.newRoomCount.push(room._id);
+    await student.newRoomCount.push(room._id);
+    await selectedTutor.tutor.save();
+    await student.save();
+
+    //Notify tutor and student of new signup
+    await sendGridEmail(selectedTutor.tutor.email, `New student in ${course.name}`, `<p>Hello ${selectedTutor.tutor.firstName},</p><p>${student.username} has been signed up as your student in ${course.name}.</p>`, false);
+    await sendGridEmail(student.email, `Tutor signup in ${course.name}`, `<p>Hello ${student.firstName},</p><p>${selectedTutor.tutor.username} has been signed up as your tutor in ${course.name}.</p>`, false);
+
+    await req.flash("success", `${selectedTutor.tutor.firstName} ${selectedTutor.tutor.lastName} is now tutoring ${student.firstName} ${student.lastName}!`);
+    return res.redirect(`/tutoringCenter/${course._id}`);
 }
 
 //Course student search
