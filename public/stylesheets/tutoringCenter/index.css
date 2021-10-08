@@ -40,6 +40,15 @@
     display: inline;
 }
 
+.course-thumbnail {
+    height: 200px;
+    object-fit: cover
+}
+
+.tutor-dropdown {
+    max-width: 100px;
+}
+
 #slots, #cost {
     margin-bottom: 20px;
     width: 90%;

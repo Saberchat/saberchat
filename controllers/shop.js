@@ -1028,9 +1028,7 @@ controller.manageOrders = async function(req, res) {
     if(startDateParam && typeof startDateParam === 'string' && startDateParam.length === 10) { 
         try {
             startDate = new Date(startDateParam);
-        } catch (error) {
-            // do nothing
-        }
+        } catch (error) {}
     }
 
     if(endDateParam && typeof endDateParam === 'string' && endDateParam.length === 10) { 
@@ -1038,9 +1036,7 @@ controller.manageOrders = async function(req, res) {
             endDate = new Date(endDateParam);
             // end datetime is technically beginning of next day
             endDate.setDate(endDate.getDate() + 1);
-        } catch (error) {
-            // do nothing
-        }
+        } catch (error) {}
     }
 
     const activeOrders = await Order.find({present: true}).sort({created_at: -1}).populate("items.item");
@@ -1054,10 +1050,7 @@ controller.manageOrders = async function(req, res) {
             present: false
         }).sort({created_at: -1}).populate("items.item");
 
-
-    // remove the extra day added for fe display purposes
-    endDate.setDate(endDate.getDate() - 1);
-
+    endDate.setDate(endDate.getDate() - 1); // remove the extra day added for fe display purposes
     return res.render("shop/orderDisplay", {
         platform, 
         activeOrders, 

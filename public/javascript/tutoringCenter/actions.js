@@ -39,16 +39,16 @@ const leave = function(button, location, darkmode) { //Leave a tutor
             bookButton.innerHTML = "Book This Tutor";
             tutorDiv.appendChild(bookButton);
 
-            //Reset user's displayed newRoomCount
-            document.getElementById("new-count").innerText = `${data.user.newRoomCount.length + data.user.annCount.length}`;
-            if (data.user.newRoomCount.length + data.user.annCount.length > 0) {
+            //Reset user's displayed newRooms
+            document.getElementById("new-count").innerText = `${data.user.newRooms.length + data.user.annCount.length}`;
+            if (data.user.newRooms.length + data.user.annCount.length > 0) {
                 document.getElementById("new-count").hidden = false;
             } else {
                 document.getElementById("new-count").hidden = true;
             }
 
-            document.getElementById("new-chat").innerText = `${data.user.newRoomCount.length}`;
-            if (data.user.newRoomCount.length > 0) {
+            document.getElementById("new-chat").innerText = `${data.user.newRooms.length}`;
+            if (data.user.newRooms.length > 0) {
                 document.getElementById("new-chat").hidden = false;
             } else {
                 document.getElementById("new-chat").hidden = true;

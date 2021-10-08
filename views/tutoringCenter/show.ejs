@@ -116,12 +116,47 @@
                     <span class="username <%=student.status%> <%=student.permission%> <%=student.tags.join(' ')%>"><span class="enrolled-name"><%=student.firstName%> <%=student.lastName%></span> <span class="enrolled-username"><%=student.username%></span></span>
                   </a>
                   <% if (course.creator._id.equals(currentUser._id)) { %>
+                    <% let enrolled = false;%>
+                    <% for (let tutor of course.tutors) {%>
+                        <% if (objectArrIndex(tutor.members, "student", student._id) > -1) {%>
+                            <%enrolled = true;%>
+                        <% }%>
+                    <%}%>
+                    <% if (!enrolled) { %>
+                        <button class="btn btn-success green-tutor-button" id="assign-button-<%=student._id%>" data-toggle="modal" data-target="#modal-index-assign-<%=student._id%>">Assign Tutor</button>
+                    <% } %>
                     <button class="btn btn-danger leave-button" id="remove-button-<%=student._id%>" data-toggle="modal" data-target="#modal-index-remove-<%=student._id%>">Remove Student</button>
+
+                    <form action="/tutoringCenter/assign-tutor/<%=course._id%>?_method=put&student=<%=student._id%>" method="post" class="modal fade" id="modal-index-assign-<%=student._id%>" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+                        <div class="modal-dialog mode">
+                          <div class="modal-content mode">
+                            <div class="modal-header mode">
+                              <h5 class="modal-title" id="exampleModalLabel">Assign Tutor to <%=student.firstName%> <%=student.lastName%></h5>
+                              <button type="button" class="close mode" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                              </button>
+                            </div>
+                            <div class="modal-body mode form-group">
+                                <% for (let tutor of course.tutors) { %>
+                                    <%if (tutor.available) {%>
+                                        <input type="radio" required name="assignTutor" id="assign-tutor-<%=tutor.tutor._id%>-<%=student._id%>" value="<%=tutor.tutor._id%>">
+                                        <label for="assign-tutor-<%=tutor.tutor._id%>-<%=student._id%>"><%=tutor.tutor.firstName%> <%=tutor.tutor.lastName%> (<%=tutor.tutor.username%>)</label><br>
+                                    <% } %>
+                                <% } %>
+                            </div>
+                            <div class="modal-footer mode">
+                              <button type="button" class="btn btn-secondary" data-dismiss="modal">Back</button>
+                              <button type="submit" class="btn btn-success">Assign This Tutor</button>
+                            </div>
+                          </div>
+                        </div>
+                    </form>
+
                   <% } else if (currentUser.tags.includes("Tutor")) {%>
                     <% for (let tutor of course.tutors) { %>
                         <% if (tutor.tutor._id.equals(currentUser._id)) { %>
                             <% if (objectArrIndex(tutor.members, "student", student._id) > -1) { %>
-                                <a style="margin-left: 10px;" class="btn btn-success" href="/chat/<%=tutor.members[objectArrIndex(tutor.members, 'student', student._id)].room%>">Chat</a>
+                                <a class="btn btn-success green-tutor-button" href="/chat/<%=tutor.members[objectArrIndex(tutor.members, 'student', student._id)].room%>">Chat</a>
                             <% } %>
                         <% } %>
                     <% } %>
@@ -327,7 +362,7 @@
                                     <span id="slots-count"><%= tutor.slots + tutor.members.length %></span></label>
                             
                                 <br/>
-                                <select class="form-control mode" name="slots" onchange="setStudentsShow('<%= course._id %>')" id="slots" style="max-width: 100px;">
+                                <select class="form-control mode tutor-dropdown" name="slots" onchange="setStudentsShow('<%= course._id %>')" id="slots">
                                     <% for (let i = tutor.members.length; i < tutor.slots + tutor.members.length + 10; i++) { %>
                                         <option value="<%=i%>" <% if (i == tutor.slots){%> selected<%}%>><%=i%></option>
                                     <% } %>
@@ -340,13 +375,14 @@
                                 <% } else {%>
                                     <span id="cost-count"><%=(tutor.cost)%> Credits</span></label><br>
                                 <% } %>
-                                <select class="form-control mode" name="cost" onchange="setCostShow('<%= course._id %>')" id="cost" style="max-width: 100px;">
+                                <select class="form-control mode tutor-dropdown" name="cost" onchange="setCostShow('<%= course._id %>')" id="cost"">
                                     <% for (let i = 5; i <= 30; i+=5) { %>
                                         <option value="<%=i%>" <% if (tutor.cost == i) {%> selected <%}%>><%=i.toFixed(2)%></option>
                                     <% } %>
                                 </select>
                             <% } %>
 
+                            <p class="tutor-student-info"><%=tutor.members.length%> Student(s)</p>
                             <p class="tutor-bio"><%= tutor.bio %></p>
                         </li>
 
@@ -590,7 +626,7 @@
                     <h4>Add Tutors</h4>
                     <div class="form-group mode" id="tutor-input-div">
                         <input type="text" class="form-control mode" id="tutor-list" placeholder="Tutors" oninput="searchTutors(this, '<%=course._id%>')"><br>
-                        <select id="tutor-select" class="form-control mode" onchange="addTutor('user')" style="display: none;"></select><br>
+                        <select id="tutor-select" class="form-control mode" onchange="addTutor('user')" hidden></select><br>
                         <input type="text" id="tutor-input" name="tutorInput" hidden/>
                     </div>
                     <button type="submit" class="btn btn-lg btn-primary btn-block">Confirm New Tutors</button>
@@ -600,7 +636,7 @@
                     <h4>Add Students</h4>
                     <div class="form-group mode" id="student-input-div">
                         <input type="text" class="form-control mode" id="student-list" placeholder="Students" oninput="searchStudents(this, '<%=course._id%>')"><br>
-                        <select id="student-select" class="form-control mode" onchange="addStudent('user')" style="display: none;"></select><br>
+                        <select id="student-select" class="form-control mode" onchange="addStudent('user')" hidden></select><br>
                         <input type="text" id="student-input" name="studentInput" hidden/>
                     </div>
                     <button type="submit" class="btn btn-lg btn-primary btn-block">Confirm New Students</button>
@@ -672,7 +708,7 @@
                                         sure you want to delete this course?
                                     </p>
                                     <input type="password" name="joincode" class="form-control mode"
-                                           placeholder="Enter Course Join Code To Confirm" id="join-code-confirm"/>
+                                           placeholder="Enter Course Join Code To Confirm" id="join-code-delete-confirm"/>
                                 </div>
                                 <div class="modal-footer mode">
                                     <button type="button" class="btn btn-secondary" data-dismiss="modal">Back</button>

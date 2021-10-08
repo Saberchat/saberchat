@@ -171,6 +171,20 @@
     width: 90%;
 }
 
+.green-tutor-button {
+    margin-left: 10px;
+}
+
+.tutor-dropdown {
+    max-width: 100px;
+}
+
+.tutor-student-info {
+    font-weight: bold;
+    font-style: italic;
+    margin-top: 20px;
+}
+
 #tutor-input-div {
     text-align: left;
 }

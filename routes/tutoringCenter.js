@@ -27,12 +27,13 @@ router.get('/book/:id', wrapAsync(middleware.isLoggedIn), wrapAsync(middleware.a
 router.post('/search-tutors/:id', wrapAsync(middleware.isLoggedIn), wrapAsync(middleware.accessToFeature), wrapAsync(middleware.isFaculty), wrapAsync(middleware.memberOfCourse), wrapAsync(tutoringCenter.searchTutors)); //Search for tutors as faculty
 router.post('/search-students/:id', wrapAsync(middleware.isLoggedIn), wrapAsync(middleware.accessToFeature), wrapAsync(middleware.isFaculty), wrapAsync(middleware.memberOfCourse), wrapAsync(tutoringCenter.searchStudents)); //Search for students as faculty
 
-//Join/leave requests
+//Join/leave/assign requests
 router.post('/join', wrapAsync(middleware.isLoggedIn), wrapAsync(middleware.accessToFeature), wrapAsync(middleware.notMemberOfCourse), wrapAsync(tutoringCenter.joinCourse)) //Join course as tutor or student
 // router.post('/unenroll-student/:id', wrapAsync(middleware.isLoggedIn), wrapAsync(middleware.accessToFeature), wrapAsync(middleware.isStudent), wrapAsync(middleware.memberOfCourse), wrapAsync(tutoringCenter.unenrollStudent)); //Leave course as a student
 // router.post('/unenroll-tutor/:id', wrapAsync(middleware.isLoggedIn), wrapAsync(middleware.accessToFeature), middleware.isTutor, wrapAsync(middleware.memberOfCourse), wrapAsync(tutoringCenter.unenrollTutor)); //Leave course as a tutor
 
 //Teacher put requests
+router.put('/assign-tutor/:id', wrapAsync(middleware.isLoggedIn), wrapAsync(middleware.accessToFeature), wrapAsync(middleware.isFaculty), wrapAsync(middleware.memberOfCourse), wrapAsync(tutoringCenter.assignTutor)); //Assign tutor to student
 router.put('/updateTeacher/:id', wrapAsync(middleware.isLoggedIn), wrapAsync(middleware.accessToFeature), wrapAsync(middleware.isFaculty), wrapAsync(middleware.memberOfCourse), wrapAsync(tutoringCenter.updateTeacher)); //Update course teacher
 router.put('/joinCode/:id', wrapAsync(middleware.isLoggedIn), wrapAsync(middleware.accessToFeature), wrapAsync(middleware.isFaculty), wrapAsync(middleware.memberOfCourse), wrapAsync(tutoringCenter.updateJoinCode)); //Update course join code
 router.put('/update-tutors/:id', wrapAsync(middleware.isLoggedIn), wrapAsync(middleware.accessToFeature), wrapAsync(middleware.isFaculty), wrapAsync(middleware.memberOfCourse), wrapAsync(tutoringCenter.updateTutors)); //For teachers to removeadd tutors to courses
