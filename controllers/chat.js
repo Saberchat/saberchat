@@ -81,7 +81,7 @@ controller.showRoom = async function(req, res) {
         await room.confirmed.push(req.user._id);
         await room.save();
     }
-    await removeIfIncluded(req.user.newRoomCount, room._id); //If user has not seen room before, remove it
+    await removeIfIncluded(req.user.newRooms, room._id); //If user has not seen room before, remove it
     await req.user.save();
     return res.render('chat/show', {platform, room});
 }
@@ -211,8 +211,8 @@ controller.createRoom = async function(req, res) {
         return res.redirect('/chat/new');
     }
 
-    for (let member of members) { //Iterate through all new members and add room to their newRoomCount
-        await member.newRoomCount.push(room._id);
+    for (let member of members) { //Iterate through all new members and add room to their newRooms
+        await member.newRooms.push(room._id);
         await member.save();
     }
     await req.flash("Created room!");
@@ -417,8 +417,8 @@ controller.deleteRoom = async function(req, res) {
         }
     }
 
-    for (let member of deletedRoom.members) { //Remove room from all members' newRoomCounts
-        await removeIfIncluded(member.newRoomCount, deletedRoom._id);
+    for (let member of deletedRoom.members) { //Remove room from all members' newRooms
+        await removeIfIncluded(member.newRooms, deletedRoom._id);
         await member.save();
     }
     await req.flash('success', 'Deleted room!');

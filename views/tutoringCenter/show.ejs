@@ -123,7 +123,7 @@
                         <% }%>
                     <%}%>
                     <% if (!enrolled) { %>
-                        <button class="btn btn-success" id="assign-button-<%=student._id%>" data-toggle="modal" data-target="#modal-index-assign-<%=student._id%>" style="margin-left: 10px;">Assign Tutor</button>
+                        <button class="btn btn-success green-tutor-button" id="assign-button-<%=student._id%>" data-toggle="modal" data-target="#modal-index-assign-<%=student._id%>">Assign Tutor</button>
                     <% } %>
                     <button class="btn btn-danger leave-button" id="remove-button-<%=student._id%>" data-toggle="modal" data-target="#modal-index-remove-<%=student._id%>">Remove Student</button>
 
@@ -156,7 +156,7 @@
                     <% for (let tutor of course.tutors) { %>
                         <% if (tutor.tutor._id.equals(currentUser._id)) { %>
                             <% if (objectArrIndex(tutor.members, "student", student._id) > -1) { %>
-                                <a style="margin-left: 10px;" class="btn btn-success" href="/chat/<%=tutor.members[objectArrIndex(tutor.members, 'student', student._id)].room%>">Chat</a>
+                                <a class="btn btn-success green-tutor-button" href="/chat/<%=tutor.members[objectArrIndex(tutor.members, 'student', student._id)].room%>">Chat</a>
                             <% } %>
                         <% } %>
                     <% } %>
@@ -362,7 +362,7 @@
                                     <span id="slots-count"><%= tutor.slots + tutor.members.length %></span></label>
                             
                                 <br/>
-                                <select class="form-control mode" name="slots" onchange="setStudentsShow('<%= course._id %>')" id="slots" style="max-width: 100px;">
+                                <select class="form-control mode tutor-dropdown" name="slots" onchange="setStudentsShow('<%= course._id %>')" id="slots">
                                     <% for (let i = tutor.members.length; i < tutor.slots + tutor.members.length + 10; i++) { %>
                                         <option value="<%=i%>" <% if (i == tutor.slots){%> selected<%}%>><%=i%></option>
                                     <% } %>
@@ -375,14 +375,14 @@
                                 <% } else {%>
                                     <span id="cost-count"><%=(tutor.cost)%> Credits</span></label><br>
                                 <% } %>
-                                <select class="form-control mode" name="cost" onchange="setCostShow('<%= course._id %>')" id="cost" style="max-width: 100px;">
+                                <select class="form-control mode tutor-dropdown" name="cost" onchange="setCostShow('<%= course._id %>')" id="cost"">
                                     <% for (let i = 5; i <= 30; i+=5) { %>
                                         <option value="<%=i%>" <% if (tutor.cost == i) {%> selected <%}%>><%=i.toFixed(2)%></option>
                                     <% } %>
                                 </select>
                             <% } %>
 
-                            <p style="font-weight: bold; font-style: italic; margin-top: 20px;"><%=tutor.members.length%> Student(s)</p>
+                            <p class="tutor-student-info"><%=tutor.members.length%> Student(s)</p>
                             <p class="tutor-bio"><%= tutor.bio %></p>
                         </li>
 
@@ -626,7 +626,7 @@
                     <h4>Add Tutors</h4>
                     <div class="form-group mode" id="tutor-input-div">
                         <input type="text" class="form-control mode" id="tutor-list" placeholder="Tutors" oninput="searchTutors(this, '<%=course._id%>')"><br>
-                        <select id="tutor-select" class="form-control mode" onchange="addTutor('user')" style="display: none;"></select><br>
+                        <select id="tutor-select" class="form-control mode" onchange="addTutor('user')" hidden></select><br>
                         <input type="text" id="tutor-input" name="tutorInput" hidden/>
                     </div>
                     <button type="submit" class="btn btn-lg btn-primary btn-block">Confirm New Tutors</button>
@@ -636,7 +636,7 @@
                     <h4>Add Students</h4>
                     <div class="form-group mode" id="student-input-div">
                         <input type="text" class="form-control mode" id="student-list" placeholder="Students" oninput="searchStudents(this, '<%=course._id%>')"><br>
-                        <select id="student-select" class="form-control mode" onchange="addStudent('user')" style="display: none;"></select><br>
+                        <select id="student-select" class="form-control mode" onchange="addStudent('user')" hidden></select><br>
                         <input type="text" id="student-input" name="studentInput" hidden/>
                     </div>
                     <button type="submit" class="btn btn-lg btn-primary btn-block">Confirm New Students</button>

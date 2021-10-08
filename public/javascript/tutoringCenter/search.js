@@ -11,7 +11,7 @@ const searchTutors = function(input, id) {
     if (input.value.length > 2) {
         sendPostReq(url, data, data => {
             if (data.success && data.tutors.length > 0) { //If there are tutors to display
-                tutorSelect.style.display = "block";
+                tutorSelect.hidden = false;
                 while (tutorSelect.firstChild) {tutorSelect.removeChild(tutorSelect.firstChild);} //Empty tutorSelect from previous searches
 
                 //Add heading back to tutorSelect's list
@@ -38,11 +38,11 @@ const searchTutors = function(input, id) {
                     }
                 }
             } else {
-                tutorSelect.style.display = "none"; //Hide dropdown if there are no matching elements
+                tutorSelect.hidden = true; //Hide dropdown if there are no matching elements
             }
         });
     } else {
-        tutorSelect.style.display = "none"; //Hide dropdown if there is not a long enough input string
+        tutorSelect.hidden = true; //Hide dropdown if there is not a long enough input string
     }
 }
 
@@ -76,7 +76,7 @@ const addTutor = function() { //Add tutor to list of tutors
     }
     //Empty input and hide dropdown
     document.getElementById("tutor-list").value = "";
-    tutorSelect.style.display = "none";
+    tutorSelect.hidden = true;
 }
 
 const remTutor = function(btn) { //Remove tutor from list of tutors
@@ -103,7 +103,7 @@ const searchStudents = function(input, id) { //Search through potential students
     if (input.value.length > 2) {
         sendPostReq(url, data, data => {
             if (data.success && data.students.length > 0) { //If there are students to display
-                studentSelect.style.display = "block";
+                studentSelect.hidden = false;
                 while (studentSelect.firstChild) {studentSelect.removeChild(studentSelect.firstChild);} //Empty studentSelect from previous searches
 
                 //Add heading back to studentSelect's list
@@ -130,11 +130,11 @@ const searchStudents = function(input, id) { //Search through potential students
                     }
                 }
             } else {
-                studentSelect.style.display = "none"; //Hide dropdown if there are no matching elements
+                studentSelect.hidden = true; //Hide dropdown if there are no matching elements
             }
         });
     } else {
-        studentSelect.style.display = "none"; //Hide dropdown if there is not a long enough input string
+        studentSelect.hidden = true; //Hide dropdown if there is not a long enough input string
     }
 }
 
@@ -168,7 +168,7 @@ const addStudent = function() { //Add student to list of students
     }
     //Empty input and hide dropdown
     document.getElementById("student-list").value = "";
-    studentSelect.style.display = "none";
+    studentSelect.hidden = true;
 }
 
 const remStudent = function(btn) { //Remove student from list of students

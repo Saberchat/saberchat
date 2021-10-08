@@ -44,7 +44,7 @@
                             <img src="<% if (room.creator.mediaFile.display) {%> <%= room.creator.mediaFile.url%><%} else {%> <%=room.creator.imageUrl.url%><%}%>" alt="user" class="user-image">
                         <% } %>
 
-                        <% if (currentUser.newRoomCount.includes(room._id)) { %>
+                        <% if (currentUser.newRooms.includes(room._id)) { %>
                             <span class="badge badge-danger float-right">New!</span>
                         <% } else { %>
                             <span class="float-right">

@@ -206,10 +206,10 @@ controller.unenrollStudent = async function(req, res) {
             tutor.slots++;
             tutor.available = true;
 
-            //Remove rooms from tutor/student newRoomCounts
-            await removeIfIncluded(req.user.newRoomCount, deletedRoom._id);
+            //Remove rooms from tutor/student newRooms
+            await removeIfIncluded(req.user.newRooms, deletedRoom._id);
             await req.user.save();
-            await removeIfIncluded(tutor.tutor.newRoomCount, deletedRoom._id);
+            await removeIfIncluded(tutor.tutor.newRooms, deletedRoom._id);
             await tutor.tutor.save();
         }
     }
@@ -235,10 +235,10 @@ controller.unenrollTutor = async function(req, res) {
                     return res.redirect('back');
                 }
 
-                //Remove rooms from tutor/student newRoomCounts
-                await removeIfIncluded(student.student.newRoomCount, deletedRoom._id);
+                //Remove rooms from tutor/student newRooms
+                await removeIfIncluded(student.student.newRooms, deletedRoom._id);
                 await student.student.save();
-                await removeIfIncluded(req.user.newRoomCount, deletedRoom._id);
+                await removeIfIncluded(req.user.newRooms, deletedRoom._id);
                 await req.user.save();
             }
             await course.tutors.splice(i, 1); //Remove tutor from course
@@ -300,7 +300,6 @@ controller.updateSettings = async function(req, res) {
 }
 
 controller.deleteCourse = async function(req, res) {
-    console.log(req.body.joinCode);
     const course = await Course.findOne({_id: req.params.id, joinCode: req.body.joincode}).populate("tutors.tutor tutors.members.student");
     if (!course) {
         await req.flash("error", "Incorrect join code");
@@ -315,9 +314,9 @@ controller.deleteCourse = async function(req, res) {
                 await req.flash("error", "Unable to find room");
                 return res.redirect("back");
             }
-            await removeIfIncluded(tutor.tutor.newRoomCount, student.room);
+            await removeIfIncluded(tutor.tutor.newRooms, student.room);
             await tutor.tutor.save();
-            await removeIfIncluded(student.student.newRoomCount, student.room);
+            await removeIfIncluded(student.student.newRooms, student.room);
             await student.student.save();
         }
     }
@@ -459,9 +458,9 @@ controller.assignTutor = async function(req, res) { //Assign user to tutor a cou
     await selectedTutor.members.push({student, room, lessons: []});
     await course.save();
     
-    //Update newRoomCount for both student and tutor
-    await selectedTutor.tutor.newRoomCount.push(room._id);
-    await student.newRoomCount.push(room._id);
+    //Update newRooms for both student and tutor
+    await selectedTutor.tutor.newRooms.push(room._id);
+    await student.newRooms.push(room._id);
     await selectedTutor.tutor.save();
     await student.save();
 
@@ -596,10 +595,10 @@ controller.removeStudent = async function(req, res) {
             deletedRoom = await ChatRoom.findByIdAndDelete(tutor.members[await objectArrIndex(tutor.members, "student", studentId._id, "_id")].room);
             if (!deletedRoom) {return res.json({error: "Error removing room"});}
 
-            //Update newRoomCount for student and tutor, and remove student from list of tutor's current members
-            await removeIfIncluded(studentId.newRoomCount, deletedRoom._id);
+            //Update newRooms for student and tutor, and remove student from list of tutor's current members
+            await removeIfIncluded(studentId.newRooms, deletedRoom._id);
             await studentId.save();
-            await removeIfIncluded(tutor.tutor.newRoomCount, deletedRoom._id);
+            await removeIfIncluded(tutor.tutor.newRooms, deletedRoom._id);
             await tutor.tutor.save();
             await tutor.members.splice(await objectArrIndex(tutor.members, "student", studentId._id, "_id"), 1);
         }
@@ -663,9 +662,9 @@ controller.removeTutor = async function(req, res) { //Remove tutor from course
                         return res.redirect("back");
                     }
                 }
-                await removeIfIncluded(student.student.newRoomCount, deletedRoom._id);
+                await removeIfIncluded(student.student.newRooms, deletedRoom._id);
                 await student.student.save();
-                await removeIfIncluded(tutorId.newRoomCount, deletedRoom._id);
+                await removeIfIncluded(tutorId.newRooms, deletedRoom._id);
                 await tutorId.save();
             }
 
@@ -913,8 +912,8 @@ controller.bookTutor = async function(req, res) {
 
             room.date = await dateFormat(room.created_at, "h:MM TT | mmm d");
             await room.save();
-            await tutor.tutor.newRoomCount.push(room._id);
-            await req.user.newRoomCount.push(room._id);
+            await tutor.tutor.newRooms.push(room._id);
+            await req.user.newRooms.push(room._id);
             await tutor.tutor.save();
             await req.user.save();
 
@@ -961,9 +960,9 @@ controller.leaveTutor = async function(req, res) {
                 if (!deletedRoom) {return res.json({error: "Error deleting room"});}
 
                 //Remove room, add student to tutor's former members
-                await removeIfIncluded(tutor.tutor.newRoomCount, tutor.members[await objectArrIndex(tutor.members, "student", req.user._id)].room);
+                await removeIfIncluded(tutor.tutor.newRooms, tutor.members[await objectArrIndex(tutor.members, "student", req.user._id)].room);
                 await tutor.tutor.save();
-                await removeIfIncluded(req.user.newRoomCount, tutor.members[await objectArrIndex(tutor.members, "student", req.user._id)].room)
+                await removeIfIncluded(req.user.newRooms, tutor.members[await objectArrIndex(tutor.members, "student", req.user._id)].room)
                 await req.user.save();
                 if (await objectArrIndex(tutor.formerStudents, "student", req.user._id) == -1) {
                     await tutor.formerStudents.push({

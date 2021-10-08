@@ -116,7 +116,7 @@
                                             <input class="form-control mode" type="password" name="joincode"
                                                    placeholder="Enter Join Code"/><br/>
                                             <label for="slots" id="slots-label">Number of Student Slots: 0</label><br/>
-                                            <select class="form-control mode" name="slots" onchange="setStudents()" id="slots" style="max-width: 100px;">
+                                            <select class="form-control mode tutor-dropdown" name="slots" onchange="setStudents()" id="slots">
                                                 <% for (let i = 0; i < 10; i++) { %>
                                                     <option value="<%=i%>"><%=i%></option>
                                                 <% } %>
@@ -129,7 +129,7 @@
                                             <% } else {%>
                                                 <span id="cost-count">0 Credits</span></label><br>
                                             <% } %>
-                                            <select class="form-control mode" name="cost" onchange="setCost(<%=platform.dollarPayment%>)" id="cost" style="max-width: 100px;">
+                                            <select class="form-control mode tutor-dropdown" name="cost" onchange="setCost(<%=platform.dollarPayment%>)" id="cost">
                                                 <% for (let i = 5; i <= 30; i+=5) { %>
                                                     <option value="<%=i%>"><%=i.toFixed(2)%></option>
                                                 <% } %>
@@ -166,7 +166,7 @@
         <% } else { %>
             <% for (let course of courses) { %>
                 <div class="card course-title darkmode-outline" title="<%= course.name %>">
-                    <img class="card-img-top course-thumbnail" src="<% if (course.thumbnailFile.display) { %> <%=course.thumbnailFile.url%> <%} else { %> <%= course.thumbnail.url %> <% } %>" alt="Card image cap" style="height: 200px;">
+                    <img class="card-img-top course-thumbnail" src="<% if (course.thumbnailFile.display) { %> <%=course.thumbnailFile.url%> <%} else { %> <%= course.thumbnail.url %> <% } %>" alt="Card image cap">
                     <div class="card-body">
                         <h5 class="card-title"><%= course.name.slice(0, 25) %>
                             <% if (course.name.length > 25) { %>...
@@ -190,6 +190,8 @@
 
                         <p class="card-text course-description"><%= course.description.slice(0, 101) %>
                             <% if (course.description.length > 100) { %>...
+                            <% } else if (course.description.length < 100) {%>
+                                <% for (let i = 0; i < 100 - course.description.length; i++) { %>&nbsp;<% } %>
                             <% } %>
                         </p>
                         <a href="tutoringCenter/<%= course._id %>" class="btn btn-primary">Go to Course</a>
