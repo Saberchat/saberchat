@@ -21,7 +21,7 @@
                 <form action="/profiles/change-email?_method=put" method="post">
                     <div class="form-group mode">
                         <label for="usernameInput">Email</label>
-                        <input id="usernameInput" class="form-control mode" type="text" name="email" value="<%= currentUser.email %>" placeholder="Enter New Email" required><br />
+                        <input id="usernameInput" class="form-control mode email-input" type="text" name="email" value="<%= currentUser.email %>" placeholder="Enter New Email" required><br />
                         <input type="checkbox" name="receiving_emails" id="receiving_emails" <% if (currentUser.receiving_emails) {%> checked <%}%>/>
                         <label for="receiving_emails">Send Me Emails</label>
                     </div>
