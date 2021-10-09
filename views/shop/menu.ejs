@@ -138,7 +138,7 @@
                                    <label for="request-name-<%=item._id%>">Your Name</label>
                                    <input id="request-name-<%=item._id%>" class="form-control mode" type="text" placeholder="Enter your name" name="name" <% if (currentUser) {%>value="<%=currentUser.firstName%> <%=currentUser.lastName%>"<%}%> required><br>
                                    <label for="request-email-<%=item._id%>">Your Email Address</label>
-                                   <input id="request-email-<%=item._id%>" class="form-control mode" type="text" placeholder="Enter your email address" name="email" <%if (currentUser) { %>value="<%=currentUser.email%>"<%}%> required><br>
+                                   <input id="request-email-<%=item._id%>" class="form-control mode email-input" type="text" placeholder="Enter your email address" name="email" <%if (currentUser) { %>value="<%=currentUser.email%>"<%}%> required><br>
                                    <label for="request-address-<%=item._id%>">Your Mailing Address</label>
                                    <input id="request-address-<%=item._id%>" class="form-control mode" type="text" placeholder="Enter your mailing address" name="address" required><br>
                                    <label for="quantity--<%=item._id%>">Number Of Items</label>

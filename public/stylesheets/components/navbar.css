@@ -120,6 +120,10 @@ SignUp form animations
     width: calc(100% - 30px);
 }
 
+.email-input {
+    text-transform: lowercase;
+}
+
 /*
 ================================
 Custom styling for the bootstrap nav
