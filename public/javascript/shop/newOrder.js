@@ -49,11 +49,11 @@ const searchCustomers = function(input) { //Check list of customers for online o
                     userSelect.appendChild(appendedCustomer); //Add userSelect option to menu
                 }
             } else {
-                userSelect.style.display = "none"; //Hide dropdown if there are no matching elements
+                userSelect.style.display = "block"; //Hide dropdown if there are no matching elements
             }
         });
     } else {
-        userSelect.style.display = "none"; //Hide dropdown if there is not a long enough input string
+        userSelect.style.display = "block"; //Hide dropdown if there is not a long enough input string
     }
 }
 
@@ -65,6 +65,10 @@ const setCustomer = function(dropdown, dollarPayment, darkmode) {
     balanceString = `Current Balance: $${currentBalance.toFixed(2)}`;
     document.getElementById("balance-box").innerText = balanceString;
     changeOrderConfirmation(dollarPayment, darkmode);
+
+    document.getElementById("order-item-section").disabled = false;
+    document.getElementById("searchbar").hidden = false;
+    document.getElementById("confirmation-section").hidden = false;
 }
 
 //Changes the order confirmation on the form
