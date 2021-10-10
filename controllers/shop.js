@@ -267,6 +267,60 @@ controller.confirmOrder = async function(req, res) {
     return res.json({success: "Successfully confirmed email"});
 }
 
+controller.processAll = async function(req, res) { //Process all currently active orders
+    const platform = await setup(Platform);
+    const shop = await setup(Market);
+    const orders = await Order.find({present: true}).populate("items.item").populate("customer"); //Find all active orders
+    if (!platform || !shop || !orders) {
+        await req.flash("error", "Unable to find orders");
+        return res.redirect("back");
+    }
+    
+    //Temporary message variables that get changed throughout loop
+    let notif;
+    let itemText;
+    let emailText;
+
+    for (let order of orders) { //Iterate through orders, update their data, and send messages to their customers
+        notif = await InboxMessage.create({
+            subject: "Order Ready", author: req.user, noReply: true,
+            recipients: [order.customer], read: [], images: []
+        });
+        if (!notif) {
+            await req.flash("error", "Unable to create notification");
+            return res.redirect("back");
+        }
+        notif.date = await dateFormat(notif.created_at, "h:MM TT | mmm d");
+
+        itemText = []; //This will have all the decoded info about the order
+        for (let i = 0; i < order.items.length; i++) {
+            await itemText.push(` - ${order.items[i].item.name}: ${order.items[i].quantity} order(s)`);
+        }
+
+        emailText = ""; //Formats the charge in money format
+        if (platform.dollarPayment) {
+            notif.text = `Your order is on its way!\n ${await itemText.join("\n")} \n\nExtra Instructions: ${order.instructions} \nTotal Cost: $${await (order.charge).toFixed(2)}`;
+            emailText =  `<p>Your order is on its way!<p><p>${await itemText.join(", ")}</p><p>Extra Instructions: ${order.instructions}</p><p>Total Cost: $${await (order.charge).toFixed(2)}</p>`;
+        } else {
+            notif.text = `Your order is on its way!\n ${await itemText.join("\n")} \n\nExtra Instructions: ${order.instructions} \nTotal Cost: ${(order.charge)} Credits`;
+            emailText =  `<p>Your order is on its way!<p><p>${await itemText.join(", ")}</p><p>Extra Instructions: ${order.instructions}</p><p>Total Cost: ${(order.charge)} Credits</p>`;
+        }
+        await notif.save();
+        if (order.customer.receiving_emails) {
+            await sendGridEmail(order.customer.email, "Order Ready", `<p>Hello ${order.customer.firstName},</p>${emailText}`, false);
+        }
+
+        await order.customer.inbox.push({message: notif, new: true}); //Add notif to user"s inbox
+        await order.customer.save();
+        order.present = false; //Order is not active anymore
+        await order.save();
+        shop.revenue += order.charge;
+        await shop.save();
+    }
+    await req.flash("success", "Successfully processed all orders!")
+    return res.redirect("/shop/manage?orders=true");
+}
+
 controller.processOrder = async function(req, res) {
     const platform = await setup(Platform);
     const order = await Order.findById(req.params.id).populate("items.item").populate("customer"); //Find the order that is currently being handled based on id, and populate info about its items

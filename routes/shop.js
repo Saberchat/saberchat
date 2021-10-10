@@ -15,6 +15,7 @@ router.route('/')
 //View menu or view new order form
 router.post('/search-customers', wrapAsync(middleware.isLoggedIn), middleware.isCashier, wrapAsync(shop.searchCustomers)); //Search for cafe customers
 router.get('/order', wrapAsync(middleware.isLoggedIn), wrapAsync(middleware.accessToFeature), wrapAsync(middleware.shopOpen), wrapAsync(shop.orderForm));
+router.put('/order/all', wrapAsync(middleware.isLoggedIn), wrapAsync(middleware.accessToFeature), wrapAsync(middleware.platformPurchasable), middleware.isCashier, wrapAsync(shop.processAll));
 
 //SPECIFIC ORDER ROUTES
 router.route('/order/:id')
