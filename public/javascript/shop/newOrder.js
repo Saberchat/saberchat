@@ -30,7 +30,7 @@ const searchCustomers = function(input) { //Check list of customers for online o
     if (input.value.length > 2) {
         sendPostReq(url, data, data => {
             if (data.success && data.customers.length > 0) { //If there are customers to display
-                userSelect.style.display = "block";
+                userSelect.hidden = false;
                 while (userSelect.firstChild) {userSelect.removeChild(userSelect.firstChild);} //Empty userSelect from previous searches
 
                 //Add heading back to userSelect's list
@@ -49,11 +49,11 @@ const searchCustomers = function(input) { //Check list of customers for online o
                     userSelect.appendChild(appendedCustomer); //Add userSelect option to menu
                 }
             } else {
-                userSelect.style.display = "block"; //Hide dropdown if there are no matching elements
+                userSelect.hidden = true; //Hide dropdown if there are no matching elements
             }
         });
     } else {
-        userSelect.style.display = "block"; //Hide dropdown if there is not a long enough input string
+        userSelect.hidden = true; //Hide dropdown if there is not a long enough input string
     }
 }
 
@@ -66,11 +66,34 @@ const setCustomer = function(dropdown, dollarPayment, darkmode) {
     document.getElementById("balance-box").innerText = balanceString;
     changeOrderConfirmation(dollarPayment, darkmode);
 
+    //Display all elements previously hidden
     document.getElementById("order-item-section").disabled = false;
     document.getElementById("searchbar").hidden = false;
     document.getElementById("confirmation-section").hidden = false;
+    for (let className of ["num-orders", "form-check-input"]) {
+        for (let element of document.getElementsByClassName(className)) {
+            element.hidden = false;
+        }
+    }
 }
 
+const changeNumOrders = function(input, max_items, dollarPayment, darkmode) { //Evaluate if the inputted number of orders is valid
+    if (input.value != '') {
+        if (isNaN(input.value) || input.value == '0') {
+            input.value = 0;
+        } else if (!isNaN(input.value)) {
+            document.getElementById(input.id.split("-")[1]).checked = true;
+            if (parseInt(input.value) > max_items) { //Check if enough items are available
+                input.value = parseInt(max_items);
+            } else {
+                input.value = parseInt(input.value); //Convert value to integer (float values not allowed)
+            }
+        }
+    } else {
+        document.getElementById(input.id.split("-")[1]).checked = false;
+    }
+    changeOrderConfirmation(dollarPayment, darkmode);
+}
 //Changes the order confirmation on the form
 const changeOrderConfirmation = function(dollarPayment, darkmode) {
     sum = 0;
@@ -84,7 +107,7 @@ const changeOrderConfirmation = function(dollarPayment, darkmode) {
                 if (i.checked) { //If it is checked
 
                     for (let no of numOrders) {
-                        if (no.id.split('_')[1] == i.id) { //Id's are constructed in format 'dd_<id>'. This extracts that ID
+                        if (no.id.split('-')[1] == i.id) { //Id's are constructed in format 'dd_<id>'. This extracts that ID
                             if (dollarPayment) {
                                 sum += parseInt(no.value) * parseFloat(l.innerText.split('$')[1]);
                             } else {

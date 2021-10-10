@@ -41,7 +41,9 @@
                         <label id="current-name" for="user-select" class="<%=currentUser._id%>">Current Customer: None</label>
                         <input class="form-control mode" type="text" id="customer-username" placeholder="Username, First Name or Last Name" oninput="searchCustomers(this)"><br>
                         <!-- Inline CSS used here as JS modifies it. Can change if needed-->
-                        <select <%if(currentUser.tags.includes("Cashier")){%>required<%}%> id="user-select" class="form-control mode" onchange="setCustomer(this, <%=platform.dollarPayment%>, <%+currentUser.darkmode%>)" name="customer_id" style="display: none;">
+                        <select <%if(currentUser.tags.includes("Cashier")){%>required<%}%> id="user-select" class="form-control mode" 
+                            onchange="setCustomer(this, <%=platform.dollarPayment%>, <%+currentUser.darkmode%>)" 
+                            name="customer_id" hidden>
                             <option class="recipient-group" value="" disabled>Select User</option>
                         </select>
                     <% } %>
@@ -91,14 +93,8 @@
                                                 <div class="style-div">
 
                                                     <input name="check[<%= item._id %>]" id="<%= item._id %>" class="form-check-input"
-                                                        type="checkbox" value="">
-                                                    <select class="num-orders mode" id="dd_<%= item._id %>" name="<%= item.name %>"
-                                                            onchange="changeOrderConfirmation(<%=platform.dollarPayment%>, <%=currentUser.darkmode%>)">
-                                                        <% for (let i = 0; i <= item.availableItems; i++) { %>
-                                                            <option><%= i %></option>
-                                                        <% } %>
-                                                    </select>
-
+                                                        type="checkbox" value="" oninput="changeOrderConfirmation(<%=platform.dollarPayment%>, <%=currentUser.darkmode%>)" hidden>
+                                                    <input name="<%=item.name%>" id="num-<%=item._id%>" type="text" class="form-control mode num-orders" hidden value="0" oninput="changeNumOrders(this, <%=item.availableItems%>, <%=platform.dollarPayment%>, <%=currentUser.darkmode%>)">
                                                     <label class="form-check-label" for="<%= item._id %>">
                                                         <span class="item-name"><%= item.name %></span>
                                                         <%if(item.displayAvailability){%>(<%= item.availableItems %> orders available)<%}%> -
