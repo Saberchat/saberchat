@@ -4,6 +4,8 @@ const order = function(form, customer, dollarPayment) {
     let items = document.getElementById('item-list');
 
     $(form).submit(function(e) {
+        e.preventDefault();
+        // alert(document.getElementById("user-select").value);
         console.log('submitted');
         let payingInPerson;
         if (dollarPayment == "true") {payingInPerson = document.getElementById('payingInPerson').checked;   

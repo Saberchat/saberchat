@@ -23,8 +23,33 @@
                 <h1><i class="fas fa-<%= data.icon %>"></i><span id="order-type"> Active Orders</span></h1>
                 <p id="order-subheading">All Active Orders</p>
                 <a href="/shop/order?order=true" class="btn btn-info"><i class="fas fa-plus-circle"></i> New Order</a>
+                <button class="btn btn-warning" id="all-orders-button" data-toggle="modal" data-target="#modal-all-ready"><i class="fas fa-check-square"></i> Mark All As Ready</button>
                 <button class="btn btn-success" id="past-order-button" onclick="switchOrders(this)"><i class="fas fa-clock"></i><span id="button-text"> View Past Orders</span></button>
                 <a class="btn btn-primary" href="manage"><i class="fas fa-arrow-left"></i> Back</a>
+
+                <form action="/shop/order/all?_method=put" method="post" class="modal fade" id="modal-all-ready" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+                    <div class="modal-dialog mode">
+                        <div class="modal-content mode">
+                            <div class="modal-header mode">
+                                <h5 class="modal-title" id="exampleModalLabel">Mark All Orders As Ready?</h5>
+                                <button type="button" class="close mode" data-dismiss="modal"
+                                        aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                            </div>
+                            <div class="modal-body mode">
+                                This will notify all active customers that their orders are ready.
+                            </div>
+                            <div class="modal-footer mode">
+                                <button type="button" class="btn btn-secondary" data-dismiss="modal">No, Go
+                                    Back
+                                </button>
+                                <button class="btn btn-warning">Yes, Mark All As Ready</button>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+
             </div>
         </div>
     </div>
@@ -78,7 +103,7 @@
                     <% if (currentUser.tags.includes("Cashier")) { %>
                         <form class="ready-form" action="<%= order._id %>/ready" method="post"
                               id="ready-form-<%= order._id %>">
-                            <% if (!order.confirmed) { %>
+                            <% if (!order.confirmed && !platform.dollarPayment) { %>
                                 <button type="button" data-toggle="modal" data-target="#modal-<%= order._id %>-confirm"
                                         id="confirm-<%= order._id %>" class="btn btn-success" name="button">Confirm
                                     Order
