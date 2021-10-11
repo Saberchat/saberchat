@@ -97,47 +97,40 @@
                             <i class="fas fa-comment-dots"></i> <%= project.comments.length %></a>
                     </div>
 
-                    <% if (project.creators.length > 2) { %>
-                        <span><span id="creator-heading">Creators:</span>
+                    <% if ((project.creators.length + project.nonaccountCreators.length) > 0) { %>
+                        <p>
+                            <span id="creator-heading">
+                                <% if ((project.creators.length + project.nonaccountCreators.length) > 1) { %>
+                                    Creators:
+                                <% } else { %>
+                                    Creator:
+                                <% } %>
+                            </span>
+                            <%let creator;%>
+                            <% for (let i = 0; i < project.creators.length; i++) {%>
+                                <%creator = project.creators[i];%>
+                                <a class="creator-names" href="../profiles/<%= creator._id %>">
+                                    <img src="<% if (creator.mediaFile.display) {%> <%= creator.mediaFile.url%><%} else {%> <%=creator.imageUrl.url%><%}%>" alt="profile pic"
+                                    class="creator-profile"> <%= creator.firstName %> <%= creator.lastName %>
+                                </a>
+                                <% if (i+1 < (project.creators.length + project.nonaccountCreators.length)) {%>,<%}%>
+                            <% } %>
 
-                            <% let tempcreators = project.creators.slice(0, project.creators.length - 2) %>
-
-                            <% tempcreators.forEach(creator => { %>
-                                <a class="creator-names" href="../profiles/<%= creator._id %>"><img
-                                            src="<% if (creator.mediaFile.display) {%> <%= creator.mediaFile.url%><%} else {%> <%=creator.imageUrl.url%><%}%>" alt="profile pic"
-                                            class="creator-profile"> <%= creator.firstName %> <%= creator.lastName %></a>
-                                ,
-                            <% }) %>
-
-                            <a class="creator-names"
-                                href="../profiles/<%= project.creators[project.creators.length - 2]._id %>"><img
-                                        src="<% if (project.creators[project.creators.length - 2].mediaFile.display) {%> <%= project.creators[project.creators.length - 2].mediaFile.url%><%} else {%> <%=project.creators[project.creators.length - 2].imageUrl.url%><%}%>"
-                                        alt="profile pic"
-                                        class="creator-profile"> <%= project.creators[project.creators.length - 2].firstName %> <%= project.creators[project.creators.length - 2].lastName %></a>,
-                <a class="creator-names"
-                    href="../profiles/<%= project.creators[project.creators.length - 1]._id %>"><img
-                            src="<% if (project.creators[project.creators.length - 1].mediaFile.display) {%> <%= project.creators[project.creators.length - 1].mediaFile.url%><%} else {%> <%=project.creators[project.creators.length - 1].imageUrl.url%><%}%>" alt="profile pic"
-                            class="creator-profile"> <%= project.creators[project.creators.length - 1].firstName %> <%= project.creators[project.creators.length - 1].lastName %></a>
-
-            </span>
-
-                    <% } else if (project.creators.length == 2) { %>
-                        <p><span id="creator-heading">Creators:</span> <span id="creator-div"><a
-                                        class="creator-names"
-                                        href="../profiles/<%= project.creators[0]._id %>"><img
-                                            src="<% if (project.creators[0].mediaFile.display) {%> <%= project.creators[0].mediaFile.url%><%} else {%> <%=project.creators[0].imageUrl.url%><%}%>" alt="profile pic"
-                                            class="creator-profile"> <%= project.creators[0].firstName %> <%= project.creators[0].lastName %></a>, <a
-                                        class="creator-names" href="../profiles/<%= project.creators[1]._id %>"><img
-                                            src="<% if (project.creators[1].mediaFile.display) {%> <%= project.creators[1].mediaFile.url%><%} else {%> <%=project.creators[1].imageUrl.url%><%}%>" class="creator-profile"
-                                            alt="profile pic"/> <%= project.creators[1].firstName %> <%= project.creators[1].lastName %></a></span>
+                            <% for (let i = 0; i < project.nonaccountCreators.length; i++) {%>
+                                <%creator = project.nonaccountCreators[i];%>
+                                <span class="creator-names"><%= creator%></span>
+                                <% if (i+1 < project.nonaccountCreators.length) {%>,<%}%>
+                            <% } %>
                         </p>
 
                     <% } else if (project.creators.length == 1){ %>
-                        <p><span id="creator-heading">Creator:</span> <span id="creator-div"><a
-                                        class="creator-names"
-                                        href="../profiles/<%= project.creators[0]._id %>"><img
-                                            src="<% if (project.creators[0].mediaFile.display) {%> <%= project.creators[0].mediaFile.url%><%} else {%> <%=project.creators[0].imageUrl.url%><%}%>" alt="profile pic"
-                                            class="creator-profile"> <%= project.creators[0].firstName %> <%= project.creators[0].lastName %></a></span>
+                        <p>
+                            <span id="creator-heading">Creator:</span> <span id="creator-div">
+                                <a class="creator-names" href="../profiles/<%= project.creators[0]._id %>">
+                                    <img src="<% if (project.creators[0].mediaFile.display) {%> <%= project.creators[0].mediaFile.url%><%} else {%> <%=project.creators[0].imageUrl.url%><%}%>"
+                                    alt="profile pic" class="creator-profile"> <%= project.creators[0].firstName %> <%= project.creators[0].lastName %>
+                                </a>
+                            </span>
                         </p>
 
                     <% } else { %>

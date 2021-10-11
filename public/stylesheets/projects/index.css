@@ -21,6 +21,10 @@
     margin-right: 0.5rem;
 }
 
+.nonuser-tag {
+    background-color: #283e5a;
+}
+
 .user-tag span {
     display: inline-block;
     height: 100%;

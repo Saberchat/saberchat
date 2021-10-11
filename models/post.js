@@ -28,7 +28,8 @@ module.exports = { //All subclass Schema
     
     //SUBCLASSES WITH APPENDED FIELDS
     Project: Post.discriminator("Project", new mongoose.Schema({ //Student projects
-        creators: [{type: mongoose.Schema.Types.ObjectId, ref: "User"}]
+        creators: [{type: mongoose.Schema.Types.ObjectId, ref: "User"}],
+        nonaccountCreators: [{type: String}] //Users without accounts
     })),
     Report: Post.discriminator("Report", new mongoose.Schema({ //Error reports/new feature requests
         handled: {type: Boolean, default: false}

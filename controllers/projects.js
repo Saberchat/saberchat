@@ -79,16 +79,14 @@ controller.searchCreators = async function(req, res) {
     let creators = [];
     let displayValue;
 
-    if (!req.body.anonymous) { //Only add other statuses if the message is not anonymous
-        for (let status of platform.studentStatuses) { //Iterate through statuses and search for matches
-            displayValue = platform.statusesPlural[platform.statusesProperty.indexOf(status)];
-            if (await `${status} ${displayValue}`.toLowerCase().includes(await req.body.text.toLowerCase())) {
-                await creators.push({ //Add status to array, using display and id values
-                    displayValue,
-                    idValue: status,
-                    type: "status"
-                });
-            }
+    for (let status of platform.studentStatuses) { //Iterate through statuses and search for matches
+        displayValue = platform.statusesPlural[platform.statusesProperty.indexOf(status)];
+        if (await `${status} ${displayValue}`.toLowerCase().includes(await req.body.text.toLowerCase())) {
+            await creators.push({ //Add status to array, using display and id values
+                displayValue,
+                idValue: status,
+                type: "status"
+            });
         }
     }
 
@@ -219,7 +217,7 @@ controller.createProject = async function(req, res) {
     } else {
         await req.flash('success', `Project Posted!`);
     }
-    return res.redirect(`/projects`);
+    return res.redirect(`/projects/${project._id}`);
 }
 
 controller.verify = async function(req, res) {
@@ -452,7 +450,7 @@ controller.updateProject = async function(req, res) {
     }
     await updatedProject.save();
     await req.flash("success", "Project Updated!");
-    return res.redirect(`/projects`);
+    return res.redirect(`/projects/${project._id}`);
 }
 
 

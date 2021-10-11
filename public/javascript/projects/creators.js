@@ -1,5 +1,6 @@
 const creatorSelect = document.getElementById('creator-select');
 const creatorDiv = document.getElementById('creator-input-div');
+const creatorInputList = document.getElementById('creator-list');
 const creatorInput = document.getElementById('creator-input');
 let creatorList = [];
 
@@ -8,6 +9,20 @@ for (let creator of document.getElementsByClassName('user-tag')) {
     creatorList.push(creator.id)
     creatorInput.value = creatorList.toString()
 }
+
+creatorInputList.addEventListener("keydown", e => { //Check to see if user is trying to add non-account name to list
+    if (e.key == "Enter" && creatorInputList.value.split(" ").join('') != '') { //If user is attempting to add a value
+        //Follow same DOM element creation algorithm as in addCreators()
+        let newCreator = document.createElement('div');
+        newCreator.classList.add('user-tag');
+        newCreator.classList.add('nonuser-tag');
+        newCreator.id = `${creatorInputList.value.toLowerCase().split(' ').join('-')}`; //Instead of the user ID, add a standardized form of their name
+        newCreator.innerHTML = `<span name="creators" value="${creatorInputList.value}">${creatorInputList.value}</span><button type="button" id="${creatorInputList.value.toLowerCase().split(' ').join('-')}" onclick="remCreator(this)">&times;</button>`;
+        creatorDiv.appendChild(newCreator);
+        creatorInputList.value = ""; //Reset value
+        e.preventDefault(); //Prevent form from submitting with enter button
+    }
+})
 
 const searchCreators = function(input) {
     const url = `/projects/search-creators`;

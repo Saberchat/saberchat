@@ -49,6 +49,12 @@
                         <button type="button" id="<%= creator._id %>" onclick="remCreator(this)">&times;</button>
                     </div>
                 <% } %>
+                <% for (let creator of project.nonaccountCreators) { %>
+                    <div class="user-tag nonuser-tag" id="<%=creator.toLowerCase().split(' ').join('-')%>">
+                        <span name="creators" value="<%=creator%>"><%= creator%></span>
+                        <button type="button" id="<%=creator.toLowerCase().split(' ').join('-')%>" onclick="remCreator(this)">&times;</button>
+                    </div>
+                <% } %>
             </div>
 
             <!-- <input id="creators" class="form-control" autocomplete="off" name="creators" type="text" aria-describedby="basic-addon2" value = "<%= creatornames.join(', ') %>" placeholder="Creators" required/> -->
