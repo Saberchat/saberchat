@@ -20,6 +20,10 @@ creatorInputList.addEventListener("keydown", e => { //Check to see if user is tr
         newCreator.innerHTML = `<span name="creators" value="${creatorInputList.value}">${creatorInputList.value}</span><button type="button" id="${creatorInputList.value.toLowerCase().split(' ').join('-')}" onclick="remCreator(this)">&times;</button>`;
         creatorDiv.appendChild(newCreator);
         creatorInputList.value = ""; //Reset value
+
+        //Add to array and hidden input field
+        creatorList.push(creatorSelect.value);
+        creatorInput.value = creatorList.toString();
         e.preventDefault(); //Prevent form from submitting with enter button
     }
 })
