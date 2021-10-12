@@ -141,7 +141,7 @@ controller.orderForm = async function(req, res) {
     }
 }
 
-//Inbox new message recipient search
+//Cafe customer search
 controller.searchCustomers = async function(req, res) {
     const platform = await setup(Platform);
     if (!platform) {return res.json({error: "An error occurred"});}

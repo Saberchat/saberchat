@@ -1,13 +1,44 @@
 const creatorSelect = document.getElementById('creator-select');
 const creatorDiv = document.getElementById('creator-input-div');
+const creatorInputList = document.getElementById('creator-list');
 const creatorInput = document.getElementById('creator-input');
 let creatorList = [];
 
 $("#post-image").hide();
+
+const removeSpaceFront = function(string) { //Remove all trailing whitespace from the front of a string
+    let copy = string;
+    while(copy.charAt(0) == ' ') {copy = copy.slice(1);} //Remove first character until the first proper value is hit
+    return copy;
+}
+
 for (let creator of document.getElementsByClassName('user-tag')) {
-    creatorList.push(creator.id)
+    if (creator.classList.contains("nonuser-tag")) { //If user does not have an account, add normal text version
+        creatorList.push(removeSpaceFront(creator.textContent.split('\n')[1]));
+    } else { //Otherwise, add standardized version of name
+        creatorList.push(creator.id);
+    }
     creatorInput.value = creatorList.toString()
 }
+
+creatorInputList.addEventListener("keydown", e => { //Check to see if user is trying to add non-account name to list
+    if (e.key == "Enter" && creatorInputList.value.split(" ").join('') != '') { //If user is attempting to add a value
+        //Follow same DOM element creation algorithm as in addCreators()
+        let newCreator = document.createElement('div');
+        newCreator.classList.add('user-tag');
+        newCreator.classList.add('nonuser-tag');
+        newCreator.id = `${creatorInputList.value.toLowerCase().split(' ').join('-')}`; //Instead of the user ID, add a standardized form of their name
+        newCreator.innerHTML = `<span name="creators" value="${creatorInputList.value}">${creatorInputList.value}</span><button type="button" id="${creatorInputList.value.toLowerCase().split(' ').join('-')}" onclick="remCreator(this)">&times;</button>`;
+        creatorDiv.appendChild(newCreator);
+
+        //Add to array and hidden input field
+        creatorList.push(creatorInputList.value);
+        creatorInput.value = creatorList.toString();
+        
+        creatorInputList.value = ""; //Reset value
+        e.preventDefault(); //Prevent form from submitting with enter button
+    }
+});
 
 const searchCreators = function(input) {
     const url = `/projects/search-creators`;
@@ -88,7 +119,18 @@ const remCreator = function(btn) { //Remove creator from list of creators
     for (let tag of userTags) { //Iterate through tags until the one with the remove ID is found
         if (tag.id == id) {
             creatorDiv.removeChild(tag);
-            creatorList.splice(creatorList.indexOf(id), 1);
+
+            if (creatorList.indexOf(id) == -1) { //If id is not found (meaning that it is a non-standardized value for a user without an account)
+                for (let i = 0; i < creatorList.length; i++) {
+                    if (creatorList[i].toLowerCase().split(' ').join('-') == id) { //Iterate until standardized value is found
+                        creatorList.splice(i, 1);
+                        break;
+                    }
+                }
+
+            } else { //If normal situation (user has an account/is a status of users and so their ID is found)
+                creatorList.splice(creatorList.indexOf(id), 1);
+            }
             creatorInput.value = creatorList.toString();
         }
     }

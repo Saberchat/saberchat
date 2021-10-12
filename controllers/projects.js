@@ -79,16 +79,14 @@ controller.searchCreators = async function(req, res) {
     let creators = [];
     let displayValue;
 
-    if (!req.body.anonymous) { //Only add other statuses if the message is not anonymous
-        for (let status of platform.studentStatuses) { //Iterate through statuses and search for matches
-            displayValue = platform.statusesPlural[platform.statusesProperty.indexOf(status)];
-            if (await `${status} ${displayValue}`.toLowerCase().includes(await req.body.text.toLowerCase())) {
-                await creators.push({ //Add status to array, using display and id values
-                    displayValue,
-                    idValue: status,
-                    type: "status"
-                });
-            }
+    for (let status of platform.studentStatuses) { //Iterate through statuses and search for matches
+        displayValue = platform.statusesPlural[platform.statusesProperty.indexOf(status)];
+        if (await `${status} ${displayValue}`.toLowerCase().includes(await req.body.text.toLowerCase())) {
+            await creators.push({ //Add status to array, using display and id values
+                displayValue,
+                idValue: status,
+                type: "status"
+            });
         }
     }
 
@@ -113,27 +111,28 @@ controller.createProject = async function(req, res) {
         return res.redirect("back");
     }
     let creators = [];
+    let nonaccountCreators = [];
     let statusGroup; //Group of creators by status
     let individual; //Individual Creator ID
 
     if (req.body.creatorInput != '') {
-        for (let creator of (await req.body.creatorInput.split(','))) {
-            if (await platform.studentStatuses.includes(creator)) { //If the 'creator' is one of the listed status groups
-                statusGroup = await User.find({authenticated: true, status: creator});  //Search for all users with that status
-
-                if (!statusGroup) {
-                    await req.flash('error', "Unable to find the users you listed");
-                    return res.redirect('back');
-                }
+        for (let creator of await req.body.creatorInput.split(',')) { //Iterate through listed creators
+            if (await platform.studentStatuses.includes(creator)) { //If 'creator' is one of the statuses (grades), find all users with that status
+                statusGroup = await User.find({authenticated: true, status: creator});
                 for (let user of statusGroup) {await creators.push(user);}
 
             } else {
-                individual = await User.findById(creator);
-                if (!individual) {
-                    await req.flash('error', "Unable to find the users you listed");
-                    return res.redirect('back');
+                try {
+                    individual = await User.findById(creator);
+                    if (individual) { //If user is found at given ID address
+                        await creators.push(individual);
+                    } else { //If value returned is null (meaning account does not exist)
+                        await nonaccountCreators.push(creator);
+                    }
+
+                } catch (err) { //If error reached from running findById on a normal string
+                    await nonaccountCreators.push(creator);
                 }
-                await creators.push(individual);
             }
         }
     }
@@ -142,7 +141,7 @@ controller.createProject = async function(req, res) {
         subject: req.body.title,
         text: req.body.text,
         sender: req.user,
-        creators,
+        creators, nonaccountCreators,
         verified: !platform.postVerifiable
     });
     if (!project) {
@@ -219,7 +218,7 @@ controller.createProject = async function(req, res) {
     } else {
         await req.flash('success', `Project Posted!`);
     }
-    return res.redirect(`/projects`);
+    return res.redirect(`/projects/${project._id}`);
 }
 
 controller.verify = async function(req, res) {
@@ -348,30 +347,28 @@ controller.updateProject = async function(req, res) {
         return res.redirect("back");
     }
     let creators = [];
+    let nonaccountCreators = [];
     let statusGroup; //Group of creators by status
     let individual; //Individual Creator ID
 
-    if (req.body.creatorInput == '') {
-        creators = [];
-        
-    } else {
-        for (let creator of await req.body.creatorInput.split(',')) { //Iterate throguh listed creators
+    if (req.body.creatorInput != '') {
+        for (let creator of await req.body.creatorInput.split(',')) { //Iterate through listed creators
             if (await platform.studentStatuses.includes(creator)) { //If 'creator' is one of the statuses (grades), find all users with that status
                 statusGroup = await User.find({authenticated: true, status: creator});
-                if (!statusGroup) {
-                    await req.flash('error', "Unable to find the users you listed");
-                    return res.redirect('back');
-                }
-
                 for (let user of statusGroup) {await creators.push(user);}
 
             } else {
-                individual = await User.findById(creator);
-                if (!individual) {
-                    await req.flash('error', "Unable to find the users you listed");
-                    return res.redirect('back');
+                try {
+                    individual = await User.findById(creator);
+                    if (individual) { //If user is found at given ID address
+                        await creators.push(individual);
+                    } else { //If value returned is null (meaning account does not exist)
+                        await nonaccountCreators.push(creator);
+                    }
+
+                } catch (err) { //If error reached from running findById on a normal string
+                    await nonaccountCreators.push(creator);
                 }
-                await creators.push(individual);
             }
         }
     }
@@ -389,7 +386,7 @@ controller.updateProject = async function(req, res) {
 
     const updatedProject = await Project.findByIdAndUpdate(project._id, {
         subject: req.body.title,
-        creators,
+        creators, nonaccountCreators,
         text: req.body.text,
         verified: !platform.postVerifiable
     });
@@ -452,7 +449,7 @@ controller.updateProject = async function(req, res) {
     }
     await updatedProject.save();
     await req.flash("success", "Project Updated!");
-    return res.redirect(`/projects`);
+    return res.redirect(`/projects/${project._id}`);
 }
 
 
