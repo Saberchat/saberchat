@@ -116,7 +116,7 @@ controller.createProject = async function(req, res) {
     let individual; //Individual Creator ID
 
     if (req.body.creatorInput != '') {
-        for (let creator of await req.body.creatorInput.split(',')) { //Iterate throguh listed creators
+        for (let creator of await req.body.creatorInput.split(',')) { //Iterate through listed creators
             if (await platform.studentStatuses.includes(creator)) { //If 'creator' is one of the statuses (grades), find all users with that status
                 statusGroup = await User.find({authenticated: true, status: creator});
                 for (let user of statusGroup) {await creators.push(user);}
@@ -352,7 +352,7 @@ controller.updateProject = async function(req, res) {
     let individual; //Individual Creator ID
 
     if (req.body.creatorInput != '') {
-        for (let creator of await req.body.creatorInput.split(',')) { //Iterate throguh listed creators
+        for (let creator of await req.body.creatorInput.split(',')) { //Iterate through listed creators
             if (await platform.studentStatuses.includes(creator)) { //If 'creator' is one of the statuses (grades), find all users with that status
                 statusGroup = await User.find({authenticated: true, status: creator});
                 for (let user of statusGroup) {await creators.push(user);}
