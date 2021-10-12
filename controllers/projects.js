@@ -105,7 +105,6 @@ controller.searchCreators = async function(req, res) {
 }
 
 controller.createProject = async function(req, res) {
-    console.log(req.body.creatorInput);
     const platform = await setup(Platform);
     if (!platform) {
         await req.flash("error", "An error occurred");
@@ -117,15 +116,21 @@ controller.createProject = async function(req, res) {
     let individual; //Individual Creator ID
 
     if (req.body.creatorInput != '') {
-        for (let creator of (await req.body.creatorInput.split(','))) {
-            if (await platform.studentStatuses.includes(creator)) { //If the 'creator' is one of the listed status groups
-                statusGroup = await User.find({authenticated: true, status: creator});  //Search for all users with that status
+        for (let creator of await req.body.creatorInput.split(',')) { //Iterate throguh listed creators
+            if (await platform.studentStatuses.includes(creator)) { //If 'creator' is one of the statuses (grades), find all users with that status
+                statusGroup = await User.find({authenticated: true, status: creator});
                 for (let user of statusGroup) {await creators.push(user);}
+
             } else {
                 try {
                     individual = await User.findById(creator);
-                    await creators.push(individual);
-                } catch (err) {
+                    if (individual) { //If user is found at given ID address
+                        await creators.push(individual);
+                    } else { //If value returned is null (meaning account does not exist)
+                        await nonaccountCreators.push(creator);
+                    }
+
+                } catch (err) { //If error reached from running findById on a normal string
                     await nonaccountCreators.push(creator);
                 }
             }
@@ -346,19 +351,22 @@ controller.updateProject = async function(req, res) {
     let statusGroup; //Group of creators by status
     let individual; //Individual Creator ID
 
-    if (req.body.creatorInput == '') {
-        creators = [];
-        
-    } else {
+    if (req.body.creatorInput != '') {
         for (let creator of await req.body.creatorInput.split(',')) { //Iterate throguh listed creators
             if (await platform.studentStatuses.includes(creator)) { //If 'creator' is one of the statuses (grades), find all users with that status
                 statusGroup = await User.find({authenticated: true, status: creator});
                 for (let user of statusGroup) {await creators.push(user);}
+
             } else {
                 try {
                     individual = await User.findById(creator);
-                    await creators.push(individual);
-                } catch (err) {
+                    if (individual) { //If user is found at given ID address
+                        await creators.push(individual);
+                    } else { //If value returned is null (meaning account does not exist)
+                        await nonaccountCreators.push(creator);
+                    }
+
+                } catch (err) { //If error reached from running findById on a normal string
                     await nonaccountCreators.push(creator);
                 }
             }
