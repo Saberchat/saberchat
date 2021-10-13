@@ -43,6 +43,13 @@ module.exports = { //All subclass Schema
             data: {}
         }]
     })),
+    WHArticle: Post.discriminator("WHArticle", new mongoose.Schema({
+        authors: [{type: mongoose.Schema.Types.ObjectId, ref: "User"}],
+        content: [{
+            text: String,
+            data: {}
+        }]
+    })),
     ArticleLink: Post.discriminator("ArticleLink", new mongoose.Schema({ //Contains references to other articles and serves as a simple post system
         links: [{type: String}]
     })),
