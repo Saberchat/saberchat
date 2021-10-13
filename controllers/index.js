@@ -11,13 +11,31 @@ const {objectArrIndex} = require("../utils/object-operations");
 const Platform = require("../models/platform");
 const User = require('../models/user');
 const Email = require('../models/admin/email');
-const {Announcement} = require('../models/post');
+const {Announcement, Project, WHArticle} = require('../models/post');
+const Order = require('../models/shop/order');
 
 const controller = {};
 
+controller.homepage = async function(req, res) {
+    const platform = await setup(Platform);
+    if (!platform) {
+        await req.flash('error', "An Error Occurred");
+        return res.redirect('back');
+    }
+
+    const announcements = await Announcement.find({}).populate('sender');
+    const projects = await Project.find({verified: true}).populate('creators').populate('sender');
+    const articles = await WHArticle.find({}).populate('authors');
+
+    if (platform.indexPlatformInfo) {
+        return res.render('other/platform-info', {platform, objectArrIndex, description: (req.user != undefined && req.query.description != undefined)});
+    }
+    return res.render('homepage', {platform, announcements, projects, articles});
+}
+
 controller.index = async function(req, res) {
     const platform = await setup(Platform);
-    const teachers = await User.find({authenticated: true, authenticated: true, status: platform.teacherStatus});
+    const teachers = await User.find({authenticated: true, status: platform.teacherStatus});
     if (!platform || !teachers) {
         await req.flash('error', "An Error Occurred");
         return res.redirect('back');
@@ -34,7 +52,7 @@ controller.index = async function(req, res) {
 
 controller.info = async function(req, res) {
     const platform = await setup(Platform);
-    const teachers = await User.find({authenticated: true, authenticated: true, status: platform.teacherStatus});
+    const teachers = await User.find({authenticated: true, status: platform.teacherStatus});
     if (!platform || !teachers) {
         await req.flash('error', "An Error Occurred");
         return res.redirect('back');
