@@ -1,3 +1,9 @@
+/**
+ * Levenshtein String Distance
+ * @param str1
+ * @param str2
+ * @returns Number The number of deletions, insertions, or substitutions one needs to do to get from str1 to str2
+ */
 const levenshteinDistance = function(str1 = "", str2 = "") {
     const track = Array(str2.length + 1).fill(null).map(() =>
         Array(str1.length + 1).fill(null));
@@ -20,6 +26,12 @@ const levenshteinDistance = function(str1 = "", str2 = "") {
     return track[str2.length][str1.length];
 }
 
+/**
+ * Sorts an array of strings based off of how close each string is to the query string
+ * @param query the string to compare to (what user entered)
+ * @param possibilities the possibilities to compare against (all the available options)
+ * @returns Array possibilities, but sorted so that first element is the best match for the query
+ */
 const matchTypo = function(query = "", possibilities=[""]) {
     let options = [];
     for (let possibility of possibilities) {
