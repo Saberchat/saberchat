@@ -22,7 +22,7 @@ controller.homepage = async function(req, res) {
         await req.flash('error', "An Error Occurred");
         return res.redirect('back');
     }
-
+    // Search for posts
     const announcements = await Announcement.find({}).populate('sender');
     const projects = await Project.find({verified: true}).populate('creators').populate('sender');
     const articles = await WHArticle.find({}).populate('authors');
