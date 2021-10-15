@@ -168,7 +168,7 @@
 
                             <div id="followers-list">
                             <div class="search-bar-container search">
-                                <input id="search-bar-follower" class="mode" type="text" placeholder="&#x1F50D; Search followers" oninput="searchFunctionFollow(this, 'Remove')"/>
+                                <input id="search-bar-follower" class="mode" type="text" placeholder="Search followers" oninput="searchFunctionFollow(this, 'Remove')"/>
                             </div>
                         <% for (let follower of user.followers) { %>
                             <span id="follower-<%= follower._id %>" class="follower-block">
@@ -213,7 +213,7 @@
 
                             <div id="following-list" hidden>
                             <div class="search-bar-container search">
-                                <input class="mode" id="search-bar-following" type="text" placeholder="&#x1F50D; Search following" oninput="searchFunctionFollow(this, 'Unfollow')"/>
+                                <input class="mode" id="search-bar-following" type="text" placeholder="Search following" oninput="searchFunctionFollow(this, 'Unfollow')"/>
                             </div>
 
                         <% for (let f of following) { %>
