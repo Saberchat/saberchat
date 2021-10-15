@@ -43,6 +43,7 @@ const searchFunction = function(statusString) { //Search for users on index page
     let statusBreaks = document.getElementsByClassName('status-page-break')
     statusString = statusString.split(',');
     let statuses = [];
+    let options = [];
     for (let i = 0; i < statusString.length; i += 3) { //Build statuses array based on platform's stored statuses
         statuses.push([statusString[i], statusString[i+1], []])
     }
@@ -54,6 +55,7 @@ const searchFunction = function(statusString) { //Search for users on index page
     let a = list.getElementsByClassName("user-element-text");
 
     for (i = 0; i < a.length; i++) { //Iterate through each user's text and search for text overlap
+        options = [];
         user = a[i].getElementsByClassName('username')[0];
         if (user.textContent.toUpperCase().includes(filter) || user.classList.toString().toUpperCase().includes(filter)) {
             listItems[i].style.display = "block";

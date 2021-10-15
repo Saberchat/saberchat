@@ -4,8 +4,10 @@ const search = function() { //Item search function
     const menuItems = document.getElementsByClassName('menu-item');
     const input = document.getElementById("search-input");
     let filter = input.value.toLowerCase().replaceAll(' ', '');
+    let options = [];
 
     for (let item of menuItems) { //Iterate through menu items and display any that match the keyword filter
+        options = [];
         if ((item.textContent.replaceAll(' ', '').toLowerCase().includes(filter)) || (item.classList.toString().toLowerCase().includes(filter))) {
             item.hidden = false;
         } else {
