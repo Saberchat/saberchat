@@ -4,7 +4,7 @@
  * @param str2
  * @returns Number The number of deletions, insertions, or substitutions one needs to do to get from str1 to str2
  */
-const levenshteinDistance = function(str1 = "", str2 = "") {
+ const levenshteinDistance = function(str1 = "", str2 = "") {
     const track = Array(str2.length + 1).fill(null).map(() =>
         Array(str1.length + 1).fill(null));
     for (let i = 0; i <= str1.length; i += 1) {
@@ -32,6 +32,7 @@ const levenshteinDistance = function(str1 = "", str2 = "") {
  * @param possibilities the possibilities to compare against (all the available options)
  * @returns Array possibilities, but sorted so that first element is the best match for the query
  */
+
 const matchTypo = function(query = "", possibilities=[""]) {
     let options = [];
     for (let possibility of possibilities) {
@@ -43,14 +44,8 @@ const matchTypo = function(query = "", possibilities=[""]) {
     options.sort((a, b) => {return a.distance - b.distance}); //Sort in order of closeless to word
     let output = [];
     for (let option of options) {
-        output.push(option.string);
+        // output.push([option.distance, option.string]);
+        output.push(option.distance); //Only need to add distance. If any possibility is < 2, the object is displayed
     }
     return output;
-}
-
-module.exports.levenshteinDistance = levenshteinDistance;
-module.exports.matchTypo = matchTypo;
-
-if (typeof require !== 'undefined' && require.main === module) {
-    console.log(matchTypo("heplo", ["hello", "hi", "bye"]));
 }
