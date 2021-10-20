@@ -1,0 +1,104 @@
+<%- include('./partials/headStart') %> 
+    <link rel="stylesheet" href="/stylesheets/home/index.css">
+    <link rel="stylesheet" href="/stylesheets/components/background.css">
+    <link rel="stylesheet" href="/stylesheets/announcements/index.css">
+    <%if (currentUser && currentUser.darkmode) {%>
+        <link rel="stylesheet" href="/stylesheets/projects/dark.css">
+    <%}%>
+
+    <script src="/javascript/nav/userForm.js"></script>
+    <script src="/javascript/home/index.js"></script>
+    <script>
+        if (window.location.href.includes("herokuapp")) {
+            window.location.href = "https://saberchat.net";
+        }
+    </script>
+<%- include('./partials/headEnd') %> 
+<body class="mode">
+<!-- insert navbar via ejs-->
+    <%- include('./partials/components/navbar') %>
+
+    <!-- Background image and text -->
+    <section id="background" style="background-image: url('<%=platform.imageUrl%>'); background-size: cover;">
+        <div class="container-fluid text-center background-inner-div">
+            <div class="row">
+                <div class="col-12 background-title">
+                    <h1 style="user-select: none; -moz-user-select: none;">Saberchat</h1>
+                    <p style="user-select: none; -moz-user-select: none;"><%=platform.name%>'s very own Community Platform</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Home Page content -->
+    <main id="main-container">
+        <div class="container mt-5 mode">
+
+            <!-- Block 1 -->
+            <div class="row element" id="about">
+
+                <div class="col-lg-6">
+                    <article class="text-block">
+                        <div class="block-header <% if (platform.homepageInfo) {%> green <% } %>">
+                            <h1 style="user-select: none; -moz-user-select: none;">Latest Announcements</h1>
+                        </div>
+                        <div class="block-content mode">
+                            <% announcements.forEach(announcement => { %>
+                                <a class="post-sender" href="../profiles/<%= announcement.sender._id %>">
+                                    <img src="<% if (announcement.sender.mediaFile.display) {%> <%= announcement.sender.mediaFile.url%><%} else {%> <%=announcement.sender.imageUrl.url%><%}%>" alt="profile pic"
+                                         class="sender-profile-image">
+                                    <%= announcement.sender.firstName %> <%= announcement.sender.lastName %>
+                                </a>
+                                <h5><%= announcement.subject %></h5>
+                                <% if (announcement.text.split(" ").length > 20) { %>
+                                    <p class="post-text"><span class="convertible-text"><%= announcementTexts.get(announcement._id).split(" ").slice(0, 21).join(" ")%></span> <a href="/announcements/<%= announcement._id %>">(Read More)</a></p>
+                                <% } else { %>
+                                    <p class="post-text convertible-text"><%= announcementTexts.get(announcement._id) %></p>
+                                <% } %>
+                            <% }) %>
+                        </div>
+                    </article>
+                </div>
+
+                <div class="col-lg-6 block">
+                    
+                </div>
+
+            </div>
+
+            <!-- Block 2 -->
+            <div class="row element" id="block-2">
+
+                <div class="col-lg-6 order-lg-2">
+                    <article class="text-block">
+                        <div class="block-header <% if (platform.homepageInfo) {%> yellow <% } %>">
+                            <h1 style="user-select: none; -moz-user-select: none;">Services</h1>
+                        </div>
+                        <div class="block-content mode">
+                            <ul>
+                                <% for (let service of platform.services) { %>
+                                    <li class="convertible-text"><%=service%></li>
+                                <% } %>
+                            </ul>
+                        </div>
+                    </article>
+                </div>
+
+                <div class="col-lg-6 block">
+                    <img class="image-block" src="<%=platform.displayImages[1]%>" alt="<%=platform.name%> image">
+                </div>
+
+            </div>
+        </div>
+    </main>
+    <script>
+        window.onload = (() => {
+            window.onscroll = (() => {
+                updateNav();
+                animateDisplay();
+            });
+        });
+    </script>
+    <script src="/javascript/embed.js"></script>
+</body>
+</html>
