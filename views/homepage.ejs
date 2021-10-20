@@ -3,7 +3,7 @@
     <link rel="stylesheet" href="/stylesheets/components/background.css">
     <link rel="stylesheet" href="/stylesheets/announcements/index.css">
     <%if (currentUser && currentUser.darkmode) {%>
-        <link rel="stylesheet" href="/stylesheets/projects/dark.css">
+        <link rel="stylesheet" href="/stylesheets/darkmode.css">
     <%}%>
 
     <script src="/javascript/nav/userForm.js"></script>
@@ -44,7 +44,7 @@
                         </div>
                         <div class="block-content mode">
                             <% announcements.forEach(announcement => { %>
-                                <a class="post-sender" href="../profiles/<%= announcement.sender._id %>">
+                                <a class="home-post-sender mode" href="../profiles/<%= announcement.sender._id %>">
                                     <img src="<% if (announcement.sender.mediaFile.display) {%> <%= announcement.sender.mediaFile.url%><%} else {%> <%=announcement.sender.imageUrl.url%><%}%>" alt="profile pic"
                                          class="sender-profile-image">
                                     <%= announcement.sender.firstName %> <%= announcement.sender.lastName %>

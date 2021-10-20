@@ -3,7 +3,11 @@
     text-decoration: none;
     margin-bottom: 0.25rem; /* Button spacing fix */
 }
-
+.home-post-sender,.home-post-sender:hover{
+    color:black;
+    text-decoration: none;
+    margin-bottom: 0.25rem; /* Button spacing fix */
+}
 .bottom-text {
     padding-bottom: 15px;
 }
