@@ -7,7 +7,7 @@ const router = express.Router(); //Router
 
 // USER ROUTES
 router.get('/', wrapAsync(index.index)); // Index Landing Page
-router.get('/home', wrapAsync(index.homepage)); // Homepage Feed
+router.get('/home', wrapAsync(middleware.isLoggedIn), wrapAsync(index.homepage)); // Homepage Feed
 router.get('/darkmode', wrapAsync(middleware.isLoggedIn), wrapAsync(index.darkmode)); //Set darkmode
 router.get('/contact', wrapAsync(middleware.isLoggedIn), wrapAsync(index.contact)); //Contact info and school info
 router.get('/info', wrapAsync(index.info)); //Platform info

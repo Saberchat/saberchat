@@ -4,8 +4,8 @@ const filter = new Filter();
 const passport = require('passport');
 const {sendGridEmail} = require("../services/sendGrid");
 const setup = require("../utils/setup");
-const {convertToLink} = require("../utils/convert-to-link");
-const {objectArrIndex} = require("../utils/object-operations");
+const {convertToLink, embedLink} = require("../utils/convert-to-link");
+const {objectArrIndex, removeIfIncluded, parsePropertyArray} = require("../utils/object-operations");
 
 //SCHEMA
 const Platform = require("../models/platform");
@@ -22,15 +22,29 @@ controller.homepage = async function(req, res) {
         await req.flash('error', "An Error Occurred");
         return res.redirect('back');
     }
+    const users = await User.find({authenticated: true});
+    if (!platform || !users) {
+        await req.flash('error', 'An Error Occurred');
+        return res.redirect('back');
+    }
+    
     // Search for all posts
-    const announcements = await Announcement.find({}).populate('sender');
+    let announcements = await Announcement.find({}).populate('sender');
     const projects = await Project.find({verified: true}).populate('creators').populate('sender');
     const articles = await WHArticle.find({}).populate('authors');
 
-    if (platform.indexPlatformInfo) {
-        return res.render('other/platform-info', {platform, objectArrIndex, description: (req.user != undefined && req.query.description != undefined)});
+    announcements = announcements.reverse();
+
+    const DISPLAY_NUMBER = 2;
+    const firstAnnouncements = [];
+
+    for (let index = 0; index < DISPLAY_NUMBER; index++) {
+        firstAnnouncements.push(announcements[index]);
     }
-    return res.render('homepage', {platform, announcements, projects, articles});
+    const userNames = await parsePropertyArray(users, "firstName").join(',').toLowerCase().split(',');
+    const announcementTexts = await embedLink(req.user, firstAnnouncements, userNames);
+
+    return res.render('homepage', {platform, announcements: firstAnnouncements, announcementTexts, projects, articles});
 }
 
 controller.index = async function(req, res) {
