@@ -12,6 +12,7 @@ const {ChatMessage} = require('../models/notification');
 const User = require("../models/user");
 const Email = require("../models/admin/email");
 const {Course, ChatRoom} = require('../models/group');
+const BalanceUpdate = require("../models/balanceUpdate");
 
 const controller = {};
 
@@ -538,15 +539,24 @@ controller.viewBalances = async function(req, res) {
 controller.updateBalances = async function(req, res) {
     const platform = await setup(Platform);
     const user = await User.findById(req.body.userId);
+    req.user.logins.push(new Date());
+    await req.user.save();
 
     if (!platform || !user) { return res.json({error: "Error. Could not change"});}
-
     if (req.body.bal != 0) { //If deposit is not 0 then user's transactions are updated
         user.deposits.push({
             amount: req.body.bal,
             added: new Date()
         });
     }
+
+    const balanceUpdate = await BalanceUpdate.create({
+        user: user._id, updater: req.user._id,
+        oldAmount: user.balance,
+        newAmount: user.balance + req.body.bal,
+        difference: req.body.bal
+    });
+    if (!balanceUpdate) {return res.json({error: "An error occurred"});}
 
     user.balance += req.body.bal;
     if (user.balance < 0) {user.balance = 0;}
@@ -559,10 +569,18 @@ controller.updateBalances = async function(req, res) {
     }
     
     if (platform.dollarPayment) {
-        return res.json({
-            success: 'Succesfully changed',
-            balance: await user.balance.toFixed(2)
-        });
+        if (req.body.bal > 0) {
+            return res.json({
+                success: `Succesfully added $${req.body.bal.toFixed(2)}`,
+                balance: await user.balance.toFixed(2)
+            });
+
+        } else if (req.body.bal < 0) {
+            return res.json({
+                success: `Succesfully removed $${Math.abs(req.body.bal.toFixed(2))}`,
+                balance: await user.balance.toFixed(2)
+            });
+        }
     }
 
     return res.json({

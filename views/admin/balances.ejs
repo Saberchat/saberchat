@@ -43,7 +43,7 @@
                                         <%if (platform.dollarPayment) { %><div class="input-group-text mode">$</div><% } %>
                                     </div>
                                     <% if (platform.dollarPayment) {%>
-                                      <input class="form-control mode" type="text" id="balance-<%=user._id%>" placeholder="Add Balance" maxlength="10" required value="0.00">
+                                      <input class="form-control mode" type="text" id="balance-<%=user._id%>" placeholder="Add Balance" onclick="highlight(this)" maxlength="10" required value="0.00">
                                       <button type="submit" class="btn btn-success" style="margin-left: 20px; margin-right: 10px; display: inline;"><i class="fas fa-plus-circle"></i></button>
                                       <button type="button" onclick="removeBalance(this, event, <%=platform.dollarPayment%>)" id="remove-balance-<%=user._id%>" class="btn btn-danger" style="display: inline;"><i class="fas fa-minus-circle"></i></button>
                                       <% } else { %>

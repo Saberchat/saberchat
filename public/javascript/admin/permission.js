@@ -27,6 +27,10 @@ const updateRole = function(select) { //Update user's permission
     });
 }
 
+const highlight = function(input) { //Highlight input to avoid user errors in text deletion
+    input.select();
+}
+
 const updateBalance = function(form, event, dollarPayment) {
     const userId = form.id;
     const loading = document.getElementById(`loading-${userId}`); //Button which shows request status
@@ -52,7 +56,7 @@ const updateBalance = function(form, event, dollarPayment) {
             loading.style.color = 'red'; 
             loading.innerHTML = data.error;
         }
-        setTimeout(() => {loading.style.display = "none";}, 2000); //After a second, hide the message
+        setTimeout(() => {loading.style.display = "none";}, 5000); //After a second, hide the message
     });
     event.preventDefault();
 }
@@ -83,7 +87,7 @@ const removeBalance = function(button, event, dollarPayment) {
             loading.style.color = 'red'; 
             loading.innerHTML = data.error;
         }
-        setTimeout(() => {loading.style.display = "none";}, 2000); //After a second, hide the message
+        setTimeout(() => {loading.style.display = "none";}, 5000); //After a second, hide the message
     });
     event.preventDefault();
 }

@@ -42,7 +42,7 @@
                         <input class="form-control mode" type="text" id="customer-username" placeholder="Username, First Name or Last Name" oninput="searchCustomers(this)"><br>
                         <!-- Inline CSS used here as JS modifies it. Can change if needed-->
                         <select <%if(currentUser.tags.includes("Cashier")){%>required<%}%> id="user-select" class="form-control mode" 
-                            onchange="setCustomer(this, <%=platform.dollarPayment%>, <%+currentUser.darkmode%>)" 
+                            onchange="setCustomer(this, <%=platform.dollarPayment%>, <%=currentUser.darkmode%>)" 
                             name="customer_id" hidden>
                             <option class="recipient-group" value="" disabled>Select User</option>
                         </select>
