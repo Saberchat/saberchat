@@ -153,15 +153,15 @@ controller.transactions = async function(req, res) {
 				price: deposit.amount,
 				summary: `Balance Deposit`,
 				added_at: deposit.added_at,
-				date: dateFormat(deposit.added_at, "mmm d, h:MM TT")
+				date: dateFormat(deposit.added, "mmm d, h:MM:ss TT")
 			});
 		} else {
 			transactions.push({
 				type: 1,
-				price: deposit.amount,
-				summary: `Balance Deposit`,
+				price: -1*deposit.amount,
+				summary: `Balance Withdrawal`,
 				added_at: deposit.added_at,
-				date: dateFormat(deposit.added_at, "mmm d, h:MM TT")
+				date: dateFormat(deposit.added, "mmm d, h:MM:ss TT")
 			});
 		}
 	}

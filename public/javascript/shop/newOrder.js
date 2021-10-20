@@ -61,10 +61,9 @@ const setCustomer = function(dropdown, dollarPayment, darkmode) {
     document.getElementById("current-name").innerText = `Current Customer: ${dropdown.value.split('| ')[1]}`;
     document.getElementById("current-name").className = dropdown.value.split(' ')[0];
     currentCustomer = dropdown.value.split(' ')[0];
-    currentBalance = parseInt(dropdown.value.split(' ')[1]);
+    currentBalance = parseFloat(dropdown.value.split(' ')[1]);
     balanceString = `Current Balance: $${currentBalance.toFixed(2)}`;
     document.getElementById("balance-box").innerText = balanceString;
-    changeOrderConfirmation(dollarPayment, darkmode);
 
     //Display all elements previously hidden
     document.getElementById("order-item-section").disabled = false;
@@ -75,6 +74,7 @@ const setCustomer = function(dropdown, dollarPayment, darkmode) {
             element.hidden = false;
         }
     }
+    changeOrderConfirmation(dollarPayment, darkmode);
 }
 
 const changeNumOrders = function(input, max_items, dollarPayment, darkmode) { //Evaluate if the inputted number of orders is valid
@@ -124,6 +124,8 @@ const changeOrderConfirmation = function(dollarPayment, darkmode) {
                                 formattedCost = (parseInt(no.value) * parseFloat(l.innerText.split("Credits: ")[1]));
                                 orderedItem.innerText = `${no.name} (${no.value} orders) - ${formattedCost} Credits`;
                             }
+
+                            if (darkmode) {orderedItem.style.color = "white";} //Color styling updates
                             orderConfirm.appendChild(orderedItem); //Add the order to the list of orders
                         }
                     }
