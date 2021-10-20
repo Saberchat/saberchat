@@ -5,10 +5,11 @@ const {sendGridEmail} = require("../services/sendGrid");
 const { sortByPopularity } = require("../utils/popularity");
 const {convertToLink} = require("../utils/convert-to-link");
 const getData = require("../utils/shop-data");
-const {objectArrIndex, removeIfIncluded} = require("../utils/object-operations");
+const {objectArrIndex, removeIfIncluded, parsePropertyArray} = require("../utils/object-operations");
 const {cloudUpload, cloudDelete} = require("../services/cloudinary");
 const setup = require("../utils/setup");
 const {autoCompress} = require("../utils/image-compress");
+const {quicksort} = require("../utils/sort");
 
 //SCHEMA
 const Platform = require("../models/platform");
@@ -139,6 +140,51 @@ controller.orderForm = async function(req, res) {
         }
         return res.render("shop/menu", {platform, categories: sortedCategories, itemDescriptions, frequentItems, fileExtensions, data: platform.features[await objectArrIndex(platform.features, "route", "shop")]});
     }
+}
+
+controller.sortItems = async function(req, res) { //Sort items based on specific parameter setting
+    let items = await Item.find({});
+    const orders = await Order.find({});
+    if (!items || !orders) {return res.json({error: "An error occurred"});}
+
+    if (req.body.setting == "Ordering Popularity") { //Sort by amount ordered
+        let orderedItems = [];
+    
+        let itemCount = 0; //Total number of orders for this item
+        let itemOrderedCount = 0; //Number of instances the item was ordered
+        for (let item of items) {
+            itemCount = 0;
+            itemOrderedCount = 0;
+            for (let order of orders) { //Iterate through orders and increment the amount ordered
+                for (let orderItem of order.items) {
+                    if (await orderItem.item.equals(item._id)) {
+                        itemCount += orderItem.quantity;
+                        itemOrderedCount ++;
+                    }
+                }
+            }
+            await orderedItems.push({item: item._id, orderCount: itemCount, date: item.created_at}); //Add with formatted variables
+        }
+        //Sort ordered items in-place
+        await quicksort(orderedItems, 0, orderedItems.length-1, "orderCount");
+        await orderedItems.reverse();
+        return res.json({success: "Successfully sorted", sorted: parsePropertyArray(orderedItems, "item", true)});
+    }
+     
+    for (let setting of [ //Iterate through each setting combination and sort accordingly
+        ["Alphabetic Order", "name", false], //Sort by alphabetical order of name
+        ["Item Availability", "availableItems", true], //Sort by number available (most to least)
+        ["Price", "price", false], //Sort by cost (least to most)
+        ["Upvotes", "upvotes", true], //Sort by upvotest (most to least)
+        ["Date Created", "created_at", true] //Sort by date created (most recent to earliest)
+    ]) {
+        if (req.body.setting == setting[0]) {
+            await quicksort(items, 0, items.length-1, setting[1]);
+            if (setting[2]) {await items.reverse();} //Reverse if display requires most->least
+            return res.json({success: "Successfully sorted", sorted: parsePropertyArray(items, "_id", true)});
+        }
+    }
+    return res.json({error: "Unable to find setting"});
 }
 
 //Cafe customer search
