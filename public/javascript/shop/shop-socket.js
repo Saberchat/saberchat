@@ -4,9 +4,6 @@ const order = function(form, customer, dollarPayment) {
     let items = document.getElementById('item-list');
 
     $(form).submit(function(e) {
-        e.preventDefault();
-        // alert(document.getElementById("user-select").value);
-        console.log('submitted');
         let payingInPerson;
         if (dollarPayment == "true") {payingInPerson = document.getElementById('payingInPerson').checked;   
         } else {payingInPerson = false;}
@@ -36,8 +33,8 @@ const order = function(form, customer, dollarPayment) {
             if ($(this).find('input').is(':checked')) {
                 let currentItemName = $(this).find('input').attr('id');
                 itemList.push(currentItemName);
-                let currentItemCount = $(this).find('select').val();
-                itemCount.push(currentItemCount);
+                let currentItemCount = $(this).find('input')[1];
+                itemCount.push(currentItemCount.value);
             }
             // this = current accessed element
             // index = int index of current element relative to parent list

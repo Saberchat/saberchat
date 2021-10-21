@@ -204,20 +204,20 @@ controller.order = async function(req, res) {
             req.flash("error", "An Error Occurred");
             return res.redirect("back");
         }
-    } else user = req.user;
+    } else {user = req.user};
 
     if (!req.body.check) { //If any items are selected
         await req.flash("error", "Cannot send empty order"); //If no items were checked
         return res.redirect("back");
     }
 
-    const sentOrders = await Order.find({name: `${user.firstName} ${user.lastName}`, present: true});
+    const sentOrders = await Order.find({customer: user._id, present: true});
     if (!sentOrders) {
         await req.flash("error", "Unable to find orders");
         return res.redirect("back");
     }
 
-    if (sentOrders.length > 3) { //If three orders are already made, you cannot order again
+    if (sentOrders.length >= 3) { //If three orders are already made, you cannot order again
         await req.flash("error", "You have made the maximum number of orders for the day");
         return res.redirect("back");
     }
@@ -390,7 +390,7 @@ controller.processOrder = async function(req, res) {
 
 //REJECT OR CANCEL ORDER
 controller.deleteOrder = async function(req, res) {
-    if (req.body.rejectionReason) {
+    if (req.body.hasOwnProperty('rejectionReason')) {
         if (!(await req.user.tags.includes("Cashier"))) {return res.json({error: "You do not have permission to do that"});}
         const platform = await setup(Platform);
         const order = await Order.findById(req.params.id).populate("items.item").populate("customer");
