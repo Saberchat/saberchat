@@ -30,6 +30,13 @@
                 <input id="search-input" oninput="search()" class="form-control search" type="text"
                        placeholder="Search For Items..." title="Type in Product">
             </div>
+            <div id="sort-option" class="form-inline">
+                <select class="form-control mode" onchange="sortItems(this)">
+                    <% for (let setting of ["Upvotes", "Ordering Frequency", "Alphabetic Order", "Price", "Item Availability", "Date Created"]) {%>
+                        <option value="<%=setting%>">Sort Items By <%=setting%></option>
+                    <% } %>
+                </select>
+            </div>
         </div>
     </div>
     <div class="row">

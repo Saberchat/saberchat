@@ -54,3 +54,35 @@ const search = function() { //Item search function
         }
     }
 }
+
+const sortItems = function(dropdown) { //Sort items based on dropdown setting
+    let categories = []; //Populate array with each category name
+    for (let category of document.getElementsByClassName("category-header")) {
+        categories.push(category.innerText.split('\n')[0]);
+    }
+
+    let items;
+    let sorted = false; //Track if array is sorted
+
+    const url = `/shop/sort`;
+    const data = {setting: dropdown.value};
+    
+    sendPostReq(url, data, data => {
+        if (data.success) {
+            for (let category of categories) { //Find each category and perform inner bucketsort
+                items = document.getElementsByClassName(category.split(' ').join(''));
+                sorted = false;
+                while (!sorted) {
+                    sorted = true; //Set sorted to true and traverse until condition falsified
+                    for (let i = 0; i < items.length-1; i++) {
+                        //If items are out of order, swap them
+                        if (data.sorted.indexOf(items[i].id.split('-')[1]) > data.sorted.indexOf(items[i+1].id.split('-')[1])) {
+                            items[i].parentNode.insertBefore(items[i+1], items[i]);
+                            sorted = false; //If swap is necessary, the sort is not completed
+                        }
+                    }
+                }
+            }
+        }
+    });
+}

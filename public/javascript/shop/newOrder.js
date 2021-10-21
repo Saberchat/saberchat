@@ -66,6 +66,7 @@ const setCustomer = function(dropdown, dollarPayment, darkmode) {
     document.getElementById("balance-box").innerText = balanceString;
 
     //Display all elements previously hidden
+    document.getElementById("sort-option").hidden = false;
     document.getElementById("order-item-section").disabled = false;
     document.getElementById("searchbar").hidden = false;
     document.getElementById("confirmation-section").hidden = false;
