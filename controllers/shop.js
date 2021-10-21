@@ -144,35 +144,11 @@ controller.orderForm = async function(req, res) {
 
 controller.sortItems = async function(req, res) { //Sort items based on specific parameter setting
     let items = await Item.find({});
-    const orders = await Order.find({});
-    if (!items || !orders) {return res.json({error: "An error occurred"});}
-
-    if (req.body.setting == "Ordering Popularity") { //Sort by amount ordered
-        let orderedItems = [];
-    
-        let itemCount = 0; //Total number of orders for this item
-        let itemOrderedCount = 0; //Number of instances the item was ordered
-        for (let item of items) {
-            itemCount = 0;
-            itemOrderedCount = 0;
-            for (let order of orders) { //Iterate through orders and increment the amount ordered
-                for (let orderItem of order.items) {
-                    if (await orderItem.item.equals(item._id)) {
-                        itemCount += orderItem.quantity;
-                        itemOrderedCount ++;
-                    }
-                }
-            }
-            await orderedItems.push({item: item._id, orderCount: itemCount, date: item.created_at}); //Add with formatted variables
-        }
-        //Sort ordered items in-place
-        await quicksort(orderedItems, 0, orderedItems.length-1, "orderCount");
-        await orderedItems.reverse();
-        return res.json({success: "Successfully sorted", sorted: parsePropertyArray(orderedItems, "item", true)});
-    }
+    if (!items) {return res.json({error: "An error occurred"});}
      
     for (let setting of [ //Iterate through each setting combination and sort accordingly
         ["Alphabetic Order", "name", false], //Sort by alphabetical order of name
+        ["Ordering Frequency", "orderCount", true], //Sort by frequency of orders
         ["Item Availability", "availableItems", true], //Sort by number available (most to least)
         ["Price", "price", false], //Sort by cost (least to most)
         ["Upvotes", "upvotes", true], //Sort by upvotest (most to least)
@@ -241,7 +217,7 @@ controller.order = async function(req, res) {
         return res.redirect("back");
     }
 
-    if (sentOrders.length > 2000) { //If more than two orders are already made, you cannot order again
+    if (sentOrders.length > 3) { //If three orders are already made, you cannot order again
         await req.flash("error", "You have made the maximum number of orders for the day");
         return res.redirect("back");
     }
@@ -275,6 +251,7 @@ controller.order = async function(req, res) {
     for (let item of orderedItems) { //Update items
         if (item.displayAvailability) {
             item.availableItems -= await parseInt(req.body[item.name]);
+            item.orderCount += await parseInt(req.body[item.name]);
             await item.save();
         }
     }
@@ -1094,7 +1071,6 @@ controller.manageShop = async function(req, res) {
         sortedCategory.items = await sortByPopularity(category.items, "upvotes", "created_at", null).popular.concat(await sortByPopularity(category.items, "upvotes", "created_at", null).unpopular);
         await sortedCategories.push(sortedCategory);
     }
-
     return res.render("shop/manage", {platform, shop, categories: sortedCategories, data: platform.features[await objectArrIndex(platform.features, "route", "shop")]});
 }
 

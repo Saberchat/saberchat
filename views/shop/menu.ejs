@@ -32,7 +32,7 @@
             </div>
             <div id="sort-option" class="form-inline">
                 <select class="form-control mode" onchange="sortItems(this)">
-                    <% for (let setting of ["Upvotes", "Ordering Popularity", "Alphabetic Order", "Price", "Item Availability", "Date Created"]) {%>
+                    <% for (let setting of ["Upvotes", "Ordering Frequency", "Alphabetic Order", "Price", "Item Availability", "Date Created"]) {%>
                         <option value="<%=setting%>">Sort Items By <%=setting%></option>
                     <% } %>
                 </select>
