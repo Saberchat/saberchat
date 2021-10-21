@@ -55,8 +55,6 @@ const reject = function(button) { //Send request that order is rejected
                 noOrders.innerText = "No New Orders";
                 document.getElementById("output-stream").appendChild(noOrders);
             }
-        } else {
-            console.log(data);
         }
     });
 }
