@@ -106,6 +106,9 @@ const changeOrderConfirmation = function(dollarPayment, darkmode) {
         for (let l of fcl) { //Iterate over every memebr of 'form-check-label' (Checkbox Labels)
             if (l.htmlFor == i.id) { //if the label matches the input
                 if (i.checked) { //If it is checked
+                    if (document.getElementById(`num-${i.id}`).value == '0') { //If value is 0, add 1
+                        document.getElementById(`num-${i.id}`).value = '1';
+                    }
 
                     for (let no of numOrders) {
                         if (no.id.split('-')[1] == i.id) { //Id's are constructed in format 'dd_<id>'. This extracts that ID
