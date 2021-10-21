@@ -27,24 +27,33 @@ controller.homepage = async function(req, res) {
         await req.flash('error', 'An Error Occurred');
         return res.redirect('back');
     }
-    
-    // Search for all posts
-    let announcements = await Announcement.find({}).populate('sender');
-    const projects = await Project.find({verified: true}).populate('creators').populate('sender');
-    const articles = await WHArticle.find({}).populate('authors');
 
-    announcements = announcements.reverse();
+    // Search for all posts
+    let allAnnouncements = (await Announcement.find({}).populate('sender')).reverse();
+    let allProjects = (await Project.find({verified: true}).populate('creators').populate('sender')).reverse();
+    let allArticles = (await WHArticle.find({}).populate('authors')).reverse();
+
+    if (!allAnnouncements || !allProjects || !allArticles) {
+        await req.flash('error', 'An Error Occurred');
+        return res.redirect('back');
+    }
 
     const DISPLAY_NUMBER = 2;
-    const firstAnnouncements = [];
+    const announcements = [];
+    const projects = [];
+    const articles = []
 
     for (let index = 0; index < DISPLAY_NUMBER; index++) {
-        firstAnnouncements.push(announcements[index]);
+        announcements.push(allAnnouncements[index]);
+        projects.push(allProjects[index]);
+        articles.push(allArticles[index]);
     }
-    const userNames = await parsePropertyArray(users, "firstName").join(',').toLowerCase().split(',');
-    const announcementTexts = await embedLink(req.user, firstAnnouncements, userNames);
+    const announcementUserNames = await parsePropertyArray(users, "firstName").join(',').toLowerCase().split(',');
+    const announcementTexts = await embedLink(req.user, announcements, announcementUserNames);
+    const projectUserNames = await parsePropertyArray(users, "firstName").join(',').toLowerCase().split(',');
+    const projectTexts = await embedLink(req.user, projects, projectUserNames);
 
-    return res.render('homepage', {platform, announcements: firstAnnouncements, announcementTexts, projects, articles});
+    return res.render('homepage', {platform, announcements, announcementTexts, projects, projectTexts, articles});
 }
 
 controller.index = async function(req, res) {

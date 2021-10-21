@@ -1,7 +1,7 @@
 <%- include('./partials/headStart') %> 
     <link rel="stylesheet" href="/stylesheets/home/index.css">
     <link rel="stylesheet" href="/stylesheets/components/background.css">
-    <link rel="stylesheet" href="/stylesheets/announcements/index.css">
+    
     <%if (currentUser && currentUser.darkmode) {%>
         <link rel="stylesheet" href="/stylesheets/darkmode.css">
     <%}%>
@@ -61,7 +61,61 @@
                 </div>
 
                 <div class="col-lg-6 block">
-                    
+                    <article class="text-block">
+                        <div class="block-header <% if (platform.homepageInfo) {%> green <% } %>">
+                            <h1 style="user-select: none; -moz-user-select: none;">New Projects</h1>
+                        </div>
+                        <div class="block-content mode">
+                            <% projects.forEach(project => { %>
+                                <% let creator;%>
+                                <% if (project.creators.length + project.nonaccountCreators.length == 0) { %>
+                                    <p class="creator-row">
+                                        <span class="creator-heading">Creators:</span> <span class="creator-names">None</span>
+                                    </p>
+
+                                <% } else if (project.creators.length + project.nonaccountCreators.length < 3){ %>
+                                    <p class="creator-row">
+                                        <span class="creator-heading">Creators:</span>
+                                        <% let creator;%>
+                                        <% for (let i = 0; i < project.creators.length; i++) { %>
+                                            <% creator = project.creators[i];%>
+                                            <a class="creator-names" href="profiles/<%=creator._id %>">
+                                                <img src="<% if (creator.mediaFile.display) {%> <%= creator.mediaFile.url%><%} else {%> <%=creator.imageUrl.url%><%}%>"
+                                                alt="profile pic" class="creator-profile"> <%=creator.firstName%> <%=creator.lastName%>
+                                            </a>
+                                            <% if ((i+1) < (project.creators.length + project.nonaccountCreators.length)) {%>,<%}%>
+                                        <% } %>
+
+                                        <% for (let i = 0; i < project.nonaccountCreators.length; i++) { %>
+                                            <% creator = project.nonaccountCreators[i];%>
+                                            <span class="creator-names"><%=creator%></span>
+                                            <% if ((i+1) < project.nonaccountCreators.length) {%>,<%}%>
+                                        <% } %>
+                                    </p>
+
+                                <% } else if ((project.creators.length + project.nonaccountCreators.length) > 2) { %>
+                                    <p class="creator-row">
+                                        <span class="creator-heading">Creators:</span>
+                                        <% if (project.creators.length > 0) {%>
+                                            <a class="creator-names" href="profiles/<%= project.creators[0]._id %>">
+                                                <img src="<% if (project.creators[0].mediaFile.display) {%> <%= project.creators[0].mediaFile.url%><%} else {%> <%=project.creators[0].imageUrl.url%><%}%>"
+                                                alt="profile pic" class="creator-profile">
+                                                <%= project.creators[0].firstName %> <%= project.creators[0].lastName %>
+                                            </a>
+                                        <% } else { %>
+                                            <span class="creator-names"><%=project.nonaccountCreators[0]%></span>
+                                        <% } %>
+                                        and <%= (project.creators.length + project.nonaccountCreators.length) - 1 %> others</p>
+                                <% } %>
+                                <h5><%= project.subject %></h5>
+                                <% if (project.text.split(" ").length > 20) { %>
+                                    <p class="post-text"><span class="convertible-text"><%= projectTexts.get(project._id).split(" ").slice(0, 21).join(" ")%></span> <a href="/projects/<%= project._id %>">(Read More)</a></p>
+                                <% } else { %>
+                                    <p class="post-text convertible-text"><%= projectTexts.get(project._id) %></p>
+                                <% } %>
+                            <% }) %>
+                        </div>
+                    </article>
                 </div>
 
             </div>
@@ -69,17 +123,41 @@
             <!-- Block 2 -->
             <div class="row element" id="block-2">
 
-                <div class="col-lg-6 order-lg-2">
+                <div class="col-lg-6">
                     <article class="text-block">
                         <div class="block-header <% if (platform.homepageInfo) {%> yellow <% } %>">
-                            <h1 style="user-select: none; -moz-user-select: none;">Services</h1>
+                            <h1 style="user-select: none; -moz-user-select: none;">Witherly Heights</h1>
                         </div>
                         <div class="block-content mode">
-                            <ul>
-                                <% for (let service of platform.services) { %>
-                                    <li class="convertible-text"><%=service%></li>
-                                <% } %>
-                            </ul>
+                            
+                        </div>
+                    </article>
+                </div>
+
+                <div class="col-lg-6 block">
+                    <article class="text-block">
+                        <div class="block-header <% if (platform.homepageInfo) {%> yellow <% } %>">
+                            <h1 style="user-select: none; -moz-user-select: none;">No Left Turn Here Cafe</h1>
+                        </div>
+                        <div class="block-content mode">
+                            <p>Coming Soon!</p>
+                        </div>
+                    </article>
+                </div>
+
+            </div>
+
+            <!-- Block 3 -->
+            <div class="row element" id="block-3">
+
+                <div class="col-lg-6">
+                    <article class="text-block">
+                        <div class="block-header <% if (platform.homepageInfo) {%> yellow <% } %>">
+                            <h1 style="user-select: none; -moz-user-select: none;">About</h1>
+                        </div>
+                        <div class="block-content mode">
+                            <p>Saberchat is an intranet platform that connects and centralizes your community's communication and notification platforms. It allows users to quickly share and access important information, and presents multiple platform-specific features for community projects. It is used across schools, clubs, organizations and more.</p>
+                            <span id="developers"><span id="developers-heading">Developers: </span>Kabir Samsi, Alexander Zhou, Siddharth Chavan, Dmitry Pleshkov, Vibhav Darsha</span>
                         </div>
                     </article>
                 </div>
