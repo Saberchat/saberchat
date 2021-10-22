@@ -60,7 +60,7 @@
 
                         <div id="sort-option" class="form-inline" hidden>
                             <select class="form-control mode" onchange="sortItems(this)">
-                                <% for (let setting of ["Upvotes", "Ordering Frequency", "Alphabetic Order", "Price", "Item Availability", "Date Created"]) {%>
+                                <% for (let setting of ["Alphabetic Order", "Ordering Frequency", "Upvotes", "Price", "Item Availability", "Date Created"]) {%>
                                     <option value="<%=setting%>">Sort Items By <%=setting%></option>
                                 <% } %>
                             </select>
@@ -105,7 +105,7 @@
                                                     <input name="<%=item.name%>" id="num-<%=item._id%>" type="text" class="form-control mode num-orders" hidden value="0" oninput="changeNumOrders(this, <%=item.availableItems%>, <%=platform.dollarPayment%>, <%=currentUser.darkmode%>)">
                                                     <label class="form-check-label" for="<%= item._id %>">
                                                         <span class="item-name"><%= item.name %></span>
-                                                        <%if(item.displayAvailability){%>(<%= item.availableItems %> orders available)<%}%> -
+                                                        <%if(item.displayAvailability){%>(<%= item.availableItems %> order<%if(item.availableItems != 1){%>s<%}%> available)<%}%> -
                                                         <%if (platform.dollarPayment) {%>$<%= (item.price).toFixed(2)%><%} else {%> Credits: <%=item.price%><% } %>
                                                     </label>
 

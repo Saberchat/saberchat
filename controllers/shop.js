@@ -61,7 +61,7 @@ controller.orderForm = async function(req, res) {
     for (let category of categories) {
         if (category.items.length > 0) {
             sortedCategory = category;
-            sortedCategory.items = await sortByPopularity(category.items, "upvotes", "created_at", null).popular.concat(await sortByPopularity(category.items, "upvotes", "created_at", null).unpopular);
+            await quicksort(sortedCategory.items, 0, sortedCategory.items.length-1, "name");
             for (let i = sortedCategory.items.length-1; i > 0; i--) {
                 if (!sortedCategory.items[i].availableItems > 0) {
                     await sortedCategory.items.splice(i, 1);
@@ -1068,7 +1068,7 @@ controller.manageShop = async function(req, res) {
     let sortedCategory;
     for (let category of categories) {
         sortedCategory = category;
-        sortedCategory.items = await sortByPopularity(category.items, "upvotes", "created_at", null).popular.concat(await sortByPopularity(category.items, "upvotes", "created_at", null).unpopular);
+        await quicksort(sortedCategory.items, 0, sortedCategory.items.length-1, "name");
         await sortedCategories.push(sortedCategory);
     }
     return res.render("shop/manage", {platform, shop, categories: sortedCategories, data: platform.features[await objectArrIndex(platform.features, "route", "shop")]});
