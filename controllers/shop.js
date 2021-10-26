@@ -21,6 +21,9 @@ const {Market} = require("../models/group");
 
 const controller = {};
 
+
+const MAX_ORDERS = 10000;
+
 //-----------GENERAL ROUTES-----------//
 
 //SHOW CAFE HOMEPAGE
@@ -105,7 +108,7 @@ controller.orderForm = async function(req, res) {
                 await req.flash("error", "Unable to find orders");
                 return res.redirect("back");
 
-            } else if (sentOrders.length > 3) {
+            } else if (sentOrders.length > MAX_ORDERS) {
                 await req.flash("error", "You have made the maximum number of orders for the day");
                 return res.redirect("back");
             }
@@ -195,7 +198,7 @@ controller.order = async function(req, res) {
         return res.redirect("back");
     }
 
-    if (sentOrders.length > 2000) { //If more than two orders are already made, you cannot order again
+    if (sentOrders.length > MAX_ORDERS) { //If more than two orders are already made, you cannot order again
         await req.flash("error", "You have made the maximum number of orders for the day");
         return res.redirect("back");
     }
