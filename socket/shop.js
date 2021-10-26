@@ -89,9 +89,6 @@ shop.order = async function(io, socket, itemList, itemCount, instructions, addre
         await order.save();
 
         if (order.charge > user.balance && !payingInPerson) { //If charge is over online balance, and user is paying online
-            console.log(user.username);
-            console.log(order.charge);
-            console.log(user.balance);
             const deletedOrder = await Order.findByIdAndDelete(order._id);
             if (!deletedOrder) {return console.log('Error deleting order');}
         }

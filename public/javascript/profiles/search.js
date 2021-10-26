@@ -28,12 +28,22 @@ const changeFollowerTab = function(newTab) {
 
 const searchFunctionFollow = function(searchbar, delimeter) { //Search for followers/following in respective tabs
     const blocks = document.getElementsByClassName(`${searchbar.id.split('-')[2]}-block`); //Find all blocks with this information
+    let options = [];
 
     for (let b = 0; b < blocks.length; b++) { //Iterate through followers and see if there is overlap with search keyword
-        if (!blocks[b].textContent.split(delimeter)[0].toLowerCase().includes(searchbar.value.toLowerCase())) {
-            blocks[b].hidden = true;
-        } else {
+        options = [];
+        //Add split values to options menu
+        for(let element of blocks[b].textContent.split(delimeter)[0].toLowerCase().split(' ')) {options.push(element);}
+
+        //If query is directly found in objects
+        if (blocks[b].textContent.split(delimeter)[0].toLowerCase().includes(searchbar.value.toLowerCase())) {
             blocks[b].hidden = false;
+        //If query is <3 operations away (typo)
+        } else if (matchTypo(searchbar.value.toLowerCase(), options).length > 0 && matchTypo(searchbar.value.toLowerCase(), options)[0] < 3) {
+            blocks[b].hidden = false;
+        //If query is not found
+        } else {
+            blocks[b].hidden = true;
         }
     }
 }
@@ -43,20 +53,32 @@ const searchFunction = function(statusString) { //Search for users on index page
     let statusBreaks = document.getElementsByClassName('status-page-break')
     statusString = statusString.split(',');
     let statuses = [];
+    let options = [];
     for (let i = 0; i < statusString.length; i += 3) { //Build statuses array based on platform's stored statuses
         statuses.push([statusString[i], statusString[i+1], []])
     }
 
     let input = document.getElementById("search-input");
-    let filter = input.value.toUpperCase();
+    let filter = input.value.toLowerCase();
     let list = document.getElementById("user-list");
     let listItems = list.getElementsByClassName("user-element");
     let a = list.getElementsByClassName("user-element-text");
 
     for (i = 0; i < a.length; i++) { //Iterate through each user's text and search for text overlap
+        options = [];
+
         user = a[i].getElementsByClassName('username')[0];
-        if (user.textContent.toUpperCase().includes(filter) || user.classList.toString().toUpperCase().includes(filter)) {
+        //Add all textual and classList elements to options array
+        for (let element of user.textContent.toLowerCase().split(' ')) {options.push(element);}
+        for (let element of user.classList.toString().split(' ')) {options.push(element);}
+
+        //If query directly matches object
+        if (user.textContent.toLowerCase().includes(filter) || user.classList.toString().toLowerCase().includes(filter)) {
             listItems[i].style.display = "block";
+        //If query is <3 operations away (typo)
+        } else if (matchTypo(filter, options).length > 0 && matchTypo(filter, options)[0] < 3) {
+            listItems[i].style.display = "block";
+        //Query not found in object
         } else {
             listItems[i].style.display = "none";
         }
@@ -66,7 +88,17 @@ const searchFunction = function(statusString) { //Search for users on index page
     for (let status of statuses) { //Iterate through statuses and see if any users under this status match the keyword
         statusIncluded = false;
         for (let member of document.getElementsByClassName(status[0])) {
-            if (member.textContent.toUpperCase().includes(filter) || member.classList.toString().toUpperCase().includes(filter)) {
+            options = [];
+            //Add all textual and classList elements to options array
+            for (let element of member.textContent.toLowerCase().split(' ')) {options.push(element);}
+            for (let element of member.classList.toString().split(' ')) {options.push(element);}
+
+            //If query directly matches one of the status's objects
+            if (member.textContent.toLowerCase().includes(filter) || member.classList.toString().toLowerCase().includes(filter)) {
+                statusIncluded = true;
+                break;
+            //If query is <3 operations away (typo)
+            } else if (matchTypo(filter, options).length > 0 && matchTypo(filter, options)[0] < 3) {
                 statusIncluded = true;
                 break;
             }

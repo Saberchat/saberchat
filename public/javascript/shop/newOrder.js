@@ -61,12 +61,12 @@ const setCustomer = function(dropdown, dollarPayment, darkmode) {
     document.getElementById("current-name").innerText = `Current Customer: ${dropdown.value.split('| ')[1]}`;
     document.getElementById("current-name").className = dropdown.value.split(' ')[0];
     currentCustomer = dropdown.value.split(' ')[0];
-    currentBalance = parseInt(dropdown.value.split(' ')[1]);
+    currentBalance = parseFloat(dropdown.value.split(' ')[1]);
     balanceString = `Current Balance: $${currentBalance.toFixed(2)}`;
     document.getElementById("balance-box").innerText = balanceString;
-    changeOrderConfirmation(dollarPayment, darkmode);
 
     //Display all elements previously hidden
+    document.getElementById("sort-option").hidden = false;
     document.getElementById("order-item-section").disabled = false;
     document.getElementById("searchbar").hidden = false;
     document.getElementById("confirmation-section").hidden = false;
@@ -75,6 +75,7 @@ const setCustomer = function(dropdown, dollarPayment, darkmode) {
             element.hidden = false;
         }
     }
+    changeOrderConfirmation(dollarPayment, darkmode);
 }
 
 const changeNumOrders = function(input, max_items, dollarPayment, darkmode) { //Evaluate if the inputted number of orders is valid
@@ -105,6 +106,9 @@ const changeOrderConfirmation = function(dollarPayment, darkmode) {
         for (let l of fcl) { //Iterate over every memebr of 'form-check-label' (Checkbox Labels)
             if (l.htmlFor == i.id) { //if the label matches the input
                 if (i.checked) { //If it is checked
+                    if (document.getElementById(`num-${i.id}`).value == '0') { //If value is 0, add 1
+                        document.getElementById(`num-${i.id}`).value = '1';
+                    }
 
                     for (let no of numOrders) {
                         if (no.id.split('-')[1] == i.id) { //Id's are constructed in format 'dd_<id>'. This extracts that ID
@@ -124,6 +128,8 @@ const changeOrderConfirmation = function(dollarPayment, darkmode) {
                                 formattedCost = (parseInt(no.value) * parseFloat(l.innerText.split("Credits: ")[1]));
                                 orderedItem.innerText = `${no.name} (${no.value} orders) - ${formattedCost} Credits`;
                             }
+
+                            if (darkmode) {orderedItem.style.color = "white";} //Color styling updates
                             orderConfirm.appendChild(orderedItem); //Add the order to the list of orders
                         }
                     }

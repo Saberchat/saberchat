@@ -5,10 +5,11 @@ const {sendGridEmail} = require("../services/sendGrid");
 const { sortByPopularity } = require("../utils/popularity");
 const {convertToLink} = require("../utils/convert-to-link");
 const getData = require("../utils/shop-data");
-const {objectArrIndex, removeIfIncluded} = require("../utils/object-operations");
+const {objectArrIndex, removeIfIncluded, parsePropertyArray} = require("../utils/object-operations");
 const {cloudUpload, cloudDelete} = require("../services/cloudinary");
 const setup = require("../utils/setup");
 const {autoCompress} = require("../utils/image-compress");
+const {quicksort} = require("../utils/sort");
 
 //SCHEMA
 const Platform = require("../models/platform");
@@ -144,6 +145,27 @@ controller.orderForm = async function(req, res) {
     }
 }
 
+controller.sortItems = async function(req, res) { //Sort items based on specific parameter setting
+    let items = await Item.find({});
+    if (!items) {return res.json({error: "An error occurred"});}
+     
+    for (let setting of [ //Iterate through each setting combination and sort accordingly
+        ["Alphabetic Order", "name", false], //Sort by alphabetical order of name
+        ["Ordering Frequency", "orderCount", true], //Sort by frequency of orders
+        ["Item Availability", "availableItems", true], //Sort by number available (most to least)
+        ["Price", "price", false], //Sort by cost (least to most)
+        ["Upvotes", "upvotes", true], //Sort by upvotest (most to least)
+        ["Date Created", "created_at", true] //Sort by date created (most recent to earliest)
+    ]) {
+        if (req.body.setting == setting[0]) {
+            await quicksort(items, 0, items.length-1, setting[1]);
+            if (setting[2]) {await items.reverse();} //Reverse if display requires most->least
+            return res.json({success: "Successfully sorted", sorted: parsePropertyArray(items, "_id", true)});
+        }
+    }
+    return res.json({error: "Unable to find setting"});
+}
+
 //Cafe customer search
 controller.searchCustomers = async function(req, res) {
     const platform = await setup(Platform);
@@ -185,14 +207,14 @@ controller.order = async function(req, res) {
             req.flash("error", "An Error Occurred");
             return res.redirect("back");
         }
-    } else user = req.user;
+    } else {user = req.user};
 
     if (!req.body.check) { //If any items are selected
         await req.flash("error", "Cannot send empty order"); //If no items were checked
         return res.redirect("back");
     }
 
-    const sentOrders = await Order.find({name: `${user.firstName} ${user.lastName}`, present: true});
+    const sentOrders = await Order.find({customer: user._id, present: true});
     if (!sentOrders) {
         await req.flash("error", "Unable to find orders");
         return res.redirect("back");
@@ -232,6 +254,7 @@ controller.order = async function(req, res) {
     for (let item of orderedItems) { //Update items
         if (item.displayAvailability) {
             item.availableItems -= await parseInt(req.body[item.name]);
+            item.orderCount += await parseInt(req.body[item.name]);
             await item.save();
         }
     }
@@ -370,7 +393,7 @@ controller.processOrder = async function(req, res) {
 
 //REJECT OR CANCEL ORDER
 controller.deleteOrder = async function(req, res) {
-    if (req.body.rejectionReason) {
+    if (req.body.hasOwnProperty('rejectionReason')) {
         if (!(await req.user.tags.includes("Cashier"))) {return res.json({error: "You do not have permission to do that"});}
         const platform = await setup(Platform);
         const order = await Order.findById(req.params.id).populate("items.item").populate("customer");
@@ -1051,7 +1074,6 @@ controller.manageShop = async function(req, res) {
         sortedCategory.items = await sortByPopularity(category.items, "upvotes", "created_at", null).popular.concat(await sortByPopularity(category.items, "upvotes", "created_at", null).unpopular);
         await sortedCategories.push(sortedCategory);
     }
-
     return res.render("shop/manage", {platform, shop, categories: sortedCategories, data: platform.features[await objectArrIndex(platform.features, "route", "shop")]});
 }
 

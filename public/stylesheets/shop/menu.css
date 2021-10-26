@@ -89,3 +89,8 @@ strong {
     left: 0;
     z-index: 99;
 }
+
+#sort-option {
+    margin-top: 30px;
+    width: 200%;
+}
