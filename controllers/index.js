@@ -32,7 +32,7 @@ controller.homepage = async function(req, res) {
     let allAnnouncements = (await Announcement.find({}).populate('sender')).reverse();
     let allProjects = (await Project.find({verified: true}).populate('creators').populate('sender')).reverse();
     let allArticles = (await WHArticle.find({}).populate('authors')).reverse();
-    let mostRecentOrder = await Order.findOne().sort({'_id':-1}).populate('items');
+    let mostRecentOrder = await Order.findOne().sort({'_id':-1}).populate('items.item');
 
     if (!allAnnouncements || !allProjects || !allArticles || !mostRecentOrder) {
         await req.flash('error', 'An Error Occurred');

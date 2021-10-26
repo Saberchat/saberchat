@@ -167,11 +167,11 @@
                                 </div>
                                 <div class="row">
                                     <% mostRecentOrder.items.forEach(item => { %>
-                                        <p><%= item.item %>: <%= item.quantity %></p>
+                                        <p><%= item.item.name %> (<%= item.quantity %>)</p>
                                     <% }) %>
                                 </div>
                                 <div class="row">
-                                    <p>Total Cost: $<%= mostRecentOrder.charge %></p>
+                                    <p>Total Cost: $<%= mostRecentOrder.charge.toFixed(2)%></p>
                                 </div>
                             </div>
                         </div>
