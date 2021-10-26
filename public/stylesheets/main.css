@@ -59,6 +59,19 @@ html, body {
     font-weight: bold;
 }
 
+.witherly-heights-image {
+    padding-bottom: 10px;
+}
+
+#witherly-heights-text {
+    font-size: 30px;
+    color: #4658ff;
+    /* background: linear-gradient(to right, #84f1ff, #461dff);
+    background-clip: text;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent; */
+}
+
 #cafeMenuButton:hover {
     filter: brightness(95%);
     cursor: pointer;

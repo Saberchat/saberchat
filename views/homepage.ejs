@@ -39,16 +39,19 @@
 
                 <div class="col-lg-6">
                     <article class="text-block">
-                        <div class="block-header <% if (platform.homepageInfo) {%> green <% } %>">
+                        <div class="block-header">
                             <h1 style="user-select: none; -moz-user-select: none;">Latest Announcements</h1>
                         </div>
+                        <div class="block-border-bottom"></div>
                         <div class="block-content mode">
                             <% announcements.forEach(announcement => { %>
-                                <a class="home-post-sender mode" href="../profiles/<%= announcement.sender._id %>">
-                                    <img src="<% if (announcement.sender.mediaFile.display) {%> <%= announcement.sender.mediaFile.url%><%} else {%> <%=announcement.sender.imageUrl.url%><%}%>" alt="profile pic"
-                                         class="sender-profile-image">
-                                    <%= announcement.sender.firstName %> <%= announcement.sender.lastName %>
-                                </a>
+                                <div class="mb-3">
+                                    <a class="home-post-sender mode" href="../profiles/<%= announcement.sender._id %>">
+                                        <img src="<% if (announcement.sender.mediaFile.display) {%> <%= announcement.sender.mediaFile.url%><%} else {%> <%=announcement.sender.imageUrl.url%><%}%>" alt="profile pic"
+                                            class="sender-profile-image">
+                                        <%= announcement.sender.firstName %> <%= announcement.sender.lastName %>
+                                    </a>
+                                </div>
                                 <h5><%= announcement.subject %></h5>
                                 <% if (announcement.text.split(" ").length > 20) { %>
                                     <p class="post-text"><span class="convertible-text"><%= announcementTexts.get(announcement._id).split(" ").slice(0, 21).join(" ")%></span> <a href="/announcements/<%= announcement._id %>">(Read More)</a></p>
@@ -62,9 +65,10 @@
 
                 <div class="col-lg-6 block">
                     <article class="text-block">
-                        <div class="block-header <% if (platform.homepageInfo) {%> green <% } %>">
+                        <div class="block-header">
                             <h1 style="user-select: none; -moz-user-select: none;">New Projects</h1>
                         </div>
+                        <div class="block-border-bottom-reversed"></div>
                         <div class="block-content mode">
                             <% projects.forEach(project => { %>
                                 <% let creator;%>
@@ -125,22 +129,51 @@
 
                 <div class="col-lg-6">
                     <article class="text-block">
-                        <div class="block-header <% if (platform.homepageInfo) {%> yellow <% } %>">
+                        <div class="block-header">
                             <h1 style="user-select: none; -moz-user-select: none;">Witherly Heights</h1>
                         </div>
+                        <div class="block-border-bottom"></div>
                         <div class="block-content mode">
-                            
+                            <div class="col">
+                                <div class="row witherly-heights-image">
+                                    <img class="img-fluid" src="<%=platform.displayImages[1]%>" alt="<%=platform.name%> image">
+                                </div>
+                                <div class="row">
+                                    <a href="https://witherlyheights.org">
+                                        <span id="witherly-heights-text">Latest Issue</span>
+                                    </a>
+                                </div>
+                            </div>
                         </div>
                     </article>
                 </div>
 
                 <div class="col-lg-6 block">
                     <article class="text-block">
-                        <div class="block-header <% if (platform.homepageInfo) {%> yellow <% } %>">
+                        <div class="block-header">
                             <h1 style="user-select: none; -moz-user-select: none;">No Left Turn Here Cafe</h1>
                         </div>
+                        <div class="block-border-bottom-reversed"></div>
                         <div class="block-content mode">
-                            <p>Coming Soon!</p>
+                            <div class="col">
+                                <div class="row">
+                                    <p>The Early College Cafe is where you can order food! It is great! Now you can order online as well! Great!</p>
+                                </div>
+                                <div class="row">
+                                    <a href="/shop/order?order=true" id="place-order-homepage" class="btn btn-info"><i class="fas fa-plus-circle"></i> Place an Order</a>
+                                </div>
+                                <div class="row mt-4">
+                                    <h5>Your Most Recent Order:</h5>
+                                </div>
+                                <div class="row">
+                                    <% mostRecentOrder.items.forEach(item => { %>
+                                        <p><%= item.item %>: <%= item.quantity %></p>
+                                    <% }) %>
+                                </div>
+                                <div class="row">
+                                    <p>Total Cost: $<%= mostRecentOrder.charge %></p>
+                                </div>
+                            </div>
                         </div>
                     </article>
                 </div>
@@ -152,9 +185,10 @@
 
                 <div class="col-lg-6">
                     <article class="text-block">
-                        <div class="block-header <% if (platform.homepageInfo) {%> yellow <% } %>">
+                        <div class="block-header">
                             <h1 style="user-select: none; -moz-user-select: none;">About</h1>
                         </div>
+                        <div class="block-border-bottom"></div>
                         <div class="block-content mode">
                             <p>Saberchat is an intranet platform that connects and centralizes your community's communication and notification platforms. It allows users to quickly share and access important information, and presents multiple platform-specific features for community projects. It is used across schools, clubs, organizations and more.</p>
                             <span id="developers"><span id="developers-heading">Developers: </span>Kabir Samsi, Alexander Zhou, Siddharth Chavan, Dmitry Pleshkov, Vibhav Darsha</span>

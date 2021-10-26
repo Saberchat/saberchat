@@ -32,8 +32,9 @@ controller.homepage = async function(req, res) {
     let allAnnouncements = (await Announcement.find({}).populate('sender')).reverse();
     let allProjects = (await Project.find({verified: true}).populate('creators').populate('sender')).reverse();
     let allArticles = (await WHArticle.find({}).populate('authors')).reverse();
+    let mostRecentOrder = await Order.findOne().sort({'_id':-1}).populate('items');
 
-    if (!allAnnouncements || !allProjects || !allArticles) {
+    if (!allAnnouncements || !allProjects || !allArticles || !mostRecentOrder) {
         await req.flash('error', 'An Error Occurred');
         return res.redirect('back');
     }
@@ -41,7 +42,7 @@ controller.homepage = async function(req, res) {
     const DISPLAY_NUMBER = 2;
     const announcements = [];
     const projects = [];
-    const articles = []
+    const articles = [];
 
     for (let index = 0; index < DISPLAY_NUMBER; index++) {
         announcements.push(allAnnouncements[index]);
@@ -53,7 +54,7 @@ controller.homepage = async function(req, res) {
     const projectUserNames = await parsePropertyArray(users, "firstName").join(',').toLowerCase().split(',');
     const projectTexts = await embedLink(req.user, projects, projectUserNames);
 
-    return res.render('homepage', {platform, announcements, announcementTexts, projects, projectTexts, articles});
+    return res.render('homepage', {platform, announcements, announcementTexts, projects, projectTexts, articles, mostRecentOrder});
 }
 
 controller.index = async function(req, res) {

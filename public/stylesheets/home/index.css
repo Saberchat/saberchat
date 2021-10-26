@@ -25,6 +25,16 @@ article.text-block {
     color: #ffffff;
 }
 
+.block-border-bottom {
+    height: 10px;
+    background-image: linear-gradient(to right, #84f1ff, #461dff);
+}
+
+.block-border-bottom-reversed {
+    height: 10px;
+    background-image: linear-gradient(to left, #fd88f3, #611dff);
+}
+
 .block-header.green {
     border-bottom: 10px solid #08c962;
 }
@@ -39,6 +49,11 @@ article.text-block {
 
 .text-block .block-content {
     padding: 15px 30px;
+}
+
+#place-order-homepage {
+    background-image: linear-gradient(to left, #fd88f3, #611dff);
+    border: 0px;
 }
 
 /* block animations */
