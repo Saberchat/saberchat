@@ -1,0 +1,220 @@
+<%- include('./partials/headStart') %> 
+    <link rel="stylesheet" href="/stylesheets/home/index.css">
+    <link rel="stylesheet" href="/stylesheets/components/background.css">
+    
+    <%if (currentUser && currentUser.darkmode) {%>
+        <link rel="stylesheet" href="/stylesheets/darkmode.css">
+    <%}%>
+
+    <script src="/javascript/nav/userForm.js"></script>
+    <script src="/javascript/home/index.js"></script>
+    <script>
+        if (window.location.href.includes("herokuapp")) {
+            window.location.href = "https://saberchat.net";
+        }
+    </script>
+<%- include('./partials/headEnd') %> 
+<body class="mode">
+<!-- insert navbar via ejs-->
+    <%- include('./partials/components/navbar') %>
+
+    <!-- Background image and text -->
+    <section id="background" style="background-image: url('<%=platform.imageUrl%>'); background-size: cover;">
+        <div class="container-fluid text-center background-inner-div">
+            <div class="row">
+                <div class="col-12 background-title">
+                    <h1 style="user-select: none; -moz-user-select: none;">Saberchat</h1>
+                    <p style="user-select: none; -moz-user-select: none;"><%=platform.name%>'s very own Community Platform</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Home Page content -->
+    <main id="main-container">
+        <div class="container mt-5 mode">
+
+            <!-- Block 1 -->
+            <div class="row element" id="about">
+
+                <div class="col-lg-6">
+                    <article class="text-block">
+                        <div class="block-header">
+                            <h1 style="user-select: none; -moz-user-select: none;">Latest Announcements</h1>
+                        </div>
+                        <div class="block-border-bottom"></div>
+                        <div class="block-content mode">
+                            <% announcements.forEach(announcement => { %>
+                                <div class="mb-3">
+                                    <a class="home-post-sender mode" href="../profiles/<%= announcement.sender._id %>">
+                                        <img src="<% if (announcement.sender.mediaFile.display) {%> <%= announcement.sender.mediaFile.url%><%} else {%> <%=announcement.sender.imageUrl.url%><%}%>" alt="profile pic"
+                                            class="sender-profile-image">
+                                        <%= announcement.sender.firstName %> <%= announcement.sender.lastName %>
+                                    </a>
+                                </div>
+                                <h5><%= announcement.subject %></h5>
+                                <% if (announcement.text.split(" ").length > 20) { %>
+                                    <p class="post-text"><span class="convertible-text"><%= announcementTexts.get(announcement._id).split(" ").slice(0, 21).join(" ")%></span> <a href="/announcements/<%= announcement._id %>">(read more)</a></p>
+                                <% } else { %>
+                                    <p class="post-text convertible-text"><%= announcementTexts.get(announcement._id) %></p>
+                                <% } %>
+                            <% }) %>
+                        </div>
+                    </article>
+                </div>
+
+                <div class="col-lg-6 block">
+                    <article class="text-block">
+                        <div class="block-header">
+                            <h1 style="user-select: none; -moz-user-select: none;">New Projects</h1>
+                        </div>
+                        <div class="block-border-bottom-reversed"></div>
+                        <div class="block-content mode">
+                            <% projects.forEach(project => { %>
+                                <% let creator;%>
+                                <% if (project.creators.length + project.nonaccountCreators.length == 0) { %>
+                                    <p class="creator-row">
+                                        <span class="creator-heading">Creators:</span> <span class="creator-names">None</span>
+                                    </p>
+
+                                <% } else if (project.creators.length + project.nonaccountCreators.length < 3){ %>
+                                    <p class="creator-row">
+                                        <span class="creator-heading">Creators:</span>
+                                        <% let creator;%>
+                                        <% for (let i = 0; i < project.creators.length; i++) { %>
+                                            <% creator = project.creators[i];%>
+                                            <a class="creator-names" href="profiles/<%=creator._id %>">
+                                                <img src="<% if (creator.mediaFile.display) {%> <%= creator.mediaFile.url%><%} else {%> <%=creator.imageUrl.url%><%}%>"
+                                                alt="profile pic" class="creator-profile"> <%=creator.firstName%> <%=creator.lastName%>
+                                            </a>
+                                            <% if ((i+1) < (project.creators.length + project.nonaccountCreators.length)) {%>,<%}%>
+                                        <% } %>
+
+                                        <% for (let i = 0; i < project.nonaccountCreators.length; i++) { %>
+                                            <% creator = project.nonaccountCreators[i];%>
+                                            <span class="creator-names"><%=creator%></span>
+                                            <% if ((i+1) < project.nonaccountCreators.length) {%>,<%}%>
+                                        <% } %>
+                                    </p>
+
+                                <% } else if ((project.creators.length + project.nonaccountCreators.length) > 2) { %>
+                                    <p class="creator-row">
+                                        <span class="creator-heading">Creators:</span>
+                                        <% if (project.creators.length > 0) {%>
+                                            <a class="creator-names" href="profiles/<%= project.creators[0]._id %>">
+                                                <img src="<% if (project.creators[0].mediaFile.display) {%> <%= project.creators[0].mediaFile.url%><%} else {%> <%=project.creators[0].imageUrl.url%><%}%>"
+                                                alt="profile pic" class="creator-profile">
+                                                <%= project.creators[0].firstName %> <%= project.creators[0].lastName %>
+                                            </a>
+                                        <% } else { %>
+                                            <span class="creator-names"><%=project.nonaccountCreators[0]%></span>
+                                        <% } %>
+                                        and <%= (project.creators.length + project.nonaccountCreators.length) - 1 %> others</p>
+                                <% } %>
+                                <h5><%= project.subject %></h5>
+                                <% if (project.text.split(" ").length > 20) { %>
+                                    <p class="post-text"><span class="convertible-text"><%= projectTexts.get(project._id).split(" ").slice(0, 21).join(" ")%></span> <a href="/projects/<%= project._id %>">(read more)</a></p>
+                                <% } else { %>
+                                    <p class="post-text convertible-text"><%= projectTexts.get(project._id) %></p>
+                                <% } %>
+                            <% }) %>
+                        </div>
+                    </article>
+                </div>
+
+            </div>
+
+            <!-- Block 2 -->
+            <div class="row element" id="block-2">
+
+                <div class="col-lg-6">
+                    <article class="text-block">
+                        <div class="block-header">
+                            <h1 style="user-select: none; -moz-user-select: none;">Witherly Heights</h1>
+                        </div>
+                        <div class="block-border-bottom"></div>
+                        <div class="block-content mode">
+                            <div class="col">
+                                <div class="row witherly-heights-image">
+                                    <img class="img-fluid" src="<%=platform.displayImages[1]%>" alt="<%=platform.name%> image">
+                                </div>
+                                <div class="row">
+                                    <a href="https://witherlyheights.org">
+                                        <span id="witherly-heights-text">Latest Issue</span>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </article>
+                </div>
+
+                <div class="col-lg-6 block">
+                    <article class="text-block">
+                        <div class="block-header">
+                            <h1 style="user-select: none; -moz-user-select: none;">No Left Turn Here Cafe</h1>
+                        </div>
+                        <div class="block-border-bottom-reversed"></div>
+                        <div class="block-content mode">
+                            <div class="col">
+                                <div class="row">
+                                    <p>The Early College Cafe is where you can order food! It is great! Now you can order online as well! Great!</p>
+                                </div>
+                                <div class="row">
+                                    <a href="/shop/order?order=true" id="place-order-homepage" class="btn btn-info"><i class="fas fa-plus-circle"></i> Place an Order</a>
+                                </div>
+                                <div class="row mt-4">
+                                    <h5>Your Most Recent Order:</h5>
+                                </div>
+                                <div class="row mt-1">
+                                    <div class="col">
+                                        <% mostRecentOrder.items.forEach(item => { %>
+                                            <div class="row">
+                                                <%= item.item.name %> (<%= item.quantity %>)
+                                            </div>
+                                        <% }) %>
+                                    </div>
+                                </div>
+                                <div class="row mt-3">
+                                    <p>Total Cost: $<%= mostRecentOrder.charge.toFixed(2)%></p>
+                                </div>
+                            </div>
+                        </div>
+                    </article>
+                </div>
+
+            </div>
+
+            <!-- Block 3 -->
+            <div class="row element" id="block-3">
+
+                <div class="col-lg-6">
+                    <article class="text-block">
+                        <div class="block-header">
+                            <h1 style="user-select: none; -moz-user-select: none;">About</h1>
+                        </div>
+                        <div class="block-border-bottom"></div>
+                        <div class="block-content mode">
+                            <p>Saberchat is an intranet platform that connects and centralizes your community's communication and notification platforms. It allows users to quickly share and access important information, and presents multiple platform-specific features for community projects. It is used across schools, clubs, organizations and more.</p>
+                            <span id="developers"><span id="developers-heading">Developers: </span>Kabir Samsi, Alexander Zhou, Siddharth Chavan, Dmitry Pleshkov, Vibhav Darsha</span>
+                        </div>
+                    </article>
+                </div>
+
+                <div class="col-lg-6 block">
+                    <img class="image-block" src="<%=platform.displayImages[1]%>" alt="<%=platform.name%> image">
+                </div>
+
+            </div>
+        </div>
+    </main>
+    <script>
+        window.onload = (() => {
+            window.onscroll = (() => {
+                updateNav();
+                animateDisplay();
+            });
+        });
+    </script>
+    <script src="/javascript/embed.js"></script>
+</body>
+</html>
