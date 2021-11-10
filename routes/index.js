@@ -15,8 +15,9 @@ router.get('/logout', wrapAsync(middleware.isLoggedIn), index.logout); //logout 
 
 router.post("/register", validateNewUser, wrapAsync(index.register)); //Register User
 router.get('/authenticate/:id', wrapAsync(index.authenticate)); // Index Landing Page
-router.post('/login', validateUserLogin, index.login); // Custom login handling so that flash messages can be sent.
 router.post('/forgot-password', validatePasswordReset, wrapAsync(index.forgotPassword)); //Submit forgot password form
+router.post('/login', validateUserLogin, index.login); // Custom login handling so that flash messages can be sent.
+
 
 router.route('/reset-password')
     .get(wrapAsync(index.resetPasswordForm)) //Form to reset password
