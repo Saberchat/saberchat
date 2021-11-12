@@ -284,7 +284,8 @@ controller.confirmOrder = async function(req, res) {
             emailText =  `<p>Your order has been confirmed! Please alert us if there are any problems, etc.<p><p>${await itemText.join(", ")}</p><p>Extra Instructions: ${order.instructions}</p><p>Total Cost: ${(order.charge)} Credits</p>`;
         }
         if (order.customer.receiving_emails) {
-            await sendGridEmail(order.customer.email, "Order Confirmed", `<p>Hello ${order.customer.firstName},</p>${emailText}`, false);
+            // TEMPORARY EMAIL MUTE - Nov 11 Dmitry
+            //await sendGridEmail(order.customer.email, "Order Confirmed", `<p>Hello ${order.customer.firstName},</p>${emailText}`, false);
         }
     }
     return res.json({success: "Successfully confirmed email"});
@@ -330,10 +331,11 @@ controller.processAll = async function(req, res) { //Process all currently activ
         }
         await notif.save();
         if (order.customer.receiving_emails) {
-            await sendGridEmail(order.customer.email, "Order Ready", `<p>Hello ${order.customer.firstName},</p>${emailText}`, false);
+            // TEMPORARY EMAIL MUTE - Nov 11 Dmitry
+            //await sendGridEmail(order.customer.email, "Order Ready", `<p>Hello ${order.customer.firstName},</p>${emailText}`, false);
         }
 
-        await order.customer.inbox.push({message: notif, new: true}); //Add notif to user"s inbox
+        //await order.customer.inbox.push({message: notif, new: true}); //Add notif to user"s inbox
         await order.customer.save();
         order.present = false; //Order is not active anymore
         await order.save();
@@ -372,10 +374,11 @@ controller.processOrder = async function(req, res) {
     }
     await notif.save();
     if (order.customer.receiving_emails) {
-        await sendGridEmail(order.customer.email, "Order Ready", `<p>Hello ${order.customer.firstName},</p>${emailText}`, false);
+        // TEMPORARY EMAIL MUTE - Nov 11 Dmitry
+        //await sendGridEmail(order.customer.email, "Order Ready", `<p>Hello ${order.customer.firstName},</p>${emailText}`, false);
     }
 
-    await order.customer.inbox.push({message: notif, new: true}); //Add notif to user"s inbox
+    //await order.customer.inbox.push({message: notif, new: true}); //Add notif to user"s inbox
     await order.customer.save();
     order.present = false; //Order is not active anymore
     await order.save();
@@ -440,7 +443,8 @@ controller.deleteOrder = async function(req, res) {
 
         await notif.save();
         if (order.customer.receiving_emails) {
-            await sendGridEmail(order.customer.email, "Order Rejected", `<p>Hello ${order.customer.firstName},</p><p>${notif.text}</p>`, false);
+            // TEMPORARY EMAIL MUTE - Nov 11 Dmitry
+            // await sendGridEmail(order.customer.email, "Order Rejected", `<p>Hello ${order.customer.firstName},</p><p>${notif.text}</p>`, false);
         }
 
         //Refund if the transaction is via online balance
@@ -449,7 +453,7 @@ controller.deleteOrder = async function(req, res) {
             order.customer.debt -= order.charge;
         }
 
-        await order.customer.inbox.push({message: notif, new: true}); //Add notif to user"s inbox
+        //await order.customer.inbox.push({message: notif, new: true}); //Add notif to user"s inbox
         await order.customer.save();
 
         const deletedOrder = await Order.findByIdAndDelete(order._id).populate("items.item").populate("customer");
