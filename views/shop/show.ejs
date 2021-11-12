@@ -49,7 +49,7 @@
                             <input id="available" class="form-control mode" type="text" name="available" placeholder="Available Orders" value="<%= item.availableItems %>" maxlength="45" required>
                         </div>
                     </div>
-                    <input type="checkbox" name="displayAvailability" id="displayAvailability" <% if (item.displayAvailability){%>checked<%}%>/>
+                    <input type="checkbox" name="displayAvailability" id="displayAvailability" <% if (platform.displayAvailability && item.displayAvailability){%>checked<%}%>/>
                     <label for="displayAvailability">Display Item Availability</label>
                     <br><br>
 

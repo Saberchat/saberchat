@@ -73,7 +73,7 @@
                                     id="item-<%= item.id %>">
                             <% } %>
 
-                                <span class="item-name"><%= item.name %> <% if (item.displayAvailability){%>(<%= item.availableItems %> in stock)<%}%></span> - <% if (platform.dollarPayment) {%>$<%=(item.price).toFixed(2)%><% } else {%><%=(item.price)%> Credits<%}%>
+                                <span class="item-name"><%= item.name %> <% if (platform.displayAvailability && item.displayAvailability){%>(<%= item.availableItems %> in stock)<%}%></span> - <% if (platform.dollarPayment) {%>$<%=(item.price).toFixed(2)%><% } else {%><%=(item.price)%> Credits<%}%>
                                 <% if (currentUser) { %>
                                     <div title="Upvotes" class="upvotes">
                                         <% if (item.upvotes.includes(currentUser._id)) { %>

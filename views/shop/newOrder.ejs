@@ -105,7 +105,7 @@
                                                     <input name="<%=item.name%>" id="num-<%=item._id%>" type="text" class="form-control mode num-orders" hidden value="0" oninput="changeNumOrders(this, <%=item.availableItems%>, <%=platform.dollarPayment%>, <%=currentUser.darkmode%>)">
                                                     <label class="form-check-label" for="<%= item._id %>">
                                                         <span class="item-name"><%= item.name %></span>
-                                                        <%if(item.displayAvailability){%>(<%= item.availableItems %> order<%if(item.availableItems != 1){%>s<%}%> available)<%}%> -
+                                                        <%if (platform.displayAvailability && item.displayAvailability){%>(<%= item.availableItems %> order<%if(item.availableItems != 1){%>s<%}%> available)<%}%> -
                                                         <%if (platform.dollarPayment) {%>$<%= (item.price).toFixed(2)%><%} else {%> Credits: <%=item.price%><% } %>
                                                     </label>
 

@@ -249,7 +249,7 @@ controller.order = async function(req, res) {
     }
 
     for (let item of orderedItems) { //Update items
-        if (item.displayAvailability) {
+        if (platform.displayAvailability && item.displayAvailability) {
             item.availableItems -= await parseInt(req.body[item.name]);
             item.orderCount += await parseInt(req.body[item.name]);
             await item.save();
