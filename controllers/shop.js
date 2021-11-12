@@ -312,7 +312,7 @@ controller.processAll = async function(req, res) { //Process all currently activ
             //await sendGridEmail(order.customer.email, "Order Ready", `<p>Hello ${order.customer.firstName},</p>${emailText}`, false);
         }
 
-        await order.customer.inbox.push({message: notif, new: true}); //Add notif to user"s inbox
+        //await order.customer.inbox.push({message: notif, new: true}); //Add notif to user"s inbox
         await order.customer.save();
         order.present = false; //Order is not active anymore
         await order.save();
@@ -355,7 +355,7 @@ controller.processOrder = async function(req, res) {
         //await sendGridEmail(order.customer.email, "Order Ready", `<p>Hello ${order.customer.firstName},</p>${emailText}`, false);
     }
 
-    await order.customer.inbox.push({message: notif, new: true}); //Add notif to user"s inbox
+    //await order.customer.inbox.push({message: notif, new: true}); //Add notif to user"s inbox
     await order.customer.save();
     order.present = false; //Order is not active anymore
     await order.save();
@@ -430,7 +430,7 @@ controller.deleteOrder = async function(req, res) {
             order.customer.debt -= order.charge;
         }
 
-        await order.customer.inbox.push({message: notif, new: true}); //Add notif to user"s inbox
+        //await order.customer.inbox.push({message: notif, new: true}); //Add notif to user"s inbox
         await order.customer.save();
 
         const deletedOrder = await Order.findByIdAndDelete(order._id).populate("items.item").populate("customer");
