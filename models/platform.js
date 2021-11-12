@@ -15,6 +15,7 @@ var platformSchema = new mongoose.Schema({
         url: String,
         originalName: String,
     },
+    displayAvailability: {type: Boolean, default: true}, //Display item availability
     homepageInfo: {type: Boolean, default: true}, //Display information on homepage
     descriptionDisplay: {type: Boolean, default: false}, //Display description or platform name first on homepage
     contactPhotoDisplay: {type: Boolean, default: true}, //Display photos of platform administrators on contact page

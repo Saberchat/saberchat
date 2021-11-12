@@ -78,14 +78,14 @@
                         <% if (item.availableItems > 0) { %>
                             <a href="/shop/item/<%= item._id %>" id="item-<%= item.id %>"
                                class="list-group-item list-group-item-action menu-item shop <%= category.name.replace(' ', '') %>"><span
-                                        class="item-name"><%= item.name %></span> <%if(item.displayAvailability){%>(<%= item.availableItems %> in stock)<%}%> <span class="upvote"
+                                        class="item-name"><%= item.name %></span> <%if (platform.displayAvailability && item.displayAvailability){%>(<%= item.availableItems %> in stock)<%}%> <span class="upvote"
                                                  title="Upvotes (Admins cannot upvote items from here)"></span><span
                                         id="upvoteCount-<%= item._id %>"
                                         class="upvote-count shoptext"> Upvotes: <%= item.upvotes.length %></span></a>
                         <% } else { %>
                             <a href="/shop/item/<%= item._id %>" id="item-<%= item.id %>"
                                class="list-group-item list-group-item-action menu-item shop <%= category.name.replace(' ', '') %>"><span
-                                        class="item-name"><%= item.name %></span> <%if(item.displayAvailability){%>(Unavailable)<%}%> <span class="upvote"
+                                        class="item-name"><%= item.name %></span> <%if (platform.displayAvailability && item.displayAvailability){%>(Unavailable)<%}%> <span class="upvote"
                                                                                                       title="Upvotes (Admins cannot upvote items from here)"></span><span
                                         id="upvoteCount-<%= item._id %>"
                                         class="upvote-count shoptext"> Upvotes: <%= item.upvotes.length %></span></a>
