@@ -24,24 +24,26 @@ const controller = {};
 
 //-----------GENERAL ROUTES-----------//
 
-//SHOW CAFE HOMEPAGE
+//Display shop homepage
 controller.index = async function(req, res) {
-    if (req.user.tags.includes("Cashier")) {
-        return controller.manage(req, res);
-    }
+    if (req.user.tags.includes("Cashier")) {return controller.manage(req, res);} //Redirect to cashier control panel
 
+    //Find all of the current user's have ordered, and populate info on their items
     const platform = await setup(Platform);
     const market = await setup(Market);
-    const orders = await Order.find({customer: req.user._id}).populate("items.item"); //Find all of the orders that you have ordered, and populate info on their items
+    const orders = await Order.find({customer: req.user._id}).populate("items.item");
     if (!platform || !orders) {
         await req.flash("error", "Unable to find orders");
         return res.redirect("back");
     }
     
+    //Display shop homepage form (with current orders and option to navigate to menu/new orders)
     return res.render("shop/index", {market, platform, orders, data: platform.features[await objectArrIndex(platform.features, "route", "shop")]});
 }
 
+//Display item ordering form
 controller.orderForm = async function(req, res) {
+    //Access item categories and populate info on ordering items
     const platform = await setup(Platform);
     const shop = await setup(Market);
     const categories = await ItemCategory.find({_id: {$in: shop.categories}}).populate("items");
@@ -50,41 +52,41 @@ controller.orderForm = async function(req, res) {
         return res.redirect("back");
     }
 
-    const allOrders = await Order.find({customer: req.user._id}).populate("items.item"); //Find all of the orders that you have ordered, and populate info on their items
+    //Find all of the user's current orders, and populate info on their items
+    const allOrders = await Order.find({customer: req.user._id}).populate("items.item");
     if (!allOrders) {
         await req.flash("error", "Unable to find orders");
         return res.redirect("back");
     }
 
-    sortedCategories = [];
+    //Iterate through each category's items and sort them alphabetically
+    let sortedCategories = [];
     let sortedCategory;
     for (let category of categories) {
         if (category.items.length > 0) {
             sortedCategory = category;
-            await quicksort(sortedCategory.items, 0, sortedCategory.items.length-1, "name");
+            await quicksort(sortedCategory.items, 0, sortedCategory.items.length-1, "name"); //Call quicksort with item 'name' property
             for (let i = sortedCategory.items.length-1; i > 0; i--) {
-                if (!sortedCategory.items[i].availableItems > 0) {
+                if (!sortedCategory.items[i].availableItems > 0) { //Remove all unavailable items from display
                     await sortedCategory.items.splice(i, 1);
                 }
             }
-            await sortedCategories.push(sortedCategory);
+            await sortedCategories.push(sortedCategory); //Add all sorted items to category list
         }
     }
 
-    orderedItems = []; //Array of ordered item objects to sort by popularity
+    //Calculate which items are the most frequently ordered
+    const orderedItems = new Map();
     let overlap = false;
-    for (let order of allOrders) {
-        for (let item of order.items) {
+    for (let order of allOrders) { //Iterate through each order's items and add their data to the map
+        for (let item of order.items) { 
             overlap = false;
-            for (let itemObject of orderedItems) {
-                if (await itemObject.item.equals(item.item._id)) {
-                    itemObject.totalOrdered += item.quantity;
-                    overlap = true;
-                    break;
-                }
+            if (await orderedItems.has(item.item._id)) { //If the map includes the item, update quantity
+                overlap = true;
+                orderedItems.get(item.item._id).totalOrdered += item.quantity;
             }
-            if (!overlap) {
-                orderedItems.push({
+            if (!overlap) { //If the item is not in the map, set it
+                orderedItems.set(item.item._id, {
                     item: item.item._id,
                     totalOrdered: item.quantity,
                     created_at: item.item.created_at
@@ -92,12 +94,13 @@ controller.orderForm = async function(req, res) {
             }
         }
     }
-    frequentItems = await sortByPopularity(orderedItems, "totalOrdered", "created_at", ["item"]).popular;
+    //Sort items and find the most popular ones
+    const frequentItems = await sortByPopularity(Array.from(orderedItems.values()), "totalOrdered", "created_at", ["item"]).popular;
 
-    if (req.query.order) { //SHOW NEW ORDER FORM
-        if (req.user.tags.includes("Cashier")) {
+    if (req.query.order) { //Display ordering form
+        if (req.user.tags.includes("Cashier")) { //At the moment, only cashiers may place orders
             if (!platform.purchasable || !req.user) {
-                await req.flash('error', `This feature is not enabled on ${platform.name} Saberchat`);
+                await req.flash('error', `This feature is not enabled on ${platform.name} Saberchat`); //If ordering is not enabled
                 return res.redirect('back');        
             }
             
@@ -106,38 +109,40 @@ controller.orderForm = async function(req, res) {
                 await req.flash("error", "Unable to find orders");
                 return res.redirect("back");
 
-            } else if (sentOrders.length > 3) {
+            } else if (sentOrders.length > 3) { //If user has made maximum number of orders for the day
                 await req.flash("error", "You have made the maximum number of orders for the day");
                 return res.redirect("back");
             }
+            //Order form display
             return res.render("shop/newOrder", {platform, categories: sortedCategories, frequentItems, data: platform.features[await objectArrIndex(platform.features, "route", "shop")]});
         }
         await req.flash("error", "You do not have permission to do that");
         return res.redirect("back");
     }
 
-    if (req.query.menu) { //SHOW MENU
+    if (req.query.menu) { //Display menu
         const categories = await ItemCategory.find({_id: {$in: shop.categories}}).populate("items"); //Collects info on every item category, to render (in frontend, the ejs checks each item inside category, and only shows it if it"s available)
         if (!categories) {
             await req.flash("error", "An Error Occurred");
             return res.redirect("back");
         }
 
-        let fileExtensions = new Map();
+        let fileExtensions = new Map(); //Store each item and its image's filetype
         let itemDescriptions = {}; //Object of items and their link-embedded descriptions
         let itemDescription = [];
         for (let category of categories) {
             for (let item of category.items) {
                 itemDescription = [];
-                for (let element of await convertToLink(item.description).split('\n')) {
+                for (let element of await convertToLink(item.description).split('\n')) { //Add description elements
                     if ((await element.split('\r').join('').split(' ').join('')) != '') {await itemDescription.push(element);}
                 }
                 itemDescriptions[item._id] = itemDescription;
-                if (item.mediaFile.filename) {
+                if (item.mediaFile.filename) { //Set each URL to its corresponding filetype (inverse bucket sort mapping)
                     await fileExtensions.set(item.mediaFile.url, await path.extname(await item.mediaFile.url.split("SaberChat/")[1]));
                 }
             }
         }
+        //Display menu with item 
         return res.render("shop/menu", {platform, categories: sortedCategories, itemDescriptions, frequentItems, fileExtensions, data: platform.features[await objectArrIndex(platform.features, "route", "shop")]});
     }
 }
@@ -154,10 +159,10 @@ controller.sortItems = async function(req, res) { //Sort items based on specific
         ["Upvotes", "upvotes", true], //Sort by upvotest (most to least)
         ["Date Created", "created_at", true] //Sort by date created (most recent to earliest)
     ]) {
-        if (req.body.setting == setting[0]) {
-            await quicksort(items, 0, items.length-1, setting[1]);
+        if (req.body.setting == setting[0]) { //Iterate through each setting 
+            await quicksort(items, 0, items.length-1, setting[1]); //Sort based on provided setting
             if (setting[2]) {await items.reverse();} //Reverse if display requires most->least
-            return res.json({success: "Successfully sorted", sorted: parsePropertyArray(items, "_id", true)});
+            return res.json({success: "Successfully sorted", sorted: parsePropertyArray(items, "_id", true)}); //Send the newly sorted data to frontend
         }
     }
     return res.json({error: "Unable to find setting"});
@@ -172,8 +177,7 @@ controller.searchCustomers = async function(req, res) {
     let users = await User.find({authenticated: true});
     if (!users) {return res.json({error: "An error occurred"});}
 
-    let customers = [];
-
+    let customers = []; //Store customers with their respective balance data
     for (let user of users) { //Iterate through usernames and search for matches
         if (await `${user.firstName} ${user.lastName} ${user.username}`.toLowerCase().includes(await req.body.text.toLowerCase())) {
             await customers.push({ //Add user to array, using username as display, and id as id value
@@ -184,20 +188,20 @@ controller.searchCustomers = async function(req, res) {
         }
     }
 
-    return res.json({success: "Successfully collected data", customers});
+    return res.json({success: "Successfully collected data", customers}); //Send data to frontend
 }
 
 //-----------GENERAL ORDER ROUTES-----------//
 
-//CREATE ORDER
+//Create order (separate from socket)
 controller.order = async function(req, res) {
-    const platform = await setup(Platform);
+    const platform = await setup(Platform); //Configure platform schema
     if (!platform) {
         await req.flash("error", "An Error Occurred");
         return res.redirect("back");
     }
 
-    let user;
+    let user; //Access user profile
     if (req.body.customer_id) {
         user = await User.findById(req.body.customer_id.split(' ')[0]);
         if (!user) {
@@ -211,7 +215,7 @@ controller.order = async function(req, res) {
         return res.redirect("back");
     }
 
-    const sentOrders = await Order.find({customer: user._id, present: true});
+    const sentOrders = await Order.find({customer: user._id, present: true}); //Access current active orders
     if (!sentOrders) {
         await req.flash("error", "Unable to find orders");
         return res.redirect("back");
@@ -239,23 +243,24 @@ controller.order = async function(req, res) {
     for (let item of orderedItems) {charge += (item.price * await parseInt(req.body[item.name]));} //Increment charge
 
     if (!req.body.payingInPerson) {
-        if (charge > user.balance) { //Check to see if you are ordering more than you can
+        if (charge > user.balance) { //Check to see if user is ordering more than they can
             await req.flash("error", `You do not have enough money in your account for this order. Contact a platform ${await platform.permissionsDisplay[platform.permissionsDisplay.length-1].toLowerCase()} if there has been a mistake.`);
             return res.redirect("/shop");
         }
-        user.balance -= charge;
+        user.balance -= charge; //Decrement balance
         user.debt += charge;
         await user.save();
     }
 
-    for (let item of orderedItems) { //Update items
-        if (platform.displayAvailability && item.displayAvailability) {
+    for (let item of orderedItems) { //Update items' availability and order count
+        if (platform.displayAvailability && item.displayAvailability) { //If availability is supposed to be displayed
             item.availableItems -= await parseInt(req.body[item.name]);
             item.orderCount += await parseInt(req.body[item.name]);
             await item.save();
         }
     }
 
+    //Frontend display message
     await req.flash("success", "Order Sent!");
     if (req.user.tags.includes("Cashier")) {
         return res.redirect("/shop/manage?orders=true");
