@@ -28,6 +28,13 @@
                     <% if (platform.postVerifiable || platform.permissionsProperty.slice(platform.permissionsProperty.length-2).includes(currentUser.permission) || currentUser.status == platform.teacherStatus) { %>
                         <a href="/announcements/new" class="btn btn-primary post-button"><i
                                     class="fas fa-bullhorn"></i> Send Announcement</a>
+                    <% } else {%>
+                        <% for (let perm of platform.announcementPerms) { %>
+                            <% if (currentUser.tags.includes(perm)) { %>
+                                <a href="/announcements/new" class="btn btn-primary post-button"><i
+                                    class="fas fa-bullhorn"></i> Send Announcement</a>
+                            <%}%>
+                        <% } %>
                     <% } %>
                     <a href="/announcements/mark-all" class="btn btn-success post-button"><i
                                 class="fas fa-check-square"></i> Mark All As Read</a>

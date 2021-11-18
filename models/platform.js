@@ -38,6 +38,7 @@ var platformSchema = new mongoose.Schema({
     statusesSingular: [{type: String}],
     statusesPlural: [{type: String}],
     studentStatuses: [{type: String}],
+    announcementPerms: [{type: String}],
     formerStudentStatus: String,
     teacherStatus: String,
     tags: [{type: String}],

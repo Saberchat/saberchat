@@ -53,6 +53,24 @@ middleware.postPermission = async function(req, res, next) {
     return res.redirect('back');
 }
 
+middleware.announcementPermission = async function(req, res, next) {
+    const platform = await setup(Platform);
+    if (!platform) {
+        await req.flash("error", "Unable to setup platform");
+        return res.redirect("back");
+    }
+    if (platform.postVerifiable || req.user.status == platform.teacherStatus || (await platform.permissionsProperty.slice(platform.permissionsProperty.length-3).includes(req.user.permission))) {
+        return next();
+    }
+
+    for (let perm of platform.announcementPerms) {
+        if (req.user.tags.includes(perm)) return next();
+    }
+    
+    await req.flash('error', 'You do not have permission to do that');
+    return res.redirect('back');
+}
+
 //checks if user is allowed into room
 middleware.checkIfMember = async function(req, res, next) {
     const room = await ChatRoom.findById(req.params.id);
