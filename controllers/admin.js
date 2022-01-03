@@ -4,7 +4,6 @@ const {objectArrIndex, concatMatrix, removeIfIncluded} = require("../utils/objec
 const setup = require("../utils/setup");
 const {cloudUpload, cloudDelete} = require('../services/cloudinary');
 const {autoCompress} = require("../utils/image-compress");
-const dateFormat = require("dateformat");
 
 //SCHEMA
 const Platform = require("../models/platform");

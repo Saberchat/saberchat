@@ -334,4 +334,13 @@ controller.ecdocs = async function(req, res) {
     return res.redirect("/");
 }
 
+controller.ecdocsUpdate = async function(req, res) {
+    const platform = await setup(Platform);
+    if (!platform) {
+        await req.flash("error", "An Error Occurred");
+        return res.redirect("back");
+    }
+    return res.render("other/edit-ecdocs", {platform, objectArrIndex});
+}
+
 module.exports = controller;
