@@ -32,18 +32,36 @@ controller.update = async function(req, res) {
     }
 
     platform.documents = [];
-    let parsedText = [];
-    for (let i = 0; i < req.body.infoHeading.length; i++) { //Update about information
+    let info = {
+        infoHeading: [],
+        infoText: [],
+        infoImages: []
+    };
+
+    for (let attr of ["infoHeading", "infoText", "infoImages"]) {
+        if (typeof req.body[attr] == "string") { //If there is only one element, read as array, not string
+            info[attr] = [req.body[attr]];
+        } else { //If multiple elements, read normally
+            info[attr] = req.body[attr];
+        }
+    }
+
+    for (let i = 0; i < info.infoHeading.length; i++) { //Update about information
         parsedText = [];
-        for (let element of req.body.infoText[i].split('\n')) {
-            if (await element.split('\r').join('').split(' ').join('') != "") {
+        for (let element of info.infoText[i].split('\n')) {
+            if (await element.split('\n').join('').split(' ').join('') != "") {
                 await parsedText.push(element);
             }
         }
-        await platform.documents.push({
-            heading: req.body.infoHeading[i],
+
+        if (!info.infoImages[i] || info.infoImages[i] == '') {
+            info.infoImages[i] = platform.displayImages[Math.floor(Math.random() * platform.displayImages.length)];
+        }
+
+        await platform.documents.push({ //Add data to platform's info
+            heading: info.infoHeading[i],
             text: parsedText,
-            image: req.body.infoImages[i]
+            image: info.infoImages[i]
         });
     }
 

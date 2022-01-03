@@ -86,19 +86,33 @@ controller.updatePlatform = async function(req, res) {
         await platform.colorScheme.push(`${req.body.colorScheme[i]}, ${req.body.colorScheme[i+1]}, ${req.body.colorScheme[i+2]}`);
     }
 
-    platform.info = [];
+    platform.info = []; //Reset platform info
+    let info = {
+        infoHeading: [],
+        infoText: [],
+        infoImages: []
+    };
+
+    for (let attr of ["infoHeading", "infoText", "infoImages"]) {
+        if (typeof req.body[attr] == "string") { //If there is only one element, read as array, not string
+            info[attr] = [req.body[attr]];
+        } else { //If multiple elements, read normally
+            info[attr] = req.body[attr];
+        }
+    }
+
     let parsedText = [];
-    for (let i = 0; i < req.body.infoHeading.length; i++) { //Update about information
+    for (let i = 0; i < info.infoHeading.length; i++) { //Update about information
         parsedText = [];
-        for (let element of req.body.infoText[i].split('\n')) {
+        for (let element of info.infoText[i].split('\n')) {
             if (await element.split('\r').join('').split(' ').join('') != "") {
                 await parsedText.push(element);
             }
         }
-        await platform.info.push({
-            heading: req.body.infoHeading[i],
-            text: parsedText,
-            image: req.body.infoImages[i]
+        await platform.info.push({ //Add data to platform's info
+            heading: info.infoHeading[i],
+            text: info.infoText[i],
+            image: info.infoImages[i]
         });
     }
 

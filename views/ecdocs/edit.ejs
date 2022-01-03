@@ -40,10 +40,10 @@
                                     <div class="image-group">
                                         <div class="input-container" id="imageblock-<%=i%>">
                                             <input type="text" placeholder="Heading..." class="form-control mode" name="infoHeading" value="<%=platform.documents[i].heading%>"><br>
-                                            <textarea class="form-control mode" placeholder="Text (Insert Links With Anchor Tags)" name="infoText" rows="10"><% for (let para of platform.documents[i].text) { %><%=para%>&#013;&#010;<% } %></textarea><br>
+                                            <textarea class="form-control mode" placeholder="Text (Insert Links With Anchor Tags)" name="infoText" rows="10"><% for (let para of platform.documents[i].text) { %><%=para%><% } %></textarea><br>
                                             <input type="text" id="<%=i%>" class="form-control mode"
                                                    oninput="createImg(this)" placeholder="Image URL (Optional)"
-                                                   name="infoImages[<%=i%>]" required
+                                                   name="infoImages[<%=i%>]"
                                                    value="<%= platform.documents[i].image %>">
                                             <img id="image-<%= platform.documents.length - (i + 1) %>"
                                                  style="width: 50%; height: 50%; margin-top: 10px; border-radius: 15px;"
