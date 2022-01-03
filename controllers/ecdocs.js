@@ -12,7 +12,7 @@ controller.index = async function(req, res) {
         await req.flash("error", "An Error Occurred");
         return res.redirect("back");
     }
-    return res.render("other/ecdocs", {platform});
+    return res.render("ecdocs/index", {platform});
 }
 
 controller.edit = async function(req, res) {
@@ -21,7 +21,7 @@ controller.edit = async function(req, res) {
         await req.flash("error", "An Error Occurred");
         return res.redirect("back");
     }
-    return res.render("other/edit-ecdocs", {platform, objectArrIndex});
+    return res.render("ecdocs/edit", {platform, objectArrIndex});
 }
 
 controller.update = async function(req, res) {

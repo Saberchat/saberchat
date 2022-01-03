@@ -40,20 +40,22 @@
                                     <div class="image-group">
                                         <div class="input-container" id="imageblock-<%=i%>">
                                             <input type="text" placeholder="Heading..." class="form-control mode" name="infoHeading" value="<%=platform.documents[i].heading%>"><br>
-                                            <textarea class="form-control mode" placeholder="Text..." name="infoText" rows="10"><% for (let para of platform.documents[i].text) { %><%=para%>&#013;&#010;<% } %></textarea><br>
+                                            <textarea class="form-control mode" placeholder="Text (Insert Links With Anchor Tags)" name="infoText" rows="10"><% for (let para of platform.documents[i].text) { %><%=para%>&#013;&#010;<% } %></textarea><br>
                                             <input type="text" id="<%=i%>" class="form-control mode"
-                                                   oninput="createImg(this)" placeholder="Url..."
+                                                   oninput="createImg(this)" placeholder="Image URL (Optional)"
                                                    name="infoImages[<%=i%>]" required
                                                    value="<%= platform.documents[i].image %>">
                                             <img id="image-<%= platform.documents.length - (i + 1) %>"
                                                  style="width: 50%; height: 50%; margin-top: 10px; border-radius: 15px;"
                                                  src="<%= platform.documents[i].image %>" alt="Image Does Not Exist"/>
                                         </div>
-                                    </div><br>
+                                        <button type="button" onclick="deleteImg(this)" style="display: inline;" class="btn btn-danger"><i class="fas fa-minus"></i></button>
+                                        <br>
+                                    </div>
                                 <% } %>
                             </div>
                             <div id="image-header">
-                                <button type="button" onclick="addBlock()" class="btn btn-primary"><i class="fas fa-plus"></i> New Document</button>
+                                <button type="button" onclick="addBlock(true)" class="btn btn-primary"><i class="fas fa-plus"></i> New Document</button>
                                 <br/><br/>
                             </div>
                         </div>

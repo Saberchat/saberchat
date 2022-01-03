@@ -204,7 +204,7 @@
                                 <div class="image-group">
                                     <div class="input-container" id="display-<%= platform.displayImages.length - (i + 1) %>">
                                         <input type="text" class="form-control mode"
-                                                oninput="createImage(this, 'displayimage-<%= platform.displayImages.length - (i + 1) %>')" placeholder="Url..."
+                                                oninput="createImage(this, 'displayimage-<%= platform.displayImages.length - (i + 1) %>')" placeholder="Image URL"
                                                 name="displayImages[<%= platform.displayImages.length - (i + 1) %>]" required
                                                 value="<%= platform.displayImages[i] %>">
                                         <img id="displayimage-<%= platform.displayImages.length - (i + 1) %>"
@@ -223,14 +223,16 @@
                                             <input type="text" placeholder="Heading..." class="form-control mode" name="infoHeading" value="<%=platform.info[i].heading%>"><br>
                                             <textarea class="form-control mode" placeholder="Text..." name="infoText" rows="10"><% for (let para of platform.info[i].text) { %><%=para%>&#013;&#010;<% } %></textarea><br>
                                             <input type="text" id="<%=i%>" class="form-control mode"
-                                                   oninput="createImg(this)" placeholder="Url..."
+                                                   oninput="createImg(this)" placeholder="Image URL"
                                                    name="infoImages[<%=i%>]" required
                                                    value="<%= platform.info[i].image %>">
                                             <img id="image-<%= platform.info.length - (i + 1) %>"
                                                  style="width: 50%; height: 50%; margin-top: 10px; border-radius: 15px;"
                                                  src="<%= platform.info[i].image %>" alt="Image Does Not Exist"/>
                                         </div>
-                                    </div><br>
+                                        <button type="button" onclick="deleteImg(this)" style="display: inline;" class="btn btn-danger"><i class="fas fa-minus"></i></button>
+                                        <br>
+                                    </div>
                                 <% } %>
                             </div>
                             <div id="image-header">

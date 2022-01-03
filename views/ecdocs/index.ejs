@@ -17,7 +17,7 @@
                 <div class="col-12 background-title">
                     <h1>Alsion Early College</h1>
                     <p>Important information and documents about Alsion's Early College Program</p>
-                    <% if (currentUser.permission == platform.permissionsProperty[platform.permissionsProperty.length-2]) { %>
+                    <% if (currentUser && currentUser.permission == platform.permissionsProperty[platform.permissionsProperty.length-2]) { %>
                         <a class="btn btn-primary" href="ecdocs/edit"><i class="fas fa-edit"></i> Edit Documents</a>
                     <%} %>
                 </div>
