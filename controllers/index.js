@@ -326,21 +326,4 @@ controller.darkmode = async function(req, res) {
     return res.redirect('back');
 }
 
-controller.ecdocs = async function(req, res) {
-    const platform = await setup(Platform);
-    if (objectArrIndex(platform.features, "route", "/ecdocs") > -1) { //Alsion-native platform
-        return res.render("other/ecdocs", {platform});
-    }
-    return res.redirect("/");
-}
-
-controller.ecdocsUpdate = async function(req, res) {
-    const platform = await setup(Platform);
-    if (!platform) {
-        await req.flash("error", "An Error Occurred");
-        return res.redirect("back");
-    }
-    return res.render("other/edit-ecdocs", {platform, objectArrIndex});
-}
-
 module.exports = controller;
