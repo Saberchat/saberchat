@@ -1,3 +1,4 @@
+//Build array of shop item tags
 let tagList = []
 if (document.getElementById("tag-input")) {
     tagList = document.getElementById("tag-input").value.split(',');
@@ -11,7 +12,7 @@ const confirm = function(button) { //Send request that order is ready
     const data = {};
 
     sendPostReq(url, data, data => {
-        if (data.success) {
+        if (data.success) { //Hide confirmation modal and update readiness bar
             $(`#modal-${orderId}-confirm`).modal('hide');
             document.getElementById(`ready-form-${orderId}`).removeChild(document.getElementById(`confirm-${orderId}`));
         }
@@ -88,8 +89,8 @@ const changeShopStatus = function() { //Send request to close/open shop
     });
 }
 
-const switchOrders = function(button) { //Switch order panel from active orders to past orders
-    if (button.id == "past-order-button") {
+const switchOrders = function(button) { //Switch order panel from active orders to past orders, or vice versa
+    if (button.id == "past-order-button") { //Switch to past orders
         document.getElementById("output-stream-old").hidden = false;
         document.getElementById("output-stream").hidden = true;
         document.getElementById("button-text").innerText = " View Active Orders";
@@ -97,7 +98,7 @@ const switchOrders = function(button) { //Switch order panel from active orders 
         document.getElementById("order-subheading").innerText = "All Past Orders";
         button.id = "active-order-button";
 
-    } else {
+    } else { //Switch to active orders
         document.getElementById("output-stream-old").hidden = true;
         document.getElementById("output-stream").hidden = false;
         document.getElementById("button-text").innerText = " View Past Orders";
@@ -107,23 +108,22 @@ const switchOrders = function(button) { //Switch order panel from active orders 
     }
 }
 
-const filterDate = function() {
+const filterDate = function() { //Filter past orders by date
     const startInput = document.getElementById('startDateInput');
     const endInput = document.getElementById('endDateInput');
 
-    if(!startInput.value && !endInput.value) {
+    if(!startInput.value && !endInput.value) { //If there are no start and end points entered
         const errMsg = document.getElementById('date-filter-err-msg');
         return errMsg.style.display = 'block';
     }
 
+    //Set viewing frame to past
     const urlParams = new URLSearchParams(window.location.search);
-    
     urlParams.set('past', 'true');
 
+    //Modify viewing timeframe
     if(startInput.value) { urlParams.set('start_date', startInput.value)};
     if(endInput.value) { urlParams.set('end_date', endInput.value)};
-
-
     window.location.search = urlParams;
 }
 
@@ -133,7 +133,7 @@ const addTag = function(e) { //Add tag to list of cafe item tags
     tagList.push(input.value);
     document.getElementById("tag-input").value = tagList.toString();
 
-    let newTag = document.createElement('div');
+    let newTag = document.createElement('div'); //Create new element for the tag and fill with necessary data
     newTag.classList.add('user-tag');
     newTag.id = input.value;
     newTag.innerHTML = `<span name="tags" value="${input.value}">${input.value}</span><button type="button" id="${input.value}" onclick="remTag(this)">&times;</button>`;

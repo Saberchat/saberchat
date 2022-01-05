@@ -50,6 +50,7 @@ shop.order = async function(io, socket, itemList, itemCount, instructions, addre
             });
         }
 
+        //Build order object based on inputted data
         let orderInstructions = "";
         if (instructions == "") {orderInstructions = "None";
         } else {orderInstructions = instructions;}

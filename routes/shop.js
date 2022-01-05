@@ -12,11 +12,10 @@ router.route('/')
     .post(wrapAsync(middleware.isLoggedIn), wrapAsync(middleware.accessToFeature), wrapAsync(middleware.platformPurchasable), wrapAsync(middleware.shopOpen), wrapAsync(shop.order)) //Create new order
     .put(wrapAsync(middleware.isLoggedIn), wrapAsync(middleware.accessToFeature), middleware.isCashier, wrapAsync(shop.updateSettings)); //Update Name/Description
 
-//View menu or view new order form
 router.post('/search-customers', wrapAsync(middleware.isLoggedIn), middleware.isCashier, wrapAsync(shop.searchCustomers)); //Search for cafe customers
-router.get('/order', wrapAsync(middleware.isLoggedIn), wrapAsync(middleware.accessToFeature), wrapAsync(middleware.shopOpen), wrapAsync(shop.orderForm));
-router.post('/sort', wrapAsync(middleware.isLoggedIn), wrapAsync(middleware.accessToFeature), wrapAsync(middleware.platformPurchasable), middleware.isCashier, wrapAsync(shop.sortItems));
-router.put('/order/all', wrapAsync(middleware.isLoggedIn), wrapAsync(middleware.accessToFeature), wrapAsync(middleware.platformPurchasable), middleware.isCashier, wrapAsync(shop.processAll));
+router.get('/order', wrapAsync(middleware.isLoggedIn), wrapAsync(middleware.accessToFeature), wrapAsync(middleware.shopOpen), wrapAsync(shop.orderForm)); //View menu or view new order form
+router.post('/sort', wrapAsync(middleware.isLoggedIn), wrapAsync(middleware.accessToFeature), wrapAsync(middleware.platformPurchasable), middleware.isCashier, wrapAsync(shop.sortItems)); //Sort menu items by a given parameter
+router.put('/order/all', wrapAsync(middleware.isLoggedIn), wrapAsync(middleware.accessToFeature), wrapAsync(middleware.platformPurchasable), middleware.isCashier, wrapAsync(shop.processAll)); //Process all orders
 
 //SPECIFIC ORDER ROUTES
 router.route('/order/:id')

@@ -1,5 +1,4 @@
-//Collect DOM Elements
-
+//DOM Elements from order form
 const container = document.getElementById('container');
 const dropdown = document.getElementsByTagName('select');
 const fci = document.getElementsByClassName('form-check-input');
@@ -10,6 +9,8 @@ const extraInstructions = document.getElementById('extra-instructions');
 const total = document.getElementById('total-cost');
 const orderConfirm = document.getElementById("order-confirm");
 const payingInPerson = document.getElementById("payingInPerson");
+
+//Mutable elements based on order summary calculations
 let balanceString = document.getElementById("balance-box").innerText;
 let orderedItem; //Order that will show up in your 'confirm order' page
 let sum = 0;
@@ -57,7 +58,7 @@ const searchCustomers = function(input) { //Check list of customers for online o
     }
 }
 
-const setCustomer = function(dropdown, dollarPayment, darkmode) {
+const setCustomer = function(dropdown, dollarPayment, darkmode) { //Select customer from dropdown menu and load data
     document.getElementById("current-name").innerText = `Current Customer: ${dropdown.value.split('| ')[1]}`;
     document.getElementById("current-name").className = dropdown.value.split(' ')[0];
     currentCustomer = dropdown.value.split(' ')[0];
@@ -75,7 +76,7 @@ const setCustomer = function(dropdown, dollarPayment, darkmode) {
             element.hidden = false;
         }
     }
-    changeOrderConfirmation(dollarPayment, darkmode);
+    changeOrderConfirmation(dollarPayment, darkmode); //With the current changes made, change confirmation as is necessary
 }
 
 const changeNumOrders = function(input, max_items, dollarPayment, darkmode) { //Evaluate if the inputted number of orders is valid
@@ -148,8 +149,8 @@ const changeOrderConfirmation = function(dollarPayment, darkmode) {
         instructionsNew.innerHTML = `<strong>Extra Instructions:</strong> ${extraInstructionsInput.value}`;
     }
 
+    //Create box displayng and tracking the user's current balance
     balanceBox = document.createElement('strong');
-    
     balanceBox.className = "list-group-item list-group-item-action form-check darkmode-outline";
     balanceBox.id = "balance-box";
     balanceBox.innerText = balanceString;
@@ -157,7 +158,7 @@ const changeOrderConfirmation = function(dollarPayment, darkmode) {
     totalNew.className = "list-group-item list-group-item-action form-check darkmode-outline";
     totalNew.id = "total-cost";
 
-    if (!darkmode) {
+    if (!darkmode) { //Modify color scheme based on darkmode
         balanceBox.style = 'color: purple;';
         totalNew.style = 'color: green;';
         instructionsNew.style = 'color: blue;';
@@ -167,10 +168,11 @@ const changeOrderConfirmation = function(dollarPayment, darkmode) {
         instructionsNew.style = 'color: turquoise;';
     }
 
+    //Calculate total payment and append to order summary
     if (dollarPayment) {totalNew.innerHTML = `<strong>Total: $${sum.toFixed(2)}</strong>`;
     } else {totalNew.innerHTML = `<strong>Total: ${sum} Credits</strong>`;}
 
-    if (dollarPayment) {
+    if (dollarPayment) { //Check if total charge payment is over the user's balance
         if (sum > parseFloat(balanceString.split("$")[1]) && !payingInPerson.checked) {
             totalNew.innerHTML += `<em style="color: red; margin-left: 20px;">Charge is over your account balance</em>`
         }
@@ -180,12 +182,13 @@ const changeOrderConfirmation = function(dollarPayment, darkmode) {
         }
     }
 
+    //Create element to check paying style (online or in-person)
     payingStyleNew = document.createElement('strong');
     payingStyleNew.style = 'color: red;';
     payingStyleNew.className = "list-group-item list-group-item-action form-check darkmode-outline";
     payingStyleNew.id = "paying-style";
 
-    if (dollarPayment) {
+    if (dollarPayment) { //Evaluate paying style and append information accordingly
         if (payingInPerson.checked) {
             payingStyleNew.innerText = "Paying In-Person";
         } else {
