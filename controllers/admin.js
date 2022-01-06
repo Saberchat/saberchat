@@ -19,7 +19,7 @@ const controller = {};
 controller.updatePlatformForm = async function(req, res) {
     const platform = await setup(Platform);
     if (!platform) {
-        await req.flash("error", "An Error Occurred");
+        req.flash("error", "An Error Occurred");
         return res.redirect("back");
     }
     return res.render("admin/settings", {platform, objectArrIndex});
@@ -29,7 +29,7 @@ controller.updatePlatform = async function(req, res) {
     const platform = await setup(Platform);
     const users = await User.find({});
     if (!platform || !users) {
-        await req.flash("error", "An Error Occurred");
+        req.flash("error", "An Error Occurred");
         return res.redirect("back");
     }
 
@@ -40,7 +40,7 @@ controller.updatePlatform = async function(req, res) {
             if (platform.displayVideo && platform.displayVideo.filename) {
                 [cloudErr, cloudResult] = await cloudDelete(platform.displayVideo.filename, "video");
                 if (cloudErr || !cloudResult || cloudResult.result !== "ok") { // check for failure
-                    await req.flash("error", "Error deleting video");
+                    req.flash("error", "Error deleting video");
                     return res.redirect("back");
                 }
             }
@@ -50,7 +50,7 @@ controller.updatePlatform = async function(req, res) {
             [cloudErr, cloudResult] = await cloudUpload(file.originalname, processedBuffer);
 
             if (cloudErr || !cloudResult) {
-                await req.flash("error", "Upload failed");
+                req.flash("error", "Upload failed");
                 return res.redirect("back");
             }
 
@@ -93,7 +93,7 @@ controller.updatePlatform = async function(req, res) {
         parsedText = [];
         for (let element of req.body.infoText[i].split('\n')) {
             if (await element.split('\r').join('').split(' ').join('') != "") {
-                await parsedText.push(element);
+                parsedText.push(element);
             }
         }
         await platform.info.push({
@@ -111,7 +111,7 @@ controller.updatePlatform = async function(req, res) {
     }
 
     if (typeof req.body.feature == "string") {
-        if (await objectArrIndex(platform.publicFeatures, "name", platform.features[0].name) > -1) {
+        if (objectArrIndex(platform.publicFeatures, "name", platform.features[0].name) > -1) {
             platform.publicFeatures[0].icon = req.body.featureIcon;
             platform.publicFeatures[0].name = req.body.feature;
         }
@@ -121,9 +121,9 @@ controller.updatePlatform = async function(req, res) {
         platform.features[0].description = req.body.featureDescription;
     } else {
         for (let i = 0; i < platform.features.length; i++) {
-            if (await objectArrIndex(platform.publicFeatures, "name", platform.features[i].name) > -1) {
-                platform.publicFeatures[await objectArrIndex(platform.publicFeatures, "name", platform.features[i].name)].icon = req.body.featureIcon[i];
-                platform.publicFeatures[await objectArrIndex(platform.publicFeatures, "name", platform.features[i].name)].name = req.body.feature[i];
+            if (objectArrIndex(platform.publicFeatures, "name", platform.features[i].name) > -1) {
+                platform.publicFeatures[objectArrIndex(platform.publicFeatures, "name", platform.features[i].name)].icon = req.body.featureIcon[i];
+                platform.publicFeatures[objectArrIndex(platform.publicFeatures, "name", platform.features[i].name)].name = req.body.feature[i];
             }
             platform.features[i].name = req.body.feature[i];
             platform.features[i].icon = req.body.featureIcon[i];
@@ -164,7 +164,7 @@ controller.updatePlatform = async function(req, res) {
             if (await user.email.split('@')[1] == oldAddress) {
                 email = await Email.create({address: user.email, version: "accesslist"});
                 if (!email) {
-                    await req.flash("error", "Unable to create new email");
+                    req.flash("error", "Unable to create new email");
                     return res.redirect("back");
                 }
             }
@@ -175,7 +175,7 @@ controller.updatePlatform = async function(req, res) {
             if (await email.address.split('@')[1] == req.body.emailExtension) { //Remove now-unnecessary emails from access list
                 email = await Email.findByIdAndDelete(email._id);
                 if (!email) {
-                    await req.flash("error", "Unable to delete email");
+                    req.flash("error", "Unable to delete email");
                     return res.redirect("back");
                 }
             }
@@ -183,7 +183,7 @@ controller.updatePlatform = async function(req, res) {
     }
 
     await platform.save();
-    await req.flash("success", "Updated platform settings!");
+    req.flash("success", "Updated platform settings!");
     return res.redirect("/admin/settings");
 }
 
@@ -191,12 +191,12 @@ controller.authenticateGet = async function(req, res) { //Access page where user
     const platform = await setup(Platform);
     let users = await User.find({authenticated: false});
     if (!platform || !users) {
-        await req.flash('error', "Unable to find users");
+        req.flash('error', "Unable to find users");
         return res.redirect('back');
     }
 
     if (!platform.principalAuthenticate) { //If principal does not have perms to authenticate users
-        await req.flash('error', `${platform.permissionsDisplay[platform.permissionsDisplay.length-1]} Authentication is not enabled on ${platform.name} Saberchat`);
+        req.flash('error', `${platform.permissionsDisplay[platform.permissionsDisplay.length-1]} Authentication is not enabled on ${platform.name} Saberchat`);
         return res.redirect('back');
     }
 
@@ -212,24 +212,24 @@ controller.authenticateGet = async function(req, res) { //Access page where user
 
 controller.authenticatePut = async function(req, res) { //Authenticate new user from principal's control panel
     const platform = await setup(Platform);
-    if (!platform) { return res.json({error: "Unable to set up platform"});}
+    if (!platform) {return res.json({error: "Unable to set up platform"});}
     if (!platform.principalAuthenticate) {
         return res.json({error: `${platform.permissionsDisplay[platform.permissionsDisplay.length-1]} Authentication is not enabled on ${platform.name} Saberchat`});
     }
     const user = await User.findByIdAndUpdate(req.body.userId, {authenticated: true});
-    if (!user) { return res.json({error: "Unable to find user"});}
+    if (!user) {return res.json({error: "Unable to find user"});}
     await sendGridEmail(user.email, 'Welcome To Saberchat!', `<p>Hello ${user.firstName},</p><p>Welcome to Saberchat! A confirmation of your account:</p><ul><li>Your username is ${user.username}.</li><li>Your full name is ${user.firstName} ${user.lastName}.</li><li>Your linked email is ${user.email}</li></ul><p>You will be assigned a role and status soon.</p>`, false);
     return res.json({success: "Authenticated User!"});
 }
 
 controller.authenticateDelete = async function(req, res) {
     const platform = await setup(Platform);
-    if (!platform) { return res.json({error: "Unable to set up platform"});}
+    if (!platform) {return res.json({error: "Unable to set up platform"});}
     if (!platform.principalAuthenticate) {
         return res.json({error: `${platform.permissionsDisplay[platform.permissionsDisplay.length-1]} Authentication is not enabled on ${platform.name} Saberchat`});
     }
     const user = await User.deleteOne({_id: req.body.userId, authenticated: false});
-    if (!user) { return res.json({error: "Unable to find user"});}
+    if (!user) {return res.json({error: "Unable to find user"});}
     return res.json({success: "Removed User!"});
 }
 
@@ -238,7 +238,7 @@ controller.moderateGet = async function(req, res) { //Show all reported comments
     const comments = await ChatMessage.find({status: 'flagged'}).populate("author statusBy room");
     const rooms = await ChatRoom.find();
     if (!platform || !comments || !rooms) {
-        await req.flash('error', 'An Error Occurred');
+        req.flash('error', 'An Error Occurred');
         return res.redirect('/admin');
     }
     const roomMap = new Map();
@@ -259,9 +259,9 @@ controller.getContext = async function(req, res) { //Get context for reported co
     let context = []; //Comments 5 before and 5 after
     const rooms = await ChatRoom.find({}).populate({path: "comments", populate: "author"});
     for (let room of rooms) {
-        if (await objectArrIndex(room.comments, "_id", reportedComment._id) > -1) {
+        if (objectArrIndex(room.comments, "_id", reportedComment._id) > -1) {
             allComments = room.comments;
-            commentIndex = await objectArrIndex(allComments, "_id", reportedComment._id);  //Get pos of reported comment
+            commentIndex = objectArrIndex(allComments, "_id", reportedComment._id);  //Get pos of reported comment
             break;
         }
     }
@@ -278,7 +278,7 @@ controller.getContext = async function(req, res) { //Get context for reported co
 
 controller.ignoreComment = async function(req, res) { //Ignore comment
     const comment = await ChatMessage.findById(req.body.commentId).populate('statusBy');
-    if (!comment) { return res.json({error: 'Could not find comment'});}
+    if (!comment) {return res.json({error: 'Could not find comment'});}
 
     //Users cannot handle comments that they have written/reported
     if (await comment.author.equals(req.user._id) || await comment.statusBy._id.equals(req.user._id)) {
@@ -314,17 +314,17 @@ controller.permissionsGet = async function(req, res) { //Show page with all user
     const platform = await setup(Platform);
     const users = await User.find({authenticated: true});
     if (!platform || !users) {
-        await req.flash('error', 'An Error Occurred');
+        req.flash('error', 'An Error Occurred');
         return res.redirect('/admin');
     }
     
     return res.render('admin/permission', {
         platform, users,
-        statusMatrix: await concatMatrix([
+        statusMatrix: concatMatrix([
             platform.statusesProperty,
             platform.statusesPlural
         ]),
-        permMatrix: await concatMatrix([
+        permMatrix: concatMatrix([
             platform.permissionsProperty,
             platform.permissionsDisplay
         ]).reverse()
@@ -335,18 +335,18 @@ controller.statusGet = async function(req, res) { //Show page with all users and
     const platform = await setup(Platform);
     const users = await User.find({authenticated: true});
     if (!platform || !users) {
-        await req.flash('error', 'An Error Occurred');
+        req.flash('error', 'An Error Occurred');
         return res.redirect('/admin');
     }
 
     return res.render('admin/status', {
         platform, users,
         tags: platform.tags, //List of tags that can be added/removed to tutors
-        statusMatrix: await concatMatrix([
+        statusMatrix: concatMatrix([
             platform.statusesProperty,
             platform.statusesSingular
         ]).reverse(),
-        permMatrix: await concatMatrix([
+        permMatrix: concatMatrix([
 			platform.permissionsProperty,
 			platform.permissionsDisplay
 		]).reverse()
@@ -404,7 +404,7 @@ controller.statusPut = async function(req, res) { //Update user's status
 controller.accesslistGet = async function(req, res) { //Show page with all permitted emails
     const platform = await setup(Platform);
     if (!platform) {
-        await req.flash("error", "An Error Occurred");
+        req.flash("error", "An Error Occurred");
         return res.redirect("back");
     }
 
@@ -420,13 +420,13 @@ controller.accesslistGet = async function(req, res) { //Show page with all permi
     }
 
     if (!emails) {
-        await req.flash('error', "Unable to find emails");
+        req.flash('error', "Unable to find emails");
         return res.redirect('back');
     }
 
     const users = await User.find({});
     if (!users) {
-        await req.flash('error', "Unable to find users");
+        req.flash('error', "Unable to find users");
         return res.redirect('back');
     }
 
@@ -503,19 +503,19 @@ controller.tag = async function(req, res) { //Add/remove status tag to user
             const courses = await Course.find({});
             if (!courses) {return res.json({error: 'Error. Could not change'});}
             for (let course of courses) { //Iterate through courses and see if user is a tutor in any of them
-                if (await objectArrIndex(course.tutors, "tutor", user._id) > -1) {
+                if (objectArrIndex(course.tutors, "tutor", user._id) > -1) {
                     return res.json({error: "User is an Active Tutor"});
                 }
             }
 
             //If there is no error, remove the tag
-            await removeIfIncluded(user.tags, req.body.tag);
+            removeIfIncluded(user.tags, req.body.tag);
             await user.save();
             return res.json({success: "Successfully removed status", tag: req.body.tag})
         }
 
         //Remove the tag
-        await removeIfIncluded(user.tags, req.body.tag);
+        removeIfIncluded(user.tags, req.body.tag);
         await user.save();
         return res.json({success: "Successfully removed status", tag: req.body.tag})
     }
@@ -530,7 +530,7 @@ controller.viewBalances = async function(req, res) {
     const platform = await setup(Platform);
     const users = await User.find({authenticated: true});
     if (!platform || !users) {
-        await req.flash('error', 'Could not find users');
+        req.flash('error', 'Could not find users');
         return res.redirect('back');
     }
     return res.render('admin/balances.ejs', {platform, users});
@@ -542,7 +542,7 @@ controller.updateBalances = async function(req, res) {
     req.user.logins.push(new Date());
     await req.user.save();
 
-    if (!platform || !user) { return res.json({error: "Error. Could not change"});}
+    if (!platform || !user) {return res.json({error: "Error. Could not change"});}
     if (req.body.bal != 0) { //If deposit is not 0 then user's transactions are updated
         user.deposits.push({
             amount: req.body.bal,

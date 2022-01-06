@@ -27,6 +27,7 @@ const likeReview = function(button) { //Like a tutor's review (restricted to stu
 
     sendPostReq(url, data, data => {
         if (data.success) {
+            //Based on whether upvote has been added or removed, change its color
             if (data.success.includes("Liked")) button.style.color = "#03a5fc";
             else button.style.color = "white";
             document.getElementById(`like-count-${reviewId}`).innerText = data.likeCount;

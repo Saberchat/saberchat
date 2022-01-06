@@ -1,6 +1,6 @@
 const findFirstValue = function(strings) {
-    for (let value of strings) {
-        if (!["\n", ''].includes(value)) { return strings.slice(strings.indexOf(value));}
+    for (let value of strings) { //Find the first value (remove all whitespace)
+        if (!["\n", ''].includes(value)) {return strings.slice(strings.indexOf(value));}
     }
 }
 

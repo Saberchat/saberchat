@@ -27,14 +27,14 @@ controller.index = async function(req, res) {
 	const platform = await setup(Platform);
 	const users = await User.find({authenticated: true});
 	if (!platform || !users) {
-		await req.flash("error", "An error occurred");
+		req.flash("error", "An error occurred");
 		return res.redirect("back");
 	}
 
-	let statuses = await concatMatrix([
+	let statuses = concatMatrix([
 		platform.statusesProperty,
 		platform.statusesPlural,
-		await multiplyArrays([], platform.statusesProperty.length)
+		multiplyArrays([], platform.statusesProperty.length)
 	]).reverse();
 
 	let reversedPerms = [];
@@ -51,14 +51,14 @@ controller.index = async function(req, res) {
 
 	return res.render("profiles/index", {
 		platform, users, statuses,
-		permMap: new Map(await concatMatrix([
+		permMap: new Map(concatMatrix([
 			await platform.permissionsProperty.slice(1),
 			await platform.permissionsDisplay.slice(1)
 		])),
-		emptyStatuses: await concatMatrix([
+		emptyStatuses: concatMatrix([
 			platform.statusesProperty,
 			platform.statusesPlural,
-			await multiplyArrays([], platform.statusesProperty.length)
+			multiplyArrays([], platform.statusesProperty.length)
 		]).reverse()
 	});
 }
@@ -70,7 +70,7 @@ controller.team = async function(req, res) {
 		status: {$in: await platform.statusesProperty.slice(platform.statusesProperty.length-2)}
 	});
 	if (!platform || !users) {
-		await req.flash("error", "An error occurred");
+		req.flash("error", "An error occurred");
 		return res.redirect("back");
 	}
 	return res.render("profiles/team", {platform, users: await sortAlph(users, "firstName")});
@@ -89,7 +89,7 @@ controller.edit = async function(req, res) {
 controller.changeLoginInfo = async function(req, res) {
 	const platform = await setup(Platform);
     if (!platform) {
-        await req.flash("error", "An Error Occurred");
+        req.flash("error", "An Error Occurred");
         return res.redirect("back");
     }
 	return res.render('profiles/edit_pwd_email', {platform});
@@ -99,18 +99,18 @@ controller.show = async function(req, res) {
 	const platform = await setup(Platform);
 	const user = await User.findById(req.params.id).populate('followers');
 	if (!platform || !user) {
-		await req.flash('error', 'Error. Cannot find user.');
+		req.flash('error', 'Error. Cannot find user.');
 		return res.redirect('back');
 	}
 
 	//Build list of current followers and following
-	let followerIds = await parsePropertyArray(user.followers, "_id");
+	let followerIds = parsePropertyArray(user.followers, "_id");
 	let following = [];
 	let currentUserFollowing = [];
 
 	const users = await User.find({authenticated: true});
 	if (!users) {
-		await req.flash('error', 'Error. Cannot find users.');
+		req.flash('error', 'Error. Cannot find users.');
 		return res.redirect('back');
 	}
 
@@ -122,8 +122,8 @@ controller.show = async function(req, res) {
 	return res.render('profiles/show', {
 		platform, user, following, followerIds,
 		convertedDescription: await convertToLink(user.description),
-		perms: new Map(await concatMatrix([platform.permissionsProperty, platform.permissionsDisplay])),
-		statuses: new Map(await concatMatrix([platform.statusesProperty, platform.statusesSingular]))
+		perms: new Map(concatMatrix([platform.permissionsProperty, platform.permissionsDisplay])),
+		statuses: new Map(concatMatrix([platform.statusesProperty, platform.statusesSingular]))
 	});
 }
 
@@ -185,10 +185,10 @@ controller.update = async function(req, res) {
 		_id: {$ne: req.user._id}
 	});
 	if (!platform || !overlap) {
-		await req.flash('error', "Unable to find users");
+		req.flash('error', "Unable to find users");
 		return res.redirect('back');
 	} else if (overlap.length > 0) {
-		await req.flash('error', "Another user already has that username.");
+		req.flash('error', "Another user already has that username.");
 		return res.redirect('back');
 	}
 
@@ -199,13 +199,13 @@ controller.update = async function(req, res) {
 		if (req.user.status == platform.teacherStatus && req.body.status != '') { //If user is currently teaching a course, they cannot lose their teacher status
 			const courses = await Course.find({});
 			if (!courses) {
-				await req.flash('error', "Could not find courses");
+				req.flash('error', "Could not find courses");
 				return res.redirect('back');
 			}
 	
 			for (let course of courses) {
 				if (await course.creator.equals(req.user._id)) {
-					await req.flash('error', "You are currently teaching a course, and cannot lose your status");
+					req.flash('error', "You are currently teaching a course, and cannot lose your status");
 					return res.redirect('back');
 				}
 			}
@@ -259,7 +259,7 @@ controller.update = async function(req, res) {
 			if (req.user.mediaFile.filename) {
 				[cloudErr, cloudResult] = await cloudDelete(req.user.mediaFile.filename, "image");
 				if (cloudErr || !cloudResult || cloudResult.result !== 'ok') {
-					await req.flash('error', 'Error deleting uploaded image');
+					req.flash('error', 'Error deleting uploaded image');
 					return res.redirect('back');
 				}
 			}
@@ -268,7 +268,7 @@ controller.update = async function(req, res) {
             const processedBuffer = await autoCompress(file.originalname, file.buffer);
             [cloudErr, cloudResult] = await cloudUpload(file.originalname, processedBuffer);
 			if (cloudErr || !cloudResult) {
-					await req.flash('error', 'Upload failed');
+					req.flash('error', 'Upload failed');
 					return res.redirect('back');
 			}
 			user.mediaFile = { //Update mediaFile info with cloudinary upload URL
@@ -283,7 +283,7 @@ controller.update = async function(req, res) {
 			if (req.user.bannerFile.filename) {
 				[cloudErr, cloudResult] = await cloudDelete(req.user.bannerFile.filename, "image");
 				if (cloudErr || !cloudResult || cloudResult.result !== 'ok') {
-					await req.flash('error', 'Error deleting uploaded image 1');
+					req.flash('error', 'Error deleting uploaded image 1');
 					return res.redirect('back');
 				}
 			}
@@ -292,7 +292,7 @@ controller.update = async function(req, res) {
             const processedBuffer2 = await autoCompress(file2.originalname, file2.buffer);
             [cloudErr, cloudResult] = await cloudUpload(file2.originalname, processedBuffer2);
 			if (cloudErr || !cloudResult) {
-				await req.flash('error', 'Upload failed');
+				req.flash('error', 'Upload failed');
 				return res.redirect('back');
 			}
 			user.bannerFile = { //Update bannerFile info with cloudinary upload URL
@@ -306,31 +306,31 @@ controller.update = async function(req, res) {
 
 	const updatedUser = await User.findByIdAndUpdate(req.user._id, user); //find and update the user with new info
 	if (!updatedUser) {
-		await req.flash('error', 'There was an error updating your profile');
+		req.flash('error', 'There was an error updating your profile');
 		return res.redirect('back');
 	}
 
-	await req.flash('success', 'Updated your profile');
+	req.flash('success', 'Updated your profile');
 	return res.redirect(`/profiles/${req.user._id}`);
 }
 
 controller.tagPut = async function(req, res) {
-	if (await req.user.tags.includes(req.body.tag)) {
+	if (req.user.tags.includes(req.body.tag)) {
 		if (req.body.tag == "Tutor") { //If tag is for tutor, check that user is not an active tutor
 			const courses = await Course.find({});
 			if (!courses) {return res.json({error: 'Error. Could not change'});}
 			
 			for (let course of courses) {
-				if (await objectArrIndex(course.tutors, "tutor", req.user._id) > -1) { //If user is a tutor
+				if (objectArrIndex(course.tutors, "tutor", req.user._id) > -1) { //If user is a tutor
 					return res.json({error: "You are an active tutor"});
 				}
 			}
 		}
-		await removeIfIncluded(req.user.tags, req.body.tag); //If no issue, remove tag
+		removeIfIncluded(req.user.tags, req.body.tag); //If no issue, remove tag
 		await req.user.save();
 		return res.json({success: "Succesfully removed status", tag: req.body.tag, user: req.user._id});
 	}
-	await req.user.tags.push(req.body.tag);
+	req.user.tags.push(req.body.tag);
 	await req.user.save();
 	return res.json({success: "Succesfully added status", tag: req.body.tag, user: req.user._id});
 }
@@ -338,7 +338,7 @@ controller.tagPut = async function(req, res) {
 controller.changeEmailPut = async function(req, res) { //Update email
 	const platform = await setup(Platform);
     if (!platform) {
-        await req.flash("error", "An Error Occurred");
+        req.flash("error", "An Error Occurred");
         return res.redirect("back");
     }
 	
@@ -346,7 +346,7 @@ controller.changeEmailPut = async function(req, res) { //Update email
 	await req.user.save();
 
 	if (req.user.email == req.body.email) { //If email is not changed, no need to update
-		await req.flash('success', "Email sending settings updated");
+		req.flash('success', "Email sending settings updated");
 		return res.redirect(`/profiles/${req.user._id}`);
 	}
 
@@ -354,20 +354,20 @@ controller.changeEmailPut = async function(req, res) { //Update email
 	const allowedEmail = await Email.findOne({address: req.body.email, version: "accesslist"});
 	if (!allowedEmail) {
 		if (platform.emailExtension != '' && (await req.body.email.split("@")[1] != platform.emailExtension)) {
-			await req.flash('error', "New email must be a platform-verified email");
+			req.flash('error', "New email must be a platform-verified email");
 			return res.redirect('back');
 		}
 	}
 
 	const blocked = await Email.findOne({address: req.body.email, version: "blockedlist"});
 	if (blocked) {
-		await req.flash('error', "New email must be a platform-verified email");
+		req.flash('error', "New email must be a platform-verified email");
 		return res.redirect('back');
 	}
 
 	const overlap = await User.findOne({email: req.body.email, _id: {$ne: req.user._id}});
 	if (overlap) {
-		await req.flash('error', "Another current or pending user already has that email.");
+		req.flash('error', "Another current or pending user already has that email.");
 		return res.redirect('back');
 	}
 
@@ -394,14 +394,14 @@ controller.changeEmailPut = async function(req, res) { //Update email
 	}).then(response => {console.log(`Email Sent with status code: ${response.status}`);
 	}).catch(error => {console.log(error);});
 
-	await req.flash('success', 'Go to your new email to confirm new address');
+	req.flash('success', 'Go to your new email to confirm new address');
 	return res.redirect('/profiles/change-login-info');
 }
 
 controller.confirmEmail = async function(req, res) {
 	const user = await User.findById(req.params.id);
 	if (!user) {
-		await req.flash('error', "Unable to find user");
+		req.flash('error', "Unable to find user");
 		return res.redirect('back');
 	}
 
@@ -428,10 +428,10 @@ controller.confirmEmail = async function(req, res) {
 		await user.save();
 
 		await sendGridEmail(user, 'Email Update Confirmation', `<p>Hello ${user.firstName},</p><p>You are receiving this email because you recently made changes to your Saberchat email. This is a confirmation of your profile.</p><p>Your username is ${user.username}.</p><p>Your full name is ${user.firstName} ${user.lastName}.</p><p>Your email is ${user.email}.</p>`, false);
-		await req.flash('success', "Email updated!")
+		req.flash('success', "Email updated!")
 		return res.redirect('/');
 	}
-	await req.flash('error', "Invalid authentication token");
+	req.flash('error', "Invalid authentication token");
 	return res.redirect('/');
 }
 
@@ -439,16 +439,16 @@ controller.changePasswordPut = async function(req, res) {
 	if (req.body.newPassword == req.body.newPasswordConfirm) {  //If confirmation passwords match
 		const user = await User.findById(req.user._id);
 		if (!user) {
-			await req.flash('error', 'Error, cannot find user');
+			req.flash('error', 'Error, cannot find user');
 			return res.redirect('/');
 		}
 
 		await user.changePassword(req.body.oldPassword, req.body.newPassword); //Update user's password
 		await sendGridEmail(req.user.email, 'Password Update Confirmation', `<p>Hello ${req.user.firstName},</p><p>You are receiving this email because you recently made changes to your Saberchat password. This is a confirmation of your profile.\n\nYour username is ${req.user.username}.\nYour full name is ${req.user.firstName} ${req.user.lastName}.\nYour email is ${req.user.email}\n\nIf you did not recently change your password, reset it immediately and contact a faculty member.</p>`, false);
-		await req.flash('success', 'Successfully changed your password');
+		req.flash('success', 'Successfully changed your password');
 		return res.redirect(`/profiles/${req.user._id}`);
 	}
-	await req.flash('error', "Passwords do not match");
+	req.flash('error', "Passwords do not match");
 	return res.redirect('back');
 }
 
@@ -469,7 +469,7 @@ controller.unfollow = async function(req, res) {
 	if (!user) {return res.json({error: "Error finding user"});}
 
 	//Try to unfollow; if user is not following person, then do not process
-	if (await removeIfIncluded(user.followers, req.user._id)) {
+	if (removeIfIncluded(user.followers, req.user._id)) {
 		await user.save();
 		return res.json({success: "Unfollowed user", user: req.user});
 	}
@@ -481,7 +481,7 @@ controller.remove = async function(req, res) {
 	if (!user) {return res.json({error: "Error finding user"});}
 
 	//Try to remove follower from user; if person is not following user, then do not process
-	if (await removeIfIncluded(req.user.followers, user._id)) {
+	if (removeIfIncluded(req.user.followers, user._id)) {
 		await req.user.blocked.push(user._id);
 		await req.user.save();
 		return res.json({success: "Succesfully removed user"});
@@ -494,7 +494,7 @@ controller.unblock = async function(req, res) {
 	if (!user) {return res.json({error: "Error finding user"});}
 
 	//Try to remove follower from user's blocked list; if person is not following user, then do not process
-	if (await removeIfIncluded(req.user.blocked, user._id)) {
+	if (removeIfIncluded(req.user.blocked, user._id)) {
 		await req.user.save();
 		return res.json({success: "Succesfully unblocked user"});
 	}
@@ -505,7 +505,7 @@ controller.unblock = async function(req, res) {
 controller.deleteAccount = async function(req, res)  {
 	req.user.archived = true;
 	await req.user.save();
-	await req.flash("Archived your account!")
+	req.flash("Archived your account!")
 	await req.logout();
 	return res.redirect('/');
 }

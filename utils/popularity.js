@@ -37,6 +37,7 @@ package.sortByPopularity = function(objects, likeFactor, dateFactor, fields) { /
 
     if (fields) { //If function includes specific fields as params
         let sortedByField = {popular: [], unpopular: []};
+        //Group across each parameter (Comes out to n^3 due to dimensionality expansion)
         for (let category in sorted) {
             for (let object of sorted[category]) {
                 for (let field in object) {

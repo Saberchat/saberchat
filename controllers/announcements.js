@@ -21,7 +21,7 @@ controller.index = async function(req, res) {
     const platform = await setup(Platform);
     const users = await User.find({authenticated: true});
     if (!platform || !users) {
-        await req.flash('error', 'An Error Occurred');
+        req.flash('error', 'An Error Occurred');
         return res.redirect('back');
     }
 
@@ -34,11 +34,11 @@ controller.index = async function(req, res) {
         announcements = await Announcement.find({verified: true}).populate('sender');
     }
     if(!announcements) {
-        await req.flash('error', 'Cannot find announcements.');
+        req.flash('error', 'Cannot find announcements.');
         return res.redirect('back');
     }
 
-    const userNames = await parsePropertyArray(users, "firstName").join(',').toLowerCase().split(',');
+    const userNames = parsePropertyArray(users, "firstName").join(',').toLowerCase().split(',');
     const announcementTexts = await embedLink(req.user, announcements, userNames);
 
     return res.render('announcements/index', {platform, announcements: await announcements.reverse(), announcementTexts});
@@ -48,7 +48,7 @@ controller.index = async function(req, res) {
 controller.new = async function(req, res) {
     const platform = await setup(Platform);
     if (!platform) {
-        await req.flash("error", "An Error Occurred");
+        req.flash("error", "An Error Occurred");
         return res.redirect("back");
     }
     return res.render('announcements/new', {platform});
@@ -58,17 +58,17 @@ controller.new = async function(req, res) {
 controller.markAll = async function(req, res) {
     req.user.annCount = []; //No new announcements in user's annCount
     await req.user.save();
-    await req.flash('success', 'All Announcements Marked As Read!');
+    req.flash('success', 'All Announcements Marked As Read!');
     return res.redirect(`/announcements`);
 };
 
 // Announcement GET mark one ann as read
 controller.markOne = async function(req, res) {
-    if (await objectArrIndex(req.user.annCount, "announcement", req.params.id) > -1) { //If user's annCount includes announcement, remove it
-        await req.user.annCount.splice(await objectArrIndex(req.user.annCount, "announcement", req.params.id), 1);
+    if (objectArrIndex(req.user.annCount, "announcement", req.params.id) > -1) { //If user's annCount includes announcement, remove it
+        await req.user.annCount.splice(objectArrIndex(req.user.annCount, "announcement", req.params.id), 1);
         await req.user.save();
     }
-    await req.flash('success', 'Announcement Marked As Read!');
+    req.flash('success', 'Announcement Marked As Read!');
     return res.redirect(`/announcements`);
 };
 
@@ -82,24 +82,24 @@ controller.show = async function(req, res) {
             populate: {path: "sender"}
         });
     if(!platform || !announcement) {
-        await req.flash('error', 'Could not find announcement');
+        req.flash('error', 'Could not find announcement');
         return res.redirect('back');
     } else if (!announcement.verified && !(await platform.permissionsProperty.slice(platform.permissionsProperty.length-3).includes(req.user.permission))) {
-        await req.flash('error', 'You cannot view that announcement');
+        req.flash('error', 'You cannot view that announcement');
         return res.redirect('back');
     }
 
     if(req.user) {
         //If this announcement is new to the user, it is no longer new, so remove it
-        if (await objectArrIndex(req.user.annCount, "announcement", announcement._id, "_id") > -1) {
-            await req.user.annCount.splice(await objectArrIndex(req.user.annCount, "announcement", announcement._id, "_id"), 1);
+        if (objectArrIndex(req.user.annCount, "announcement", announcement._id, "_id") > -1) {
+            await req.user.annCount.splice(objectArrIndex(req.user.annCount, "announcement", announcement._id, "_id"), 1);
             await req.user.save();
         }
     }
 
     let fileExtensions = new Map(); //Track which file format each attachment is in
     for (let media of announcement.mediaFiles) {
-        await fileExtensions.set(media.url, await path.extname(media.url.split("SaberChat/")[1]));
+        fileExtensions.set(media.url, path.extname(media.url.split("SaberChat/")[1]));
     }
     const convertedText = await convertToLink(announcement.text); //Parse and add hrefs to all links in text
     return res.render('announcements/show', {platform, announcement, convertedText, fileExtensions});
@@ -110,17 +110,17 @@ controller.updateForm = async function(req, res) {
     const platform = await setup(Platform);
     const announcement = await Announcement.findById(req.params.id);
     if(!platform || !announcement) {
-        await req.flash('error', 'Could not find announcement');
+        req.flash('error', 'Could not find announcement');
         return res.redirect('back');
     }
     if(!(await announcement.sender.equals(req.user._id))) { //Only the sender may edit the announcement
-        await req.flash('error', 'You do not have permission to do that.');
+        req.flash('error', 'You do not have permission to do that.');
         return res.redirect('back');
     }
 
     let fileExtensions = new Map(); //Track which file format each attachment is in
     for (let media of announcement.mediaFiles) {
-        await fileExtensions.set(media.url, await path.extname(await media.url.split("SaberChat/")[1]));
+        fileExtensions.set(media.url, path.extname(await media.url.split("SaberChat/")[1]));
     }
     return res.render('announcements/edit', {platform, announcement, fileExtensions});
 };
@@ -135,7 +135,7 @@ controller.create = async function(req, res) {
         verified: !platform.postVerifiable //Announcement does not need to be verified if platform does not support verifying announcements
     });
     if (!platform || !announcement) {
-        await req.flash('error', 'Unable to create announcement');
+        req.flash('error', 'Unable to create announcement');
         return res.redirect('back');
     }
     if (req.body.public && req.body.public === 'False') {
@@ -153,7 +153,7 @@ controller.create = async function(req, res) {
                 const processedBuffer = await autoCompress(file.originalname, file.buffer);
                 [cloudErr, cloudResult] = await cloudUpload(file.originalname, processedBuffer);
                 if (cloudErr || !cloudResult) {
-                    await req.flash('error', 'Upload failed');
+                    req.flash('error', 'Upload failed');
                     return res.redirect('back');
                 }
 
@@ -172,7 +172,7 @@ controller.create = async function(req, res) {
     if (!platform.postVerifiable) {
         const users = await User.find({authenticated: true, _id: {$ne: req.user._id}});
         if (!users) {
-            await req.flash('error', "An Error Occurred");
+            req.flash('error', "An Error Occurred");
             return res.redirect('back');
         }
 
@@ -189,9 +189,9 @@ controller.create = async function(req, res) {
     }
 
     if (platform.postVerifiable) {
-        await req.flash('success', `Announcement Posted! A platform ${await platform.permissionsDisplay[platform.permissionsDisplay.length-1].toLowerCase()} will verify your post soon.`);
+        req.flash('success', `Announcement Posted! A platform ${await platform.permissionsDisplay[platform.permissionsDisplay.length-1].toLowerCase()} will verify your post soon.`);
     } else {
-        await req.flash('success', `Announcement Posted!`);
+        req.flash('success', `Announcement Posted!`);
     }
     return res.redirect(`/announcements`);
 };
@@ -200,14 +200,14 @@ controller.verify = async function(req, res) {
     const platform = await setup(Platform);
     const announcement = await Announcement.findByIdAndUpdate(req.params.id, {verified: true}).populate("sender");
     if (!platform || !announcement) {
-        await req.flash('error', "Unable to access announcement");
+        req.flash('error', "Unable to access announcement");
         return res.redirect('back');
     }
 
     if (platform.postVerifiable) {
         const users = await User.find({authenticated: true, _id: {$ne: req.user._id}});
         if (!users) {
-            await req.flash('error', "An Error Occurred");
+            req.flash('error', "An Error Occurred");
             return res.redirect('back');
         }
 
@@ -223,7 +223,7 @@ controller.verify = async function(req, res) {
         }
     }
 
-    await req.flash("success", "Verified Announcement!");
+    req.flash("success", "Verified Announcement!");
     return res.redirect("/announcements");
 }
 
@@ -232,12 +232,12 @@ controller.updateAnnouncement = async function(req, res) {
     const platform = await setup(Platform);
     const announcement = await Announcement.findById(req.params.id).populate('sender');
     if (!platform || !announcement) {
-        await req.flash('error', "Unable to access announcement");
+        req.flash('error', "Unable to access announcement");
         return res.redirect('back');
     }
 
     if ((await announcement.sender._id.toString()) != (await req.user._id.toString())) {
-        await req.flash('error', "You can only update announcements which you have sent");
+        req.flash('error', "You can only update announcements which you have sent");
         return res.redirect('back');
     }
 
@@ -247,7 +247,7 @@ controller.updateAnnouncement = async function(req, res) {
         verified: !platform.postVerifiable //Announcement does not need to be verified if platform does not support verifying announcements
     });
     if (!updatedAnnouncement) {
-        await req.flash('error', "Unable to update announcement");
+        req.flash('error', "Unable to update announcement");
         return res.redirect('back');
     }
 
@@ -265,7 +265,7 @@ controller.updateAnnouncement = async function(req, res) {
     for (let i = updatedAnnouncement.mediaFiles.length-1; i >= 0; i--) {
         if (req.body[`deleteUpload-${updatedAnnouncement.mediaFiles[i].url}`] && updatedAnnouncement.mediaFiles[i] && updatedAnnouncement.mediaFiles[i].filename) {
             //Evaluate filetype to decide on file deletion strategy
-            switch(await path.extname(await updatedAnnouncement.mediaFiles[i].url.split("SaberChat/")[1]).toLowerCase()) {
+            switch(path.extname(await updatedAnnouncement.mediaFiles[i].url.split("SaberChat/")[1]).toLowerCase()) {
                 case ".mp3":
                 case ".mp4":
                 case ".m4a":
@@ -281,7 +281,7 @@ controller.updateAnnouncement = async function(req, res) {
 
             // Check For Failure
             if (cloudErr || !cloudResult || cloudResult.result !== 'ok') {
-                await req.flash('error', 'Error deleting uploaded image');
+                req.flash('error', 'Error deleting uploaded image');
                 return res.redirect('back');
             }
             await updatedAnnouncement.mediaFiles.splice(i, 1);
@@ -296,7 +296,7 @@ controller.updateAnnouncement = async function(req, res) {
                 const processedBuffer = await autoCompress(file.originalname, file.buffer);
                 [cloudErr, cloudResult] = await cloudUpload(file.originalname, processedBuffer);
                 if (cloudErr || !cloudResult) {
-                    await req.flash('error', 'Upload failed');
+                    req.flash('error', 'Upload failed');
                     return res.redirect('back');
                 }
 
@@ -312,7 +312,7 @@ controller.updateAnnouncement = async function(req, res) {
     await updatedAnnouncement.save();
     const users = await User.find({authenticated: true, _id: {$ne: req.user._id}});
     if (!users) {
-        await req.flash('error', "An Error Occurred");
+        req.flash('error', "An Error Occurred");
         return res.redirect('back');
     }
 
@@ -320,13 +320,13 @@ controller.updateAnnouncement = async function(req, res) {
     for (let image of announcement.images) {imageString += `<img src="${image}">`;}
     for (let user of users) {
         //If announcement not already in user's annCount, add it
-        if (await objectArrIndex(user.annCount, "announcement", updatedAnnouncement._id) == -1) {
+        if (objectArrIndex(user.annCount, "announcement", updatedAnnouncement._id) == -1) {
             await user.annCount.push({announcement: updatedAnnouncement, version: "updated"});
             await user.save();
         }
     }
 
-    await req.flash('success', 'Announcement Updated!');
+    req.flash('success', 'Announcement Updated!');
     return res.redirect(`/announcements`);
 }
 
@@ -335,7 +335,7 @@ controller.likeAnnouncement = async function(req, res) {
     const announcement = await Announcement.findById(req.body.announcementId);
     if(!announcement) {return res.json({error: 'Error updating announcement.'});}
 
-    if (await removeIfIncluded(announcement.likes, req.user._id)) { //Remove like
+    if (removeIfIncluded(announcement.likes, req.user._id)) { //Remove like
         await announcement.save();
         return res.json({
             success: `Removed a like from ${announcement.subject}`,
@@ -418,7 +418,7 @@ controller.likeComment = async function(req, res) {
     const comment = await PostComment.findById(req.body.commentId);
     if(!comment) {return res.json({error: 'Error finding comment'});}
 
-    if (await removeIfIncluded(comment.likes, req.user._id)) {
+    if (removeIfIncluded(comment.likes, req.user._id)) {
         await comment.save();
         return res.json({
             success: `Removed a like`,
@@ -437,12 +437,12 @@ controller.likeComment = async function(req, res) {
 controller.deleteAnnouncement = async function(req, res) {
     const announcement = await Announcement.findById(req.params.id).populate('sender');
     if (!announcement) {
-        await req.flash('error', "Unable to access announcement");
+        req.flash('error', "Unable to access announcement");
         return res.redirect('back');
     }
 
     if ((await announcement.sender._id.toString()) != (await req.user._id.toString())) {
-        await req.flash('error', "You can only delete announcements that you have posted");
+        req.flash('error', "You can only delete announcements that you have posted");
         return res.redirect('back');
     }
     
@@ -452,7 +452,7 @@ controller.deleteAnnouncement = async function(req, res) {
     for (let file of announcement.mediaFiles) {
         if (file && file.filename) {
             //Evaluate deleted files' filetype and delete accordingly
-            switch(await path.extname(await file.url.split("SaberChat/")[1]).toLowerCase()) {
+            switch(path.extname(await file.url.split("SaberChat/")[1]).toLowerCase()) {
                 case ".mp3":
                 case ".mp4":
                 case ".m4a":
@@ -468,7 +468,7 @@ controller.deleteAnnouncement = async function(req, res) {
 
             // check for failure
             if (cloudErr || !cloudResult || cloudResult.result !== 'ok') {
-                await req.flash('error', 'Error deleting uploaded image');
+                req.flash('error', 'Error deleting uploaded image');
                 return res.redirect('back');
             }
         }
@@ -476,24 +476,24 @@ controller.deleteAnnouncement = async function(req, res) {
 
     const deletedAnnouncement = await Announcement.findByIdAndDelete(announcement._id);
     if (!deletedAnnouncement) {
-        await req.flash('error', "Unable to delete announcement");
+        req.flash('error', "Unable to delete announcement");
         return res.redirect('back');
     }
 
     const users = await User.find({authenticated: true});
     if (!users) {
-        await req.flash('error', "Unable to find users");
+        req.flash('error', "Unable to find users");
         return res.redirect('back');
     }
 
     for (let user of users) {
-        if (await objectArrIndex(user.annCount, "announcement", deletedAnnouncement._id) > -1) {
-            await user.annCount.splice(await objectArrIndex(user.annCount, "announcement", deletedAnnouncement._id), 1);
+        if (objectArrIndex(user.annCount, "announcement", deletedAnnouncement._id) > -1) {
+            await user.annCount.splice(objectArrIndex(user.annCount, "announcement", deletedAnnouncement._id), 1);
             await user.save();
         }
     }
 
-    await req.flash('success', 'Announcement Deleted!');
+    req.flash('success', 'Announcement Deleted!');
     return res.redirect('/announcements');
 }
 

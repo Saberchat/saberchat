@@ -80,7 +80,7 @@ package.getStats = function(times) { //Get mean, median and standard deviation o
         stdDevTime += Math.pow((time-avgTime), 2);
     }
 
-    stdDevTime = Math.sqrt(stdDevTime/times.length);
+    stdDevTime = Math.sqrt(stdDevTime/times.length); //Square root the current standard deviation
     minTime = package.formatTime(avgTime-(2*stdDevTime));
     maxTime = package.formatTime(avgTime+(2*stdDevTime));
 

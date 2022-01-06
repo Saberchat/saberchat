@@ -63,7 +63,7 @@ const leave = function(button, location, darkmode) { //Leave a tutor
     });
 }
 
-const approve = function(button) {
+const approve = function(button) { //Approve lesson transaction
     const courseId = button.id.split('-')[0];
     const tutorId = button.id.split('-')[1];
     const index = button.id.split('-')[2];
@@ -71,7 +71,7 @@ const approve = function(button) {
     const data = {tutorId, index};
 
     sendPostReq(url, data, data => {
-        if (data.success) {
+        if (data.success) { //Update button as is necessary
             if (button.innerText == "Reject Lesson") {
                 button.className = "btn btn-success";
                 button.innerText = "Approve Lesson";
@@ -79,6 +79,7 @@ const approve = function(button) {
                 button.className = "btn btn-danger";
                 button.innerText = "Reject Lesson";
             }
+            //Update displayed time, cost and lesson count data
             document.getElementById("time-count").innerText = `${data.time} minutes`;
             document.getElementById("cost").innerText = data.cost;
             document.getElementById("time-count").innerText = getTime(document.getElementById("time-count").innerText.split(' ')[0]);
@@ -86,7 +87,7 @@ const approve = function(button) {
     });
 }
 
-const markPayment = function(button) {
+const markPayment = function(button) { //Mark that a payment transaction has been completed
     const courseId = button.id.split('-')[0];
     const studentId = button.id.split('-')[1];
     const index = button.id.split('-')[2];
@@ -94,7 +95,7 @@ const markPayment = function(button) {
     const data = {studentId, index};
 
     sendPostReq(url, data, data => {
-        if (data.success) {
+        if (data.success) { //Change button text accordingly
             if (button.innerText == "Cancel Payment") {
                 button.className = "btn btn-success";
                 button.innerText = "Approve Payment";
@@ -108,7 +109,7 @@ const markPayment = function(button) {
     });
 }
 
-const closeLessons = function(button, location) {
+const closeLessons = function(button, location) { //Close tutoring lessns
     const courseId = button.id.split('-')[0];
     const tutorId = button.id.split('-')[1];
     const url = `/tutoringCenter/close-lessons/${courseId}?_method=put`;
@@ -197,7 +198,7 @@ const setCostShow = function(courseId) { //For tutors to set their price (not wh
     const data = {courseId, cost};
 
     sendPostReq(url, data, data => {
-        if (data.success) {
+        if (data.success) { //Update cost display
             document.getElementById("cost-count").innerText = `$${data.tutor.cost}.00`;
             document.getElementById(`cost-info-${data.tutor.tutor}`).innerText = `$${data.tutor.cost}.00`;
         }
@@ -209,9 +210,9 @@ const setStudentsShow = function(courseId) { //For tutors to set how many studen
     const slots = document.getElementById('slots').value;
     const data = {courseId, slots};
 
-    sendPostReq(url, data, data => {
+    sendPostReq(url, data, data => { //Send request with data
         if (data.success) {
-            if (!data.tutor.available) {
+            if (!data.tutor.available) { //If tutor is now unavailable (all slots filled) give option to reopen
                 const lessonButton = document.getElementsByClassName("lesson-action")[0];
                 lessonButton.className = "btn btn-success reopen-lessons lesson-action";
                 lessonButton.id = `reopen-${courseId}-${data.tutor.tutor}`;
@@ -222,7 +223,7 @@ const setStudentsShow = function(courseId) { //For tutors to set how many studen
     });
 }
 
-const removeStudent = function(button) {
+const removeStudent = function(button) { //Remove student from a course
     const courseId = button.id.split('-')[0];
     const studentId = button.id.split('-')[1];
     const reason = document.getElementById(`reason-${studentId}`).value;  //Listed reason that student is being blocked
@@ -255,7 +256,7 @@ const removeStudent = function(button) {
             }        
             blockedElement.innerHTML += ` <span class="username ${data.student.status} ${data.student.permission} ${data.student.tags.join(' ')}"><span class="enrolled-name">${data.student.firstName} ${data.student.lastName}</span> <span class="enrolled-username">${data.student.username}</span></span> </a> <button class="btn btn-danger leave-button" id="unblock-button-${data.student._id}" data-toggle="modal" data-target="#modal-index-unblock-${data.student._id}">Unblock</button>`;
 
-            let unblockModal = document.createElement("div");
+            let unblockModal = document.createElement("div"); //Create modal to allow teachers to unblock members
             unblockModal.className = "modal fade";
             unblockModal.id = `modal-index-unblock-${data.student._id}`;
             unblockModal.setAttribute("tabindex", "-1");

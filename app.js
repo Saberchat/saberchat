@@ -42,26 +42,26 @@ const Platform = require('./models/platform');
 const User = require("./models/user");
 
 const appSetup = async function() {
-    const app = await express();
+    const app = express();
     // set up ports and socket.io
-    const http = await require('http').createServer(app);
-    const io = await require('socket.io')(http);
+    const http = require('http').createServer(app);
+    const io = require('socket.io')(http);
     const port = process.env.PORT || 3000;
 
     // APP CONFIGURATION
-    await app.use(favicon(`${__dirname}/public/images/favicon.ico`)); // use favicon
-    await app.use(express.static(`${__dirname}/public`)); // make public dir accessible in all views
-    await app.use('/editor', express.static(`${__dirname}/node_modules/@editorjs`)); // try serving editorjs package to frontend
-    await app.use(express.urlencoded({extended: true})); // express has bodyparser integrated as of 4.16>=
-    await app.use(express.json()); // parse content-type application/json. 
+    app.use(favicon(`${__dirname}/public/images/favicon.ico`)); // use favicon
+    app.use(express.static(`${__dirname}/public`)); // make public dir accessible in all views
+    app.use('/editor', express.static(`${__dirname}/node_modules/@editorjs`)); // try serving editorjs package to frontend
+    app.use(express.urlencoded({extended: true})); // express has bodyparser integrated as of 4.16>=
+    app.use(express.json()); // parse content-type application/json. 
 
-    await app.set("view engine", "ejs"); // set view engine to ejs
-    await app.use(methodOverride('_method')); // Allows for forms to use PUT and DELETE requests
-    await app.use(flash()); // use connect-flash for flash messages
-    await app.use(mongoSanitize({replaceWith: '_'})); // replaces $ and .  with _ in req.body, req.query, or req.params
-    await app.use(helmet()); // Helmet security headers
+    app.set("view engine", "ejs"); // set view engine to ejs
+    app.use(methodOverride('_method')); // Allows for forms to use PUT and DELETE requests
+    app.use(flash()); // use connect-flash for flash messages
+    app.use(mongoSanitize({replaceWith: '_'})); // replaces $ and .  with _ in req.body, req.query, or req.params
+    app.use(helmet()); // Helmet security headers
 
-    await app.use(helmet.contentSecurityPolicy({ // customizations for helmet content security policy
+    app.use(helmet.contentSecurityPolicy({ // customizations for helmet content security policy
         directives: {
             defaultSrc: ["https://docs.google.com", "https://drive.google.com", "https://res.cloudinary.com", "https://www.gofundme.com/"],
             connectSrc: ["'self'", "https://ka-f.fontawesome.com/", "https://res.cloudinary.com", "https://www.googletagmanager.com", "https://www.google-analytics.com"],
@@ -75,9 +75,9 @@ const appSetup = async function() {
         }
     }));
 
-    await app.use(helmet.referrerPolicy({policy: "same-origin"})); // customizations for helmet referrer policy
+    app.use(helmet.referrerPolicy({policy: "same-origin"})); // customizations for helmet referrer policy
 
-    const MemoryStore = await require('memorystore')(session); // Memorystore package (express-session has memory leaks, bad for production)
+    const MemoryStore = require('memorystore')(session); // Memorystore package (express-session has memory leaks, bad for production)
     const sessionConfig = {
         name: 'app-ses',
         cookie: {httpOnly: true, maxAge: 86400000},
@@ -90,14 +90,14 @@ const appSetup = async function() {
     // allows cookies to only be accessed over https; this wouldn't allow authentication for local dev since local host is http
     if (process.env.NODE_ENV === 'production') {sessionConfig.cookie.secure = false;}
 
-    await app.use(session(sessionConfig));
-    await app.use(passport.initialize()); // passport required authorization setup that I also know nothing about.
-    await app.use(passport.session());
-    await passport.use(User.createStrategy()); // Sets strategy used. FOR NOW: email and pwd. LATER: Google, FB, Twitter logins
-    await passport.serializeUser(User.serializeUser()); // prepares the user schema for authorization
-    await passport.deserializeUser(User.deserializeUser());
+    app.use(session(sessionConfig));
+    app.use(passport.initialize()); // passport required authorization setup that I also know nothing about.
+    app.use(passport.session());
+    passport.use(User.createStrategy()); // Sets strategy used. FOR NOW: email and pwd. LATER: Google, FB, Twitter logins
+    passport.serializeUser(User.serializeUser()); // prepares the user schema for authorization
+    passport.deserializeUser(User.deserializeUser());
 
-    await app.use((req, res, next) => { // setting app locals, which can be accessed in all ejs views
+    app.use((req, res, next) => { // setting app locals, which can be accessed in all ejs views
         res.locals.currentUser = req.user; // puts user info into 'currentUser' variable
         res.locals.error = req.flash('error');
         res.locals.success = req.flash('success');
@@ -109,14 +109,14 @@ const appSetup = async function() {
     const generalRoutes = ["chat", "profiles", "inbox", "announcements", "admin", "projects", "reports"];
     
     // Import And Use Routes From Routes Directory
-    await app.use(await require("./routes/index")); //Index routes (no prefix)
-    for (let route of generalRoutes) { await app.use(`/${route}`, await require(`./routes/${route}`));} //General Routes for all platforms
+    app.use(require("./routes/index")); //Index routes (no prefix)
+    for (let route of generalRoutes) { app.use(`/${route}`, require(`./routes/${route}`));} //General Routes for all platforms
     for (let feature of platform.features) { //Platform-Specific Routes (For features in their own route directories)
-        if (!(await feature.route.includes('/'))) {
-            await app.use(`/${feature.route}`, await require(`./routes/${feature.route}`));
+        if (!(feature.route.includes('/'))) {
+            app.use(`/${feature.route}`, require(`./routes/${feature.route}`));
         }
     }
-    await app.get('*', (req, res) => {return res.redirect('/');}); // Catch-all route
+    app.get('*', (req, res) => {return res.redirect('/');}); // Catch-all route
 
     //NodeSchedule code for any scheduled jobs, with attached callbacks
     await schedule.scheduleJob(`0 0 0 ${platform.updateTime.split(' ')[0]} ${platform.updateTime.split(' ')[1]} *`, wrapAsync(profileSchedule.updateStatuses));
@@ -129,16 +129,15 @@ const appSetup = async function() {
     });
 
     // Start server
-    const running = await http.listen(port, process.env.IP);
-    if (running) { await console.log(`:: App listening on port ${port} ::`);}
+    const running = http.listen(port, process.env.IP);
+    if (running) {console.log(`:: App listening on port ${port} ::`);}
 }
 
 // connect to db.
-mongoose.connect(process.env.DATABASE_URL,
-    {
-        useNewUrlParser: true,
-        useUnifiedTopology: true,
-        useFindAndModify: false
-    }).then(()=> {
-        appSetup().catch(err => { console.log(err);}); 
-    });
+mongoose.connect(process.env.DATABASE_URL, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+    useFindAndModify: false
+}).then(()=> {
+    appSetup().catch(err => {console.log(err);}); 
+});

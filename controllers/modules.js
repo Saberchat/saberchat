@@ -26,23 +26,23 @@ controller.index = async function(req, res) {
     }
 
     if(!platform || !users || !modules) {
-        await req.flash('error', 'Cannot find modules.');
+        req.flash('error', 'Cannot find modules.');
         return res.redirect('back');
     }
 
-    const userNames = await parsePropertyArray(users, "firstName").join(',').toLowerCase().split(',');
+    const userNames = parsePropertyArray(users, "firstName").join(',').toLowerCase().split(',');
     const moduleTexts = await embedLink(req.user, modules, userNames);
 
-    return res.render('modules/index', {platform, modules: await modules.reverse(), data: platform.features[await objectArrIndex(platform.features, "route", "modules")], moduleTexts});
+    return res.render('modules/index', {platform, modules: await modules.reverse(), data: platform.features[objectArrIndex(platform.features, "route", "modules")], moduleTexts});
 };
 
 controller.new = async function(req, res) {
     const platform = await setup(Platform);
     if (!platform) {
-        await req.flash("error", "An error occurred");
+        req.flash("error", "An error occurred");
         return res.redirect("back");
     }
-    return res.render('modules/new', {platform, data: platform.features[await objectArrIndex(platform.features, "route", "modules")]});
+    return res.render('modules/new', {platform, data: platform.features[objectArrIndex(platform.features, "route", "modules")]});
 };
 
 // Module GET show
@@ -55,19 +55,19 @@ controller.show = async function(req, res) {
             populate: {path: "sender"}
         });
     if(!platform || !module) {
-        await req.flash('error', 'Could not find module');
+        req.flash('error', 'Could not find module');
         return res.redirect('back');
 
     } else if (!module.verified && !(await platform.permissionsProperty.slice(platform.permissionsProperty.length-3).includes(req.user.permission))) {
-        await req.flash('error', 'You cannot view that module');
+        req.flash('error', 'You cannot view that module');
         return res.redirect('back');
     }
 
     let fileExtensions = new Map(); //Track which file format each attachment is in
     for (let media of module.mediaFiles) {
-        await fileExtensions.set(media.url, await path.extname(await media.url.split("SaberChat/")[1]));
+        fileExtensions.set(media.url, path.extname(await media.url.split("SaberChat/")[1]));
     }
-    return res.render('modules/show', {platform, module, convertedText: await convertToLink(module.text), fileExtensions, data: platform.features[await objectArrIndex(platform.features, "route", "modules")]});
+    return res.render('modules/show', {platform, module, convertedText: await convertToLink(module.text), fileExtensions, data: platform.features[objectArrIndex(platform.features, "route", "modules")]});
 };
 
 // Module GET edit form
@@ -75,20 +75,20 @@ controller.updateForm = async function(req, res) {
     const platform = await setup(Platform);
     const module = await Module.findById(req.params.id);
     if(!platform || !module) {
-        await req.flash('error', 'Could not find module');
+        req.flash('error', 'Could not find module');
         return res.redirect('back');
     }
     
     if(!(await module.sender._id.equals(req.user._id))) {
-        await req.flash('error', 'You do not have permission to do that.');
+        req.flash('error', 'You do not have permission to do that.');
         return res.redirect('back');
     }
 
     let fileExtensions = new Map(); //Track which file format each attachment is in
     for (let media of module.mediaFiles) {
-        await fileExtensions.set(media.url, await path.extname(media.url.split("SaberChat/")[1]));
+        fileExtensions.set(media.url, path.extname(media.url.split("SaberChat/")[1]));
     }
-    return res.render('modules/edit', {platform, module, fileExtensions, data: platform.features[await objectArrIndex(platform.features, "route", "modules")]});
+    return res.render('modules/edit', {platform, module, fileExtensions, data: platform.features[objectArrIndex(platform.features, "route", "modules")]});
 };
 
 // Module POST create
@@ -101,7 +101,7 @@ controller.create = async function(req, res) {
         verified: true
     });
     if (!platform || !module) {
-        await req.flash('error', 'Unable to create module');
+        req.flash('error', 'Unable to create module');
         return res.redirect('back');
     }
 
@@ -120,7 +120,7 @@ controller.create = async function(req, res) {
                 const processedBuffer = await autoCompress(file.originalname, file.buffer);
                 [cloudErr, cloudResult] = await cloudUpload(file.originalname, processedBuffer);
                 if (cloudErr || !cloudResult) {
-                    await req.flash('error', 'Upload failed');
+                    req.flash('error', 'Upload failed');
                     return res.redirect('back');
                 }
 
@@ -133,13 +133,13 @@ controller.create = async function(req, res) {
         }
     }
 
-    module.date = await dateFormat(module.created_at, "h:MM TT | mmm d");
+    module.date = dateFormat(module.created_at, "h:MM TT | mmm d");
     await module.save();
 
     if (platform.postVerifiable) {
-        await req.flash('success', `Module Posted! A platform ${await platform.permissionsDisplay[platform.permissionsDisplay.length-1].toLowerCase()} will verify your post soon.`);
+        req.flash('success', `Module Posted! A platform ${await platform.permissionsDisplay[platform.permissionsDisplay.length-1].toLowerCase()} will verify your post soon.`);
     } else {
-        await req.flash('success', `Module Posted!`);
+        req.flash('success', `Module Posted!`);
     }
     return res.redirect(`/modules`);
 };
@@ -148,12 +148,12 @@ controller.updateModule = async function(req, res) {
     const platform = await setup(Platform);
     const module = await Module.findById(req.params.id).populate('sender');
     if (!platform || !module) {
-        await req.flash('error', "Unable to access module");
+        req.flash('error', "Unable to access module");
         return res.redirect('back');
     }
 
     if ((await module.sender._id.toString()) != (await req.user._id.toString())) {
-        await req.flash('error', "You can only update modules which you have sent");
+        req.flash('error', "You can only update modules which you have sent");
         return res.redirect('back');
     }
 
@@ -163,7 +163,7 @@ controller.updateModule = async function(req, res) {
         verified: true
     });
     if (!updatedModule) {
-        await req.flash('error', "Unable to update module");
+        req.flash('error', "Unable to update module");
         return res.redirect('back');
     }
 
@@ -175,7 +175,7 @@ controller.updateModule = async function(req, res) {
     for (let i = updatedModule.mediaFiles.length-1; i >= 0; i--) {
         if (req.body[`deleteUpload-${updatedModule.mediaFiles[i].url}`] && updatedModule.mediaFiles[i] && updatedModule.mediaFiles[i].filename) {
             //Evaluate filetype to decide on file deletion strategy
-            switch(await path.extname(await updatedModule.mediaFiles[i].url.split("SaberChat/")[1]).toLowerCase()) {
+            switch(path.extname(await updatedModule.mediaFiles[i].url.split("SaberChat/")[1]).toLowerCase()) {
                 case ".mp3":
                 case ".mp4":
                 case ".m4a":
@@ -191,7 +191,7 @@ controller.updateModule = async function(req, res) {
 
             // Check For Failure
             if (cloudErr || !cloudResult || cloudResult.result !== 'ok') {
-                await req.flash('error', 'Error deleting uploaded image');
+                req.flash('error', 'Error deleting uploaded image');
                 return res.redirect('back');
             }
             await updatedModule.mediaFiles.splice(i, 1);
@@ -206,7 +206,7 @@ controller.updateModule = async function(req, res) {
                 const processedBuffer = await autoCompress(file.originalname, file.buffer);
                 [cloudErr, cloudResult] = await cloudUpload(file.originalname, processedBuffer);
                 if (cloudErr || !cloudResult) {
-                    await req.flash('error', 'Upload failed');
+                    req.flash('error', 'Upload failed');
                     return res.redirect('back');
                 }
 
@@ -220,7 +220,7 @@ controller.updateModule = async function(req, res) {
     }
     
     await updatedModule.save();
-    await req.flash('success', 'Module Updated!');
+    req.flash('success', 'Module Updated!');
     return res.redirect(`/modules`);
 }
 
@@ -229,7 +229,7 @@ controller.likeModule = async function(req, res) {
     const module = await Module.findById(req.body.moduleId);
     if(!module) {return res.json({error: 'Error updating module.'});}
 
-    if (await removeIfIncluded(module.likes, req.user._id)) { //Remove like
+    if (removeIfIncluded(module.likes, req.user._id)) { //Remove like
         await module.save();
         return res.json({
             success: `Removed a like from ${module.subject}`,
@@ -259,7 +259,7 @@ controller.comment = async function(req, res) {
         sender: req.user
     });
     if (!comment) {return res.json({error: 'Error commenting'});}
-    comment.date = await dateFormat(comment.created_at, "h:MM TT | mmm d");
+    comment.date = dateFormat(comment.created_at, "h:MM TT | mmm d");
     await comment.save();
 
     await module.comments.push(comment);
@@ -292,7 +292,7 @@ controller.likeComment = async function(req, res) {
     const comment = await PostComment.findById(req.body.commentId);
     if(!comment) {return res.json({error: 'Error finding comment'});}
 
-    if (await removeIfIncluded(comment.likes, req.user._id)) { //Remove Like
+    if (removeIfIncluded(comment.likes, req.user._id)) { //Remove Like
         await comment.save();
         return res.json({
             success: `Removed a like`,
@@ -311,12 +311,12 @@ controller.likeComment = async function(req, res) {
 controller.deleteModule = async function(req, res) {
     const module = await Module.findById(req.params.id).populate('sender');
     if (!module) {
-        await req.flash('error', "Unable to access module");
+        req.flash('error', "Unable to access module");
         return res.redirect('back');
     }
 
     if ((await module.sender._id.toString()) != (await req.user._id.toString())) { //Doublecheck that deleter is moduleer
-        await req.flash('error', "You can only delete modules that you have posted");
+        req.flash('error', "You can only delete modules that you have posted");
         return res.redirect('back');
     }
 
@@ -326,7 +326,7 @@ controller.deleteModule = async function(req, res) {
     for (let file of module.mediaFiles) {
         if (file && file.filename) {
             //Evaluate deleted files' filetype and delete accordingly
-            switch(await path.extname(await file.url.split("SaberChat/")[1]).toLowerCase()) {
+            switch(path.extname(await file.url.split("SaberChat/")[1]).toLowerCase()) {
                 case ".mp3":
                 case ".mp4":
                 case ".m4a":
@@ -341,7 +341,7 @@ controller.deleteModule = async function(req, res) {
             }
 
             if (cloudErr || !cloudResult || cloudResult.result !== 'ok') { // Check for Failure
-                await req.flash('error', 'Error deleting uploaded image');
+                req.flash('error', 'Error deleting uploaded image');
                 return res.redirect('back');
             }
         }
@@ -349,11 +349,11 @@ controller.deleteModule = async function(req, res) {
 
     const deletedModule = await Module.findByIdAndDelete(module._id);
     if (!deletedModule) {
-        await req.flash('error', "Unable to delete module");
+        req.flash('error', "Unable to delete module");
         return res.redirect('back');
     }
 
-    await req.flash('success', 'Module Deleted!');
+    req.flash('success', 'Module Deleted!');
     return res.redirect('/modules/');
 }
 

@@ -23,7 +23,7 @@ controller.index = async function(req, res) {
         populate: {path: "author"}
     });
     if (!platform || !rooms) {
-        await req.flash('error', 'Unable to find rooms');
+        req.flash('error', 'Unable to find rooms');
         return res.redirect('back');
     }
 
@@ -50,7 +50,7 @@ controller.index = async function(req, res) {
     //Track all of the current user's requests
     const requests = await AccessRequest.find({author: req.user._id, status: "pending"});
     if (!requests) {
-        await req.flash('error', 'Unable to find access requests');
+        req.flash('error', 'Unable to find access requests');
         return res.redirect('back');
     }
     return res.render('chat/index', {platform, rooms, requests, commentObject, filteredRooms});
@@ -60,7 +60,7 @@ controller.newRoom = async function(req, res) {
     const platform = await setup(Platform);
     const users = await User.find({authenticated: true});
     if (!platform || !users) {
-        await req.flash('error', "An Error Occurred");
+        req.flash('error', "An Error Occurred");
         return res.redirect('back');
     }
     return res.render('chat/new', {platform, users});
@@ -73,7 +73,7 @@ controller.showRoom = async function(req, res) {
         populate: {path: "author"}
     });
     if (!platform || !room) {
-        await req.flash('error', 'Could not find room');
+        req.flash('error', 'Could not find room');
         return res.redirect('/chat');
     }
 
@@ -81,7 +81,7 @@ controller.showRoom = async function(req, res) {
         await room.confirmed.push(req.user._id);
         await room.save();
     }
-    await removeIfIncluded(req.user.newRooms, room._id); //If user has not seen room before, remove it
+    removeIfIncluded(req.user.newRooms, room._id); //If user has not seen room before, remove it
     await req.user.save();
     return res.render('chat/show', {platform, room});
 }
@@ -90,14 +90,14 @@ controller.showMembers = async function(req, res) {
     const platform = await setup(Platform);
     const room = await ChatRoom.findById(req.params.id).populate('creator').populate('members');
     if (!platform || !room) {
-        await req.flash('error', "Unable to find room");
+        req.flash('error', "Unable to find room");
         return res.redirect('back');
     }
 
-    let statuses = await concatMatrix([
+    let statuses = concatMatrix([
 		platform.statusesProperty,
 		platform.statusesPlural,
-		await multiplyArrays([], platform.statusesProperty.length)
+		multiplyArrays([], platform.statusesProperty.length)
 	]).reverse();
 
     let reversedPerms = [];
@@ -115,18 +115,18 @@ controller.showMembers = async function(req, res) {
     if (room.private) {
         return res.render('chat/people', {
             platform, room, statuses,
-            permMap: new Map(await concatMatrix([
+            permMap: new Map(concatMatrix([
                 await platform.permissionsProperty.slice(1),
                 await platform.permissionsDisplay.slice(1)
             ])),
-            emptyStatuses: await concatMatrix([
+            emptyStatuses: concatMatrix([
                 platform.statusesProperty,
                 platform.statusesPlural,
-                await multiplyArrays([], platform.statusesProperty.length)
+                multiplyArrays([], platform.statusesProperty.length)
             ]).reverse()
         });
     }
-    await req.flash("error", "Public rooms are open to all users");
+    req.flash("error", "Public rooms are open to all users");
     return res.redirect("back");
 }
 
@@ -134,13 +134,13 @@ controller.editRoom = async function(req, res) {
     const platform = await setup(Platform);
     const room = await ChatRoom.findById(req.params.id);
     if (!platform || !room) {
-        await req.flash('error', "Unable to find room");
+        req.flash('error', "Unable to find room");
         return res.redirect('back');
     }
 
     const users = await User.find({authenticated: true});
     if (!users) {
-        await req.flash('error', 'An Error Occurred');
+        req.flash('error', 'An Error Occurred');
         return res.redirect('back');
     }
     return res.render('chat/edit', {platform, users, room});
@@ -150,14 +150,14 @@ controller.createRoom = async function(req, res) {
     const platform = await setup(Platform);
     const rooms = await ChatRoom.find({});
     if (!platform || !rooms) {
-        await req.flash('error', "Unable to access data");
+        req.flash('error', "Unable to access data");
         return res.redirect('back');
     }
 
     let roomCount = 0;
     for (let room of rooms) {if (await room.creator.equals(req.user._id)) {roomCount++;}} //Iterate through rooms and see how many rooms this user has created
     if (platform.restrictPosts && roomCount >= 3) {
-        await req.flash('error', "You have already created 3 rooms");
+        req.flash('error', "You have already created 3 rooms");
         return res.redirect('back');
     }
 
@@ -172,7 +172,7 @@ controller.createRoom = async function(req, res) {
         },
     });
     if (!room) {
-        await req.flash('error', 'Room could not be created');
+        req.flash('error', 'Room could not be created');
         return res.redirect('/chat/new');
     }
 
@@ -182,7 +182,7 @@ controller.createRoom = async function(req, res) {
             const processedBuffer = await autoCompress(file.originalname, file.buffer);
             const [cloudErr, cloudResult] = await cloudUpload(file.originalname, processedBuffer);
             if (cloudErr || !cloudResult) {
-                await req.flash("error", "Upload failed");
+                req.flash("error", "Upload failed");
                 return res.redirect("back");
             }
 
@@ -202,12 +202,12 @@ controller.createRoom = async function(req, res) {
     }
 
     if (req.body.description) {room.description = await filter.clean(req.body.description);} //If room has a description (otherwise default applied)
-    room.date = await dateFormat(room.created_at, "h:MM TT | mmm d");
+    room.date = dateFormat(room.created_at, "h:MM TT | mmm d");
     await room.save();
 
     const members = await User.find({authenticated: true, _id: {$in: room.members, $ne: req.user._id}});
     if (!members) {
-        await req.flash('error', 'Members could not be found');
+        req.flash('error', 'Members could not be found');
         return res.redirect('/chat/new');
     }
 
@@ -215,24 +215,24 @@ controller.createRoom = async function(req, res) {
         await member.newRooms.push(room._id);
         await member.save();
     }
-    await req.flash("Created room!");
+    req.flash("Created room!");
     return res.redirect(`/chat/${room._id}`);
 }
 
 controller.leaveRoom = async function(req, res) {
     const room = await ChatRoom.findById(req.params.id);
     if (!room) {
-        await req.flash('error', 'Room does not exist');
+        req.flash('error', 'Room does not exist');
         return res.redirect('back');
     }
 
     if (await room.creator.equals(req.user._id)) {
-        await req.flash('error', 'You cannot leave a room you created');
+        req.flash('error', 'You cannot leave a room you created');
         return res.redirect('back');
     }
 
     if (!room.mutable) {
-        await req.flash('error', 'You cannot leave this room');
+        req.flash('error', 'You cannot leave this room');
         return res.redirect('back');
     }
 
@@ -240,11 +240,11 @@ controller.leaveRoom = async function(req, res) {
     if (request) {await request.remove();} // Will delete past request for now
 
     //remove user from room's member list and confirmed list
-    await removeIfIncluded(room.members, req.user._id);
-    await removeIfIncluded(room.confirmed, req.user._id);
+    removeIfIncluded(room.members, req.user._id);
+    removeIfIncluded(room.confirmed, req.user._id);
     await room.save();
 
-    await req.flash('success', `You have left "${room.name}"`);
+    req.flash('success', `You have left "${room.name}"`);
     return res.redirect('/chat');
 }
 
@@ -296,7 +296,7 @@ controller.requestCancel = async function(req, res) {
     if (!deletedReq) {return res.json({error: "Unable to find request"});}
 
     //Remove Access Request From from creator's inbox
-    await removeIfIncluded(room.creator.requests, deletedReq._id);
+    removeIfIncluded(room.creator.requests, deletedReq._id);
     await room.creator.save();
 
     //Delete after removing from inbox (Will not return _id, so cannot be used earlier)
@@ -315,14 +315,14 @@ controller.updateRoom = async function(req, res) {
         }
     });
     if (!room) {
-        await req.flash('error', 'An Error Occurred');
+        req.flash('error', 'An Error Occurred');
         return res.redirect('back');
     }
 
     if (req.body.type == 'true') { //If room is private, iterate through users that need to be removed and added
         for (const rUser in req.body.checkRemove) {
-            await removeIfIncluded(room.members, rUser);
-            await removeIfIncluded(room.confirmed, rUser);
+            removeIfIncluded(room.members, rUser);
+            removeIfIncluded(room.confirmed, rUser);
         }
         for (const aUser in req.body.checkAdd) {await room.members.push(aUser);}
         room.private = true;
@@ -339,7 +339,7 @@ controller.updateRoom = async function(req, res) {
             if (room.thumbnailFile && room.thumbnailFile.filename) {
                 [cloudErr, cloudResult] = await cloudDelete(room.thumbnailFile.filename, "image");
                 if (cloudErr || !cloudResult || cloudResult.result !== "ok") {
-                    await req.flash("error", "Error deleting uploaded image");
+                    req.flash("error", "Error deleting uploaded image");
                     return res.redirect("back");
                 }
             }
@@ -348,7 +348,7 @@ controller.updateRoom = async function(req, res) {
             const processedBuffer = await autoCompress(file.originalname, file.buffer);
             [cloudErr, cloudResult] = await cloudUpload(file.originalname, processedBuffer);
             if (cloudErr || !cloudResult) {
-                await req.flash("error", "Upload failed");
+                req.flash("error", "Upload failed");
                 return res.redirect("back");
             }
 
@@ -363,40 +363,40 @@ controller.updateRoom = async function(req, res) {
     }
 
     await room.save();
-    await req.flash('success', 'Updated your group');
+    req.flash('success', 'Updated your group');
     return res.redirect(`/chat/${room._id}`);
 }
 
 controller.deleteRoom = async function(req, res) {
     const room = await ChatRoom.findById(req.params.id).populate("creator");
     if (!room) {
-        await req.flash('error', 'An error occured');
+        req.flash('error', 'An error occured');
         return res.redirect('back');
     }
 
     if (!room.mutable) {
-        await req.flash('error', 'You cannot delete this room');
+        req.flash('error', 'You cannot delete this room');
         return res.redirect('back');
     }
 
     const deletedComments = await ChatMessage.deleteMany({_id: {$in: room.comments}});
     if (!deletedComments) {
-        await req.flash('error', 'Unable to delete comments');
+        req.flash('error', 'Unable to delete comments');
         return res.redirect('back');
     }
 
     const requests = await AccessRequest.find({room: room._id});
     if (!requests) {
-        await req.flash('error', 'Unable to find requests');
+        req.flash('error', 'Unable to find requests');
         return res.redirect('back');
     }
 
     let deletedRequest; 
     for (let request of requests) { //Iterate through all active join requests and remove them from room creator's inbox
-        await removeIfIncluded(room.creator.requests, request._id);
+        removeIfIncluded(room.creator.requests, request._id);
         deletedRequest = await AccessRequest.findByIdAndDelete(request._id);
         if (!deletedRequest) {
-            await req.flash('error', 'Unable to delete requests');
+            req.flash('error', 'Unable to delete requests');
             return res.redirect('back');
         }
     }
@@ -404,7 +404,7 @@ controller.deleteRoom = async function(req, res) {
 
     const deletedRoom = await ChatRoom.findByIdAndDelete(req.params.id).populate("members");
     if (!deletedRoom) {
-        await req.flash('error', 'A problem occured');
+        req.flash('error', 'A problem occured');
         return res.redirect('back');
     }
 
@@ -412,16 +412,16 @@ controller.deleteRoom = async function(req, res) {
     if (room.thumbnailFile && room.thumbnailFile.filename) {
         const [cloudErr, cloudResult] = await cloudDelete(room.thumbnailFile.filename, "image");
         if (cloudErr || !cloudResult || cloudResult.result !== "ok") {
-            await req.flash("error", "Error deleting uploaded image");
+            req.flash("error", "Error deleting uploaded image");
             return res.redirect("back");
         }
     }
 
     for (let member of deletedRoom.members) { //Remove room from all members' newRooms
-        await removeIfIncluded(member.newRooms, deletedRoom._id);
+        removeIfIncluded(member.newRooms, deletedRoom._id);
         await member.save();
     }
-    await req.flash('success', 'Deleted room!');
+    req.flash('success', 'Deleted room!');
     return res.redirect('/chat');
 }
 
