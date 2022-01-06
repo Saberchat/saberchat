@@ -47,6 +47,7 @@ var platformSchema = new mongoose.Schema({
     features: [{route: String, name: String, description: {type: String, default: ''}, icon: String}],
     displayImages: [{type: String}],
     info: [{heading: String, text: [{type: String}], image: String}],
+    documents: [{heading: String, text: [{type: String}], image: String}],
     services: [{type: String}],
     community: [{type: String}],
     contact: {

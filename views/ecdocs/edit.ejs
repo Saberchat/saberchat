@@ -1,0 +1,72 @@
+<%- include('../partials/headStart') %>
+    <link rel="stylesheet" href="/stylesheets/home/index.css">
+    <link rel="stylesheet" href="/stylesheets/tutoringCenter/show.css">
+    <link rel="stylesheet" href="/stylesheets/shop/menu.css">
+    <link rel="stylesheet" href="/stylesheets/announcements/form.css">
+    <%if (currentUser && currentUser.darkmode) {%>
+        <link rel="stylesheet" href="/stylesheets/tutoringCenter/tutoringCenter-dark.css">
+    <%}%>
+
+    <script src="/javascript/admin/settings.js"></script>
+<%- include('../partials/headEnd') %>
+
+    <body class="mode">
+        <!-- include the navbar via ejs -->
+        <%- include('../partials/components/navbar') %>
+        <%- include('../partials/components/header') %>
+
+        <div class="container mt-5">
+            <div class="header-section">
+                <div class="row">
+                    <div class="col-12">
+                        <div class="jumbotron text-center" id="course-thumbnail"
+                            style="background-image: url('<%=platform.imageUrl%>');">
+                            <h1 id="courseName" <% if (platform.navDark) {%> style="color: black"<%}%> >Early College Docs</h1>
+                            <h5 id="courseInfo" <% if (platform.navDark) {%> style="color: black"<%}%>>Edit and Add Documents</h5>
+                            <a class="btn btn-primary" href="/ecdocs"><i class="fas fa-arrow-left"></i> Back</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            </ul>
+
+            <div class="row settings">
+                <div class="col-12">
+                    <form id="update-settings" action="/ecdocs?_method=put" method="post">
+                        <div class="form-group">
+                            <label>EC Document Layout (Insert Links with Anchor Tags)</label>
+                            <div id="image-block">
+                                <% for( let i = 0; i < platform.documents.length; i++ ) { %>
+                                    <div class="image-group">
+                                        <div class="input-container" id="imageblock-<%=i%>">
+                                            <input type="text" placeholder="Heading..." class="form-control mode" name="infoHeading" value="<%=platform.documents[i].heading%>"><br>
+                                            <textarea class="form-control mode" placeholder="Text (Insert Links With Anchor Tags)" name="infoText" rows="10"><% for (let para of platform.documents[i].text) { %><%=para%><% } %></textarea><br>
+                                            <input type="text" id="<%=i%>" class="form-control mode"
+                                                   oninput="createImg(this)" placeholder="Image URL (Optional)"
+                                                   name="infoImages[<%=i%>]"
+                                                   value="<%= platform.documents[i].image %>">
+                                            <img id="image-<%= platform.documents.length - (i + 1) %>"
+                                                 style="width: 50%; height: 50%; margin-top: 10px; border-radius: 15px;"
+                                                 src="<%= platform.documents[i].image %>" alt="Image Does Not Exist"/>
+                                        </div>
+                                        <button type="button" onclick="deleteImg(this)" style="display: inline;" class="btn btn-danger"><i class="fas fa-minus"></i></button>
+                                        <br>
+                                    </div>
+                                <% } %>
+                            </div>
+                            <div id="image-header">
+                                <button type="button" onclick="addBlock(true)" class="btn btn-primary"><i class="fas fa-plus"></i> New Document</button>
+                                <br/><br/>
+                            </div>
+                        </div>
+                        <br />
+                        <button type="submit" class="btn btn-lg btn-primary btn-block">Confirm Changes</button>
+                        <br/>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </body>
+    <script src="/javascript/image-url.js"></script>
+    <script src="/javascript/shop/image.js"></script>
+</html>

@@ -10,7 +10,6 @@ router.get('/', wrapAsync(index.index)); // Index Landing Page
 router.get('/darkmode', wrapAsync(middleware.isLoggedIn), wrapAsync(index.darkmode)); //Set darkmode
 router.get('/contact', wrapAsync(middleware.isLoggedIn), wrapAsync(index.contact)); //Contact info and school info
 router.get('/info', wrapAsync(index.info)); //Platform info
-router.get('/ecdocs', wrapAsync(index.ecdocs)); //EC info
 router.get('/logout', wrapAsync(middleware.isLoggedIn), index.logout); //logout route
 
 router.post("/register", validateNewUser, wrapAsync(index.register)); //Register User
