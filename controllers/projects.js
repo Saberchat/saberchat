@@ -625,7 +625,7 @@ controller.data = async function(req, res) {
         return res.redirect('back');
     }
 
-    const {popular, unpopular} = await sortByPopularity(projects, "likes", "created_at", null); //Extract and sort popular projects
+    const {popular, unpopular} = sortByPopularity(projects, "likes", "created_at", null); //Extract and sort popular projects
     let popularProjectText = "";
     let popularCommentText = "";
     for (let project of popular) { //Iterate through popular projects and parse out their text
