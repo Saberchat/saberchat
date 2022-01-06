@@ -56,7 +56,7 @@ middleware.postPermission = async function(req, res, next) {
 middleware.announcementPermission = async function(req, res, next) {
     const platform = await setup(Platform);
     if (!platform) {
-        await req.flash("error", "Unable to setup platform");
+        req.flash("error", "Unable to setup platform");
         return res.redirect("back");
     }
     if (platform.postVerifiable || req.user.status == platform.teacherStatus || (await platform.permissionsProperty.slice(platform.permissionsProperty.length-3).includes(req.user.permission))) {
@@ -67,7 +67,7 @@ middleware.announcementPermission = async function(req, res, next) {
         if (req.user.tags.includes(perm)) return next();
     }
     
-    await req.flash('error', 'You do not have permission to do that');
+    req.flash('error', 'You do not have permission to do that');
     return res.redirect('back');
 }
 
