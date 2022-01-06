@@ -39,12 +39,12 @@ controller.show = async function(req, res) {
     });
 
     if(!poll) {
-        await req.flash('error', 'Cannot find poll.');
+        req.flash('error', 'Cannot find poll.');
         return res.redirect('/polls');
     }
 
     if(poll.closed && !poll.sender._id.equals(req.user._id)) {
-        await req.flash('error', 'Poll has been closed.');
+        req.flash('error', 'Poll has been closed.');
         return res.redirect('/polls');
     }
 
@@ -72,11 +72,11 @@ controller.form = async function(req, res) {
 controller.toggleClosed = async function(req, res) {
     const poll = await Poll.findById(req.params.id);
     if(!poll) {
-        await req.flash('error', 'Cannot find poll.');
+        req.flash('error', 'Cannot find poll.');
         return res.redirect('/back');
     }
     if(!poll.sender._id.equals(req.user._id)) {
-        await req.flash('error', 'You do not own this poll.');
+        req.flash('error', 'You do not own this poll.');
         return res.redirect('/back');
     }
     let state;
@@ -89,7 +89,7 @@ controller.toggleClosed = async function(req, res) {
     }
 
     await poll.save();
-    await req.flash('success', `Form is now ${state}.`)
+    req.flash('success', `Form is now ${state}.`)
     res.redirect('back');
 }
 
@@ -100,14 +100,14 @@ controller.create = async function(req, res) {
     const height = parseInt(req.body.formHeight);
 
     if(typeof title !== 'string' || typeof googleFormUrl !=='string') {
-        await req.flash("error", "Invalid inputs.");
+        req.flash("error", "Invalid inputs.");
         return res.redirect("back");
     }
     let parsedUrl;
     try {
         parsedUrl = new URL(googleFormUrl);
     } catch (error) {
-        await req.flash('error', 'Invalid form url.');
+        req.flash('error', 'Invalid form url.');
         return res.redirect('back');
     }
 
@@ -118,7 +118,7 @@ controller.create = async function(req, res) {
     const pollObj = {
         subject: title,
         googleFormUrl: parsedUrl,
-        date: await dateFormat(now, "mmm d"),
+        date: dateFormat(now, "mmm d"),
         sender: req.user._id
     }
 
@@ -129,11 +129,11 @@ controller.create = async function(req, res) {
 
     const newPoll = await Poll.create(pollObj);
     if(!newPoll) {
-        await req.flash('error', 'Poll could not be created');
+        req.flash('error', 'Poll could not be created');
         return res.redirect('back');
     }
 
-    await req.flash('success', 'Form Created')
+    req.flash('success', 'Form Created')
     res.redirect('/polls');
 }
 

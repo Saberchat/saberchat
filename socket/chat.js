@@ -30,14 +30,14 @@ chat.chatMessage = async function(io, socket, msg) { //Send Chat Room Message
     }
 
     const room = await ChatRoom.findById(socket.room);
-    if (!room) { return console.log(err);}
+    if (!room) {return console.log(err);}
 
     const comment = await ChatMessage.create({text: msg.text, author: msg.authorId});
-    if (!comment) { return console.log(err);}
+    if (!comment) {return console.log(err);}
 
     msg.id = comment._id;
     await socket.to(socket.room).emit('chat message', msg); // broadcast message to all connected users in the room
-    comment.date = await dateFormat(comment.created_at, "h:MM TT | mmm d");
+    comment.date = dateFormat(comment.created_at, "h:MM TT | mmm d");
     await comment.save();
     await room.comments.push(comment._id);
     await room.save();
@@ -47,9 +47,9 @@ chat.chatMessage = async function(io, socket, msg) { //Send Chat Room Message
         await io.in(socket.room).emit('announcement', notif);
 
         const newComment = await ChatMessage.create({text: notif, status: notif.status});
-        if (!newComment) {await console.log(err);}
+        if (!newComment) {console.log(err);}
 
-        newChatMessage.date = await dateFormat(comment.created_at, "h:MM TT | mmm d");
+        newChatMessage.date = dateFormat(comment.created_at, "h:MM TT | mmm d");
         await newChatMessage.save();
     }
 }

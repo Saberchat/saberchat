@@ -23,7 +23,7 @@ controller.index = async function(req, res) {
         events = await Event.find({}).populate('sender');
     } else {events = await Event.find({verified: true}).populate('sender');}
     if(!platform || !users || !events) {
-        await req.flash('error', 'Cannot find events.');
+        req.flash('error', 'Cannot find events.');
         return res.redirect('back');
     }
 
@@ -31,29 +31,29 @@ controller.index = async function(req, res) {
     let past = [];
     let date;
     for (let event of events) {
-        date = new Date(await parseInt(event.deadline.year), await parseInt(event.deadline.month)-1, await parseInt(event.deadline.day));
+        date = new Date(parseInt(event.deadline.year), parseInt(event.deadline.month)-1, parseInt(event.deadline.day));
         if ((await date.getTime) > (await new Date().getTime())) {await past.push(event);}
         else {await current.push(event);}
     }
 
-    const userNames = await parsePropertyArray(users, "firstName").join(',').toLowerCase().split(',');
+    const userNames = parsePropertyArray(users, "firstName").join(',').toLowerCase().split(',');
     let eventTexts;
     if (req.query.past) {
         eventTexts = await embedLink(req.user, past, userNames);
-        return res.render('events/index', {platform, events: await past.reverse(), activeSearch: false, data: platform.features[await objectArrIndex(platform.features, "route", "events")], eventTexts});   
+        return res.render('events/index', {platform, events: await past.reverse(), activeSearch: false, data: platform.features[objectArrIndex(platform.features, "route", "events")], eventTexts});   
     }
     eventTexts = await embedLink(req.user, current, userNames);
-    return res.render('events/index', {platform, events: await current.reverse(), activeSearch: true, data: platform.features[await objectArrIndex(platform.features, "route", "events")], eventTexts});
+    return res.render('events/index', {platform, events: await current.reverse(), activeSearch: true, data: platform.features[objectArrIndex(platform.features, "route", "events")], eventTexts});
 };
 
 // Event GET new event
 controller.new = async function(req, res) {
     const platform = await setup(Platform);
     if (!platform) {
-        await req.flash("error", "An error occurred");
+        req.flash("error", "An error occurred");
         return res.redirect("back");
     }
-    return res.render('events/new', {platform, data: platform.features[await objectArrIndex(platform.features, "route", "events")]});
+    return res.render('events/new', {platform, data: platform.features[objectArrIndex(platform.features, "route", "events")]});
 };
 
 // Event GET show
@@ -66,21 +66,21 @@ controller.show = async function(req, res) {
             populate: {path: "sender"}
         });
     if(!platform || !event) {
-        await req.flash('error', 'Could not find event'); return res.redirect('back');
+        req.flash('error', 'Could not find event'); return res.redirect('back');
     } else if (!event.verified && !(await platform.permissionsProperty.slice(platform.permissionsProperty.length-3).includes(req.user.permission))) {
-        await req.flash('error', 'You cannot view that event');
+        req.flash('error', 'You cannot view that event');
         return res.redirect('back');
     }
 
-    let date = new Date(await parseInt(event.deadline.year), await parseInt(event.deadline.month)-1, await parseInt(event.deadline.day));
+    let date = new Date(parseInt(event.deadline.year), parseInt(event.deadline.month)-1, parseInt(event.deadline.day));
     let version = ((await date.getTime) < (await new Date().getTime()));
 
     let fileExtensions = new Map(); //Track which file format each attachment is in
     for (let media of event.mediaFiles) {
-        await fileExtensions.set(media.url, await path.extname(media.url.split("SaberChat/")[1]));
+        fileExtensions.set(media.url, path.extname(media.url.split("SaberChat/")[1]));
     }
     const convertedText = await convertToLink(event.text); //Parse and add hrefs to all links in text
-    return res.render('events/show', {platform, event, convertedText, fileExtensions, version, data: platform.features[await objectArrIndex(platform.features, "route", "events")]});
+    return res.render('events/show', {platform, event, convertedText, fileExtensions, version, data: platform.features[objectArrIndex(platform.features, "route", "events")]});
 };
 
 // Event GET edit form
@@ -88,19 +88,19 @@ controller.updateForm = async function(req, res) {
     const platform = await setup(Platform);
     const event = await Event.findById(req.params.id);
     if(!platform || !event) {
-        await req.flash('error', 'Could not find event');
+        req.flash('error', 'Could not find event');
         return res.redirect('back');
     }
     if(!(await event.sender._id.equals(req.user._id))) {
-        await req.flash('error', 'You do not have permission to do that.');
+        req.flash('error', 'You do not have permission to do that.');
         return res.redirect('back');
     }
 
     let fileExtensions = new Map(); //Track which file format each attachment is in
     for (let media of event.mediaFiles) {
-        await fileExtensions.set(media.url, await path.extname(await media.url.split("SaberChat/")[1]));
+        fileExtensions.set(media.url, path.extname(await media.url.split("SaberChat/")[1]));
     }
-    return res.render('events/edit', {platform, event, fileExtensions, data: platform.features[await objectArrIndex(platform.features, "route", "events")]});
+    return res.render('events/edit', {platform, event, fileExtensions, data: platform.features[objectArrIndex(platform.features, "route", "events")]});
 };
 
 // Event POST create
@@ -118,7 +118,7 @@ controller.create = async function(req, res) {
         verified: !platform.postVerifiable //Event does not need to be verified if platform does not support verifying events
     });
     if (!platform || !event) {
-        await req.flash('error', 'Unable to create event');
+        req.flash('error', 'Unable to create event');
         return res.redirect('back');
     }
     for (let attr of ["images", "links"]) {if (req.body[attr]) {event[attr] = req.body[attr];}} //Add images and links
@@ -132,7 +132,7 @@ controller.create = async function(req, res) {
                 const processedBuffer = await autoCompress(file.originalname, file.buffer);
                 [cloudErr, cloudResult] = await cloudUpload(file.originalname, processedBuffer);
                 if (cloudErr || !cloudResult) {
-                    await req.flash('error', 'Upload failed');
+                    req.flash('error', 'Upload failed');
                     return res.redirect('back');
                 }
 
@@ -145,13 +145,13 @@ controller.create = async function(req, res) {
         }
     }
 
-    event.date = await dateFormat(event.created_at, "h:MM TT | mmm d");
+    event.date = dateFormat(event.created_at, "h:MM TT | mmm d");
     await event.save();
 
     if (platform.postVerifiable) {
-        await req.flash('success', `Event Posted! A platform ${await platform.permissionsDisplay[platform.permissionsDisplay.length-1].toLowerCase()} will verify your post soon.`);
+        req.flash('success', `Event Posted! A platform ${await platform.permissionsDisplay[platform.permissionsDisplay.length-1].toLowerCase()} will verify your post soon.`);
     } else {
-        await req.flash('success', `Event Posted!`);
+        req.flash('success', `Event Posted!`);
     }
     return res.redirect(`/events`);
 };
@@ -159,11 +159,11 @@ controller.create = async function(req, res) {
 controller.verify = async function(req, res) {
     const event = await Event.findByIdAndUpdate(req.params.id, {verified: true});
     if (!event) {
-        await req.flash('error', "Unable to access event");
+        req.flash('error', "Unable to access event");
         return res.redirect('back');
     }
 
-    await req.flash("success", "Verified Event!");
+    req.flash("success", "Verified Event!");
     return res.redirect("/events");
 }
 
@@ -171,12 +171,12 @@ controller.updateEvent = async function(req, res) {
     const platform = await setup(Platform);
     const event = await Event.findById(req.params.id).populate('sender');
     if (!platform || !event) {
-        await req.flash('error', "Unable to access event");
+        req.flash('error', "Unable to access event");
         return res.redirect('back');
     }
 
     if ((await event.sender._id.toString()) != (await req.user._id.toString())) {
-        await req.flash('error', "You can only update events which you have sent");
+        req.flash('error', "You can only update events which you have sent");
         return res.redirect('back');
     }
 
@@ -192,7 +192,7 @@ controller.updateEvent = async function(req, res) {
         verified: !platform.postVerifiable //Event does not need to be verified if platform does not support verifying events
     });
     if (!updatedEvent) {
-        await req.flash('error', "Unable to update event");
+        req.flash('error', "Unable to update event");
         return res.redirect('back');
     }
     for (let attr of ["images", "links"]) {if (req.body[attr]) {updatedEvent[attr] = req.body[attr];}} //Add images and links
@@ -203,7 +203,7 @@ controller.updateEvent = async function(req, res) {
     for (let i = updatedEvent.mediaFiles.length-1; i >= 0; i--) {
         if (req.body[`deleteUpload-${updatedEvent.mediaFiles[i].url}`] && updatedEvent.mediaFiles[i] && updatedEvent.mediaFiles[i].filename) {
             //Evaluate filetype to decide on file deletion strategy
-            switch(await path.extname(await updatedEvent.mediaFiles[i].url.split("SaberChat/")[1]).toLowerCase()) {
+            switch(path.extname(await updatedEvent.mediaFiles[i].url.split("SaberChat/")[1]).toLowerCase()) {
                 case ".mp3":
                 case ".mp4":
                 case ".m4a":
@@ -219,7 +219,7 @@ controller.updateEvent = async function(req, res) {
 
             // Check For Failure
             if (cloudErr || !cloudResult || cloudResult.result !== 'ok') {
-                await req.flash('error', 'Error deleting uploaded image');
+                req.flash('error', 'Error deleting uploaded image');
                 return res.redirect('back');
             }
             await updatedEvent.mediaFiles.splice(i, 1);
@@ -234,7 +234,7 @@ controller.updateEvent = async function(req, res) {
                 const processedBuffer = await autoCompress(file.originalname, file.buffer);
                 [cloudErr, cloudResult] = await cloudUpload(file.originalname, processedBuffer);
                 if (cloudErr || !cloudResult) {
-                    await req.flash('error', 'Upload failed');
+                    req.flash('error', 'Upload failed');
                     return res.redirect('back');
                 }
 
@@ -248,7 +248,7 @@ controller.updateEvent = async function(req, res) {
     }
     
     await updatedEvent.save();
-    await req.flash('success', 'Event Updated!');
+    req.flash('success', 'Event Updated!');
     return res.redirect(`/events`);
 }
 
@@ -257,7 +257,7 @@ controller.likeEvent = async function(req, res) {
     const event = await Event.findById(req.body.eventId);
     if(!event) {return res.json({error: 'Error updating event.'});}
 
-    if (await removeIfIncluded(event.likes, req.user._id)) { //Remove like
+    if (removeIfIncluded(event.likes, req.user._id)) { //Remove like
         await event.save();
         return res.json({
             success: `Removed a like from ${event.subject}`,
@@ -288,7 +288,7 @@ controller.comment = async function(req, res) {
     });
     if (!comment) {return res.json({error: 'Error commenting'});}
 
-    comment.date = await dateFormat(comment.created_at, "h:MM TT | mmm d");
+    comment.date = dateFormat(comment.created_at, "h:MM TT | mmm d");
     await comment.save();
 
     await event.comments.push(comment);
@@ -316,7 +316,7 @@ controller.likeComment = async function(req, res) {
     const comment = await PostComment.findById(req.body.commentId);
     if(!comment) {return res.json({error: 'Error finding comment'});}
 
-    if (await removeIfIncluded(comment.likes, req.user._id)) { //Remove Like
+    if (removeIfIncluded(comment.likes, req.user._id)) { //Remove Like
         await comment.save();
         return res.json({
             success: `Removed a like`,
@@ -335,12 +335,12 @@ controller.likeComment = async function(req, res) {
 controller.deleteEvent = async function(req, res) {
     const event = await Event.findById(req.params.id).populate('sender');
     if (!event) {
-        await req.flash('error', "Unable to access event");
+        req.flash('error', "Unable to access event");
         return res.redirect('back');
     }
 
     if ((await event.sender._id.toString()) != (await req.user._id.toString())) { //Doublecheck that deleter is eventer
-        await req.flash('error', "You can only delete events that you have posted");
+        req.flash('error', "You can only delete events that you have posted");
         return res.redirect('back');
     }
 
@@ -350,7 +350,7 @@ controller.deleteEvent = async function(req, res) {
     for (let file of event.mediaFiles) {
         if (file && file.filename) {
             //Evaluate deleted files' filetype and delete accordingly
-            switch(await path.extname(await file.url.split("SaberChat/")[1]).toLowerCase()) {
+            switch(path.extname(await file.url.split("SaberChat/")[1]).toLowerCase()) {
                 case ".mp3":
                 case ".mp4":
                 case ".m4a":
@@ -365,7 +365,7 @@ controller.deleteEvent = async function(req, res) {
             }
 
              if (cloudErr || !cloudResult || cloudResult.result !== 'ok') { // Check for Failure
-                await req.flash('error', 'Error deleting uploaded image');
+                req.flash('error', 'Error deleting uploaded image');
                 return res.redirect('back');
             }
         }
@@ -373,11 +373,11 @@ controller.deleteEvent = async function(req, res) {
 
     const deletedEvent = await Event.findByIdAndDelete(event._id);
     if (!deletedEvent) {
-        await req.flash('error', "Unable to delete event");
+        req.flash('error', "Unable to delete event");
         return res.redirect('back');
     }
 
-    await req.flash('success', 'Event Deleted!');
+    req.flash('success', 'Event Deleted!');
     return res.redirect('/events/');
 }
 

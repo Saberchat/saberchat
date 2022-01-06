@@ -17,10 +17,10 @@ const cloudUploader = util.promisify(cloudinary.uploader.upload);
 const cloudDestroyer = util.promisify(cloudinary.uploader.destroy);
 
 module.exports.cloudUpload = async function(fileName, fileBuffer) {
-    const imgFile = await parseBuffer(fileName, fileBuffer).content; // turn file into buffer
+    const imgFile = parseBuffer(fileName, fileBuffer).content; // turn file into buffer
     const options = {folder: 'SaberChat'}; // upload to cloudinary
     let type = 'image';
-    const extension = await path.extname(fileName).toLowerCase();
+    const extension = path.extname(fileName).toLowerCase();
 
     if (await [".mp3", ".mp4", ".m4a", ".mov"].includes(extension)) {
         type = 'video'

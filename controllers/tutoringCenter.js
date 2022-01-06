@@ -16,29 +16,26 @@ const {Review} = require('../models/post');
 
 const controller = {};
 
+//Index page - display all user's courses
 controller.index = async function(req, res) {
     const platform = await setup(Platform);
-    const courses = await Course.find({});
+    const courses = await Course.find({}); //Load all courses
     if (!platform || !courses) {
-        await req.flash('error', "Unable to find courses");
+        req.flash('error', "Unable to find courses");
         return res.redirect('back');
     }
 
     let courseList = [];
-    for (let course of courses) {
-        if ((await course.creator.equals(req.user._id)) || (await course.members.includes(req.user._id))) {
+    for (let course of courses) { //Iterate through each course and see if user is a part of it (as teacher, student or tutor)
+        if ((course.creator.equals(req.user._id)) || (course.members.includes(req.user._id)) || (objectArrIndex(course.tutors, "tutor", req.user._id) > -1)) {
             await courseList.push(course);
-        } else {
-            for (let tutor of course.tutors) {
-                if (await tutor.tutor.equals(req.user._id)) {
-                    await courseList.push(course);
-                }
-            }
         }
     }
-    return res.render('tutoringCenter/index', {platform, courses: courseList, studentStatuses: platform.studentStatuses, data: platform.features[await objectArrIndex(platform.features, "route", "tutoringCenter")]});
+    //Return compiled data
+    return res.render('tutoringCenter/index', {platform, courses: courseList, studentStatuses: platform.studentStatuses, data: platform.features[objectArrIndex(platform.features, "route", "tutoringCenter")]});
 }
 
+//Create course as teacher
 controller.createCourse = async function(req, res) {
     let charSetMatrix = []; //Build unique join code for course
     await charSetMatrix.push('qwertyuiopasdfghjklzxcvbnm'.split(''));
@@ -64,7 +61,7 @@ controller.createCourse = async function(req, res) {
     });
 
     if (!course) {
-        await req.flash('error', "Unable to create course");
+        req.flash('error', "Unable to create course");
         return res.redirect('back');
     }
 
@@ -75,11 +72,11 @@ controller.createCourse = async function(req, res) {
             const processedBuffer = await autoCompress(file.originalname, file.buffer);
             const [cloudErr, cloudResult] = await cloudUpload(file.originalname, processedBuffer);
             if (cloudErr || !cloudResult) {
-                await req.flash("error", "Upload failed");
+                req.flash("error", "Upload failed");
                 return res.redirect("back");
             }
 
-            course.thumbnailFile = {
+            course.thumbnailFile = { //Set up thumbnail file through cloudinary result data
                 filename: cloudResult.public_id,
                 url: cloudResult.secure_url,
                 originalName: file.originalname,
@@ -88,68 +85,61 @@ controller.createCourse = async function(req, res) {
             await course.save();
         }
     }
-    await req.flash('success', "Successfully created course");
+    req.flash('success', "Successfully created course");
     return res.redirect('/tutoringCenter');
 }
 
 //Join as tutor or as student
 controller.joinCourse = async function(req, res) {
     const platform = await setup(Platform);
-    if (!platform) {
-        await req.flash("error", "An Error Occurred");
-        return res.redirect("back");
+    const course = await Course.findOne({joinCode: req.body.joincode}); //Search for course by join code
+    if (!platform || !course) {
+        req.flash('error', "No courses matching this join code were found.");
+        return res.redirect('back');
     }
 
-    if (req.body.bio) { //Join as tutor
-        if (await req.user.tags.includes("Tutor")) {
-            const course = await Course.findOne({joinCode: req.body.joincode});
-            if (!course) {
-                await req.flash('error', "No courses matching this join code were found.");
-                return res.redirect('back');
-            }
-
-            await course.tutors.push({
+    //Join as tutor
+    if (req.body.bio) {
+        if (req.user.tags.includes("Tutor")) { //Ensure that user has permissions to become tutor
+            await course.tutors.push({ //Add user's data and form settings to tutor's list
                 tutor: req.user,
                 bio: req.body.bio,
-                slots: await parseInt(req.body.slots),
-                cost: await parseInt(req.body.cost),
-                available: (await parseInt(req.body.slots) > 0),
+                slots: parseInt(req.body.slots),
+                cost: parseInt(req.body.cost),
+                available: (parseInt(req.body.slots) > 0), //Check that user has available slots
                 dateJoined: new Date(Date.now())
             });
             await course.save();
-            await req.flash('success', `Successfully joined ${course.name} as a tutor!`);
+            req.flash('success', `Successfully joined ${course.name} as a tutor!`);
             return res.redirect(`/tutoringCenter/${course._id}`);
         }
-        await req.flash('error', `You do not have permission to do that`);
+        req.flash('error', `You do not have permission to do that`); //User does not have tutor perms
         return res.redirect(`back`);
     }
 
     //Join as student
     if (await platform.studentStatuses.includes(req.user.status)) {
-        const course = await Course.findOne({joinCode: req.body.joincode});
-        if (!course) {
-            await req.flash('error', "No courses matching this join code were found.");
-            return res.redirect('back');
-        }
-
         await course.members.push(req.user);
         await course.save();
-        await req.flash('success', `Successfully joined ${course.name}!`);
+        req.flash('success', `Successfully joined ${course.name}!`);
         return res.redirect(`/tutoringCenter/${course._id}`);
     }
-    await req.flash('error', `You do not have permission to do that`);
+    req.flash('error', `You do not have permission to do that`);
     return res.redirect(`back`);
 }
 
+//Show route - displays course interface for those with permissions
 controller.showCourse = async function(req, res) {
     const platform = await setup(Platform);
+    //Load course with populated data
     const course = await Course.findById(req.params.id).populate('creator members tutors.tutor tutors.reviews blocked');
     if (!platform || !course) {
-        await req.flash('error', "Unable to find course");
+        req.flash('error', "Unable to find course");
         return res.redirect('back');
     }
 
-    let studentIds = []; //Collect info on the ids of all members and tutors in the course
+    //Collect info on the ids of all members and tutors in the course
+    let studentIds = [];
     let tutorIds = [];
     let tutors = [];
     for (let student of course.members) {
@@ -180,48 +170,50 @@ controller.showCourse = async function(req, res) {
 
     const teachers = await User.find({authenticated: true, status: platform.teacherStatus, _id: {$ne: req.user._id}});
     if (!teachers) {
-        await req.flash('error', "Unable to find teachers");
+        req.flash('error', "Unable to find teachers");
         return res.redirect('back');
     }
-    return res.render('tutoringCenter/show', {platform, course, studentIds, tutorIds, tutors, teachers, objectArrIndex, data: platform.features[await objectArrIndex(platform.features, "route", "tutoringCenter")]}); //Export function for ejs evaluation
+    return res.render('tutoringCenter/show', {platform, course, studentIds, tutorIds, tutors, teachers, objectArrIndex, data: platform.features[objectArrIndex(platform.features, "route", "tutoringCenter")]}); //Export function for ejs evaluation
 }
+
+//PICK UP WORK HERE
 
 controller.unenrollStudent = async function(req, res) {
     const course = await Course.findByIdAndUpdate(req.params.id, {$pull: {members: req.user._id}}).populate("tutors.tutor");
     if (!course) {
-        await req.flash('error', "Unable to find course");
+        req.flash('error', "Unable to find course");
         return res.redirect('back');
     }
 
     //Remove user from all tutors they have signed up with, and delete corresponding chat rooms
     let deletedRoom;
     for (let tutor of course.tutors) {
-        if (await objectArrIndex(tutor.members, "student", req.user._id) > -1) { //Update the tutor's members array
+        if (objectArrIndex(tutor.members, "student", req.user._id) > -1) { //Update the tutor's members array
             await tutor.formerStudents.push({
                 student: req.user._id,
-                lessons: tutor.members[await objectArrIndex(tutor.members, "student", req.user._id)].lessons
+                lessons: tutor.members[objectArrIndex(tutor.members, "student", req.user._id)].lessons
             });
-            deletedRoom = await ChatRoom.findByIdAndDelete(tutor.members[await objectArrIndex(tutor.members, "student", req.user._id)].room);
-            await tutor.members.splice(await objectArrIndex(tutor.members, "student", req.user._id), 1);
+            deletedRoom = await ChatRoom.findByIdAndDelete(tutor.members[objectArrIndex(tutor.members, "student", req.user._id)].room);
+            await tutor.members.splice(objectArrIndex(tutor.members, "student", req.user._id), 1);
             tutor.slots++;
             tutor.available = true;
 
             //Remove rooms from tutor/student newRooms
-            await removeIfIncluded(req.user.newRooms, deletedRoom._id);
+            removeIfIncluded(req.user.newRooms, deletedRoom._id);
             await req.user.save();
-            await removeIfIncluded(tutor.tutor.newRooms, deletedRoom._id);
+            removeIfIncluded(tutor.tutor.newRooms, deletedRoom._id);
             await tutor.tutor.save();
         }
     }
     await course.save();
-    await req.flash('success', `Unenrolled from ${course.name}!`);
+    req.flash('success', `Unenrolled from ${course.name}!`);
     return res.redirect('/tutoringCenter');
 }
 
 controller.unenrollTutor = async function(req, res) {
     const course = await Course.findById(req.params.id).populate('tutors.tutor tutors.members.student');
     if (!course) {
-        await req.flash('error', "Unable to find course");
+        req.flash('error', "Unable to find course");
         return res.redirect('back');
     }
 
@@ -231,14 +223,14 @@ controller.unenrollTutor = async function(req, res) {
             for (let student of course.tutors[i].members) {
                 deletedRoom = await ChatRoom.findByIdAndDelete(student.room);
                 if (!deletedRoom) {
-                    await req.flash('error', "Unable to remove chat room");
+                    req.flash('error', "Unable to remove chat room");
                     return res.redirect('back');
                 }
 
                 //Remove rooms from tutor/student newRooms
-                await removeIfIncluded(student.student.newRooms, deletedRoom._id);
+                removeIfIncluded(student.student.newRooms, deletedRoom._id);
                 await student.student.save();
-                await removeIfIncluded(req.user.newRooms, deletedRoom._id);
+                removeIfIncluded(req.user.newRooms, deletedRoom._id);
                 await req.user.save();
             }
             await course.tutors.splice(i, 1); //Remove tutor from course
@@ -246,14 +238,14 @@ controller.unenrollTutor = async function(req, res) {
         }
     }
     await course.save();
-    await req.flash('success', `Unenrolled from ${course.name}!`);
+    req.flash('success', `Unenrolled from ${course.name}!`);
     return res.redirect('/tutoringCenter');
 }
 
 controller.updateSettings = async function(req, res) {
     const course = await Course.findById(req.params.id);
     if (!course) {
-        await req.flash("error", "An error occurred");
+        req.flash("error", "An error occurred");
         return res.redirect("back");
     }
 
@@ -271,7 +263,7 @@ controller.updateSettings = async function(req, res) {
         if (course.thumbnailFile.filename) {
             [cloudErr, cloudResult] = await cloudDelete(course.thumbnailFile.filename, "image");
             if (cloudErr || !cloudResult) {
-                await req.flash("error", "Error deleting uploaded image");
+                req.flash("error", "Error deleting uploaded image");
                 return res.redirect("back");
             }
         }
@@ -281,7 +273,7 @@ controller.updateSettings = async function(req, res) {
             const processedBuffer = await autoCompress(file.originalname, file.buffer);
             [cloudErr, cloudResult] = await cloudUpload(file.originalname, processedBuffer);
             if (cloudErr || !cloudResult) {
-                await req.flash("error", "Upload failed");
+                req.flash("error", "Upload failed");
                 return res.redirect("back");
             }
 
@@ -295,14 +287,14 @@ controller.updateSettings = async function(req, res) {
     }
 
     await course.save();
-    await req.flash("success", "Updated course settings")
+    req.flash("success", "Updated course settings")
     return res.redirect(`/tutoringCenter/${course._id}`);
 }
 
 controller.deleteCourse = async function(req, res) {
     const course = await Course.findOne({_id: req.params.id, joinCode: req.body.joincode}).populate("tutors.tutor tutors.members.student");
     if (!course) {
-        await req.flash("error", "Incorrect join code");
+        req.flash("error", "Incorrect join code");
         return res.redirect("back");
     }
 
@@ -311,22 +303,22 @@ controller.deleteCourse = async function(req, res) {
         for (let student of tutor.members) {
             deletedRoom = await ChatRoom.findByIdAndDelete(student.room);
             if (!deletedRoom) {
-                await req.flash("error", "Unable to find room");
+                req.flash("error", "Unable to find room");
                 return res.redirect("back");
             }
-            await removeIfIncluded(tutor.tutor.newRooms, student.room);
+            removeIfIncluded(tutor.tutor.newRooms, student.room);
             await tutor.tutor.save();
-            await removeIfIncluded(student.student.newRooms, student.room);
+            removeIfIncluded(student.student.newRooms, student.room);
             await student.student.save();
         }
     }
 
     const deletedCourse = await Course.findByIdAndDelete(course._id);
     if (!deletedCourse) {
-        await req.flash("error", "An error occurred");
+        req.flash("error", "An error occurred");
         return res.redirect("back");
     }
-    await req.flash("success", `Deleted ${course.name}!`);
+    req.flash("success", `Deleted ${course.name}!`);
     return res.redirect("/tutoringCenter");
 }
 
@@ -335,24 +327,24 @@ controller.deleteCourse = async function(req, res) {
 controller.updateTeacher = async function(req, res) { //Update course teacher
     const course = await Course.findById(req.params.id);
     if (!course) {
-        await req.flash("error", "Unable to find course");
+        req.flash("error", "Unable to find course");
         return res.redirect("back");
     }
 
     if (!(course.joinCode == req.body.joinCodeConfirm)) {
-        await req.flash("error", "Join code is invalid");
+        req.flash("error", "Join code is invalid");
         return res.redirect("back");
     }
 
     const newTeacher = await User.findById(req.body.teacher);
     if (!newTeacher) {
-        await req.flash("error", "Error finding teacher");
+        req.flash("error", "Error finding teacher");
         return res.redirect("back");
     }
 
     course.creator = newTeacher;
     await course.save();
-    await req.flash("success", "Updated course teacher!");
+    req.flash("success", "Updated course teacher!");
     return res.redirect("/tutoringCenter");
 }
 
@@ -407,7 +399,7 @@ controller.searchTutors = async function(req, res) {
 
     for (let user of users) { //Iterate through usernames and search for matches
         //Check that user is not currently tutoring this course, is a verified tutor and is part of search
-        if (await objectArrIndex(course.tutors, "tutor", user._id) == -1 && await user.tags.includes("Tutor") && await `${user.firstName} ${user.lastName} ${user.username}`.toLowerCase().includes(await req.body.text.toLowerCase())) {
+        if (objectArrIndex(course.tutors, "tutor", user._id) == -1 && await user.tags.includes("Tutor") && await `${user.firstName} ${user.lastName} ${user.username}`.toLowerCase().includes(await req.body.text.toLowerCase())) {
             await tutors.push({ //Add user to array, using username as display, and id as id value
                 displayValue: `${user.firstName} ${user.lastName} (${user.username})`, 
                 idValue: user._id,
@@ -424,13 +416,13 @@ controller.assignTutor = async function(req, res) { //Assign user to tutor a cou
     const course = await Course.findById(req.params.id).populate("tutors.tutor"); //Populate tutor data
     const student = await User.findById(req.query.student); //Populate student data
     if (!platform || !course || !student) {
-        await req.flash("error", "An error occurred");
+        req.flash("error", "An error occurred");
         return res.redirect("back");
     }
 
     for (let tutor of course.tutors) { //Iterate through course tutors and check that student does not have any other current tutors
         if (tutor.members.includes(student._id)) {
-            await req.flash("error", "Student is already enrolled with another tutor");
+            req.flash("error", "Student is already enrolled with another tutor");
             return res.redirect("back");
         }
     }
@@ -451,7 +443,7 @@ controller.assignTutor = async function(req, res) { //Assign user to tutor a cou
         mutable: false
     });
     if (!room) {
-        await req.flash("error", "An error occurred");
+        req.flash("error", "An error occurred");
         return res.redirect("back");
     }
     
@@ -468,7 +460,7 @@ controller.assignTutor = async function(req, res) { //Assign user to tutor a cou
     await sendGridEmail(selectedTutor.tutor.email, `New student in ${course.name}`, `<p>Hello ${selectedTutor.tutor.firstName},</p><p>${student.username} has been signed up as your student in ${course.name}.</p>`, false);
     await sendGridEmail(student.email, `Tutor signup in ${course.name}`, `<p>Hello ${student.firstName},</p><p>${selectedTutor.tutor.username} has been signed up as your tutor in ${course.name}.</p>`, false);
 
-    await req.flash("success", `${selectedTutor.tutor.firstName} ${selectedTutor.tutor.lastName} is now tutoring ${student.firstName} ${student.lastName}!`);
+    req.flash("success", `${selectedTutor.tutor.firstName} ${selectedTutor.tutor.lastName} is now tutoring ${student.firstName} ${student.lastName}!`);
     return res.redirect(`/tutoringCenter/${course._id}`);
 }
 
@@ -515,7 +507,7 @@ controller.updateTutors = async function(req, res) { //Add tutors to course, as 
     const platform = await setup(Platform);
     const course = await Course.findById(req.params.id);
     if (!platform || !course) {
-        await req.flash("An error occurred");
+        req.flash("An error occurred");
         return res.redirect("back");
     }
 
@@ -523,7 +515,7 @@ controller.updateTutors = async function(req, res) { //Add tutors to course, as 
         for (let user of req.body.tutorInput.split(',')) {
             if (platform.studentStatuses.includes(user)) { //Added 'tutor' is a full status of users
                 for (let u of await User.find({status: user})) {
-                    if (!(await course.members.includes(u._id)) && (await objectArrIndex(course.tutors, "tutor", u._id) == -1)) {
+                    if (!(await course.members.includes(u._id)) && (objectArrIndex(course.tutors, "tutor", u._id) == -1)) {
                         await course.tutors.push({
                             tutor: u._id,
                             bio: '',
@@ -535,7 +527,7 @@ controller.updateTutors = async function(req, res) { //Add tutors to course, as 
                     }
                 }
 
-            } else if (!(await course.members.includes(user)) && (await objectArrIndex(course.tutors, "tutor", user) == -1)) { //Added student is a user ID
+            } else if (!(await course.members.includes(user)) && (objectArrIndex(course.tutors, "tutor", user) == -1)) { //Added student is a user ID
                 await course.tutors.push({
                     tutor: await User.findById(user),
                     bio: '',
@@ -547,7 +539,7 @@ controller.updateTutors = async function(req, res) { //Add tutors to course, as 
             }
         }
         await course.save();
-        await req.flash("success", "Successfully added tutors!");
+        req.flash("success", "Successfully added tutors!");
     }
     return res.redirect(`/tutoringCenter/${req.params.id}`);
 }
@@ -556,7 +548,7 @@ controller.updateStudents = async function(req, res) { //Add students to a cours
     const platform = await setup(Platform);
     const course = await Course.findById(req.params.id);
     if (!platform || !course) {
-        await req.flash("An error occurred");
+        req.flash("An error occurred");
         return res.redirect("back");
     }
 
@@ -564,18 +556,18 @@ controller.updateStudents = async function(req, res) { //Add students to a cours
         for (let user of req.body.studentInput.split(',')) {
             if (platform.studentStatuses.includes(user)) { //Added 'student' is a full status of usrs
                 for (let u of await User.find({status: user})) {
-                    if (!(await course.members.includes(u._id)) && (await objectArrIndex(course.tutors, "tutor", u._id)) == -1) { //Check that each user is not a current tutor for this course
+                    if (!(await course.members.includes(u._id)) && (objectArrIndex(course.tutors, "tutor", u._id)) == -1) { //Check that each user is not a current tutor for this course
                         await course.members.push(u);
                     }
                 };
             } else { //Added student represents user ID
-                if (!(await course.members.includes(user)) && (await objectArrIndex(course.tutors, "tutor", user) == -1)) { //Check that user is not a current tutor for this course
+                if (!(await course.members.includes(user)) && (objectArrIndex(course.tutors, "tutor", user) == -1)) { //Check that user is not a current tutor for this course
                     await course.members.push(await User.findById(user));
                 }
             }
         }
         await course.save();
-        await req.flash("success", "Successfully added students!");
+        req.flash("success", "Successfully added students!");
     }
     return res.redirect(`/tutoringCenter/${req.params.id}`);
 }
@@ -587,20 +579,20 @@ controller.removeStudent = async function(req, res) {
 
     let deletedRoom;
     for (let tutor of course.tutors) { //Iterate through tutors and remove the student
-        if (await objectArrIndex(tutor.members, "student", studentId._id, "_id") > -1) {
+        if (objectArrIndex(tutor.members, "student", studentId._id, "_id") > -1) {
             await tutor.formerStudents.push({ //Add student to list of former studnts
                 student: studentId._id,
-                lessons: tutor.members[await objectArrIndex(tutor.members, "student", studentId._id, "_id")].lessons
+                lessons: tutor.members[objectArrIndex(tutor.members, "student", studentId._id, "_id")].lessons
             });
-            deletedRoom = await ChatRoom.findByIdAndDelete(tutor.members[await objectArrIndex(tutor.members, "student", studentId._id, "_id")].room);
+            deletedRoom = await ChatRoom.findByIdAndDelete(tutor.members[objectArrIndex(tutor.members, "student", studentId._id, "_id")].room);
             if (!deletedRoom) {return res.json({error: "Error removing room"});}
 
             //Update newRooms for student and tutor, and remove student from list of tutor's current members
-            await removeIfIncluded(studentId.newRooms, deletedRoom._id);
+            removeIfIncluded(studentId.newRooms, deletedRoom._id);
             await studentId.save();
-            await removeIfIncluded(tutor.tutor.newRooms, deletedRoom._id);
+            removeIfIncluded(tutor.tutor.newRooms, deletedRoom._id);
             await tutor.tutor.save();
-            await tutor.members.splice(await objectArrIndex(tutor.members, "student", studentId._id, "_id"), 1);
+            await tutor.members.splice(objectArrIndex(tutor.members, "student", studentId._id, "_id"), 1);
         }
     }
 
@@ -615,7 +607,7 @@ controller.removeStudent = async function(req, res) {
     });
     if (!notif) {return res.json({error: "Error removing student"});}
 
-    notif.date = await dateFormat(notif.created_at, "h:MM TT | mmm d");
+    notif.date = dateFormat(notif.created_at, "h:MM TT | mmm d");
     await notif.save()
     await studentId.inbox.push({message: notif, new: true});
     await studentId.save();
@@ -623,7 +615,7 @@ controller.removeStudent = async function(req, res) {
         await sendGridEmail(studentId.email, `Removal from ${course.name}`, `<p>Hello ${studentId.firstName},</p><p>${notif.text}</p>`, false);
     }
     // await course.blocked.push(studentId);
-    await removeIfIncluded(course.members, studentId._id); //Remove student
+    removeIfIncluded(course.members, studentId._id); //Remove student
     await course.save();
     return res.json({success: "Succesfully removed student", student: studentId, course});
 }
@@ -636,7 +628,7 @@ controller.removeTutor = async function(req, res) { //Remove tutor from course
     } else {
         tutorId = await User.findById(req.query.tutorId);
         if (!tutorId) {
-            await req.flash("error", "Error removing tutor");
+            req.flash("error", "Error removing tutor");
             return res.redirect("back");
         }
     }
@@ -645,7 +637,7 @@ controller.removeTutor = async function(req, res) { //Remove tutor from course
     if (!course) {
         if (req.body.show) {return res.json({error: "Error removing tutor"});
         } else {
-            await req.flash("error", "Error removing tutor");
+            req.flash("error", "Error removing tutor");
             return res.redirect("back");
         }
     }
@@ -658,13 +650,13 @@ controller.removeTutor = async function(req, res) { //Remove tutor from course
                 if (!deletedRoom) {
                     if (req.body.show) {return res.json({error: "Error removing tutor"});
                     } else {
-                        await req.flash("error", "Error removing tutor");
+                        req.flash("error", "Error removing tutor");
                         return res.redirect("back");
                     }
                 }
-                await removeIfIncluded(student.student.newRooms, deletedRoom._id);
+                removeIfIncluded(student.student.newRooms, deletedRoom._id);
                 await student.student.save();
-                await removeIfIncluded(tutorId.newRooms, deletedRoom._id);
+                removeIfIncluded(tutorId.newRooms, deletedRoom._id);
                 await tutorId.save();
             }
 
@@ -682,11 +674,11 @@ controller.removeTutor = async function(req, res) { //Remove tutor from course
                 if (req.body.show) {
                     return res.json({error: "Error removing tutor"});
                 } else {
-                    await req.flash("error", "Error removing tutor");
+                    req.flash("error", "Error removing tutor");
                     return res.redirect("back");
                 }
             }
-            notif.date = await dateFormat(notif.created_at, "h:MM TT | mmm d");
+            notif.date = dateFormat(notif.created_at, "h:MM TT | mmm d");
             await notif.save();
 
             await tutorId.inbox.push({message: notif, new: true});
@@ -701,7 +693,7 @@ controller.removeTutor = async function(req, res) { //Remove tutor from course
 
             if (req.body.show) {return res.json({success: "Succesfully removed tutor", tutor: tutorId, course});
             } else {
-                await req.flash("success", "Succesfully Removed Tutor!");
+                req.flash("success", "Succesfully Removed Tutor!");
                 return res.redirect(`/tutoringCenter/${course._id}`);
             }
         }
@@ -715,7 +707,7 @@ controller.unblock = async function(req, res) { //Unblock a previously blocked u
     if (!blockedId || !course) {return res.json({error: "Unable to access course"});}
     if (!(await course.blocked.includes(blockedId._id))) {return res.json({error: "User is not blocked from this course"});} //If the user is not blocked, they cannot be unblocked
     
-    await removeIfIncluded(course.blocked, blockedId._id); //Unblock user
+    removeIfIncluded(course.blocked, blockedId._id); //Unblock user
     await course.save();
     const notif = await InboxMessage.create({  //Create a notification to alert the user
         subject: `Unblocked from ${course.name}`,
@@ -728,7 +720,7 @@ controller.unblock = async function(req, res) { //Unblock a previously blocked u
     });
     if (!notif) {return res.json({error: "Error removing student"});}
 
-    notif.date = await dateFormat(notif.created_at, "h:MM TT | mmm d");
+    notif.date = dateFormat(notif.created_at, "h:MM TT | mmm d");
     await notif.save();
 
     await blockedId.inbox.push({message: notif, new: true});
@@ -819,8 +811,8 @@ controller.setStudents = async function(req, res) {
 
     for (let tutor of course.tutors) { //Search through tutors to find requested tutor
         if (await tutor.tutor.equals(req.user._id)) {
-            tutor.slots = await parseInt(req.body.slots) - tutor.members.length; //Update slots based on data
-            if ((await parseInt(req.body.slots) - tutor.members.length) == 0) { //Update availability based on new slot info
+            tutor.slots = parseInt(req.body.slots) - tutor.members.length; //Update slots based on data
+            if ((parseInt(req.body.slots) - tutor.members.length) == 0) { //Update availability based on new slot info
                 tutor.available = false;
             }
             await course.save();
@@ -836,7 +828,7 @@ controller.setCost = async function(req, res) {
 
     for (let tutor of course.tutors) { //Search through tutors to find requested tutor
         if (await tutor.tutor.equals(req.user._id)) {
-            tutor.cost = await parseInt(req.body.cost);
+            tutor.cost = parseInt(req.body.cost);
             await course.save();
             return res.json({success: "Succesfully changed", tutor});
         }
@@ -849,8 +841,8 @@ controller.markLesson = async function(req, res) {
     if (!course) {return res.json({error: "Error accessing course"});}
 
     const newLesson = {
-        time: await parseInt(req.body.time),
-        date: await dateFormat(new Date(), "mmm d"),
+        time: parseInt(req.body.time),
+        date: dateFormat(new Date(), "mmm d"),
         summary: req.body.summary
     };
 
@@ -876,23 +868,23 @@ controller.markLesson = async function(req, res) {
 controller.bookTutor = async function(req, res) {
     const course = await Course.findById(req.params.id).populate('tutors.tutor');
     if (!course) {
-        await req.flash("error", "Unable to find course");
+        req.flash("error", "Unable to find course");
         return res.redirect("back");
     }
 
     let formerStudent = false;
     let lessons = [];
     for (let tutor of course.tutors) { //Iterate through tutors and search for the corresponding one
-        if (await objectArrIndex(tutor.members, "student", req.user._id) > -1) {
-            await req.flash("error", "You are already have a tutor"); //Don't allow student to sign up if they already have a tutor
+        if (objectArrIndex(tutor.members, "student", req.user._id) > -1) {
+            req.flash("error", "You are already have a tutor"); //Don't allow student to sign up if they already have a tutor
             return res.redirect("back");
         }
 
         if (await tutor.tutor._id.equals(req.query.tutorId) && tutor.available) {
-            if (await objectArrIndex(tutor.formerStudents, "student", req.user._id) > -1) { //Remove student from tutor's former members (if they were there)
+            if (objectArrIndex(tutor.formerStudents, "student", req.user._id) > -1) { //Remove student from tutor's former members (if they were there)
                 formerStudent = true;
-                lessons = await objectArrIndex(tutor.formerStudents, "student", req.user._id).lessons;
-                await tutor.formerStudents.splice(await objectArrIndex(tutor.formerStudents, "student", req.user._id), 1);
+                lessons = objectArrIndex(tutor.formerStudents, "student", req.user._id).lessons;
+                await tutor.formerStudents.splice(objectArrIndex(tutor.formerStudents, "student", req.user._id), 1);
             }
 
             tutor.slots--;
@@ -906,11 +898,11 @@ controller.bookTutor = async function(req, res) {
                 mutable: false
             });
             if (!room) {
-                await req.flash("error", "Unable to create chat room;");
+                req.flash("error", "Unable to create chat room;");
                 return res.redirect("back");
             }
 
-            room.date = await dateFormat(room.created_at, "h:MM TT | mmm d");
+            room.date = dateFormat(room.created_at, "h:MM TT | mmm d");
             await room.save();
             await tutor.tutor.newRooms.push(room._id);
             await req.user.newRooms.push(room._id);
@@ -929,20 +921,20 @@ controller.bookTutor = async function(req, res) {
             }
 
             //All current members of the tutor
-            const studentIds = await User.find({authenticated: true, _id: {$in: await parsePropertyArray(tutor.members, "student")}});
+            const studentIds = await User.find({authenticated: true, _id: {$in: parsePropertyArray(tutor.members, "student")}});
             if (!studentIds) {
-                await req.flash("error", "Error accessing students");
+                req.flash("error", "Error accessing students");
                 return res.redirect("back");
             }
 
             //All former members of the tutor
-            const formerStudents = await User.find({authenticated: true, _id: {$in: await parsePropertyArray(tutor.formerStudents, "student")}});
+            const formerStudents = await User.find({authenticated: true, _id: {$in: parsePropertyArray(tutor.formerStudents, "student")}});
             if (!formerStudents) {
-                await req.flash("error", "Error accessing students");
+                req.flash("error", "Error accessing students");
                 return res.redirect("back");
             }
 
-            await req.flash("success", `Congratulations, ${req.user.firstName}. You have signed up with ${tutor.tutor.firstName} ${tutor.tutor.lastName} for tutoring!`);
+            req.flash("success", `Congratulations, ${req.user.firstName}. You have signed up with ${tutor.tutor.firstName} ${tutor.tutor.lastName} for tutoring!`);
             return res.redirect(`/chat/${room._id}`);
         }
     }
@@ -955,22 +947,22 @@ controller.leaveTutor = async function(req, res) {
     let deletedRoom;
     for (let tutor of course.tutors) { //If the selected tutor is the one being left, and the user is a student of that tutor, leave
         if (await tutor.tutor._id.equals(req.body.tutorId)) {
-            if (await objectArrIndex(tutor.members, "student", req.user._id) > -1) {
-                deletedRoom = await ChatRoom.findByIdAndDelete(tutor.members[await objectArrIndex(tutor.members, "student", req.user._id)].room);
+            if (objectArrIndex(tutor.members, "student", req.user._id) > -1) {
+                deletedRoom = await ChatRoom.findByIdAndDelete(tutor.members[objectArrIndex(tutor.members, "student", req.user._id)].room);
                 if (!deletedRoom) {return res.json({error: "Error deleting room"});}
 
                 //Remove room, add student to tutor's former members
-                await removeIfIncluded(tutor.tutor.newRooms, tutor.members[await objectArrIndex(tutor.members, "student", req.user._id)].room);
+                removeIfIncluded(tutor.tutor.newRooms, tutor.members[objectArrIndex(tutor.members, "student", req.user._id)].room);
                 await tutor.tutor.save();
-                await removeIfIncluded(req.user.newRooms, tutor.members[await objectArrIndex(tutor.members, "student", req.user._id)].room)
+                removeIfIncluded(req.user.newRooms, tutor.members[objectArrIndex(tutor.members, "student", req.user._id)].room)
                 await req.user.save();
-                if (await objectArrIndex(tutor.formerStudents, "student", req.user._id) == -1) {
+                if (objectArrIndex(tutor.formerStudents, "student", req.user._id) == -1) {
                     await tutor.formerStudents.push({
                         student: req.user._id,
-                        lessons: tutor.members[await objectArrIndex(tutor.members, "student", req.user._id).lessons]
+                        lessons: tutor.members[objectArrIndex(tutor.members, "student", req.user._id).lessons]
                     });
                 }
-                await tutor.members.splice(await objectArrIndex(tutor.members, "student", req.user._id), 1);
+                await tutor.members.splice(objectArrIndex(tutor.members, "student", req.user._id), 1);
                 tutor.slots++;
                 tutor.available = true;
 
@@ -987,8 +979,8 @@ controller.upvoteTutor = async function(req, res) {
 
     for (let tutor of course.tutors) {
         if (await tutor.tutor.equals(req.body.tutorId)) { //Search for tutor until they are found
-            if (await objectArrIndex(await tutor.members.concat(tutor.formerStudents), "student", req.user._id) > -1) { //Only current/former members of a tutor can upvote them
-                if (await removeIfIncluded(tutor.upvotes, req.user._id)) { //If tutor is currently upvoted by this user, downvote them
+            if (objectArrIndex(await tutor.members.concat(tutor.formerStudents), "student", req.user._id) > -1) { //Only current/former members of a tutor can upvote them
+                if (removeIfIncluded(tutor.upvotes, req.user._id)) { //If tutor is currently upvoted by this user, downvote them
                     await course.save();
                     return res.json({success: "Downvoted tutor", upvoteCount: tutor.upvotes.length});
                 }
@@ -1007,11 +999,11 @@ controller.rateTutor = async function(req, res) {
 
     for (let tutor of course.tutors) {
         if (await tutor.tutor.equals(req.body.tutorId)) {
-            if (await objectArrIndex(await tutor.members.concat(tutor.formerStudents), "student", req.user._id) > -1) { //Only current/former members of a tutor can upvote them
+            if (objectArrIndex(await tutor.members.concat(tutor.formerStudents), "student", req.user._id) > -1) { //Only current/former members of a tutor can upvote them
                 const review = await Review.create({text: req.body.text.split('<').join('&lt'), sender: req.user, rating: req.body.rating}); //Create comment with review
                 if (!review) {return res.json({error: "Error reviewing tutor"});}
 
-                review.date = await dateFormat(review.created_at, "h:MM TT | mmm d");
+                review.date = dateFormat(review.created_at, "h:MM TT | mmm d");
                 await review.save();
                 await tutor.reviews.push(review);
                 await course.save();
@@ -1037,7 +1029,7 @@ controller.likeReview = async function(req, res) {
     const review = await Review.findById(req.params.id);
     if (!review) {return res.json({error: "Error accessing review"});}
 
-    if (await removeIfIncluded(review.likes, req.user._id)) { //If user has liked this review, remove a like
+    if (removeIfIncluded(review.likes, req.user._id)) { //If user has liked this review, remove a like
         await review.save();
         return res.json({success: "Removed a like", likeCount: review.likes.length, review});
     }
@@ -1050,7 +1042,7 @@ controller.likeReview = async function(req, res) {
 controller.approveLesson = async function(req, res) { //Approve lesson as user
     const platform = await setup(Platform);
     const course = await Course.findById(req.params.id);
-    if (!platform || !course) { return res.json({error: "Unable to find course"});}
+    if (!platform || !course) {return res.json({error: "Unable to find course"});}
     for (let tutor of course.tutors) {
         if (await tutor.tutor.equals(req.body.tutorId)) { //Iterate through tutors until correct user has been found
             for (let student of tutor.members) {
@@ -1089,7 +1081,7 @@ controller.showTutor = async function(req, res) {
         populate: {path: "sender"}
     });
     if (!platform || !course) {
-        await req.flash('error', "Unable to find course");
+        req.flash('error', "Unable to find course");
         return res.redirect('back');
     }
 
@@ -1106,7 +1098,7 @@ controller.showTutor = async function(req, res) {
             let enrolledCourses = []; //Collect all courses which this tutor teaches (that are not the current one)
             const courses = await Course.find({_id: {$ne: course._id}}).populate("creator");
             if (!courses) {
-                await req.flash('error', "Unable to find courses");
+                req.flash('error', "Unable to find courses");
                 return res.redirect('back');
             }
 
@@ -1121,9 +1113,9 @@ controller.showTutor = async function(req, res) {
             averageRating = Math.round(averageRating / tutor.reviews.length);
             
             //Collect info on all members who are members of this tutor
-            const members = await User.find({authenticated: true, _id: {$in: await parsePropertyArray(tutor.members, "student")}});
+            const members = await User.find({authenticated: true, _id: {$in: parsePropertyArray(tutor.members, "student")}});
             if (!members) {
-                await req.flash('error', "Unable to find members");
+                req.flash('error', "Unable to find members");
                 return res.redirect('back');
             }
 
@@ -1147,28 +1139,28 @@ controller.showTutor = async function(req, res) {
 
             if (req.query.studentId) { //If query is to show a tutor's lessons with a specific student
                 const allStudents = await (tutor.members.concat(tutor.formerStudents));
-                if (await objectArrIndex(allStudents, "student", req.query.studentId, "_id") > -1) {
+                if (objectArrIndex(allStudents, "student", req.query.studentId, "_id") > -1) {
                     //Check that user is either a student of this tutor, this tutor, or the course's teacher
-                    if (allStudents[await objectArrIndex(allStudents, "student", req.query.studentId, "_id")].student._id.equals(req.user._id) || (await tutor.tutor._id.equals(req.user._id)) || (await course.creator.equals(req.user._id))) {
+                    if (allStudents[objectArrIndex(allStudents, "student", req.query.studentId, "_id")].student._id.equals(req.user._id) || (await tutor.tutor._id.equals(req.user._id)) || (await course.creator.equals(req.user._id))) {
                         return res.render('tutoringCenter/lessons', {
-                            platform, course, tutor, student: allStudents[await objectArrIndex(allStudents, "student", req.query.studentId, "_id")], objectArrIndex,
-                            time: await lessonMap.get(allStudents[await objectArrIndex(allStudents, "student", req.query.studentId, "_id")].student._id.toString()), 
-                            cost: await costMap.get(allStudents[await objectArrIndex(allStudents, "student", req.query.studentId, "_id")].student._id.toString()),
-                            data: platform.features[await objectArrIndex(platform.features, "route", "tutoringCenter")]
+                            platform, course, tutor, student: allStudents[objectArrIndex(allStudents, "student", req.query.studentId, "_id")], objectArrIndex,
+                            time: await lessonMap.get(allStudents[objectArrIndex(allStudents, "student", req.query.studentId, "_id")].student._id.toString()), 
+                            cost: await costMap.get(allStudents[objectArrIndex(allStudents, "student", req.query.studentId, "_id")].student._id.toString()),
+                            data: platform.features[objectArrIndex(platform.features, "route", "tutoringCenter")]
                         });
                     }
-                    await req.flash('error', "You do not have permission to view that student");
+                    req.flash('error', "You do not have permission to view that student");
                     return res.redirect('back');
                 }
                 
-                await req.flash('error', "You do not have permission to view that student");
+                req.flash('error', "You do not have permission to view that student");
                 return res.redirect('back');
             }
 
             return res.render('tutoringCenter/tutor-show', {
                 platform, course, tutor, students: members, studentIds, averageRating,
                 lessons: lessonMap, courses: enrolledCourses, objectArrIndex,
-                data: platform.features[await objectArrIndex(platform.features, "route", "tutoringCenter")]
+                data: platform.features[objectArrIndex(platform.features, "route", "tutoringCenter")]
             });
         }
     }

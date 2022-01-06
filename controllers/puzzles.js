@@ -21,7 +21,7 @@ controller.index = async function(req, res) {
     const platform = await setup(Platform);
     const users = await User.find({authenticated: true});
     if (!platform || !users) {
-        await req.flash('error', 'An Error Occurred');
+        req.flash('error', 'An Error Occurred');
         return res.redirect('back');
     }
 
@@ -32,11 +32,11 @@ controller.index = async function(req, res) {
         puzzles = await Puzzle.find({verified: true}).populate('sender').populate("answers");;
     }
     if(!puzzles) {
-        await req.flash('error', 'Cannot find puzzles.');
+        req.flash('error', 'Cannot find puzzles.');
         return res.redirect('back');
     }
 
-    const userNames = await parsePropertyArray(users, "firstName").join(',').toLowerCase().split(',');
+    const userNames = parsePropertyArray(users, "firstName").join(',').toLowerCase().split(',');
     const puzzleTexts = await embedLink(req.user, puzzles, userNames);
     const answeredPuzzles = new Map();
 
@@ -48,7 +48,7 @@ controller.index = async function(req, res) {
 
     return res.render('puzzles/index', {
         platform, puzzles: await puzzles.reverse(), puzzleTexts,
-        data: platform.features[await objectArrIndex(platform.features, "route", "puzzles")]
+        data: platform.features[objectArrIndex(platform.features, "route", "puzzles")]
     });
 };
 
@@ -56,10 +56,10 @@ controller.index = async function(req, res) {
 controller.new = async function(req, res) {
     const platform = await setup(Platform);
     if (!platform) {
-        await req.flash("error", "An Error Occurred");
+        req.flash("error", "An Error Occurred");
         return res.redirect("back");
     }
-    return res.render('puzzles/new', {platform, data: platform.features[await objectArrIndex(platform.features, "route", "puzzles")]});
+    return res.render('puzzles/new', {platform, data: platform.features[objectArrIndex(platform.features, "route", "puzzles")]});
 };
 
 // Puzzle GET show
@@ -76,22 +76,22 @@ controller.show = async function(req, res) {
             populate: {path: "sender"}
         });
     if(!platform || !puzzle) {
-        await req.flash('error', 'Could not find puzzle');
+        req.flash('error', 'Could not find puzzle');
         return res.redirect('back');
 
     } else if (!puzzle.verified && !(await platform.permissionsProperty.slice(platform.permissionsProperty.length-3).includes(req.user.permission))) {
-        await req.flash('error', 'You cannot view that puzzle');
+        req.flash('error', 'You cannot view that puzzle');
         return res.redirect('back');
     }
 
     let fileExtensions = new Map(); //Track which file format each attachment is in
     for (let media of puzzle.mediaFiles) {
-        await fileExtensions.set(media.url, await path.extname(media.url.split("SaberChat/")[1]));
+        fileExtensions.set(media.url, path.extname(media.url.split("SaberChat/")[1]));
     }
     const convertedText = await convertToLink(puzzle.text); //Parse and add hrefs to all links in text
     return res.render('puzzles/show', {
         platform, puzzle, convertedText, fileExtensions,
-        data: platform.features[await objectArrIndex(platform.features, "route", "puzzles")]
+        data: platform.features[objectArrIndex(platform.features, "route", "puzzles")]
     });
 };
 
@@ -100,17 +100,17 @@ controller.updateForm = async function(req, res) {
     const platform = await setup(Platform);
     const puzzle = await Puzzle.findById(req.params.id);
     if(!platform || !puzzle) {
-        await req.flash('error', 'Could not find puzzle');
+        req.flash('error', 'Could not find puzzle');
         return res.redirect('back');
     }
     if(!(await puzzle.sender.equals(req.user._id))) { //Only the sender may edit the puzzle
-        await req.flash('error', 'You do not have permission to do that.');
+        req.flash('error', 'You do not have permission to do that.');
         return res.redirect('back');
     }
 
     let fileExtensions = new Map(); //Track which file format each attachment is in
     for (let media of puzzle.mediaFiles) {
-        await fileExtensions.set(media.url, await path.extname(await media.url.split("SaberChat/")[1]));
+        fileExtensions.set(media.url, path.extname(await media.url.split("SaberChat/")[1]));
     }
     return res.render('puzzles/edit', {platform, puzzle, fileExtensions});
 };
@@ -126,7 +126,7 @@ controller.create = async function(req, res) {
         verified: !platform.postVerifiable //Puzzle does not need to be verified if platform does not support verifying puzzles
     });
     if (!platform || !puzzle) {
-        await req.flash('error', 'Unable to create puzzle');
+        req.flash('error', 'Unable to create puzzle');
         return res.redirect('back');
     }
 
@@ -141,7 +141,7 @@ controller.create = async function(req, res) {
                 const processedBuffer = await autoCompress(file.originalname, file.buffer);
                 [cloudErr, cloudResult] = await cloudUpload(file.originalname, processedBuffer);
                 if (cloudErr || !cloudResult) {
-                    await req.flash('error', 'Upload failed');
+                    req.flash('error', 'Upload failed');
                     return res.redirect('back');
                 }
 
@@ -160,7 +160,7 @@ controller.create = async function(req, res) {
     if (!platform.postVerifiable) {
         const users = await User.find({authenticated: true, _id: {$ne: req.user._id}});
         if (!users) {
-            await req.flash('error', "An Error Occurred");
+            req.flash('error', "An Error Occurred");
             return res.redirect('back');
         }
 
@@ -176,9 +176,9 @@ controller.create = async function(req, res) {
     }
 
     if (platform.postVerifiable) {
-        await req.flash('success', `Puzzle Posted! A platform ${await platform.permissionsDisplay[platform.permissionsDisplay.length-1].toLowerCase()} will verify your post soon.`);
+        req.flash('success', `Puzzle Posted! A platform ${await platform.permissionsDisplay[platform.permissionsDisplay.length-1].toLowerCase()} will verify your post soon.`);
     } else {
-        await req.flash('success', `Puzzle Posted!`);
+        req.flash('success', `Puzzle Posted!`);
     }
     return res.redirect(`/puzzles`);
 };
@@ -187,14 +187,14 @@ controller.verify = async function(req, res) {
     const platform = await setup(Platform);
     const puzzle = await Puzzle.findByIdAndUpdate(req.params.id, {verified: true}).populate("sender");
     if (!platform || !puzzle) {
-        await req.flash('error', "Unable to access puzzle");
+        req.flash('error', "Unable to access puzzle");
         return res.redirect('back');
     }
 
     if (platform.postVerifiable) {
         const users = await User.find({authenticated: true, _id: {$ne: req.user._id}});
         if (!users) {
-            await req.flash('error', "An Error Occurred");
+            req.flash('error', "An Error Occurred");
             return res.redirect('back');
         }
 
@@ -209,7 +209,7 @@ controller.verify = async function(req, res) {
         }
     }
 
-    await req.flash("success", "Verified Puzzle!");
+    req.flash("success", "Verified Puzzle!");
     return res.redirect("/puzzles");
 }
 
@@ -218,12 +218,12 @@ controller.updatePuzzle = async function(req, res) {
     const platform = await setup(Platform);
     const puzzle = await Puzzle.findById(req.params.id).populate('sender');
     if (!platform || !puzzle) {
-        await req.flash('error', "Unable to access puzzle");
+        req.flash('error', "Unable to access puzzle");
         return res.redirect('back');
     }
 
     if ((await puzzle.sender._id.toString()) != (await req.user._id.toString())) {
-        await req.flash('error', "You can only update puzzles which you have sent");
+        req.flash('error', "You can only update puzzles which you have sent");
         return res.redirect('back');
     }
 
@@ -234,7 +234,7 @@ controller.updatePuzzle = async function(req, res) {
         verified: !platform.postVerifiable //Puzzle does not need to be verified if platform does not support verifying puzzles
     });
     if (!updatedPuzzle) {
-        await req.flash('error', "Unable to update puzzle");
+        req.flash('error', "Unable to update puzzle");
         return res.redirect('back');
     }
 
@@ -246,7 +246,7 @@ controller.updatePuzzle = async function(req, res) {
     for (let i = updatedPuzzle.mediaFiles.length-1; i >= 0; i--) {
         if (req.body[`deleteUpload-${updatedPuzzle.mediaFiles[i].url}`] && updatedPuzzle.mediaFiles[i] && updatedPuzzle.mediaFiles[i].filename) {
             //Evaluate filetype to decide on file deletion strategy
-            switch(await path.extname(await updatedPuzzle.mediaFiles[i].url.split("SaberChat/")[1]).toLowerCase()) {
+            switch(path.extname(await updatedPuzzle.mediaFiles[i].url.split("SaberChat/")[1]).toLowerCase()) {
                 case ".mp3":
                 case ".mp4":
                 case ".m4a":
@@ -262,7 +262,7 @@ controller.updatePuzzle = async function(req, res) {
 
             // Check For Failure
             if (cloudErr || !cloudResult || cloudResult.result !== 'ok') {
-                await req.flash('error', 'Error deleting uploaded image');
+                req.flash('error', 'Error deleting uploaded image');
                 return res.redirect('back');
             }
             await updatedPuzzle.mediaFiles.splice(i, 1);
@@ -277,7 +277,7 @@ controller.updatePuzzle = async function(req, res) {
                 const processedBuffer = await autoCompress(file.originalname, file.buffer);
                 [cloudErr, cloudResult] = await cloudUpload(file.originalname, processedBuffer);
                 if (cloudErr || !cloudResult) {
-                    await req.flash('error', 'Upload failed');
+                    req.flash('error', 'Upload failed');
                     return res.redirect('back');
                 }
 
@@ -293,14 +293,14 @@ controller.updatePuzzle = async function(req, res) {
     await updatedPuzzle.save();
     const users = await User.find({authenticated: true, _id: {$ne: req.user._id}});
     if (!users) {
-        await req.flash('error', "An Error Occurred");
+        req.flash('error', "An Error Occurred");
         return res.redirect('back');
     }
 
     let imageString = "";
     for (let image of puzzle.images) {imageString += `<img src="${image}">`;}
 
-    await req.flash('success', 'Puzzle Updated!');
+    req.flash('success', 'Puzzle Updated!');
     return res.redirect(`/puzzles`);
 }
 
@@ -309,7 +309,7 @@ controller.likePuzzle = async function(req, res) {
     const puzzle = await Puzzle.findById(req.body.puzzleId);
     if(!puzzle) {return res.json({error: 'Error updating puzzle.'});}
 
-    if (await removeIfIncluded(puzzle.likes, req.user._id)) { //Remove like
+    if (removeIfIncluded(puzzle.likes, req.user._id)) { //Remove like
         await puzzle.save();
         return res.json({
             success: `Removed a like from ${puzzle.subject}`,
@@ -391,12 +391,12 @@ controller.comment = async function(req, res) {
 controller.answer = async function(req, res) {
     const puzzle = await Puzzle.findById(req.params.id).populate("answers");
     if (!puzzle) {
-        await req.flash("error", "Unable to post answer");
+        req.flash("error", "Unable to post answer");
         return res.redirect("back");
     }
 
     if (objectArrIndex(puzzle.answers, "sender", req.user._id) > -1) {
-        await req.flash("error", "You have already answered this post");
+        req.flash("error", "You have already answered this post");
         return res.redirect("back");
     }
 
@@ -405,7 +405,7 @@ controller.answer = async function(req, res) {
         sender: req.user
     });
     if (!answer) {
-        await req.flash("error", "Unable to post answer");
+        req.flash("error", "Unable to post answer");
         return res.redirect("back");
     }
 
@@ -415,7 +415,7 @@ controller.answer = async function(req, res) {
     await puzzle.answers.push(answer);
     await puzzle.save();
 
-    await req.flash("Successfully posted answer!")
+    req.flash("Successfully posted answer!")
     return res.redirect("/puzzles");
 }
  
@@ -424,7 +424,7 @@ controller.likeComment = async function(req, res) {
     const comment = await PostComment.findById(req.body.commentId);
     if(!comment) {return res.json({error: 'Error finding comment'});}
 
-    if (await removeIfIncluded(comment.likes, req.user._id)) {
+    if (removeIfIncluded(comment.likes, req.user._id)) {
         await comment.save();
         return res.json({
             success: `Removed a like`,
@@ -443,12 +443,12 @@ controller.likeComment = async function(req, res) {
 controller.deletePuzzle = async function(req, res) {
     const puzzle = await Puzzle.findById(req.params.id).populate('sender');
     if (!puzzle) {
-        await req.flash('error', "Unable to access puzzle");
+        req.flash('error', "Unable to access puzzle");
         return res.redirect('back');
     }
 
     if ((await puzzle.sender._id.toString()) != (await req.user._id.toString())) {
-        await req.flash('error', "You can only delete puzzles that you have posted");
+        req.flash('error', "You can only delete puzzles that you have posted");
         return res.redirect('back');
     }
     
@@ -458,7 +458,7 @@ controller.deletePuzzle = async function(req, res) {
     for (let file of puzzle.mediaFiles) {
         if (file && file.filename) {
             //Evaluate deleted files' filetype and delete accordingly
-            switch(await path.extname(await file.url.split("SaberChat/")[1]).toLowerCase()) {
+            switch(path.extname(await file.url.split("SaberChat/")[1]).toLowerCase()) {
                 case ".mp3":
                 case ".mp4":
                 case ".m4a":
@@ -474,7 +474,7 @@ controller.deletePuzzle = async function(req, res) {
 
             // check for failure
             if (cloudErr || !cloudResult || cloudResult.result !== 'ok') {
-                await req.flash('error', 'Error deleting uploaded image');
+                req.flash('error', 'Error deleting uploaded image');
                 return res.redirect('back');
             }
         }
@@ -482,17 +482,17 @@ controller.deletePuzzle = async function(req, res) {
 
     const deletedPuzzle = await Puzzle.findByIdAndDelete(puzzle._id);
     if (!deletedPuzzle) {
-        await req.flash('error', "Unable to delete puzzle");
+        req.flash('error', "Unable to delete puzzle");
         return res.redirect('back');
     }
 
     const users = await User.find({authenticated: true});
     if (!users) {
-        await req.flash('error', "Unable to find users");
+        req.flash('error', "Unable to find users");
         return res.redirect('back');
     }
 
-    await req.flash('success', 'Puzzle Deleted!');
+    req.flash('success', 'Puzzle Deleted!');
     return res.redirect('/puzzles');
 }
 

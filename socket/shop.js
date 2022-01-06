@@ -32,7 +32,7 @@ shop.order = async function(io, socket, itemList, itemCount, instructions, addre
 
         let unavailable = false; //This variable will track if any items are unavailable in the requested quantities
         for (let i = 0; i < orderItems.length; i++) { //Iterate over each item and check if any are unavailable
-            if (orderItems[i].availableItems < await parseInt(itemCount[i])) { //If order asks for more of this item than is available, unavailable is now true, and the checking stops immediately
+            if (orderItems[i].availableItems < parseInt(itemCount[i])) { //If order asks for more of this item than is available, unavailable is now true, and the checking stops immediately
                 unavailable = true;
                 break;
             }
@@ -43,7 +43,7 @@ shop.order = async function(io, socket, itemList, itemCount, instructions, addre
 
         let orderItemsObjects = [];
         for (let i = 0; i < itemList.length; i += 1) {
-            await orderItemsObjects.push({
+            orderItemsObjects.push({
                 item: itemList[i],
                 quantity: parseInt(itemCount[i]),
                 price: 0
@@ -71,7 +71,7 @@ shop.order = async function(io, socket, itemList, itemCount, instructions, addre
 
         if (!order) {return console.log('error creating order');}
 
-        order.date = await dateFormat(order.created_at, "mmm d, h:MM TT");
+        order.date = dateFormat(order.created_at, "mmm d, h:MM TT");
         let charge = 0;
         let itemProfile;
 

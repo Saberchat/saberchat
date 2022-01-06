@@ -18,10 +18,10 @@ controller.index = async function(req, res) {
     const platform = await setup(Platform);
     const articles = await Article.find({}).populate('sender');
     if (!platform || !articles) {
-        await req.flash('error', 'An Error Occurred');
+        req.flash('error', 'An Error Occurred');
         return res.redirect('/wHeights');
     }
-    return res.render('wHeights/index', {platform, articles, icon: platform.features[await objectArrIndex(platform.features, "route", "wHeights")].icon});
+    return res.render('wHeights/index', {platform, articles, icon: platform.features[objectArrIndex(platform.features, "route", "wHeights")].icon});
 }
 
 // display form for creating articles
@@ -34,17 +34,17 @@ controller.new = async function(req, res) {
         status: {$in: platform.studentStatuses} //All students
     });
     if (!platform || !wHeightsOrg || !students) {
-        await req.flash('error', "Unable to find students");
+        req.flash('error', "Unable to find students");
         return res.redirect('back');
     }
 
     const categories = await PostCategory.find({_id: {$in: wHeightsOrg.categories}}); //Find list of article categories (for sorting)
     if (!categories) {
-        await req.flash('error', "Unable to find article categories");
+        req.flash('error', "Unable to find article categories");
         return res.redirect('back');
     }
 
-    return res.render('wHeights/new', {platform, students, categories, icon: platform.features[await objectArrIndex(platform.features, "route", "wHeights")].icon});
+    return res.render('wHeights/new', {platform, students, categories, icon: platform.features[objectArrIndex(platform.features, "route", "wHeights")].icon});
 }
 
 // display specific article
@@ -58,10 +58,10 @@ controller.show = async function(req, res) {
         });
 
     if (!platform || !article) {
-        await req.flash('error', 'Cannot find article');
+        req.flash('error', 'Cannot find article');
         return res.redirect('/wHeights');
     }
-    return res.render('wHeights/show', {platform, article, icon: platform.features[await objectArrIndex(platform.features, "route", "wHeights")].icon});
+    return res.render('wHeights/show', {platform, article, icon: platform.features[objectArrIndex(platform.features, "route", "wHeights")].icon});
 }
 
 //Create article
@@ -72,14 +72,14 @@ controller.create = async function(req, res) {
         content: content
     });
     if (!article) {
-        await req.flash('error', "Error creating article");
+        req.flash('error', "Error creating article");
         return res.redirect('/wHeights');
     }
-    article.date = await dateFormat(article.created_at, "mmm d, yyyy - h:MM TT");
+    article.date = dateFormat(article.created_at, "mmm d, yyyy - h:MM TT");
 
     const sender = await User.findById(req.body.sender);
     if (!sender) {
-        await req.flash('error', "Unable to find sender");
+        req.flash('error', "Unable to find sender");
         return res.redirect('back');
     }
 
@@ -88,7 +88,7 @@ controller.create = async function(req, res) {
 
     const category = await PostCategory.findById(req.body.category);
     if (!category) {
-        await req.flash('error', "Unable to find specified category");
+        req.flash('error', "Unable to find specified category");
         return res.redirect('back');
     }
 
@@ -111,11 +111,11 @@ controller.comment = async function(req, res) {
     const comment = await PostComment.create({
         text: await req.body.text.split('<').join('&lt'),
         sender: req.user,
-        date: await dateFormat(new Date(), "h:MM TT | mmm d")
+        date: dateFormat(new Date(), "h:MM TT | mmm d")
     });
     if (!comment) {return res.json({error: 'Error commenting'});}
 
-    comment.date = await dateFormat(comment.created_at, "h:MM TT | mmm d");
+    comment.date = dateFormat(comment.created_at, "h:MM TT | mmm d");
     await comment.save();
 
     await article.comments.push(comment);
@@ -148,7 +148,7 @@ controller.comment = async function(req, res) {
             return res.json({error: "Error creating notification"});
         }
 
-        notif.date = await dateFormat(notif.created_at, "h:MM TT | mmm d");
+        notif.date = dateFormat(notif.created_at, "h:MM TT | mmm d");
         notif.text = `Hello ${user.firstName},\n\n${req.user.firstName} ${req.user.lastName} mentioned you in a comment on "${article.title}":\n${comment.text}`;
         await notif.save();
         if (user.receiving_emails) {
@@ -167,7 +167,7 @@ controller.likeComment = async function(req, res) {
         return res.json({error: 'Error updating comment'});
     }
 
-    if (await removeIfIncluded(comment.likes, req.user._id)) { //Remove Like
+    if (removeIfIncluded(comment.likes, req.user._id)) { //Remove Like
         await comment.save();
         return res.json({
             success: `Removed a like from a comment`,
