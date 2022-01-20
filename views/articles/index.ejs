@@ -20,7 +20,7 @@
             <div class="jumbotron text-center header">
                 <h1><i class="fas fa-<%=data.icon%>"></i> <%=data.name%></h1>
                 <p><%=data.description%></p>
-                <% if (platform.postVerifiable || currentUser.status == platform.teacherStatus || currentUser.permission == platform.permissionsProperty[platform.permissionsProperty.length-1]) { %>
+                <% if (currentUser && (platform.postVerifiable || currentUser.status == platform.teacherStatus || currentUser.permission == platform.permissionsProperty[platform.permissionsProperty.length-1])) { %>
                     <a href="/articles/new" class="btn btn-primary post-button">
                         <i class="fas fa-plus-circle"></i> Add New Article
                     </a>
@@ -46,7 +46,7 @@
 
                             <a class="post-button" href="/articles/<%= article._id %>">
                                 <span class="post-subject-header"><%= article.subject %></span>
-                                <% if (platform.postVerifiable && !article.verified && platform.permissionsProperty.slice(platform.permissionsProperty.length-3).includes(currentUser.permission)) { %>
+                                <% if (currentUser && (platform.postVerifiable && !article.verified && platform.permissionsProperty.slice(platform.permissionsProperty.length-3).includes(currentUser.permission))) { %>
                                     <a href="/articles/verify/<%= article._id %>">
                                         <span class="badge badge-pill badge-primary" id="mark">Verify</span>
                                     </a>
@@ -61,7 +61,7 @@
                                         class="sender-profile-image">
                                 <%= article.sender.firstName %> <%= article.sender.lastName %>
                             </a>
-                            <% if (currentUser._id.toString() == article.sender._id.toString()) { %>
+                            <% if (currentUser && currentUser._id.toString() == article.sender._id.toString()) { %>
                                 <button type="button" class="edit-button btn btn-info"><a
                                             class="post-button"
                                             href="/articles/<%= article._id %>/edit"><i
@@ -107,21 +107,23 @@
                                 </form>
                             <% } %>
 
-                            <% if (article.likes.includes(currentUser._id)) { %>
-                                <span class="liked-button"><i id="like-<%= article._id %>-index"
-                                                                onclick="like(this, 'article', 'articles')"
-                                                                class="fas fa-thumbs-up"></i></span> <span
-                                        class="likeCount-<%= article._id %>"><%= article.likes.length %></span>
+                            <% if (currentUser) { %>
+                                <% if (article.likes.includes(currentUser._id)) { %>
+                                    <span class="liked-button"><i id="like-<%= article._id %>-index"
+                                                                    onclick="like(this, 'article', 'articles')"
+                                                                    class="fas fa-thumbs-up"></i></span> <span
+                                            class="likeCount-<%= article._id %>"><%= article.likes.length %></span>
 
-                            <% } else { %>
-                                <span class="unliked-button"><i id="like-<%= article._id %>-index"
-                                                                onclick="like(this, 'article', 'articles')"
-                                                                class="fas fa-thumbs-up"></i></span> <span
-                                        class="likeCount-<%= article._id %>"><%= article.likes.length %></span>
+                                <% } else { %>
+                                    <span class="unliked-button"><i id="like-<%= article._id %>-index"
+                                                                    onclick="like(this, 'article', 'articles')"
+                                                                    class="fas fa-thumbs-up"></i></span> <span
+                                            class="likeCount-<%= article._id %>"><%= article.likes.length %></span>
 
-                            <% } %>
+                                <% } %>
                             <a class="comment-button" href="/articles/<%= article._id %>#comment-section"><i
                                         class="fas fa-comment-dots"></i> <%= article.comments.length %></a>
+                            <% } %>
                         </div>
                     </div>
 
