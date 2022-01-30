@@ -1,3 +1,4 @@
+// displays or hides message reply form
 const reply = function() {
     document.getElementById('reply-box').hidden = false;
 }

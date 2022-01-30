@@ -1,10 +1,10 @@
 const express = require('express');
 const middleware = require('../middleware');
-const { validateMsg } = require('../middleware/validation');
+const { validateMsg } = require('../middleware/validation'); // Backend validation
 const wrapAsync = require('../utils/wrapAsync');
-const {multipleUpload} = require('../middleware/multer');
-const inbox = require('../controllers/inbox'); //Controller
-const router = express.Router(); //Router
+const {multipleUpload} = require('../middleware/multer'); // Media upload
+const inbox = require('../controllers/inbox'); // Import Controller functions
+const router = express.Router(); // Initialize Express Router
 
 //INBOX ACTIONS
 router.get('/', wrapAsync(middleware.isLoggedIn), wrapAsync(inbox.index)); // Display user inbox
@@ -27,4 +27,4 @@ router.get('/requests/:id', wrapAsync(middleware.isLoggedIn), wrapAsync(inbox.sh
 router.post('/requests/:id/accept', wrapAsync(middleware.isLoggedIn), wrapAsync(inbox.acceptReq)); // route to accept request
 router.post('/requests/:id/reject', wrapAsync(middleware.isLoggedIn), wrapAsync(inbox.rejectReq)); // route to reject request
 
-module.exports = router;
+module.exports = router; // export Inbox router
