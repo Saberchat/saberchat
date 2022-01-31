@@ -1,4 +1,4 @@
-const request = function(button) { //Send room join request
+const request = function(button) { //Send room join request to server
     const roomId = button.id.split('-')[1];
     const url = `/chat/${roomId}/request`;
     const data = {};
@@ -12,7 +12,7 @@ const request = function(button) { //Send room join request
     });
 }
 
-const cancelRequest = function(button) { //Cancel room join request
+const cancelRequest = function(button) { //Send request to server to cancel join request 
     const roomId = button.id.split('-')[1];
     const url = `/chat/${roomId}/request?_method=delete`;
     const data = {};

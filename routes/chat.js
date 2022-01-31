@@ -1,11 +1,11 @@
 // Chat rooms routes control the creation and management of rooms and comments
 const express = require('express');
 const middleware = require('../middleware');
-const {singleUpload} = require('../middleware/multer');
-const {validateRoom} = require('../middleware/validation');
+const {singleUpload} = require('../middleware/multer'); // media upload service
+const {validateRoom} = require('../middleware/validation'); // backend validation
 const wrapAsync = require('../utils/wrapAsync');
-const chat = require('../controllers/chat'); //Controller
-const router = express.Router(); //Router
+const chat = require('../controllers/chat'); // Import Controller functions
+const router = express.Router(); // Initialize Express Router
 
 router.route('/')
     .get(wrapAsync(middleware.isLoggedIn), wrapAsync(chat.index)) //Show index of chat rooms
@@ -29,4 +29,4 @@ router.route('/:id/request')
 
 router.put('/comments/:id/report', wrapAsync(middleware.isLoggedIn), wrapAsync(chat.reportComment)); //Report a comment
 
-module.exports = router;
+module.exports = router; // Export chat router
