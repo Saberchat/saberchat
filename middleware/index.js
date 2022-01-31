@@ -41,7 +41,7 @@ middleware.accessToFeature = async function(req, res, next) {
     return res.redirect('back');
 }
 
-// check if user is allowed to Posts
+// check if user is allowed to create Posts
 middleware.postPermission = async function(req, res, next) {
     const platform = await setup(Platform);
     if (!platform) {
@@ -55,7 +55,7 @@ middleware.postPermission = async function(req, res, next) {
     return res.redirect('back');
 }
 
-// check if user is allowed to Announcements
+// check if user is allowed to create Announcements
 middleware.announcementPermission = async function(req, res, next) {
     const platform = await setup(Platform);
     if (!platform) {
