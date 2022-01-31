@@ -1,7 +1,7 @@
 const mongoose = require("mongoose");
 
 //Platform schema holds all data for individual platform's settings
-var platformSchema = new mongoose.Schema({
+module.exports = mongoose.model("Platform", new mongoose.Schema({
     name: String,
     description: {type: String, default: ''},
     postText: String,
@@ -54,6 +54,5 @@ var platformSchema = new mongoose.Schema({
         heading: String,
         description: [{type: String}]
     }
-}, {timestamps: {createdAt: 'created_at'}});
-
-module.exports = mongoose.model("Platform", platformSchema);
+}, {timestamps: {createdAt: 'created_at'}
+}));

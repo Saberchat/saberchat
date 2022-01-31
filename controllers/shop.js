@@ -429,7 +429,7 @@ controller.deleteOrder = async function(req, res) {
         notif.date = dateFormat(notif.created_at, "h:MM TT | mmm d");
 
         let itemText = []; //This will have all the decoded info about the order
-        for (var i = 0; i < order.items.length; i++) {
+        for (let i = 0; i < order.items.length; i++) {
             itemText.push(` - ${order.items[i].item.name}: ${order.items[i].quantity} order(s)`);
         }
 

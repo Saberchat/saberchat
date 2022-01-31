@@ -6,7 +6,7 @@ const scrollBtn = document.getElementsByClassName('btn-scrolldown')[0];
 
 // function for auto scrolling to new messages
 const scrollToElement = function(innerElement) {
-    var topPos = innerElement.offsetTop;
+    let topPos = innerElement.offsetTop;
     messageDisplay.scrollTop = topPos - 10;
 }
 
