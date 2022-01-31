@@ -1,12 +1,12 @@
 //LIBRARIES
-const dateFormat = require('dateformat');
-const Filter = require('bad-words');
-const filter = new Filter();
+const dateFormat = require('dateformat'); // library for formatting datetimes to readable strings
+const Filter = require('bad-words'); // badword and profanity filter
+const filter = new Filter(); // initialize filter
 const path = require('path');
-const {sendGridEmail} = require("../services/sendGrid");
+const {sendGridEmail} = require("../services/sendGrid"); // email service
 const {convertToLink} = require("../utils/convert-to-link");
-const {cloudUpload} = require('../services/cloudinary');
-const {autoCompress} = require("../utils/image-compress");
+const {cloudUpload} = require('../services/cloudinary'); // image upload service
+const {autoCompress} = require("../utils/image-compress"); // image compression service
 const {objectArrIndex, removeIfIncluded, parseKeysOrValues, parsePropertyArray, concatMatrix} = require("../utils/object-operations");
 const setup = require("../utils/setup");
 
@@ -16,7 +16,7 @@ const User = require('../models/user');
 const {ChatRoom} = require('../models/group');
 const {AccessRequest, InboxMessage} = require("../models/notification");
 
-const controller = {};
+const controller = {}; // define controller object
 
 //INBOX MESSAGE ROUTES
 
@@ -27,6 +27,7 @@ controller.index = async function(req, res) {
         req.flash("error", "An Error Occurred");
         return res.redirect("back");
     }
+    // populate inbox data
     await req.user.populate({
             path: 'inbox.message',
 			populate: {path: 'author', select: ['username', 'imageUrl']}
@@ -178,9 +179,9 @@ controller.createMsg = async function(req, res) {
     }
 
     let message = { //Build message
-        subject: await filter.clean(req.body.subject),
+        subject: await filter.clean(req.body.subject), // badwords filter
         text: await filter.clean(req.body.message),
-        mediaFiles: []
+        mediaFiles: [] // initialize with no media
     };
 
     if(req.body.images) { message.images = req.body.images;}
@@ -191,13 +192,15 @@ controller.createMsg = async function(req, res) {
         let cloudResult;
         if (req.files.mediaFile) {
             for (let file of req.files.mediaFile) {
+                // attempt to compress
                 const processedBuffer = await autoCompress(file.originalname, file.buffer);
+                // upload to cloudinary
                 [cloudErr, cloudResult] = await cloudUpload(file.originalname, processedBuffer);
                 if (cloudErr || !cloudResult) {
                     req.flash('error', 'Upload failed');
                     return res.redirect('back');
                 }
-
+                // link media file to cloudinary-stored address
                 await message.mediaFiles.push({ //Add cloudinary-uploaded images to message files
                     filename: cloudResult.public_id,
                     url: cloudResult.secure_url,
@@ -215,6 +218,8 @@ controller.createMsg = async function(req, res) {
         recipients = await JSON.parse(req.body.recipients);
     }
 
+    // recipient checks
+
     //If message is anonymous/to everyone, override recipient list
     if(req.body.all == 'true') {
         message.toEveryone = true;
@@ -230,7 +235,7 @@ controller.createMsg = async function(req, res) {
             req.flash('error', 'An error occured');
             return res.redirect('back');
         }
-        if(faculty.length == 0) { //If message is anonymous without recipients
+        if(faculty.length == 0) { //If message is anonymous without faculty recipients
             req.flash('error', 'You can only select faculty');
             return res.redirect('back');
         }
@@ -271,6 +276,7 @@ controller.createMsg = async function(req, res) {
         return res.redirect('back');
     }
 
+    // format readable date for the UI from created_at
     newMessage.date = dateFormat(newMessage.created_at, "h:MM TT | mmm d");
     await newMessage.save();
 
@@ -358,7 +364,7 @@ controller.markReadSelected = async function(req, res) {
 
 // Inbox DELETE clear inbox
 controller.clear = async function(req, res) {
-    req.user.inbox = [];
+    req.user.inbox = []; // set inbox to empty array
 	await req.user.save();
 	req.flash('success', 'Inbox cleared!');
 	return res.redirect('/inbox');
@@ -379,9 +385,9 @@ controller.reply = async function(req, res) {
     const reply = { //Build reply object
         author: req.user,
         text: req.body.text,
-        images: [],
+        images: [], // initialize with no image urls
         date: dateFormat(new Date(), "h:MM TT | mmm d"),
-        mediaFiles: []
+        mediaFiles: [] // initialize with no media files
     };
 
     if(req.body.images) {reply.images = req.body.images;}
@@ -392,13 +398,16 @@ controller.reply = async function(req, res) {
         let cloudResult;
         if (req.files.mediaFile) {
             for (let file of req.files.mediaFile) {
+                // attempt to compress media
                 const processedBuffer = await autoCompress(file.originalname, file.buffer);
+                // upload to cloudinary
                 [cloudErr, cloudResult] = await cloudUpload(file.originalname, processedBuffer);
                 if (cloudErr || !cloudResult) {
                     req.flash('error', 'Upload failed');
                     return res.redirect('back');
                 }
 
+                // link to cloudinary-stored address
                 await reply.mediaFiles.push({ //Add cloudinary-uploaded images to message files
                     filename: cloudResult.public_id,
                     url: cloudResult.secure_url,
@@ -455,6 +464,7 @@ controller.delete = async function(req, res) {
 };
 
 // ACCESS REQUEST ROUTES
+// requests to join private chat rooms
 
 controller.showReq = async function(req, res) { //Display access request
     const platform = await setup(Platform);
@@ -541,4 +551,4 @@ controller.rejectReq = async function(req, res) { //Reject access request
     return res.redirect('/inbox');
 };
 
-module.exports = controller;
+module.exports = controller; // export inbox controller object

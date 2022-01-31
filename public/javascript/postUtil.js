@@ -8,6 +8,6 @@ const sendPostReq = function(url, data, callback) { //Send UI interaction to ser
         if (!response.ok) {throw new Error(`HTTP-Error: ${response.status}`);} //Error
         return response.json(); //If no error, return respons as JSON object
     })
-    .then(data => {return callback(data);})
+    .then(data => {return callback(data);}) // pass data to callback func
     .catch(error => {console.log(`Error:\n${String(error)}`);});
 }

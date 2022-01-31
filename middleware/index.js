@@ -1,15 +1,16 @@
-// Executes before the code in route requests
+// Executes before route logic
+// Checks for status, permissions, settings, etc. 
 
 const Platform = require("../models/platform");
 const {ChatRoom, Market, Course} = require('../models/group');
 const {objectArrIndex} = require("../utils/object-operations");
 const setup = require("../utils/setup");
 
-const middleware = {};
+const middleware = {}; // middleware object to be exported
 
 //checks if user is logged in
 middleware.isLoggedIn = async function(req, res, next) {
-    const platform = await setup(Platform);
+    const platform = await setup(Platform); // get platform settings
     if (!platform) {
         req.flash("error", "An error occurred");
         return res.redirect("/");
@@ -32,7 +33,7 @@ middleware.accessToFeature = async function(req, res, next) {
         req.flash("error", "An error occurred");
         return res.redirect("back");
     }
-
+    // check if platform has feature
     if (objectArrIndex(platform.features, "route", (await req.baseUrl.slice(1))) > -1 || objectArrIndex(platform.features, "route", `${req.baseUrl.slice(1)}${req.route.path}`) > -1) {
         return next();
     }
@@ -40,6 +41,7 @@ middleware.accessToFeature = async function(req, res, next) {
     return res.redirect('back');
 }
 
+// check if user is allowed to create Posts
 middleware.postPermission = async function(req, res, next) {
     const platform = await setup(Platform);
     if (!platform) {
@@ -53,6 +55,7 @@ middleware.postPermission = async function(req, res, next) {
     return res.redirect('back');
 }
 
+// check if user is allowed to create Announcements
 middleware.announcementPermission = async function(req, res, next) {
     const platform = await setup(Platform);
     if (!platform) {
@@ -115,6 +118,7 @@ middleware.checkRoomOwnership = async function(req, res, next) {
     return res.redirect(`/chat/${room._id}`);
 }
 
+// check if user has principal level permissions
 middleware.isPrincipal = async function(req, res, next) {
     const platform = await setup(Platform);
     if (!platform) {
@@ -126,6 +130,7 @@ middleware.isPrincipal = async function(req, res, next) {
     return res.redirect('/');
 }
 
+// check if user has admin level privileges
 middleware.isAdmin = async function(req, res, next) {
     const platform = await setup(Platform);
     if (!platform) {
@@ -137,6 +142,7 @@ middleware.isAdmin = async function(req, res, next) {
     return res.redirect('/');
 }
 
+// check if user has moderator level privileges
 middleware.isMod = async function(req, res, next) {
     const platform = await setup(Platform);
     if (!platform) {
@@ -148,6 +154,7 @@ middleware.isMod = async function(req, res, next) {
     return res.redirect('/');
 }
 
+// check if user is faculty
 middleware.isFaculty = async function(req, res, next) {
     const platform = await setup(Platform);
     if (req.user.status == platform.teacherStatus) {return next();}
@@ -155,6 +162,7 @@ middleware.isFaculty = async function(req, res, next) {
     return res.redirect('back');
 }
 
+// check if user is student
 middleware.isStudent = async function(req, res, next) {
     const platform = await setup(Platform);
     if (!platform) {
@@ -166,18 +174,21 @@ middleware.isStudent = async function(req, res, next) {
     return res.redirect('back');
 }
 
+// check if user is tutor
 middleware.isTutor = function(req, res, next) {
     if (req.user.tags.includes('Tutor')) {return next();}
     req.flash('error', 'You do not have permission to do that');
     return res.redirect('back');
 }
 
+// check if user has cashier access
 middleware.isCashier = function(req, res, next) {
     if (req.user.tags.includes('Cashier')) {return next();}
     req.flash('error', 'You do not have permission to do that');
     return res.redirect('back');
 }
 
+// check if user has student council permissions
 middleware.isStudentCouncil = async function(req, res, next) {
     const platform = await setup(Platform);
     if (!platform) {
@@ -194,12 +205,14 @@ middleware.isStudentCouncil = async function(req, res, next) {
     return res.redirect('/');
 }
 
+// check if user has polls access
 middleware.isPollster = function(req, res, next) {
     if (req.user.tags.includes('Pollster')) {return next();}
     req.flash('error', 'You do not have permission to do that');
     return res.redirect('back');
 }
 
+// check if user has editor access
 middleware.isEditor = function(req, res, next) {
     if (req.user.tags.includes('Editor')) {return next();}
     req.flash('error', 'You do not have permission to do that');
@@ -219,6 +232,7 @@ middleware.shopOpen = async function(req, res, next) {
     return res.redirect('back');
 }
 
+// check if shop transactions are enabled
 middleware.platformPurchasable = async function(req, res, next) {
     const platform = await setup(Platform);
     if (platform.purchasable) {return next();}
@@ -262,4 +276,4 @@ middleware.notMemberOfCourse = async function(req, res, next) {
     return next();
 }
 
-module.exports = middleware;
+module.exports = middleware; // export middleware object

@@ -1,12 +1,12 @@
 //LIBRARIES
-const Filter = require('bad-words');
-const filter = new Filter();
-const dateFormat = require('dateformat');
-const {sendGridEmail} = require("../services/sendGrid");
+const Filter = require('bad-words'); // badwords and profanity filter library
+const filter = new Filter(); // initialize filter
+const dateFormat = require('dateformat'); // timestamp formatting library
+const {sendGridEmail} = require("../services/sendGrid"); // emailing service
 const {removeIfIncluded, concatMatrix, multiplyArrays, sortAlph} = require("../utils/object-operations");
 const setup = require("../utils/setup");
-const {cloudUpload, cloudDelete} = require('../services/cloudinary');
-const {autoCompress} = require("../utils/image-compress");
+const {cloudUpload, cloudDelete} = require('../services/cloudinary'); // media upload service
+const {autoCompress} = require("../utils/image-compress"); // image compression service
 
 //SCHEMA
 const Platform = require("../models/platform");
@@ -14,8 +14,9 @@ const User = require('../models/user');
 const {ChatMessage, AccessRequest} = require("../models/notification");
 const {ChatRoom} = require('../models/group');
 
-const controller = {};
+const controller = {}; // initialize controller object
 
+// GET: chat homepage; List existing chatrooms
 controller.index = async function(req, res) {
     const platform = await setup(Platform);
     const rooms = await ChatRoom.find({}).populate("creator").populate({
@@ -47,7 +48,7 @@ controller.index = async function(req, res) {
         }
     }
 
-    //Track all of the current user's requests
+    //Track all of the current user's join requests
     const requests = await AccessRequest.find({author: req.user._id, status: "pending"});
     if (!requests) {
         req.flash('error', 'Unable to find access requests');
@@ -56,6 +57,7 @@ controller.index = async function(req, res) {
     return res.render('chat/index', {platform, rooms, requests, commentObject, filteredRooms});
 }
 
+// GET: Displays form to create new room
 controller.newRoom = async function(req, res) {
     const platform = await setup(Platform);
     const users = await User.find({authenticated: true});
@@ -66,6 +68,7 @@ controller.newRoom = async function(req, res) {
     return res.render('chat/new', {platform, users});
 }
 
+// GET: Show page for when entering a room
 controller.showRoom = async function(req, res) {
     const platform = await setup(Platform);
     const room = await ChatRoom.findById(req.params.id).populate({
@@ -86,6 +89,7 @@ controller.showRoom = async function(req, res) {
     return res.render('chat/show', {platform, room});
 }
 
+// GET: Show people in private room
 controller.showMembers = async function(req, res) {
     const platform = await setup(Platform);
     const room = await ChatRoom.findById(req.params.id).populate('creator').populate('members');
@@ -130,6 +134,7 @@ controller.showMembers = async function(req, res) {
     return res.redirect("back");
 }
 
+// GET: Display edit form for room
 controller.editRoom = async function(req, res) {
     const platform = await setup(Platform);
     const room = await ChatRoom.findById(req.params.id);
@@ -146,6 +151,7 @@ controller.editRoom = async function(req, res) {
     return res.render('chat/edit', {platform, users, room});
 }
 
+// POST: Create new room
 controller.createRoom = async function(req, res) {
     const platform = await setup(Platform);
     const rooms = await ChatRoom.find({});
@@ -161,7 +167,7 @@ controller.createRoom = async function(req, res) {
         return res.redirect('back');
     }
 
-    const room = await ChatRoom.create({
+    const room = await ChatRoom.create({ // initialize room
         name: await filter.clean(req.body.name),
         creator: req.user._id,
         members: [req.user._id],
@@ -179,7 +185,9 @@ controller.createRoom = async function(req, res) {
     if (req.files) {
         if (req.files.mediaFile) {
             const file = req.files.mediaFile[0];
+            // attempt to compress
             const processedBuffer = await autoCompress(file.originalname, file.buffer);
+            // upload to cloudinary
             const [cloudErr, cloudResult] = await cloudUpload(file.originalname, processedBuffer);
             if (cloudErr || !cloudResult) {
                 req.flash("error", "Upload failed");
@@ -187,6 +195,7 @@ controller.createRoom = async function(req, res) {
             }
 
             // Add info to image file
+            // link to cloudinary-stored address
             room.thumbnailFile = {
                 filename: cloudResult.public_id,
                 url: cloudResult.secure_url,
@@ -219,6 +228,7 @@ controller.createRoom = async function(req, res) {
     return res.redirect(`/chat/${room._id}`);
 }
 
+// POST: leave private room
 controller.leaveRoom = async function(req, res) {
     const room = await ChatRoom.findById(req.params.id);
     if (!room) {
@@ -248,6 +258,7 @@ controller.leaveRoom = async function(req, res) {
     return res.redirect('/chat');
 }
 
+// POST: send join request (Access request)
 controller.requestJoin = async function(req, res) {
     const platform = await setup(Platform);
     const room = await ChatRoom.findById(req.params.id); // find the room
@@ -263,7 +274,7 @@ controller.requestJoin = async function(req, res) {
 
     } else if (existingRequest) {return res.json({error: 'Identical request has already been sent'});}
 
-    const request = {
+    const request = { // initialize request
         author: req.user._id,
         room: room._id,
         status: "pending",
@@ -288,6 +299,7 @@ controller.requestJoin = async function(req, res) {
     return res.json({success: 'Request for access sent'});
 }
 
+// DELETE: cancel access request
 controller.requestCancel = async function(req, res) {
     const room = await ChatRoom.findById(req.params.id).populate("creator");
     if (!room) {return res.json({error: "Unable to find room"});}
@@ -305,6 +317,7 @@ controller.requestCancel = async function(req, res) {
     return res.json({success: "Successfully deleted request"});
 }
 
+// PUT: edit/update room
 controller.updateRoom = async function(req, res) {
     const room = await ChatRoom.findByIdAndUpdate(req.params.id, {
         name: await filter.clean(req.body.name),
@@ -345,7 +358,9 @@ controller.updateRoom = async function(req, res) {
             }
             
             const file = req.files.mediaFile[0];
+            // attempt to compress media
             const processedBuffer = await autoCompress(file.originalname, file.buffer);
+            // upload to cloudinary
             [cloudErr, cloudResult] = await cloudUpload(file.originalname, processedBuffer);
             if (cloudErr || !cloudResult) {
                 req.flash("error", "Upload failed");
@@ -353,6 +368,7 @@ controller.updateRoom = async function(req, res) {
             }
 
             // Add info to image file
+            // link to cloudinary-stored address
             room.thumbnailFile = {
                 filename: cloudResult.public_id,
                 url: cloudResult.secure_url,
@@ -367,6 +383,7 @@ controller.updateRoom = async function(req, res) {
     return res.redirect(`/chat/${room._id}`);
 }
 
+// DELETE: delete room
 controller.deleteRoom = async function(req, res) {
     const room = await ChatRoom.findById(req.params.id).populate("creator");
     if (!room) {
@@ -379,6 +396,7 @@ controller.deleteRoom = async function(req, res) {
         return res.redirect('back');
     }
 
+    // delete comments
     const deletedComments = await ChatMessage.deleteMany({_id: {$in: room.comments}});
     if (!deletedComments) {
         req.flash('error', 'Unable to delete comments');
@@ -402,6 +420,7 @@ controller.deleteRoom = async function(req, res) {
     }
     await room.creator.save();
 
+    // delete room object
     const deletedRoom = await ChatRoom.findByIdAndDelete(req.params.id).populate("members");
     if (!deletedRoom) {
         req.flash('error', 'A problem occured');
@@ -425,12 +444,15 @@ controller.deleteRoom = async function(req, res) {
     return res.redirect('/chat');
 }
 
+// PUT: flag/report a comment message
 controller.reportComment = async function(req, res) {
     const comment = await ChatMessage.findById(req.params.id);
     const room = await ChatRoom.findById(req.body.roomId);
     if (!room || !comment) {return res.json('Error finding comment');}
     
     if (!room.moderate) {return res.json('Reporting Is Disabled');}
+
+    // if comment already handled before
     if (comment.status == 'flagged') {return res.json('Already Reported');}
     if (comment.status == 'ignored') {return res.json('Report Ignored by Mod');}
     
@@ -440,4 +462,4 @@ controller.reportComment = async function(req, res) {
     return res.json('Reported');
 }
 
-module.exports = controller;
+module.exports = controller; // export chat controller

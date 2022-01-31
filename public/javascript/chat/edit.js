@@ -33,4 +33,4 @@ const searchFunction = function(mode) { //Search for users within a chat room
     }
 }
 
-updateDisplay();
+updateDisplay(); // update display on initial page load
