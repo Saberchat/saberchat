@@ -35,59 +35,6 @@
                placeholder="Search..." title="Type in report segment"/>
     </div>
 
-    <main id="main-container">
-        <div class="container mt-5">
-            <!-- Block 1 -->
-            <% const developers = [["Kabir Samsi", "kabirs@alsionschool.org", "pP2gALC", "Team Lead"], ["Alexander Zhou", "alexanderz@alsionschool.org", "GZiDjGU", "Technology Lead"], ["Siddharth Chavan", "siddharthc@alsionschool.org", "AydPXHS", "Engineering Lead"], ["Dmitry Pleshkov", "dmitry@alsionschool.org", "yJalLUC", "Systems Lead"], ["Vibhav Darsha", "vibhavec@alsionschool.org", "rcuEKOf", "Marketing Lead"]]; %>
-            <div class="row text-element">
-                <div class="col-lg-6">
-                    <article class="text-block mode">
-                        <div class="block-header <% if (platform.homepageInfo) {%> green <% } %>">
-                            <h1>Developers</h1>
-                        </div>
-                        <div class="block-content mode">
-                        <p>
-                            Kabir Samsi, Alexander Zhou, Siddharth Chavan, Dmitry Pleshkov and Vibhav Darsha are high school seniors at Alsion Montessori High School. They developed Saberchat over the 2020
-                            Summer Break in an effort to improve the their school's community by connecting its communication forums.
-                        </p>
-
-                        <% developers.forEach(developer => { %>
-                            <span class="developer-info"><%=developer[0]%></span> <span class="developer-description">(<%=developer[3]%>)</span>
-                            <p><a href="mailto: <%=developer[1]%>"><%=developer[1]%></a></p>
-                        <% }); %>
-
-                        </div>
-                    </article>
-                </div>
-
-                <div class="col-lg-6 block">
-                    <div class="container photo-div">
-                        <div class="row dev-row">
-                            <div class="row photo-row">
-                                <div class="col col-photo"><img src="https://i.imgur.com/<%=developers[0][2]%>.jpg" class="image row-end" alt="Photo of <%= developers[0][0] %>"></div>
-                                <div class="col col-photo"><img src="https://i.imgur.com/<%=developers[1][2]%>.jpg" class="image row-end" alt="Photo of <%= developers[1][0] %>"></div>
-                            </div>
-                            <% let counter = 0; %>
-                            <% for (let i = 2; i < developers.length; i += 3) { %>
-                                <div class="row photo-row">
-                                    <div class="col col-photo"><img src="https://i.imgur.com/<%=developers[i][2]%>.jpg" class="image <% if (i + 1 >= developers.length) { %>end<% } %> <% if (i + 3 >= developers.length) { %> row-end <% } %>" alt="Photo of <%= developers[i][0] %>"></div>
-
-                                    <% if (i + 1 < developers.length) { %>
-                                        <div class="col col-photo"><img src="https://i.imgur.com/<%= developers[i + 1][2] %>.jpg" class="image <% if (i + 2 >= developers.length) { %>end row-end<% } %>" alt="Photo of <%= developers[i + 1][0] %>"></div>
-                                    <% } %>
-
-                                    <% if (i + 2 < developers.length) { %>
-                                        <div class="col col-photo"><img src="https://i.imgur.com/<%= developers[i + 2][2] %>.jpg" class="image <% if (i + 1 >= developers.length) { %> row-end <% } %>" alt="Photo of <%= developers[i + 2][0] %>"></div>
-                                    <% } %>
-                                </div>
-                            <% } %>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </main>
-
     <% reports.forEach(report => { %>
         <div class="row">
             <div class="col-lg-12">
