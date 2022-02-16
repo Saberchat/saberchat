@@ -643,6 +643,7 @@ controller.deleteItem = async function(req, res) {
         req.flash("error", "Could not delete item");
         return res.redirect("back");
     }
+    console.log(item)
 
     //Delete any attached uploads
     if (item.mediaFile && item.mediaFile.filename) {
@@ -678,7 +679,11 @@ controller.deleteItem = async function(req, res) {
         }
 
         order.charge = 0; //Reset and re-increment order charge
-        for (let i of order.items) {order.charge += (i.item.price * i.quantity);}
+        for (let i of order.items) {
+            if (i.item && i.item.price) { 
+                order.charge += (i.item.price * i.quantity);
+            }
+        }
         await order.save();
     }
 
