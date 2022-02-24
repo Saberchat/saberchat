@@ -18,23 +18,26 @@ const controller = {};
 // Article GET index
 controller.index = async function(req, res) {
     const platform = await setup(Platform);
-    const users = await User.find({authenticated: true});
+    const users = await User.find({authenticated: true}); // Fetch all users
     let articles;
     if (req.user && await platform.permissionsProperty.slice(platform.permissionsProperty.length-3).includes(req.user.permission)) {
+        // Fetch all articles
         articles = await ArticleLink.find({}).populate('sender');
     } else {
+        // If the platform has post verification enabled, only fetch verified articles
         articles = await ArticleLink.find({verified: true}).populate('sender');
     }
 
-    if(!platform || !users || !articles) {
+    if(!platform || !users || !articles) { // Catch-all redirect
         await req.flash('error', 'Cannot find articles.');
         return res.redirect('back');
     }
 
+    // Format a string of names for all users of the site
     const userNames = await parsePropertyArray(users, "firstName").join(',').toLowerCase().split(',');
     const articleTexts = await embedLink(req.user, articles, userNames);
 
-    return res.render('articles/index', {
+    return res.render('articles/index', { // Send data to frontend
         platform, articles: await articles.reverse(), articleTexts,
         data: platform.features[await objectArrIndex(platform.features, "route", "articles")]
     });
@@ -47,42 +50,48 @@ controller.new = async function(req, res) {
         await req.flash("error", "An error occurred");
         return res.redirect("back");
     }
+    // Render the article creation page
     return res.render('articles/new', {platform, data: platform.features[await objectArrIndex(platform.features, "route", "articles")]});
 };
 
 // Article GET show
 controller.show = async function(req, res) {
     const platform = await setup(Platform);
-    const article = await ArticleLink.findById(req.params.id)
-        .populate('sender')
-        .populate({
+    const article = await ArticleLink.findById(req.params.id) // Fetch relevant article
+        .populate('sender') // Fill in authoer information
+        .populate({ // Fill in comment information
             path: "comments",
             populate: {path: "sender"}
         });
-    if(!platform || !article) {
+    if(!platform || !article) { // Redirect if article is not found
         await req.flash('error', 'Could not find article'); return res.redirect('back');
     } else if (!article.verified && !(await platform.permissionsProperty.slice(platform.permissionsProperty.length-3).includes(req.user.permission))) {
+        // If the article is not verified, don't let the user view it
         await req.flash('error', 'You cannot view that article');
         return res.redirect('back');
     }
 
+    // Handle file extensions
     let fileExtensions = new Map(); //Track which file format each attachment is in
     for (let media of article.mediaFiles) {
         await fileExtensions.set(media.url, await path.extname(await media.url.split("SaberChat/")[1]));
     }
     const convertedText = await convertToLink(article.text); //Parse and add hrefs to all links in text
+
+    // Redirect and send data to frontend
     return res.render('articles/show', {platform, article, convertedText, fileExtensions, data: platform.features[await objectArrIndex(platform.features, "route", "articles")]});
 };
 
 // Article GET edit form
 controller.updateForm = async function(req, res) {
     const platform = await setup(Platform);
-    const article = await ArticleLink.findById(req.params.id);
-    if(!platform || !article) {
+    const article = await ArticleLink.findById(req.params.id); // Find relevant article
+    if(!platform || !article) { // If article is not found, redirect user
         await req.flash('error', 'Could not find article');
         return res.redirect('back');
     }
     if(!(await article.sender._id.equals(req.user._id))) {
+        // If the user did not post that article, don't let them edit
         await req.flash('error', 'You do not have permission to do that.');
         return res.redirect('back');
     }
@@ -91,6 +100,8 @@ controller.updateForm = async function(req, res) {
     for (let media of article.mediaFiles) {
         await fileExtensions.set(media.url, await path.extname(await media.url.split("SaberChat/")[1]));
     }
+
+    // Redirect to edit page
     return res.render('articles/edit', {platform, article, fileExtensions, data: platform.features[await objectArrIndex(platform.features, "route", "articles")]});
 };
 
@@ -98,16 +109,18 @@ controller.updateForm = async function(req, res) {
 controller.create = async function(req, res) {
     const platform = await setup(Platform);
     const article = await ArticleLink.create({ //Build article with error info
-        sender: req.user,
-        subject: req.body.subject,
-        text: req.body.message,
+        sender: req.user, // Current user
+        subject: req.body.subject, // Article title
+        text: req.body.message, // Article body
         verified: !platform.postVerifiable //Article does not need to be verified if platform does not support verifying articles
     });
-    if (!platform || !article) {
+    if (!platform || !article) { // Error
         await req.flash('error', 'Unable to create article');
         return res.redirect('back');
     }
-    for (let attr of ["images", "links"]) {if (req.body[attr]) {article[attr] = req.body[attr];}}//Add images and links
+
+    //Add images and links
+    for (let attr of ["images", "links"]) {if (req.body[attr]) {article[attr] = req.body[attr];}}
 
     // if files were uploaded, process them
     if (req.files) {
@@ -134,7 +147,7 @@ controller.create = async function(req, res) {
     article.date = await dateFormat(article.created_at, "h:MM TT | mmm d");
     await article.save();
 
-    if (platform.postVerifiable) {
+    if (platform.postVerifiable) { // Different message based on whether the platform has verification or not
         await req.flash('success', `Article Posted! A platform ${await platform.permissionsDisplay[platform.permissionsDisplay.length-1].toLowerCase()} will verify your post soon.`);
     } else {
         await req.flash('success', `Article Posted!`);
@@ -143,8 +156,9 @@ controller.create = async function(req, res) {
 };
 
 controller.verify = async function(req, res) {
+    // Find relevant article and update the verification to true
     const article = await ArticleLink.findByIdAndUpdate(req.params.id, {verified: true});
-    if (!article) {
+    if (!article) { // Redirect if article cannot be found
         await req.flash('error', "Unable to access article");
         return res.redirect('back');
     }
@@ -155,26 +169,30 @@ controller.verify = async function(req, res) {
 
 controller.updateArticle = async function(req, res) {
     const platform = await setup(Platform);
+    // Find relevant article
     const article = await ArticleLink.findById(req.params.id).populate('sender');
-    if (!platform || !article) {
+    if (!platform || !article) { // Redirect if article was not found
         await req.flash('error', "Unable to access article");
         return res.redirect('back');
     }
 
+    // Check if current user is the author of the article. If not, don't allow edit
     if ((await article.sender._id.toString()) != (await req.user._id.toString())) {
         await req.flash('error', "You can only update articles which you have sent");
         return res.redirect('back');
     }
 
+    // Update article with new information
     const updatedArticle = await ArticleLink.findByIdAndUpdate(req.params.id, {
-        subject: req.body.subject,
-        text: req.body.message,
+        subject: req.body.subject, // Article title
+        text: req.body.message, // Article body
         verified: !platform.postVerifiable //Article does not need to be verified if platform does not support verifying articles
     });
-    if (!updatedArticle) {
+    if (!updatedArticle) { // Redirect if there was an error updating
         await req.flash('error', "Unable to update article");
         return res.redirect('back');
     }
+    // Set article media
     for (let attr of ["images", "links"]) {if (req.body[attr]) {updatedArticle[attr] = req.body[attr];}}
 
     //Iterate through all selected media to remove and delete them
@@ -233,7 +251,9 @@ controller.updateArticle = async function(req, res) {
 
 // Article PUT like article
 controller.likeArticle = async function(req, res) {
+    // Find relevant article
     const article = await ArticleLink.findById(req.body.articleId);
+
     if(!article) {return res.json({error: 'Error updating article.'});}
 
     if (await removeIfIncluded(article.likes, req.user._id)) { //Remove like
@@ -254,27 +274,27 @@ controller.likeArticle = async function(req, res) {
 
 // Article PUT comment
 controller.comment = async function(req, res) {
-    const article = await ArticleLink.findById(req.body.articleId)
+    const article = await ArticleLink.findById(req.body.articleId) // Find relevant article
         .populate({
-            path: "comments",
-            populate: {path: "sender"}
+            path: "comments", // Fill in comment information
+            populate: {path: "sender"} // Fill in author information
         });
     if (!article) {
         return res.json({
-            error: 'Error commenting'
+            error: 'Error commenting' // Let the frontend know that there was an error
         });
     }
 
-    const comment = await PostComment.create({
-        text: await req.body.text.split('<').join('&lt'),
-        sender: req.user
+    const comment = await PostComment.create({ // Create new comment object
+        text: await req.body.text.split('<').join('&lt'), // Comment body
+        sender: req.user // Comment author
     });
     if (!comment) {return res.json({error: 'Error commenting'});}
 
-    comment.date = await dateFormat(comment.created_at, "h:MM TT | mmm d");
+    comment.date = await dateFormat(comment.created_at, "h:MM TT | mmm d"); // Date of comment
     await comment.save();
 
-    await article.comments.push(comment);
+    await article.comments.push(comment); // Save the comment under the relevant article
     await article.save();
 
     let users = [];
@@ -288,7 +308,7 @@ controller.comment = async function(req, res) {
         }
     }
 
-    return res.json({
+    return res.json({ // Send success information to frontend
         success: 'Successful comment',
         comments: article.comments
     });
@@ -296,12 +316,13 @@ controller.comment = async function(req, res) {
 
 // Article PUT like comment
 controller.likeComment = async function(req, res) {
+    // Find relevant comment
     const comment = await PostComment.findById(req.body.commentId);
     if(!comment) {return res.json({error: 'Error finding comment'});}
 
     if (await removeIfIncluded(comment.likes, req.user._id)) { //Remove Like
         await comment.save();
-        return res.json({
+        return res.json({ // Send information to frontend
             success: `Removed a like`,
             likeCount: comment.likes.length
         });
@@ -309,13 +330,14 @@ controller.likeComment = async function(req, res) {
 
     await comment.likes.push(req.user._id); //Add Like
     await comment.save();
-    return res.json({
+    return res.json({ // Send information to frontend
         success: `Liked comment`,
         likeCount: comment.likes.length
     });
 }
 
 controller.deleteArticle = async function(req, res) {
+    // Find relevant article
     const article = await ArticleLink.findById(req.params.id).populate('sender');
     if (!article) {
         await req.flash('error', "Unable to access article");
@@ -354,7 +376,9 @@ controller.deleteArticle = async function(req, res) {
         }
     }
 
+    // Delete the article
     const deletedArticle = await ArticleLink.findByIdAndDelete(article._id);
+    
     if (!deletedArticle) {
         await req.flash('error', "Unable to delete article");
         return res.redirect('back');
@@ -366,17 +390,20 @@ controller.deleteArticle = async function(req, res) {
 
 controller.specificInfo = async function(req, res) {
     const platform = await setup(Platform);
+    // render specific info page
     return res.render('other/specific-info', {platform, description: platform.features[await objectArrIndex(platform.features, "route", "articles/specific-info")].description});
 }
 
 controller.donate = async function(req, res) {
     const platform = await setup(Platform);
+    // render donate page
     return res.render('other/donate', {platform, description: platform.features[await objectArrIndex(platform.features, "route", "articles/donate")].description, objectArrIndex});
 }
 
 controller.advice = async function(req, res) {
     const platform = await setup(Platform);
     if (platform.originalEmail != '') {
+        // File setup
         let images = [];
         let pdfs = [];
         let text = req.body.message;
@@ -402,6 +429,7 @@ controller.advice = async function(req, res) {
             }
         }
 
+        //Send emails to all users
         for (let file of images) {text += `<br><img src="${file}" style="width: 50%; height: 50%;>`;}
         for (let file of pdfs) {text += `<iframe src="${file.url}" height="300" width="250"></iframe><a href="${file.url}" target="_blank"><h5>Open ${file.originalname} New Tab?</h5></a>`;}
         await sendGridEmail(platform.officialEmail, `New Advice Donation From ${req.user.firstName} ${req.user.lastName} - ${req.body.subject}`, text, false);

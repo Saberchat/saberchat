@@ -20,8 +20,9 @@ controller.index = async function(req, res) {
     const users = await User.find({authenticated: true});
     let events;
     if (req.user && (await platform.permissionsProperty.slice(platform.permissionsProperty.length-3).includes(req.user.permission))) {
+        // If the user is authorized to see the event, then search for the event
         events = await Event.find({}).populate('sender');
-    } else {events = await Event.find({verified: true}).populate('sender');}
+    } else {events = await Event.find({verified: true}).populate('sender');} // Else find only the verified events
     if(!platform || !users || !events) {
         await req.flash('error', 'Cannot find events.');
         return res.redirect('back');

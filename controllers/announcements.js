@@ -27,10 +27,13 @@ controller.index = async function(req, res) {
 
     let announcements;
     if (req.user && await platform.permissionsProperty.slice(platform.permissionsProperty.length-3).includes(req.user.permission)) {
+        // Show all announcements if the user is signed in
         announcements = await Announcement.find({}).populate('sender');
     } else if (!req.user) {
+        // Show only public verified announcements
         announcements = await Announcement.find({verified: true, public: { $ne: false }}).populate('sender');
     } else {
+        // Show all verified announcements
         announcements = await Announcement.find({verified: true}).populate('sender');
     }
     if(!announcements) {
@@ -65,6 +68,7 @@ controller.markAll = async function(req, res) {
 // Announcement GET mark one ann as read
 controller.markOne = async function(req, res) {
     if (await objectArrIndex(req.user.annCount, "announcement", req.params.id) > -1) { //If user's annCount includes announcement, remove it
+        // Find the index of relevant announcement in new announcement array and remove it
         await req.user.annCount.splice(await objectArrIndex(req.user.annCount, "announcement", req.params.id), 1);
         await req.user.save();
     }
@@ -75,15 +79,16 @@ controller.markOne = async function(req, res) {
 // Announcement GET show
 controller.show = async function(req, res) {
     const platform = await setup(Platform);
-    const announcement = await Announcement.findById(req.params.id)
-        .populate('sender')
-        .populate({
+    const announcement = await Announcement.findById(req.params.id) // Find announcement with given ID
+        .populate('sender') // Fill in author information
+        .populate({ // Fill in comment information
             path: "comments",
             populate: {path: "sender"}
         });
-    if(!platform || !announcement) {
+    if(!platform || !announcement) { // Catch-all redirect
         await req.flash('error', 'Could not find announcement');
-        return res.redirect('back');
+        return res.redirect('back'); 
+        // Raise error if user is not authorized to view the announcement
     } else if (!announcement.verified && !(await platform.permissionsProperty.slice(platform.permissionsProperty.length-3).includes(req.user.permission))) {
         await req.flash('error', 'You cannot view that announcement');
         return res.redirect('back');
@@ -92,6 +97,7 @@ controller.show = async function(req, res) {
     if(req.user) {
         //If this announcement is new to the user, it is no longer new, so remove it
         if (await objectArrIndex(req.user.annCount, "announcement", announcement._id, "_id") > -1) {
+            // Remove the announcement from the new announcements array
             await req.user.annCount.splice(await objectArrIndex(req.user.annCount, "announcement", announcement._id, "_id"), 1);
             await req.user.save();
         }
@@ -99,6 +105,7 @@ controller.show = async function(req, res) {
 
     let fileExtensions = new Map(); //Track which file format each attachment is in
     for (let media of announcement.mediaFiles) {
+        // Set file extensions
         await fileExtensions.set(media.url, await path.extname(media.url.split("SaberChat/")[1]));
     }
     const convertedText = await convertToLink(announcement.text); //Parse and add hrefs to all links in text
@@ -108,18 +115,19 @@ controller.show = async function(req, res) {
 // Announcement GET edit form
 controller.updateForm = async function(req, res) {
     const platform = await setup(Platform);
-    const announcement = await Announcement.findById(req.params.id);
-    if(!platform || !announcement) {
+    const announcement = await Announcement.findById(req.params.id); // Find relevant announcement
+    if(!platform || !announcement) { // Catch-all redirect
         await req.flash('error', 'Could not find announcement');
         return res.redirect('back');
     }
-    if(!(await announcement.sender.equals(req.user._id))) { //Only the sender may edit the announcement
+    if(!(await announcement.sender.equals(req.user._id))) { // Only the sender may edit the announcement
         await req.flash('error', 'You do not have permission to do that.');
         return res.redirect('back');
     }
 
     let fileExtensions = new Map(); //Track which file format each attachment is in
     for (let media of announcement.mediaFiles) {
+        // Set file extensions
         await fileExtensions.set(media.url, await path.extname(await media.url.split("SaberChat/")[1]));
     }
     return res.render('announcements/edit', {platform, announcement, fileExtensions});
@@ -128,7 +136,7 @@ controller.updateForm = async function(req, res) {
 // Announcement POST create
 controller.create = async function(req, res) {
     const platform = await setup(Platform);
-    const announcement = await Announcement.create({
+    const announcement = await Announcement.create({ // Create new announcement with the given information from the frontend
         sender: req.user,
         subject: req.body.subject,
         text: req.body.message,
@@ -170,6 +178,7 @@ controller.create = async function(req, res) {
     await announcement.save();
 
     if (!platform.postVerifiable) {
+        // Find all other users that are not the current user
         const users = await User.find({authenticated: true, _id: {$ne: req.user._id}});
         if (!users) {
             await req.flash('error', "An Error Occurred");
@@ -198,13 +207,15 @@ controller.create = async function(req, res) {
 
 controller.verify = async function(req, res) {
     const platform = await setup(Platform);
+    // Find relevant announcement and prepare to update it
     const announcement = await Announcement.findByIdAndUpdate(req.params.id, {verified: true}).populate("sender");
     if (!platform || !announcement) {
         await req.flash('error', "Unable to access announcement");
         return res.redirect('back');
     }
 
-    if (platform.postVerifiable) {
+    if (platform.postVerifiable) { // If the platform has enabled post verification:
+        // Find all other users
         const users = await User.find({authenticated: true, _id: {$ne: req.user._id}});
         if (!users) {
             await req.flash('error', "An Error Occurred");
@@ -213,7 +224,7 @@ controller.verify = async function(req, res) {
 
         let imageString = ""; //Build string of all attached images
         for (const image of announcement.images) {imageString += `<img src="${image}">`;}
-        for (let user of users) { //Send email to all users
+        for (let user of users) { //Send email to all other users
             if (user.receiving_emails) {
                 const emailText = `<p>Hello ${user.firstName},</p><p>${announcement.sender.username} has recently posted a new announcement - '${announcement.subject}'.</p><p>${announcement.text}</p><p>You can access the full announcement at https://${platform.url}</p> ${imageString}`;
                 await sendGridEmail(user.email, `New Saberchat Announcement - ${announcement.subject}`, emailText, false);
@@ -230,17 +241,20 @@ controller.verify = async function(req, res) {
 //Announcement PUT Update
 controller.updateAnnouncement = async function(req, res) {
     const platform = await setup(Platform);
+    // Find relevant announcement
     const announcement = await Announcement.findById(req.params.id).populate('sender');
     if (!platform || !announcement) {
         await req.flash('error', "Unable to access announcement");
         return res.redirect('back');
     }
 
+    // Exit if the current user is not the one who posted the announcement
     if ((await announcement.sender._id.toString()) != (await req.user._id.toString())) {
         await req.flash('error', "You can only update announcements which you have sent");
         return res.redirect('back');
     }
 
+    // Update announcement with new information
     const updatedAnnouncement = await Announcement.findByIdAndUpdate(req.params.id, {
         subject: req.body.subject,
         text: req.body.message,
@@ -310,6 +324,7 @@ controller.updateAnnouncement = async function(req, res) {
     }
 
     await updatedAnnouncement.save();
+    // Find all other users
     const users = await User.find({authenticated: true, _id: {$ne: req.user._id}});
     if (!users) {
         await req.flash('error', "An Error Occurred");
@@ -332,6 +347,7 @@ controller.updateAnnouncement = async function(req, res) {
 
 // Announcement PUT like ann
 controller.likeAnnouncement = async function(req, res) {
+    // Find relevant announcement
     const announcement = await Announcement.findById(req.body.announcementId);
     if(!announcement) {return res.json({error: 'Error updating announcement.'});}
 
@@ -343,7 +359,7 @@ controller.likeAnnouncement = async function(req, res) {
         });
     }
     
-    await announcement.likes.push(req.user._id);
+    await announcement.likes.push(req.user._id); // Add new like
     await announcement.save();
     return res.json({
         success: `Liked ${announcement.subject}`,
@@ -353,6 +369,7 @@ controller.likeAnnouncement = async function(req, res) {
 
 // Announcement PUT comment
 controller.comment = async function(req, res) {
+    // Find relevant announcement
     const announcement = await Announcement.findById(req.body.announcementId)
         .populate({
             path: "comments",
@@ -360,6 +377,7 @@ controller.comment = async function(req, res) {
         });
     if (!announcement) {return res.json({error: 'Error commenting'});}
 
+    // Create new comment under the post
     const comment = await PostComment.create({
         text: await req.body.text.split('<').join('&lt'),
         sender: req.user
@@ -369,6 +387,7 @@ controller.comment = async function(req, res) {
     comment.date = dateFormat(comment.created_at, "h:MM TT | mmm d");
     await comment.save();
 
+    // Add the comment to the comments array under the announcement
     await announcement.comments.push(comment);
     await announcement.save();
 
@@ -418,29 +437,31 @@ controller.likeComment = async function(req, res) {
     const comment = await PostComment.findById(req.body.commentId);
     if(!comment) {return res.json({error: 'Error finding comment'});}
 
-    if (await removeIfIncluded(comment.likes, req.user._id)) {
+    if (await removeIfIncluded(comment.likes, req.user._id)) { // If the post has already been liked, remove the like
         await comment.save();
-        return res.json({
+        return res.json({ // Send new information to the frontend so that the page can update
             success: `Removed a like`,
             likeCount: comment.likes.length
         });
     }
 
-    await comment.likes.push(req.user._id); //Add Like
+    await comment.likes.push(req.user._id); // If the post hasn't been liked, add Like
     await comment.save();
-    return res.json({
+    return res.json({ // Send new information to the frontend so that the page can update
         success: `Liked comment`,
         likeCount: comment.likes.length
     });
 }
 
 controller.deleteAnnouncement = async function(req, res) {
+    //Find relevant announcement
     const announcement = await Announcement.findById(req.params.id).populate('sender');
     if (!announcement) {
         await req.flash('error', "Unable to access announcement");
         return res.redirect('back');
     }
 
+    // If the current user didn't post the announcement, they are not allowed to remove it
     if ((await announcement.sender._id.toString()) != (await req.user._id.toString())) {
         await req.flash('error', "You can only delete announcements that you have posted");
         return res.redirect('back');
@@ -474,18 +495,21 @@ controller.deleteAnnouncement = async function(req, res) {
         }
     }
 
+    // Delete the announcement
     const deletedAnnouncement = await Announcement.findByIdAndDelete(announcement._id);
     if (!deletedAnnouncement) {
         await req.flash('error', "Unable to delete announcement");
         return res.redirect('back');
     }
 
+    // Find the current user (aka the user that posted the announcement)
     const users = await User.find({authenticated: true});
     if (!users) {
         await req.flash('error', "Unable to find users");
         return res.redirect('back');
     }
 
+    // Remove the announcement from the current user's posted announcements
     for (let user of users) {
         if (await objectArrIndex(user.annCount, "announcement", deletedAnnouncement._id) > -1) {
             await user.annCount.splice(await objectArrIndex(user.annCount, "announcement", deletedAnnouncement._id), 1);
