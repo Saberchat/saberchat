@@ -79,7 +79,8 @@ controller.orderForm = async function(req, res) {
     const orderedItems = new Map();
     let overlap = false;
     for (let order of allOrders) { //Iterate through each order's items and add their data to the map
-        for (let item of order.items) { 
+        for (let item of order.items) {
+            if (!item || !item.item) continue; // this is a hotfix -- Dmitry
             overlap = false;
             if (orderedItems.has(item.item._id)) { //If the map includes the item, update quantity
                 overlap = true;
