@@ -72,6 +72,7 @@ const validateForm = function() { // validates signup form
         enableBtn();
         form.password.style.border = '2px solid red';
         return false;
+    // validate email with regex
     } else if (!/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test(form.email.value)) {
         enableBtn();
         form.email.style.border = '2px solid red';

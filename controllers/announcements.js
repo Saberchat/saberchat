@@ -1,22 +1,30 @@
-//LIBRARIES
-const {sendGridEmail} = require("../services/sendGrid");
-const {convertToLink, embedLink} = require("../utils/convert-to-link");
+// LIBRARIES
+
+// Email service
+const {sendGridEmail} = require("../services/sendGrid"); 
+// string utilities
+const {convertToLink, embedLink} = require("../utils/convert-to-link"); 
+// object utilities
 const {objectArrIndex, removeIfIncluded, parsePropertyArray} = require("../utils/object-operations");
-const setup = require("../utils/setup");
+// setup function
+const setup = require("../utils/setup"); 
 const path = require('path');
-const dateFormat = require('dateformat');
+// for date manipulation
+const dateFormat = require('dateformat'); 
+// for media uploads
 const {cloudUpload, cloudDelete} = require('../services/cloudinary');
+// for media compression
 const {autoCompress} = require("../utils/image-compress");
 
-//SCHEMA
+// SCHEMA
 const Platform = require("../models/platform");
 const User = require('../models/user');
 const {Announcement, PostComment} = require('../models/post');
 const {InboxMessage} = require('../models/notification');
 
-const controller = {};
+const controller = {}; // initialize controller object
 
-// Announcement GET index
+// GET: Announcement index
 controller.index = async function(req, res) {
     const platform = await setup(Platform);
     const users = await User.find({authenticated: true});
@@ -27,10 +35,13 @@ controller.index = async function(req, res) {
 
     let announcements;
     if (req.user && await platform.permissionsProperty.slice(platform.permissionsProperty.length-3).includes(req.user.permission)) {
+        // get all announcements
         announcements = await Announcement.find({}).populate('sender');
     } else if (!req.user) {
+        // get all public announcements
         announcements = await Announcement.find({verified: true, public: { $ne: false }}).populate('sender');
     } else {
+        // get all verified announcements
         announcements = await Announcement.find({verified: true}).populate('sender');
     }
     if(!announcements) {
@@ -44,7 +55,7 @@ controller.index = async function(req, res) {
     return res.render('announcements/index', {platform, announcements: await announcements.reverse(), announcementTexts});
 };
 
-// Announcement GET new ann
+// GET: Announcement new ann form
 controller.new = async function(req, res) {
     const platform = await setup(Platform);
     if (!platform) {
@@ -54,17 +65,18 @@ controller.new = async function(req, res) {
     return res.render('announcements/new', {platform});
 };
 
-// Announcement GET markall ann as read
+// GET: Announcement mark-all ann as read
 controller.markAll = async function(req, res) {
-    req.user.annCount = []; //No new announcements in user's annCount
+    req.user.annCount = []; // No new announcements in user's annCount
     await req.user.save();
     req.flash('success', 'All Announcements Marked As Read!');
     return res.redirect(`/announcements`);
 };
 
-// Announcement GET mark one ann as read
+// GET: Announcement mark-one ann as read
 controller.markOne = async function(req, res) {
-    if (objectArrIndex(req.user.annCount, "announcement", req.params.id) > -1) { //If user's annCount includes announcement, remove it
+    // If user's annCount includes announcement, remove it
+    if (objectArrIndex(req.user.annCount, "announcement", req.params.id) > -1) {
         await req.user.annCount.splice(objectArrIndex(req.user.annCount, "announcement", req.params.id), 1);
         await req.user.save();
     }
@@ -72,9 +84,10 @@ controller.markOne = async function(req, res) {
     return res.redirect(`/announcements`);
 };
 
-// Announcement GET show
+// GET: Announcement show
 controller.show = async function(req, res) {
     const platform = await setup(Platform);
+    // get announcement by id
     const announcement = await Announcement.findById(req.params.id)
         .populate('sender')
         .populate({
@@ -90,22 +103,24 @@ controller.show = async function(req, res) {
     }
 
     if(req.user) {
-        //If this announcement is new to the user, it is no longer new, so remove it
+        // If this announcement is new to the user, it is no longer new, so remove it
         if (objectArrIndex(req.user.annCount, "announcement", announcement._id, "_id") > -1) {
             await req.user.annCount.splice(objectArrIndex(req.user.annCount, "announcement", announcement._id, "_id"), 1);
             await req.user.save();
         }
     }
 
-    let fileExtensions = new Map(); //Track which file format each attachment is in
+    let fileExtensions = new Map(); // Track which file format each attachment is in
     for (let media of announcement.mediaFiles) {
         fileExtensions.set(media.url, path.extname(media.url.split("SaberChat/")[1]));
     }
-    const convertedText = await convertToLink(announcement.text); //Parse and add hrefs to all links in text
+    // Parse and add hrefs to all links in text
+    const convertedText = await convertToLink(announcement.text); 
+    // Render announcement page
     return res.render('announcements/show', {platform, announcement, convertedText, fileExtensions});
 };
 
-// Announcement GET edit form
+// GET: Announcement edit form
 controller.updateForm = async function(req, res) {
     const platform = await setup(Platform);
     const announcement = await Announcement.findById(req.params.id);
@@ -113,26 +128,30 @@ controller.updateForm = async function(req, res) {
         req.flash('error', 'Could not find announcement');
         return res.redirect('back');
     }
-    if(!(await announcement.sender.equals(req.user._id))) { //Only the sender may edit the announcement
+    // Only the sender may edit the announcement
+    if(!(await announcement.sender.equals(req.user._id))) { 
         req.flash('error', 'You do not have permission to do that.');
         return res.redirect('back');
     }
 
-    let fileExtensions = new Map(); //Track which file format each attachment is in
+    let fileExtensions = new Map(); // Track which file format each attachment is in
     for (let media of announcement.mediaFiles) {
         fileExtensions.set(media.url, path.extname(await media.url.split("SaberChat/")[1]));
     }
+    // Render edit form
     return res.render('announcements/edit', {platform, announcement, fileExtensions});
 };
 
-// Announcement POST create
+// POST: Announcement create
 controller.create = async function(req, res) {
     const platform = await setup(Platform);
     const announcement = await Announcement.create({
         sender: req.user,
         subject: req.body.subject,
         text: req.body.message,
-        verified: !platform.postVerifiable //Announcement does not need to be verified if platform does not support verifying announcements
+        // Announcement does not need to be verified if platform
+        // does not support verifying announcements.
+        verified: !platform.postVerifiable
     });
     if (!platform || !announcement) {
         req.flash('error', 'Unable to create announcement');
@@ -141,22 +160,24 @@ controller.create = async function(req, res) {
     if (req.body.public && req.body.public === 'False') {
         announcement.public = false; // no access to visitors without accounts/not logged in
     }
-
-    if (req.body.images) {announcement.images = req.body.images;} //If any images were added (if not, the 'images' property is empty)
+    // If any images were added (if not, the 'images' property is empty)
+    if (req.body.images) {announcement.images = req.body.images;}
 
     // if files were uploaded, process them
     if (req.files) {
-        if (req.files.mediaFile) {
+        if (req.files.mediaFile) { // if files in POST
             let cloudErr;
             let cloudResult;
-            for (let file of req.files.mediaFile) { //Upload each file to cloudinary
+            for (let file of req.files.mediaFile) { // Upload each file to cloudinary
+                // attempt to compress files
                 const processedBuffer = await autoCompress(file.originalname, file.buffer);
+                // upload files to Cloudinary
                 [cloudErr, cloudResult] = await cloudUpload(file.originalname, processedBuffer);
                 if (cloudErr || !cloudResult) {
                     req.flash('error', 'Upload failed');
                     return res.redirect('back');
                 }
-
+                // add files to database record
                 await announcement.mediaFiles.push({
                     filename: cloudResult.public_id,
                     url: cloudResult.secure_url,
@@ -165,10 +186,10 @@ controller.create = async function(req, res) {
             }
         }
     }
-
+    // get pre-formatted date for readability.
     announcement.date = dateFormat(announcement.created_at, "h:MM TT | mmm d");
     await announcement.save();
-
+    // If announcement does not need verification
     if (!platform.postVerifiable) {
         const users = await User.find({authenticated: true, _id: {$ne: req.user._id}});
         if (!users) {
@@ -176,9 +197,9 @@ controller.create = async function(req, res) {
             return res.redirect('back');
         }
 
-        let imageString = ""; //Build string of all attached images
+        let imageString = ""; // Build string of all attached images
         for (const image of announcement.images) {imageString += `<img src="${image}">`;}
-        for (let user of users) { //Send email to all users
+        for (let user of users) { // Send email to all users
             if (user.receiving_emails) {
                 const emailText = `<p>Hello ${user.firstName},</p><p>${req.user.username} has recently posted a new announcement - '${announcement.subject}'.</p><p>${announcement.text}</p><p>You can access the full announcement at https://${platform.url}</p> ${imageString}`;
                 await sendGridEmail(user.email, `New Saberchat Announcement - ${announcement.subject}`, emailText, false);
@@ -186,34 +207,40 @@ controller.create = async function(req, res) {
                 await user.save();
             }
         }
-    }
-
-    if (platform.postVerifiable) {
-        req.flash('success', `Announcement Posted! A platform ${await platform.permissionsDisplay[platform.permissionsDisplay.length-1].toLowerCase()} will verify your post soon.`);
-    } else {
         req.flash('success', `Announcement Posted!`);
+    } else {
+        // Send alternative message if announcement needs verification
+        req.flash('success', `Announcement Posted! A platform ${await platform.permissionsDisplay[platform.permissionsDisplay.length-1].toLowerCase()} will verify your post soon.`);
     }
     return res.redirect(`/announcements`);
 };
 
+// GET: verify announcement
 controller.verify = async function(req, res) {
     const platform = await setup(Platform);
-    const announcement = await Announcement.findByIdAndUpdate(req.params.id, {verified: true}).populate("sender");
+    // Update announcement so verified status = true
+    const announcement = await Announcement.findByIdAndUpdate(
+        req.params.id, 
+        { verified: true }
+    ).populate("sender");
+
     if (!platform || !announcement) {
         req.flash('error', "Unable to access announcement");
         return res.redirect('back');
     }
 
+    // Check if platform requires verification
     if (platform.postVerifiable) {
+        // Get all users except the current user
         const users = await User.find({authenticated: true, _id: {$ne: req.user._id}});
         if (!users) {
             req.flash('error', "An Error Occurred");
             return res.redirect('back');
         }
 
-        let imageString = ""; //Build string of all attached images
+        let imageString = ""; // Build string of all attached images
         for (const image of announcement.images) {imageString += `<img src="${image}">`;}
-        for (let user of users) { //Send email to all users
+        for (let user of users) { // Send email to all users
             if (user.receiving_emails) {
                 const emailText = `<p>Hello ${user.firstName},</p><p>${announcement.sender.username} has recently posted a new announcement - '${announcement.subject}'.</p><p>${announcement.text}</p><p>You can access the full announcement at https://${platform.url}</p> ${imageString}`;
                 await sendGridEmail(user.email, `New Saberchat Announcement - ${announcement.subject}`, emailText, false);
@@ -227,7 +254,7 @@ controller.verify = async function(req, res) {
     return res.redirect("/announcements");
 }
 
-//Announcement PUT Update
+// PUT: Announcement Update
 controller.updateAnnouncement = async function(req, res) {
     const platform = await setup(Platform);
     const announcement = await Announcement.findById(req.params.id).populate('sender');
@@ -236,7 +263,8 @@ controller.updateAnnouncement = async function(req, res) {
         return res.redirect('back');
     }
 
-    if ((await announcement.sender._id.toString()) != (await req.user._id.toString())) {
+    // Make sure user is ann author.
+    if(!(await announcement.sender.equals(req.user._id))) { 
         req.flash('error', "You can only update announcements which you have sent");
         return res.redirect('back');
     }
@@ -244,27 +272,32 @@ controller.updateAnnouncement = async function(req, res) {
     const updatedAnnouncement = await Announcement.findByIdAndUpdate(req.params.id, {
         subject: req.body.subject,
         text: req.body.message,
-        verified: !platform.postVerifiable //Announcement does not need to be verified if platform does not support verifying announcements
+        // Announcement does not need to be verified if platform
+        // does not support verifying announcements.
+        verified: !platform.postVerifiable
     });
     if (!updatedAnnouncement) {
         req.flash('error', "Unable to update announcement");
         return res.redirect('back');
     }
 
+    // set announcement 'public' status
     if (req.body.public && req.body.public === 'False') {
-        updatedAnnouncement.public = false; // no access to visitors without accounts/not logged in
+        // no access to visitors without accounts/not logged in
+        updatedAnnouncement.public = false; 
     } else {
         updatedAnnouncement.public = true;
     }
 
-    if (req.body.images) {updatedAnnouncement.images = req.body.images;} //Only add images if any are provided
+    // Only add images if any are provided
+    if (req.body.images) {updatedAnnouncement.images = req.body.images;}
 
-    //Iterate through all selected media to remove and delete them
+    // Iterate through all selected media to remove and delete them
     let cloudErr;
     let cloudResult;
     for (let i = updatedAnnouncement.mediaFiles.length-1; i >= 0; i--) {
         if (req.body[`deleteUpload-${updatedAnnouncement.mediaFiles[i].url}`] && updatedAnnouncement.mediaFiles[i] && updatedAnnouncement.mediaFiles[i].filename) {
-            //Evaluate filetype to decide on file deletion strategy
+            // Evaluate filetype to decide on file deletion strategy
             switch(path.extname(await updatedAnnouncement.mediaFiles[i].url.split("SaberChat/")[1]).toLowerCase()) {
                 case ".mp3":
                 case ".mp4":
@@ -291,15 +324,17 @@ controller.updateAnnouncement = async function(req, res) {
     // if files were uploaded
     if (req.files) {
         if (req.files.mediaFile) {
-            //Iterate through all new attached media
+            // Iterate through all new attached media
             for (let file of req.files.mediaFile) {
+                // attempt media compression
                 const processedBuffer = await autoCompress(file.originalname, file.buffer);
+                // upload to cloudinary
                 [cloudErr, cloudResult] = await cloudUpload(file.originalname, processedBuffer);
                 if (cloudErr || !cloudResult) {
                     req.flash('error', 'Upload failed');
                     return res.redirect('back');
                 }
-
+                // add files to database record
                 await updatedAnnouncement.mediaFiles.push({
                     filename: cloudResult.public_id,
                     url: cloudResult.secure_url,
@@ -310,6 +345,7 @@ controller.updateAnnouncement = async function(req, res) {
     }
 
     await updatedAnnouncement.save();
+    // get all users except current user
     const users = await User.find({authenticated: true, _id: {$ne: req.user._id}});
     if (!users) {
         req.flash('error', "An Error Occurred");
@@ -319,7 +355,7 @@ controller.updateAnnouncement = async function(req, res) {
     let imageString = "";
     for (let image of announcement.images) {imageString += `<img src="${image}">`;}
     for (let user of users) {
-        //If announcement not already in user's annCount, add it
+        // If announcement not already in user's annCount, add it
         if (objectArrIndex(user.annCount, "announcement", updatedAnnouncement._id) == -1) {
             await user.annCount.push({announcement: updatedAnnouncement, version: "updated"});
             await user.save();
@@ -330,14 +366,14 @@ controller.updateAnnouncement = async function(req, res) {
     return res.redirect(`/announcements`);
 }
 
-// Announcement PUT like ann
+// PUT: Like Announcement
 controller.likeAnnouncement = async function(req, res) {
     const announcement = await Announcement.findById(req.body.announcementId);
     if(!announcement) {return res.json({error: 'Error updating announcement.'});}
 
-    if (removeIfIncluded(announcement.likes, req.user._id)) { //Remove like
+    if (removeIfIncluded(announcement.likes, req.user._id)) { // Remove like
         await announcement.save();
-        return res.json({
+        return res.json({ // send json to frontend
             success: `Removed a like from ${announcement.subject}`,
             likeCount: announcement.likes.length
         });
@@ -345,13 +381,13 @@ controller.likeAnnouncement = async function(req, res) {
     
     await announcement.likes.push(req.user._id);
     await announcement.save();
-    return res.json({
+    return res.json({ // send json to frontend
         success: `Liked ${announcement.subject}`,
         likeCount: announcement.likes.length
     });
 };
 
-// Announcement PUT comment
+// PUT: Announcement comment
 controller.comment = async function(req, res) {
     const announcement = await Announcement.findById(req.body.announcementId)
         .populate({
@@ -366,6 +402,7 @@ controller.comment = async function(req, res) {
     });
     if (!comment) {return res.json({error: 'Error commenting'});}
 
+    // get pre-formatted date for readability
     comment.date = dateFormat(comment.created_at, "h:MM TT | mmm d");
     await comment.save();
 
@@ -374,6 +411,7 @@ controller.comment = async function(req, res) {
 
     let users = [];
     let user;
+    // find mentions in text
     for (let line of await comment.text.split(" ")) {
         if (line[0] == '@') {
             user = await User.findById(await line.split("#")[1].split("_")[0]);
@@ -382,6 +420,7 @@ controller.comment = async function(req, res) {
         }
     }
 
+    // notify users of mention
     let notif;
     for (let user of users) {
         notif = await InboxMessage.create({
@@ -407,13 +446,13 @@ controller.comment = async function(req, res) {
         await user.save();
     }
 
-    return res.json({
+    return res.json({ // send json to frontend
         success: 'Successful comment',
         comments: announcement.comments
     });
 }
 
-// Announcement PUT like comment
+// PUT: Announcement like comment
 controller.likeComment = async function(req, res) {
     const comment = await PostComment.findById(req.body.commentId);
     if(!comment) {return res.json({error: 'Error finding comment'});}
@@ -426,22 +465,22 @@ controller.likeComment = async function(req, res) {
         });
     }
 
-    await comment.likes.push(req.user._id); //Add Like
+    await comment.likes.push(req.user._id); // Add Like
     await comment.save();
     return res.json({
         success: `Liked comment`,
         likeCount: comment.likes.length
     });
 }
-
+// DELETE: delete announcement 
 controller.deleteAnnouncement = async function(req, res) {
     const announcement = await Announcement.findById(req.params.id).populate('sender');
     if (!announcement) {
         req.flash('error', "Unable to access announcement");
         return res.redirect('back');
     }
-
-    if ((await announcement.sender._id.toString()) != (await req.user._id.toString())) {
+    // check if user is announcement author
+    if(!(await announcement.sender.equals(req.user._id))) { 
         req.flash('error', "You can only delete announcements that you have posted");
         return res.redirect('back');
     }
@@ -451,7 +490,7 @@ controller.deleteAnnouncement = async function(req, res) {
     let cloudResult;
     for (let file of announcement.mediaFiles) {
         if (file && file.filename) {
-            //Evaluate deleted files' filetype and delete accordingly
+            // Evaluate deleted files' filetype and delete accordingly
             switch(path.extname(await file.url.split("SaberChat/")[1]).toLowerCase()) {
                 case ".mp3":
                 case ".mp4":
@@ -486,6 +525,7 @@ controller.deleteAnnouncement = async function(req, res) {
         return res.redirect('back');
     }
 
+    // remove announcement from user ann inboxes
     for (let user of users) {
         if (objectArrIndex(user.annCount, "announcement", deletedAnnouncement._id) > -1) {
             await user.annCount.splice(objectArrIndex(user.annCount, "announcement", deletedAnnouncement._id), 1);
@@ -497,4 +537,4 @@ controller.deleteAnnouncement = async function(req, res) {
     return res.redirect('/announcements');
 }
 
-module.exports = controller;
+module.exports = controller; // export controller object
