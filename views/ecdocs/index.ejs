@@ -1,0 +1,88 @@
+<%- include('../partials/headStart') %>
+    <link rel="stylesheet" href="/stylesheets/home/index.css">
+    <link rel="stylesheet" href="/stylesheets/components/background.css">
+    <link rel="stylesheet" href="/stylesheets/other/index.css">
+
+    <script src="/javascript/nav/userForm.js"></script>
+    <script src="/javascript/home/index.js"></script>
+<%- include('../partials/headEnd') %>
+<body class="mode">
+    <!-- insert navbar via ejs-->
+    <%- include('../partials/components/navbar') %>
+
+    <!-- Background image and text -->
+    <section id="background" style="background-image: url('<%=platform.imageUrl%>'); background-size: cover;">
+        <div class="container-fluid text-center">
+            <div class="row">
+                <div class="col-12 background-title">
+                    <h1>Alsion Early College</h1>
+                    <p>Important information and documents about Alsion's Early College Program</p>
+                    <% if (currentUser && currentUser.permission == platform.permissionsProperty[platform.permissionsProperty.length-1]) { %>
+                        <a class="btn btn-primary" href="ecdocs/edit"><i class="fas fa-edit"></i> Edit Documents</a>
+                    <%} %>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <main id="main-container">
+        <div class="container mt-5">
+            <% let block;%>
+            <% for (let i = 0; i < platform.documents.length; i++) { %>
+                <% block = platform.documents[i]%>
+                <% if (i%2 == 0) { %>
+                    <div class="row text-element">
+                        <div class="col-lg-6">
+                            <article class="text-block mode">
+                                <div class="block-header <% if (platform.homepageInfo) {%> green <% } %>">
+                                    <h1><%=block.heading%></h1>
+                                </div>
+                                <div class="block-content mode">
+                                    <% for (let element of block.text) { %>
+                                        <p class="convertible-text"><%=element%></p>
+                                    <% } %>
+                                </div>
+                            </article>
+                        </div>
+                        <div class="col-lg-6 block">
+                            <img class="image-block" src="<%=block.image%>"
+                                alt="Image Does Not Exist">
+                        </div>
+                    </div>
+
+                <% } else { %>
+                    <div class="row text-element">
+                        <div class="col-lg-6 block">
+                            <img class="image-block" src="<%=block.image%>"
+                                alt="Image Does Not Exist">
+                        </div>
+                        <div class="col-lg-6">
+                            <article class="text-block mode">
+                                <div class="block-header <% if (platform.homepageInfo) {%> green <% } %>">
+                                    <h1><%=block.heading%></h1>
+                                </div>
+                                <div class="block-content mode">
+                                    <% for (let element of block.text) { %>
+                                        <p class="convertible-text"><%=element%></p>
+                                    <% } %>
+                                </div>
+                            </article>
+                        </div>
+                    </div>
+                <% } %>
+            <% } %>
+        </div>
+        </div>
+    </main>
+    
+        <script>
+            window.onload = (() => {
+                window.onscroll = (() => {
+                    updateNav();
+                    animateDisplay();
+                });
+            });
+        </script>
+        <script src="/javascript/embed.js"></script>
+</body>
+</html>

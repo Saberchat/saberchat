@@ -42,13 +42,13 @@ package.objectArrIndex = function(arr, property, key, subproperty, caseInsensiti
 package.parsePropertyArray = function(arr, property, lower) { //Build an array with a single property for each item in an array of objects
     let final = [];
     for (let object of arr) { //Iterate through array, and parse out specific property from each object
-        if (lower) {final.push(object[property].toLowerCase());}
+        if (lower) {final.push(object[property].toString().toLowerCase());}
         else {final.push(object[property]);}
     }
     return final;
 }
 
-package. removeIfIncluded = function(arr, element, property) {
+package.removeIfIncluded = function(arr, element, property) {
     if (property) { //If a specific property in the element needs to be evaluated, evaluate element's property
         if (package.objectArrIndex(arr, property, element) > -1) {
             arr.splice(package.objectArrIndex(arr, property, element), 1);

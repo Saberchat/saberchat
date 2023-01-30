@@ -5,16 +5,22 @@ const addImg = function() { //Add image input field
     const img = document.createElement('div');
     img.classList.add('image-group');
     img.id = `imageblock-${i}`;
-    img.innerHTML = `<div class="input-container"><input type="text" id="${i}" class="form-control mode" oninput="createImg(this)" placeholder="Url..." name="images" required></div><button type="button" onclick="deleteImg(this)" style="display: inline;" class="btn btn-danger"><i class="fas fa-minus"></i></button>`;
+    img.innerHTML = `<div class="input-container"><input type="text" id="${i}" class="form-control mode" oninput="createImg(this)" placeholder="Image URL" name="images" required></div><button type="button" onclick="deleteImg(this)" style="display: inline;" class="btn btn-danger"><i class="fas fa-minus"></i></button>`;
     imgContainer.append(img);
     i++;
 }
 
-const addBlock = function() {
+const addBlock = function(optional) {
+    let placeholder = "Image URL";
+    let required = "required";
+    if (optional) {
+        placeholder += " (Optional)";
+        required = "";
+    }
     const img = document.createElement('div');
     img.classList.add('image-group');
     img.id = `imageblock-${i}`;
-    img.innerHTML = `<div class="input-container" id="display-${i}" ><input type="text" placeholder="Heading..." class="form-control mode" name="infoHeading"><br><textarea class="form-control mode" placeholder="Text..." name="infoText" rows="10"></textarea><br><input type="text" class="form-control mode" oninput="createImg(this)" id="${i}" placeholder="Url..." name="infoImages" required></div><button type="button" onclick="deleteImg(this)" style="display: inline;" class="btn btn-danger"><i class="fas fa-minus"></i></button><br>`;
+    img.innerHTML = `<div class="input-container" id="display-${i}" ><input type="text" placeholder="Heading..." class="form-control mode" name="infoHeading"><br><textarea class="form-control mode" placeholder="Text (Insert Links With Anchor Tags)" name="infoText" rows="10"></textarea><br><input type="text" class="form-control mode" oninput="createImg(this)" id="${i}" placeholder="${placeholder}" name="infoImages" ${required}></div><button type="button" onclick="deleteImg(this)" style="display: inline;" class="btn btn-danger"><i class="fas fa-minus"></i></button><br>`;
     imgContainer.append(img);
     i++;
 }

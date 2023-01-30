@@ -42,7 +42,7 @@
                         <input class="form-control mode" type="text" id="customer-username" placeholder="Username, First Name or Last Name" oninput="searchCustomers(this)"><br>
                         <!-- Inline CSS used here as JS modifies it. Can change if needed-->
                         <select <%if(currentUser.tags.includes("Cashier")){%>required<%}%> id="user-select" class="form-control mode" 
-                            onchange="setCustomer(this, <%=platform.dollarPayment%>, <%+currentUser.darkmode%>)" 
+                            onchange="setCustomer(this, <%=platform.dollarPayment%>, <%=currentUser.darkmode%>)" 
                             name="customer_id" hidden>
                             <option class="recipient-group" value="" disabled>Select User</option>
                         </select>
@@ -56,6 +56,14 @@
                                 <input id="search-input" oninput="search()" class="form-control search" type="text"
                                     placeholder="Search For Items..." title="Type in product"/>
                             </div>
+                        </div>
+
+                        <div id="sort-option" class="form-inline" hidden>
+                            <select class="form-control mode" onchange="sortItems(this)">
+                                <% for (let setting of ["Alphabetic Order", "Ordering Frequency", "Upvotes", "Price", "Item Availability", "Date Created"]) {%>
+                                    <option value="<%=setting%>">Sort Items By <%=setting%></option>
+                                <% } %>
+                            </select>
                         </div>
 
                         <div id="item-list">
@@ -97,7 +105,7 @@
                                                     <input name="<%=item.name%>" id="num-<%=item._id%>" type="text" class="form-control mode num-orders" hidden value="0" oninput="changeNumOrders(this, <%=item.availableItems%>, <%=platform.dollarPayment%>, <%=currentUser.darkmode%>)">
                                                     <label class="form-check-label" for="<%= item._id %>">
                                                         <span class="item-name"><%= item.name %></span>
-                                                        <%if(item.displayAvailability){%>(<%= item.availableItems %> orders available)<%}%> -
+                                                        <%if (platform.displayAvailability && item.displayAvailability){%>(<%= item.availableItems %> order<%if(item.availableItems != 1){%>s<%}%> available)<%}%> -
                                                         <%if (platform.dollarPayment) {%>$<%= (item.price).toFixed(2)%><%} else {%> Credits: <%=item.price%><% } %>
                                                     </label>
 

@@ -27,16 +27,16 @@ controller.index = async function(req, res) {
     }
 
     if(!platform || !users || !articles) {
-        await req.flash('error', 'Cannot find articles.');
+        req.flash('error', 'Cannot find articles.');
         return res.redirect('back');
     }
 
-    const userNames = await parsePropertyArray(users, "firstName").join(',').toLowerCase().split(',');
+    const userNames = parsePropertyArray(users, "firstName").join(',').toLowerCase().split(',');
     const articleTexts = await embedLink(req.user, articles, userNames);
 
     return res.render('articles/index', {
         platform, articles: await articles.reverse(), articleTexts,
-        data: platform.features[await objectArrIndex(platform.features, "route", "articles")]
+        data: platform.features[objectArrIndex(platform.features, "route", "articles")]
     });
 };
 
@@ -44,10 +44,10 @@ controller.index = async function(req, res) {
 controller.new = async function(req, res) {
     const platform = await setup(Platform);
     if (!platform) {
-        await req.flash("error", "An error occurred");
+        req.flash("error", "An error occurred");
         return res.redirect("back");
     }
-    return res.render('articles/new', {platform, data: platform.features[await objectArrIndex(platform.features, "route", "articles")]});
+    return res.render('articles/new', {platform, data: platform.features[objectArrIndex(platform.features, "route", "articles")]});
 };
 
 // Article GET show
@@ -60,18 +60,18 @@ controller.show = async function(req, res) {
             populate: {path: "sender"}
         });
     if(!platform || !article) {
-        await req.flash('error', 'Could not find article'); return res.redirect('back');
+        req.flash('error', 'Could not find article'); return res.redirect('back');
     } else if (!article.verified && !(await platform.permissionsProperty.slice(platform.permissionsProperty.length-3).includes(req.user.permission))) {
-        await req.flash('error', 'You cannot view that article');
+        req.flash('error', 'You cannot view that article');
         return res.redirect('back');
     }
 
     let fileExtensions = new Map(); //Track which file format each attachment is in
     for (let media of article.mediaFiles) {
-        await fileExtensions.set(media.url, await path.extname(await media.url.split("SaberChat/")[1]));
+        fileExtensions.set(media.url, path.extname(await media.url.split("SaberChat/")[1]));
     }
     const convertedText = await convertToLink(article.text); //Parse and add hrefs to all links in text
-    return res.render('articles/show', {platform, article, convertedText, fileExtensions, data: platform.features[await objectArrIndex(platform.features, "route", "articles")]});
+    return res.render('articles/show', {platform, article, convertedText, fileExtensions, data: platform.features[objectArrIndex(platform.features, "route", "articles")]});
 };
 
 // Article GET edit form
@@ -79,19 +79,19 @@ controller.updateForm = async function(req, res) {
     const platform = await setup(Platform);
     const article = await ArticleLink.findById(req.params.id);
     if(!platform || !article) {
-        await req.flash('error', 'Could not find article');
+        req.flash('error', 'Could not find article');
         return res.redirect('back');
     }
     if(!(await article.sender._id.equals(req.user._id))) {
-        await req.flash('error', 'You do not have permission to do that.');
+        req.flash('error', 'You do not have permission to do that.');
         return res.redirect('back');
     }
 
     let fileExtensions = new Map(); //Track which file format each attachment is in
     for (let media of article.mediaFiles) {
-        await fileExtensions.set(media.url, await path.extname(await media.url.split("SaberChat/")[1]));
+        fileExtensions.set(media.url, path.extname(await media.url.split("SaberChat/")[1]));
     }
-    return res.render('articles/edit', {platform, article, fileExtensions, data: platform.features[await objectArrIndex(platform.features, "route", "articles")]});
+    return res.render('articles/edit', {platform, article, fileExtensions, data: platform.features[objectArrIndex(platform.features, "route", "articles")]});
 };
 
 // Article POST create
@@ -104,7 +104,7 @@ controller.create = async function(req, res) {
         verified: !platform.postVerifiable //Article does not need to be verified if platform does not support verifying articles
     });
     if (!platform || !article) {
-        await req.flash('error', 'Unable to create article');
+        req.flash('error', 'Unable to create article');
         return res.redirect('back');
     }
     for (let attr of ["images", "links"]) {if (req.body[attr]) {article[attr] = req.body[attr];}}//Add images and links
@@ -118,7 +118,7 @@ controller.create = async function(req, res) {
                 const processedBuffer = await autoCompress(file.originalname, file.buffer);
                 [cloudErr, cloudResult] = await cloudUpload(file.originalname, processedBuffer);
                 if (cloudErr || !cloudResult) {
-                    await req.flash('error', 'Upload failed');
+                    req.flash('error', 'Upload failed');
                     return res.redirect('back');
                 }
 
@@ -131,13 +131,13 @@ controller.create = async function(req, res) {
         }
     }
 
-    article.date = await dateFormat(article.created_at, "h:MM TT | mmm d");
+    article.date = dateFormat(article.created_at, "h:MM TT | mmm d");
     await article.save();
 
     if (platform.postVerifiable) {
-        await req.flash('success', `Article Posted! A platform ${await platform.permissionsDisplay[platform.permissionsDisplay.length-1].toLowerCase()} will verify your post soon.`);
+        req.flash('success', `Article Posted! A platform ${await platform.permissionsDisplay[platform.permissionsDisplay.length-1].toLowerCase()} will verify your post soon.`);
     } else {
-        await req.flash('success', `Article Posted!`);
+        req.flash('success', `Article Posted!`);
     }
     return res.redirect(`/articles`);
 };
@@ -145,11 +145,11 @@ controller.create = async function(req, res) {
 controller.verify = async function(req, res) {
     const article = await ArticleLink.findByIdAndUpdate(req.params.id, {verified: true});
     if (!article) {
-        await req.flash('error', "Unable to access article");
+        req.flash('error', "Unable to access article");
         return res.redirect('back');
     }
 
-    await req.flash("success", "Verified Article!");
+    req.flash("success", "Verified Article!");
     return res.redirect("/articles");
 }
 
@@ -157,12 +157,12 @@ controller.updateArticle = async function(req, res) {
     const platform = await setup(Platform);
     const article = await ArticleLink.findById(req.params.id).populate('sender');
     if (!platform || !article) {
-        await req.flash('error', "Unable to access article");
+        req.flash('error', "Unable to access article");
         return res.redirect('back');
     }
 
     if ((await article.sender._id.toString()) != (await req.user._id.toString())) {
-        await req.flash('error', "You can only update articles which you have sent");
+        req.flash('error', "You can only update articles which you have sent");
         return res.redirect('back');
     }
 
@@ -172,7 +172,7 @@ controller.updateArticle = async function(req, res) {
         verified: !platform.postVerifiable //Article does not need to be verified if platform does not support verifying articles
     });
     if (!updatedArticle) {
-        await req.flash('error', "Unable to update article");
+        req.flash('error', "Unable to update article");
         return res.redirect('back');
     }
     for (let attr of ["images", "links"]) {if (req.body[attr]) {updatedArticle[attr] = req.body[attr];}}
@@ -183,7 +183,7 @@ controller.updateArticle = async function(req, res) {
     for (let i = updatedArticle.mediaFiles.length-1; i >= 0; i--) {
         if (req.body[`deleteUpload-${updatedArticle.mediaFiles[i].url}`] && updatedArticle.mediaFiles[i] && updatedArticle.mediaFiles[i].filename) {
             //Evaluate filetype to decide on file deletion strategy
-            switch(await path.extname(await updatedArticle.mediaFiles[i].url.split("SaberChat/")[1]).toLowerCase()) {
+            switch(path.extname(await updatedArticle.mediaFiles[i].url.split("SaberChat/")[1]).toLowerCase()) {
                 case ".mp3":
                 case ".mp4":
                 case ".m4a":
@@ -198,7 +198,7 @@ controller.updateArticle = async function(req, res) {
             }
 
             if (cloudErr || !cloudResult || cloudResult.result !== 'ok') { // Check for Failure
-                await req.flash('error', 'Error deleting uploaded image');
+                req.flash('error', 'Error deleting uploaded image');
                 return res.redirect('back');
             }
             await updatedArticle.mediaFiles.splice(i, 1);
@@ -213,7 +213,7 @@ controller.updateArticle = async function(req, res) {
                 const processedBuffer = await autoCompress(file.originalname, file.buffer);
                 [cloudErr, cloudResult] = await cloudUpload(file.originalname, processedBuffer);
                 if (cloudErr || !cloudResult) {
-                    await req.flash('error', 'Upload failed');
+                    req.flash('error', 'Upload failed');
                     return res.redirect('back');
                 }
 
@@ -227,7 +227,7 @@ controller.updateArticle = async function(req, res) {
     }
     
     await updatedArticle.save();
-    await req.flash('success', 'Article Updated!');
+    req.flash('success', 'Article Updated!');
     return res.redirect(`/articles`);
 }
 
@@ -236,7 +236,7 @@ controller.likeArticle = async function(req, res) {
     const article = await ArticleLink.findById(req.body.articleId);
     if(!article) {return res.json({error: 'Error updating article.'});}
 
-    if (await removeIfIncluded(article.likes, req.user._id)) { //Remove like
+    if (removeIfIncluded(article.likes, req.user._id)) { //Remove like
         await article.save();
         return res.json({
             success: `Removed a like from ${article.subject}`,
@@ -271,7 +271,7 @@ controller.comment = async function(req, res) {
     });
     if (!comment) {return res.json({error: 'Error commenting'});}
 
-    comment.date = await dateFormat(comment.created_at, "h:MM TT | mmm d");
+    comment.date = dateFormat(comment.created_at, "h:MM TT | mmm d");
     await comment.save();
 
     await article.comments.push(comment);
@@ -299,7 +299,7 @@ controller.likeComment = async function(req, res) {
     const comment = await PostComment.findById(req.body.commentId);
     if(!comment) {return res.json({error: 'Error finding comment'});}
 
-    if (await removeIfIncluded(comment.likes, req.user._id)) { //Remove Like
+    if (removeIfIncluded(comment.likes, req.user._id)) { //Remove Like
         await comment.save();
         return res.json({
             success: `Removed a like`,
@@ -318,12 +318,12 @@ controller.likeComment = async function(req, res) {
 controller.deleteArticle = async function(req, res) {
     const article = await ArticleLink.findById(req.params.id).populate('sender');
     if (!article) {
-        await req.flash('error', "Unable to access article");
+        req.flash('error', "Unable to access article");
         return res.redirect('back');
     }
 
     if ((await article.sender._id.toString()) != await (req.user._id.toString())) { //Doublecheck that deleter is articleer
-        await req.flash('error', "You can only delete articles that you have posted");
+        req.flash('error', "You can only delete articles that you have posted");
         return res.redirect('back');
     }
 
@@ -333,7 +333,7 @@ controller.deleteArticle = async function(req, res) {
     for (let file of article.mediaFiles) {
         if (file && file.filename) {
             //Evaluate deleted files' filetype and delete accordingly
-            switch(await path.extname(await file.url.split("SaberChat/")[1]).toLowerCase()) {
+            switch(path.extname(await file.url.split("SaberChat/")[1]).toLowerCase()) {
                 case ".mp3":
                 case ".mp4":
                 case ".m4a":
@@ -348,7 +348,7 @@ controller.deleteArticle = async function(req, res) {
             }
 
              if (cloudErr || !cloudResult || cloudResult.result !== 'ok') { // Check For Failure
-                await req.flash('error', 'Error deleting uploaded image');
+                req.flash('error', 'Error deleting uploaded image');
                 return res.redirect('back');
             }
         }
@@ -356,22 +356,22 @@ controller.deleteArticle = async function(req, res) {
 
     const deletedArticle = await ArticleLink.findByIdAndDelete(article._id);
     if (!deletedArticle) {
-        await req.flash('error', "Unable to delete article");
+        req.flash('error', "Unable to delete article");
         return res.redirect('back');
     }
 
-    await req.flash('success', 'Article Deleted!');
+    req.flash('success', 'Article Deleted!');
     return res.redirect('/articles/');
 }
 
 controller.specificInfo = async function(req, res) {
     const platform = await setup(Platform);
-    return res.render('other/specific-info', {platform, description: platform.features[await objectArrIndex(platform.features, "route", "articles/specific-info")].description});
+    return res.render('other/specific-info', {platform, description: platform.features[objectArrIndex(platform.features, "route", "articles/specific-info")].description});
 }
 
 controller.donate = async function(req, res) {
     const platform = await setup(Platform);
-    return res.render('other/donate', {platform, description: platform.features[await objectArrIndex(platform.features, "route", "articles/donate")].description, objectArrIndex});
+    return res.render('other/donate', {platform, description: platform.features[objectArrIndex(platform.features, "route", "articles/donate")].description, objectArrIndex});
 }
 
 controller.advice = async function(req, res) {
@@ -389,10 +389,10 @@ controller.advice = async function(req, res) {
                     const processedBuffer = await autoCompress(file.originalname, file.buffer);
                     [cloudErr, cloudResult] = await cloudUpload(file.originalname, processedBuffer);
                     if (cloudErr || !cloudResult) {
-                        await req.flash('error', 'Upload failed');
+                        req.flash('error', 'Upload failed');
                         return res.redirect('back');
                     }
-                    if (await [".png", ".jpg"].includes(await path.extname(await cloudResult.url.split("SaberChat/")[1]))) {
+                    if (await [".png", ".jpg"].includes(path.extname(await cloudResult.url.split("SaberChat/")[1]))) {
                         await images.push(cloudResult.url);
                     }
                     else {
@@ -405,10 +405,10 @@ controller.advice = async function(req, res) {
         for (let file of images) {text += `<br><img src="${file}" style="width: 50%; height: 50%;>`;}
         for (let file of pdfs) {text += `<iframe src="${file.url}" height="300" width="250"></iframe><a href="${file.url}" target="_blank"><h5>Open ${file.originalname} New Tab?</h5></a>`;}
         await sendGridEmail(platform.officialEmail, `New Advice Donation From ${req.user.firstName} ${req.user.lastName} - ${req.body.subject}`, text, false);
-        await req.flash("success", "Thank you for sending us your advice!");
+        req.flash("success", "Thank you for sending us your advice!");
         return res.redirect("/articles/donate");
     }
-    await req.flash("error", `${platform.name} Saberchat does not have an official email set up yet`);
+    req.flash("error", `${platform.name} Saberchat does not have an official email set up yet`);
     return res.redirect("back");
 }
 

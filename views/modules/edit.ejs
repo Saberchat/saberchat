@@ -38,7 +38,7 @@
                   <div class="image-group" id="slideblock-<%=i%>">
                       <div class="input-container">
                           <input type="text" id="<%=i%>" class="form-control"
-                                 oninput="createSlide(this)" placeholder="Url..."
+                                 oninput="createSlide(this)" placeholder="Image URL"
                                  name="links" required
                                  value="<%= module.links[i] %>">
                       </div>
@@ -89,7 +89,7 @@
                   <div class="image-group">
                       <div class="input-container" id="imageblock-<%=i%>">
                           <input type="text" id="<%=i%>" class="form-control"
-                                 oninput="createImg(this)" placeholder="Url..."
+                                 oninput="createImg(this)" placeholder="Image URL"
                                  name="images" required
                                  value="<%= module.images[i] %>">
                           <img id="image-<%=i%>"

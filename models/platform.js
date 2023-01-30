@@ -1,7 +1,7 @@
 const mongoose = require("mongoose");
 
 //Platform schema holds all data for individual platform's settings
-var platformSchema = new mongoose.Schema({
+module.exports = mongoose.model("Platform", new mongoose.Schema({
     name: String,
     description: {type: String, default: ''},
     postText: String,
@@ -15,6 +15,7 @@ var platformSchema = new mongoose.Schema({
         url: String,
         originalName: String,
     },
+    displayAvailability: {type: Boolean, default: true}, //Display item availability
     homepageInfo: {type: Boolean, default: true}, //Display information on homepage
     descriptionDisplay: {type: Boolean, default: false}, //Display description or platform name first on homepage
     contactPhotoDisplay: {type: Boolean, default: true}, //Display photos of platform administrators on contact page
@@ -37,6 +38,7 @@ var platformSchema = new mongoose.Schema({
     statusesSingular: [{type: String}],
     statusesPlural: [{type: String}],
     studentStatuses: [{type: String}],
+    announcementPerms: [{type: String}],
     formerStudentStatus: String,
     teacherStatus: String,
     tags: [{type: String}],
@@ -45,12 +47,12 @@ var platformSchema = new mongoose.Schema({
     features: [{route: String, name: String, description: {type: String, default: ''}, icon: String}],
     displayImages: [{type: String}],
     info: [{heading: String, text: [{type: String}], image: String}],
+    documents: [{heading: String, text: [{type: String}], image: String}],
     services: [{type: String}],
     community: [{type: String}],
     contact: {
         heading: String,
         description: [{type: String}]
     }
-}, {timestamps: {createdAt: 'created_at'}});
-
-module.exports = mongoose.model("Platform", platformSchema);
+}, {timestamps: {createdAt: 'created_at'}
+}));

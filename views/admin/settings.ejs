@@ -100,6 +100,11 @@
                                 <br>
                             <% } %>
                         </div>
+
+                        <div class="form-group">
+                            <label for="item-display-input">Display Item Availability</label>
+                            <input id="item-display-input" class="mode" type="checkbox" name="displayAvailability" <% if (platform.displayAvailability) { %> checked <% } %>>
+                        </div>
                         
                         <div class="form-group">
                             <label for="display-input">Navbar Dark Display</label>
@@ -165,7 +170,7 @@
                         <% } %>
                         <h4>Feature Settings</h4>
                         <div class="form-group">
-                            <p>Visit <a href="https://fontawesome.com/v5.15/icons?d=gallery">this link</a> to view usable icons</p>
+                            <p>Visit <a target="_blank" href="https://fontawesome.com/v5.15/icons?d=gallery">this link</a> to view usable icons</p>
                             <% for (let feature of platform.features) { %>
                                 <label for="<%=feature.name%>"><i id="display-icon-<%=feature.name%>" class="fas fa-<%=feature.icon%>"></i> <span id="feature-name-<%=feature.name%>"><%=feature.name%></span></label>
                                 <input oninput="changeFeatureName(this)"  type="text" id="<%=feature.name%>" class="form-control mode" placeholder="Enter feature name" value="<%=feature.name%>" name="feature"><br>
@@ -199,7 +204,7 @@
                                 <div class="image-group">
                                     <div class="input-container" id="display-<%= platform.displayImages.length - (i + 1) %>">
                                         <input type="text" class="form-control mode"
-                                                oninput="createImage(this, 'displayimage-<%= platform.displayImages.length - (i + 1) %>')" placeholder="Url..."
+                                                oninput="createImage(this, 'displayimage-<%= platform.displayImages.length - (i + 1) %>')" placeholder="Image URL"
                                                 name="displayImages[<%= platform.displayImages.length - (i + 1) %>]" required
                                                 value="<%= platform.displayImages[i] %>">
                                         <img id="displayimage-<%= platform.displayImages.length - (i + 1) %>"
@@ -218,14 +223,16 @@
                                             <input type="text" placeholder="Heading..." class="form-control mode" name="infoHeading" value="<%=platform.info[i].heading%>"><br>
                                             <textarea class="form-control mode" placeholder="Text..." name="infoText" rows="10"><% for (let para of platform.info[i].text) { %><%=para%>&#013;&#010;<% } %></textarea><br>
                                             <input type="text" id="<%=i%>" class="form-control mode"
-                                                   oninput="createImg(this)" placeholder="Url..."
+                                                   oninput="createImg(this)" placeholder="Image URL"
                                                    name="infoImages[<%=i%>]" required
                                                    value="<%= platform.info[i].image %>">
                                             <img id="image-<%= platform.info.length - (i + 1) %>"
                                                  style="width: 50%; height: 50%; margin-top: 10px; border-radius: 15px;"
                                                  src="<%= platform.info[i].image %>" alt="Image Does Not Exist"/>
                                         </div>
-                                    </div><br>
+                                        <button type="button" onclick="deleteImg(this)" style="display: inline;" class="btn btn-danger"><i class="fas fa-minus"></i></button>
+                                        <br>
+                                    </div>
                                 <% } %>
                             </div>
                             <div id="image-header">

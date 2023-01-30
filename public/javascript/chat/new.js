@@ -8,7 +8,7 @@ const updateDisplayNewRoom = function() { //Update the list of new users, if roo
     }
 }
 
-const searchFunctionNewRoom = function() { //Search for users in new room
+const searchFunctionNewRoom = function() { //Search filter for users in new room
     let input = document.getElementById("search-input");
     let filter = input.value.toUpperCase();
     let list = document.getElementById("user-list");

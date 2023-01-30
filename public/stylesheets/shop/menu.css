@@ -21,7 +21,7 @@ input#search-input {
 }
 
 #search-input:focus, #search-input:active {
-    border-bottom: 3px solid rgb(255, 177, 33);
+    border-bottom: 3px;
 }
 
 .profile-image {
@@ -88,4 +88,9 @@ strong {
     bottom: 0;
     left: 0;
     z-index: 99;
+}
+
+#sort-option {
+    margin-top: 30px;
+    width: 200%;
 }

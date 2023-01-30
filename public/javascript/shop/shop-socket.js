@@ -1,16 +1,14 @@
-const order = function(form, customer, dollarPayment) {
+const order = function(form, customer, dollarPayment) { //Send real-time order to server
     console.log('connected');
     let socket = io();
-    let items = document.getElementById('item-list');
+    let items = document.getElementById('item-list'); //Access HTML item list
 
-    $(form).submit(function(e) {
-        e.preventDefault();
-        // alert(document.getElementById("user-select").value);
-        console.log('submitted');
+    $(form).submit(function(e) { //Callback for form submission
         let payingInPerson;
         if (dollarPayment == "true") {payingInPerson = document.getElementById('payingInPerson').checked;   
         } else {payingInPerson = false;}
 
+        //Order information appendages
         let instructions = $('#descInput').val();
         let address = $('#addressInput').val();
         let balance;
@@ -31,16 +29,16 @@ const order = function(form, customer, dollarPayment) {
         let itemList = [];
         let itemCount = [];
 
+        //Iterate through all menu items and scan if they are checked - if so, add to order list
+        //"this" = current accessed element
+        //"index" = int index of current element relative to parent list
         $('#item-list > .form-check > .style-div').each(function(index) {
-
             if ($(this).find('input').is(':checked')) {
                 let currentItemName = $(this).find('input').attr('id');
                 itemList.push(currentItemName);
-                let currentItemCount = $(this).find('select').val();
-                itemCount.push(currentItemCount);
+                let currentItemCount = $(this).find('input')[1];
+                itemCount.push(currentItemCount.value);
             }
-            // this = current accessed element
-            // index = int index of current element relative to parent list
         });
 
         if (itemList.length > 0) { //If some items have been ordered, send socket request

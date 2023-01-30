@@ -70,7 +70,7 @@
                         </li>
 
                     <% } else { %>
-                        <% if (platform.publicFeatures.length > 2) { %>
+                        <% if (platform.publicFeatures.length > 3) { %>
                             <% for (let feature of platform.publicFeatures.slice(0, 3)) { %>
                                 <li class="nav-item">
                                     <% if (feature.route.includes("http")) {%>
@@ -246,9 +246,9 @@
                    placeholder="enter password">
         </div>
         <button data-toggle="modal" data-target="#modal-pwd" id="forgot-button" type="button"
-                class="btn btn-warning float-left">Forgot Password?
+                class="btn btn-warning float-right">Forgot Password?
         </button>
-        <button type="submit" formaction="/login" class="btn btn-success float-right">Login</button>
+        <button type="submit" formaction="/login" class="btn btn-success float-left">Login</button>
     </form>
 
     <!-- onsubmit="disableBtn()" -->

@@ -10,7 +10,7 @@ const router = express.Router(); //Router
 
 //ROUTES
 router.route('/')
-    .get(wrapAsync(middleware.isLoggedIn), wrapAsync(middleware.accessToFeature), wrapAsync(articles.index)) //Show all articles
+    .get(wrapAsync(middleware.accessToFeature), wrapAsync(articles.index)) //Show all articles
     .post(wrapAsync(middleware.isLoggedIn), wrapAsync(middleware.accessToFeature), multipleUpload, wrapAsync(articles.create)); //Create article
 
 router.get('/new', wrapAsync(middleware.isLoggedIn), wrapAsync(middleware.accessToFeature), wrapAsync(articles.new)); //Form to create new article
@@ -24,7 +24,7 @@ router.get('/verify/:id', wrapAsync(middleware.isLoggedIn), wrapAsync(middleware
 router.post('/advice', wrapAsync(middleware.isLoggedIn), wrapAsync(middleware.accessToFeature), multipleUpload, wrapAsync(articles.advice)); //Send advice through donation forum
 
 router.route('/:id')
-    .get(wrapAsync(middleware.isLoggedIn), wrapAsync(middleware.accessToFeature), wrapAsync(articles.show)) //Show specific article
+    .get(wrapAsync(middleware.accessToFeature), wrapAsync(articles.show)) //Show specific article
     .put(wrapAsync(middleware.isLoggedIn), wrapAsync(middleware.accessToFeature), multipleUpload, wrapAsync(articles.updateArticle)) //Update specific article
     .delete(wrapAsync(middleware.isLoggedIn), wrapAsync(middleware.accessToFeature), wrapAsync(articles.deleteArticle)); //Delete specific article
 

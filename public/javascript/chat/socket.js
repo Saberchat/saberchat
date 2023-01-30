@@ -1,3 +1,5 @@
+// handles server-user interaction and chatting with socket
+
 // init variables
 let autoScroll = true;
 let lastScrollTop;
@@ -6,7 +8,7 @@ const scrollBtn = document.getElementsByClassName('btn-scrolldown')[0];
 
 // function for auto scrolling to new messages
 const scrollToElement = function(innerElement) {
-    var topPos = innerElement.offsetTop;
+    let topPos = innerElement.offsetTop;
     messageDisplay.scrollTop = topPos - 10;
 }
 
@@ -49,7 +51,7 @@ messageDisplay.addEventListener('scroll', () => {
 //create function that sets up the socket chat
 const chatInit = function(username, userId, messageForm, input, chatDisplay, room, userImage) {
 
-    var socket = io();
+    const socket = io();
 
     $(messageForm).submit(e => {
         e.preventDefault(); // prevents page reloading
