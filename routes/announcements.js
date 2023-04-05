@@ -7,27 +7,43 @@ const {multipleUpload} = require('../middleware/multer');
 const {validateAnn} = require('../middleware/validation');
 const wrapAsync = require('../utils/wrapAsync');
 const announcements = require('../controllers/announcements'); // Controller
-const router = express.Router(); //Router
+const router = express.Router(); // Router
 
-//ROUTES
+// ROUTES
+
+// Root
 router.route('/')
-    .get(wrapAsync(middleware.isLoggedIn), wrapAsync(announcements.index)) //Show all announcements
-    .post(wrapAsync(middleware.isLoggedIn), wrapAsync(middleware.announcementPermission), multipleUpload, validateAnn, wrapAsync(announcements.create)); //Create announcement
+    // show all announcements
+    .get(wrapAsync(middleware.isLoggedIn), wrapAsync(announcements.index))
+    // Create announcement
+    .post(wrapAsync(middleware.isLoggedIn), wrapAsync(middleware.announcementPermission), multipleUpload, validateAnn, wrapAsync(announcements.create)); 
 
-router.get('/new', wrapAsync(middleware.isLoggedIn), wrapAsync(middleware.announcementPermission), wrapAsync(announcements.new)); //Form to create new announcement
-router.get('/mark-all', wrapAsync(middleware.isLoggedIn), wrapAsync(announcements.markAll)); //Mark all announcements as read
-router.get('/mark/:id', wrapAsync(middleware.isLoggedIn), wrapAsync(announcements.markOne)); //Mark specific announcement as read
-router.get('/verify/:id', wrapAsync(middleware.isLoggedIn), wrapAsync(middleware.isMod), wrapAsync(announcements.verify)); //Verify Announcement
+// Form to create new announcement
+router.get('/new', wrapAsync(middleware.isLoggedIn), wrapAsync(middleware.announcementPermission), wrapAsync(announcements.new));
+// Mark all announcements as read
+router.get('/mark-all', wrapAsync(middleware.isLoggedIn), wrapAsync(announcements.markAll)); 
+// Mark specific announcement as read
+router.get('/mark/:id', wrapAsync(middleware.isLoggedIn), wrapAsync(announcements.markOne));
+// Verify Announcement
+router.get('/verify/:id', wrapAsync(middleware.isLoggedIn), wrapAsync(middleware.isMod), wrapAsync(announcements.verify));
 
-router.put('/like', wrapAsync(middleware.isLoggedIn), wrapAsync(announcements.likeAnnouncement)); //Like announcement
-router.put('/like-comment', wrapAsync(middleware.isLoggedIn), wrapAsync(announcements.likeComment)); //Comment on announcement
-router.put('/comment', wrapAsync(middleware.isLoggedIn), wrapAsync(announcements.comment)); //Like a comment on announcement
+// Like announcement
+router.put('/like', wrapAsync(middleware.isLoggedIn), wrapAsync(announcements.likeAnnouncement));
+// Comment on announcement
+router.put('/like-comment', wrapAsync(middleware.isLoggedIn), wrapAsync(announcements.likeComment));
+// Like a comment on announcement
+router.put('/comment', wrapAsync(middleware.isLoggedIn), wrapAsync(announcements.comment));
 
+// :ID
 router.route('/:id')
-    .get(wrapAsync(middleware.isLoggedIn), wrapAsync(announcements.show)) //Show specific announcement
-    .put(wrapAsync(middleware.isLoggedIn), wrapAsync(middleware.announcementPermission), multipleUpload, wrapAsync(announcements.updateAnnouncement)) //Update specific announcement
-    .delete(wrapAsync(middleware.isLoggedIn), wrapAsync(middleware.announcementPermission), wrapAsync(announcements.deleteAnnouncement)); //Delete specific announcement
+    // Show specific announcement
+    .get(wrapAsync(middleware.isLoggedIn), wrapAsync(announcements.show))
+    // Update specific announcement
+    .put(wrapAsync(middleware.isLoggedIn), wrapAsync(middleware.announcementPermission), multipleUpload, wrapAsync(announcements.updateAnnouncement))
+    // Delete specific announcement
+    .delete(wrapAsync(middleware.isLoggedIn), wrapAsync(middleware.announcementPermission), wrapAsync(announcements.deleteAnnouncement));
 
-router.get('/:id/edit', wrapAsync(middleware.isLoggedIn), wrapAsync(middleware.announcementPermission), wrapAsync(announcements.updateForm)); //Form to edit specific announcement
+// Form to edit specific announcement
+router.get('/:id/edit', wrapAsync(middleware.isLoggedIn), wrapAsync(middleware.announcementPermission), wrapAsync(announcements.updateForm)); 
 
 module.exports = router;

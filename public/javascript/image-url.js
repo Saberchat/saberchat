@@ -1,7 +1,7 @@
 const imgContainer = document.getElementById('image-block');
 let i = document.getElementsByClassName("image-group").length;
 
-const addImg = function() { //Add image input field
+const addImg = function() { // Add image input field
     const img = document.createElement('div');
     img.classList.add('image-group');
     img.id = `imageblock-${i}`;
@@ -25,19 +25,20 @@ const addBlock = function(optional) {
     i++;
 }
 
-const createImg = function(val) { //Creates an image based on value of image input
-    if ($(`#imageblock-${val.id}`).find('img').length == 0) { //If an image has not been created yet, create one
+const createImg = function(val) { // Creates an image based on value of image input
+    // If an image has not been created yet, create one
+    if ($(`#imageblock-${val.id}`).find('img').length == 0) { 
         const imageDisplay = document.createElement('img');
         imageDisplay.id = `image-${val.id}`;
 
-        if (val.value.split(' ').join('') != '') { //If some input has been entered, build the image
+        if (val.value.split(' ').join('') != '') { // If some input has been entered, build the image
             imageDisplay.src = val.value;
-            imageDisplay.alt = "Image Does Not Exist"; //Display if image does not exist
+            imageDisplay.alt = "Image Does Not Exist"; // Display if image does not exist
             imageDisplay.style = "width: 40%; height: 40%; margin-top: 10px; border-radius: 15px;";
             document.getElementById(`imageblock-${val.id}`).appendChild(imageDisplay);
         }
 
-    } else { //If an image has been created, update it
+    } else { // If an image has been created, update it
         if (val.value.split(' ').join('') != '') {
             $(`#imageblock-${val.id}`).find('img')[0].src = val.value;
             $(`#${$(`#imageblock-${val.id}`).find('img')[0].id}`).show();
@@ -48,7 +49,7 @@ const createImg = function(val) { //Creates an image based on value of image inp
     }
 }
 
-const deleteImg = function(btn) { //Remove input field and corresponding image
+const deleteImg = function(btn) { // Remove input field and corresponding image
     const parent = btn.parentNode;
     parent.remove();
     i--;
