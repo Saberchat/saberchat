@@ -501,6 +501,17 @@ controller.unblock = async function(req, res) {
 	return res.json({error: "You have not unblocked this user"});
 }
 
+controller.deactivate = async function(req, res) {
+	const user = await User.findById(req.params.id);
+	if (!user) {return res.json({error: "Error finding user"});}
+
+    user.authenticated = false
+
+    await user.save()
+
+    return res.json({success: "Succesfully deactivated user"});
+}
+
 //DELETE ACCOUNT. CURRENTLY DISABLED ROUTE
 controller.deleteAccount = async function(req, res)  {
 	req.user.archived = true;

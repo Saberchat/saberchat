@@ -96,3 +96,15 @@ const unblock = function(button) { //Unblock blocked user
         }
     });
 }
+
+const deactivate = function(button) { //Unblock blocked user
+    const userId = button.id.split("-")[2];
+    const url = `/profiles/deactivate/${userId}?_method=put`;
+    const data = {};
+
+    sendPostReq(url, data, data => {
+        if (data.success) {
+            $(`#modal-${userId}-deactivate`).modal('hide');
+        }
+    });
+}

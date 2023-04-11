@@ -25,6 +25,7 @@ router.put('/follow/:id', wrapAsync(profiles.follow)); //Follow user
 router.put('/unfollow/:id', wrapAsync(profiles.unfollow)); //Unfollow user
 router.put('/remove/:id', wrapAsync(profiles.remove)); //Remove/block user
 router.put('/unblock/:id', wrapAsync(profiles.unblock)); //Unblock user
+router.put('/deactivate/:id', wrapAsync(profiles.deactivate)); //Deactivate user
 
 // router.delete('/delete-account', wrapAsync(middleware.isLoggedIn), wrapAsync(profiles.deleteAccount));
 

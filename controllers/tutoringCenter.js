@@ -749,6 +749,10 @@ controller.unblock = async function(req, res) { //Unblock a previously blocked u
     return res.json({success: "Succesfully unblocked user", blocked: blockedId, course});
 }
 
+controller.deactiavte = async function(req, res) { // Set authentication of a user to false
+    console.log(req)
+}
+
 //-----------TUTOR ROUTES -----------//
 
 //Mark tutoring lesson payment
