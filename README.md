@@ -11,7 +11,7 @@ The above links been temporarily disbaneded as we are no longer servicing the ab
 
 View a detailed overview of the platform, codebase and tech used, as well as an in-depth tutorial of the MEAN Stack on our [site documentation](https://docs.google.com/document/d/1EYrg0uwGUwl5xgEbyJXWbSMgdxHzTvRN1VV6FWYGFqE/edit?usp=sharing)!
 
-**Version History**: [Linked here]([url](https://drive.google.com/file/d/1d9iEajFV2JQCogyUn6pm1u9-s3xXZ1Lo/view?usp=sharing))
+**Version History**: [Linked here](https://drive.google.com/file/d/1d9iEajFV2JQCogyUn6pm1u9-s3xXZ1Lo/view?usp=sharing)
 
 ### Contents
 1) App: Website's main file, implements all routes and libraries
